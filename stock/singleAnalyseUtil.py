@@ -84,7 +84,7 @@ import sys
 def get_code_search_loop(num_input,code,timed=5,dayl='10'):
     # if not status:
     #
-    if code == num_input:
+    if code == num_input://///////////////
         get_single_tick_ave(code)
     else:
         get_single_ave_compare(num_input,dayl)
