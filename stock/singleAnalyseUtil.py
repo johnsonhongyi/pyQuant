@@ -50,7 +50,7 @@ def get_now_time():
     now=time.time()
     now=time.localtime(now)
     # d_time=time.strftime("%Y-%m-%d %H:%M:%S",now)
-    d_time=time.strftime("%H:%M:%S",now)
+    d_time=time.strftime("%H:%M",now)
     return d_time
 
 def get_hot_count(changepercent):

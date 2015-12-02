@@ -42,8 +42,12 @@ for code in top['code']:
             gold[code]=d_hist
             goldl.append(code)
             print ("code:%s ep:%s ave:%s"%(code,ep,total_ave))
-
-print "goldl:%s",goldl
+for x in range(len(goldl)):
+    print "gold:",
+    if x % 4 == 0
+        print "%s"%goldl[x]
+    else:
+        print "%s"%gold[x],
 # print gold
 # print top_count
 
