@@ -68,7 +68,7 @@ def getdata_ema_trend(stock,datelenth,type=None):
     #     print ("len:",datalen)
     # df = ts.get_tick_data(stock)
     start_date=get_ts_start_date(stock,datelenth,type)
-    print ("\nstart: %s  stock: %s" %(start_date,stock))
+    print ("\nstart: %s  stock: %s" %(start_date[-5:],stock))
     if type !=None:
         df = ts.get_hist_data(stock,start=start_date,ktype=type)
     else:
@@ -87,6 +87,12 @@ def getdata_ema_trend(stock,datelenth,type=None):
     # print ("open:%s  lastc:%s nowp:%s"%(real_o,real_perc,real_c))
     return df
 
+def less_average(score):
+  num = len(score)
+  sum_score = sum(score)
+  ave_num = sum_score/num
+  # less_ave = [i for i in score if i<ave_num]
+  return ave_num
 
 if __name__ == '__main__':
     dayl='10'
