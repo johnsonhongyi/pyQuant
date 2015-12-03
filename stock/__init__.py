@@ -5,4 +5,5 @@ __author__ = 'Johnson'
 for trading data
 """
 # from pyQuant.stock.emacount import (get_ts_start_date,getdata_ema_trend)
-
+import emacount
+import singleAnalyseUtil

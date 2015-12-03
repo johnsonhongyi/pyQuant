@@ -10,7 +10,7 @@ def time_sleep(timemin):
     return True
 
 
-def get_single_ave_compare(code, dayl='10'):
+def get_multiday_ave_compare(code, dayl='10'):
     dtick = ts.get_today_ticks(code)
     d_hist = ema.getdata_ema_trend(code, dayl, 'd')
     # print d_hist
@@ -33,37 +33,37 @@ def get_single_ave_compare(code, dayl='10'):
     ave = ema.less_average(ep_list)
     if len(dtick.index) > 0:
         ep = dtick['amount'].sum() / dtick['volume'].sum()
-        p_now = dtick['price'].values[0]*100
-        if p_now >ave and ep>ave:
-            print ("GOLD: %s ep:%s UP:%s !!! A:%s %s !!!!!!" % (code, ep, p_now,ave, get_now_time()))
-        elif p_now >ave and ep<ave:
-            print ("gold: %s ep:%s UP:%s ! A:%s %s !" % (code, ep, p_now,ave, get_now_time()))
-        elif p_now <ave and ep >ave:
-            print ("down: %s ep:%s Dow:%s ? A:%s %s ?" % (code, ep, p_now,ave, get_now_time()))
+        p_now = dtick['price'].values[0] * 100
+        if p_now > ave and ep > ave:
+            print ("GOLD:%s ep:%s UP:%s!!! A:%s %s !!!" % (code, ep, p_now, ave, get_now_time()))
+        elif p_now > ave and ep < ave:
+            print ("gold:%s ep:%s UP:%s! A:%s %s !" % (code, ep, p_now, ave, get_now_time()))
+        elif p_now < ave and ep > ave:
+            print ("down:%s ep:%s Dow:%s? A:%s %s ?" % (code, ep, p_now, ave, get_now_time()))
         else:
-            print ("DOWN: %s ep:%s now:%s ??? A:%s %s ???" % (code, ep, p_now,ave, get_now_time()))
+            print ("DOWN:%s ep:%s now:%s??? A:%s %s ???" % (code, ep, p_now, ave, get_now_time()))
     return ave
 
 
-def get_single_tick_ave(code, ave=None):
+def get_today_tick_ave(code, ave=None):
     dtick = ts.get_today_ticks(code)
     if len(dtick.index) > 0:
-        p_now = dtick['price'].values[0]*100
+        p_now = dtick['price'].values[0] * 100
         ep = dtick['amount'].sum() / dtick['volume'].sum()
-        if not ave==None:
-            if p_now >ave and ep>ave:
-                print ("GOLD: %s ep:%s UP:%s!!! A:%s %s !!!!!!" % (code, ep, p_now,ave, get_now_time()))
-            elif p_now >ave and ep<ave:
-                print ("gold: %s ep:%s UP:%s! A:%s %s !" % (code, ep, p_now,ave, get_now_time()))
-            elif p_now <ave and ep >ave:
-                print ("down: %s ep:%s Dow:%s? A:%s %s ?" % (code, ep, p_now,ave, get_now_time()))
+        if not ave == None:
+            if p_now > ave and ep > ave:
+                print ("GOLD:%s ep:%s UP:%s!!! A:%s %s !!!" % (code, ep, p_now, ave, get_now_time()))
+            elif p_now > ave and ep < ave:
+                print ("gold:%s ep:%s UP:%s! A:%s %s !" % (code, ep, p_now, ave, get_now_time()))
+            elif p_now < ave and ep > ave:
+                print ("down:%s ep:%s Dow:%s? A:%s %s ?" % (code, ep, p_now, ave, get_now_time()))
             else:
-                print ("DOWN: %s ep:%s now:%s??? A:%s %s ???" % (code, ep, p_now,ave, get_now_time()))
+                print ("DOWN:%s ep:%s now:%s??? A:%s %s ???" % (code, ep, p_now, ave, get_now_time()))
         else:
-            if ep>ave:
-                print ("GOLD: %s ep:%s UP:%s!!! A:%s %s !!!" % (code, ep, p_now,ave, get_now_time()))
+            if ep > ave:
+                print ("GOLD:%s ep:%s UP:%s!!! A:%s %s !!!" % (code, ep, p_now, ave, get_now_time()))
             else:
-                print ("down: %s ep:%s now:%s??? A:%s %s ?"% (code, ep, p_now,ave, get_now_time()))
+                print ("down:%s ep:%s now:%s??? A:%s %s ?" % (code, ep, p_now, ave, get_now_time()))
 
     else:
         print "tick null"
@@ -128,13 +128,13 @@ def get_code_search_loop(num_input, code, timed=60, dayl='10', ave=None):
         if code == num_input:
             get_single_tick_ave(code, ave)
         else:
-            ave = get_single_ave_compare(num_input, dayl)
+            ave = get_multiday_ave_compare(num_input, dayl)
     time.sleep(timed)
     return ave
 
 
 if __name__ == '__main__':
-    # get_single_ave_compare('601198')
+    # get_multiday_ave_compare('601198')
     # print len(sys.argv)
     if len(sys.argv) == 2:
         status = True
@@ -148,7 +148,7 @@ if __name__ == '__main__':
 
     code = ''
     ave = None
-    days = '10'
+    days = '20'
     while 1:
         try:
             if not status:
