@@ -35,13 +35,13 @@ def get_single_ave_compare(code, dayl='10'):
         ep = dtick['amount'].sum() / dtick['volume'].sum()
         p_now = dtick['price'].values[0]*100
         if p_now >ave and ep>ave:
-            print ("GOLD: %s ep:%s UP:%s⬆⬆⬆ A:%s %s !!!!!!!!!!!!!!!!!" % (code, ep, p_now,ave, get_now_time()))
+            print ("GOLD: %s ep:%s UP:%s⬆️⬆️⬆️ A:%s %s !!!!!!!!!!!!!!!!!" % (code, ep, p_now,ave, get_now_time()))
         elif p_now >ave and ep<ave:
-            print ("gold: %s ep:%s UP:%s⬆ A:%s %s !" % (code, ep, p_now,ave, get_now_time()))
+            print ("gold: %s ep:%s UP:%s⬆️ A:%s %s !" % (code, ep, p_now,ave, get_now_time()))
         elif p_now <ave and ep >ave:
-            print ("down: %s ep:%s Dow:%s⬇ A:%s %s !" % (code, ep, p_now,ave, get_now_time()))
+            print ("down: %s ep:%s Dow:%s⬇️ A:%s %s !" % (code, ep, p_now,ave, get_now_time()))
         else:
-            print ("DOWN: %s ep:%s now:%s⬇⬇⬇ A:%s %s !!!!!" % (code, ep, p_now,ave, get_now_time()))
+            print ("DOWN: %s ep:%s now:%s⬇️⬇️⬇️ A:%s %s !!" % (code, ep, p_now,ave, get_now_time()))
     return ave
 
 
@@ -52,18 +52,18 @@ def get_single_tick_ave(code, ave=None):
         ep = dtick['amount'].sum() / dtick['volume'].sum()
         if not ave==None:
             if p_now >ave and ep>ave:
-                print ("GOLD: %s ep:%s UP:%s⬆⬆⬆ A:%s %s !!!!!!!!!!!!!!!!!" % (code, ep, p_now,ave, get_now_time()))
+                print ("GOLD: %s ep:%s UP:%s⬆️⬆️⬆️ A:%s %s !!!" % (code, ep, p_now,ave, get_now_time()))
             elif p_now >ave and ep<ave:
-                print ("gold: %s ep:%s UP:%s⬆ A:%s %s !" % (code, ep, p_now,ave, get_now_time()))
+                print ("gold: %s ep:%s UP:%s⬆️ A:%s %s !" % (code, ep, p_now,ave, get_now_time()))
             elif p_now <ave and ep >ave:
-                print ("down: %s ep:%s Dow:%s⬇ A:%s %s !" % (code, ep, p_now,ave, get_now_time()))
+                print ("down: %s ep:%s Dow:%s⬇️ A:%s %s !" % (code, ep, p_now,ave, get_now_time()))
             else:
-                print ("DOWN: %s ep:%s now:%s⬇⬇⬇ A:%s %s !!!!!" % (code, ep, p_now,ave, get_now_time()))
+                print ("DOWN: %s ep:%s now:%s⬇️⬇️⬇️ A:%s %s !!" % (code, ep, p_now,ave, get_now_time()))
         else:
             if ep>ave:
-                print ("GOLD: %s ep:%s UP:%s⬆⬆⬆ a:%s %s !!!!!!!!!!!!!!!!!" % (code, ep, p_now,ave, get_now_time()))
+                print ("GOLD: %s ep:%s UP:%s⬆️⬆️⬆️ a:%s %s !!!" % (code, ep, p_now,ave, get_now_time()))
             else:
-                print ("down: %s ep:%s now:%s⬇⬇⬇ a:%s %s !!!!!"% (code, ep, p_now,ave, get_now_time()))
+                print ("down: %s ep:%s now:%s⬇️⬇️⬇️ a:%s %s !!"% (code, ep, p_now,ave, get_now_time()))
 
     else:
         print "tick null"
