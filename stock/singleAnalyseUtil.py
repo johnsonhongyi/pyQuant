@@ -81,7 +81,7 @@ def get_hot_loop(timedelay):
 
 import sys
 
-def get_code_search_loop(num_input,code,timed=5,dayl='10'):
+def get_code_search_loop(num_input,code,timed=60,dayl='10'):
     # if not status:
     #
     if code == num_input:

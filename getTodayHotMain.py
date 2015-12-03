@@ -54,6 +54,7 @@ if len(goldl)>0:
             print "%s"%(goldl[x])
         else:
             print "%s"%(goldl[x]),
+num_input = raw_input("please input code:")
 # print gold
 # print top_count
 
