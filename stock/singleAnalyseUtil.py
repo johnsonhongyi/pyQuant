@@ -95,7 +95,8 @@ def handle_ctrl_c(signal, frame):
 
 
 def get_hot_loop(timedelay):
-    get_hot_count(3)
+    if get_now_time():
+        get_hot_count(3)
     time.sleep(timedelay)
 
 
