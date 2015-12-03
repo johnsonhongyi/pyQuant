@@ -30,23 +30,41 @@ def get_single_ave_compare(code, dayl='10'):
             ep = td['amount'].sum() / td['volume'].sum()
             ep_list.append(ep)
             print ("D: %s P: %s" % (da[-5:], ep))
-    total_ave = ema.less_average(ep_list)
+    ave = ema.less_average(ep_list)
     if len(dtick.index) > 0:
         ep = dtick['amount'].sum() / dtick['volume'].sum()
-        if ep >= total_ave:
-            # gold[code]=d_hist
-            # goldl.append(code)
-            print ("Gold: %s ep:%s ave:%s %s" % (code, ep, total_ave, get_now_time()))
+        p_now = dtick['price'].values[0]*100
+        if p_now >ave and ep>ave:
+            print ("GOLD: %s ep:%s UP:%s⬆⬆⬆ A:%s %s !!!!!!!!!!!!!!!!!" % (code, ep, p_now,ave, get_now_time()))
+        elif p_now >ave and ep<ave:
+            print ("gold: %s ep:%s UP:%s⬆ A:%s %s !" % (code, ep, p_now,ave, get_now_time()))
+        elif p_now <ave and ep >ave:
+            print ("down: %s ep:%s Dow:%s⬇ A:%s %s !" % (code, ep, p_now,ave, get_now_time()))
         else:
-            print ("Fail: %s ep:%s ave:%s %s" % (code, ep, total_ave, get_now_time()))
-    return total_ave
+            print ("DOWN: %s ep:%s now:%s⬇⬇⬇ A:%s %s !!!!!" % (code, ep, p_now,ave, get_now_time()))
+    return ave
 
 
 def get_single_tick_ave(code, ave=None):
     dtick = ts.get_today_ticks(code)
     if len(dtick.index) > 0:
+        p_now = dtick['price'].values[0]*100
         ep = dtick['amount'].sum() / dtick['volume'].sum()
-        print ("Code: %s ep:%s :%s %s" % (code, ep, ave, get_now_time()))
+        if not ave==None:
+            if p_now >ave and ep>ave:
+                print ("GOLD: %s ep:%s UP:%s⬆⬆⬆ A:%s %s !!!!!!!!!!!!!!!!!" % (code, ep, p_now,ave, get_now_time()))
+            elif p_now >ave and ep<ave:
+                print ("gold: %s ep:%s UP:%s⬆ A:%s %s !" % (code, ep, p_now,ave, get_now_time()))
+            elif p_now <ave and ep >ave:
+                print ("down: %s ep:%s Dow:%s⬇ A:%s %s !" % (code, ep, p_now,ave, get_now_time()))
+            else:
+                print ("DOWN: %s ep:%s now:%s⬇⬇⬇ A:%s %s !!!!!" % (code, ep, p_now,ave, get_now_time()))
+        else:
+            if ep>ave:
+                print ("GOLD: %s ep:%s UP:%s⬆⬆⬆ a:%s %s !!!!!!!!!!!!!!!!!" % (code, ep, p_now,ave, get_now_time()))
+            else:
+                print ("down: %s ep:%s now:%s⬇⬇⬇ a:%s %s !!!!!"% (code, ep, p_now,ave, get_now_time()))
+
     else:
         print "tick null"
 
@@ -60,7 +78,7 @@ def get_now_time():
 
 
 def get_work_time():
-    now_t = get_now_time().replace(':', '')
+    now_t = str(get_now_time()).replace(':', '')
     # now_t = int(now_t)
     if (now_t > '1131' and now_t < '1301') or (now_t < '0925' or now_t > '1502'):
         return False
