@@ -126,7 +126,7 @@ def get_code_search_loop(num_input, code, timed=60, dayl='10', ave=None):
     #
     if get_work_time():
         if code == num_input:
-            get_single_tick_ave(code, ave)
+            get_today_tick_ave(code, ave)
         else:
             ave = get_multiday_ave_compare(num_input, dayl)
     time.sleep(timed)
