@@ -87,6 +87,32 @@ def getdata_ema_trend(stock,datelenth,type=None):
     # print ("open:%s  lastc:%s nowp:%s"%(real_o,real_perc,real_c))
     return df
 
+def getdata_ema_trend_silent(stock,datelenth,type=None):
+    # if datalen == '10':
+    #     print ("datalen not 10")
+    # else:
+    #     print ("len:",datalen)
+    # df = ts.get_tick_data(stock)
+    start_date=get_ts_start_date(stock,datelenth,type)
+    # print ("\nstart: %s  stock: %s" %(start_date[-5:],stock))
+    if type !=None:
+        df = ts.get_hist_data(stock,start=start_date,ktype=type)
+    else:
+        df = ts.get_hist_data(stock,start=start_date)
+    # countnum = df['open'].count()
+    # print ('countnum:',countnum)
+    # open_p=df['open'].mean()
+    # low_p=df['open'].mean()
+    # close_p=df['close'].mean()
+    # print ("open_p:",open_p)
+    # print  ("close_p:",close_p)
+    # real_df=ts.get_realtime_quotes(stock)
+    # real_o=(real_df['open'])[0]
+    # real_c=(real_df['price'])[0]
+    # real_perc=(real_df['pre_close'])[0]
+    # print ("open:%s  lastc:%s nowp:%s"%(real_o,real_perc,real_c))
+    return df
+
 def less_average(score):
   num = len(score)
   sum_score = sum(score)

@@ -26,6 +26,7 @@ def get_all_hot():
         goldl = []
         df = ts.get_today_all()
         top = df[df['changepercent'] > 6]
+        top = top[top['changepercent'] <11]
         print "top:", len(top['code'])
 
         for code in top['code']:
@@ -59,7 +60,8 @@ def get_all_hot():
                     print ("code:%s ep:%s ave:%s" % (code, ep, total_ave))
     except (IOError, EOFError, KeyboardInterrupt):
         # print "key"
-        print "break"
+        # print "break"
+        print "why"
         return
 
 
@@ -79,6 +81,7 @@ def disp_all_data(list):
 
 
 if __name__ == '__main__':
+	get_all_hot()
     # sl.get_single_ave_compare()
 # print gold
 # print top_count
