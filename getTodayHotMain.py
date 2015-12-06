@@ -18,7 +18,7 @@ def get_all_top():
     top = df[df['changepercent'] > 6]
     print "top:", len(top['code'])
     for code in top['code']:
-        ave=sl.get_single_ave_compare(code)
+        ave=sl.get_today_tick_ave(code)
 
 def get_all_hot():
     try:

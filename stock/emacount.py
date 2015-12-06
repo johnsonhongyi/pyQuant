@@ -68,7 +68,7 @@ def getdata_ema_trend(stock,datelenth,type=None):
     #     print ("len:",datalen)
     # df = ts.get_tick_data(stock)
     start_date=get_ts_start_date(stock,datelenth,type)
-    print ("\nstart: %s  stock: %s" %(start_date[-5:],stock))
+    # print ("\nstart: %s  stock: %s" %(start_date[-5:],stock))
     if type !=None:
         df = ts.get_hist_data(stock,start=start_date,ktype=type)
     else:

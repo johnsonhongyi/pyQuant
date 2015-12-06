@@ -9,16 +9,18 @@ def time_sleep(timemin):
     time.sleep(timemin)
     return True
 
+
 def get_all_toplist():
     # gold = {}
     # goldl = []
     df = ts.get_today_all()
-    top = df[df['changepercent'] >6 ]
-    top = top[top['changepercent'] <10]
+    top = df[df['changepercent'] > 6]
+    top = top[top['changepercent'] < 10]
     # logging.info("top:", len(top['code']))
-    list =top['code']
+    list = top['code']
     print len(list)
     return list
+
 
 def get_multiday_ave_compare(code, dayl='10'):
     dtick = ts.get_today_ticks(code)
@@ -45,14 +47,19 @@ def get_multiday_ave_compare(code, dayl='10'):
         ep = dtick['amount'].sum() / dtick['volume'].sum()
         p_now = dtick['price'].values[0] * 100
         if p_now > ave and ep > ave:
-            print ("GOLD:%s ep:%s UP:%s!!! A:%s %s !!!" % (code, ep, p_now, ave, get_now_time()))
+            print ("GOLD:%s ep:%s UP:%s!!! A:%s %s !!!" %
+                   (code, ep, p_now, ave, get_now_time()))
         elif p_now > ave and ep < ave:
-            print ("gold:%s ep:%s UP:%s! A:%s %s !" % (code, ep, p_now, ave, get_now_time()))
+            print ("gold:%s ep:%s UP:%s! A:%s %s !" %
+                   (code, ep, p_now, ave, get_now_time()))
         elif p_now < ave and ep > ave:
-            print ("down:%s ep:%s Dow:%s? A:%s %s ?" % (code, ep, p_now, ave, get_now_time()))
+            print ("down:%s ep:%s Dow:%s? A:%s %s ?" %
+                   (code, ep, p_now, ave, get_now_time()))
         else:
-            print ("DOWN:%s ep:%s now:%s??? A:%s %s ???" % (code, ep, p_now, ave, get_now_time()))
+            print ("DOWN:%s ep:%s now:%s??? A:%s %s ???" %
+                   (code, ep, p_now, ave, get_now_time()))
     return ave
+
 
 def get_multiday_ave_compare_silent(code, dayl='10'):
     dtick = ts.get_today_ticks(code)
@@ -79,42 +86,91 @@ def get_multiday_ave_compare_silent(code, dayl='10'):
         ep = dtick['amount'].sum() / dtick['volume'].sum()
         p_now = dtick['price'].values[0] * 100
         if p_now > ave and ep > ave:
-            print ("GOLD:%s ep:%s UP:%s!!! A:%s %s !!!" % (code, ep, p_now, ave, get_now_time()))
+            print ("GOLD:%s ep:%s UP:%s!!! A:%s %s !!!" %
+                   (code, ep, p_now, ave, get_now_time()))
         # elif p_now > ave and ep < ave:
         #     print ("gold:%s ep:%s UP:%s! A:%s %s !" % (code, ep, p_now, ave, get_now_time()))
         # elif p_now < ave and ep > ave:
         #     print ("down:%s ep:%s Dow:%s? A:%s %s ?" % (code, ep, p_now, ave, get_now_time()))
         else:
             if p_now < ave and ep < ave:
-                print ("DOWN:%s ep:%s now:%s??? A:%s %s ???" % (code, ep, p_now, ave, get_now_time()))
+                print ("DOWN:%s ep:%s now:%s??? A:%s %s ???" %
+                       (code, ep, p_now, ave, get_now_time()))
     return ave
+
+
+def get_multiday_ave_compare_silent_noreal(code, dayl='10'):
+    # dtick = ts.get_today_ticks(code)
+    d_hist = ema.getdata_ema_trend(code, dayl, 'd')
+    # print d_hist
+    d_close = d_hist[:1]['close'].values
+    day_t = ema.get_today()
+    if day_t in d_hist.index:
+        dl = d_hist.drop(day_t).index
+    else:
+        dl = d_hist.index
+    # print dl
+    ep_list = []
+    for da in dl.values:
+        # print da
+        td = ts.get_tick_data(code, da)
+        # print td
+        if len(td) > 0:
+            ep = td['amount'].sum() / td['volume'].sum()
+            ep_list.append(ep)
+            # print ("D: %s P: %s" % (da[-5:], ep))
+    ave = ema.less_average(ep_list)
+    if d_close:
+        p_now = d_close*100
+        if p_now > ave:
+            print "start:%s stock:%s >%s DayP "% (d_hist.index[-1], code,dayl)
+            print ("GOLD:%s ep:%s UP:%s!!! A:%s %s !!!" %
+                   (code, ep_list[0], p_now, ave, get_now_time()))
+            # elif p_now > ave and ep < ave:
+            #     print ("gold:%s ep:%s UP:%s! A:%s %s !" % (code, ep, p_now, ave, get_now_time()))
+            # elif p_now < ave and ep > ave:
+            #     print ("down:%s ep:%s Dow:%s? A:%s %s ?" % (code, ep, p_now, ave, get_now_time()))
+
+            # else:
+            #     if p_now < ave:
+            #         print ("DOWN:%s ep:%s now:%s??? A:%s %s ???" %
+            #                (code, ep, p_now, ave, get_now_time()))
+    # print "%s done :%s" % (code,get_now_time())
+    return ave
+
 
 def get_today_tick_ave(code, ave=None):
     try:
         dtick = ts.get_today_ticks(code)
-    # try:
+        # try:
         if len(dtick.index) > 0:
             p_now = dtick['price'].values[0] * 100
             ep = dtick['amount'].sum() / dtick['volume'].sum()
             if not ave == None:
                 if p_now > ave and ep > ave:
-                    print ("GOLD:%s ep:%s UP:%s!!! A:%s %s !!!" % (code, ep, p_now, ave, get_now_time()))
+                    print ("GOLD:%s ep:%s UP:%s!!! A:%s %s !!!" %
+                           (code, ep, p_now, ave, get_now_time()))
                 elif p_now > ave and ep < ave:
-                    print ("gold:%s ep:%s UP:%s! A:%s %s !" % (code, ep, p_now, ave, get_now_time()))
+                    print ("gold:%s ep:%s UP:%s! A:%s %s !" %
+                           (code, ep, p_now, ave, get_now_time()))
                 elif p_now < ave and ep > ave:
-                    print ("down:%s ep:%s Dow:%s? A:%s %s ?" % (code, ep, p_now, ave, get_now_time()))
+                    print ("down:%s ep:%s Dow:%s? A:%s %s ?" %
+                           (code, ep, p_now, ave, get_now_time()))
                 else:
-                    print ("DOWN:%s ep:%s now:%s??? A:%s %s ???" % (code, ep, p_now, ave, get_now_time()))
+                    print ("DOWN:%s ep:%s now:%s??? A:%s %s ???" %
+                           (code, ep, p_now, ave, get_now_time()))
             else:
                 if ep > ave:
-                    print ("GOLD:%s ep:%s UP:%s!!! A:%s %s !!!" % (code, ep, p_now, ave, get_now_time()))
+                    print ("GOLD:%s ep:%s UP:%s!!! A:%s %s !!!" %
+                           (code, ep, p_now, ave, get_now_time()))
                 else:
-                    print ("down:%s ep:%s now:%s??? A:%s %s ?" % (code, ep, p_now, ave, get_now_time()))
+                    print ("down:%s ep:%s now:%s??? A:%s %s ?" %
+                           (code, ep, p_now, ave, get_now_time()))
 
         else:
             print "tick null"
     except (IOError, EOFError, KeyboardInterrupt) as e:
-        print("Except:%s"%(e))
+        print("Except:%s" % (e))
         # print "IOError"
 
 
@@ -144,7 +200,8 @@ def get_hot_count(changepercent):
 
     # top=df[ df['changepercent'] <6]
     print ("topT: %s top>%s: %s" % (len(topTen), changepercent, len(top))),
-    print ("crashT: %s crash<-%s: %s" % (len(crashTen), changepercent, len(crash)))
+    print ("crashT: %s crash<-%s: %s" %
+           (len(crashTen), changepercent, len(crash)))
     return top
 
 
@@ -209,14 +266,16 @@ if __name__ == '__main__':
                     if num_input == 'ex' or num_input == 'qu' \
                             or num_input == 'q' or num_input == "e":
                         sys.exit()
-                    elif not num_input or not len(num_input) == 6:  # str.isdigit()是用来判断字符串是否纯粹由数字组成
+                    # str.isdigit()是用来判断字符串是否纯粹由数字组成
+                    elif not num_input or not len(num_input) == 6:
                         print ("Please input 6 code:or exit")
                         num_input = ''
                 if num_input:
                     if ave == None:
                         ave = get_code_search_loop(num_input, code, dayl=days)
                     else:
-                        get_code_search_loop(num_input, code, dayl=days, ave=ave)
+                        get_code_search_loop(
+                            num_input, code, dayl=days, ave=ave)
                     code = num_input
 
         except (IOError, EOFError, KeyboardInterrupt):
@@ -225,13 +284,13 @@ if __name__ == '__main__':
             status = not status
             num_input = ''
             ave = None
-            code=''
+            code = ''
             # num_input=num_input
             # print "status:",status
             # handle_ctrl_c()
             # raise
             # except (Exception, KeyboardInterrupt):
-            #     # print "key"
+            # print "key"
             #     print "a"
             #     status=not status
             #     num_input=''

@@ -32,7 +32,8 @@ class DownloadWorker(Thread):
             # Get the work from the queue and expand the tuple
         code = self.queue.get()
         print "I am %s, set counter:%s" % (self.name, counter)
-        sl.get_multiday_ave_compare_silent(code)
+        # sl.get_multiday_ave_compare_silent(code)
+        sl.get_multiday_ave_compare_silent_noreal(code)
         self.queue.task_done()
 
 

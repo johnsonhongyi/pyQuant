@@ -53,8 +53,8 @@ def get_all_top():
     goldl = []
     df = ts.get_today_all()
     top = df[df['changepercent'] > 6]
-    # top = df[df['changepercent'] < -5]
-    top = top[top['changepercent'] <7]
+    # top = df[df['changepercent'] < -2]
+    top = top[top['changepercent'] <10]
     # logging.info("top:", len(top['code']))
     list =top['code'].tolist()
     print len(list)
@@ -62,8 +62,84 @@ def get_all_top():
 # Make the Pool of workers
 # print cpu_count()
 
+def mainrun(codes=None):
+
+    pool = ThreadPool(cpu_count())
+    # pool.
+    # pool = ThreadPool(1)
+    # # Open the urls in their own threads
+    # # and return the results
+    # results = pool.map(urllib2.urlopen, urls)
+    # #close the pool and wait for the work to finish
+    # codes=['000030','601198','601608']
+    # codes=['600476']
+    if codes==None:
+        codes=get_all_top()
+    starttime = datetime.datetime.now()
+    # results=pool.map(sl.get_multiday_ave_compare_silent,codes)
+    # goldl = ['1', '2', '3', '4', '5', '6', '7', '8', '9','10','12','13','14']
+    # for x in cpu_count():
+    #     eval(pool+str(i))
+
+    # c_num=cpu_count()
+    # num=len(goldl)/c_num
+    # print num
+    # listall=[]
+    # count_list=len(goldl)
+    # list=div_list(goldl,c_num)
+    # print list
+    # sys.exit(0)
+
+    # logger = multiprocessing.get_logger()
+    # logger.setLevel(logging.INFO)
+    # print type(codes)
+    c_list=div_list(codes,cpu_count())
+
+    # results=pool.map(sl.get_multiday_ave_compare_silent,codes)
+
+    # results= pool.map(sl.get_multiday_ave_compare_silent_noreal,(codes,60))
+
+    for code in codes:
+        results=pool.apply_async(sl.get_multiday_ave_compare_silent_noreal,(code,60))
+        # print results
+    pool.close()
+    pool.join()
+
+    # print results
+
+    # if c_list==[]:
+    #     print "MuP"
+    #     # pool.map(sl.get_multiday_ave_compare_silent,codes)
+    #     for code in codes:
+    #         pool.apply_async(sl.get_multiday_ave_compare_silent_noreal,(code,))
+    #
+    #     pool.close()
+    #     pool.join()
+    # else:
+    #     print "All P"
+    #     for code in c_list:
+    #             # msg = "hello %d" %(i)
+    #             # print code
+    #             pool.apply_async(tt.main,(code,))
+    #
+    #     pool.close()
+    #     pool.join()
+
+    # for p in multiprocessing.active_children():
+    #         print("child   p.name:" + p.name + "\tp.id" + str(p.pid))
+    #         print "END!!!!!!!!!!!!!!!!!"
+
+    endtime = datetime.datetime.now()
+    interval=(endtime - starttime).seconds
+    print ""
+    print "interval:",interval
+    # print results
+
 
 if __name__ == '__main__':
+    mainrun()
+
+    sys.exit(0)
     pool = ThreadPool(cpu_count())
     # pool.
     # pool = ThreadPool(1)
