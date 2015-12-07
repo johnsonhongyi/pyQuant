@@ -219,9 +219,9 @@ if __name__ == '__main__':
                         get_code_search_loop(num_input, code, dayl=days, ave=ave)
                     code = num_input
 
-        except (IOError, EOFError, KeyboardInterrupt):
+        except (IOError, EOFError, KeyboardInterrupt) as e:
             # print "key"
-            print ""
+            print "expect:",e
             status = not status
             num_input = ''
             ave = None

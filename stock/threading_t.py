@@ -77,5 +77,7 @@ def main(codes):
     # print('Took %s', time() - ts)
 
 if __name__ == '__main__':
-    codes=mp.get_all_top()
-    main(codes)
+    # codes=mp.get_all_top()
+    # main(codes)
+    df = ts.get_sina_dd('601198','2015-11-20')
+    print df
