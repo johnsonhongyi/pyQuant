@@ -52,13 +52,14 @@ def get_ts_start_date(stock,datelen,type=None):
     # if day_t in df.index:
     #     # print "daynow"
     #     df=df.drop(day_t)
-    if not df.empty:
+    if df.empty :
+
+        print ("data err,pls check dataframe")
+    else:
         if df['open'].count < datelen:
             start_date = (df.index)[-1]
         else:
             start_date =  (df.index)[datelen-1]
-    else:
-        print ("data err,pls check dataframe")
     return  start_date
 
 def getdata_ema_trend(stock,datelenth,type=None):
@@ -68,7 +69,7 @@ def getdata_ema_trend(stock,datelenth,type=None):
     #     print ("len:",datalen)
     # df = ts.get_tick_data(stock)
     start_date=get_ts_start_date(stock,datelenth,type)
-    print ("\nstart: %s  stock: %s" %(start_date[-5:],stock))
+    print ("start: %s  stock: %s" %(start_date[-5:],stock))
     if type !=None:
         df = ts.get_hist_data(stock,start=start_date,ktype=type)
     else:

@@ -24,12 +24,14 @@ def get_all_hot():
     try:
         gold = {}
         goldl = []
-        df = ts.get_today_all()
-        top = df[df['changepercent'] > 6]
-        top = top[top['changepercent'] <11]
-        print "top:", len(top['code'])
-
-        for code in top['code']:
+        # df = ts.get_today_all()
+        # top = df[df['changepercent'] > 6]
+        # top = top[top['changepercent'] <11]
+        # print "top:", len(top['code'])
+        codes="000893,002351,000705,002451,002515,002279,002679,002761,600895,000532,002113,002438,600235,600210,600857".split(',')
+        print codes
+        # for code in top['code']:
+        for code in codes:
             dtick = ts.get_today_ticks(code)
             d_hist = ema.getdata_ema_trend(code, '10', 'd')
             # print d_hist
@@ -52,12 +54,14 @@ def get_all_hot():
                     ep_list.append(ep)
                     # print ("D: %s P: %s"%(da,ep))
             total_ave = ema.less_average(ep_list)
+            all_max=max(ep_list)
             if len(dtick.index) > 0:
                 ep = dtick['amount'].sum() / dtick['volume'].sum()
-                if ep >= total_ave:
+                if ep >= all_max:
                     gold[code] = d_hist
                     goldl.append(code)
-                    print ("code:%s ep:%s ave:%s" % (code, ep, total_ave))
+                    print ("Gold:%s ep:%s ave:%s max:%s" % (code, ep, total_ave,all_max))
+
     except (IOError, EOFError, KeyboardInterrupt):
         # print "key"
         # print "break"

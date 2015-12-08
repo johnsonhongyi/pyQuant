@@ -110,6 +110,7 @@ def get_sina_all_dd(vol='0', type='0', retry_count=3, pause=0.001):
             print (ct.DD_VOL_List[vol], ct.DD_TYPE_List[type])
             # print(ct.SINA_DD_VRatio % (ct.P_TYPE['http'], ct.DOMAINS['vsf'], ct.PAGES['sinadd_all'],
                                               # ct.DD_VOL_List[vol], ct.DD_TYPE_List[type]))
+            print ct.SINA_DD_VRatio % (ct.P_TYPE['http'], ct.DOMAINS['vsf'], ct.PAGES['sinadd_all'],ct.DD_VOL_List[vol], ct.DD_TYPE_List[type])
             html = lxml.html.parse(ct.SINA_DD_VRatio % (ct.P_TYPE['http'], ct.DOMAINS['vsf'], ct.PAGES['sinadd_all'],
                                               ct.DD_VOL_List[vol], ct.DD_TYPE_List[type]))
             # else:
@@ -131,13 +132,13 @@ def get_sina_all_dd(vol='0', type='0', retry_count=3, pause=0.001):
             else:
                 sarr = [etree.tostring(node) for node in res]
                 print sarr
-            sarr = ''.join(sarr)
-            sarr = '<table>%s</table>'%sarr
-            sarr = sarr.replace('--', '0')
-            df = pd.read_html(StringIO(sarr), parse_dates=False)[0]
-            df.columns = ct.TODAY_TICK_COLUMNS
-            df['pchange'] = df['pchange'].map(lambda x : x.replace('%', ''))
-
+            # sarr = ''.join(sarr)
+            # sarr = '<table>%s</table>'%sarr
+            # sarr = sarr.replace('--', '0')
+            # df = pd.read_html(StringIO(sarr), parse_dates=False)[0]
+            # df.columns = ct.TODAY_TICK_COLUMNS
+            # df['pchange'] = df['pchange'].map(lambda x : x.replace('%', ''))
+            df=None
             # if df is not None:
             #     df['code'] = df['code'].map(lambda x: x[2:])
         except Exception as e:
