@@ -185,7 +185,7 @@ if __name__ == "__main__":
 
         except (IOError, EOFError, KeyboardInterrupt) as e:
             # print "key"
-            print "expect:",e.encode('utf8')
+            print "expect:",e
             status = not status
             code_a=[]
 
