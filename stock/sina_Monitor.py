@@ -17,7 +17,7 @@ from pandas import Series,DataFrame
 import sys,re,time
 import cons as ct
 import time
-
+import singleAnalyseUtil as sl
 
 def downloadpage(url):
     fp = urllib2.urlopen(url)
@@ -40,13 +40,15 @@ def html_clean_content(soup):
 
 def get_sina_url(vol='0', type='0',pageCount='100'):
     # if len(pageCount) >=1:
-    url=ct.SINA_DD_VRatio_All%(ct.P_TYPE['http'], ct.DOMAINS['vsf'], ct.PAGES['sinadd_all'],pageCount,ct.DD_VOL_List[vol], ct.DD_TYPE_List[type])
+    url=ct.SINA_DD_VRatio_All%(ct.P_TYPE['http'], ct.DOMAINS['vsf'], ct.PAGES['sinadd_all'],pageCount,ct.DD_VOL_List[vol], type)
     # print url
     return url
 
 def get_sina_all_dd(vol='0', type='0', retry_count=3, pause=0.001):
     if len(vol) != 1 or len(type) != 1:
         return None
+    else:
+        print ("Vol:%s  Type:%s"%(ct.DD_VOL_List[vol],ct.DD_TYPE_List[type]))
     # symbol = _code_to_symbol(code)
     for _ in range(retry_count):
         time.sleep(pause)
@@ -64,9 +66,9 @@ def get_sina_all_dd(vol='0', type='0', retry_count=3, pause=0.001):
                 start_t=time.time()
                 pageCount=pageCount[0]
                 if int(pageCount) > 100:
-                    if pageCount >5000:
+                    if int(pageCount) >10000:
                         print "BigBig:",pageCount
-                        pageCount='5000'
+                        pageCount='10000'
 
                     print "AllBig:",pageCount
                     html_doc=urllib2.urlopen(get_sina_url(vol,type,pageCount=pageCount)).read()
@@ -145,13 +147,50 @@ def get_sina_all_dd(vol='0', type='0', retry_count=3, pause=0.001):
 
 if __name__ == "__main__":
     # parsehtml(downloadpage(url_s))
-    start_t= time.time()
-    data=get_sina_all_dd('3')
-    interval=(time.time() - start_t)
-    # print ""
-    print "interval:",interval
-    print data[:2]
-    print data.describe()
+    vol='0'
+    type='2'
+    code_a=[]
+    def get_code_g():
+        start_t= time.time()
+        data=get_sina_all_dd(vol,type)
+        interval=(time.time() - start_t)
+        df=data[(data['status']=='up')]['code'].value_counts()[:8]
+        # print ""
+        print "interval:",interval
+        print df
+        code_g=[]
+        for code in df.index:
+            code=re.findall('(\d+)',code)
+            if len(code)>0:
+                code=code[0]
+                status=sl.get_multiday_ave_compare_silent(code)
+                if status:
+                    code_g.append(code)
+        return code_g
+
+    while 1:
+        try:
+            cd=get_code_g()
+            if len(code_a) ==0:
+                code_a=cd
+            else:
+                for code in cd:
+                    if code in cd:
+                        print "duble:code%s",code
+                    else:
+                        code_a.append(code)
+            time.sleep(60)
+
+
+
+        except (IOError, EOFError, KeyboardInterrupt) as e:
+            # print "key"
+            print "expect:",e.encode('utf8')
+            status = not status
+            code_a=[]
+
+    # sl.get_code_search_loop()
+    # print data.describe()
     # while 1:
     #     intput=raw_input("code")
     #     print

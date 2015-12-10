@@ -84,10 +84,12 @@ def get_multiday_ave_compare_silent(code, dayl='10'):
         #     print ("gold:%s ep:%s UP:%s! A:%s %s !" % (code, ep, p_now, ave, get_now_time()))
         # elif p_now < ave and ep > ave:
         #     print ("down:%s ep:%s Dow:%s? A:%s %s ?" % (code, ep, p_now, ave, get_now_time()))
+            return True
         else:
             if p_now < ave and ep < ave:
                 print ("DOWN:%s ep:%s now:%s??? A:%s %s ???" % (code, ep, p_now, ave, get_now_time()))
-    return ave
+            return False
+    # return ave
 
 def get_today_tick_ave(code, ave=None):
     try:
@@ -112,7 +114,8 @@ def get_today_tick_ave(code, ave=None):
                     print ("down:%s ep:%s now:%s??? A:%s %s ?" % (code, ep, p_now, ave, get_now_time()))
 
         else:
-            print "tick null"
+            df=ts.get_realtime_quotes(code)
+            print "name:%s op:%s  price:%s"%(df['name'].values[0],df['open'].values[0],df['price'].values[0])
     except (IOError, EOFError, KeyboardInterrupt) as e:
         print("Except:%s"%(e))
         # print "IOError"
@@ -170,7 +173,7 @@ def get_hot_loop(timedelay):
 import sys
 
 
-def get_code_search_loop(num_input, code, timed=60, dayl='10', ave=None):
+def get_code_search_loop(num_input, code='', timed=60, dayl='10', ave=None):
     # if not status:
     #
     if get_work_time():
@@ -216,16 +219,18 @@ if __name__ == '__main__':
                     if ave == None:
                         ave = get_code_search_loop(num_input, code, dayl=days)
                     else:
-                        get_code_search_loop(num_input, code, dayl=days, ave=ave)
+                        ave=get_code_search_loop(num_input, code, dayl=days, ave=ave)
                     code = num_input
 
-        except (IOError, EOFError, KeyboardInterrupt) as e:
+        except (KeyboardInterrupt) as e:
             # print "key"
-            print "expect:",e
+            print "KeyboardInterrupt:",e
             status = not status
             num_input = ''
             ave = None
             code=''
+        except (IOError, EOFError) as e:
+            print "Except",e
             # num_input=num_input
             # print "status:",status
             # handle_ctrl_c()
