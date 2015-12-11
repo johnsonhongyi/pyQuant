@@ -11,6 +11,7 @@ K_LABELS = ['D', 'W', 'M']
 K_MIN_LABELS = ['5', '15', '30', '60']
 K_TYPE = {'D': 'akdaily', 'W': 'akweekly', 'M': 'akmonthly'}
 INDEX_LABELS = ['sh', 'sz', 'hs300', 'sz50', 'cyb', 'zxb']
+REAL_INDEX_LABELS=['sh_a','sz_a','cyb']
 INDEX_LIST = {'sh': 'sh000001', 'sz': 'sz399001', 'hs300': 'sz399300',
               'sz50': 'sh000016', 'zxb': 'sz399005', 'cyb': 'sz399006'}
 DD_VOL_List={'0':'40000','1':'100000','2':'100000','3':'200000','4':'1000000'}
@@ -70,6 +71,7 @@ DAY_PRICE_URL = '%sapi.finance.%s/%s/?code=%s&type=last'
 LIVE_DATA_URL = '%shq.%s/rn=%s&list=%s'
 DAY_PRICE_MIN_URL = '%sapi.finance.%s/akmin?scode=%s&type=%s'
 SINA_DAY_PRICE_URL = '%s%s/quotes_service/api/%s/Market_Center.getHQNodeData?num=80&sort=changepercent&asc=0&node=hs_a&symbol=&_s_r_a=page&page=%s'
+SINA_REAL_PRICE_CODE = '%s%s/quotes_service/api/json_v2.php/Market_Center.getHQNodeData?page=1&num=%s&sort=changepercent&asc=0&node=%s&symbol=%s'
 REPORT_URL = '%s%s/q/go.php/vFinanceAnalyze/kind/mainindex/%s?s_i=&s_a=&s_c=&reportdate=%s&quarter=%s&p=%s&num=%s'
 FORECAST_URL = '%s%s/q/go.php/vFinanceAnalyze/kind/performance/%s?s_i=&s_a=&s_c=&s_type=&reportdate=%s&quarter=%s&p=%s&num=%s'
 PROFIT_URL = '%s%s/q/go.php/vFinanceAnalyze/kind/profit/%s?s_i=&s_a=&s_c=&reportdate=%s&quarter=%s&p=%s&num=%s'

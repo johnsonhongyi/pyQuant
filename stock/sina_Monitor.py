@@ -10,7 +10,9 @@
 url_s="http://vip.stock.finance.sina.com.cn/quotes_service/view/cn_bill_all.php?num=100&page=1&sort=ticktime&asc=0&volume=0&type=1"
 url_b="http://vip.stock.finance.sina.com.cn/quotes_service/view/cn_bill_all.php?num=100&page=1&sort=ticktime&asc=0&volume=100000&type=0"
 status={u"中性盘":"normal",u"买盘":"up",u"卖盘":"down"}
-
+url_real_sina="http://finance.sina.com.cn/realstock/"
+url_real_sina_top="http://vip.stock.finance.sina.com.cn/mkt/#stock_sh_up"
+url_real_east="http://quote.eastmoney.com/sz000004.html"
 from bs4 import BeautifulSoup
 import urllib2
 from pandas import Series,DataFrame
