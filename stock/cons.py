@@ -18,7 +18,6 @@ DD_VOL_List={'0':'40000','1':'100000','2':'100000','3':'200000','4':'1000000'}
 DD_TYPE_List={'0':'5','1':'10','2':'20','3':'50','4':'100'}
 P_TYPE = {'http': 'http://', 'ftp': 'ftp://'}
 PAGE_NUM = [38, 60, 80, 100]
-STATUS_DD={u"中性盘": "normal", u"买盘": "up", u"卖盘": "down"}
 FORMAT = lambda x: '%.2f' % x
 DOMAINS = {'sina': 'sina.com.cn', 'sinahq': 'sinajs.cn',
            'ifeng': 'ifeng.com', 'sf': 'finance.sina.com.cn',
@@ -109,6 +108,11 @@ SINA_DD_VRatio_All = '%s%s/quotes_service/view/%s?num=%s&page=1&sort=ticktime&as
 JSON_DD_CountURL="http://vip.stock.finance.sina.com.cn/quotes_service/api/json_v2.php/CN_Bill.GetBillListCount?num=100&page=1&sort=ticktime&asc=0&volume=%s&type=%s"
 JSON_DD_Data_URL="http://vip.stock.finance.sina.com.cn/quotes_service/api/json_v2.php/CN_Bill.GetBillList?num=%s&page=1&sort=ticktime&asc=0&volume=%s&type=%s"
 JSON_DD_Data_URL_Page="http://vip.stock.finance.sina.com.cn/quotes_service/api/json_v2.php/CN_Bill.GetBillList?num=%s&page=%s&sort=ticktime&asc=0&volume=%s&type=%s"
+
+DAY_REAL_DD_COLUMNS = ['code','symbol','name','ticktime','price','volume','prev_price','kind']
+Status_DD={u"中性盘": "normal", u"买盘": "up", u"卖盘": "down"}
+Status_KIND=['U','D','E']
+
 
 
 

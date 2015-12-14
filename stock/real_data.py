@@ -145,19 +145,20 @@ def _parsing_real_price_json(url):
         return None
     reg = re.compile(r'\,(.*?)\:')
     text = reg.sub(r',"\1":', text.decode('gbk') if ct.PY3 else text)
-    text = text.replace('"{symbol', '{"symbol')
-    text = text.replace('{symbol', '{"symbol"')
+    text = text.replace('"{symbol', '{"code')
+    text = text.replace('{symbol', '{"code"')
+
     if ct.PY3:
         jstr = json.dumps(text)
     else:
         jstr = json.dumps(text, encoding='GBK')
     js = json.loads(jstr)
     df = pd.DataFrame(pd.read_json(js, dtype={'code':object}),
-                      columns=ct.DAY_TRADING_COLUMNS)
+                      columns=ct.DAY_REAL_DD_COLUMNS)
     df = df.drop('symbol', axis=1)
     df = df.ix[df.volume > 0]
-    print ""
-    print df['name'][len(df.index)-1:],len(df.index)
+    # print ""
+    # print df['name'][len(df.index)-1:],len(df.index)
     return df
 
 def get_sina_all_json_dd(vol='0',type='3',retry_count=3, pause=0.001):
@@ -170,21 +171,22 @@ def get_sina_all_json_dd(vol='0',type='3',retry_count=3, pause=0.001):
       DataFrame
            属性：代码，名称，涨跌幅，现价，开盘价，最高价，最低价，最日收盘价，成交量，换手率
     """
-    ct._write_head()
+    # ct._write_head()
     url_list = get_sina_json_url(vol,type)
     df = pd.DataFrame()
     # data['code'] = symbol
     # df = df.append(data, ignore_index=True)
     for url in url_list:
-        print url
+        # print url
         data = _parsing_real_price_json(url)
         df=df.append(data,ignore_index=True)
+        # break
 
     if df is not None:
         # for i in range(2, ct.PAGE_NUM[0]):
         #     newdf = _parsing_dayprice_json(i)
         #     df = df.append(newdf, ignore_index=True)
-        print len(df.index)
+        # print len(df.index)
         return df
     else:
         print "no data"
@@ -398,5 +400,6 @@ if __name__ == '__main__':
     # df=get_sina_real_dd()
     # up= df[df['trade']>df['settlement']]
     # print up[:2]
-    df=get_sina_all_json_dd(type='1')
+    df=get_sina_all_json_dd(type='3')
+    print df[:10]
     sys.exit(0)

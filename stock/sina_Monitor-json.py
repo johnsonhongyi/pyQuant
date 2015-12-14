@@ -14,17 +14,17 @@ import time
 import traceback
 # import urllib2
 
-from bs4 import BeautifulSoup
-from pandas import DataFrame
+# from pandas import DataFrame
 import pandas as pd
 import cons as ct
 import singleAnalyseUtil as sl
+import real_data
 
-import json
-try:
-    from urllib.request import urlopen, Request
-except ImportError:
-    from urllib2 import urlopen, Request
+# import json
+# try:
+#     from urllib.request import urlopen, Request
+# except ImportError:
+#     from urllib2 import urlopen, Request
 
 
 url_s = "http://vip.stock.finance.sina.com.cn/quotes_service/view/cn_bill_all.php?num=100&page=1&sort=ticktime&asc=0&volume=0&type=1"
@@ -64,93 +64,17 @@ def get_sina_url(vol='0', type='0', pageCount='100'):
     return url
 
 
-def get_sina_all_dd(vol='0', type='0', retry_count=3, pause=0.001):
-    if len(vol) != 1 or len(type) != 1:
-        return None
-    else:
-        print ("Vol:%s  Type:%s" % (ct.DD_VOL_List[vol], ct.DD_TYPE_List[type]))
-    # symbol = _code_to_symbol(code)
-    for _ in range(retry_count):
-        time.sleep(pause)
-        try:
-            ct._write_console()
-            url = get_sina_url(vol, type)
-            # url= ct.SINA_DD_VRatio % (ct.P_TYPE['http'], ct.DOMAINS['vsf'], ct.PAGES['sinadd_all'],ct.DD_VOL_List[vol], ct.DD_TYPE_List[type])
-            page = urllib2.urlopen(url)
-            html_doc = page.read()
-            # print (html_doc)
-            # soup = BeautifulSoup(html_doc,fromEncoding='gb18030')
-            # print html_doc
-            pageCount = re.findall('fillCount\"\]\((\d+)', html_doc, re.S)
-            if len(pageCount) > 0:
-                start_t = time.time()
-                pageCount = pageCount[0]
-                if int(pageCount) > 100:
-                    if int(pageCount) > 10000:
-                        print "BigBig:", pageCount
-                        pageCount = '10000'
-
-                    print "AllBig:", pageCount
-                    html_doc = urllib2.urlopen(get_sina_url(vol, type, pageCount=pageCount)).read()
-                    print (time.time() - start_t)
-
-            soup = BeautifulSoup(html_doc, "lxml")
-            print (time.time() - start_t)
-            alldata = {}
-            dict_data = {}
-            # print soup.find_all('div',id='divListTemplate')
-
-            row = soup.find_all('div', id='divListTemplate')
-            sdata = []
-            if len(row) >= 1:
-                '''
-                colums:CHN name
-
-                '''
-                for tag in row[0].find_all('tr', attrs={"class": True}):
-                    # print tag
-                    th_cells = tag.find_all('th')
-                    td_cells = tag.find_all('td')
-                    m_name = th_cells[0].find(text=True)
-                    m_code = th_cells[1].find(text=True)
-                    print m_code
-                    m_time = th_cells[2].find(text=True)
-                    # m_detail=(th_cells[4]).find('a')["href"]   #detail_url
-                    m_price = td_cells[0].find(text=True)
-                    m_vol = float(td_cells[1].find(text=True).replace(',', '')) * 100
-                    m_pre_p = td_cells[2].find(text=True)
-                    m_status_t = th_cells[3].find(text=True)
-                    if m_status_t in ct.STATUS_DD.keys():
-                        m_status = ct.STATUS_DD[m_status_t]
-                        # print m_status
-                    sdata.append({'code': m_code, 'time': m_time, 'vol': m_vol, 'price': m_price, 'pre_p': m_pre_p,
-                                  'status': m_status, 'name': m_name})
-            df = DataFrame(sdata, columns=['code', 'time', 'vol', 'price', 'pre_p', 'status', 'name'])
-            # for row in soup.find_all('tr',attrs={"class":"gray","class":""}):
-            return df
-        except Exception as e:
-            print "Except-Sina:", (e)
-            traceback.print_exc()
-        # else:
-        #     return df
-        raise IOError(ct.NETWORK_URL_ERROR_MSG)
-
-
 if __name__ == "__main__":
 
-    # get_sina_json_url()
-    df=get_sina_all_json_dd(type='2')
-    sys.exit(0)
+    status=True
     vol = '0'
     type = '2'
     code_a = []
-
-
     def get_code_g():
         start_t = time.time()
-        data = get_sina_all_dd(vol, type)
+        data = real_data.get_sina_all_json_dd(vol,type)
         interval = (time.time() - start_t)
-        df = data[(data['status'] == 'up')]['code'].value_counts()[:8]
+        df = data[(data['kind'] == 'U')]['code'].value_counts()[:8]
         # print ""
         print "interval:", interval
         print df
