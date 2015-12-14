@@ -18,6 +18,8 @@ import cons as ct
 import re
 from pandas.compat import StringIO
 from tushare.util import dateu as du
+import math
+import sys
 try:
     from urllib.request import urlopen, Request
 except ImportError:
@@ -38,11 +40,16 @@ DAY_REAL_COLUMNS = ['code', 'symbol', 'name', 'changepercent',
                        'trade', 'open', 'high', 'low', 'settlement', 'volume', 'turnoverratio']
 
 
+def get_url_data(url):
+    fp = urlopen(url)
+    data = fp.read()
+    fp.close()
+    return data
 
 def get_code_count(type):
     pass
 
-def _parsing_real_price_json():
+def _parsing_real_price_json__():
     """
            处理当日行情分页数据，格式为json
      Parameters
@@ -79,29 +86,83 @@ def _parsing_real_price_json():
     return df
 
 
-def get_sina_real_dd(retry_count=3, pause=0.001):
-    url="http://vip.stock.finance.sina.com.cn/quotes_service/api/json_v2.php/Market_Center.getHQNodeData?page=1&num=50&sort=changepercent&asc=0&node=sh_a&symbol="
-    SINA_REAL_PRICE_DD = '%s%s/quotes_service/api/json_v2.php/Market_Center.getHQNodeData?page=1&num=%s&sort=changepercent&asc=0&node=%s&symbol=%s'
-    # for _ in range(retry_count):
-    #     time.sleep(pause)
-    #     try:
-    #
-    #         # re = Request(SINA_REAL_PRICE_DD% (ct.P_TYPE['http'], ct.DOMAINS['vsf'], ct.PAGES['sinadd'],
-    #         #                     symbol, date))
-    #
-    #         lines = urlopen(re, timeout=10).read()
-    #         lines = lines.decode('GBK')
-    #         if len(lines) < 100:
-    #             return None
-    #         df = pd.read_csv(StringIO(lines), names=ct.SINA_DD_COLS,
-    #                            skiprows=[0])
-    #         if df is not None:
-    #             df['code'] = df['code'].map(lambda x: x[2:])
-    #     except Exception as e:
-    #         print(e)
-    #     else:
-    #         return df
-    # raise IOError(ct.NETWORK_URL_ERROR_MSG)
+def get_sina_json_url(vol='0',type='3',count=None):
+    if count==None:
+        url = ct.JSON_DD_CountURL%( ct.DD_VOL_List[vol],type)
+        # print url
+        data=get_url_data(url)
+        count=re.findall('(\d+)', data, re.S)
+        urllist=[]
+        if len(count) >0:
+            count= count[0]
+            if int(count) >=10000:
+                page_count=int(math.ceil(int(count)/10000))
+                for page in range(1,page_count+1):
+                    # print page
+                    url = ct.JSON_DD_Data_URL_Page%('10000',page, ct.DD_VOL_List[vol],type)
+                    urllist.append(url)
+            else:
+                url=ct.JSON_DD_Data_URL_Page%(count,'1', ct.DD_VOL_List[vol],type)
+                urllist.append(url)
+    else:
+        url = ct.JSON_DD_CountURL%( ct.DD_VOL_List[vol],type)
+        # print url
+        data=get_url_data(url)
+        count_now=re.findall('(\d+)', data, re.S)
+        urllist=[]
+        if count < count_now:
+            count_diff =int(count_now)-int(count)
+            if int(math.ceil(int(count_diff)/10000)) >=1:
+                page_start=int(math.ceil(int(count)/10000))
+                page_end=int(math.ceil(int(count_now)/10000))
+                for page in range(page_start,page_end+1):
+                    # print page
+                    url = ct.JSON_DD_Data_URL_Page%('10000',page, ct.DD_VOL_List[vol],type)
+                    urllist.append(url)
+            else:
+                page=int(math.ceil(int(count_now)/10000))
+                url = ct.JSON_DD_Data_URL_Page%('10000',page, ct.DD_VOL_List[vol],type)
+                urllist.append(url)
+    # print urllist
+    return urllist
+
+def _parsing_real_price_json(url):
+    """
+           处理当日行情分页数据，格式为json
+     Parameters
+     ------
+        pageNum:页码
+     return
+     -------
+        DataFrame 当日所有股票交易数据(DataFrame)
+    """
+    ct._write_console()
+    # request = Request(ct.SINA_DAY_PRICE_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'],
+    #                              ct.PAGES['jv'], pageNum))
+    request = Request(url)
+    text = urlopen(request, timeout=10).read()
+    if text == 'null':
+        return None
+    reg = re.compile(r'\,(.*?)\:')
+    text = reg.sub(r',"\1":', text.decode('gbk') if ct.PY3 else text)
+    text = text.replace('"{symbol', '{"symbol')
+    text = text.replace('{symbol', '{"symbol"')
+    if ct.PY3:
+        jstr = json.dumps(text)
+    else:
+        jstr = json.dumps(text, encoding='GBK')
+    js = json.loads(jstr)
+    df = pd.DataFrame(pd.read_json(js, dtype={'code':object}),
+                      columns=ct.DAY_TRADING_COLUMNS)
+    df = df.drop('symbol', axis=1)
+    df = df.ix[df.volume > 0]
+    print ""
+    print df['name'][len(df.index)-1:],len(df.index)
+    return df
+
+def get_sina_all_json_dd(vol='0',type='3',retry_count=3, pause=0.001):
+    # url="http://vip.stock.finance.sina.com.cn/quotes_service/api/json_v2.php/Market_Center.getHQNodeData?page=1&num=50&sort=changepercent&asc=0&node=sh_a&symbol="
+    # SINA_REAL_PRICE_DD = '%s%s/quotes_service/api/json_v2.php/Market_Center.getHQNodeData?page=1&num=%s&sort=changepercent&asc=0&node=%s&symbol=%s'
     """
         一次性获取最近一个日交易日所有股票的交易数据
     return
@@ -110,11 +171,20 @@ def get_sina_real_dd(retry_count=3, pause=0.001):
            属性：代码，名称，涨跌幅，现价，开盘价，最高价，最低价，最日收盘价，成交量，换手率
     """
     ct._write_head()
-    df = _parsing_real_price_json()
+    url_list = get_sina_json_url(vol,type)
+    df = pd.DataFrame()
+    # data['code'] = symbol
+    # df = df.append(data, ignore_index=True)
+    for url in url_list:
+        print url
+        data = _parsing_real_price_json(url)
+        df=df.append(data,ignore_index=True)
+
     if df is not None:
         # for i in range(2, ct.PAGE_NUM[0]):
         #     newdf = _parsing_dayprice_json(i)
         #     df = df.append(newdf, ignore_index=True)
+        print len(df.index)
         return df
     else:
         print "no data"
@@ -325,6 +395,8 @@ def _code_to_symbol(code):
 
 
 if __name__ == '__main__':
-    df=get_sina_real_dd()
-    up= df[df['trade']>df['settlement']]
-    print up[:2]
+    # df=get_sina_real_dd()
+    # up= df[df['trade']>df['settlement']]
+    # print up[:2]
+    df=get_sina_all_json_dd(type='1')
+    sys.exit(0)

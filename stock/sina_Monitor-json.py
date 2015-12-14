@@ -8,20 +8,31 @@
 #
 # sys.setdefaultencoding('utf-8')
 
-from bs4 import BeautifulSoup
-import urllib2
-from pandas import Series, DataFrame
-import sys, re, time
-import cons as ct
+import re
+import sys
 import time
-import singleAnalyseUtil as sl
 import traceback
+# import urllib2
+
+from bs4 import BeautifulSoup
+from pandas import DataFrame
+import pandas as pd
+import cons as ct
+import singleAnalyseUtil as sl
+
+import json
+try:
+    from urllib.request import urlopen, Request
+except ImportError:
+    from urllib2 import urlopen, Request
+
 
 url_s = "http://vip.stock.finance.sina.com.cn/quotes_service/view/cn_bill_all.php?num=100&page=1&sort=ticktime&asc=0&volume=0&type=1"
 url_b = "http://vip.stock.finance.sina.com.cn/quotes_service/view/cn_bill_all.php?num=100&page=1&sort=ticktime&asc=0&volume=100000&type=0"
 url_real_sina = "http://finance.sina.com.cn/realstock/"
 url_real_sina_top = "http://vip.stock.finance.sina.com.cn/mkt/#stock_sh_up"
 url_real_east = "http://quote.eastmoney.com/sz000004.html"
+
 
 def downloadpage(url):
     fp = urllib2.urlopen(url)
@@ -49,7 +60,7 @@ def get_sina_url(vol='0', type='0', pageCount='100'):
     # if len(pageCount) >=1:
     url = ct.SINA_DD_VRatio_All % (
         ct.P_TYPE['http'], ct.DOMAINS['vsf'], ct.PAGES['sinadd_all'], pageCount, ct.DD_VOL_List[vol], type)
-    # print url
+    print url
     return url
 
 
@@ -126,7 +137,10 @@ def get_sina_all_dd(vol='0', type='0', retry_count=3, pause=0.001):
 
 
 if __name__ == "__main__":
-    # parsehtml(downloadpage(url_s))
+
+    # get_sina_json_url()
+    df=get_sina_all_json_dd(type='2')
+    sys.exit(0)
     vol = '0'
     type = '2'
     code_a = []
