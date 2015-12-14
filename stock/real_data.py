@@ -75,7 +75,7 @@ def _parsing_real_price_json():
     df = df.drop('symbol', axis=1)
     df = df.ix[df.volume > 0]
     print ""
-    print df[:1]
+    print df[:1],len(df.index)
     return df
 
 

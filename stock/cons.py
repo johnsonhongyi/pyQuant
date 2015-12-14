@@ -18,6 +18,7 @@ DD_VOL_List={'0':'40000','1':'100000','2':'100000','3':'200000','4':'1000000'}
 DD_TYPE_List={'0':'5','1':'10','2':'20','3':'50','4':'100'}
 P_TYPE = {'http': 'http://', 'ftp': 'ftp://'}
 PAGE_NUM = [38, 60, 80, 100]
+STATUS_DD={u"中性盘": "normal", u"买盘": "up", u"卖盘": "down"}
 FORMAT = lambda x: '%.2f' % x
 DOMAINS = {'sina': 'sina.com.cn', 'sinahq': 'sinajs.cn',
            'ifeng': 'ifeng.com', 'sf': 'finance.sina.com.cn',
