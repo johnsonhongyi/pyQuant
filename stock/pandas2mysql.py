@@ -9,20 +9,18 @@ engine = create_engine('mysql://root:plokij@127.0.0.1/Quant?charset=utf8',echo=T
 # engine = create_engine('mysql://root:plokij@127.0.0.1/Quant?charset=utf8',echo=True,strategy=’threadlocal’)
 # metadata = MetaData(engine)
 
-# users_table = table('users',
-#           metadata,
-#           Column('date', VARCHAR(40), primary_key=True),
-#           Column('open', FLOAT(53)),
-#           Column('high', FLOAT(53)),
-#           Column('high', FLOAT(53)),
-#
-#           )
+users_table = table('users',
+          metadata,
+          Column('date', VARCHAR(40), primary_key=True),
+          Column('open', FLOAT(53)),
+          Column('high', FLOAT(53)),
+          Column('high', FLOAT(53)),
+
+          )
 codes=mp.get_all_top()
 
 
-
-# code_table=table(
-# CREATE TABLE `300277` (
+# CREATE TABLE `000017`
 # 	date TEXT,
 # 	open FLOAT(53),
 # 	high FLOAT(53),
@@ -39,6 +37,8 @@ codes=mp.get_all_top()
 # 	v_ma20 FLOAT(53),
 # 	turnover FLOAT(53)
 # )
+
+
 # codes=['000030','601198','600476']
 num=0
 for code in codes:

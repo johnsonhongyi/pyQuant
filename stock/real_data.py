@@ -14,7 +14,7 @@ import lxml.html
 from lxml import etree
 import pandas as pd
 import numpy as np
-from pyQuant.stock import cons as ct
+import cons as ct
 import re
 from pandas.compat import StringIO
 from tushare.util import dateu as du
@@ -64,6 +64,7 @@ def _parsing_real_price_json():
     text = reg.sub(r',"\1":', text.decode('gbk') if ct.PY3 else text) 
     text = text.replace('"{symbol', '{"symbol')
     text = text.replace('{symbol', '{"symbol"')
+    print text
     if ct.PY3:
         jstr = json.dumps(text)
     else:
