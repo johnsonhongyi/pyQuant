@@ -9,7 +9,7 @@
 # sys.setdefaultencoding('utf-8')
 url_s="http://vip.stock.finance.sina.com.cn/quotes_service/view/cn_bill_all.php?num=100&page=1&sort=ticktime&asc=0&volume=0&type=1"
 url_b="http://vip.stock.finance.sina.com.cn/quotes_service/view/cn_bill_all.php?num=100&page=1&sort=ticktime&asc=0&volume=100000&type=0"
-status={u"中性盘":"normal",u"买盘":"up",u"卖盘":"down"}
+status_dict={u"中性盘":"normal",u"买盘":"up",u"卖盘":"down"}
 url_real_sina="http://finance.sina.com.cn/realstock/"
 url_real_sina_top="http://vip.stock.finance.sina.com.cn/mkt/#stock_sh_up"
 url_real_east="http://quote.eastmoney.com/sz000004.html"
@@ -17,7 +17,7 @@ from bs4 import BeautifulSoup
 import urllib2
 from pandas import Series,DataFrame
 import sys,re,time
-import cons as ct
+import johnson_cons as ct
 import time
 import singleAnalyseUtil as sl
 
@@ -130,8 +130,8 @@ def get_sina_all_dd(vol='0', type='0', retry_count=3, pause=0.001):
                     m_vol=float(td_cells[1].find(text=True).replace(',',''))*100
                     m_pre_p=td_cells[2].find(text=True)
                     m_status_t=th_cells[3].find(text=True)
-                    if m_status_t in status.keys():
-                        m_status = status[m_status_t]
+                    if m_status_t in status_dict.keys():
+                        m_status = status_dict[m_status_t]
                         # print m_status
                     sdata.append({'code':m_code,'time':m_time,'vol':m_vol,'price':m_price,'pre_p':m_pre_p,'status':m_status,'name':m_name})
                     # sdata.append({'code':m_code,'time':m_time,'vol':m_vol,'price':m_price,'pre_p':m_pre_p,'detail':m_detail,'status':m_status,'name':m_name})
@@ -149,6 +149,7 @@ def get_sina_all_dd(vol='0', type='0', retry_count=3, pause=0.001):
 
 if __name__ == "__main__":
     # parsehtml(downloadpage(url_s))
+    status=False
     vol='0'
     type='2'
     code_a=[]
@@ -156,7 +157,7 @@ if __name__ == "__main__":
         start_t= time.time()
         data=get_sina_all_dd(vol,type)
         interval=(time.time() - start_t)
-        df=data[(data['status']=='up')]['code'].value_counts()[:8]
+        df=data[(data['status']=='up')]['code'].value_counts()[:10]
         # print ""
         print "interval:",interval
         print df

@@ -13,7 +13,7 @@ import lxml.html
 from lxml import etree
 import pandas as pd
 import numpy as np
-import cons as ct
+import johnson_cons as ct
 import re
 from pandas.compat import StringIO
 from tushare.util import dateu as du

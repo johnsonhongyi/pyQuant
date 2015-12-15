@@ -75,9 +75,9 @@ if __name__ == "__main__":
         data = real_data.get_sina_all_json_dd(vol,type)
         interval = (time.time() - start_t)
         df = data[(data['kind'] == 'U')]['code'].value_counts()[:10]
-        print len(data.index)
+        # print ""
         print "interval:", interval
-        print df[:10]
+        print df
         code_g = []
         for code in df.index:
             code = re.findall('(\d+)', code)

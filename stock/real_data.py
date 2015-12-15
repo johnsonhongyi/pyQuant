@@ -14,42 +14,46 @@ import lxml.html
 from lxml import etree
 import pandas as pd
 import numpy as np
-import cons as ct
+import johnson_cons as ct
 import re
 from pandas.compat import StringIO
-from tushare.util import dateu as du
+# from tushare.util import dateu as du
 import math
-import sys
+# import sys
 try:
     from urllib.request import urlopen, Request
 except ImportError:
     from urllib2 import urlopen, Request
 
-REAL_INDEX_LABELS=['sh_a','sz_a','cyb']
-DD_VOL_List={'0':'40000','1':'100000','2':'100000','3':'200000','4':'1000000'}
-DD_TYPE_List={'0':'5','1':'10','2':'20','3':'50','4':'100'}
-TICK_COLUMNS = ['time', 'price', 'change', 'volume', 'amount', 'type']
-TODAY_TICK_COLUMNS = ['time', 'price', 'pchange', 'change', 'volume', 'amount', 'type']
-DAY_TRADING_COLUMNS = ['code', 'symbol', 'name', 'changepercent',
-                       'trade', 'open', 'high', 'low', 'settlement', 'volume', 'turnoverratio']
-SINA_DATA_DETAIL_URL = '%s%s/quotes_service/api/%s/Market_Center.getHQNodeData?page=1&num=400&sort=symbol&asc=1&node=%s&symbol=&_s_r_a=page'
-SINA_DAY_PRICE_URL = '%s%s/quotes_service/api/%s/Market_Center.getHQNodeData?num=80&sort=changepercent&asc=0&node=hs_a&symbol=&_s_r_a=page&page=%s'
-SINA_REAL_PRICE_DD = '%s%s/quotes_service/api/json_v2.php/Market_Center.getHQNodeData?page=1&num=%s&sort=changepercent&asc=0&node=%s&symbol=%s'
+# REAL_INDEX_LABELS=['sh_a','sz_a','cyb']
+# DD_VOL_List={'0':'40000','1':'100000','2':'100000','3':'200000','4':'1000000'}
+# DD_TYPE_List={'0':'5','1':'10','2':'20','3':'50','4':'100'}
+# TICK_COLUMNS = ['time', 'price', 'change', 'volume', 'amount', 'type']
+# TODAY_TICK_COLUMNS = ['time', 'price', 'pchange', 'change', 'volume', 'amount', 'type']
+# DAY_TRADING_COLUMNS = ['code', 'symbol', 'name', 'changepercent',
+#                        'trade', 'open', 'high', 'low', 'settlement', 'volume', 'turnoverratio']
+# SINA_DATA_DETAIL_URL = '%s%s/quotes_service/api/%s/Market_Center.getHQNodeData?page=1&num=400&sort=symbol&asc=1&node=%s&symbol=&_s_r_a=page'
+# SINA_DAY_PRICE_URL = '%s%s/quotes_service/api/%s/Market_Center.getHQNodeData?num=80&sort=changepercent&asc=0&node=hs_a&symbol=&_s_r_a=page&page=%s'
+# SINA_REAL_PRICE_DD = '%s%s/quotes_service/api/json_v2.php/Market_Center.getHQNodeData?page=1&num=%s&sort=changepercent&asc=0&node=%s&symbol=%s'
+#
+# DAY_REAL_COLUMNS = ['code', 'symbol', 'name', 'changepercent',
+#                        'trade', 'open', 'high', 'low', 'settlement', 'volume', 'turnoverratio']
 
-DAY_REAL_COLUMNS = ['code', 'symbol', 'name', 'changepercent',
-                       'trade', 'open', 'high', 'low', 'settlement', 'volume', 'turnoverratio']
 
-
-def get_url_data(url):
+def _get_url_data(url):
     fp = urlopen(url)
     data = fp.read()
     fp.close()
     return data
 
-def get_code_count(type):
+def _write_to_csv(df,filename):
+    df.to_csv(filename,encoding='gbk', index=False)
+
+
+def _get_code_count(type):
     pass
 
-def _parsing_real_price_json__():
+def _parsing_Market_price_json(url):
     """
            处理当日行情分页数据，格式为json
      Parameters
@@ -60,7 +64,7 @@ def _parsing_real_price_json__():
         DataFrame 当日所有股票交易数据(DataFrame)
     """
     ct._write_console()
-    url="http://vip.stock.finance.sina.com.cn/quotes_service/api/json_v2.php/Market_Center.getHQNodeData?page=1&num=50&sort=changepercent&asc=0&node=sh_a&symbol="
+    # url="http://vip.stock.finance.sina.com.cn/quotes_service/api/json_v2.php/Market_Center.getHQNodeData?page=1&num=50&sort=changepercent&asc=0&node=sh_a&symbol="
     # request = Request(ct.SINA_DAY_PRICE_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'],
     #                              ct.PAGES['jv'], pageNum))
     request = Request(url)
@@ -71,32 +75,119 @@ def _parsing_real_price_json__():
     text = reg.sub(r',"\1":', text.decode('gbk') if ct.PY3 else text) 
     text = text.replace('"{symbol', '{"symbol')
     text = text.replace('{symbol', '{"symbol"')
-    print text
+    # print text
     if ct.PY3:
         jstr = json.dumps(text)
     else:
         jstr = json.dumps(text, encoding='GBK')
     js = json.loads(jstr)
+    # print js
+    # df = pd.DataFrame(pd.read_json(js, dtype={'code':object}),columns=ct.MARKET_COLUMNS)
     df = pd.DataFrame(pd.read_json(js, dtype={'code':object}),
-                      columns=ct.DAY_TRADING_COLUMNS)
-    df = df.drop('symbol', axis=1)
+                      columns=ct.SINA_Market_COLUMNS)
+    # print df[:1]
+    # df = df.drop('symbol', axis=1)
     df = df.ix[df.volume > 0]
-    print ""
-    print df[:1],len(df.index)
+    # print ""
+    # print df[:1],len(df.index)
     return df
 
-
-def get_sina_json_url(vol='0',type='3',count=None):
+def _get_sina_Market_url(market='sh_a',count=None,num='1000'):
     if count==None:
-        url = ct.JSON_DD_CountURL%( ct.DD_VOL_List[vol],type)
+        print market
+        url = ct.JSON_Market_Center_CountURL%(market)
         # print url
-        data=get_url_data(url)
+        data=_get_url_data(url)
+        # print data
         count=re.findall('(\d+)', data, re.S)
         urllist=[]
         if len(count) >0:
             count= count[0]
-            if int(count) >=10000:
-                page_count=int(math.ceil(int(count)/10000))
+            if int(count) >=int(num):
+                page_count=int(math.ceil(int(count)/int(num)))
+                for page in range(1,page_count+1):
+                    # print page
+                    url = ct.JSON_Market_Center_RealURL%(page,num,market)
+                    # print "url",url
+                    urllist.append(url)
+
+            else:
+                    url = ct.JSON_Market_Center_RealURL%('1',num,market)
+                    # print "url",url
+                    urllist.append(url)
+    # else:
+    #     url = ct.JSON_DD_CountURL%( ct.DD_VOL_List[vol],type)
+    #     # print url
+    #     data=_get_url_data(url)
+    #     count_now=re.findall('(\d+)', data, re.S)
+    #     urllist=[]
+    #     if count < count_now:
+    #         count_diff =int(count_now)-int(count)
+    #         if int(math.ceil(int(count_diff)/10000)) >=1:
+    #             page_start=int(math.ceil(int(count)/10000))
+    #             page_end=int(math.ceil(int(count_now)/10000))
+    #             for page in range(page_start,page_end+1):
+    #                 # print page
+    #                 url = ct.JSON_DD_Data_URL_Page%('10000',page, ct.DD_VOL_List[vol],type)
+    #                 urllist.append(url)
+    #         else:
+    #             page=int(math.ceil(int(count_now)/10000))
+    #             url = ct.JSON_DD_Data_URL_Page%('10000',page, ct.DD_VOL_List[vol],type)
+    #             urllist.append(url)
+    # print urllist
+    return urllist
+
+def get_sina_Market_json(market='sh_a',num='2000',retry_count=3, pause=0.001):
+    start_t=time.time()
+    # url="http://vip.stock.finance.sina.com.cn/quotes_service/api/json_v2.php/Market_Center.getHQNodeData?page=1&num=50&sort=changepercent&asc=0&node=sh_a&symbol="
+    # SINA_REAL_PRICE_DD = '%s%s/quotes_service/api/json_v2.php/Market_Center.getHQNodeData?page=1&num=%s&sort=changepercent&asc=0&node=%s&symbol=%s'
+    """
+        一次性获取最近一个日交易日所有股票的交易数据
+    return
+    -------
+      DataFrame
+           属性：代码，名称，涨跌幅，现价，开盘价，最高价，最低价，最日收盘价，成交量，换手率
+    """
+    # ct._write_head()
+    url_list = _get_sina_Market_url(market,num=num)
+    # print "url:",url_list
+    df = pd.DataFrame()
+    # data['code'] = symbol
+    # df = df.append(data, ignore_index=True)
+    for url in url_list:
+        # print url
+        data = _parsing_Market_price_json(url)
+        # print data[:1]
+        df=df.append(data,ignore_index=True)
+        # break
+
+    if df is not None:
+        # for i in range(2, ct.PAGE_NUM[0]):
+        #     newdf = _parsing_dayprice_json(i)
+        #     df = df.append(newdf, ignore_index=True)
+        # print len(df.index)
+        print "interval:", (time.time() - start_t)
+        return df
+    else:
+        print "no data"
+        print "interval:", (time.time() - start_t)
+        return []
+
+
+
+
+def _get_sina_json_dd_url(vol='0',type='3',num='10000',count=None):
+    if count==None:
+        url = ct.JSON_DD_CountURL%( ct.DD_VOL_List[vol],type)
+        # print url
+        data=_get_url_data(url)
+        count=re.findall('(\d+)', data, re.S)
+        urllist=[]
+        if len(count) >0:
+            count= count[0]
+            print "Big:",count
+            if int(count) >=int(num):
+                page_count=int(math.ceil(int(count)/int(num)))
                 for page in range(1,page_count+1):
                     # print page
                     url = ct.JSON_DD_Data_URL_Page%('10000',page, ct.DD_VOL_List[vol],type)
@@ -107,7 +198,7 @@ def get_sina_json_url(vol='0',type='3',count=None):
     else:
         url = ct.JSON_DD_CountURL%( ct.DD_VOL_List[vol],type)
         # print url
-        data=get_url_data(url)
+        data=_get_url_data(url)
         count_now=re.findall('(\d+)', data, re.S)
         urllist=[]
         if count < count_now:
@@ -126,7 +217,7 @@ def get_sina_json_url(vol='0',type='3',count=None):
     # print urllist
     return urllist
 
-def _parsing_real_price_json(url):
+def _parsing_sina_dd_price_json(url):
     """
            处理当日行情分页数据，格式为json
      Parameters
@@ -161,7 +252,8 @@ def _parsing_real_price_json(url):
     # print df['name'][len(df.index)-1:],len(df.index)
     return df
 
-def get_sina_all_json_dd(vol='0',type='3',retry_count=3, pause=0.001):
+def get_sina_all_json_dd(vol='0',type='3',num='1000',retry_count=3, pause=0.001):
+    start_t = time.time()
     # url="http://vip.stock.finance.sina.com.cn/quotes_service/api/json_v2.php/Market_Center.getHQNodeData?page=1&num=50&sort=changepercent&asc=0&node=sh_a&symbol="
     # SINA_REAL_PRICE_DD = '%s%s/quotes_service/api/json_v2.php/Market_Center.getHQNodeData?page=1&num=%s&sort=changepercent&asc=0&node=%s&symbol=%s'
     """
@@ -172,13 +264,13 @@ def get_sina_all_json_dd(vol='0',type='3',retry_count=3, pause=0.001):
            属性：代码，名称，涨跌幅，现价，开盘价，最高价，最低价，最日收盘价，成交量，换手率
     """
     # ct._write_head()
-    url_list = get_sina_json_url(vol,type)
+    url_list = _get_sina_json_dd_url(vol,type,num)
     df = pd.DataFrame()
     # data['code'] = symbol
     # df = df.append(data, ignore_index=True)
     for url in url_list:
         # print url
-        data = _parsing_real_price_json(url)
+        data = _parsing_sina_dd_price_json(url)
         df=df.append(data,ignore_index=True)
         # break
 
@@ -187,9 +279,11 @@ def get_sina_all_json_dd(vol='0',type='3',retry_count=3, pause=0.001):
         #     newdf = _parsing_dayprice_json(i)
         #     df = df.append(newdf, ignore_index=True)
         # print len(df.index)
+        print "interval:", (time.time() - start_t)
         return df
     else:
         print "no data"
+        print "interval:", (time.time() - start_t)
         return []
 
 def _today_ticks(symbol, tdate, pageNo, retry_count, pause):
@@ -219,7 +313,7 @@ def _today_ticks(symbol, tdate, pageNo, retry_count, pause):
     raise IOError(ct.NETWORK_URL_ERROR_MSG)
         
     
-def get_today_all():
+def _get_today_all():
     """
         一次性获取最近一个日交易日所有股票的交易数据
     return
@@ -236,7 +330,7 @@ def get_today_all():
     return df
 
 
-def get_realtime_quotes(symbols=None):
+def _get_realtime_quotes(symbols=None):
     """
         获取实时交易数据 getting real time quotes data
        用于跟踪交易情况（本次执行的结果-上一次执行的数据）
@@ -311,7 +405,7 @@ def _fun_except(x):
     else:
         return x
 
-def get_index():
+def _get_index():
     """
     获取大盘指数行情
     return
@@ -357,7 +451,7 @@ def _get_index_url(index, code, qt):
     return url
 
 
-def get_hists(symbols, start=None, end=None,
+def _get_hists(symbols, start=None, end=None,
                   ktype='D', retry_count=3,
                   pause=0.001):
     """
@@ -400,6 +494,21 @@ if __name__ == '__main__':
     # df=get_sina_real_dd()
     # up= df[df['trade']>df['settlement']]
     # print up[:2]
-    df=get_sina_all_json_dd(type='3')
-    print df[:10]
-    sys.exit(0)
+    # df=get_sina_all_json_dd(type='3')
+    # print df[:10]
+    # df=get_sina_Market_url()
+    # for x in df:print ":",x
+    df=pd.DataFrame()
+    dz=get_sina_Market_json('sz_a')
+    ds=get_sina_Market_json('sh_a')
+    dc=get_sina_Market_json('cyb')
+    df=df.append(dz,ignore_index=True)
+    df=df.append(ds,ignore_index=True)
+    df=df.append(dc,ignore_index=True)
+    print df[:2],len(df.index)
+
+    # da[da['changepercent']<9.9].
+    # dd=df[(df['open'] <= df['low']) ]
+    # dd=df[(df['open'] <= df['low']) ]
+    # dd[dd['trade'] >= dd['high']*0.99]
+    # sys.exit(0)

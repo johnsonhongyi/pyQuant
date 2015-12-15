@@ -2,7 +2,7 @@
 import tushare as ts
 import emacount as ema
 import time
-
+import types
 
 def time_sleep(timemin):
     time1 = time.time()
@@ -36,7 +36,7 @@ def get_multiday_ave_compare(code, dayl='10'):
         # print da
         td = ts.get_tick_data(code, da)
         # print td
-        if len(td) > 0:
+        if not type(td)==types.NoneType:
             ep = td['amount'].sum() / td['volume'].sum()
             ep_list.append(ep)
             print ("D: %s P: %s" % (da[-5:], ep))
@@ -67,10 +67,10 @@ def get_multiday_ave_compare_silent(code, dayl='10'):
     # print dl
     ep_list = []
     for da in dl.values:
-        # print da
+        # print code,da
         td = ts.get_tick_data(code, da)
         # print td
-        if len(td) > 0:
+        if not type(td)==types.NoneType:
             ep = td['amount'].sum() / td['volume'].sum()
             ep_list.append(ep)
             # print ("D: %s P: %s" % (da[-5:], ep))

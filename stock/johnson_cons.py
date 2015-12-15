@@ -61,9 +61,8 @@ INX_DAY_PRICE_COLUMNS = ['date', 'open', 'high', 'close', 'low', 'volume', 'pric
 LIVE_DATA_COLS = ['name', 'open', 'pre_close', 'price', 'high', 'low', 'bid', 'ask', 'volume', 'amount',
                   'b1_v', 'b1_p', 'b2_v', 'b2_p', 'b3_v', 'b3_p', 'b4_v', 'b4_p', 'b5_v', 'b5_p',
                   'a1_v', 'a1_p', 'a2_v', 'a2_p', 'a3_v', 'a3_p', 'a4_v', 'a4_p', 'a5_v', 'a5_p', 'date', 'time', 's']
-FOR_CLASSIFY_B_COLS = ['code','name']
-FOR_CLASSIFY_W_COLS = ['date','code','weight']
-THE_FIELDS = ['code','symbol','name','changepercent','trade','open','high','low','settlement','volume','turnoverratio']
+FOR_CLASSIFY_B_COLS = ['code', 'name']
+FOR_CLASSIFY_W_COLS = ['date', 'code', 'weight']
 TICK_PRICE_URL = '%smarket.%s/%s?date=%s&symbol=%s'
 TODAY_TICKS_PAGE_URL = '%s%s/quotes_service/api/%s/CN_Transactions.getAllPageTime?date=%s&symbol=%s'
 TODAY_TICKS_URL = '%s%s/quotes_service/view/%s?symbol=%s&date=%s&page=%s'
@@ -96,9 +95,7 @@ INDEX_HQ_URL = '''%shq.%s/rn=xppzh&list=sh000001,sh000002,sh000003,sh000008,sh00
 SSEQ_CQ_REF_URL = '%s%s/assortment/stock/list/name'
 ALL_STK_URL = '%s%s/all.csv'
 SINA_DD = '%s%s/quotes_service/view/%s?symbol=%s&num=60&page=1&sort=ticktime&asc=0&volume=40000&amount=0&type=0&day=%s'
-'''
-Johnson add
-'''
+
 SINA_DD_Now = '%s%s/quotes_service/view/%s?symbol=%s&num=60&page=1&sort=ticktime&asc=0&volume=40000&amount=0&type=0'
 SINA_DD_VRatio_10 = '%s%s/quotes_service/view/%s?num=100&page=1&sort=ticktime&asc=0&volume=%s&type=%s'
 SINA_DD_VRatio = '%s%s/quotes_service/view/%s?num=100&page=1&sort=ticktime&asc=0&volume=%s&type=%s'
@@ -109,6 +106,13 @@ JSON_DD_CountURL="http://vip.stock.finance.sina.com.cn/quotes_service/api/json_v
 JSON_DD_Data_URL="http://vip.stock.finance.sina.com.cn/quotes_service/api/json_v2.php/CN_Bill.GetBillList?num=%s&page=1&sort=ticktime&asc=0&volume=%s&type=%s"
 JSON_DD_Data_URL_Page="http://vip.stock.finance.sina.com.cn/quotes_service/api/json_v2.php/CN_Bill.GetBillList?num=%s&page=%s&sort=ticktime&asc=0&volume=%s&type=%s"
 
+JSON_Market_Center_RealURL="http://vip.stock.finance.sina.com.cn/quotes_service/api/json_v2.php/Market_Center.getHQNodeData?page=%s&num=%s&sort=changepercent&asc=0&node=%s&symbol="
+JSON_Market_Center_CountURL="http://vip.stock.finance.sina.com.cn/quotes_service/api/json_v2.php/Market_Center.getHQNodeStockCount?node=%s"
+
+SINA_Market_KEY=['sh_a','sz_a','cyb']
+SINA_Market_COLUMNS = ['code', 'name', 'trade', 'buy', 'changepercent', 'open', 'high', 'low', 'volume', 'ticktime', 'turnoverratio']
+THE_FIELDS = ['code', 'symbol', 'name', 'changepercent', 'trade', 'open', 'high', 'low', 'settlement', 'volume', 'turnoverratio']
+# Market_Center_COLUMNS = ['code','name','trade','changepercent','buy','sell','settlement','open','high','low','volume','ticktime','turnoverratio']
 DAY_REAL_DD_COLUMNS = ['code','symbol','name','ticktime','price','volume','prev_price','kind']
 Status_DD={u"中性盘": "normal", u"买盘": "up", u"卖盘": "down"}
 Status_KIND=['U','D','E']
