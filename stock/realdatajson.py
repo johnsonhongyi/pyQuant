@@ -63,7 +63,7 @@ def _parsing_Market_price_json(url):
      -------
         DataFrame 当日所有股票交易数据(DataFrame)
     """
-    ct._write_console()
+    # ct._write_console()
     # url="http://vip.stock.finance.sina.com.cn/quotes_service/api/json_v2.php/Market_Center.getHQNodeData?page=1&num=50&sort=changepercent&asc=0&node=sh_a&symbol="
     # request = Request(ct.SINA_DAY_PRICE_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'],
     #                              ct.PAGES['jv'], pageNum))
@@ -94,7 +94,6 @@ def _parsing_Market_price_json(url):
 
 def _get_sina_Market_url(market='sh_a',count=None,num='1000'):
     if count==None:
-        print market
         url = ct.JSON_Market_Center_CountURL%(market)
         # print url
         data=_get_url_data(url)
@@ -112,29 +111,11 @@ def _get_sina_Market_url(market='sh_a',count=None,num='1000'):
                     urllist.append(url)
 
             else:
-                    url = ct.JSON_Market_Center_RealURL%('1',num,market)
-                    # print "url",url
+                    url = ct.JSON_Market_Center_RealURL%('1',count,market)
                     urllist.append(url)
-    # else:
-    #     url = ct.JSON_DD_CountURL%( ct.DD_VOL_List[vol],type)
-    #     # print url
-    #     data=_get_url_data(url)
-    #     count_now=re.findall('(\d+)', data, re.S)
-    #     urllist=[]
-    #     if count < count_now:
-    #         count_diff =int(count_now)-int(count)
-    #         if int(math.ceil(int(count_diff)/10000)) >=1:
-    #             page_start=int(math.ceil(int(count)/10000))
-    #             page_end=int(math.ceil(int(count_now)/10000))
-    #             for page in range(page_start,page_end+1):
-    #                 # print page
-    #                 url = ct.JSON_DD_Data_URL_Page%('10000',page, ct.DD_VOL_List[vol],type)
-    #                 urllist.append(url)
-    #         else:
-    #             page=int(math.ceil(int(count_now)/10000))
-    #             url = ct.JSON_DD_Data_URL_Page%('10000',page, ct.DD_VOL_List[vol],type)
-    #             urllist.append(url)
-    # print urllist
+    # print "%s count: %s"%(market,count),
+
+    # print urllist[0],
     return urllist
 
 def get_sina_Market_json(market='sh_a',num='2000',retry_count=3, pause=0.001):
@@ -166,11 +147,11 @@ def get_sina_Market_json(market='sh_a',num='2000',retry_count=3, pause=0.001):
         #     newdf = _parsing_dayprice_json(i)
         #     df = df.append(newdf, ignore_index=True)
         # print len(df.index)
-        print "interval:", (time.time() - start_t)
+        print ("interval:%s"%(format((time.time() - start_t),'.2f'))),
         return df
     else:
-        print "no data"
-        print "interval:", (time.time() - start_t)
+        print ("no data")
+        print ("interval:%s"%(format((time.time() - start_t),'.2f')))
         return []
 
 
@@ -499,14 +480,18 @@ if __name__ == '__main__':
     # df=get_sina_Market_url()
     # for x in df:print ":",x
     df=pd.DataFrame()
-    dz=get_sina_Market_json('sz_a')
-    ds=get_sina_Market_json('sh_a')
+    # dz=get_sina_Market_json('sz_a')
+    # ds=get_sina_Market_json('sh_a')
     dc=get_sina_Market_json('cyb')
-    df=df.append(dz,ignore_index=True)
-    df=df.append(ds,ignore_index=True)
+    # df=df.append(dz,ignore_index=True)
+    # df=df.append(ds,ignore_index=True)
     df=df.append(dc,ignore_index=True)
-    print df[:2],len(df.index)
+    # df=df[df['changepercent']<5]
+    df=df[df['changepercent']>0.2]
 
+    # dd=df[(df['open'] <= df['low']) ]
+    # dd=df[(df['open'] <= df['low']) ]
+    print df[:10],len(df.index)
     # da[da['changepercent']<9.9].
     # dd=df[(df['open'] <= df['low']) ]
     # dd=df[(df['open'] <= df['low']) ]

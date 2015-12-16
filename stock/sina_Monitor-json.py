@@ -18,7 +18,7 @@ import traceback
 import pandas as pd
 import johnson_cons as ct
 import singleAnalyseUtil as sl
-import real_data
+import realdatajson
 
 # import json
 # try:
@@ -72,7 +72,7 @@ if __name__ == "__main__":
     code_a = []
     def get_code_g():
         start_t = time.time()
-        data = real_data.get_sina_all_json_dd(vol,type)
+        data = realdatajson.get_sina_all_json_dd(vol, type)
         interval = (time.time() - start_t)
         df = data[(data['kind'] == 'U')]['code'].value_counts()[:10]
         print len(data.index)

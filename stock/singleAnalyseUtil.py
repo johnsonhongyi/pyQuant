@@ -3,6 +3,9 @@ import tushare as ts
 import emacount as ema
 import time
 import types
+import realdatajson as rd
+import johnson_cons as ct
+import pandas as pd
 
 def time_sleep(timemin):
     time1 = time.time()
@@ -133,22 +136,36 @@ def get_work_time():
     now_t = str(get_now_time()).replace(':', '')
     # now_t = int(now_t)
     if (now_t > '1131' and now_t < '1301') or (now_t < '0925' or now_t > '1502'):
-        return False
+        # return False
+        return True
     else:
         return True
 
 
 def get_hot_count(changepercent):
-    df = ts.get_today_all()
+    allTop = pd.DataFrame()
+    for market in ct.SINA_Market_KEY:
+        df = rd.get_sina_Market_json(market)
+        # count=len(df.index)
+        top = df[df['changepercent'] > changepercent]['code']
+        topTen = df[df['changepercent'] > 9.9]['code']
+        crashTen = df[df['changepercent'] < -9.8]['code']
+        crash = df[df['changepercent'] < -changepercent]['code']
+
+        # top=df[ df['changepercent'] <6]
+        print ("%s  topT: %s top>%s: %s" % ("{0:4}".format(market),len(topTen), changepercent, len(top))),
+        print (" crashT: %s crash<-%s: %s" % (len(crashTen), changepercent, len(crash)))
+        allTop=allTop.append(df,ignore_index=True)
+
+    df=allTop
+    count=len(df.index)
     top = df[df['changepercent'] > changepercent]['code']
     topTen = df[df['changepercent'] > 9.9]['code']
     crashTen = df[df['changepercent'] < -9.8]['code']
     crash = df[df['changepercent'] < -changepercent]['code']
-
-    # top=df[ df['changepercent'] <6]
-    print ("topT: %s top>%s: %s" % (len(topTen), changepercent, len(top))),
-    print ("crashT: %s crash<-%s: %s" % (len(crashTen), changepercent, len(crash)))
-    return top
+    print ("\t\t\t\t\t\t A:%s topT: %s top>%s: %s" % ("{0:4}".format(count),len(topTen), changepercent, len(top))),
+    print (" crashT: %s crash<-%s: %s" % (len(crashTen), changepercent, len(crash)))
+    return allTop
 
 
 def signal_handler(signal, frame):
@@ -167,6 +184,7 @@ def handle_ctrl_c(signal, frame):
 def get_hot_loop(timedelay):
     if get_now_time():
         get_hot_count(3)
+        # print ""
     time.sleep(timedelay)
 
 
@@ -204,7 +222,7 @@ if __name__ == '__main__':
     while 1:
         try:
             if not status:
-                get_hot_loop(180)
+                get_hot_loop(60)
             if status:
                 # status=True
                 if not num_input:
