@@ -158,12 +158,14 @@ def get_sina_Market_json(market='sh_a',num='2000',retry_count=3, pause=0.001):
 
 
 def _get_sina_json_dd_url(vol='0',type='3',num='10000',count=None):
+    urllist=[]
     if count==None:
         url = ct.JSON_DD_CountURL%( ct.DD_VOL_List[vol],type)
         # print url
         data=_get_url_data(url)
+            # return []
+        # print data.find('abc')
         count=re.findall('(\d+)', data, re.S)
-        urllist=[]
         if len(count) >0:
             count= count[0]
             print "Big:",count
@@ -180,6 +182,7 @@ def _get_sina_json_dd_url(vol='0',type='3',num='10000',count=None):
         url = ct.JSON_DD_CountURL%( ct.DD_VOL_List[vol],type)
         # print url
         data=_get_url_data(url)
+        # print data
         count_now=re.findall('(\d+)', data, re.S)
         urllist=[]
         if count < count_now:
@@ -195,7 +198,7 @@ def _get_sina_json_dd_url(vol='0',type='3',num='10000',count=None):
                 page=int(math.ceil(int(count_now)/10000))
                 url = ct.JSON_DD_Data_URL_Page%('10000',page, ct.DD_VOL_List[vol],type)
                 urllist.append(url)
-    # print urllist
+    # print "url:",urllist[:0]
     return urllist
 
 def _parsing_sina_dd_price_json(url):
@@ -472,7 +475,10 @@ def _code_to_symbol(code):
 
 
 if __name__ == '__main__':
-    # df=get_sina_real_dd()
+    df=get_sina_all_json_dd()
+    print df[:2]
+    import sys
+    sys.exit(0)
     # up= df[df['trade']>df['settlement']]
     # print up[:2]
     # df=get_sina_all_json_dd(type='3')

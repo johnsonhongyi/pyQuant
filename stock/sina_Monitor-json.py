@@ -74,18 +74,23 @@ if __name__ == "__main__":
         start_t = time.time()
         data = realdatajson.get_sina_all_json_dd(vol, type)
         interval = (time.time() - start_t)
-        df = data[(data['kind'] == 'U')]['code'].value_counts()[:10]
-        print len(data.index)
-        print "interval:", interval
-        print df[:10]
+        # print type(data)
+        # print data
         code_g = []
-        for code in df.index:
-            code = re.findall('(\d+)', code)
-            if len(code) > 0:
-                code = code[0]
-                status = sl.get_multiday_ave_compare_silent(code)
-                if status:
-                    code_g.append(code)
+
+        if len(data) >=1:
+            # return []
+            df = data[(data['kind'] == 'U')]['code'].value_counts()[:10]
+            print len(data.index)
+            print "interval:", interval
+            print df[:10]
+            for code in df.index:
+                code = re.findall('(\d+)', code)
+                if len(code) > 0:
+                    code = code[0]
+                    status = sl.get_multiday_ave_compare_silent(code)
+                    if status:
+                        code_g.append(code)
         return code_g
 
 

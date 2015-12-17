@@ -69,23 +69,29 @@ if __name__ == "__main__":
     status=True
     vol = '0'
     type = '2'
-    code_a = []
+    code_a = {}
     def get_code_g():
         start_t = time.time()
         data = realdatajson.get_sina_all_json_dd(vol, type)
         interval = (time.time() - start_t)
-        df = data[(data['kind'] == 'U')]['code'].value_counts()[:10]
-        # print ""
-        print "interval:", interval
-        print df
-        code_g = []
-        for code in df.index:
-            code = re.findall('(\d+)', code)
-            if len(code) > 0:
-                code = code[0]
-                status = sl.get_multiday_ave_compare_silent(code)
-                if status:
-                    code_g.append(code)
+        # print type(data)
+        # print data
+        code_g = {}
+        top_now=pd.DataFrame()
+        if len(data) >=1:
+            # return []
+            df = data
+            df['count'] = data[(data['kind'] == 'U')]['code'].value_counts()
+            print len(data.index)
+            print "interval:", interval
+            print df[:1]
+            for code in df.index:
+                code = re.findall('(\d+)', code)
+                if len(code) > 0:
+                    code = code[0]
+                    status = sl.get_multiday_ave_compare_silent(code)
+                    if status:
+                        code_g.append(code)
         return code_g
 
 
@@ -109,3 +115,27 @@ if __name__ == "__main__":
             print "expect:", e
             status = not status
             code_a = []
+    # http://stackoverflow.com/questions/17709270/i-want-to-create-a-column-of-value-counts-in-my-pandas-dataframe
+# df['Counts'] = df.groupby(['Color'])['Value'].transform('count')
+#
+# For example,
+#
+# In [102]: df = pd.DataFrame({'Color': 'Red Red Blue'.split(), 'Value': [100, 150, 50]})
+#
+# In [103]: df
+# Out[103]:
+#   Color  Value
+# 0   Red    100
+# 1   Red    150
+# 2  Blue     50
+#
+# In [104]: df['Counts'] = df.groupby(['Color'])['Value'].transform('count')
+#
+# In [105]: df
+# Out[105]:
+#   Color  Value  Counts
+# 0   Red    100       2
+# 1   Red    150       2
+# 2  Blue     50       1
+#
+# Note that transform('count') ignores NaNs. If you want to count NaNs, use transform(len)

@@ -135,9 +135,9 @@ def get_now_time():
 def get_work_time():
     now_t = str(get_now_time()).replace(':', '')
     # now_t = int(now_t)
-    if (now_t > '1131' and now_t < '1301') or (now_t < '0925' or now_t > '1502'):
+    if (now_t > '1131' and now_t < '1300') or (now_t < '0924' or now_t > '1502'):
         # return False
-        return True
+        return False
     else:
         return True
 
@@ -222,7 +222,7 @@ if __name__ == '__main__':
     while 1:
         try:
             if not status:
-                get_hot_loop(60)
+                get_hot_loop(120)
             if status:
                 # status=True
                 if not num_input:
