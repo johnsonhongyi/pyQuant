@@ -19,11 +19,34 @@ import re
 from pandas.compat import StringIO
 # from tushare.util import dateu as du
 import math
+
+# import multiprocessing
+
+from multiprocessing import cpu_count
+from multiprocessing.dummy import Pool as ThreadPool
 # import sys
 try:
     from urllib.request import urlopen, Request
 except ImportError:
     from urllib2 import urlopen, Request
+
+
+# import tabulate as tbl
+# http://stackoverflow.com/questions/18528533/pretty-print-pandas-dataframe
+# tabulate([list(row) for row in df.values], headers=list(df.columns))
+
+import prettytable as pt
+# print pt.PrettyTable([''] + list(df.columns))
+def format_for_print(df):
+    table = pt.PrettyTable([''] + list(df.columns))
+    for row in df.itertuples():
+        table.add_row(row)
+    return str(table)
+def format_for_print2(df):
+    table = pt.PrettyTable(list(df.columns))
+    for row in df.itertuples():
+        table.add_row(row[1:])
+    return str(table)
 
 # REAL_INDEX_LABELS=['sh_a','sz_a','cyb']
 # DD_VOL_List={'0':'40000','1':'100000','2':'100000','3':'200000','4':'1000000'}
@@ -39,9 +62,30 @@ except ImportError:
 # DAY_REAL_COLUMNS = ['code', 'symbol', 'name', 'changepercent',
 #                        'trade', 'open', 'high', 'low', 'settlement', 'volume', 'turnoverratio']
 
+def to_mp_run(cmd,urllist):
+    # n_t=time.time()
+    pool=ThreadPool(cpu_count())
+    print cpu_count()
+    # pool = multiprocessing.Pool(processes=8)
+    # for code in codes:
+    #     results=pool.apply_async(sl.get_multiday_ave_compare_silent_noreal,(code,60))
+    # result=[]
+    results=pool.map(cmd,urllist)
+    # for code in urllist:
+        # result.append(pool.apply_async(cmd,(code,)))
+
+    pool.close()
+    pool.join()
+    # print "time:MP", (time.time() - n_t)
+    return results
 
 def _get_url_data(url):
-    fp = urlopen(url)
+    # headers = {'User-Agent':'Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.6) Gecko/20091201 Firefox/3.5.6'}
+    headers={'User-Agent':'Mozilla/5.0 (Windows NT 6.2; rv:16.0) Gecko/20100101 Firefox/16.0',
+    'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+    'Connection':'keep-alive'}
+    req=Request(url,headers=headers)
+    fp = urlopen(req,timeout=5)
     data = fp.read()
     fp.close()
     return data
@@ -242,8 +286,10 @@ def _parsing_sina_dd_price_json(url):
     ct._write_console()
     # request = Request(ct.SINA_DAY_PRICE_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'],
     #                              ct.PAGES['jv'], pageNum))
-    request = Request(url)
-    text = urlopen(request, timeout=10).read()
+    # request = Request(url)
+    # text = urlopen(request, timeout=10).read()
+    text = _get_url_data(url)
+
     if text == 'null':
         return None
     reg = re.compile(r'\,(.*?)\:')
@@ -264,7 +310,7 @@ def _parsing_sina_dd_price_json(url):
     # print df['name'][len(df.index)-1:],len(df.index)
     return df
 
-def get_sina_all_json_dd(vol='0',type='3',num='1000',retry_count=3, pause=0.001):
+def get_sina_all_json_dd(vol='0',type='3',num='10000',retry_count=3, pause=0.001):
     start_t = time.time()
     # url="http://vip.stock.finance.sina.com.cn/quotes_service/api/json_v2.php/Market_Center.getHQNodeData?page=1&num=50&sort=changepercent&asc=0&node=sh_a&symbol="
     # SINA_REAL_PRICE_DD = '%s%s/quotes_service/api/json_v2.php/Market_Center.getHQNodeData?page=1&num=%s&sort=changepercent&asc=0&node=%s&symbol=%s'
@@ -280,11 +326,14 @@ def get_sina_all_json_dd(vol='0',type='3',num='1000',retry_count=3, pause=0.001)
     df = pd.DataFrame()
     # data['code'] = symbol
     # df = df.append(data, ignore_index=True)
-    for url in url_list:
-        # print url
-        data = _parsing_sina_dd_price_json(url)
-        df=df.append(data,ignore_index=True)
-        # break
+
+    data=to_mp_run(_parsing_sina_dd_price_json,url_list)
+    df=df.append(data,ignore_index=True)
+
+    # for url in url_list:
+    #     # print url
+    #     data = _parsing_sina_dd_price_json(url)
+    #     df=df.append(data,ignore_index=True)
 
     if df is not None:
         # for i in range(2, ct.PAGE_NUM[0]):
@@ -292,6 +341,7 @@ def get_sina_all_json_dd(vol='0',type='3',num='1000',retry_count=3, pause=0.001)
         #     df = df.append(newdf, ignore_index=True)
         # print len(df.index)
         print "interval:", (time.time() - start_t)
+        # print len(df)
         return df
     else:
         print "no data"
@@ -503,8 +553,9 @@ def _code_to_symbol(code):
 
 
 if __name__ == '__main__':
-    df=get_sina_all_json_dd()
+    df=get_sina_all_json_dd('0','2')
     print df[:2]
+    print len(df)
     import sys
     sys.exit(0)
     # up= df[df['trade']>df['settlement']]

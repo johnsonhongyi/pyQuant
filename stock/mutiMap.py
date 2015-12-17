@@ -7,6 +7,7 @@ import stock.singleAnalyseUtil as sl
 import tushare as ts
 start = time.time()
 
+# import realdatajson as rl
 
 gold = {}
 goldl = []

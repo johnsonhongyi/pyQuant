@@ -137,7 +137,20 @@ def mainrun(codes=None):
 
 
 if __name__ == '__main__':
-    mainrun()
+    # mainrun()
+    import time
+    j='#'
+    for i in range(1,61):
+        j += '#'
+        sys.stdout.write(str(int((i/60)*100))+'% ||'+j+'->'+"\r")
+        sys.stdout.flush()
+        time.sleep(0.5)
+    # for i in range(1,61):
+    #     sys.stdout.write('#'+'->'+"\b\b")
+    #     sys.stdout.flush()
+    #     time.sleep(0.5)
+    print
+
 
     sys.exit(0)
     pool = ThreadPool(cpu_count())
