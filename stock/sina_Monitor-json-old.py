@@ -146,7 +146,7 @@ if __name__ == "__main__":
             # print top_all
             # print pt.PrettyTable([''] + list(top_all.columns))
             # print tbl.tabulate(top_all,headers='keys', tablefmt='psql')
-            # print tbl.tabulate(top_all,headers='keys', tablefmt='psql')
+            # print tbl.tabulate(top_all,headers='keys', tablefmt='orgtbl')
             print format_for_print(top_all)
             time.sleep(60)
 
