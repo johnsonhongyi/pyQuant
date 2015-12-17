@@ -68,30 +68,38 @@ if __name__ == "__main__":
 
     status=True
     vol = '0'
-    type = '2'
-    code_a = {}
+    type = '4'
+    top_now=pd.DataFrame()
+    code_a={}
     def get_code_g():
         start_t = time.time()
-        data = realdatajson.get_sina_all_json_dd(vol, type)
+        df = realdatajson.get_sina_all_json_dd(vol,type)
         interval = (time.time() - start_t)
         # print type(data)
         # print data
         code_g = {}
-        top_now=pd.DataFrame()
-        if len(data) >=1:
+        if len(df) >=1:
             # return []
-            df = data
-            df['count'] = data[(data['kind'] == 'U')]['code'].value_counts()
-            print len(data.index)
+            # df = data
+            # df['count'] = data[(data['kind'] == 'U')]['code'].value_counts()
+            # print(len(df))
+            df['counts']=df.groupby(['code'])['code'].transform('count')
+            df=df[(df['kind'] == 'U')]
+            df=df.sort_values(by='counts',ascending=0)
+            df=df.drop_duplicates('code')[:10]
+            df=df.set_index('code')
+            # print len(data),len(df)
             print "interval:", interval
-            print df[:1]
-            for code in df.index:
-                code = re.findall('(\d+)', code)
+            print df.iloc[0:,0:1]
+            for ix in df.index:
+                # print (df.iloc[i,0])
+                code = re.findall('(\d+)', ix)
+                # print "code",code
                 if len(code) > 0:
                     code = code[0]
                     status = sl.get_multiday_ave_compare_silent(code)
                     if status:
-                        code_g.append(code)
+                        code_g[code]= df.loc[ix].values
         return code_g
 
 
@@ -101,11 +109,11 @@ if __name__ == "__main__":
             if len(code_a) == 0:
                 code_a = cd
             else:
-                for code in cd:
-                    if code in cd:
-                        print "duble:code%s", code
+                for code in cd.keys():
+                    if code in code_a.keys():
+                        print "duble:code%s %s"%(code,cd[code])
                     else:
-                        code_a.append(code)
+                        code_a[code]=cd[code]
             time.sleep(60)
 
 

@@ -68,7 +68,7 @@ if __name__ == "__main__":
 
     status=True
     vol = '0'
-    type = '2'
+    type = '3'
     code_a = []
     def get_code_g():
         start_t = time.time()
@@ -101,7 +101,7 @@ if __name__ == "__main__":
                 code_a = cd
             else:
                 for code in cd:
-                    if code in cd:
+                    if code in code_a:
                         print "duble:code%s", code
                     else:
                         code_a.append(code)

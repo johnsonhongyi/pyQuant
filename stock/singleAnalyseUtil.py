@@ -81,7 +81,7 @@ def get_multiday_ave_compare_silent(code, dayl='10'):
     if len(dtick.index) > 0:
         ep = dtick['amount'].sum() / dtick['volume'].sum()
         p_now = dtick['price'].values[0] * 100
-        if p_now > ave and ep > ave:
+        if p_now > ave or ep > ave:
             print ("GOLD:%s ep:%s UP:%s!!! A:%s %s !!!" % (code, ep, p_now, ave, get_now_time()))
         # elif p_now > ave and ep < ave:
         #     print ("gold:%s ep:%s UP:%s! A:%s %s !" % (code, ep, p_now, ave, get_now_time()))
