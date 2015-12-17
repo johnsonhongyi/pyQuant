@@ -201,6 +201,34 @@ def _get_sina_json_dd_url(vol='0',type='3',num='10000',count=None):
     # print "url:",urllist[:0]
     return urllist
 
+def _code_to_symbol(code):
+    """
+        生成symbol代码标志
+    """
+    if code in ct.INDEX_LABELS:
+        return ct.INDEX_LIST[code]
+    else:
+        if len(code) != 6 :
+            return ''
+        else:
+            return 'sh%s'%code if code[:1] in ['5', '6'] else 'sz%s'%code
+
+
+
+def _symbol_to_code(symbol):
+    """
+        生成symbol代码标志
+    """
+    if code in ct.INDEX_LABELS:
+        return ct.INDEX_LIST[code]
+    else:
+        if len(symbol) != 8 :
+            return ''
+        else:
+            return re.findall('(\d+)', symbol)[0]
+
+
+
 def _parsing_sina_dd_price_json(url):
     """
            处理当日行情分页数据，格式为json

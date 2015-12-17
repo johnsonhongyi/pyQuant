@@ -18,7 +18,7 @@ import traceback
 import pandas as pd
 import johnson_cons as ct
 import singleAnalyseUtil as sl
-import realdatajson
+import realdatajson as rl
 
 # import json
 # try:
@@ -69,51 +69,85 @@ if __name__ == "__main__":
     status=True
     vol = '0'
     type = '4'
-    top_now=pd.DataFrame()
+    top_all=pd.DataFrame()
     code_a={}
+    def get_count_code_df(data):
+        df=data
+        df['counts']=df.groupby(['code'])['code'].transform('count')
+        df=df[(df['kind'] == 'U')]
+        df=df.sort_values(by='counts',ascending=0)
+        df=df.drop_duplicates('code')[:10]
+        df=df.loc[:,['code','name','counts']]
+        # dz.loc['sh600110','counts']=dz.loc['sh600110'].values[1]+3
+        df=df.set_index('code')
+        df=df.iloc[0:,0:2]
+        df['diff']=0
+        return df
+
     def get_code_g():
         start_t = time.time()
-        df = realdatajson.get_sina_all_json_dd(vol,type)
+        data = rl.get_sina_all_json_dd(vol,type)
         interval = (time.time() - start_t)
         # print type(data)
         # print data
-        code_g = {}
-        if len(df) >=1:
+        # code_g = {}
+        if len(data) >=1:
             # return []
             # df = data
             # df['count'] = data[(data['kind'] == 'U')]['code'].value_counts()
             # print(len(df))
-            df['counts']=df.groupby(['code'])['code'].transform('count')
-            df=df[(df['kind'] == 'U')]
-            df=df.sort_values(by='counts',ascending=0)
-            df=df.drop_duplicates('code')[:10]
-            df=df.set_index('code')
+            df=get_count_code_df(data)
             # print len(data),len(df)
             print "interval:", interval
-            print df.iloc[0:,0:1]
-            for ix in df.index:
-                # print (df.iloc[i,0])
-                code = re.findall('(\d+)', ix)
-                # print "code",code
-                if len(code) > 0:
-                    code = code[0]
-                    status = sl.get_multiday_ave_compare_silent(code)
-                    if status:
-                        code_g[code]= df.loc[ix].values
-        return code_g
+            # for ix in df.index:
+            #     code = re.findall('(\d+)', ix)
+            #     if len(code) > 0:
+            #         code = code[0]
+            #         status = sl.get_multiday_ave_compare_silent(code)
+            #         if status:
+            #             code_g[code]= df.loc[ix,'name']
+        return df
 
+    import tabulate as tbl
+    # http://stackoverflow.com/questions/18528533/pretty-print-pandas-dataframe
+    # tabulate([list(row) for row in df.values], headers=list(df.columns))
+    import prettytable as pt
+    # print pt.PrettyTable([''] + list(df.columns))
+    def format_for_print(df):
+        table = pt.PrettyTable([''] + list(df.columns))
+        for row in df.itertuples():
+            table.add_row(row)
+        return str(table)
+    def format_for_print2(df):
+        table = pt.PrettyTable(list(df.columns))
+        for row in df.itertuples():
+            table.add_row(row[1:])
+        return str(table)
 
     while 1:
         try:
-            cd = get_code_g()
-            if len(code_a) == 0:
-                code_a = cd
+            top_now = get_code_g()
+            if len(top_all) == 0:
+                top_all = top_now
+                # dd=dd.fillna(0)
             else:
-                for code in cd.keys():
-                    if code in code_a.keys():
-                        print "duble:code%s %s"%(code,cd[code])
+                for symbol in top_now.index:
+
+                    # code = rl._symbol_to_code(symbol)
+                    if symbol in top_all.index :
+                        # if top_all.loc[symbol,'diff'] == 0:
+                        top_all.loc[symbol,'diff']=top_now.loc[symbol,'counts']-top_all.loc[symbol,'counts']
+                        # else:
+                            # value=top_all.loc[symbol,'diff']
+
                     else:
-                        code_a[code]=cd[code]
+                        top_all.append(top_now.loc[symbol])
+            top_all=top_all.sort_values(by='diff',ascending=0)
+            # print top_all
+            # print pt.PrettyTable([''] + list(top_all.columns))
+            # print tbl.tabulate(top_all,headers='keys', tablefmt='psql')
+            # print tbl.tabulate(top_all,headers='keys', tablefmt='psql')
+            print format_for_print(top_all)
             time.sleep(60)
 
 
