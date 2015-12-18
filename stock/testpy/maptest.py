@@ -8,7 +8,7 @@ import logging
 import sys
 logger = logging.getLogger(__name__)
 #do something
-import singleAnalyseUtil as sl
+import pyQuant.stock.singleAnalyseUtil as sl
 import threading_t as tt
 
 urls = [

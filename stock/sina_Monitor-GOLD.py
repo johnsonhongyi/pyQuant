@@ -19,7 +19,7 @@ import pandas as pd
 import johnson_cons as ct
 import singleAnalyseUtil as sl
 import realdatajson as rl
-
+import types
 # import json
 # try:
 #     from urllib.request import urlopen, Request
@@ -63,31 +63,6 @@ def get_sina_url(vol='0', type='0', pageCount='100'):
     print url
     return url
 
-def get_count_code_df(data):
-        df=data
-        df['counts']=df.groupby(['code'])['code'].transform('count')
-        df=df[(df['kind'] == 'U')]
-        df=df.sort_values(by='counts',ascending=0)
-        df=df.drop_duplicates('code')[:10]
-        df=df.loc[:,['code','name','counts']]
-        # dz.loc['sh600110','counts']=dz.loc['sh600110'].values[1]+3
-        df=df.set_index('code')
-        df=df.iloc[0:,0:2]
-        df['diff']=0
-        return df
-
-def get_code_g(vol='0',type='2'):
-    # start_t = time.time()
-    data = rl.get_sina_all_json_dd(vol,type)
-    # print type(data)
-    # print data
-    # code_g = {}
-    if len(data) >=1:
-        # return []
-        # df = data
-        # df['count'] = data[(data['kind'] == 'U')]['code'].value_counts()
-        # print(len(df))
-        df=get_count_code_df(data)
         # print len(data),len(df)
         # for ix in df.index:
         #     code = re.findall('(\d+)', ix)
@@ -98,41 +73,51 @@ def get_code_g(vol='0',type='2'):
         #             code_g[code]= df.loc[ix,'name']
     # interval = (time.time() - start_t)
     # print "time:", interval
-    return df
+
 
 
 if __name__ == "__main__":
 
     status=True
     vol = '0'
-    type = '2'
+    type = '3'
     top_all=pd.DataFrame()
     code_a={}
     while 1:
         try:
-            top_now = get_code_g(vol,type)
-            if len(top_all) == 0:
-                top_all = top_now
-                # dd=dd.fillna(0)
+            top_now = rl.get_json_dd_code_realTime(vol,type)
+            # print type(top_now)
+            if len(top_now)>10:
+                if len(top_all) == 0:
+                    top_all = top_now
+                    # dd=dd.fillna(0)
+                else:
+                    for symbol in top_now.index:
+
+                        # code = rl._symbol_to_code(symbol)
+                        if symbol in top_all.index :
+                            # if top_all.loc[symbol,'diff'] == 0:
+                            # print "code:",symbol
+                            # print top_now.loc[symbol,'counts']
+                            # print top_all.loc[symbol,'counts']
+                            top_all.loc[symbol,'diff']=top_now.loc[symbol,'counts']-top_all.loc[symbol,'counts']
+                            # else:
+                                # value=top_all.loc[symbol,'diff']
+
+                        else:
+                            top_all.append(top_now.loc[symbol])
+                top_all=top_all.sort_values(by=['diff','counts'],ascending=[0,0])
+                # print top_all
+                # print pt.PrettyTable([''] + list(top_all.columns))
+                # print tbl.tabulate(top_all,headers='keys', tablefmt='psql')
+                # print tbl.tabulate(top_all,headers='keys', tablefmt='orgtbl')
+                # print rl.format_for_print(top_all)
+                # print top_all[:10]
+                print rl.format_for_print(top_all[:10])
             else:
-                for symbol in top_now.index:
-
-                    # code = rl._symbol_to_code(symbol)
-                    if symbol in top_all.index :
-                        # if top_all.loc[symbol,'diff'] == 0:
-                        top_all.loc[symbol,'diff']=top_now.loc[symbol,'counts']-top_all.loc[symbol,'counts']
-                        # else:
-                            # value=top_all.loc[symbol,'diff']
-
-                    else:
-                        top_all.append(top_now.loc[symbol])
-            top_all=top_all.sort_values(by='diff',ascending=0)
-            # print top_all
-            # print pt.PrettyTable([''] + list(top_all.columns))
-            # print tbl.tabulate(top_all,headers='keys', tablefmt='psql')
-            # print tbl.tabulate(top_all,headers='keys', tablefmt='orgtbl')
-            print rl.format_for_print(top_all)
-            time.sleep(60)
+                print top_now
+                print "no data"
+            time.sleep(90)
 
 
 

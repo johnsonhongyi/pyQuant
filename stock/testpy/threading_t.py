@@ -11,7 +11,7 @@ from time import time
 import maptest as mp
 
 # from download import setup_download_dir, get_links, download_link
-import singleAnalyseUtil as sl
+import pyQuant.stock.singleAnalyseUtil as sl
 import tushare as ts
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')

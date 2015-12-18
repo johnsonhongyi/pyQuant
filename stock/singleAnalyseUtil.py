@@ -6,6 +6,8 @@ import types
 import realdatajson as rd
 import johnson_cons as ct
 import pandas as pd
+import datetime
+
 
 def time_sleep(timemin):
     time1 = time.time()
@@ -22,6 +24,18 @@ def get_all_toplist():
     list =top['code']
     print len(list)
     return list
+
+def _write_to_csv(df, filename,indexCode='code'):
+    TODAY = datetime.date.today()
+    CURRENTDAY=TODAY.strftime('%Y-%m-%d')
+#     reload(sys)
+#     sys.setdefaultencoding( "gbk" )
+    df=df.drop_duplicates(indexCode)
+    df=df.set_index(indexCode)
+    df.to_csv(CURRENTDAY+'-'+filename+'.csv',encoding='gbk',index=False)#选择保存
+    print ("write csv")
+
+    # df.to_csv(filename, encoding='gbk', index=False)
 
 def get_multiday_ave_compare(code, dayl='10'):
     dtick = ts.get_today_ticks(code)
@@ -218,7 +232,8 @@ def handle_ctrl_c(signal, frame):
 
 def get_hot_loop(timedelay):
     if get_now_time():
-        get_hot_count(3)
+        df=get_hot_count(3)
+        # _write_to_csv(df,'tick-data')
         # print ""
     time.sleep(timedelay)
 

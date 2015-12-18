@@ -16,9 +16,9 @@ import traceback
 
 # from pandas import DataFrame
 import pandas as pd
-import johnson_cons as ct
-import singleAnalyseUtil as sl
-import realdatajson
+import pyQuant.stock.johnson_cons as ct
+import pyQuant.stock.singleAnalyseUtil as sl
+import pyQuant.stock.realdatajson
 
 # import json
 # try:
@@ -72,7 +72,7 @@ if __name__ == "__main__":
     code_a = []
     def get_code_g():
         start_t = time.time()
-        data = realdatajson.get_sina_all_json_dd(vol, type)
+        data = pyQuant.stock.realdatajson.get_sina_all_json_dd(vol, type)
         interval = (time.time() - start_t)
         # print type(data)
         # print data
