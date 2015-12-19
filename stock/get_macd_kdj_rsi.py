@@ -20,7 +20,9 @@ def Get_Stock_List():
 #     print (df)
     return df
 
-
+def Get_BBANDS(df):
+    df=df.sort_index(axis=0, by=None, ascending=True)
+    upperband,middleband,lowerband=ta.BBANDS(np.array(df['close']),timeperiod=20,nbdevdn=2,matype=0)
 
 #修改了的函数，按照多个指标进行分析
 
@@ -238,8 +240,8 @@ def Write_Blog(strinput,Dist):
     time.sleep(1)
 
 if __name__ == '__main__':
-    df = Get_Stock_List()
-    Dist = 'E:\\Quant\\'
+    # df = Get_Stock_List()
+    # Dist = 'E:\\Quant\\'
     df = Get_TA(df,Dist)
     # Output_Csv(df,Dist)
     print ("sucess")

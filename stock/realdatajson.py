@@ -577,10 +577,12 @@ def _get_hists(symbols, start=None, end=None,
     else:
         return None
 
-def get_json_dd_code_realTime(vol='0',type='2'):
-    # start_t = time.time()
-
-    df = get_sina_all_json_dd(vol,type)
+def get_sina_dd_count_price_realTime(df='',mtype='all'):
+    '''
+    input df count and merge price to df
+    '''
+    if len(df)==0:
+        df = get_sina_all_json_dd('0','4')
     if len(df)>0:
         df['counts']=df.groupby(['code'])['code'].transform('count')
         df=df[(df['kind'] == 'U')]
@@ -592,7 +594,7 @@ def get_json_dd_code_realTime(vol='0',type='2'):
         df=df.iloc[0:,0:2]
         df['diff']=0
 
-        dp=get_sina_Market_json('all')
+        dp=get_sina_Market_json(mtype)
         if len(dp)>10:
             dp=dp.drop_duplicates()
             dp=dp.dropna('index')
@@ -620,7 +622,7 @@ def _code_to_symbol(code):
 
 if __name__ == '__main__':
     # df = get_sina_all_json_dd('0', '3')
-    df=get_json_dd_code_realTime('0','4')
+    df=get_sina_dd_count_price_realTime()
     # df=df.drop_duplicates('code')
     # df=df.set_index('code')
     # _write_to_csv(df,'readdata3')

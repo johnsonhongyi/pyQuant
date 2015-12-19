@@ -78,14 +78,15 @@ def get_sina_url(vol='0', type='0', pageCount='100'):
 
 if __name__ == "__main__":
 
-    status=True
+    status=False
     vol = '0'
-    type = '3'
+    type = '2'
     top_all=pd.DataFrame()
     code_a={}
     while 1:
         try:
-            top_now = rl.get_json_dd_code_realTime(vol,type)
+            df=rl.get_sina_all_json_dd(vol,type)
+            top_now = rl.get_sina_dd_count_price_realTime(df)
             # print type(top_now)
             if len(top_now)>10:
                 if len(top_all) == 0:
@@ -114,20 +115,27 @@ if __name__ == "__main__":
                 # print rl.format_for_print(top_all)
                 # print top_all[:10]
                 print rl.format_for_print(top_all[:10])
+                if status:
+                    for code in top_all[:10].index:
+                        code=re.findall('(\d+)',code)
+                        if len(code)>0:
+                            code=code[0]
+                            kind=sl.get_multiday_ave_compare_silent(code)
             else:
-                print top_now
+                # print top_now[:10]
                 print "no data"
-            time.sleep(90)
+            time.sleep(60)
 
 
 
         except (IOError, EOFError, KeyboardInterrupt) as e:
             # print "key"
-            print "expect:", e
+            # print "expect:",
+            traceback.print_exc()
             status = not status
-            code_a = []
-    # http://stackoverflow.com/questions/17709270/i-want-to-create-a-column-of-value-counts-in-my-pandas-dataframe
-# df['Counts'] = df.groupby(['Color'])['Value'].transform('count')
+
+    # http://stackoverflow.com/questions/17709270/i-want-to-create-a-column-of-value-count-in-my-pandas-dataframe
+# df['counts'] = df.groupby(['Color'])['Value'].transform('count')
 #
 # For example,
 #
@@ -140,11 +148,11 @@ if __name__ == "__main__":
 # 1   Red    150
 # 2  Blue     50
 #
-# In [104]: df['Counts'] = df.groupby(['Color'])['Value'].transform('count')
+# In [104]: df['counts'] = df.groupby(['Color'])['Value'].transform('count')
 #
 # In [105]: df
 # Out[105]:
-#   Color  Value  Counts
+#   Color  Value  count
 # 0   Red    100       2
 # 1   Red    150       2
 # 2  Blue     50       1

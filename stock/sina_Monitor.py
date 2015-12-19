@@ -16,10 +16,14 @@ url_real_east="http://quote.eastmoney.com/sz000004.html"
 from bs4 import BeautifulSoup
 import urllib2
 from pandas import Series,DataFrame
-import sys,re,time
+import re
 import johnson_cons as ct
 import time
 import singleAnalyseUtil as sl
+import realdatajson as rl
+import pandas as pd
+import traceback
+
 
 def downloadpage(url):
     fp = urllib2.urlopen(url)
@@ -150,47 +154,63 @@ def get_sina_all_dd(vol='0', type='0', retry_count=3, pause=0.001):
 if __name__ == "__main__":
     # parsehtml(downloadpage(url_s))
     status=False
-    vol='0'
-    type='2'
-    code_a=[]
-    def get_code_g():
-        start_t= time.time()
-        data=get_sina_all_dd(vol,type)
-        interval=(time.time() - start_t)
-        df=data[(data['status']=='up')]['code'].value_counts()[:10]
-        # print ""
-        print "interval:",interval
-        print df
-        code_g=[]
-        for code in df.index:
-            code=re.findall('(\d+)',code)
-            if len(code)>0:
-                code=code[0]
-                status=sl.get_multiday_ave_compare_silent(code)
-                if status:
-                    code_g.append(code)
-        return code_g
-
+    vol = '0'
+    type = '2'
+    cut_num='10000'
+    top_all=pd.DataFrame()
     while 1:
         try:
-            cd=get_code_g()
-            if len(code_a) ==0:
-                code_a=cd
+            df=rl.get_sina_all_json_dd(vol,type)
+            if len(df) >cut_num:
+                df=df[:cut_num]
+            top_now = rl.get_sina_dd_count_price_realTime(df)
+            # print type(top_now)
+            if len(top_now)>10:
+                if len(top_all) == 0:
+                    top_all = top_now
+                    # dd=dd.fillna(0)
+                else:
+                    for symbol in top_now.index:
+
+                        # code = rl._symbol_to_code(symbol)
+                        if symbol in top_all.index :
+                            # if top_all.loc[symbol,'diff'] == 0:
+                            # print "code:",symbol
+                            # print top_now.loc[symbol,'counts']
+                            # print top_all.loc[symbol,'counts']
+                            top_all.loc[symbol,'diff']=top_now.loc[symbol,'counts']-top_all.loc[symbol,'counts']
+                            # else:
+                                # value=top_all.loc[symbol,'diff']
+
+                        else:
+                            top_all.append(top_now.loc[symbol])
+                top_all=top_all.sort_values(by=['diff','counts'],ascending=[0,0])
+                # print top_all
+                # print pt.PrettyTable([''] + list(top_all.columns))
+                # print tbl.tabulate(top_all,headers='keys', tablefmt='psql')
+                # print tbl.tabulate(top_all,headers='keys', tablefmt='orgtbl')
+                # print rl.format_for_print(top_all)
+                # print top_all[:10]
+                print rl.format_for_print(top_all[:10])
+                # print "staus",status
+                if status:
+                    for code in top_all[:10].index:
+                        code=re.findall('(\d+)',code)
+                        if len(code)>0:
+                            code=code[0]
+                            kind=sl.get_multiday_ave_compare_silent(code)
+
             else:
-                for code in cd:
-                    if code in cd:
-                        print "duble:code%s",code
-                    else:
-                        code_a.append(code)
+                print "no data"
             time.sleep(60)
 
 
 
         except (IOError, EOFError, KeyboardInterrupt) as e:
             # print "key"
-            print "expect:",e
+            # print "expect:", e
+            traceback.print_exc()
             status = not status
-            code_a=[]
 
     # sl.get_code_search_loop()
     # print data.describe()
