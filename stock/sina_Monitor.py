@@ -23,7 +23,7 @@ import singleAnalyseUtil as sl
 import realdatajson as rl
 import pandas as pd
 import traceback
-
+import sys
 
 def downloadpage(url):
     fp = urllib2.urlopen(url)
@@ -157,6 +157,7 @@ if __name__ == "__main__":
     vol = '0'
     type = '2'
     cut_num='10000'
+    success=0
     top_all=pd.DataFrame()
     while 1:
         try:
@@ -166,6 +167,8 @@ if __name__ == "__main__":
             top_now = rl.get_sina_dd_count_price_realTime(df)
             # print type(top_now)
             if len(top_now)>10:
+                if 'percent' in top_now.columns.values:
+                    top_now=top_now[top_now['percent']>0]
                 if len(top_all) == 0:
                     top_all = top_now
                     # dd=dd.fillna(0)
@@ -176,9 +179,12 @@ if __name__ == "__main__":
                         if symbol in top_all.index :
                             # if top_all.loc[symbol,'diff'] == 0:
                             # print "code:",symbol
-                            # print top_now.loc[symbol,'counts']
-                            # print top_all.loc[symbol,'counts']
-                            top_all.loc[symbol,'diff']=top_now.loc[symbol,'counts']-top_all.loc[symbol,'counts']
+                            count_n=top_now.loc[symbol,'counts']
+                            count_a=top_all.loc[symbol,'counts']
+                            # print count_n,count_a
+                            top_all.loc[symbol,'diff']=count_n-count_a
+                            # top_all.loc[symbol,'diff']=top_now.loc[symbol,'counts']-top_all.loc[symbol,'counts']
+
                             # else:
                                 # value=top_all.loc[symbol,'diff']
 
@@ -202,15 +208,17 @@ if __name__ == "__main__":
 
             else:
                 print "no data"
-            time.sleep(60)
+            time.sleep(120)
 
-
-
-        except (IOError, EOFError, KeyboardInterrupt) as e:
+        except (KeyboardInterrupt) as e:
             # print "key"
-            # print "expect:", e
-            traceback.print_exc()
+            print "KeyboardInterrupt:", e
             status = not status
+            time.sleep(0.5)
+            if success > 3:
+                sys.exit(0)
+        except (IOError, EOFError) as e:
+            traceback.print_exc()
 
     # sl.get_code_search_loop()
     # print data.describe()

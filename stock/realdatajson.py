@@ -596,11 +596,15 @@ def get_sina_dd_count_price_realTime(df='',mtype='all'):
 
         dp=get_sina_Market_json(mtype)
         if len(dp)>10:
-            dp=dp.drop_duplicates()
             dp=dp.dropna('index')
-            dm=pd.merge(df,dp,on='name',how='left').set_index('code')
+            dp=dp.drop_duplicates('code')
+            dm=pd.merge(df,dp,on='name',how='left')
+            # dm=dm.drop_duplicates('code')
+            dm=dm.set_index('code')
             dm=dm.dropna('index')
+            # print dm[-1:]
             dm=dm.loc[:,ct.SINA_DD_Clean_Count_Coluns]
+            # print dm[-1:]
         else:
             dm=df
     else:

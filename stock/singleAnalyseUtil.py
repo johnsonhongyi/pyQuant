@@ -7,7 +7,7 @@ import realdatajson as rd
 import johnson_cons as ct
 import pandas as pd
 import datetime
-
+import sys,traceback
 
 def time_sleep(timemin):
     time1 = time.time()
@@ -196,10 +196,11 @@ def get_hot_count(changepercent):
     for market in ct.SINA_Market_KEY:
         df = rd.get_sina_Market_json(market)
         # count=len(df.index)
-        top = df[df['changepercent'] > changepercent]['code']
-        topTen = df[df['changepercent'] > 9.9]['code']
-        crashTen = df[df['changepercent'] < -9.8]['code']
-        crash = df[df['changepercent'] < -changepercent]['code']
+        # print df[:1]
+        top = df[df['percent'] > changepercent]['code']
+        topTen = df[df['percent'] > 9.9]['code']
+        crashTen = df[df['percent'] < -9.8]['code']
+        crash = df[df['percent'] < -changepercent]['code']
 
         # top=df[ df['changepercent'] <6]
         print ("%s  topT: %s top>%s: %s" % ("{0:4}".format(market),len(topTen), changepercent, len(top))),
@@ -208,10 +209,10 @@ def get_hot_count(changepercent):
 
     df=allTop
     count=len(df.index)
-    top = df[df['changepercent'] > changepercent]['code']
-    topTen = df[df['changepercent'] > 9.9]['code']
-    crashTen = df[df['changepercent'] < -9.8]['code']
-    crash = df[df['changepercent'] < -changepercent]['code']
+    top = df[df['percent'] > changepercent]['code']
+    topTen = df[df['percent'] > 9.9]['code']
+    crashTen = df[df['percent'] < -9.8]['code']
+    crash = df[df['percent'] < -changepercent]['code']
     print ("\t\t\t\t\t\t A:%s topT: %s top>%s: %s" % ("{0:4}".format(count),len(topTen), changepercent, len(top))),
     print (" crashT: %s crash<-%s: %s" % (len(crashTen), changepercent, len(crash)))
     return allTop
@@ -269,6 +270,7 @@ if __name__ == '__main__':
     code = ''
     ave = None
     days = '20'
+    success=0
     while 1:
         try:
             if not status:
@@ -297,8 +299,12 @@ if __name__ == '__main__':
             num_input = ''
             ave = None
             code=''
+            time.sleep(0.5)
+            if success > 3:
+                sys.exit(0)
+
         except (IOError, EOFError) as e:
-            print "Except",e
+            traceback.print_exc()
             # num_input=num_input
             # print "status:",status
             # handle_ctrl_c()

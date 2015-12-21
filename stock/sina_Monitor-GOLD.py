@@ -26,7 +26,6 @@ import types
 # except ImportError:
 #     from urllib2 import urlopen, Request
 
-
 url_s = "http://vip.stock.finance.sina.com.cn/quotes_service/view/cn_bill_all.php?num=100&page=1&sort=ticktime&asc=0&volume=0&type=1"
 url_b = "http://vip.stock.finance.sina.com.cn/quotes_service/view/cn_bill_all.php?num=100&page=1&sort=ticktime&asc=0&volume=100000&type=0"
 url_real_sina = "http://finance.sina.com.cn/realstock/"
@@ -83,25 +82,31 @@ if __name__ == "__main__":
     type = '2'
     top_all=pd.DataFrame()
     code_a={}
+    success = 0
     while 1:
         try:
             df=rl.get_sina_all_json_dd(vol,type)
             top_now = rl.get_sina_dd_count_price_realTime(df)
             # print type(top_now)
             if len(top_now)>10:
+                if 'percent' in top_now.columns.values:
+                    top_now=top_now[top_now['percent']>0]
                 if len(top_all) == 0:
                     top_all = top_now
                     # dd=dd.fillna(0)
                 else:
                     for symbol in top_now.index:
-
                         # code = rl._symbol_to_code(symbol)
                         if symbol in top_all.index :
+                            # print top_all.iloc[symbol]
+                            # print top_now[symbol]
                             # if top_all.loc[symbol,'diff'] == 0:
                             # print "code:",symbol
-                            # print top_now.loc[symbol,'counts']
-                            # print top_all.loc[symbol,'counts']
-                            top_all.loc[symbol,'diff']=top_now.loc[symbol,'counts']-top_all.loc[symbol,'counts']
+                            count_n=top_now.loc[symbol,'counts']
+                            count_a=top_all.loc[symbol,'counts']
+                            # print "count_n:",count_n
+                            # print "count_a:",count_a
+                            top_all.loc[symbol,'diff']=count_n-count_a
                             # else:
                                 # value=top_all.loc[symbol,'diff']
 
@@ -124,15 +129,22 @@ if __name__ == "__main__":
             else:
                 # print top_now[:10]
                 print "no data"
-            time.sleep(60)
+            time.sleep(120)
 
 
 
-        except (IOError, EOFError, KeyboardInterrupt) as e:
+        except (KeyboardInterrupt) as e:
             # print "key"
-            # print "expect:",
-            traceback.print_exc()
+            print "KeyboardInterrupt:",e
+            success+=1
             status = not status
+            time.sleep(0.5)
+            if success > 3:
+                sys.exit(0)
+
+        except (IOError, EOFError) as e:
+            traceback.print_exc()
+
 
     # http://stackoverflow.com/questions/17709270/i-want-to-create-a-column-of-value-count-in-my-pandas-dataframe
 # df['counts'] = df.groupby(['Color'])['Value'].transform('count')
