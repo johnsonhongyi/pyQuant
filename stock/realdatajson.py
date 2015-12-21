@@ -19,6 +19,7 @@ import re
 from pandas.compat import StringIO
 # from tushare.util import dateu as du
 import math
+import singleAnalyseUtil as sl
 # import multiprocessing
 
 from multiprocessing import cpu_count
@@ -230,11 +231,10 @@ def get_sina_Market_json(market='sh_a', num='2000', retry_count=3, pause=0.001):
         #     newdf = _parsing_dayprice_json(i)
         #     df = df.append(newdf, ignore_index=True)
         # print len(df.index)
-        print ("interval:%s" % (format((time.time() - start_t), '.2f')))
+        print ("market-df:%s time: %s" % (format((time.time() - start_t), '.1f'),sl.get_now_time()))
         return df
     else:
-        print ("no data")
-        print ("interval:%s" % (format((time.time() - start_t), '.2f')))
+        print ("no data market-df:%s" % (format((time.time() - start_t), '.2f')))
         return []
 
 
@@ -380,11 +380,11 @@ def get_sina_all_json_dd(vol='0', type='3', num='10000', retry_count=3, pause=0.
         #     newdf = _parsing_dayprice_json(i)
         #     df = df.append(newdf, ignore_index=True)
         # print len(df.index)
-        print "intervaldf:", (time.time() - start_t),
+        print (" json-df: %0.2f"%((time.time() - start_t))),
         return df
     else:
-        print "no data"
-        print "interval-none:", (time.time() - start_t)
+        print
+        print ("no data  json-df: %0.2f"%((time.time() - start_t)))
         return ''
 
 

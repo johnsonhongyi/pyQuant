@@ -156,7 +156,7 @@ if __name__ == "__main__":
     status=False
     vol = '0'
     type = '2'
-    cut_num='10000'
+    cut_num='5000'
     success=0
     top_all=pd.DataFrame()
     while 1:
