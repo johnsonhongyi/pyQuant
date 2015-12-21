@@ -15,10 +15,11 @@ def get_BBANDS(df):
     df = df.sort_index(axis=0, by=None, ascending=True)
     upperband, middleband, lowerband = ta.BBANDS(np.array(df['close']), timeperiod=20, nbdevdn=2, matype=0)
     df['upperband'] = pd.Series(upperband, index=df.index)  # K
-    # df['middleband'] = pd.Series(middleband, index=df.index)  # D
-    # df['lowerband'] = pd.Series(lowerband, index=df.index)  # D
-    # print df[:20]
-    ts.get_hist_data()
+    df['middleband'] = pd.Series(middleband, index=df.index)  # D
+    df['lowerband'] = pd.Series(lowerband, index=df.index)  # D
+    df = df.sort_index(axis=0, by=None, ascending=False)
+
+    print df[:10]
 
     return df
 
@@ -224,3 +225,7 @@ def Get_RSI(df):
     elif df.iat[(dflen - 1), 19] < df.iat[(dflen - 1), 18] and df.iat[(dflen - 2), 19] >= df.iat[(dflen - 2), 18]:
         operate = operate - 10
     return (df, operate)
+
+if __name__ == '__main__':
+    df=ts.get_hist_data('601198')
+    db=get_BBANDS(df)
