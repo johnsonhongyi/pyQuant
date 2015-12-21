@@ -27,7 +27,7 @@ def Get_BBANDS(df):
 #修改了的函数，按照多个指标进行分析
 
 #按照MACD，KDJ等进行分析
-def Get_TA(df_Code,Dist):
+def Get_TA(df_Code,Dist=''):
     operate_array1=[]
     operate_array2=[]
     operate_array3=[]

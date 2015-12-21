@@ -109,9 +109,14 @@ def Get_MACD(df):
 
     return (df,operate)
 
-def Get_BBANDS(df):
+def get_BBANDS(df):
     df=df.sort_index(axis=0, by=None, ascending=True)
     upperband,middleband,lowerband=ta.BBANDS(np.array(df['close']),timeperiod=20,nbdevdn=2,matype=0)
+    df['upperband']=pd.Series(upperband,index=df.index) #K
+    df['middleband']=pd.Series(middleband,index=df.index)#D
+    df['lowerband']=pd.Series(lowerband,index=df.index)#D
+    # print df[:20]
+    return df
 
 
 
@@ -242,10 +247,13 @@ def Write_Blog(strinput,Dist):
     time.sleep(1)
 
 if __name__ == '__main__':
-    df = Get_Stock_List()
-    Dist = 'E:\\Quant\\'
-    df = Get_TA(df,Dist)
-    # Output_Csv(df,Dist)
-    print ("sucess")
-    # time.sleep(1)
-    # Close_machine()
+    # df = Get_Stock_List()
+    # Dist = 'E:\\Quant\\'
+    # df = Get_TA(df,Dist)
+    # # Output_Csv(df,Dist)
+    # print ("sucess")
+    # # time.sleep(1)
+    # # Close_machine()
+    df=ts.get_hist_data('601198')
+    db=get_BBANDS(df)
+    print db.sort_index(axis=0,ascending=False).loc[:,['open','close','upperband','middleband','lowerband']]
