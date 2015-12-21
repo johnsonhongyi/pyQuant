@@ -146,7 +146,7 @@ def get_yestoday_tick_status(code, ave=None):
 def get_today_tick_ave(code, ave=None):
     try:
         dtick = ts.get_today_ticks(code)
-    # try:
+        df=dtick
         if len(dtick.index) > 0:
             p_now = dtick['price'].values[0] * 100
             ep = dtick['amount'].sum() / dtick['volume'].sum()
@@ -168,6 +168,8 @@ def get_today_tick_ave(code, ave=None):
         else:
             df=ts.get_realtime_quotes(code)
             print "name:%s op:%s  price:%s"%(df['name'].values[0],df['open'].values[0],df['price'].values[0])
+        # print df
+        return df
     except (IOError, EOFError, KeyboardInterrupt) as e:
         print("Except:%s"%(e))
         # print "IOError"
@@ -186,7 +188,7 @@ def get_work_time():
     # now_t = int(now_t)
     if (now_t > '1131' and now_t < '1300') or (now_t < '0924' or now_t > '1502'):
         # return False
-        return False
+        return True
     else:
         return True
 
@@ -194,7 +196,7 @@ def get_work_time():
 def get_hot_count(changepercent):
     allTop = pd.DataFrame()
     for market in ct.SINA_Market_KEY:
-        df = rd.get_sina_Market_json(market)
+        df = rd.get_sina_Market_json(market,False)
         # count=len(df.index)
         # print df[:1]
         top = df[df['percent'] > changepercent]['code']
@@ -231,9 +233,9 @@ def handle_ctrl_c(signal, frame):
     sys.exit(0)
 
 
-def get_hot_loop(timedelay):
+def get_hot_loop(timedelay,percent=3):
     if get_now_time():
-        df=get_hot_count(3)
+        df=get_hot_count(percent)
         # _write_to_csv(df,'tick-data')
         # print ""
     time.sleep(timedelay)
@@ -274,7 +276,7 @@ if __name__ == '__main__':
     while 1:
         try:
             if not status:
-                get_hot_loop(120)
+                get_hot_loop(120,3)
             if status:
                 # status=True
                 if not num_input:

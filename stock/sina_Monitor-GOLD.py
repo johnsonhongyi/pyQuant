@@ -79,7 +79,7 @@ if __name__ == "__main__":
 
     status=False
     vol = '0'
-    type = '2'
+    type = '3'
     top_all=pd.DataFrame()
     code_a={}
     success = 0

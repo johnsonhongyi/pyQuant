@@ -190,7 +190,7 @@ def _get_sina_Market_url(market='sh_a', count=None, num='1000'):
     return urllist
 
 
-def get_sina_Market_json(market='sh_a', num='2000', retry_count=3, pause=0.001):
+def get_sina_Market_json(market='sh_a',showtime=True,num='2000', retry_count=3, pause=0.001):
     start_t = time.time()
     # url="http://vip.stock.finance.sina.com.cn/quotes_service/api/json_v2.php/Market_Center.getHQNodeData?page=1&num=50&sort=changepercent&asc=0&node=sh_a&symbol="
     # SINA_REAL_PRICE_DD = '%s%s/quotes_service/api/json_v2.php/Market_Center.getHQNodeData?page=1&num=%s&sort=changepercent&asc=0&node=%s&symbol=%s'
@@ -231,10 +231,10 @@ def get_sina_Market_json(market='sh_a', num='2000', retry_count=3, pause=0.001):
         #     newdf = _parsing_dayprice_json(i)
         #     df = df.append(newdf, ignore_index=True)
         # print len(df.index)
-        print ("market-df:%s time: %s" % (format((time.time() - start_t), '.1f'),sl.get_now_time()))
+        if showtime:print ("market-df:%s time: %s" % (format((time.time() - start_t), '.1f'),sl.get_now_time()))
         return df
     else:
-        print ("no data market-df:%s" % (format((time.time() - start_t), '.2f')))
+        if showtime:print ("no data market-df:%s" % (format((time.time() - start_t), '.2f')))
         return []
 
 
