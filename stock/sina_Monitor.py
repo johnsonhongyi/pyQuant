@@ -156,17 +156,21 @@ if __name__ == "__main__":
     status=False
     vol = '0'
     type = '2'
-    cut_num='5000'
+    cut_num=10000
     success=0
     top_all=pd.DataFrame()
     while 1:
         try:
             df=rl.get_sina_all_json_dd(vol,type)
+            print len(df)
+
             if len(df) >cut_num:
                 df=df[:cut_num]
+                # print len(df)
             top_now = rl.get_sina_dd_count_price_realTime(df)
-            # print type(top_now)
+            # print len(top_now)
             if len(top_now)>10:
+                top_now = top_now[top_now.trade >= top_now.high*0.99]
                 if 'percent' in top_now.columns.values:
                     top_now=top_now[top_now['percent']>0]
                 if len(top_all) == 0:
@@ -182,7 +186,12 @@ if __name__ == "__main__":
                             count_n=top_now.loc[symbol,'counts']
                             count_a=top_all.loc[symbol,'counts']
                             # print count_n,count_a
-                            top_all.loc[symbol,'diff']=count_n-count_a
+                            if count_n>count_a:
+                                top_all.loc[symbol,'diff']=count_n-count_a
+                                top_all.loc[symbol,'percent':]=top_now.loc[symbol,'percent':]
+                            else:
+                                top_all.loc[symbol,'percent':]=top_now.loc[symbol,'percent':]
+                            # top_all.loc[symbol]=top_now.loc[symbol]?
                             # top_all.loc[symbol,'diff']=top_now.loc[symbol,'counts']-top_all.loc[symbol,'counts']
 
                             # else:
@@ -190,7 +199,13 @@ if __name__ == "__main__":
 
                         else:
                             top_all.append(top_now.loc[symbol])
-                top_all=top_all.sort_values(by=['diff','counts'],ascending=[0,0])
+                # top_all=top_all.sort_values(by=['diff','percent','counts'],ascending=[0,0,1])
+                # top_all=top_all.sort_values(by=['diff','ratio','percent','counts'],ascending=[0,1,0,1])
+                top_all=top_all.sort_values(by=['diff','percent','counts','ratio'],ascending=[0,0,1,1])
+                # top_all=top_all.sort_values(by=['percent','diff','counts','ratio'],ascending=[0,0,1,1])
+
+
+
                 # print top_all
                 # print pt.PrettyTable([''] + list(top_all.columns))
                 # print tbl.tabulate(top_all,headers='keys', tablefmt='psql')
@@ -208,17 +223,31 @@ if __name__ == "__main__":
 
             else:
                 print "no data"
-            time.sleep(120)
+            time.sleep(60)
 
         except (KeyboardInterrupt) as e:
             # print "key"
             print "KeyboardInterrupt:", e
-            status = not status
-            time.sleep(0.5)
-            if success > 3:
+            # time.sleep(1)
+            # if success > 3:
+            #     raw_input("Except")
+            #     sys.exit(0)
+            st=raw_input("status:[go(g),clear(c),quit(q,e)]:")
+            if len(st)==0:
+                status=False
+            elif st=='g' or st=='go':
+                status = True
+            elif st=='clear' or st=='c':
+                top_all=pd.DataFrame()
+                status=False
+            else:
                 sys.exit(0)
         except (IOError, EOFError) as e:
-            traceback.print_exc()
+            print "Error",e
+
+            # traceback.print_exc()
+            # raw_input("Except")
+
 
     # sl.get_code_search_loop()
     # print data.describe()

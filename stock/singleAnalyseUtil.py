@@ -297,16 +297,26 @@ if __name__ == '__main__':
         except (KeyboardInterrupt) as e:
             # print "key"
             print "KeyboardInterrupt:",e
-            status = not status
-            num_input = ''
-            ave = None
-            code=''
-            time.sleep(0.5)
-            if success > 3:
+
+            st=raw_input("status:[go(g),clear(c),quit(q,e)]:")
+            if len(st)==0:
+                status=False
+            elif st=='g' or st=='go':
+                status = True
+                num_input = ''
+                ave = None
+                code=''
+            else:
                 sys.exit(0)
+            # time.sleep(0.5)
+            # if success > 3:
+            #     raw_input("Except")
+            #     sys.exit(0)
 
         except (IOError, EOFError) as e:
-            traceback.print_exc()
+            print "Error",e
+            # traceback.print_exc()
+            # raw_input("Except")
             # num_input=num_input
             # print "status:",status
             # handle_ctrl_c()

@@ -602,6 +602,7 @@ def get_sina_dd_count_price_realTime(df='',mtype='all'):
             # dm=dm.drop_duplicates('code')
             dm=dm.set_index('code')
             dm=dm.dropna('index')
+            dm.loc[dm.percent>9.9,'percent']=10
             # print dm[-1:]
             dm=dm.loc[:,ct.SINA_DD_Clean_Count_Coluns]
             # print dm[-1:]
