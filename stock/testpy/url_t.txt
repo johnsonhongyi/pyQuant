@@ -37,3 +37,45 @@ http://vip.stock.finance.sina.com.cn/quotes_service/api/json_v2.php/MoneyFlow.ss
 
 {symbol:"sh603936",code:"603936",name:"��������",trade:"14.05",pricechange:"1.280",changepercent:"10.023",buy:"14.05",sell:"0.00",settlement:"12.77",open:"14.05",high:"14.05",low:"14.05",volume:9315,amount:130876,ticktime:"15:03:08",per:24.78,pb:3.15,mktcap:235126.75,nmc:58799.25,turnoverratio:0.02226}
 
+
+
+
+资金及实时
+http://qt.gtimg.cn/q=ff_sz000001
+现金流数据仍然采用腾讯接口：沪市：http://qt.gtimg.cn/q=ff_sh<int>，深市：http://qt.gtimg.cn/q=ff_sz<int>
+
+      例如平安银行的现金流数据http://qt.gtimg.cn/q=ff_sz000001：
+
+v_ff_sz000001="sz000001~21162.20~24136.40~-2974.20~-8.31~14620.87~11646.65~2974.22~
+8.31~35783.07~261502.0~261158.3~平安银行~20151029~20151028^37054.20^39358.20~
+20151027^39713.50^42230.70~20151026^82000.80^83689.90~20151023^81571.30^71743.10";
+
+          比较重要的：1-主力流入；2-主力流出；3-主力净流量；4-主力流入/主力总资金；5-散户流入；6-散户流出；7-散户净流量；8-散户流入/散户总资金；9-总资金流量；12-名字；13-日期
+
+
+http://stock.qq.com/zjlx/#
+var ggDataURL = {
+        'in':{
+                '1': ['http://stock.gtimg.cn/data/view/zldx.php?t=1','stock_fund_netin_10'],
+                '5': ['http://stock.gtimg.cn/data/view/zldx.php?t=2','stock_fund_netin_5days']
+             },
+        'out':{
+                '1': ['http://stock.gtimg.cn/data/view/zldx.php?t=1','stock_fund_netout_10'],
+                '5': ['http://stock.gtimg.cn/data/view/zldx.php?t=2','stock_fund_netout_5days']
+              }
+    },
+    ggTableHead = '\
+            <table width="770" border="0" cellpadding="0" cellspacing="0" class="data notborT">\
+              <thead>\
+                <tr align="center">\
+                <th width="40">序号</th>\
+                <td width="70">股票代码</td>\
+                <td width="70">股票名称</td>\
+                <td width="150">主力@ADD_SUB@仓额(万元)</td>\
+                <td width="170">主力@ADD_SUB@仓占@DANG@日成交比</td>\
+                <td width="60">最新价</td>\
+                <td width="60">涨跌幅</td>\
+                <td style="width:150px;">主力增减仓10日趋势</td>\
+                </tr>\
+              </thead>\
+           ',

@@ -5,7 +5,6 @@ Created on 2015年3月2日
 '''
 import time
 import threading
-from setting import params
 '''
 上证编码：'600001' .. '602100'
 深圳编码：'000001' .. '001999'
@@ -14,9 +13,10 @@ from setting import params
 '''
 import urllib2
 from datetime import date
-# from db import *
-from db.DBOperator import *
 from db.LoggerFactory import *
+from db.DBOperator import *
+# from setting import *
+codingtype='gbk'
 
 class StockTencent(object):
     #数据库表
@@ -140,7 +140,7 @@ class StockTencent(object):
             self.__logger.error(">>>>>> Exception: " +str(e))
             return None
 
-        stdoutInfo = stdout.read().decode(params.codingtype).encode('utf-8')
+        stdoutInfo = stdout.read().decode(codingtype).encode('utf-8')
         tempData = stdoutInfo.replace('"', '')
         self.__logger.debug(tempData)
         return tempData
@@ -151,13 +151,12 @@ class StockTencent(object):
         try:
             #沪市股票
             for code in range(600001, 602100):
-                dataUrl = "http://qt.gtimg.cn/q=sh%d" % code
-                self.__logger.info('info:'+str(dataUrl))
+                dataUrl = "http://qt.gtimg.cn/q=ff_sh%d" % code
                 self.__getStockCashDetail(dataUrl)
 
             #深市股票
             for code in range(1, 1999):
-                dataUrl = "http://qt.gtimg.cn/q=sz%06d" % code
+                dataUrl = "http://qt.gtimg.cn/q=ff_sz%06d" % code
                 self.__getStockCashDetail(dataUrl)
 
             #中小板股票

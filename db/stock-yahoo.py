@@ -7,8 +7,9 @@ import urllib
 import re
 import sys
 # from setting import params
-# import urllib2
-from db import *
+import urllib2
+from DBOperator import *
+
 dbOperator = DBOperator()
 table = "stock_quote_yahoo"
 '''查找指定日期股票流量'''
