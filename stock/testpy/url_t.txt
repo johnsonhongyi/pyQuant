@@ -82,3 +82,13 @@ var ggDataURL = {
 
 
 http://s1.dfcfw.com/js/index.js?rt=0.6858937390291169
+http://s1.dfcfw.com/js/zs399001.js?rt=0.6858937390291169
+all index
+sh zs000001
+sz=zs399001
+zxb zs399005
+cyb zs399006
+
+
+
+http://vip.stock.finance.sina.com.cn/quotes_service/api/json_v2.php/Market_Center.getHQNodeData?page=1&num=40&sort=symbol&asc=1&node=new_stock&symbol=&_s_r_a=init

@@ -8,6 +8,12 @@ import johnson_cons as ct
 import pandas as pd
 import datetime
 import sys,traceback
+import fundflowUtil as ffu
+try:
+    from urllib.request import urlopen, Request
+except ImportError:
+    from urllib2 import urlopen, Request
+
 
 def time_sleep(timemin):
     time1 = time.time()
@@ -35,6 +41,16 @@ def get_work_time():
     else:
         return True
 
+def get_url_data(url):
+    # headers = {'User-Agent':'Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.6) Gecko/20091201 Firefox/3.5.6'}
+    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.2; rv:16.0) Gecko/20100101 Firefox/16.0',
+               'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+               'Connection': 'keep-alive'}
+    req = Request(url, headers=headers)
+    fp = urlopen(req, timeout=5)
+    data = fp.read()
+    fp.close()
+    return data
 
 
 def get_all_toplist():
@@ -208,10 +224,18 @@ def get_hot_count(changepercent):
         topTen = df[df['percent'] > 9.9]['code']
         crashTen = df[df['percent'] < -9.8]['code']
         crash = df[df['percent'] < -changepercent]['code']
-
         # top=df[ df['changepercent'] <6]
-        print ("%s  topT: %s top>%s: %s" % ("{0:4}".format(market),len(topTen), changepercent, len(top))),
-        print (" crashT: %s crash<-%s: %s" % (len(crashTen), changepercent, len(crash)))
+
+        print ("%s topT: %s top>%s: %s " % ("{0:4}".format(market),len(topTen), changepercent, "{0:4}".format(len(top)))),
+        ff=ffu.get_dfcfw_fund_flow(ct.DFCFW_FUND_FLOW_URL%ct.SINA_Market_KEY_TO_DFCFW[market])
+        if len(ff)>0:
+            zlr=float(ff['zlr'])
+            zzb=float(ff['zzb'])
+            # zt=str(ff['time'])
+            print ("crashT: %s crash<-%s: %s 流:%0.1f亿 比:%0.1f%%" % (len(crashTen), changepercent, "{0:4}".format(len(crash)),zlr,zzb))
+        else:
+            print ("crashT: %s crash<-%s: %s 流:%0.1f亿 比:%0.1f%% %s" % (len(crashTen), changepercent, "{0:4}".format(len(crash))))
+
         allTop=allTop.append(df,ignore_index=True)
 
     df=allTop
@@ -220,8 +244,15 @@ def get_hot_count(changepercent):
     topTen = df[df['percent'] > 9.9]['code']
     crashTen = df[df['percent'] < -9.8]['code']
     crash = df[df['percent'] < -changepercent]['code']
-    print ("\t\t\t\t\t\t A:%s topT: %s top>%s: %s" % ("{0:4}".format(count),len(topTen), changepercent, len(top))),
-    print (" crashT: %s crash<-%s: %s" % (len(crashTen), changepercent, len(crash)))
+    print ("\t\tA:%s topT: %s top>%s: %s" % ("{0:4}".format(count),len(topTen), changepercent, "{0:4}".format(len(top)))),
+    ff=ffu.get_dfcfw_fund_flow(ct.DFCFW_FUND_FLOW_ALL)
+    if len(ff)>0:
+        zlr=float(ff['zlr'])
+        zzb=float(ff['zzb'])
+        zt=str(ff['time'])
+        print ("crashT: %s crash<-%s: %s 流入:%0.1f亿 占比:%0.1f%% %s" % (len(crashTen), changepercent,"{0:4}".format(len(crash)),zlr,zzb,zt))
+    else:
+        print (" crashT: %s crash<-%s: %s" % (len(crashTen), changepercent, len(crash)))
     return allTop
 
 

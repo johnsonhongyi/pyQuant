@@ -125,6 +125,11 @@ DAY_REAL_DD_COLUMNS = ['code','symbol','name','ticktime','price','volume','prev_
 Status_DD={u"中性盘": "normal", u"买盘": "up", u"卖盘": "down"}
 Status_KIND=['U','D','E']
 
+SINA_Market_KEY_TO_DFCFW={'sh_a':'zs000001','sz_a':'zs399001','cyb':'zs399006'}
+DFCFW_FUND_FLOW_URL="http://s1.dfcfw.com/js/%s.js?rt="
+DFCFW_FUND_FLOW_ALL="http://s1.dfcfw.com/js/index.js?rt="
+
+
 
 
 
