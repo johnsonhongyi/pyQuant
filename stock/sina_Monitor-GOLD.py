@@ -83,13 +83,16 @@ if __name__ == "__main__":
     top_all=pd.DataFrame()
     code_a={}
     success = 0
+    time_s=time.time()
+    delay_time=600
     while 1:
         try:
             df=rl.get_sina_all_json_dd(vol,type)
             top_now = rl.get_sina_dd_count_price_realTime(df)
             # print type(top_now)
-            if len(top_now)>10:
-                top_now = top_now[top_now.trade >= top_now.high*0.99]
+            if len(top_now)>10 and len(top_now.columns)>4:
+                top_now = top_now[top_now.trade >= top_now.high*0.98]
+                time_d=time.time()
                 if 'percent' in top_now.columns.values:
                     top_now=top_now[top_now['percent']>0]
                 if len(top_all) == 0:
@@ -108,8 +111,12 @@ if __name__ == "__main__":
                             # print "count_n:",count_n
                             # print "count_a:",count_a
                             if count_n>count_a:
-                                top_all.loc[symbol,'diff']=count_n-count_a
-                                top_all.loc[symbol,'percent':]=top_now.loc[symbol,'percent':]
+                                top_now.loc[symbol,'diff']=count_n-count_a
+                                if time_d-time_s>delay_time:
+                                    # print "change:",time.time()-time_s
+                                    top_all.loc[symbol]=top_now.loc[symbol]
+                                else:
+                                    top_all.loc[symbol,'diff':]=top_now.loc[symbol,'diff':]
                             else:
                                 top_all.loc[symbol,'percent':]=top_now.loc[symbol,'percent':]
                             # top_all.loc[symbol]=top_now.loc[symbol]
@@ -121,7 +128,8 @@ if __name__ == "__main__":
                 # top_all=top_all.sort_values(by=['diff','counts'],ascending=[0,0])
                 # top_all=top_all.sort_values(by=['diff','percent','counts','ratio'],ascending=[0,0,1,1])
                 top_all=top_all.sort_values(by=['diff','percent','counts','ratio'],ascending=[0,0,1,1])
-
+                if time_d-time_s>delay_time:
+                    time_s=time.time()
                 # print top_all
                 # print pt.PrettyTable([''] + list(top_all.columns))
                 # print tbl.tabulate(top_all,headers='keys', tablefmt='psql')

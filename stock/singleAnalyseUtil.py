@@ -14,6 +14,29 @@ def time_sleep(timemin):
     time.sleep(timemin)
     return True
 
+def get_now_time_num():
+    now_t=datetime.datetime.now().strftime("%H%M")
+    return int(now_t)
+
+def get_now_time():
+    now = time.time()
+    now = time.localtime(now)
+    # d_time=time.strftime("%Y-%m-%d %H:%M:%S",now)
+    d_time = time.strftime("%H:%M", now)
+    return d_time
+
+
+def get_work_time():
+    now_t = str(get_now_time()).replace(':', '')
+    # now_t = int(now_t)
+    if (now_t > '1131' and now_t < '1300') or (now_t < '0924' or now_t > '1502'):
+        # return False
+        return True
+    else:
+        return True
+
+
+
 def get_all_toplist():
     # gold = {}
     # goldl = []
@@ -173,24 +196,6 @@ def get_today_tick_ave(code, ave=None):
     except (IOError, EOFError, KeyboardInterrupt) as e:
         print("Except:%s"%(e))
         # print "IOError"
-
-
-def get_now_time():
-    now = time.time()
-    now = time.localtime(now)
-    # d_time=time.strftime("%Y-%m-%d %H:%M:%S",now)
-    d_time = time.strftime("%H:%M", now)
-    return d_time
-
-
-def get_work_time():
-    now_t = str(get_now_time()).replace(':', '')
-    # now_t = int(now_t)
-    if (now_t > '1131' and now_t < '1300') or (now_t < '0924' or now_t > '1502'):
-        # return False
-        return True
-    else:
-        return True
 
 
 def get_hot_count(changepercent):

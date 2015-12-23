@@ -627,11 +627,12 @@ def _code_to_symbol(code):
 
 if __name__ == '__main__':
     # df = get_sina_all_json_dd('0', '3')
-    df=get_sina_dd_count_price_realTime()
+    df=get_sina_Market_json()
+    # df=get_sina_dd_count_price_realTime()
     # df=df.drop_duplicates('code')
     # df=df.set_index('code')
     # _write_to_csv(df,'readdata3')
-    print format_for_print(df[:2])
+    print format_for_print(df[:10])
     print len(df)
     import sys
 
