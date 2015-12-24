@@ -156,40 +156,36 @@ if __name__ == "__main__":
     status=False
     vol = '0'
     type = '2'
-    cut_num=10000
+    # cut_num=10000
     success=0
     top_all=pd.DataFrame()
     time_s=time.time()
     delay_time=300
     while 1:
         try:
-            df=rl.get_sina_all_json_dd(vol,type)
-            if len(df) >cut_num:
-                df=df[:cut_num]
-                print len(df)
-            top_now = rl.get_sina_dd_count_price_realTime(df)
-            # print len(top_now)
+            df=rl.get_sina_Market_json('all')
+            top_now = rl.get_market_price_sina_dd_realTime(df,vol,type)
+            print len(df),len(top_now)
             if len(top_now)>10 and len(top_now.columns)>4:
                 top_now = top_now[top_now.trade >= top_now.high*0.98]
                 time_d=time.time()
                 if 'percent' in top_now.columns.values:
-                    top_now=top_now[top_now['percent']>0]
+                    top_now=top_now[top_now['percent']>=0]
                 if len(top_all) == 0:
                     top_all = top_now
                     time_s=time.time()
                     # dd=dd.fillna(0)
                 else:
                     for symbol in top_now.index:
-
                         # code = rl._symbol_to_code(symbol)
                         if symbol in top_all.index :
                             # if top_all.loc[symbol,'diff'] == 0:
                             # print "code:",symbol
-                            count_n=top_now.loc[symbol,'counts']
-                            count_a=top_all.loc[symbol,'counts']
+                            count_n=top_now.loc[symbol,'buy']
+                            count_a=top_all.loc[symbol,'buy']
                             # print count_n,count_a
-                            if count_n>count_a:
-                                top_now.loc[symbol,'diff']=count_n-count_a
+                            if not count_n==count_a:
+                                top_now.loc[symbol,'diff']=round((float(count_n-count_a)/count_a*100),1)
                                 if time_d-time_s>delay_time:
                                     # print "change:",time.time()-time_s
                                     top_all.loc[symbol]=top_now.loc[symbol]
@@ -207,20 +203,15 @@ if __name__ == "__main__":
                             top_all.append(top_now.loc[symbol])
                 # top_all=top_all.sort_values(by=['diff','percent','counts'],ascending=[0,0,1])
                 # top_all=top_all.sort_values(by=['diff','ratio','percent','counts'],ascending=[0,1,0,1])
-                top_all=top_all.sort_values(by=['diff','percent','counts','ratio'],ascending=[0,0,1,1])
+                if 'counts' in top_all.columns.values:
+                    top_all=top_all.sort_values(by=['diff','percent','counts','ratio'],ascending=[0,0,1,1])
+                else:
+                    top_all=top_all.sort_values(by=['diff','percent','ratio'],ascending=[0,0,1])
                 if time_d-time_s>delay_time:
                     time_s=time.time()
 
                 # top_all=top_all.sort_values(by=['percent','diff','counts','ratio'],ascending=[0,0,1,1])
 
-
-
-                # print top_all
-                # print pt.PrettyTable([''] + list(top_all.columns))
-                # print tbl.tabulate(top_all,headers='keys', tablefmt='psql')
-                # print tbl.tabulate(top_all,headers='keys', tablefmt='orgtbl')
-                # print rl.format_for_print(top_all)
-                # print top_all[:10]
                 print rl.format_for_print(top_all[:10])
                 # print "staus",status
                 if status:
@@ -251,7 +242,7 @@ if __name__ == "__main__":
                 status=False
             else:
                 sys.exit(0)
-        except (IOError, EOFError) as e:
+        except (IOError, EOFError,Exception) as e:
             print "Error",e
 
             # traceback.print_exc()

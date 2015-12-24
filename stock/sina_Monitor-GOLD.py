@@ -97,6 +97,7 @@ if __name__ == "__main__":
                     top_now=top_now[top_now['percent']>0]
                 if len(top_all) == 0:
                     top_all = top_now
+                    time_s=time.time()
                     # dd=dd.fillna(0)
                 else:
                     for symbol in top_now.index:

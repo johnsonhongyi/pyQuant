@@ -210,6 +210,8 @@ def get_sina_Market_json(market='sh_a',showtime=True,num='2000', retry_count=3, 
         # print url_list
     else:
         url_list=_get_sina_Market_url(market, num=num)
+
+    # print url_list
     # print "url:",url_list
     df = pd.DataFrame()
     # data['code'] = symbol
@@ -588,6 +590,7 @@ def get_sina_dd_count_price_realTime(df='',mtype='all'):
         df=df[(df['kind'] == 'U')]
         df=df.sort_values(by='counts',ascending=0)
         df=df.drop_duplicates('code')
+        df=df[df.price >df.prev_price]
         df=df.loc[:,['code','name','counts']]
         # dz.loc['sh600110','counts']=dz.loc['sh600110'].values[1]+3
         df=df.set_index('code')
@@ -604,10 +607,53 @@ def get_sina_dd_count_price_realTime(df='',mtype='all'):
             dm=dm.dropna('index')
             dm.loc[dm.percent>9.9,'percent']=10
             # print dm[-1:]
-            dm=dm.loc[:,ct.SINA_DD_Clean_Count_Coluns]
+            dm=dm.loc[:,ct.SINA_DD_Clean_Count_Columns]
             # print dm[-1:]
         else:
             dm=df
+    else:
+        dm=''
+    return dm
+
+def get_market_price_sina_dd_realTime(dp='',vol='0',type='4'):
+    '''
+    input df count and merge price to df
+    '''
+    if len(dp)==0:
+            dp=get_sina_Market_json()
+    if len(dp)>10:
+        # df=df.dropna('index')
+        # df=df.drop_duplicates('code')
+        # dm=pd.merge(df,dp,on='name',how='left')
+        dp=dp.drop_duplicates('code')
+        dp=dp.set_index('code')
+        dp=dp.dropna('index')
+        dp.loc[dp.percent>9.9,'percent']=10
+        dp['diff']=0
+        df=get_sina_all_json_dd(vol,type)
+        if len(df)>10:
+            df['counts']=df.groupby(['code'])['code'].transform('count')
+            # df=df[(df['kind'] == 'U')]
+            df=df.sort_values(by='counts',ascending=0)
+            df=df.drop_duplicates('code')
+            df=df[df.price >df.prev_price]
+            df=df.loc[:,['name','counts','kind']]
+            # df.counts =df.counts.astype(int)
+            # df.drop('code')
+            # dz.loc['sh600110','counts']=dz.loc['sh600110'].values[1]+3
+            # df=df.set_index('code')
+            # df=df.dropna('index')
+            # df=df.iloc[0:,['name','counts','kind']]
+            dm=pd.merge(dp,df,on='name',how='left',right_index='code')
+            dm.counts=dm.counts.fillna(0)
+            dm.counts=dm.counts.astype(int)
+            # print dm[:2]
+            # dm=dm.fillna(int(0))
+            dm=dm.loc[:,ct.SINA_Market_Clean_UP_Columns]
+
+        else:
+            dm=dp.loc[:,['name','buy','diff','percent','trade','high','ratio','volume']]
+                    #['name','buy','diff','percent','trade','high','ratio','volume','counts']
     else:
         dm=''
     return dm
@@ -627,7 +673,8 @@ def _code_to_symbol(code):
 
 if __name__ == '__main__':
     # df = get_sina_all_json_dd('0', '3')
-    df=get_sina_Market_json()
+    # df=get_sina_Market_json('all')
+    df=get_market_price_sina_dd_realTime()
     # df=get_sina_dd_count_price_realTime()
     # df=df.drop_duplicates('code')
     # df=df.set_index('code')

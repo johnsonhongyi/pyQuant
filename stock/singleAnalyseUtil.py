@@ -213,7 +213,9 @@ def get_today_tick_ave(code, ave=None):
         print("Except:%s"%(e))
         # print "IOError"
 
-
+def f_print(len,datastr):
+    data=('{0:%s}'%(len)).format(datastr)
+    return data
 def get_hot_count(changepercent):
     allTop = pd.DataFrame()
     for market in ct.SINA_Market_KEY:
@@ -226,15 +228,15 @@ def get_hot_count(changepercent):
         crash = df[df['percent'] < -changepercent]['code']
         # top=df[ df['changepercent'] <6]
 
-        print ("%s topT: %s top>%s: %s " % ("{0:4}".format(market),len(topTen), changepercent, "{0:4}".format(len(top)))),
+        print ("%s topT: %s top>%s: %s " % (f_print(4,market),f_print(3,len(topTen)), changepercent, f_print(4,len(top)))),
         ff=ffu.get_dfcfw_fund_flow(ct.DFCFW_FUND_FLOW_URL%ct.SINA_Market_KEY_TO_DFCFW[market])
         if len(ff)>0:
             zlr=float(ff['zlr'])
             zzb=float(ff['zzb'])
             # zt=str(ff['time'])
-            print ("crashT: %s crash<-%s: %s 流:%0.1f亿 比:%0.1f%%" % (len(crashTen), changepercent, "{0:4}".format(len(crash)),zlr,zzb))
+            print (u"crashT:%s crash<-%s:%s 流入: %0.1f亿 比: %0.1f%%" % (f_print(4,len(crashTen)), changepercent, f_print(4,len(crash)),zlr,zzb))
         else:
-            print ("crashT: %s crash<-%s: %s 流:%0.1f亿 比:%0.1f%% %s" % (len(crashTen), changepercent, "{0:4}".format(len(crash))))
+            print (u"crashT:%s crash<-%s:%s 流入: %0.1f亿 比: %0.1f%% %s" % (f_print(4,len(crashTen)), changepercent,f_print(4,len(crash))))
 
         allTop=allTop.append(df,ignore_index=True)
 
@@ -244,15 +246,15 @@ def get_hot_count(changepercent):
     topTen = df[df['percent'] > 9.9]['code']
     crashTen = df[df['percent'] < -9.8]['code']
     crash = df[df['percent'] < -changepercent]['code']
-    print ("\t\tA:%s topT: %s top>%s: %s" % ("{0:4}".format(count),len(topTen), changepercent, "{0:4}".format(len(top)))),
+    print (u"\t\tA:%s topT:%s top>%s:%s" % (f_print(4,count),f_print(3,len(topTen)), changepercent,f_print(4,len(top)))),
     ff=ffu.get_dfcfw_fund_flow(ct.DFCFW_FUND_FLOW_ALL)
     if len(ff)>0:
         zlr=float(ff['zlr'])
         zzb=float(ff['zzb'])
         zt=str(ff['time'])
-        print ("crashT: %s crash<-%s: %s 流入:%0.1f亿 占比:%0.1f%% %s" % (len(crashTen), changepercent,"{0:4}".format(len(crash)),zlr,zzb,zt))
+        print (u"crashT:%s crash<-%s:%s 流入: %0.1f亿 占比: %0.1f%% %s" % (f_print(3,len(crashTen)), changepercent,f_print(4,(len(crash))),zlr,zzb,zt))
     else:
-        print (" crashT: %s crash<-%s: %s" % (len(crashTen), changepercent, len(crash)))
+        print (u"crashT:%s crash<-%s:%s" % (f_print(3,len(crashTen)), changepercent, f_print(4,len(crash))))
     return allTop
 
 
