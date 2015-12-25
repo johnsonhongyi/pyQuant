@@ -24,6 +24,7 @@ import realdatajson as rl
 import pandas as pd
 import traceback
 import sys
+import numpy as np
 
 def downloadpage(url):
     fp = urllib2.urlopen(url)
@@ -155,27 +156,40 @@ if __name__ == "__main__":
     # parsehtml(downloadpage(url_s))
     status=False
     vol = '0'
-    type = '2'
+    type = '4'
     # cut_num=10000
     success=0
     top_all=pd.DataFrame()
     time_s=time.time()
-    delay_time=300
+    delay_time=900
     while 1:
         try:
             df=rl.get_sina_Market_json('all')
             top_now = rl.get_market_price_sina_dd_realTime(df,vol,type)
-            print len(df),len(top_now)
+            print len(df),len(top_now),len(top_all)
             if len(top_now)>10 and len(top_now.columns)>4:
-                top_now = top_now[top_now.trade >= top_now.high*0.98]
                 time_d=time.time()
-                if 'percent' in top_now.columns.values:
-                    top_now=top_now[top_now['percent']>=0]
+                # if 'percent' in top_now.columns.values:
+                #     top_now=top_now[top_now['percent']>=0]
                 if len(top_all) == 0:
                     top_all = top_now
+                    top_all['lp']=0
+                    codelist=np.array(top_all.index)
+                    print len(codelist)
+                    lastp_d=rl.get_market_LastPrice_sina_js(codelist)
+                    print lastp_d
+                    if len(lastp_d.keys())==len(codelist):
+                        print "eq"
+                        for code in lastp_d.keys():
+                            print code
+                            top_all.loc[code,'lp']=lastp_d[code]
+                    print len(lastp_d.keys()),len(codelist)
                     time_s=time.time()
-                    # dd=dd.fillna(0)
                 else:
+                    if 'counts' in top_now.columns.values:
+                        if not 'counts' in top_all.columns.values:
+                            top_all['counts']=0
+
                     for symbol in top_now.index:
                         # code = rl._symbol_to_code(symbol)
                         if symbol in top_all.index :
@@ -183,6 +197,7 @@ if __name__ == "__main__":
                             # print "code:",symbol
                             count_n=top_now.loc[symbol,'buy']
                             count_a=top_all.loc[symbol,'buy']
+                            # print count_a,count_n
                             # print count_n,count_a
                             if not count_n==count_a:
                                 top_now.loc[symbol,'diff']=round((float(count_n-count_a)/count_a*100),1)
@@ -203,16 +218,23 @@ if __name__ == "__main__":
                             top_all.append(top_now.loc[symbol])
                 # top_all=top_all.sort_values(by=['diff','percent','counts'],ascending=[0,0,1])
                 # top_all=top_all.sort_values(by=['diff','ratio','percent','counts'],ascending=[0,1,0,1])
+
+                # top_all = top_all[top_all.open>=top_all.low*0.99]
+                # top_all = top_all[top_all.buy >= top_all.open*0.99]
+                # top_all = top_all[top_all.trade >= top_all.low*0.99]
+                # top_all = top_all[top_all.trade >= top_all.high*0.99]
+                # top_all = top_all[top_all.percent >= 0]
+
                 if 'counts' in top_all.columns.values:
                     top_all=top_all.sort_values(by=['diff','percent','counts','ratio'],ascending=[0,0,1,1])
                 else:
+                    print "Good Morning!!!"
                     top_all=top_all.sort_values(by=['diff','percent','ratio'],ascending=[0,0,1])
                 if time_d-time_s>delay_time:
                     time_s=time.time()
-
                 # top_all=top_all.sort_values(by=['percent','diff','counts','ratio'],ascending=[0,0,1,1])
-
                 print rl.format_for_print(top_all[:10])
+                print rl.format_for_print(top_all[-10:])
                 # print "staus",status
                 if status:
                     for code in top_all[:10].index:
@@ -261,4 +283,9 @@ if __name__ == "__main__":
     # <A Href="www.pythonclub.org"> PythonClub </a>
     # <A HREF = "www.sina.com.cn"> Sina </a>
     # """)
+'''
+{symbol:"sz000001",code:"000001",name:"平安银行",trade:"0.00",pricechange:"0.000",changepercent:"0.000",buy:"12.36",sell:"12.36",settlement:"12.34",open:"0.00",high:"0.00",low:"0",volume:0,amount:0,ticktime:"09:17:55",per:7.133,pb:1.124,mktcap:17656906.355526,nmc:14566203.350486,turnoverratio:0},
+{symbol:"sz000002",code:"000002",name:"万  科Ａ",trade:"0.00",pricechange:"0.000",changepercent:"0.000",buy:"0.00",sell:"0.00",settlement:"24.43",open:"0.00",high:"0.00",low:"0",volume:0,amount:0,ticktime:"09:17:55",per:17.084,pb:3.035,mktcap:26996432.575,nmc:23746405.928119,turnoverratio:0},
 
+
+'''

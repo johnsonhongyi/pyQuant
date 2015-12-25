@@ -118,8 +118,8 @@ JSON_Market_Center_CountURL="http://vip.stock.finance.sina.com.cn/quotes_service
 # http://vip.stock.finance.sina.com.cn/quotes_service/api/json_v2.php/Market_Center.getHQNodeData?num=80&sort=changepercent&asc=0&node=hs_a&symbol=&_s_r_a=page&page=1
 SINA_Market_KEY=['sh_a','sz_a','cyb']
 SINA_Market_COLUMNS = ['code', 'name', 'trade', 'buy', 'percent', 'open', 'high', 'low', 'volume', 'ticktime', 'ratio']
-SINA_DD_Clean_Count_Columns=['name','counts','diff','percent','trade','high','open','ratio']
-SINA_Market_Clean_UP_Columns=['name','buy','diff','percent','trade','high','ratio','volume','counts']
+SINA_DD_Clean_Count_Columns=['name','percent','diff','counts','trade','high','open','low','ratio']
+SINA_Market_Clean_UP_Columns=['name','buy','diff','percent','trade','high','ratio','open','low','counts']
 
 THE_FIELDS = ['code', 'symbol', 'name', 'changepercent', 'trade', 'open', 'high', 'low', 'settlement', 'volume', 'turnoverratio']
 # Market_Center_COLUMNS = ['code','name','trade','changepercent','buy','sell','settlement','open','high','low','volume','ticktime','turnoverratio']

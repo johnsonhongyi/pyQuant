@@ -156,11 +156,11 @@ if __name__ == "__main__":
     status=False
     vol = '0'
     type = '2'
-    cut_num=10000
+    cut_num=100000
     success=0
     top_all=pd.DataFrame()
     time_s=time.time()
-    delay_time=300
+    delay_time=1800
     while 1:
         try:
             df=rl.get_sina_all_json_dd(vol,type)
@@ -188,15 +188,15 @@ if __name__ == "__main__":
                             count_n=top_now.loc[symbol,'counts']
                             count_a=top_all.loc[symbol,'counts']
                             # print count_n,count_a
-                            if count_n>count_a:
+                            if not count_n==count_a:
                                 top_now.loc[symbol,'diff']=count_n-count_a
                                 if time_d-time_s>delay_time:
                                     # print "change:",time.time()-time_s
                                     top_all.loc[symbol]=top_now.loc[symbol]
                                 else:
-                                    top_all.loc[symbol,'diff':]=top_now.loc[symbol,'diff':]
+                                    top_all.loc[symbol,['percent','diff','trade','high','open','low','ratio']]=top_now.loc[symbol,['percent','diff','trade','high','open','low','ratio']]
                             else:
-                                top_all.loc[symbol,'percent':]=top_now.loc[symbol,'percent':]
+                                top_all.loc[symbol,['percent','trade','high','open','low','ratio']]=top_now.loc[symbol,['percent','diff','trade','high','open','low','ratio']]
                             # top_all.loc[symbol]=top_now.loc[symbol]?
                             # top_all.loc[symbol,'diff']=top_now.loc[symbol,'counts']-top_all.loc[symbol,'counts']
 
@@ -207,7 +207,8 @@ if __name__ == "__main__":
                             top_all.append(top_now.loc[symbol])
                 # top_all=top_all.sort_values(by=['diff','percent','counts'],ascending=[0,0,1])
                 # top_all=top_all.sort_values(by=['diff','ratio','percent','counts'],ascending=[0,1,0,1])
-                top_all=top_all.sort_values(by=['diff','percent','counts','ratio'],ascending=[0,0,1,1])
+                # top_all=top_all.sort_values(by=['diff','percent','counts','ratio'],ascending=[0,0,1,1])
+                top_all=top_all.sort_values(by=['diff','counts','ratio'],ascending=[0,0,1])
                 if time_d-time_s>delay_time:
                     time_s=time.time()
 

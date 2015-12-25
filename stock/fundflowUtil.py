@@ -23,6 +23,7 @@ def get_dfcfw_fund_flow(url):
 
 
 
+
 if __name__ == "__main__":
     ff=get_dfcfw_fund_flow()
     print "%.1f"%(float(ff['zzb']))

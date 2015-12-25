@@ -84,22 +84,22 @@ if __name__ == "__main__":
     code_a={}
     success = 0
     time_s=time.time()
-    delay_time=600
+    delay_time=900
     while 1:
         try:
             df=rl.get_sina_all_json_dd(vol,type)
             top_now = rl.get_sina_dd_count_price_realTime(df)
             # print type(top_now)
             if len(top_now)>10 and len(top_now.columns)>4:
-                top_now = top_now[top_now.trade >= top_now.high*0.98]
                 time_d=time.time()
-                if 'percent' in top_now.columns.values:
-                    top_now=top_now[top_now['percent']>0]
+                # if 'percent' in top_now.columns.values:
+                #     top_now=top_now[top_now['percent']>0]
                 if len(top_all) == 0:
                     top_all = top_now
                     time_s=time.time()
                     # dd=dd.fillna(0)
                 else:
+                    top_now = top_now[top_now.trade >= top_now.high*0.98]
                     for symbol in top_now.index:
                         # code = rl._symbol_to_code(symbol)
                         if symbol in top_all.index :
@@ -107,19 +107,19 @@ if __name__ == "__main__":
                             # print top_now[symbol]
                             # if top_all.loc[symbol,'diff'] == 0:
                             # print "code:",symbol
-                            count_n=top_now.loc[symbol,'counts']
-                            count_a=top_all.loc[symbol,'counts']
+                            count_n=top_now.loc[symbol,'percent']
+                            count_a=top_all.loc[symbol,'percent']
                             # print "count_n:",count_n
                             # print "count_a:",count_a
-                            if count_n>count_a:
-                                top_now.loc[symbol,'diff']=count_n-count_a
+                            if not count_n==count_a:
+                                top_now.loc[symbol,'diff']=round((count_n-count_a),1)
                                 if time_d-time_s>delay_time:
                                     # print "change:",time.time()-time_s
                                     top_all.loc[symbol]=top_now.loc[symbol]
                                 else:
                                     top_all.loc[symbol,'diff':]=top_now.loc[symbol,'diff':]
                             else:
-                                top_all.loc[symbol,'percent':]=top_now.loc[symbol,'percent':]
+                                top_all.loc[symbol,'counts':]=top_now.loc[symbol,'counts':]
                             # top_all.loc[symbol]=top_now.loc[symbol]
                             # else:
                                 # value=top_all.loc[symbol,'diff']

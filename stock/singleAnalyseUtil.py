@@ -31,6 +31,24 @@ def get_now_time():
     d_time = time.strftime("%H:%M", now)
     return d_time
 
+def get_div_list(ls,n):
+    if not isinstance(ls,list) or not isinstance(n,int):
+        return []
+    ls_len = len(ls)
+    if n<=0 or 0==ls_len:
+        return []
+    if n > ls_len:
+        return []
+    elif n == ls_len:
+        return [[i] for i in ls]
+    else:
+        j = (ls_len/n)+1
+        k = ls_len%n
+        ls_return = []
+        for i in xrange(0,(n-1)*j,j):
+            ls_return.append(ls[i:i+j])
+        ls_return.append(ls[(n-1)*j:])
+        return ls_return
 
 def get_work_time():
     now_t = str(get_now_time()).replace(':', '')

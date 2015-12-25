@@ -156,7 +156,7 @@ def _parsing_Market_price_json(url):
                       columns=ct.SINA_Market_COLUMNS)
     # print df[:1]
     # df = df.drop('symbol', axis=1)
-    df = df.ix[df.volume > 0]
+    df = df.ix[df.volume >= 0]
     # print ""
     # print df[:1],len(df.index)
     return df
@@ -233,10 +233,10 @@ def get_sina_Market_json(market='sh_a',showtime=True,num='2000', retry_count=3, 
         #     newdf = _parsing_dayprice_json(i)
         #     df = df.append(newdf, ignore_index=True)
         # print len(df.index)
-        if showtime:print ("market-df:%s time: %s" % (format((time.time() - start_t), '.1f'),sl.get_now_time()))
+        if showtime:print ("Market-df:%s time: %s" % (format((time.time() - start_t), '.1f'),sl.get_now_time()))
         return df
     else:
-        if showtime:print ("no data market-df:%s" % (format((time.time() - start_t), '.2f')))
+        if showtime:print ("no data Market-df:%s" % (format((time.time() - start_t), '.2f')))
         return []
 
 
@@ -587,10 +587,10 @@ def get_sina_dd_count_price_realTime(df='',mtype='all'):
         df = get_sina_all_json_dd('0','4')
     if len(df)>0:
         df['counts']=df.groupby(['code'])['code'].transform('count')
-        df=df[(df['kind'] == 'U')]
+        # df=df[(df['kind'] == 'U')]
         df=df.sort_values(by='counts',ascending=0)
         df=df.drop_duplicates('code')
-        df=df[df.price >df.prev_price]
+        # df=df[df.price >df.prev_price]
         df=df.loc[:,['code','name','counts']]
         # dz.loc['sh600110','counts']=dz.loc['sh600110'].values[1]+3
         df=df.set_index('code')
@@ -614,8 +614,80 @@ def get_sina_dd_count_price_realTime(df='',mtype='all'):
     else:
         dm=''
     return dm
+def get_sina_tick_js_LastPrice(symbols):
+    symbols_list=''
+    if isinstance(symbols, list) or isinstance(symbols, set) or isinstance(symbols, tuple) or isinstance(symbols, pd.Series):
+        for code in symbols:
+            symbols_list += _code_to_symbol(code) + ','
+    else:
+        symbols_list = _code_to_symbol(symbols)
+    # print symbol_str
+    url="http://hq.sinajs.cn/list=%s"%(symbols_list)
+    data=sl.get_url_data(url)
+    # vollist=re.findall('{data:(\d+)',code)
+    # print data
+    ulist=data.split(";")
+    price_dict={}
+    for var in range(0,len(ulist)-1):
+        # print var
+        if len(ulist)==2:
+            code=symbols
+        else:
+            code=symbols[var]
+        tempData = re.search('''(")(.+)(")''', ulist[var]).group(2)
+        stockInfo = tempData.split(",")
+        # stockName   = stockInfo[0]  #名称
+        # stockStart  = stockInfo[1]  #开盘
+        stockLastEnd= stockInfo[2]  #昨收盘
+        price_dict[code]=stockLastEnd
+        # stockCur    = stockInfo[3]  #当前
+        # stockMax    = stockInfo[4]  #最高
+        # stockMin    = stockInfo[5]  #最低
+        # stockUp     = round(float(stockCur) - float(stockLastEnd), 2)
+        # stockRange  = round(float(stockUp) / float(stockLastEnd), 4) * 100
+        # stockVolume = round(float(stockInfo[8]) / (100 * 10000), 2)
+        # stockMoney  = round(float(stockInfo[9]) / (100000000), 2)
+        # stockTime   = stockInfo[31]
+        # dd={}
+    return price_dict
 
-def get_market_price_sina_dd_realTime(dp='',vol='0',type='4'):
+# def get_sina_tick_js_code(code):
+#     symbol=_code_to_symbol(code)
+#     url="http://hq.sinajs.cn/list=%s"%(symbol)
+#     data=sl.get_url_data(url)
+#     # vollist=re.findall('{data:(\d+)',code)
+#     tempData = re.search('''(")(.+)(")''', data).group(2)
+#     stockInfo = tempData.split(",")
+#     # stockName   = stockInfo[0]  #名称
+#     # stockStart  = stockInfo[1]  #开盘
+#     stockLastEnd= stockInfo[2]  #昨收盘
+#     # stockCur    = stockInfo[3]  #当前
+#     # stockMax    = stockInfo[4]  #最高
+#     # stockMin    = stockInfo[5]  #最低
+#     # stockUp     = round(float(stockCur) - float(stockLastEnd), 2)
+#     # stockRange  = round(float(stockUp) / float(stockLastEnd), 4) * 100
+#     # stockVolume = round(float(stockInfo[8]) / (100 * 10000), 2)
+#     # stockMoney  = round(float(stockInfo[9]) / (100000000), 2)
+#     # stockTime   = stockInfo[31]
+#     '''
+#     http://hq.sinajs.cn/list=sz002399,sh601919
+#     '''
+#     return stockLastEnd
+
+def get_market_LastPrice_sina_js(codeList):
+    time_s=time.time()
+    if isinstance(codeList, list) or isinstance(codeList, set) or isinstance(codeList, tuple) or isinstance(codeList, pd.Series):
+        if len(codeList)>50*cpu_count():
+            div_list=sl.get_div_list(codeList,'50')
+            results=to_mp_run(get_sina_tick_js_LastPrice,div_list)
+        else:
+            results=get_sina_tick_js_LastPrice(codeList)
+        print "time:",time.time()-time_s
+        return results
+    else:
+        return get_sina_tick_js_LastPrice(codeList)
+
+def get_market_price_sina_dd_realTime(dp='',vol='0',type='3'):
     '''
     input df count and merge price to df
     '''
@@ -626,34 +698,36 @@ def get_market_price_sina_dd_realTime(dp='',vol='0',type='4'):
         # df=df.drop_duplicates('code')
         # dm=pd.merge(df,dp,on='name',how='left')
         dp=dp.drop_duplicates('code')
-        dp=dp.set_index('code')
+        # dp=dp.set_index('code')
         dp=dp.dropna('index')
         dp.loc[dp.percent>9.9,'percent']=10
         dp['diff']=0
+        # print dp[:2]
         df=get_sina_all_json_dd(vol,type)
         if len(df)>10:
+            # df['counts']=0
             df['counts']=df.groupby(['code'])['code'].transform('count')
             # df=df[(df['kind'] == 'U')]
             df=df.sort_values(by='counts',ascending=0)
             df=df.drop_duplicates('code')
-            df=df[df.price >df.prev_price]
+            # df=df[df.price >df.prev_price]
             df=df.loc[:,['name','counts','kind']]
-            # df.counts =df.counts.astype(int)
-            # df.drop('code')
-            # dz.loc['sh600110','counts']=dz.loc['sh600110'].values[1]+3
-            # df=df.set_index('code')
-            # df=df.dropna('index')
-            # df=df.iloc[0:,['name','counts','kind']]
-            dm=pd.merge(dp,df,on='name',how='left',right_index='code')
+            # print df[df.counts>0][:2]
+            dm=pd.merge(dp,df,on='name',how='left')
+            # print dm[dm.counts>0][:2]
             dm.counts=dm.counts.fillna(0)
             dm.counts=dm.counts.astype(int)
-            # print dm[:2]
+            dm=dm.drop_duplicates('code')
+            dm=dm.set_index('code')
+            # print dm.sort_values(by=['counts','percent','diff','ratio'],ascending=[0,0,0,1])[:2]
             # dm=dm.fillna(int(0))
+            # dm.ratio=dm.ratio
             dm=dm.loc[:,ct.SINA_Market_Clean_UP_Columns]
 
         else:
-            dm=dp.loc[:,['name','buy','diff','percent','trade','high','ratio','volume']]
+            dm=dp.loc[:,['name','buy','diff','percent','trade','high','ratio','open']]
                     #['name','buy','diff','percent','trade','high','ratio','volume','counts']
+
     else:
         dm=''
     return dm
@@ -674,13 +748,18 @@ def _code_to_symbol(code):
 if __name__ == '__main__':
     # df = get_sina_all_json_dd('0', '3')
     # df=get_sina_Market_json('all')
-    df=get_market_price_sina_dd_realTime()
+    # df=get_market_price_sina_dd_realTime(df,'0','1')
     # df=get_sina_dd_count_price_realTime()
     # df=df.drop_duplicates('code')
     # df=df.set_index('code')
     # _write_to_csv(df,'readdata3')
-    print format_for_print(df[:10])
-    print len(df)
+    # print ""
+    # print format_for_print(df[:10])
+    # print df[df.index=='601919']
+    # print len(df)
+    # print "\033[1;37;4%dm%s\033[0m" % (1 > 0 and 1 or 2, get_sina_tick_js_code('002399'))
+    print get_sina_tick_js_LastPrice('002399')
+    # print get_sina_tick_js_LastPrice(['002399','002399','601919','601198'])
     import sys
 
     sys.exit(0)
