@@ -616,6 +616,8 @@ def get_sina_dd_count_price_realTime(df='',mtype='all'):
     return dm
 def get_sina_tick_js_LastPrice(symbols):
     symbols_list=''
+    if len(symbols) == 0:
+        return ''
     if isinstance(symbols, list) or isinstance(symbols, set) or isinstance(symbols, tuple) or isinstance(symbols, pd.Series):
         for code in symbols:
             symbols_list += _code_to_symbol(code) + ','
@@ -623,6 +625,7 @@ def get_sina_tick_js_LastPrice(symbols):
         symbols_list = _code_to_symbol(symbols)
     # print symbol_str
     url="http://hq.sinajs.cn/list=%s"%(symbols_list)
+    # print url
     data=sl.get_url_data(url)
     # vollist=re.findall('{data:(\d+)',code)
     # print data
@@ -675,14 +678,17 @@ def get_sina_tick_js_LastPrice(symbols):
 #     return stockLastEnd
 
 def get_market_LastPrice_sina_js(codeList):
-    time_s=time.time()
+    # time_s=time.time()
     if isinstance(codeList, list) or isinstance(codeList, set) or isinstance(codeList, tuple) or isinstance(codeList, pd.Series):
-        if len(codeList)>50*cpu_count():
-            div_list=sl.get_div_list(codeList,'50')
+        if len(codeList)>200:
+            # num=int(len(codeList)/cpu_count())
+            div_list=sl.get_div_list(codeList,100)
+            # print "ti:",time.time()-time_s
             results=to_mp_run(get_sina_tick_js_LastPrice,div_list)
+            # print results
         else:
             results=get_sina_tick_js_LastPrice(codeList)
-        print "time:",time.time()-time_s
+        # print "time:",time.time()-time_s
         return results
     else:
         return get_sina_tick_js_LastPrice(codeList)
@@ -758,8 +764,9 @@ if __name__ == '__main__':
     # print df[df.index=='601919']
     # print len(df)
     # print "\033[1;37;4%dm%s\033[0m" % (1 > 0 and 1 or 2, get_sina_tick_js_code('002399'))
-    print get_sina_tick_js_LastPrice('002399')
-    # print get_sina_tick_js_LastPrice(['002399','002399','601919','601198'])
+    # print get_sina_tick_js_LastPrice('002399')
+    dd = get_sina_tick_js_LastPrice(['002399','002399','601919','601198'])
+    print(type(dd))
     import sys
 
     sys.exit(0)

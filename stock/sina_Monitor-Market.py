@@ -156,43 +156,51 @@ if __name__ == "__main__":
     # parsehtml(downloadpage(url_s))
     status=False
     vol = '0'
-    type = '4'
+    type = '2'
     # cut_num=10000
     success=0
     top_all=pd.DataFrame()
     time_s=time.time()
-    delay_time=900
+    delay_time=1800
     while 1:
         try:
             df=rl.get_sina_Market_json('all')
             top_now = rl.get_market_price_sina_dd_realTime(df,vol,type)
-            print len(df),len(top_now),len(top_all)
-            if len(top_now)>10 and len(top_now.columns)>4:
+            print len(df),len(top_now),len(top_all),
+            if len(top_now)>10:
                 time_d=time.time()
                 # if 'percent' in top_now.columns.values:
                 #     top_now=top_now[top_now['percent']>=0]
                 if len(top_all) == 0:
                     top_all = top_now
-                    top_all['lp']=0
-                    codelist=np.array(top_all.index)
-                    print len(codelist)
+                    top_all['lastp']=0
+                    codelist=np.array(top_all.index).tolist()
                     lastp_d=rl.get_market_LastPrice_sina_js(codelist)
-                    print lastp_d
-                    if len(lastp_d.keys())==len(codelist):
-                        print "eq"
-                        for code in lastp_d.keys():
-                            print code
-                            top_all.loc[code,'lp']=lastp_d[code]
-                    print len(lastp_d.keys()),len(codelist)
+                    # lp_dict={}
+                    # print repr(lastp_d)
+                    i=0
+                    for w_dict in lastp_d:
+                        for code in w_dict:
+                            i+=1
+                            # print code,w_dict[code]
+                            top_all.loc[code,'lastp']=w_dict[code]
+                    print i,len(codelist)
                     time_s=time.time()
+                    time_tmp=time.time()
+
                 else:
+                    time_tmp=time.time()
                     if 'counts' in top_now.columns.values:
                         if not 'counts' in top_all.columns.values:
                             top_all['counts']=0
+                    if time_d-time_s>delay_time:
+                        status_change=True
+                    else:
+                        status_change=False
 
                     for symbol in top_now.index:
                         # code = rl._symbol_to_code(symbol)
-                        if symbol in top_all.index :
+                        if symbol in top_all.index:
                             # if top_all.loc[symbol,'diff'] == 0:
                             # print "code:",symbol
                             count_n=top_now.loc[symbol,'buy']
@@ -201,8 +209,9 @@ if __name__ == "__main__":
                             # print count_n,count_a
                             if not count_n==count_a:
                                 top_now.loc[symbol,'diff']=round((float(count_n-count_a)/count_a*100),1)
-                                if time_d-time_s>delay_time:
+                                if status_change:
                                     # print "change:",time.time()-time_s
+                                    top_now.loc[symbol,'lastp']=top_all.loc[symbol,'lastp']
                                     top_all.loc[symbol]=top_now.loc[symbol]
                                 else:
                                     top_all.loc[symbol,'diff':]=top_now.loc[symbol,'diff':]
@@ -215,7 +224,9 @@ if __name__ == "__main__":
                                 # value=top_all.loc[symbol,'diff']
 
                         else:
-                            top_all.append(top_now.loc[symbol])
+                            if float(top_now.loc[symbol,'low'])>float(top_all.loc[symbol,'lastp']):
+                                top_all.append(top_now.loc[symbol])
+
                 # top_all=top_all.sort_values(by=['diff','percent','counts'],ascending=[0,0,1])
                 # top_all=top_all.sort_values(by=['diff','ratio','percent','counts'],ascending=[0,1,0,1])
 
@@ -225,6 +236,16 @@ if __name__ == "__main__":
                 # top_all = top_all[top_all.trade >= top_all.high*0.99]
                 # top_all = top_all[top_all.percent >= 0]
 
+                # float(top_now.loc[symbol,'low'])>float(top_all.loc[symbol,'lastp'])
+                # top_now = top_now[top_now.open>=top_now.low*0.99]
+                # top_now = top_now[top_now.buy >= top_now.open*0.99]
+                # top_now = top_now[top_now.trade >= top_now.low*0.99]
+                # top_now = top_now[top_now.trade >= top_now.high*0.99]
+                # top_now = top_now[top_now.percent >= 0]
+                # top_now = top_now[top_now.low >= top_now.lastp]
+
+
+                print "t:",time.time()-time_tmp
                 if 'counts' in top_all.columns.values:
                     top_all=top_all.sort_values(by=['diff','percent','counts','ratio'],ascending=[0,0,1,1])
                 else:
@@ -234,7 +255,7 @@ if __name__ == "__main__":
                     time_s=time.time()
                 # top_all=top_all.sort_values(by=['percent','diff','counts','ratio'],ascending=[0,0,1,1])
                 print rl.format_for_print(top_all[:10])
-                print rl.format_for_print(top_all[-10:])
+                print rl.format_for_print(top_all[-1:])
                 # print "staus",status
                 if status:
                     for code in top_all[:10].index:
@@ -267,7 +288,7 @@ if __name__ == "__main__":
         except (IOError, EOFError,Exception) as e:
             print "Error",e
 
-            # traceback.print_exc()
+            traceback.print_exc()
             # raw_input("Except")
 
 
@@ -287,5 +308,7 @@ if __name__ == "__main__":
 {symbol:"sz000001",code:"000001",name:"平安银行",trade:"0.00",pricechange:"0.000",changepercent:"0.000",buy:"12.36",sell:"12.36",settlement:"12.34",open:"0.00",high:"0.00",low:"0",volume:0,amount:0,ticktime:"09:17:55",per:7.133,pb:1.124,mktcap:17656906.355526,nmc:14566203.350486,turnoverratio:0},
 {symbol:"sz000002",code:"000002",name:"万  科Ａ",trade:"0.00",pricechange:"0.000",changepercent:"0.000",buy:"0.00",sell:"0.00",settlement:"24.43",open:"0.00",high:"0.00",low:"0",volume:0,amount:0,ticktime:"09:17:55",per:17.084,pb:3.035,mktcap:26996432.575,nmc:23746405.928119,turnoverratio:0},
 
+python -m cProfile -s cumulative timing_functions.py
+http://www.jb51.net/article/63244.htm
 
 '''
