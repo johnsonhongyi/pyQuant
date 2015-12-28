@@ -157,7 +157,7 @@ def _parsing_Market_price_json(url):
     # print df[:1]
     # df = df.drop('symbol', axis=1)
     df = df.ix[df.volume >= 0]
-    # print ""
+    # print type(df)
     # print df[:1],len(df.index)
     return df
 
@@ -234,6 +234,7 @@ def get_sina_Market_json(market='sh_a',showtime=True,num='2000', retry_count=3, 
         #     df = df.append(newdf, ignore_index=True)
         # print len(df.index)
         if showtime:print ("Market-df:%s time: %s" % (format((time.time() - start_t), '.1f'),sl.get_now_time()))
+        # print type(df)
         return df
     else:
         if showtime:print ("no data Market-df:%s" % (format((time.time() - start_t), '.2f')))
@@ -297,6 +298,17 @@ def _code_to_symbol(code):
         else:
             return 'sh%s' % code if code[:1] in ['5', '6'] else 'sz%s' % code
 
+def _code_to_tdx_blk(code):
+    """
+        生成symbol代码标志
+    """
+    if code in ct.INDEX_LABELS:
+        return ct.INDEX_LIST[code]
+    else:
+        if len(code) != 6:
+            return ''
+        else:
+            return '1%s' % code if code[:1] in ['5', '6'] else '0%s' % code
 
 def _symbol_to_code(symbol):
     """
@@ -642,10 +654,12 @@ def get_sina_tick_js_LastPrice(symbols):
         # stockName   = stockInfo[0]  #名称
         # stockStart  = stockInfo[1]  #开盘
         stockLastEnd= stockInfo[2]  #昨收盘
-        price_dict[code]=stockLastEnd
         # stockCur    = stockInfo[3]  #当前
         # stockMax    = stockInfo[4]  #最高
         # stockMin    = stockInfo[5]  #最低
+        # price_dict[code]=stockLastEnd
+        price_dict[code]=float(stockLastEnd)
+
         # stockUp     = round(float(stockCur) - float(stockLastEnd), 2)
         # stockRange  = round(float(stockUp) / float(stockLastEnd), 4) * 100
         # stockVolume = round(float(stockInfo[8]) / (100 * 10000), 2)
@@ -691,12 +705,14 @@ def get_market_LastPrice_sina_js(codeList):
         # print "time:",time.time()-time_s
         return results
     else:
-        return get_sina_tick_js_LastPrice(codeList)
+        print "codeL not list"
+        # return get_sina_tick_js_LastPrice(codeList)
 
-def get_market_price_sina_dd_realTime(dp='',vol='0',type='3'):
+def get_market_price_sina_dd_realTime(dp=pd.DataFrame(),vol='0',type='3'):
     '''
     input df count and merge price to df
     '''
+
     if len(dp)==0:
             dp=get_sina_Market_json()
     if len(dp)>10:
@@ -708,7 +724,6 @@ def get_market_price_sina_dd_realTime(dp='',vol='0',type='3'):
         dp=dp.dropna('index')
         dp.loc[dp.percent>9.9,'percent']=10
         dp['diff']=0
-        # print dp[:2]
         df=get_sina_all_json_dd(vol,type)
         if len(df)>10:
             # df['counts']=0
@@ -730,12 +745,15 @@ def get_market_price_sina_dd_realTime(dp='',vol='0',type='3'):
             # dm.ratio=dm.ratio
             dm=dm.loc[:,ct.SINA_Market_Clean_UP_Columns]
 
+
         else:
-            dm=dp.loc[:,['name','buy','diff','percent','trade','high','ratio','open']]
+            dp=dp.set_index('code')
+            dm=dp.loc[:,['name','buy','diff','percent','ratio','low']]
                     #['name','buy','diff','percent','trade','high','ratio','volume','counts']
 
     else:
         dm=''
+    # print type(dm)
     return dm
 
 def _code_to_symbol(code):

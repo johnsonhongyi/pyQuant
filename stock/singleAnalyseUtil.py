@@ -66,6 +66,44 @@ def get_work_time():
     else:
         return True
 
+def get_work_time_now():
+    now_t = str(get_now_time()).replace(':', '')
+    # now_t = int(now_t)
+    if (now_t > '1131' and now_t < '1300') or (now_t < '0924' or now_t > '1502'):
+        # return False
+        return True
+    else:
+        return True
+
+def code_to_tdxblk(code):
+    """
+        生成symbol代码标志
+    """
+    if code in ct.INDEX_LABELS:
+        return ct.INDEX_LIST[code]
+    else:
+        if len(code) != 6:
+            return ''
+        else:
+            return '1%s' % code if code[:1] in ['5', '6'] else '0%s' % code
+
+def write_to_blocknew(p_name,data,append=True):
+    if append:
+        fout = open(p_name, 'ab')
+    else:
+        fout = open(p_name, 'wb')
+    x=0
+    for i in data:
+        # print type(i)
+        if x==0:
+            x+=1
+            raw='\r\n'+code_to_tdxblk(i)+'\r\n'
+        else:
+            raw=code_to_tdxblk(i)+'\r\n'
+        # raw = pack('IfffffII', t, i[2], i[3], i[4], i[5], i[6], i[7], i[8])
+        fout.write(raw)
+    ## end for
+    fout.close()
 
 def get_url_data(url):
     # headers = {'User-Agent':'Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.6) Gecko/20091201 Firefox/3.5.6'}
@@ -241,8 +279,8 @@ def get_today_tick_ave(code, ave=None):
         # print "IOError"
 
 
-def f_print(len, datastr):
-    data = ('{0:%s}' % (len)).format(datastr)
+def f_print(lens, datastr):
+    data = ('{0:%s}' % (lens)).format(datastr)
     return data
 
 

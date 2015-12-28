@@ -11,7 +11,8 @@ import datetime
 
 
 path_sep=os.path.sep
-basedir = r'/Users/Johnson/Documents/Johnson/WinTools/zd_pazq'  # 如果你的安装路径不同,请改这里
+# basedir = r'/Users/Johnson/Documents/Johnson/WinTools/zd_pazq'  # 如果你的安装路径不同,请改这里
+basedir = r'E:\DOC\Parallels\WinTools\zd_pazq'  # 如果你的安装路径不同,请改这里
 
 exp_dir = basedir + r'/T0002/export/'
 blocknew = r'/Users/Johnson/Documents/Johnson/WinTools/zd_pazq/T0002/blocknew'
@@ -185,12 +186,12 @@ if __name__ == '__main__':
     print len(results)
     # df=pd.DataFrame(results)
     for code in results:
-        print type(code)
+        print code
         # print code[:1]
-        # print code.columns
+        # print code
         # print code.keys()
-        # dd= code.values()[0]
-        # print type(dd)
+        dd= code['300342']
+        print type(dd)
         # print dd[:1]
         # dd=pd.DataFrame(code.values()[0],columns=ct.TDX_Day_columns)
         # print type(dd)

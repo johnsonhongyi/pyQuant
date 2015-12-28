@@ -62,7 +62,7 @@ def get_ts_start_date(stock, datelen, type=None):
         # print df['open'].count()
         if df['open'].count() < datelen:
             start_date = (df.index)[-1]
-            print start_date
+            # print start_date
         else:
             start_date = (df.index)[datelen - 1]
     return start_date
@@ -124,11 +124,13 @@ def getdata_ema_trend_silent(stock, datelenth, type=None):
 
 def less_average(score):
     num = len(score)
-    sum_score = sum(score)
-    ave_num = sum_score / num
-    # less_ave = [i for i in score if i<ave_num]
-    return ave_num
-
+    if num >1:
+        sum_score = sum(score)
+        ave_num = sum_score / num
+        # less_ave = [i for i in score if i<ave_num]
+        return ave_num
+    else:
+        return 0
 
 if __name__ == '__main__':
     dayl = '10'
