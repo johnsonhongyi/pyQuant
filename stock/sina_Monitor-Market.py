@@ -170,8 +170,9 @@ if __name__ == "__main__":
     top_all = pd.DataFrame()
     time_s = time.time()
     delay_time = 1800
-    block_path=r"E:\DOC\Parallels\WinTools\zd_pazq\T0002\blocknew\063.blk"
-
+    base_path=r"E:\DOC\Parallels\WinTools\zd_pazq\T0002\blocknew\\"
+    block_path=base_path+'063.blk'
+    all_diffpath=base_path+'062.blk'
     while 1:
         try:
             df = rl.get_sina_Market_json('all')
@@ -180,7 +181,7 @@ if __name__ == "__main__":
             time_Rt = time.time()
 
             # print top_now[:1]
-            if len(top_now) > 10:
+            if len(top_now) > 10 and not top_now[:1].buy.values==0:
                 time_d = time.time()
                 # if 'percent' in top_now.columns.values:
                 #     top_now=top_now[top_now['percent']>=0]
@@ -223,15 +224,18 @@ if __name__ == "__main__":
                             # print count_n,count_a
                             if not count_n == count_a:
                                 top_now.loc[symbol, 'diff'] = round((float(count_n - count_a) / count_a * 100), 1)
-                                if status_change:
+                                if status_change and 'counts' in top_now.columns.values:
                                     # print "change:",time.time()-time_s
                                     # top_now.loc[symbol,'lastp']=top_all.loc[symbol,'lastp']
-                                    top_all.loc[symbol, :'counts'] = top_now.loc[symbol:'counts']
+                                    top_all.loc[symbol, 'buy':'counts'] = top_now.loc[symbol,'buy':'counts']
                                 else:
                                     # top_now.loc[symbol,'lastp']=top_all.loc[symbol,'lastp']
-                                    top_all.loc[symbol, 'diff':'counts'] = top_now.loc[symbol, 'diff':'counts']
-                            else:
+                                    top_all.loc[symbol, 'diff':'low'] = top_now.loc[symbol, 'diff':'low']
+                            elif 'counts' in top_now.columns.values:
                                 top_all.loc[symbol, 'percent':'counts'] = top_now.loc[symbol, 'percent':'counts']
+                            else:
+                                top_all.loc[symbol, 'percent':'low'] = top_now.loc[symbol, 'percent':'low']
+
                                 # top_all.loc[symbol]=top_now.loc[symbol]?
                                 # top_all.loc[symbol,'diff']=top_now.loc[symbol,'counts']-top_all.loc[symbol,'counts']
 
@@ -254,16 +258,28 @@ if __name__ == "__main__":
                 # top_all = top_all[top_all.percent >= 0]
 
                 top_dif = top_all
-                top_dif = top_dif[top_dif.buy >= top_dif.lastp]
+                # print len(top_dif),top_dif[:1]
+
+                top_dif = top_dif[top_dif.buy > top_dif.lastp]
+                # print len(top_dif),top_dif[:1]
+
                 if not top_dif[:1].low.values==0:
-                    top_dif = top_dif[top_dif.low >= top_dif.lastp]
-                    top_dif = top_dif[top_dif.open >= top_dif.lastp]
+                    top_dif = top_dif[top_dif.low > top_dif.lastp]
+                    # print len(top_dif),top_dif[:1]
+
+                    top_dif = top_dif[top_dif.open > top_dif.lastp]
+                    # print len(top_dif),top_dif[:1]
+
                     top_dif = top_dif[top_dif.buy >= top_dif.open*0.99]
+                    # print len(top_dif),top_dif[:1]
+
                     # top_dif = top_dif[top_dif.trade >= top_dif.buy]
                     top_dif = top_dif[top_dif.buy >= top_dif.high * 0.99]
+                    # print len(top_dif),top_dif[:1]
+
                     top_dif = top_dif[top_dif.percent >= 0]
                 # print len(top_dif),top_dif[:1]
-                print len(df), len(top_now), len(top_all),len(top_dif),
+                print ("A:%s N:%s K:%s %s G:%s"%(len(df), len(top_now), len(top_all)-len(top_all[top_all.low.values==0]),len(top_all[top_all.low.values==0]),len(top_dif))),
                 print "Rt:%0.3f"%(float(time.time() - time_Rt))
                 if 'counts' in top_dif.columns.values:
                     top_dif = top_dif.sort_values(by=['diff', 'percent', 'counts', 'ratio'], ascending=[0, 0, 1, 1])
@@ -282,9 +298,12 @@ if __name__ == "__main__":
                         if len(code) > 0:
                             code = code[0]
                             kind = sl.get_multiday_ave_compare_silent(code)
+                # print top_all[top_all.low.values==0]
 
+                # else:
+                #     print "\t No RealTime Data"
             else:
-                print "no data"
+                print "\tNo Data"
             time.sleep(60)
 
         except (KeyboardInterrupt) as e:
@@ -308,13 +327,15 @@ if __name__ == "__main__":
                 top_all = pd.DataFrame()
                 status = False
             elif st == 'w' or st == 'a':
-                codew=top_dif[:10].index.tolist()
+                codew=(top_dif.index).tolist()
                 if st=='a':
-                    sl.write_to_blocknew(block_path,codew)
+                    sl.write_to_blocknew(block_path,codew[:10])
+                    sl.write_to_blocknew(all_diffpath,codew)
                 else:
-                    sl.write_to_blocknew(block_path,codew,False)
+                    sl.write_to_blocknew(block_path,codew[:10],False)
+                    sl.write_to_blocknew(all_diffpath,codew,False)
                 print "wri ok"
-                time.sleep(2)
+                # time.sleep(2)
 
             else:
                 sys.exit(0)

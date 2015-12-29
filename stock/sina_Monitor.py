@@ -242,7 +242,9 @@ if __name__ == "__main__":
             # if success > 3:
             #     raw_input("Except")
             #     sys.exit(0)
-            st=raw_input("status:[go(g),clear(c),quit(q,e)]:")
+            # st=raw_input("status:[go(g),clear(c),quit(q,e)]:")
+            st = raw_input("status:[go(g),clear(c),quit(q,e),W(w),Wa(a)]:")
+
             if len(st)==0:
                 status=False
             elif st=='g' or st=='go':
@@ -250,6 +252,19 @@ if __name__ == "__main__":
             elif st=='clear' or st=='c':
                 top_all=pd.DataFrame()
                 status=False
+            elif st == 'w' or st == 'a':
+                base_path=r"E:\DOC\Parallels\WinTools\zd_pazq\T0002\blocknew\\"
+                block_path=base_path+'064.blk'
+                # all_diffpath=base_path+'\065.blk'
+                codew=top_all[:20].index.tolist()
+                if st=='a':
+                    sl.write_to_blocknew(block_path,codew)
+                    # sl.write_to_blocknew(all_diffpath,codew)
+                else:
+                    sl.write_to_blocknew(block_path,codew,False)
+                    # sl.write_to_blocknew(all_diffpath,codew,False)
+                print "wri ok"
+                # time.sleep(5)
             else:
                 sys.exit(0)
         except (IOError, EOFError) as e:

@@ -89,19 +89,31 @@ def code_to_tdxblk(code):
 
 def write_to_blocknew(p_name,data,append=True):
     if append:
-        fout = open(p_name, 'ab')
+        fout = open(p_name, 'ab+')
+        flist= fout.readlines()
     else:
         fout = open(p_name, 'wb')
-    x=0
+    # x=0
     for i in data:
         # print type(i)
-        if x==0:
-            x+=1
-            raw='\r\n'+code_to_tdxblk(i)+'\r\n'
+        if append and len(flist)>0:
+            wstatus=True
+            for ic in flist:
+                # print code_to_tdxblk(i),ic
+                if code_to_tdxblk(i).strip()==ic.strip():
+                    wstatus=False
+            if wstatus:
+                # if x==0:
+                #     x+=1
+                #     raw='\r\n'+code_to_tdxblk(i)+'\r\n'
+                # else:
+                raw=code_to_tdxblk(i)+'\r\n'
+                fout.write(raw)
         else:
             raw=code_to_tdxblk(i)+'\r\n'
+            fout.write(raw)
+
         # raw = pack('IfffffII', t, i[2], i[3], i[4], i[5], i[6], i[7], i[8])
-        fout.write(raw)
     ## end for
     fout.close()
 

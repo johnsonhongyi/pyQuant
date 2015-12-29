@@ -5,9 +5,10 @@ from __future__ import division
 from struct import *
 import os,time
 import pandas as pd
+from pandas import Series
 import realdatajson as rl
 import johnson_cons as ct
-import datetime
+import numpy as np
 
 
 path_sep=os.path.sep
@@ -34,11 +35,11 @@ code_u='sz002399'
 # http://www.douban.com/note/504811026/
 
 def get_tdx_day_to_df_dict(code):
-    time_s=time.time()
+    # time_s=time.time()
     code_u=rl._code_to_symbol(code)
     day_path=day_dir % 'sh' if code[:1] in ['5', '6', '9'] else day_dir % 'sz'
     p_day_dir=day_path.replace('/',path_sep).replace('\\',path_sep)
-    p_exp_dir=exp_dir.replace('/',path_sep).replace('\\',path_sep)
+    # p_exp_dir=exp_dir.replace('/',path_sep).replace('\\',path_sep)
     # print p_day_dir,p_exp_dir
     file_path=p_day_dir+code_u+'.day'
     if not os.path.exists(file_path):
@@ -46,17 +47,13 @@ def get_tdx_day_to_df_dict(code):
     ofile=open(file_path,'rb')
     buf=ofile.read()
     ofile.close()
-
-    ifile=open(p_exp_dir+code_u+'.txt','w')
+    # ifile=open(p_exp_dir+code_u+'.txt','w')
     num=len(buf)
     # print num
     no=int(num/32)
     # print no
     b=0
     e=32
-    line=''
-
-    # df = pd.DataFrame
     dict_t=[]
     for i in xrange(no):
        a=unpack('IIIIIfII',buf[b:e])
@@ -80,14 +77,10 @@ def get_tdx_day_to_df_dict(code):
     # df=pd.DataFrame.from_dict(dict_t,orient='index')
     df=pd.DataFrame(dict_t,columns=ct.TDX_Day_columns)
     df=df.set_index('date')
-    # df=df.astype(float)
-    # print "time:",(time.time()-time_s)*1000
-
-    ifile.close()
     return {code:df}
 
 def get_tdx_day_to_df(code):
-    time_s=time.time()
+    # time_s=time.time()
     code_u=rl._code_to_symbol(code)
     day_path=day_dir % 'sh' if code[:1] in ['5', '6', '9'] else day_dir % 'sz'
     p_day_dir=day_path.replace('/',path_sep).replace('\\',path_sep)
@@ -99,21 +92,13 @@ def get_tdx_day_to_df(code):
     ofile=open(file_path,'rb')
     buf=ofile.read()
     ofile.close()
-
-    ifile=open(p_exp_dir+code_u+'.txt','w')
     num=len(buf)
-    # print num
     no=int(num/32)
-    # print no
     b=0
     e=32
-    line=''
-
-    # df = pd.DataFrame
-    dict_t=[]
+    dt_list=[]
     for i in xrange(no):
        a=unpack('IIIIIfII',buf[b:e])
-       # print type((a[0])[:4])
        # dt=datetime.date(int(str(a[0])[:4]),int(str(a[0])[4:6]),int(str(a[0])[6:8]))
        tdate=str(a[0])[:4]+'-'+str(a[0])[4:6]+'-'+str(a[0])[6:8]
        # tdate=dt.strftime('%Y-%m-%d')
@@ -124,27 +109,72 @@ def get_tdx_day_to_df(code):
        amount=str(a[5]/10.0)
        tvol=str(a[6])   #int
        tpre=str(a[7])  #back
-       # line=str(a[0])+' '+str(a[1]/100.0)+' '+str(a[2]/100.0)+' '+str(a[3]/100.0)+\
-       # ' '+str(a[4]/100.0)+' '+str(a[5]/10.0)+' '+str(a[6])+' '+str(a[7])+' '+'\n'
-       # print line
-       # list_t.append(tdate,topen,thigh,tlow,tclose,tvolp,tvol,tpre)
-       # dict_t[tdate]={'date':tdate,'open':topen,'high':thigh,'low':tlow,'close':tclose,'volp':tvolp,'vol':tvol,'pre':tpre}
-       dict_t.append({'code':code,'date':tdate,'open':topen,'high':thigh,'low':tlow,'close':tclose,'amount':amount,'vol':tvol,'pre':tpre})
+       dt_list.append({'code':code,'date':tdate,'open':topen,'high':thigh,'low':tlow,'close':tclose,'amount':amount,'vol':tvol,'pre':tpre})
        b=b+32
        e=e+32
-    # df=pd.DataFrame.from_dict(dict_t,orient='index')
-    df=pd.DataFrame(dict_t,columns=ct.TDX_Day_columns)
+    df=pd.DataFrame(dt_list,columns=ct.TDX_Day_columns)
     df=df.set_index('date')
-    # df=df.astype(float)
-
     # print "time:",(time.time()-time_s)*1000
-
-    ifile.close()
     return df
+
+def get_tdx_day_to_Series_last(code,dayl=1):
+    code_u=rl._code_to_symbol(code)
+    day_path=day_dir % 'sh' if code[:1] in ['5', '6', '9'] else day_dir % 'sz'
+    p_day_dir=day_path.replace('/',path_sep).replace('\\',path_sep)
+    # p_exp_dir=exp_dir.replace('/',path_sep).replace('\\',path_sep)
+    # print p_day_dir,p_exp_dir
+    file_path=p_day_dir+code_u+'.day'
+    if not os.path.exists(file_path):
+        return ''
+    ofile=file(file_path,'rb')
+    b=0
+    e=32
+    buf=ofile.read()
+    num=len(buf)
+    no=int(num/32)
+    if no > dayl:
+        no=e*dayl
+        ofile.seek(-no,2)
+    else:
+        ofile.seek(-num,2)
+    buf=ofile.read()
+    print buf
+    ofile.close()
+    dSeries=Series()
+    for i in xrange(no):
+        a=unpack('IIIIIfII',buf[b:e])
+        tdate=str(a[0])[:4]+'-'+str(a[0])[4:6]+'-'+str(a[0])[6:8]
+        topen=str(a[1]/100.0)
+        thigh=str(a[2]/100.0)
+        tlow=str(a[3]/100.0)
+        tclose=str(a[4]/100.0)
+        amount=str(a[5]/10.0)
+        tvol=str(a[6])   #int
+        tpre=str(a[7])  #back
+        dSeries.append(Series({'code':code,'date':tdate,'open':topen,'high':thigh,'low':tlow,'close':tclose,'amount':amount,'vol':tvol,'pre':tpre}))
+        b=b+32
+        e=e+32
+    return dSeries
 #############################################################
 # usage 使用说明
 #
 #############################################################
+def get_tdx_allday_lastDF(plate='all'):
+    time_t=time.time()
+    df=rl.get_sina_Market_json(plate)
+    code_list=np.array(df.code)
+    results=rl.to_mp_run(get_tdx_day_to_Series_last,(code_list,))
+    # print (time.time()-time_t)
+    # df=pd.DataFrame()
+    # print len(results)
+    df=pd.DataFrame(results,columns=ct.TDX_Day_columns)
+    df=df.set_index('code')
+    # print len(df),df[:1]
+    # print "date< '2015-08-25'",len(df[(df.date< '2015-08-25')])
+    # df= df[(df.date< '2015-08-25')&(df.date > '2015-06-25')]
+    # print "'2015-08-25')&(df.date > '2015-06-25'",len(df)
+    print "t:",time.time()-time_t
+    return df
 
 def usage(p):
     print """
@@ -157,15 +187,33 @@ python %s -t txt 999999 20070101 20070302
 
 
 if __name__ == '__main__':
-    df=rl.get_sina_Market_json('cyb')
-    print len(df.code)
-    import numpy as np
-    code_list=np.array(df.code)
-    # print code_list
-    df=get_tdx_day_to_df('002399')
-    print df[-1:]
+    df=get_tdx_day_to_Series_last('002399')
+    # print df
     import sys
-    # sys.exit(0)
+    sys.exit(0)
+    time_t=time.time()
+    df=get_tdx_allday_lastDF()
+    # print "date<2015-08-25:",len(df[(df.date< '2015-08-25')])
+    # df= df[(df.date< '2015-08-25')&(df.date > '2015-06-25')]
+    # print "2015-08-25-2015-06-25",len(df)
+    # print df[:1]
+    import sys
+    sys.exit(0)
+    df=rl.get_sina_Market_json('all')
+    code_list=np.array(df.code)
+    results=rl.to_mp_run(get_tdx_day_to_df,code_list)
+    # df=pd.DataFrame(results,)
+    print len(results)
+    # for code in results:
+    #     print code[:2]
+    #     print type(code)
+    #     break
+    print (time.time()-time_t)
+
+    # print code_list
+    # df=get_tdx_day_to_df('002399')
+    # print df[-1:]
+
     # print df[:1]
     # df=get_tdx_day_totxt('002399')
     # print df[:1]
@@ -180,35 +228,15 @@ if __name__ == '__main__':
     # df=get_tdx_day_totxt('600018')
     #
     # import tushare as ts
-    time_t=time.time()
-    results=rl.to_mp_run(get_tdx_day_to_df_dict,code_list)
-    # print results[:1][:1]
-    print len(results)
-    # df=pd.DataFrame(results)
-    for code in results:
-        print code
-        # print code[:1]
-        # print code
-        # print code.keys()
-        dd= code['300342']
-        print type(dd)
-        # print dd[:1]
-        # dd=pd.DataFrame(code.values()[0],columns=ct.TDX_Day_columns)
-        # print type(dd)
-        # print dd[:1]
-        break
-    # a_index=np.array([x.keys() for x in results]).tolist()
-    # print a_index
-    # dz=pd.DataFrame(results)
-    # print dz
-    # dz.index=pd.Index(a_index)
-    # print df.index
-    # dz=pd.DataFrame([x.keys() for x in results])
-    # print df[:1]
-    # df=df.set_index('code')
-    # import pprint
-    # pprint.pprint(df[df.index=='300219'])
-    print (time.time()-time_t)
+    # print len(df),df[:1]
+
+    # print df[df.]
+    # code_stop=[]
+    # for code in results:
+    #     dt=code.values()[0]
+    #     if dt[-1:].index.values < '2015-08-25':
+    #         code_stop.append(code.keys())
+    # print "stop:",len(code_stop)
     # pprint.pprint(df)
 
 
