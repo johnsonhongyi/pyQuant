@@ -3,17 +3,16 @@
 from __future__ import division
 # import getopt
 from struct import *
-import os,time
+import os, time
 import pandas as pd
 from pandas import Series
 import realdatajson as rl
 import johnson_cons as ct
 import numpy as np
 
-
-path_sep=os.path.sep
-# basedir = r'/Users/Johnson/Documents/Johnson/WinTools/zd_pazq'  # 如果你的安装路径不同,请改这里
-basedir = r'E:\DOC\Parallels\WinTools\zd_pazq'  # 如果你的安装路径不同,请改这里
+path_sep = os.path.sep
+basedir = r'/Users/Johnson/Documents/Johnson/WinTools/zd_pazq'  # 如果你的安装路径不同,请改这里
+# basedir = r'E:\DOC\Parallels\WinTools\zd_pazq'  # 如果你的安装路径不同,请改这里
 
 exp_dir = basedir + r'/T0002/export/'
 blocknew = r'/Users/Johnson/Documents/Johnson/WinTools/zd_pazq/T0002/blocknew'
@@ -27,153 +26,221 @@ day_dir = basedir + r'\Vipdoc\%s\lday/'
 day_dir_sh = basedir + r'\Vipdoc\sh\lday/'
 day_dir_sz = basedir + r'/Vipdoc/sz/lday/'
 
-day_path={'sh':day_dir_sh,'sz':day_dir_sz}
+day_path = {'sh': day_dir_sh, 'sz': day_dir_sz}
 
 stkdict = {}  # 存储股票ID和上海市、深圳市的对照
 
-code_u='sz002399'
+code_u = 'sz002399'
+
+
 # http://www.douban.com/note/504811026/
 
 def get_tdx_day_to_df_dict(code):
     # time_s=time.time()
-    code_u=rl._code_to_symbol(code)
-    day_path=day_dir % 'sh' if code[:1] in ['5', '6', '9'] else day_dir % 'sz'
-    p_day_dir=day_path.replace('/',path_sep).replace('\\',path_sep)
+    code_u = rl._code_to_symbol(code)
+    day_path = day_dir % 'sh' if code[:1] in ['5', '6', '9'] else day_dir % 'sz'
+    p_day_dir = day_path.replace('/', path_sep).replace('\\', path_sep)
     # p_exp_dir=exp_dir.replace('/',path_sep).replace('\\',path_sep)
     # print p_day_dir,p_exp_dir
-    file_path=p_day_dir+code_u+'.day'
+    file_path = p_day_dir + code_u + '.day'
     if not os.path.exists(file_path):
         return ''
-    ofile=open(file_path,'rb')
-    buf=ofile.read()
+    ofile = open(file_path, 'rb')
+    buf = ofile.read()
     ofile.close()
     # ifile=open(p_exp_dir+code_u+'.txt','w')
-    num=len(buf)
+    num = len(buf)
     # print num
-    no=int(num/32)
+    no = int(num / 32)
     # print no
-    b=0
-    e=32
-    dict_t=[]
+    b = 0
+    e = 32
+    dict_t = []
     for i in xrange(no):
-       a=unpack('IIIIIfII',buf[b:e])
-       # tdate=str(a[0])
-       tdate=str(a[0])[:4]+'-'+str(a[0])[4:6]+'-'+str(a[0])[6:8]
-       topen=str(a[1]/100.0)
-       thigh=str(a[2]/100.0)
-       tlow=str(a[3]/100.0)
-       tclose=str(a[4]/100.0)
-       amount=str(a[5]/10.0)
-       tvol=str(a[6])   #int
-       tpre=str(a[7])  #back
-       # line=str(a[0])+' '+str(a[1]/100.0)+' '+str(a[2]/100.0)+' '+str(a[3]/100.0)+\
-       # ' '+str(a[4]/100.0)+' '+str(a[5]/10.0)+' '+str(a[6])+' '+str(a[7])+' '+'\n'
-       # print line
-       # list_t.append(tdate,topen,thigh,tlow,tclose,tvolp,tvol,tpre)
-       # dict_t[tdate]={'date':tdate,'open':topen,'high':thigh,'low':tlow,'close':tclose,'volp':tvolp,'vol':tvol,'pre':tpre}
-       dict_t.append({'code':code,'date':tdate,'open':topen,'high':thigh,'low':tlow,'close':tclose,'amount':amount,'vol':tvol,'pre':tpre})
-       b=b+32
-       e=e+32
+        a = unpack('IIIIIfII', buf[b:e])
+        # tdate=str(a[0])
+        tdate = str(a[0])[:4] + '-' + str(a[0])[4:6] + '-' + str(a[0])[6:8]
+        topen = str(a[1] / 100.0)
+        thigh = str(a[2] / 100.0)
+        tlow = str(a[3] / 100.0)
+        tclose = str(a[4] / 100.0)
+        amount = str(a[5] / 10.0)
+        tvol = str(a[6])  # int
+        tpre = str(a[7])  # back
+        # line=str(a[0])+' '+str(a[1]/100.0)+' '+str(a[2]/100.0)+' '+str(a[3]/100.0)+\
+        # ' '+str(a[4]/100.0)+' '+str(a[5]/10.0)+' '+str(a[6])+' '+str(a[7])+' '+'\n'
+        # print line
+        # list_t.append(tdate,topen,thigh,tlow,tclose,tvolp,tvol,tpre)
+        # dict_t[tdate]={'date':tdate,'open':topen,'high':thigh,'low':tlow,'close':tclose,'volp':tvolp,'vol':tvol,'pre':tpre}
+        dict_t.append(
+            {'code': code, 'date': tdate, 'open': topen, 'high': thigh, 'low': tlow, 'close': tclose, 'amount': amount,
+             'vol': tvol, 'pre': tpre})
+        b = b + 32
+        e = e + 32
     # df=pd.DataFrame.from_dict(dict_t,orient='index')
-    df=pd.DataFrame(dict_t,columns=ct.TDX_Day_columns)
-    df=df.set_index('date')
-    return {code:df}
+    df = pd.DataFrame(dict_t, columns=ct.TDX_Day_columns)
+    df = df.set_index('date')
+    return {code: df}
+
 
 def get_tdx_day_to_df(code):
     # time_s=time.time()
-    code_u=rl._code_to_symbol(code)
-    day_path=day_dir % 'sh' if code[:1] in ['5', '6', '9'] else day_dir % 'sz'
-    p_day_dir=day_path.replace('/',path_sep).replace('\\',path_sep)
-    p_exp_dir=exp_dir.replace('/',path_sep).replace('\\',path_sep)
+    # print code
+    code_u = rl._code_to_symbol(code)
+    day_path = day_dir % 'sh' if code[:1] in ['5', '6', '9'] else day_dir % 'sz'
+    p_day_dir = day_path.replace('/', path_sep).replace('\\', path_sep)
+    p_exp_dir = exp_dir.replace('/', path_sep).replace('\\', path_sep)
     # print p_day_dir,p_exp_dir
-    file_path=p_day_dir+code_u+'.day'
+    file_path = p_day_dir + code_u + '.day'
     if not os.path.exists(file_path):
         return ''
-    ofile=open(file_path,'rb')
-    buf=ofile.read()
+    ofile = open(file_path, 'rb')
+    buf = ofile.read()
     ofile.close()
-    num=len(buf)
-    no=int(num/32)
-    b=0
-    e=32
-    dt_list=[]
+    num = len(buf)
+    no = int(num / 32)
+    b = 0
+    e = 32
+    dt_list = []
     for i in xrange(no):
-       a=unpack('IIIIIfII',buf[b:e])
-       # dt=datetime.date(int(str(a[0])[:4]),int(str(a[0])[4:6]),int(str(a[0])[6:8]))
-       tdate=str(a[0])[:4]+'-'+str(a[0])[4:6]+'-'+str(a[0])[6:8]
-       # tdate=dt.strftime('%Y-%m-%d')
-       topen=str(a[1]/100.0)
-       thigh=str(a[2]/100.0)
-       tlow=str(a[3]/100.0)
-       tclose=str(a[4]/100.0)
-       amount=str(a[5]/10.0)
-       tvol=str(a[6])   #int
-       tpre=str(a[7])  #back
-       dt_list.append({'code':code,'date':tdate,'open':topen,'high':thigh,'low':tlow,'close':tclose,'amount':amount,'vol':tvol,'pre':tpre})
-       b=b+32
-       e=e+32
-    df=pd.DataFrame(dt_list,columns=ct.TDX_Day_columns)
-    df=df.set_index('date')
+        a = unpack('IIIIIfII', buf[b:e])
+        # dt=datetime.date(int(str(a[0])[:4]),int(str(a[0])[4:6]),int(str(a[0])[6:8]))
+        tdate = str(a[0])[:4] + '-' + str(a[0])[4:6] + '-' + str(a[0])[6:8]
+        # tdate=dt.strftime('%Y-%m-%d')
+        topen = str(a[1] / 100.0)
+        thigh = str(a[2] / 100.0)
+        tlow = str(a[3] / 100.0)
+        tclose = str(a[4] / 100.0)
+        amount = str(a[5] / 10.0)
+        tvol = str(a[6])  # int
+        tpre = str(a[7])  # back
+        dt_list.append(
+            {'code': code, 'date': tdate, 'open': topen, 'high': thigh, 'low': tlow, 'close': tclose, 'amount': amount,
+             'vol': tvol, 'pre': tpre})
+        b = b + 32
+        e = e + 32
+    df = pd.DataFrame(dt_list, columns=ct.TDX_Day_columns)
+    df = df.set_index('date')
     # print "time:",(time.time()-time_s)*1000
     return df
 
-def get_tdx_day_to_Series_last(code,dayl=1):
-    code_u=rl._code_to_symbol(code)
-    day_path=day_dir % 'sh' if code[:1] in ['5', '6', '9'] else day_dir % 'sz'
-    p_day_dir=day_path.replace('/',path_sep).replace('\\',path_sep)
+
+def get_tdx_day_to_df_last(code, dayl=1):
+    code_u = rl._code_to_symbol(code)
+    day_path = day_dir % 'sh' if code[:1] in ['5', '6', '9'] else day_dir % 'sz'
+    p_day_dir = day_path.replace('/', path_sep).replace('\\', path_sep)
     # p_exp_dir=exp_dir.replace('/',path_sep).replace('\\',path_sep)
     # print p_day_dir,p_exp_dir
-    file_path=p_day_dir+code_u+'.day'
+    file_path = p_day_dir + code_u + '.day'
     if not os.path.exists(file_path):
         return ''
-    ofile=file(file_path,'rb')
-    b=0
-    e=32
-    buf=ofile.read()
-    num=len(buf)
-    no=int(num/32)
-    if no > dayl:
-        no=e*dayl
-        ofile.seek(-no,2)
+    ofile = file(file_path, 'rb')
+    b = 0
+    e = 32
+    # buf=ofile.read()
+    # num=len(buf)
+    # no=int(num/32)
+    # if no > dayl:
+    #     length=e*dayl
+    #     ofile.seek(-length,2)
+    # else:
+    #     ofile.seek(-num,2)
+    # buf = ofile.read()
+    # print repr(buf)
+    # dt_list=[]
+    if dayl == 1:
+        ofile.seek(-e, 2)
+        buf=ofile.read()
+        ofile.close()
+        a = unpack('IIIIIfII', buf[b:e])
+        tdate = str(a[0])[:4] + '-' + str(a[0])[4:6] + '-' + str(a[0])[6:8]
+        topen = str(a[1] / 100.0)
+        thigh = str(a[2] / 100.0)
+        tlow = str(a[3] / 100.0)
+        tclose = str(a[4] / 100.0)
+        amount = str(a[5] / 10.0)
+        tvol = str(a[6])  # int
+        # tpre = str(a[7])  # back
+        dt_list=Series(
+            {'code': code, 'date': tdate, 'open': topen, 'high': thigh, 'low': tlow, 'close': tclose, 'amount': amount,
+             'vol': tvol})
+        return dt_list
     else:
-        ofile.seek(-num,2)
-    buf=ofile.read()
-    print buf
-    ofile.close()
-    dSeries=Series()
-    for i in xrange(no):
-        a=unpack('IIIIIfII',buf[b:e])
-        tdate=str(a[0])[:4]+'-'+str(a[0])[4:6]+'-'+str(a[0])[6:8]
-        topen=str(a[1]/100.0)
-        thigh=str(a[2]/100.0)
-        tlow=str(a[3]/100.0)
-        tclose=str(a[4]/100.0)
-        amount=str(a[5]/10.0)
-        tvol=str(a[6])   #int
-        tpre=str(a[7])  #back
-        dSeries.append(Series({'code':code,'date':tdate,'open':topen,'high':thigh,'low':tlow,'close':tclose,'amount':amount,'vol':tvol,'pre':tpre}))
-        b=b+32
-        e=e+32
-    return dSeries
+        dt_list=[]
+        fileSize = os.path.getsize(file_path)
+        day_cout = abs(e * dayl)
+        # print day_cout
+        if day_cout > fileSize:
+            b=fileSize
+            ofile.seek(-fileSize, 2)
+            no=int(fileSize/e)
+        else:
+            no=dayl
+            b=day_cout
+            ofile.seek(-day_cout,2)
+        buf=ofile.read()
+        # print repr(buf)
+        # df=pd.DataFrame()
+        for i in xrange(no):
+            a = unpack('IIIIIfII', buf[-e:b])
+            tdate = str(a[0])[:4] + '-' + str(a[0])[4:6] + '-' + str(a[0])[6:8]
+            topen = str(a[1] / 100.0)
+            thigh = str(a[2] / 100.0)
+            tlow = str(a[3] / 100.0)
+            tclose = str(a[4] / 100.0)
+            amount = str(a[5] / 10.0)
+            tvol = str(a[6])  # int
+            # tpre = str(a[7])  # back
+            dt_list.append({'code': code, 'date': tdate, 'open': topen, 'high': thigh, 'low': tlow, 'close': tclose,
+                              'amount': amount, 'vol': tvol})
+            # print series
+            # dSeries.append(series)
+            # dSeries.append(Series({'code':code,'date':tdate,'open':topen,'high':thigh,'low':tlow,'close':tclose,'amount':amount,'vol':tvol,'pre':tpre}))
+            b = b - 32
+            e = e + 32
+        df = pd.DataFrame(dt_list, columns=ct.TDX_Day_columns)
+        df = df.set_index('date')
+        return df
+
+
 #############################################################
 # usage 使用说明
 #
 #############################################################
-def get_tdx_allday_lastDF(plate='all'):
-    time_t=time.time()
-    df=rl.get_sina_Market_json(plate)
-    code_list=np.array(df.code)
-    results=rl.to_mp_run(get_tdx_day_to_Series_last,(code_list,))
+def get_tdx_allday_lastDF(plate='all',dayl=1):
+    time_t = time.time()
+    df = rl.get_sina_Market_json(plate)
+    code_list = np.array(df.code)
+    results = rl.to_mp_run(get_tdx_day_to_df_last, code_list)
     # print (time.time()-time_t)
     # df=pd.DataFrame()
     # print len(results)
-    df=pd.DataFrame(results,columns=ct.TDX_Day_columns)
-    df=df.set_index('code')
+    df = pd.DataFrame(results, columns=ct.TDX_Day_columns)
+    df = df.set_index('code')
+    print len(df),df[:1]
+    # print "date< '2015-08-25'",len(df[(df.date< '2015-08-25')])
+    # df= df[(df.date< '2015-08-25')&(df.date > '2015-06-25')]
+    # print "'2015-08-25')&(df.date > '2015-06-25'",len(df)
+    print "t:", time.time() - time_t
+    return df
+
+def get_tdx_allday_Day_DF(plate='cyb',dayl=1):
+    time_t = time.time()
+    df = rl.get_sina_Market_json(plate)
+    code_list = np.array(df.code)
+    results = rl.to_mp_run_op(get_tdx_allday_Day_DF, code_list)
+    # print (time.time()-time_t)
+    # df=pd.DataFrame()
+    # print len(results)
+    df = pd.DataFrame(results, columns=ct.TDX_Day_columns)
+    df = df.set_index('code')
+    print df[:1]
+
     # print len(df),df[:1]
     # print "date< '2015-08-25'",len(df[(df.date< '2015-08-25')])
     # df= df[(df.date< '2015-08-25')&(df.date > '2015-06-25')]
     # print "'2015-08-25')&(df.date > '2015-06-25'",len(df)
-    print "t:",time.time()-time_t
+    print "t:", time.time() - time_t
     return df
 
 def usage(p):
@@ -187,28 +254,44 @@ python %s -t txt 999999 20070101 20070302
 
 
 if __name__ == '__main__':
-    df=get_tdx_day_to_Series_last('002399')
+    # df = get_tdx_day_to_Series_last('601198',3)
     # print df
-    import sys
-    sys.exit(0)
-    time_t=time.time()
-    df=get_tdx_allday_lastDF()
+    # import sys
+
+    # sys.exit(0)
+    time_t = time.time()
+    # df = get_tdx_allday_lastDF()
     # print "date<2015-08-25:",len(df[(df.date< '2015-08-25')])
     # df= df[(df.date< '2015-08-25')&(df.date > '2015-06-25')]
     # print "2015-08-25-2015-06-25",len(df)
     # print df[:1]
-    import sys
-    sys.exit(0)
-    df=rl.get_sina_Market_json('all')
-    code_list=np.array(df.code)
-    results=rl.to_mp_run(get_tdx_day_to_df,code_list)
+    # print (time.time() - time_t)
+
+    # import sys
+    # sys.exit(0)
+
+    df = rl.get_sina_Market_json('all')
+    code_list = np.array(df.code)
+    print len(code_list)
+    # results = rl.to_mp_run_op(get_tdx_day_to_df_last,code_list)
+    # df=pd.DataFrame((x.get() for x in results),columns=ct.TDX_Day_columns)
+    # print df[:1]
+    print (time.time() - time_t)
+
+    # get_tdx_allday_lastDF()
+
+    # results=rl.to_mp_run(get_tdx_day_to_df_last,code_list)
+    # df=pd.DataFrame(results,columns=ct.TDX_Day_columns)
+    # print df[:1]
+    # for res in results:
+    #     print res.get()
     # df=pd.DataFrame(results,)
-    print len(results)
+    # for x in  results:
+    #     print x
     # for code in results:
     #     print code[:2]
     #     print type(code)
     #     break
-    print (time.time()-time_t)
 
     # print code_list
     # df=get_tdx_day_to_df('002399')

@@ -131,7 +131,7 @@ Status_KIND=['U','D','E']
 SINA_Market_KEY_TO_DFCFW={'sh_a':'zs000001','sz_a':'zs399001','cyb':'zs399006'}
 DFCFW_FUND_FLOW_URL="http://s1.dfcfw.com/js/%s.js?rt="
 DFCFW_FUND_FLOW_ALL="http://s1.dfcfw.com/js/index.js?rt="
-TDX_Day_columns=['code','date','open','high','low','close','vol','amount','pre']
+TDX_Day_columns=['code','date','open','high','low','close','vol','amount']
 
 
 

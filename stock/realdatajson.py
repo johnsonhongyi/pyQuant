@@ -92,6 +92,28 @@ def to_mp_run(cmd, urllist):
     return results
 
 
+def to_mp_run_op(cmd, urllist,arg=1):
+    # n_t=time.time()
+    pool = ThreadPool(cpu_count())
+    # print arg
+    # print cpu_count()
+    # pool = multiprocessing.Pool(processes=8)
+    # for code in codes:
+    #     results=pool.apply_async(sl.get_multiday_ave_compare_silent_noreal,(code,60))
+    # result=[]
+    # results = pool.map(cmd, urllist)
+    # for code in urllist:
+    # result.append(pool.apply_async(cmd,(code,)))
+    results=[]
+
+    for code in urllist:
+        result=pool.apply_async(cmd,(code,arg))
+        results.append(result)
+    pool.close()
+    pool.join()
+    # print "time:MP", (time.time() - n_t)
+    return results
+
 def _get_url_data(url):
     # headers = {'User-Agent':'Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.6) Gecko/20091201 Firefox/3.5.6'}
     headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.2; rv:16.0) Gecko/20100101 Firefox/16.0',

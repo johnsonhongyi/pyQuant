@@ -1,23 +1,24 @@
 # -*- coding: UTF-8 -*-
-from sqlalchemy import create_engine,table
+from sqlalchemy import create_engine
+import sqlalchemy
 import MySQLdb
 import tushare as ts
 import time
-import maptest as mp
+# import maptest as mp
 
 engine = create_engine('mysql://root:plokij@127.0.0.1/Quant?charset=utf8',echo=True)
 # engine = create_engine('mysql://root:plokij@127.0.0.1/Quant?charset=utf8',echo=True,strategy=’threadlocal’)
 # metadata = MetaData(engine)
-
-users_table = table('users',
-          metadata,
-          Column('date', VARCHAR(40), primary_key=True),
-          Column('open', FLOAT(53)),
-          Column('high', FLOAT(53)),
-          Column('high', FLOAT(53)),
-
-          )
-codes=mp.get_all_top()
+#
+# users_table = table('users',
+#           metadata,
+#           Column('date', VARCHAR(40), primary_key=True),
+#           Column('open', FLOAT(53)),
+#           Column('high', FLOAT(53)),
+#           Column('high', FLOAT(53)),
+#
+#           )
+# codes=mp.get_all_top()
 
 
 # CREATE TABLE `000017`
@@ -39,7 +40,7 @@ codes=mp.get_all_top()
 # )
 
 
-# codes=['000030','601198','600476']
+codes=['000030','601198','600476']
 num=0
 for code in codes:
     df = ts.get_hist_data(code)
@@ -49,8 +50,10 @@ for code in codes:
         print "write to sql"
         num+=len(df.index)
         print num
-        df.to_sql(code,engine,if_exists='append',chunksize=100000000)
-        time.sleep(1)
+        print code
+
+        df.to_sql(code,engine,if_exists='replace',dtype={'code':sqlalchemy.types.CHAR(length=6),'date':sqlalchemy.types.DATE})
+        # time.sleep(1)
     else:
         print "df None"
 
