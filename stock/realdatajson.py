@@ -13,9 +13,9 @@ import json
 import lxml.html
 from lxml import etree
 import pandas as pd
-import numpy as np
+# import numpy as np
 import johnson_cons as ct
-import re
+# import re
 from pandas.compat import StringIO
 # from tushare.util import dateu as du
 import math
@@ -24,6 +24,7 @@ import singleAnalyseUtil as sl
 
 from multiprocessing import cpu_count
 from multiprocessing.dummy import Pool as ThreadPool
+# import tdx_data_Day as tdd
 
 # import sys
 try:
@@ -105,7 +106,6 @@ def to_mp_run_op(cmd, urllist,arg=1):
     # for code in urllist:
     # result.append(pool.apply_async(cmd,(code,)))
     results=[]
-
     for code in urllist:
         result=pool.apply_async(cmd,(code,arg))
         results.append(result)
@@ -226,12 +226,12 @@ def get_sina_Market_json(market='sh_a',showtime=True,num='2000', retry_count=3, 
     # ct._write_head()
     if market=='all':
         url_list=[]
-        for m in ct.SINA_Market_KEY:
+        for m in ct.SINA_Market_KEY.values():
             list=_get_sina_Market_url(m, num=num)
             for l in list:url_list.append(l)
         # print url_list
     else:
-        url_list=_get_sina_Market_url(market, num=num)
+        url_list=_get_sina_Market_url(ct.SINA_Market_KEY[market], num=num)
 
     # print url_list
     # print "url:",url_list
@@ -243,6 +243,11 @@ def get_sina_Market_json(market='sh_a',showtime=True,num='2000', retry_count=3, 
 
     if len(results)>0:
         df = df.append(results, ignore_index=True)
+        df['volume']= df['volume'].apply(lambda x:x/100)
+        df['ratio']=df['ratio'].apply(lambda x:round(x,1))
+        df['percent']=df['percent'].apply(lambda x:round(x,1))
+
+        # print df[:1]
     # for url in url_list:
     #     # print url
     #     data = _parsing_Market_price_json(url)
@@ -730,7 +735,19 @@ def get_market_LastPrice_sina_js(codeList):
         print "codeL not list"
         # return get_sina_tick_js_LastPrice(codeList)
 
-def get_market_price_sina_dd_realTime(dp=pd.DataFrame(),vol='0',type='3'):
+# 'code': code, 'date':get_today() , 'open': 0, 'high': 0, 'low': 0, 'close': 0, 'amount': 0,
+#              'vol'
+
+
+# def get_market_LastPrice_TDX(market='all'):
+#         time_s=time.time()
+#         results=to_mp_run(tdd.get_tdx_all_day_LastDF,market)
+#         print "timeTDX:",time.time()-time_s
+#         return results
+#     else:
+#         print "codeL not list"
+
+def get_market_price_sina_dd_realTime(dp='',vol='0',type='3'):
     '''
     input df count and merge price to df
     '''
@@ -741,6 +758,7 @@ def get_market_price_sina_dd_realTime(dp=pd.DataFrame(),vol='0',type='3'):
         # df=df.dropna('index')
         # df=df.drop_duplicates('code')
         # dm=pd.merge(df,dp,on='name',how='left')
+        # print(type(dp))
         dp=dp.drop_duplicates('code')
         # dp=dp.set_index('code')
         dp=dp.dropna('index')
@@ -767,10 +785,10 @@ def get_market_price_sina_dd_realTime(dp=pd.DataFrame(),vol='0',type='3'):
             # dm.ratio=dm.ratio
             dm=dm.loc[:,ct.SINA_Market_Clean_UP_Columns]
 
-
         else:
             dp=dp.set_index('code')
-            dm=dp.loc[:,['name','buy','diff','percent','ratio','low']]
+            dm=dp.loc[:,['name','buy','diff','percent','ratio','high','open','volume','low']]
+                    # ['name','buy','diff','percent','ratio','high','open','volume','low','counts']
                     #['name','buy','diff','percent','trade','high','ratio','volume','counts']
 
     else:

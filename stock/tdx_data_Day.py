@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- encoding: gbk -*-
+# -*- encoding: utf-8 -*-
 from __future__ import division
 # import getopt
 from struct import *
@@ -9,10 +9,16 @@ from pandas import Series
 import realdatajson as rl
 import johnson_cons as ct
 import numpy as np
+from datetime import date
+
+def get_today():
+    TODAY = date.today()
+    today = TODAY.strftime('%Y-%m-%d')
+    return today
 
 path_sep = os.path.sep
-basedir = r'/Users/Johnson/Documents/Johnson/WinTools/zd_pazq'  # Èç¹ûÄãµÄ°²×°Â·¾¶²»Í¬,Çë¸ÄÕâÀï
-# basedir = r'E:\DOC\Parallels\WinTools\zd_pazq'  # Èç¹ûÄãµÄ°²×°Â·¾¶²»Í¬,Çë¸ÄÕâÀï
+# basedir = r'/Users/Johnson/Documents/Johnson/WinTools/zd_pazq'  # å¦‚æœä½ çš„å®‰è£…è·¯å¾„ä¸åŒ,è¯·æ”¹è¿™é‡Œ
+basedir = r'E:\DOC\Parallels\WinTools\zd_pazq'  # å¦‚æœä½ çš„å®‰è£…è·¯å¾„ä¸åŒ,è¯·æ”¹è¿™é‡Œ
 
 exp_dir = basedir + r'/T0002/export/'
 blocknew = r'/Users/Johnson/Documents/Johnson/WinTools/zd_pazq/T0002/blocknew'
@@ -28,7 +34,7 @@ day_dir_sz = basedir + r'/Vipdoc/sz/lday/'
 
 day_path = {'sh': day_dir_sh, 'sz': day_dir_sz}
 
-stkdict = {}  # ´æ´¢¹ÉÆ±IDºÍÉÏº£ÊĞ¡¢ÉîÛÚÊĞµÄ¶ÔÕÕ
+stkdict = {}  # å­˜å‚¨è‚¡ç¥¨IDå’Œä¸Šæµ·å¸‚ã€æ·±åœ³å¸‚çš„å¯¹ç…§
 
 code_u = 'sz002399'
 
@@ -44,7 +50,10 @@ def get_tdx_day_to_df_dict(code):
     # print p_day_dir,p_exp_dir
     file_path = p_day_dir + code_u + '.day'
     if not os.path.exists(file_path):
-        return ''
+        ds=Series(
+            {'code': code, 'date':get_today() , 'open': 0, 'high': 0, 'low': 0, 'close': 0, 'amount': 0,
+             'vol': 0})
+        return ds
     ofile = open(file_path, 'rb')
     buf = ofile.read()
     ofile.close()
@@ -93,7 +102,11 @@ def get_tdx_day_to_df(code):
     # print p_day_dir,p_exp_dir
     file_path = p_day_dir + code_u + '.day'
     if not os.path.exists(file_path):
-        return ''
+        ds=Series(
+            {'code': code, 'date':get_today() , 'open': 0, 'high': 0, 'low': 0, 'close': 0, 'amount': 0,
+             'vol': 0})
+        return ds
+
     ofile = open(file_path, 'rb')
     buf = ofile.read()
     ofile.close()
@@ -133,22 +146,16 @@ def get_tdx_day_to_df_last(code, dayl=1):
     # print p_day_dir,p_exp_dir
     file_path = p_day_dir + code_u + '.day'
     if not os.path.exists(file_path):
-        return ''
+        ds=Series(
+            {'code': code, 'date':get_today() , 'open': 0, 'high': 0, 'low': 0, 'close': 0, 'amount': 0,
+             'vol': 0})
+        return ds
     ofile = file(file_path, 'rb')
     b = 0
     e = 32
-    # buf=ofile.read()
-    # num=len(buf)
-    # no=int(num/32)
-    # if no > dayl:
-    #     length=e*dayl
-    #     ofile.seek(-length,2)
-    # else:
-    #     ofile.seek(-num,2)
-    # buf = ofile.read()
-    # print repr(buf)
-    # dt_list=[]
     if dayl == 1:
+        fileSize = os.path.getsize(file_path)
+        if fileSize<32:print "why",code
         ofile.seek(-e, 2)
         buf=ofile.read()
         ofile.close()
@@ -178,6 +185,7 @@ def get_tdx_day_to_df_last(code, dayl=1):
             no=dayl
             b=day_cout
             ofile.seek(-day_cout,2)
+        # print no,b,day_cout,fileSize
         buf=ofile.read()
         # print repr(buf)
         # df=pd.DataFrame()
@@ -200,53 +208,46 @@ def get_tdx_day_to_df_last(code, dayl=1):
             e = e + 32
         df = pd.DataFrame(dt_list, columns=ct.TDX_Day_columns)
         df = df.set_index('date')
+
         return df
 
 
 #############################################################
-# usage Ê¹ÓÃËµÃ÷
+# usage ä½¿ç”¨è¯´æ˜
 #
 #############################################################
-def get_tdx_allday_lastDF(plate='all',dayl=1):
+def get_tdx_all_day_LastDF(market='all'):
     time_t = time.time()
-    df = rl.get_sina_Market_json(plate)
+    df = rl.get_sina_Market_json(market)
     code_list = np.array(df.code)
     results = rl.to_mp_run(get_tdx_day_to_df_last, code_list)
-    # print (time.time()-time_t)
-    # df=pd.DataFrame()
-    # print len(results)
     df = pd.DataFrame(results, columns=ct.TDX_Day_columns)
     df = df.set_index('code')
-    print len(df),df[:1]
-    # print "date< '2015-08-25'",len(df[(df.date< '2015-08-25')])
-    # df= df[(df.date< '2015-08-25')&(df.date > '2015-06-25')]
-    # print "'2015-08-25')&(df.date > '2015-06-25'",len(df)
+    # print len(df)
+    # print "<2015-08-25",len(df[(df.date< '2015-08-25')])
+    # print "06-25-->8-25'",len(df[(df.date< '2015-08-25')&(df.date > '2015-06-25')])
     print "t:", time.time() - time_t
     return df
 
-def get_tdx_allday_Day_DF(plate='cyb',dayl=1):
+def get_tdx_all_day_DayL_DF(market='cyb',dayl=1):
     time_t = time.time()
-    df = rl.get_sina_Market_json(plate)
+    df = rl.get_sina_Market_json(market)
     code_list = np.array(df.code)
-    results = rl.to_mp_run_op(get_tdx_allday_Day_DF, code_list)
-    # print (time.time()-time_t)
-    # df=pd.DataFrame()
-    # print len(results)
-    df = pd.DataFrame(results, columns=ct.TDX_Day_columns)
-    df = df.set_index('code')
-    print df[:1]
+    results = rl.to_mp_run_op(get_tdx_day_to_df_last, code_list,dayl)
+    # df = pd.DataFrame(results, columns=ct.TDX_Day_columns)
+    # df = df.set_index('code')
+    # print df[:1]
 
     # print len(df),df[:1]
-    # print "date< '2015-08-25'",len(df[(df.date< '2015-08-25')])
-    # df= df[(df.date< '2015-08-25')&(df.date > '2015-06-25')]
-    # print "'2015-08-25')&(df.date > '2015-06-25'",len(df)
+    # print "<2015-08-25",len(df[(df.date< '2015-08-25')])
+    # print "06-25-->8-25'",len(df[(df.date< '2015-08-25')&(df.date > '2015-06-25')])
     print "t:", time.time() - time_t
-    return df
+    return results
 
 def usage(p):
     print """
 python %s [-t txt|zip] stkid [from] [to]
--t txt ±íÊ¾´Ótxt files ¶ÁÈ¡Êı¾İ£¬·ñÔò´Ózip file ¶ÁÈ¡(ÕâÒ²ÊÇÄ¬ÈÏ·½Ê½)
+-t txt è¡¨ç¤ºä»txt files è¯»å–æ•°æ®ï¼Œå¦åˆ™ä»zip file è¯»å–(è¿™ä¹Ÿæ˜¯é»˜è®¤æ–¹å¼)
 for example :
 python %s 999999 20070101 20070302
 python %s -t txt 999999 20070101 20070302
@@ -254,11 +255,11 @@ python %s -t txt 999999 20070101 20070302
 
 
 if __name__ == '__main__':
-    # df = get_tdx_day_to_Series_last('601198',3)
-    # print df
-    # import sys
+    df = get_tdx_day_to_df_last('601198',1)
+    print df
+    import sys
 
-    # sys.exit(0)
+    sys.exit(0)
     time_t = time.time()
     # df = get_tdx_allday_lastDF()
     # print "date<2015-08-25:",len(df[(df.date< '2015-08-25')])
@@ -270,17 +271,30 @@ if __name__ == '__main__':
     # import sys
     # sys.exit(0)
 
-    df = rl.get_sina_Market_json('all')
-    code_list = np.array(df.code)
-    print len(code_list)
-    # results = rl.to_mp_run_op(get_tdx_day_to_df_last,code_list)
+    # df = rl.get_sina_Market_json('all')
+    # code_list = np.array(df.code)
+    # print len(code_list)
+
+
+    # results = rl.to_mp_run_op(get_tdx_day_to_df_last,code_list,2)
     # df=pd.DataFrame((x.get() for x in results),columns=ct.TDX_Day_columns)
     # print df[:1]
-    print (time.time() - time_t)
 
     # get_tdx_allday_lastDF()
 
-    # results=rl.to_mp_run(get_tdx_day_to_df_last,code_list)
+    # results=rl.to_mp_run(get_tdx_day_to_df,code_list)
+    # print results[:2]
+    # print len(results)
+
+    df=get_tdx_all_day_DayL_DF('all',20)
+    print len(df)
+    dd=pd.DataFrame()
+    for res in df:
+        res.get()
+        dd.concat
+        pass
+    # for x in results:
+        # print x[:1]
     # df=pd.DataFrame(results,columns=ct.TDX_Day_columns)
     # print df[:1]
     # for res in results:
@@ -292,6 +306,7 @@ if __name__ == '__main__':
     #     print code[:2]
     #     print type(code)
     #     break
+    print (time.time() - time_t)
 
     # print code_list
     # df=get_tdx_day_to_df('002399')

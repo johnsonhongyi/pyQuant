@@ -3,7 +3,7 @@
 @author: yucezhe
 @contact: QQ:2089973054 email:xjc@yucezhe.com
 """
-%matplotlib inline
+# %matplotlib inline
 import pandas as pd
 import tushare as ts
 import matplotlib.pyplot as plt

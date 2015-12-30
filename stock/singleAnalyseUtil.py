@@ -7,7 +7,7 @@ import realdatajson as rd
 import johnson_cons as ct
 import pandas as pd
 import datetime
-import sys, traceback
+# import sys, traceback
 import fundflowUtil as ffu
 
 try:
@@ -15,6 +15,10 @@ try:
 except ImportError:
     from urllib2 import urlopen, Request
 
+def get_today():
+    TODAY = datetime.date.today()
+    today = TODAY.strftime('%Y-%m-%d')
+    return today
 
 def time_sleep(timemin):
     time1 = time.time()

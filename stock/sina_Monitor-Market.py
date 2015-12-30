@@ -7,12 +7,12 @@
 # reload(sys)
 #
 # sys.setdefaultencoding('utf-8')
-url_s = "http://vip.stock.finance.sina.com.cn/quotes_service/view/cn_bill_all.php?num=100&page=1&sort=ticktime&asc=0&volume=0&type=1"
-url_b = "http://vip.stock.finance.sina.com.cn/quotes_service/view/cn_bill_all.php?num=100&page=1&sort=ticktime&asc=0&volume=100000&type=0"
-status_dict = {u"中性盘": "normal", u"买盘": "up", u"卖盘": "down"}
-url_real_sina = "http://finance.sina.com.cn/realstock/"
-url_real_sina_top = "http://vip.stock.finance.sina.com.cn/mkt/#stock_sh_up"
-url_real_east = "http://quote.eastmoney.com/sz000004.html"
+# url_s = "http://vip.stock.finance.sina.com.cn/quotes_service/view/cn_bill_all.php?num=100&page=1&sort=ticktime&asc=0&volume=0&type=1"
+# url_b = "http://vip.stock.finance.sina.com.cn/quotes_service/view/cn_bill_all.php?num=100&page=1&sort=ticktime&asc=0&volume=100000&type=0"
+# status_dict = {u"中性盘": "normal", u"买盘": "up", u"卖盘": "down"}
+# url_real_sina = "http://finance.sina.com.cn/realstock/"
+# url_real_sina_top = "http://vip.stock.finance.sina.com.cn/mkt/#stock_sh_up"
+# url_real_east = "http://quote.eastmoney.com/sz000004.html"
 from bs4 import BeautifulSoup
 import urllib2
 from pandas import Series, DataFrame
@@ -24,7 +24,8 @@ import realdatajson as rl
 import pandas as pd
 import traceback
 import sys
-import numpy as np
+# import numpy as np
+import tdx_data_Day as tdd
 
 
 def downloadpage(url):
@@ -179,8 +180,9 @@ if __name__ == "__main__":
             # print type(df)
             top_now = rl.get_market_price_sina_dd_realTime(df, vol, type)
             time_Rt = time.time()
+            # print top_now[:5]
+            # print len(top_now)
 
-            # print top_now[:1]
             if len(top_now) > 10 and not top_now[:1].buy.values==0:
                 time_d = time.time()
                 # if 'percent' in top_now.columns.values:
@@ -215,7 +217,7 @@ if __name__ == "__main__":
 
                     for symbol in top_now.index:
                         # code = rl._symbol_to_code(symbol)
-                        if symbol in top_all.index:
+                        if symbol in top_all.index and top_all.loc[symbol, 'buy']<>0:
                             # if top_all.loc[symbol,'diff'] == 0:
                             # print "code:",symbol
                             count_n = top_now.loc[symbol, 'buy']
@@ -223,7 +225,7 @@ if __name__ == "__main__":
                             # print count_a,count_n
                             # print count_n,count_a
                             if not count_n == count_a:
-                                top_now.loc[symbol, 'diff'] = round((float(count_n - count_a) / count_a * 100), 1)
+                                top_now.loc[symbol, 'diff'] = round(((float(count_n) - float(count_a)) / float(count_a) * 100), 1)
                                 if status_change and 'counts' in top_now.columns.values:
                                     # print "change:",time.time()-time_s
                                     # top_now.loc[symbol,'lastp']=top_all.loc[symbol,'lastp']
