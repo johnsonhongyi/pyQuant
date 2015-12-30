@@ -26,6 +26,8 @@ import traceback
 import sys
 # import numpy as np
 import tdx_data_Day as tdd
+from logbook import Logger,StreamHandler,SyslogHandler
+from logbook import StderrHandler
 
 
 def downloadpage(url):
@@ -160,12 +162,26 @@ def get_sina_all_dd(vol='0', type='0', retry_count=3, pause=0.001):
             return df
         raise IOError(ct.NETWORK_URL_ERROR_MSG)
 
+def log_format(record, handler):
+    handler = StderrHandler()
+    # handler.format_string = '{record.channel}: {record.message}'
+    handler.format_string = '{record.channel}: {record.message) [{record.extra[cwd]}]'
+    return record.message
+
+from logbook import FileHandler
+log_handler = FileHandler('application.log')
+log_handler.push_application()
 
 if __name__ == "__main__":
     # parsehtml(downloadpage(url_s))
+    StreamHandler(sys.stdout).push_application()
+    log=Logger('SinaMarket')
+    handler=StderrHandler(format_string='{record.channel}: {record.message) [{record.extra[cwd]}]')
+    # log.level=log.debug
+    # error_handler = SyslogHandler('Sina-M-Log', level='ERROR')
     status = False
     vol = '0'
-    type = '2'
+    type = '4'
     # cut_num=10000
     success = 0
     top_all = pd.DataFrame()
@@ -177,34 +193,41 @@ if __name__ == "__main__":
     while 1:
         try:
             df = rl.get_sina_Market_json('all')
-            # print type(df)
             top_now = rl.get_market_price_sina_dd_realTime(df, vol, type)
             time_Rt = time.time()
-            # print top_now[:5]
-            # print len(top_now)
-
             if len(top_now) > 10 and not top_now[:1].buy.values==0:
                 time_d = time.time()
-                # if 'percent' in top_now.columns.values:
                 #     top_now=top_now[top_now['percent']>=0]
                 if len(top_all) == 0:
                     top_all = top_now
-                    # top_all['llow'] = 0
+                    top_all['llow'] = 0
                     top_all['lastp'] = 0
                     codelist = top_all.index.tolist()
-                    # print type(codelist)
-                    lastp_d = rl.get_market_LastPrice_sina_js(codelist)
-                    # lp_dict={}
-                    # print repr(lastp_d)s
-                    i = 0
-                    for w_dict in lastp_d:
-                        for code in w_dict:
-                            i += 1
-                            # print code,w_dict[code]
-                            # print (w_dict[code])
-                            top_all.loc[code, 'lastp'] = w_dict[code]
-                            # top_all.loc[code, 'llow'] = w_dict[code][1]
-                    # print i, len(codelist)
+                    data=tdd.get_tdx_all_day_LastDF(codelist)
+                    log.debug("TdxLastP: %s"%len(df))
+                    data.rename(columns={'low':'llow'}, inplace=True)
+                    data.rename(columns={'high':'lhigh'}, inplace=True)
+                    data.rename(columns={'close':'lastp'}, inplace=True)
+                    data.rename(columns={'vol':'lvol'}, inplace=True)
+                    log.debug("TDX rename:%s"%df.columns)
+                    import sys
+                    sys.exit(0)
+                    # # top_all['llow'] = 0
+                    # top_all['lastp'] = 0
+                    # codelist = top_all.index.tolist()
+                    # # print type(codelist)
+                    # lastp_d = rl.get_market_LastPrice_sina_js(codelist)
+                    # # lp_dict={}
+                    # # print repr(lastp_d)s
+                    # i = 0
+                    # for w_dict in lastp_d:
+                    #     for code in w_dict:
+                    #         i += 1
+                    #         # print code,w_dict[code]
+                    #         # print (w_dict[code])
+                    #         top_all.loc[code, 'lastp'] = w_dict[code]
+                    #         # top_all.loc[code, 'llow'] = w_dict[code][1]
+                    # # print i, len(codelist)
                     time_s = time.time()
                 else:
                     if 'counts' in top_now.columns.values:

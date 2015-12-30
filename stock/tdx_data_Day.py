@@ -216,17 +216,17 @@ def get_tdx_day_to_df_last(code, dayl=1):
 # usage 使用说明
 #
 #############################################################
-def get_tdx_all_day_LastDF(market='all'):
+def get_tdx_all_day_LastDF(codeList):
     time_t = time.time()
-    df = rl.get_sina_Market_json(market)
-    code_list = np.array(df.code)
-    results = rl.to_mp_run(get_tdx_day_to_df_last, code_list)
+    # df = rl.get_sina_Market_json(market)
+    # code_list = np.array(df.code)
+    results = rl.to_mp_run(get_tdx_day_to_df_last, codeList)
     df = pd.DataFrame(results, columns=ct.TDX_Day_columns)
     df = df.set_index('code')
     # print len(df)
     # print "<2015-08-25",len(df[(df.date< '2015-08-25')])
     # print "06-25-->8-25'",len(df[(df.date< '2015-08-25')&(df.date > '2015-06-25')])
-    print "t:", time.time() - time_t
+    print "TDX:", time.time() - time_t
     return df
 
 def get_tdx_all_day_DayL_DF(market='cyb',dayl=1):
