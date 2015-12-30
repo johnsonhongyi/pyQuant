@@ -32,6 +32,9 @@ try:
 except ImportError:
     from urllib2 import urlopen, Request
 
+from LoggerFactory import *
+
+log=getLogger('Realdata')
 # import tabulate as tbl
 # http://stackoverflow.com/questions/18528533/pretty-print-pandas-dataframe
 # tabulate([list(row) for row in df.values], headers=list(df.columns))
@@ -246,7 +249,7 @@ def get_sina_Market_json(market='sh_a',showtime=True,num='2000', retry_count=3, 
         df['volume']= df['volume'].apply(lambda x:x/100)
         df['ratio']=df['ratio'].apply(lambda x:round(x,1))
         df['percent']=df['percent'].apply(lambda x:round(x,1))
-
+        df=df.drop_duplicates()
         # print df[:1]
     # for url in url_list:
     #     # print url
@@ -760,6 +763,7 @@ def get_market_price_sina_dd_realTime(dp='',vol='0',type='3'):
         # dm=pd.merge(df,dp,on='name',how='left')
         # print(type(dp))
         dp=dp.drop_duplicates('code')
+        log.info("Market_realTime:%s"%len(dp))
         # dp=dp.set_index('code')
         dp=dp.dropna('index')
         dp.loc[dp.percent>9.9,'percent']=10
@@ -775,6 +779,7 @@ def get_market_price_sina_dd_realTime(dp='',vol='0',type='3'):
             df=df.loc[:,['name','counts','kind']]
             # print df[df.counts>0][:2]
             dm=pd.merge(dp,df,on='name',how='left')
+            log.info("dmMerge:%s"%dm[:1])
             # print dm[dm.counts>0][:2]
             dm.counts=dm.counts.fillna(0)
             dm.counts=dm.counts.astype(int)

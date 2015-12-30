@@ -10,6 +10,14 @@ import realdatajson as rl
 import johnson_cons as ct
 import numpy as np
 from datetime import date
+import platform
+import LoggerFactory
+# import logbook
+
+
+# log=logbook.Logger('TDX_day')
+log=LoggerFactory.getLogger('TDX_Day')
+# log.level='info'
 
 def get_today():
     TODAY = date.today()
@@ -17,8 +25,19 @@ def get_today():
     return today
 
 path_sep = os.path.sep
-# basedir = r'/Users/Johnson/Documents/Johnson/WinTools/zd_pazq'  # 如果你的安装路径不同,请改这里
-basedir = r'E:\DOC\Parallels\WinTools\zd_pazq'  # 如果你的安装路径不同,请改这里
+os_platform=platform.platform()
+os_sys=platform.system()
+if os_sys.find('Darwin')==0:
+    log.info("DarwinFind:%s"%os_sys)
+    basedir = r'/Users/Johnson/Documents/Johnson/WinTools/zd_pazq'  # 如果你的安装路径不同,请改这里
+elif os_sys.find('Win')==0:
+    log.info("Windows:%s"%os_sys)
+    if os_platform.find('XP'):
+        log.info("XP:%s"%os_platform)
+        basedir = r'E:\DOC\Parallels\WinTools\zd_pazq'  # 如果你的安装路径不同,请改这里
+    else:
+        log.info("Win7O:"%os_platform)
+        basedir = r'E:\DOC\Parallels\WinTools\zd_pazq'  # 如果你的安装路径不同,请改这里
 
 exp_dir = basedir + r'/T0002/export/'
 blocknew = r'/Users/Johnson/Documents/Johnson/WinTools/zd_pazq/T0002/blocknew'
@@ -223,17 +242,23 @@ def get_tdx_all_day_LastDF(codeList):
     results = rl.to_mp_run(get_tdx_day_to_df_last, codeList)
     df = pd.DataFrame(results, columns=ct.TDX_Day_columns)
     df = df.set_index('code')
+    df.loc[:,'open':] =df.loc[:,'open':].astype(float)
+    df.vol=df.vol.apply(lambda x:x/100)
+    log.info("get_to_mp:%s"%(len(df)))
+
     # print len(df)
     # print "<2015-08-25",len(df[(df.date< '2015-08-25')])
     # print "06-25-->8-25'",len(df[(df.date< '2015-08-25')&(df.date > '2015-06-25')])
-    print "TDX:", time.time() - time_t
+    log.info("TDXTime:%s" %(time.time() - time_t))
     return df
 
 def get_tdx_all_day_DayL_DF(market='cyb',dayl=1):
     time_t = time.time()
     df = rl.get_sina_Market_json(market)
     code_list = np.array(df.code)
+    log.info('code_list:%s'%len(code_list))
     results = rl.to_mp_run_op(get_tdx_day_to_df_last, code_list,dayl)
+    log.info("get_to_mp_op:%s"%(len(results)))
     # df = pd.DataFrame(results, columns=ct.TDX_Day_columns)
     # df = df.set_index('code')
     # print df[:1]
@@ -255,11 +280,11 @@ python %s -t txt 999999 20070101 20070302
 
 
 if __name__ == '__main__':
-    df = get_tdx_day_to_df_last('601198',1)
-    print df
+    # df = get_tdx_day_to_df_last('601198',1)
+    # print df
     import sys
 
-    sys.exit(0)
+    # sys.exit(0)
     time_t = time.time()
     # df = get_tdx_allday_lastDF()
     # print "date<2015-08-25:",len(df[(df.date< '2015-08-25')])
@@ -285,14 +310,24 @@ if __name__ == '__main__':
     # results=rl.to_mp_run(get_tdx_day_to_df,code_list)
     # print results[:2]
     # print len(results)
-
-    df=get_tdx_all_day_DayL_DF('all',20)
-    print len(df)
-    dd=pd.DataFrame()
-    for res in df:
-        res.get()
-        dd.concat
-        pass
+    df = rl.get_sina_Market_json('all')
+    print(len(df))
+    code_list = np.array(df.code)
+    get_tdx_all_day_LastDF(code_list)
+    get_tdx_all_day_DayL_DF('all')
+    # time.sleep(5)
+    # print len(df)
+    # df=df.drop_duplicates()
+    # print(len(df))
+    # for x in df.index:
+    #     print df[df.index==x]
+    # df=get_tdx_all_day_DayL_DF('all',20)
+    # print len(df)
+    # dd=pd.DataFrame()
+    # for res in df:
+    #     print res.get()[:1]
+    #     # dd.concat
+    #     pass
     # for x in results:
         # print x[:1]
     # df=pd.DataFrame(results,columns=ct.TDX_Day_columns)

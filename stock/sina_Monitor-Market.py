@@ -26,8 +26,10 @@ import traceback
 import sys
 # import numpy as np
 import tdx_data_Day as tdd
-from logbook import Logger,StreamHandler,SyslogHandler
-from logbook import StderrHandler
+from LoggerFactory import *
+
+# from logbook import Logger,StreamHandler,SyslogHandler
+# from logbook import StderrHandler
 
 
 def downloadpage(url):
@@ -174,14 +176,20 @@ log_handler.push_application()
 
 if __name__ == "__main__":
     # parsehtml(downloadpage(url_s))
-    StreamHandler(sys.stdout).push_application()
-    log=Logger('SinaMarket')
-    handler=StderrHandler(format_string='{record.channel}: {record.message) [{record.extra[cwd]}]')
+    # StreamHandler(sys.stdout).push_application()
+    log=getLogger('SinaMarket')
+    console = logging.StreamHandler()
+    console.setLevel(logging.INFO)
+    formatter = logging.Formatter('%(name)-12s: %(levelname)-8s %(message)s')
+    console.setFormatter(formatter)
+    logging.getLogger('').addHandler(console)
+
+    # handler=StderrHandler(format_string='{record.channel}: {record.message) [{record.extra[cwd]}]')
     # log.level=log.debug
     # error_handler = SyslogHandler('Sina-M-Log', level='ERROR')
     status = False
     vol = '0'
-    type = '4'
+    type = '2'
     # cut_num=10000
     success = 0
     top_all = pd.DataFrame()
@@ -200,18 +208,26 @@ if __name__ == "__main__":
                 #     top_now=top_now[top_now['percent']>=0]
                 if len(top_all) == 0:
                     top_all = top_now
-                    top_all['llow'] = 0
-                    top_all['lastp'] = 0
+                    # top_all['llow'] = 0
+                    # top_all['lastp'] = 0
+                    top_all=top_all[top_all.buy>0]
                     codelist = top_all.index.tolist()
+                    log.info('toTDXlist:%s'%len(codelist))
                     data=tdd.get_tdx_all_day_LastDF(codelist)
-                    log.debug("TdxLastP: %s"%len(df))
+                    log.info("TdxLastP: %s %s"%(len(data),data.columns.values))
                     data.rename(columns={'low':'llow'}, inplace=True)
                     data.rename(columns={'high':'lhigh'}, inplace=True)
                     data.rename(columns={'close':'lastp'}, inplace=True)
                     data.rename(columns={'vol':'lvol'}, inplace=True)
-                    log.debug("TDX Col:%s"%data.columns.values)
-                    import sys
-                    sys.exit(0)
+                    data=data.loc[:,['llow','lhigh','lastp','lvol','date']]
+                    # data.drop('amount',axis=0,inplace=True)
+                    log.info("TDX Col:%s"%data.columns.values)
+                    # df_now=top_all.merge(data,on='code',how='left')
+                    # df_now=pd.merge(top_all,data,left_index=True,right_index=True,how='left')
+                    top_all=top_all.merge(data,left_index=True,right_index=True,how='left')
+                    log.info('Top-merge_now:%s'%(top_all[:1]))
+                    # import sys
+                    # sys.exit(0)
                     # # top_all['llow'] = 0
                     # top_all['lastp'] = 0
                     # codelist = top_all.index.tolist()
@@ -283,24 +299,26 @@ if __name__ == "__main__":
                 # top_all = top_all[top_all.percent >= 0]
 
                 top_dif = top_all
-                # print len(top_dif),top_dif[:1]
-
+                log.info('dif1:%s'%len(top_dif))
+                print top_dif[:3]
                 top_dif = top_dif[top_dif.buy > top_dif.lastp]
-                # print len(top_dif),top_dif[:1]
+                log.info('dif2:%s'%len(top_dif))
+
 
                 if not top_dif[:1].low.values==0:
                     top_dif = top_dif[top_dif.low > top_dif.lastp]
-                    # print len(top_dif),top_dif[:1]
+                    log.info('dif3 low<>0 :%s'%len(top_dif))
+
 
                     top_dif = top_dif[top_dif.open > top_dif.lastp]
-                    # print len(top_dif),top_dif[:1]
+                    log.info('dif4 open>lastp:%s'%len(top_dif))
 
                     top_dif = top_dif[top_dif.buy >= top_dif.open*0.99]
-                    # print len(top_dif),top_dif[:1]
+                    log.info('dif5 buy>open:%s'%len(top_dif))
 
                     # top_dif = top_dif[top_dif.trade >= top_dif.buy]
                     top_dif = top_dif[top_dif.buy >= top_dif.high * 0.99]
-                    # print len(top_dif),top_dif[:1]
+                    log.info('dif6 buy>high:%s'%len(top_dif))
 
                     top_dif = top_dif[top_dif.percent >= 0]
                 # print len(top_dif),top_dif[:1]
