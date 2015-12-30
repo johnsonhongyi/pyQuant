@@ -209,7 +209,7 @@ if __name__ == "__main__":
                     data.rename(columns={'high':'lhigh'}, inplace=True)
                     data.rename(columns={'close':'lastp'}, inplace=True)
                     data.rename(columns={'vol':'lvol'}, inplace=True)
-                    log.debug("TDX rename:%s"%df.columns)
+                    log.debug("TDX Col:%s"%data.columns.values)
                     import sys
                     sys.exit(0)
                     # # top_all['llow'] = 0
