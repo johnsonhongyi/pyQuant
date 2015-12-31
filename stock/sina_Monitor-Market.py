@@ -28,6 +28,7 @@ import sys
 import tdx_data_Day as tdd
 from LoggerFactory import *
 
+
 # from logbook import Logger,StreamHandler,SyslogHandler
 # from logbook import StderrHandler
 
@@ -164,25 +165,37 @@ def get_sina_all_dd(vol='0', type='0', retry_count=3, pause=0.001):
             return df
         raise IOError(ct.NETWORK_URL_ERROR_MSG)
 
+
 def log_format(record, handler):
     handler = StderrHandler()
     # handler.format_string = '{record.channel}: {record.message}'
     handler.format_string = '{record.channel}: {record.message) [{record.extra[cwd]}]'
     return record.message
 
-from logbook import FileHandler
-log_handler = FileHandler('application.log')
-log_handler.push_application()
+    # from logbook import FileHandler
+    # log_handler = FileHandler('application.log')
+    # log_handler.push_application()
+
+
+def set_log_file():
+    console = logging.StreamHandler()
+    console.setLevel(logging.WARNING)
+    formatter = logging.Formatter('%(name)-12s: %(levelname)-8s %(message)s')
+    console.setFormatter(formatter)
+    logging.getLogger('').addHandler(console)
+
 
 if __name__ == "__main__":
     # parsehtml(downloadpage(url_s))
     # StreamHandler(sys.stdout).push_application()
-    log=getLogger('SinaMarket')
-    console = logging.StreamHandler()
-    console.setLevel(logging.INFO)
-    formatter = logging.Formatter('%(name)-12s: %(levelname)-8s %(message)s')
-    console.setFormatter(formatter)
-    logging.getLogger('').addHandler(console)
+    log = getLogger('SinaMarket')
+    # log.setLevel(logging.INFO)
+    # log.setLevel(logging.DEBUG)
+    # console = logging.StreamHandler()
+    # console.setLevel(logging.WARNING)
+    # formatter = logging.Formatter('%(name)-12s: %(levelname)-8s %(message)s')
+    # console.setFormatter(formatter)
+    # logging.getLogger('').addHandler(console)
 
     # handler=StderrHandler(format_string='{record.channel}: {record.message) [{record.extra[cwd]}]')
     # log.level=log.debug
@@ -195,56 +208,47 @@ if __name__ == "__main__":
     top_all = pd.DataFrame()
     time_s = time.time()
     delay_time = 1800
-    base_path=r"E:\DOC\Parallels\WinTools\zd_pazq\T0002\blocknew\\"
-    block_path=base_path+'063.blk'
-    all_diffpath=base_path+'062.blk'
+    base_path = r"E:\DOC\Parallels\WinTools\zd_pazq\T0002\blocknew\\"
+    block_path = base_path + '063.blk'
+    all_diffpath = base_path + '062.blk'
     while 1:
         try:
             df = rl.get_sina_Market_json('all')
             top_now = rl.get_market_price_sina_dd_realTime(df, vol, type)
             time_Rt = time.time()
-            if len(top_now) > 10 and not top_now[:1].buy.values==0:
+            if len(top_now) > 10 and not top_now[:1].buy.values == 0:
                 time_d = time.time()
                 #     top_now=top_now[top_now['percent']>=0]
                 if len(top_all) == 0:
                     top_all = top_now
                     # top_all['llow'] = 0
                     # top_all['lastp'] = 0
-                    top_all=top_all[top_all.buy>0]
+                    top_all = top_all[top_all.buy > 0]
                     codelist = top_all.index.tolist()
-                    log.info('toTDXlist:%s'%len(codelist))
-                    data=tdd.get_tdx_all_day_LastDF(codelist)
-                    log.info("TdxLastP: %s %s"%(len(data),data.columns.values))
-                    data.rename(columns={'low':'llow'}, inplace=True)
-                    data.rename(columns={'high':'lhigh'}, inplace=True)
-                    data.rename(columns={'close':'lastp'}, inplace=True)
-                    data.rename(columns={'vol':'lvol'}, inplace=True)
-                    data=data.loc[:,['llow','lhigh','lastp','lvol','date']]
+                    log.info('toTDXlist:%s' % len(codelist))
+                    data = tdd.get_tdx_all_day_LastDF(codelist)
+                    log.debug("TdxLastP: %s %s" % (len(data), data.columns.values))
+                    data.rename(columns={'low': 'llow'}, inplace=True)
+                    data.rename(columns={'high': 'lhigh'}, inplace=True)
+                    data.rename(columns={'close': 'lastp'}, inplace=True)
+                    data.rename(columns={'vol': 'lvol'}, inplace=True)
+                    data = data.loc[:, ['llow', 'lhigh', 'lastp', 'lvol', 'date']]
                     # data.drop('amount',axis=0,inplace=True)
-                    log.info("TDX Col:%s"%data.columns.values)
+                    log.debug("TDX Col:%s" % data.columns.values)
                     # df_now=top_all.merge(data,on='code',how='left')
                     # df_now=pd.merge(top_all,data,left_index=True,right_index=True,how='left')
-                    top_all=top_all.merge(data,left_index=True,right_index=True,how='left')
-                    log.info('Top-merge_now:%s'%(top_all[:1]))
+                    top_all = top_all.merge(data, left_index=True, right_index=True, how='left')
+                    log.info('Top-merge_now:%s' % (top_all[:1]))
+                    top_all = top_all[top_all['llow'] > 0]
+                    radio_t = sl.get_work_time_ratio()
+                    if top_now.loc[symbol, 'volume'] > 0:
+                        top_now.loc[symbol, 'volume'] = round(top_now.loc[symbol, 'volume'] / radio_t, 1)
+                        top_now.loc[symbol, 'volume'] = round(
+                            top_now.loc[symbol, 'volume'] / top_all.loc[symbol, 'lvol'], 1)
+
+                    time_s = time.time()
                     # import sys
                     # sys.exit(0)
-                    # # top_all['llow'] = 0
-                    # top_all['lastp'] = 0
-                    # codelist = top_all.index.tolist()
-                    # # print type(codelist)
-                    # lastp_d = rl.get_market_LastPrice_sina_js(codelist)
-                    # # lp_dict={}
-                    # # print repr(lastp_d)s
-                    # i = 0
-                    # for w_dict in lastp_d:
-                    #     for code in w_dict:
-                    #         i += 1
-                    #         # print code,w_dict[code]
-                    #         # print (w_dict[code])
-                    #         top_all.loc[code, 'lastp'] = w_dict[code]
-                    #         # top_all.loc[code, 'llow'] = w_dict[code][1]
-                    # # print i, len(codelist)
-                    time_s = time.time()
                 else:
                     if 'counts' in top_now.columns.values:
                         if not 'counts' in top_all.columns.values:
@@ -256,26 +260,29 @@ if __name__ == "__main__":
 
                     for symbol in top_now.index:
                         # code = rl._symbol_to_code(symbol)
-                        if symbol in top_all.index and top_all.loc[symbol, 'buy']<>0:
+                        if symbol in top_all.index and top_all.loc[symbol, 'buy'] <> 0:
                             # if top_all.loc[symbol,'diff'] == 0:
                             # print "code:",symbol
+
+
                             count_n = top_now.loc[symbol, 'buy']
                             count_a = top_all.loc[symbol, 'buy']
                             # print count_a,count_n
                             # print count_n,count_a
                             if not count_n == count_a:
-                                top_now.loc[symbol, 'diff'] = round(((float(count_n) - float(count_a)) / float(count_a) * 100), 1)
+                                top_now.loc[symbol, 'diff'] = round(
+                                    ((float(count_n) - float(count_a)) / float(count_a) * 100), 1)
                                 if status_change and 'counts' in top_now.columns.values:
                                     # print "change:",time.time()-time_s
                                     # top_now.loc[symbol,'lastp']=top_all.loc[symbol,'lastp']
-                                    top_all.loc[symbol, 'buy':'counts'] = top_now.loc[symbol,'buy':'counts']
+                                    top_all.loc[symbol, 'buy':'counts'] = top_now.loc[symbol, 'buy':'counts']
                                 else:
                                     # top_now.loc[symbol,'lastp']=top_all.loc[symbol,'lastp']
                                     top_all.loc[symbol, 'diff':'low'] = top_now.loc[symbol, 'diff':'low']
                             elif 'counts' in top_now.columns.values:
-                                top_all.loc[symbol, 'percent':'counts'] = top_now.loc[symbol, 'percent':'counts']
+                                top_all.loc[symbol, 'volume':'counts'] = top_now.loc[symbol, 'volume':'counts']
                             else:
-                                top_all.loc[symbol, 'percent':'low'] = top_now.loc[symbol, 'percent':'low']
+                                top_all.loc[symbol, 'volume':'low'] = top_now.loc[symbol, 'volume':'low']
 
                                 # top_all.loc[symbol]=top_now.loc[symbol]?
                                 # top_all.loc[symbol,'diff']=top_now.loc[symbol,'counts']-top_all.loc[symbol,'counts']
@@ -299,33 +306,39 @@ if __name__ == "__main__":
                 # top_all = top_all[top_all.percent >= 0]
 
                 top_dif = top_all
-                log.info('dif1:%s'%len(top_dif))
-                print top_dif[:3]
+                log.info('dif1:%s' % len(top_dif))
+                log.info(top_dif[:1])
                 top_dif = top_dif[top_dif.buy > top_dif.lastp]
-                log.info('dif2:%s'%len(top_dif))
+                log.debug('dif2:%s' % len(top_dif))
 
+                # if top_dif[:1].llow.values <> 0:
+                top_dif = top_dif[top_dif.low > top_dif.llow]
+                log.debug('diff2-1:%s' % len(top_dif))
 
-                if not top_dif[:1].low.values==0:
-                    top_dif = top_dif[top_dif.low > top_dif.lastp]
-                    log.info('dif3 low<>0 :%s'%len(top_dif))
+                top_dif = top_dif[top_dif.low > top_dif.lastp]
+                log.debug('dif3 low<>0 :%s' % len(top_dif))
 
+                top_dif = top_dif[top_dif.open > top_dif.lastp]
+                log.debug('dif4 open>lastp:%s' % len(top_dif))
 
-                    top_dif = top_dif[top_dif.open > top_dif.lastp]
-                    log.info('dif4 open>lastp:%s'%len(top_dif))
+                # top_dif = top_dif[top_dif.buy >= top_dif.open*0.99]
+                # log.debug('dif5 buy>open:%s'%len(top_dif))
+                # top_dif = top_dif[top_dif.trade >= top_dif.buy]
 
-                    top_dif = top_dif[top_dif.buy >= top_dif.open*0.99]
-                    log.info('dif5 buy>open:%s'%len(top_dif))
+                # df['volume']= df['volume'].apply(lambda x:x/100)
 
-                    # top_dif = top_dif[top_dif.trade >= top_dif.buy]
-                    top_dif = top_dif[top_dif.buy >= top_dif.high * 0.99]
-                    log.info('dif6 buy>high:%s'%len(top_dif))
+                top_dif = top_dif[top_dif.volume > 1]
 
-                    top_dif = top_dif[top_dif.percent >= 0]
+                log.debug('dif6 vol>lvol:%s' % len(top_dif))
+                # top_dif = top_dif[top_dif.percent >= 0]
+
                 # print len(top_dif),top_dif[:1]
-                print ("A:%s N:%s K:%s %s G:%s"%(len(df), len(top_now), len(top_all)-len(top_all[top_all.low.values==0]),len(top_all[top_all.low.values==0]),len(top_dif))),
-                print "Rt:%0.3f"%(float(time.time() - time_Rt))
+                print ("A:%s N:%s K:%s %s G:%s" % (
+                    len(df), len(top_now), len(top_all),
+                    len(top_now)-len(top_all), len(top_dif))),
+                print "Rt:%0.3f" % (float(time.time() - time_Rt))
                 if 'counts' in top_dif.columns.values:
-                    top_dif = top_dif.sort_values(by=['diff', 'percent', 'counts', 'ratio'], ascending=[0, 0, 1, 1])
+                    top_dif = top_dif.sort_values(by=['diff','volume', 'percent', 'counts', 'ratio'], ascending=[0,0, 0, 1, 1])
                 else:
                     print "Good Morning!!!"
                     top_dif = top_dif.sort_values(by=['diff', 'percent', 'ratio'], ascending=[0, 0, 1])
@@ -341,13 +354,22 @@ if __name__ == "__main__":
                         if len(code) > 0:
                             code = code[0]
                             kind = sl.get_multiday_ave_compare_silent(code)
-                # print top_all[top_all.low.values==0]
+                            # print top_all[top_all.low.values==0]
 
-                # else:
-                #     print "\t No RealTime Data"
+                            # else:
+                            #     print "\t No RealTime Data"
             else:
                 print "\tNo Data"
-            time.sleep(60)
+            int_time = sl.get_now_time_int()
+            if sl.get_work_time_now():
+                if int_time < 926:
+                    time.sleep(5)
+                else:
+                    time.sleep(60)
+            else:
+                # break
+                # time.sleep(5)
+                # pass
 
         except (KeyboardInterrupt) as e:
             # print "key"
@@ -370,13 +392,13 @@ if __name__ == "__main__":
                 top_all = pd.DataFrame()
                 status = False
             elif st == 'w' or st == 'a':
-                codew=(top_dif.index).tolist()
-                if st=='a':
-                    sl.write_to_blocknew(block_path,codew[:10])
-                    sl.write_to_blocknew(all_diffpath,codew)
+                codew = (top_dif.index).tolist()
+                if st == 'a':
+                    sl.write_to_blocknew(block_path, codew[:10])
+                    sl.write_to_blocknew(all_diffpath, codew)
                 else:
-                    sl.write_to_blocknew(block_path,codew[:10],False)
-                    sl.write_to_blocknew(all_diffpath,codew,False)
+                    sl.write_to_blocknew(block_path, codew[:10], False)
+                    sl.write_to_blocknew(all_diffpath, codew, False)
                 print "wri ok"
                 # time.sleep(2)
 

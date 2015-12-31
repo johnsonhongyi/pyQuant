@@ -792,7 +792,7 @@ def get_market_price_sina_dd_realTime(dp='',vol='0',type='3'):
 
         else:
             dp=dp.set_index('code')
-            dm=dp.loc[:,['name','buy','diff','percent','ratio','high','open','volume','low']]
+            dm=dp.loc[:,ct.SINA_Market_Clean_Columns]
                     # ['name','buy','diff','percent','ratio','high','open','volume','low','counts']
                     #['name','buy','diff','percent','trade','high','ratio','volume','counts']
 
@@ -828,8 +828,9 @@ if __name__ == '__main__':
     # print len(df)
     # print "\033[1;37;4%dm%s\033[0m" % (1 > 0 and 1 or 2, get_sina_tick_js_code('002399'))
     # print get_sina_tick_js_LastPrice('002399')
-    dd = get_sina_tick_js_LastPrice(['002399','002399','601919','601198'])
-    print(type(dd))
+    # print "ra:",sl.get_work_time_ratio()
+    # dd = get_sina_tick_js_LastPrice(['002399','002399','601919','601198'])
+    # print(type(dd))
     import sys
 
     sys.exit(0)

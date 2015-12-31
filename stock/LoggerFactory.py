@@ -13,11 +13,11 @@ def getLogger(name):
         now = time.strftime('%Y-%m-%d %H:%M:%S')
 
         logging.basicConfig(
-            level    = logging.DEBUG,
+            # level    = logging.DEBUG,
             format   = now +":" + name + ' LINE %(lineno)-4d  %(levelname)-8s %(message)s',
             datefmt  = '%m-%d %H:%M',
             filename =  "stock.log",
-            filemode = 'a');
+            filemode = 'w');
 
         console = logging.StreamHandler();
         console.setLevel(logging.DEBUG);

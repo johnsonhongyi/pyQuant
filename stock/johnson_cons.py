@@ -119,7 +119,8 @@ JSON_Market_Center_CountURL="http://vip.stock.finance.sina.com.cn/quotes_service
 SINA_Market_KEY={'sh':'sh_a','sz':'sz_a','cyb':'cyb'}
 SINA_Market_COLUMNS = ['code', 'name', 'trade', 'buy', 'percent', 'open', 'high', 'low', 'volume', 'ticktime', 'ratio']
 SINA_DD_Clean_Count_Columns=['name','percent','diff','counts','trade','high','open','low','ratio']
-SINA_Market_Clean_UP_Columns=['name','buy','diff','percent','ratio','high','open','volume','low','counts']
+SINA_Market_Clean_UP_Columns=['name','buy','diff','volume','percent','ratio','high','open','low','counts']
+SINA_Market_Clean_Columns=['name','buy','diff','volume','percent','ratio','high','open','low']
 # SINA_Market_Clean_UP_Columns=['name','buy','diff','percent','trade','high','ratio','open','low','counts']
 
 THE_FIELDS = ['code', 'symbol', 'name', 'changepercent', 'trade', 'open', 'high', 'low', 'settlement', 'volume', 'turnoverratio']
@@ -128,7 +129,7 @@ DAY_REAL_DD_COLUMNS = ['code','symbol','name','ticktime','price','volume','prev_
 Status_DD={u"中性盘": "normal", u"买盘": "up", u"卖盘": "down"}
 Status_KIND=['U','D','E']
 
-SINA_Market_KEY_TO_DFCFW={'sh_a':'zs000001','sz_a':'zs399001','cyb':'zs399006'}
+SINA_Market_KEY_TO_DFCFW={'sh':'zs000001','sz':'zs399001','cyb':'zs399006'}
 DFCFW_FUND_FLOW_URL="http://s1.dfcfw.com/js/%s.js?rt="
 DFCFW_FUND_FLOW_ALL="http://s1.dfcfw.com/js/index.js?rt="
 TDX_Day_columns=['code','date','open','high','low','close','vol','amount']
