@@ -1,5 +1,5 @@
-#!/usr/bin/python
 # -*- encoding: utf-8 -*-
+#!/usr/bin/python
 from __future__ import division
 # import getopt
 from struct import *
@@ -12,50 +12,66 @@ import numpy as np
 from datetime import date
 import platform
 import LoggerFactory
+
 # import logbook
 
 
 # log=logbook.Logger('TDX_day')
-log=LoggerFactory.getLogger('TDX_Day')
+log = LoggerFactory.getLogger('TDX_Day')
 # log.level='info'
+
+path_sep = os.path.sep
+
 
 def get_today():
     TODAY = date.today()
     today = TODAY.strftime('%Y-%m-%d')
     return today
 
-path_sep = os.path.sep
-os_platform=platform.platform()
-os_sys=platform.system()
-if os_sys.find('Darwin')==0:
-    log.info("DarwinFind:%s"%os_sys)
-    basedir = r'/Users/Johnson/Documents/Johnson/WinTools/zd_pazq'  # 如果你的安装路径不同,请改这里
-elif os_sys.find('Win')==0:
-    log.info("Windows:%s"%os_sys)
-    if os_platform.find('XP'):
-        log.info("XP:%s"%os_platform)
-        basedir = r'E:\DOC\Parallels\WinTools\zd_pazq'  # 如果你的安装路径不同,请改这里
-    else:
-        log.info("Win7O:"%os_platform)
-        basedir = r'E:\DOC\Parallels\WinTools\zd_pazq'  # 如果你的安装路径不同,请改这里
 
-exp_dir = basedir + r'/T0002/export/'
+def get_tdx_dir():
+    os_platform = platform.platform()
+    os_sys = platform.system()
+    if os_sys.find('Darwin') == 0:
+        log.info("DarwinFind:%s" % os_sys)
+        basedir = r'/Users/Johnson/Documents/Johnson/WinTools/zd_pazq'.replace('/', path_sep).replace('\\',
+                                                                                                      path_sep)  # 如果你的安装路径不同,请改这里
+    elif os_sys.find('Win') == 0:
+        log.info("Windows:%s" % os_sys)
+        if os_platform.find('XP'):
+            log.info("XP:%s" % os_platform)
+            basedir = r'E:\DOC\Parallels\WinTools\zd_pazq'.replace('/', path_sep).replace('\\',
+                                                                                          path_sep)  # 如果你的安装路径不同,请改这里
+        else:
+            log.info("Win7O:" % os_platform)
+            basedir = r'E:\DOC\Parallels\WinTools\zd_pazq'.replace('/', path_sep).replace('\\',
+                                                                                          path_sep)  # 如果你的安装路径不同,请改这里
+    return basedir
+
+
+def get_tdx_dir_blocknew():
+    blocknew_path = get_tdx_dir() + r'/T0002/'.replace('/', path_sep).replace('\\', path_sep)
+    return blocknew_path
+
+
+# path_sep = os.path.sep
+exp_dir = get_tdx_dir() + r'/T0002/export/'
 blocknew = r'/Users/Johnson/Documents/Johnson/WinTools/zd_pazq/T0002/blocknew'
 # blocknew = 'Z:\Documents\Johnson\WinTools\zd_pazq\T0002\blocknew'
 # exp_dir    = basedir + r'\T0002\export_back'
-lc5_dir_sh = basedir + r'\Vipdoc\sh\fzline'
+lc5_dir_sh = get_tdx_dir() + r'\Vipdoc\sh\fzline'
 # lc5_dir_sh =  r'D:\2965\ydzqwsjy\Vipdoc\sh\fzline'
-lc5_dir_sz = basedir + r'\Vipdoc\sz\fzline'
-lc5_dir = basedir + r'\Vipdoc\%s\fzline'
-day_dir = basedir + r'\Vipdoc\%s\lday/'
-day_dir_sh = basedir + r'\Vipdoc\sh\lday/'
-day_dir_sz = basedir + r'/Vipdoc/sz/lday/'
+lc5_dir_sz = get_tdx_dir() + r'\Vipdoc\sz\fzline'
+lc5_dir = get_tdx_dir() + r'\Vipdoc\%s\fzline'
+day_dir = get_tdx_dir() + r'\Vipdoc\%s\lday/'
+day_dir_sh = get_tdx_dir() + r'\Vipdoc\sh\lday/'
+day_dir_sz = get_tdx_dir() + r'/Vipdoc/sz/lday/'
 
 day_path = {'sh': day_dir_sh, 'sz': day_dir_sz}
 
-stkdict = {}  # 存储股票ID和上海市、深圳市的对照
+# stkdict = {}  # 存储股票ID和上海市、深圳市的对照
 
-code_u = 'sz002399'
+# code_u = 'sz002399'
 
 
 # http://www.douban.com/note/504811026/
@@ -69,8 +85,8 @@ def get_tdx_day_to_df_dict(code):
     # print p_day_dir,p_exp_dir
     file_path = p_day_dir + code_u + '.day'
     if not os.path.exists(file_path):
-        ds=Series(
-            {'code': code, 'date':get_today() , 'open': 0, 'high': 0, 'low': 0, 'close': 0, 'amount': 0,
+        ds = Series(
+            {'code': code, 'date': get_today(), 'open': 0, 'high': 0, 'low': 0, 'close': 0, 'amount': 0,
              'vol': 0})
         return ds
     ofile = open(file_path, 'rb')
@@ -121,8 +137,8 @@ def get_tdx_day_to_df(code):
     # print p_day_dir,p_exp_dir
     file_path = p_day_dir + code_u + '.day'
     if not os.path.exists(file_path):
-        ds=Series(
-            {'code': code, 'date':get_today() , 'open': 0, 'high': 0, 'low': 0, 'close': 0, 'amount': 0,
+        ds = Series(
+            {'code': code, 'date': get_today(), 'open': 0, 'high': 0, 'low': 0, 'close': 0, 'amount': 0,
              'vol': 0})
         return ds
 
@@ -165,8 +181,8 @@ def get_tdx_day_to_df_last(code, dayl=1):
     # print p_day_dir,p_exp_dir
     file_path = p_day_dir + code_u + '.day'
     if not os.path.exists(file_path):
-        ds=Series(
-            {'code': code, 'date':get_today() , 'open': 0, 'high': 0, 'low': 0, 'close': 0, 'amount': 0,
+        ds = Series(
+            {'code': code, 'date': get_today(), 'open': 0, 'high': 0, 'low': 0, 'close': 0, 'amount': 0,
              'vol': 0})
         return ds
     ofile = file(file_path, 'rb')
@@ -174,9 +190,9 @@ def get_tdx_day_to_df_last(code, dayl=1):
     e = 32
     if dayl == 1:
         fileSize = os.path.getsize(file_path)
-        if fileSize<32:print "why",code
+        if fileSize < 32: print "why", code
         ofile.seek(-e, 2)
-        buf=ofile.read()
+        buf = ofile.read()
         ofile.close()
         a = unpack('IIIIIfII', buf[b:e])
         tdate = str(a[0])[:4] + '-' + str(a[0])[4:6] + '-' + str(a[0])[6:8]
@@ -187,25 +203,25 @@ def get_tdx_day_to_df_last(code, dayl=1):
         amount = str(a[5] / 10.0)
         tvol = str(a[6])  # int
         # tpre = str(a[7])  # back
-        dt_list=Series(
+        dt_list = Series(
             {'code': code, 'date': tdate, 'open': topen, 'high': thigh, 'low': tlow, 'close': tclose, 'amount': amount,
              'vol': tvol})
         return dt_list
     else:
-        dt_list=[]
+        dt_list = []
         fileSize = os.path.getsize(file_path)
         day_cout = abs(e * dayl)
         # print day_cout
         if day_cout > fileSize:
-            b=fileSize
+            b = fileSize
             ofile.seek(-fileSize, 2)
-            no=int(fileSize/e)
+            no = int(fileSize / e)
         else:
-            no=dayl
-            b=day_cout
-            ofile.seek(-day_cout,2)
+            no = dayl
+            b = day_cout
+            ofile.seek(-day_cout, 2)
         # print no,b,day_cout,fileSize
-        buf=ofile.read()
+        buf = ofile.read()
         # print repr(buf)
         # df=pd.DataFrame()
         for i in xrange(no):
@@ -219,7 +235,7 @@ def get_tdx_day_to_df_last(code, dayl=1):
             tvol = str(a[6])  # int
             # tpre = str(a[7])  # back
             dt_list.append({'code': code, 'date': tdate, 'open': topen, 'high': thigh, 'low': tlow, 'close': tclose,
-                              'amount': amount, 'vol': tvol})
+                            'amount': amount, 'vol': tvol})
             # print series
             # dSeries.append(series)
             # dSeries.append(Series({'code':code,'date':tdate,'open':topen,'high':thigh,'low':tlow,'close':tclose,'amount':amount,'vol':tvol,'pre':tpre}))
@@ -242,23 +258,24 @@ def get_tdx_all_day_LastDF(codeList):
     results = rl.to_mp_run(get_tdx_day_to_df_last, codeList)
     df = pd.DataFrame(results, columns=ct.TDX_Day_columns)
     df = df.set_index('code')
-    df.loc[:,'open':] =df.loc[:,'open':].astype(float)
-    df.vol=df.vol.apply(lambda x:x/100)
-    log.info("get_to_mp:%s"%(len(df)))
+    df.loc[:, 'open':] = df.loc[:, 'open':].astype(float)
+    df.vol = df.vol.apply(lambda x: x / 100)
+    log.info("get_to_mp:%s" % (len(df)))
 
     # print len(df)
     # print "<2015-08-25",len(df[(df.date< '2015-08-25')])
     # print "06-25-->8-25'",len(df[(df.date< '2015-08-25')&(df.date > '2015-06-25')])
-    log.info("TDXTime:%s" %(time.time() - time_t))
+    log.info("TDXTime:%s" % (time.time() - time_t))
     return df
 
-def get_tdx_all_day_DayL_DF(market='cyb',dayl=1):
+
+def get_tdx_all_day_DayL_DF(market='cyb', dayl=1):
     time_t = time.time()
     df = rl.get_sina_Market_json(market)
     code_list = np.array(df.code)
-    log.info('code_list:%s'%len(code_list))
-    results = rl.to_mp_run_op(get_tdx_day_to_df_last, code_list,dayl)
-    log.info("get_to_mp_op:%s"%(len(results)))
+    log.info('code_list:%s' % len(code_list))
+    results = rl.to_mp_run_op(get_tdx_day_to_df_last, code_list, dayl)
+    log.info("get_to_mp_op:%s" % (len(results)))
     # df = pd.DataFrame(results, columns=ct.TDX_Day_columns)
     # df = df.set_index('code')
     # print df[:1]
@@ -268,6 +285,7 @@ def get_tdx_all_day_DayL_DF(market='cyb',dayl=1):
     # print "06-25-->8-25'",len(df[(df.date< '2015-08-25')&(df.date > '2015-06-25')])
     print "t:", time.time() - time_t
     return results
+
 
 def usage(p):
     print """
@@ -329,7 +347,7 @@ if __name__ == '__main__':
     #     # dd.concat
     #     pass
     # for x in results:
-        # print x[:1]
+    # print x[:1]
     # df=pd.DataFrame(results,columns=ct.TDX_Day_columns)
     # print df[:1]
     # for res in results:

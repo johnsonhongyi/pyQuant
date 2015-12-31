@@ -208,9 +208,9 @@ if __name__ == "__main__":
     top_all = pd.DataFrame()
     time_s = time.time()
     delay_time = 1800
-    base_path = r"E:\DOC\Parallels\WinTools\zd_pazq\T0002\blocknew\\"
-    block_path = base_path + '063.blk'
-    all_diffpath = base_path + '062.blk'
+    base_path = tdd.get_tdx_dir()
+    block_path = tdd.get_tdx_dir_blocknew() + '063.blk'
+    all_diffpath = tdd.get_tdx_dir_blocknew() + '062.blk'
     while 1:
         try:
             df = rl.get_sina_Market_json('all')
