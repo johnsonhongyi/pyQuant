@@ -24,10 +24,10 @@ import realdatajson as rl
 import pandas as pd
 import traceback
 import sys
-# import numpy as np
+import numpy as np
 import tdx_data_Day as tdd
 from LoggerFactory import *
-
+import gc
 
 # from logbook import Logger,StreamHandler,SyslogHandler
 # from logbook import StderrHandler
@@ -202,7 +202,7 @@ if __name__ == "__main__":
     # error_handler = SyslogHandler('Sina-M-Log', level='ERROR')
     status = False
     vol = '0'
-    type = '2'
+    type = '4'
     # cut_num=10000
     success = 0
     top_all = pd.DataFrame()
@@ -215,6 +215,10 @@ if __name__ == "__main__":
         try:
             df = rl.get_sina_Market_json('all')
             top_now = rl.get_market_price_sina_dd_realTime(df, vol, type)
+            df_count=len(df)
+            now_count=len(top_now)
+            del df
+            gc.collect()
             time_Rt = time.time()
             if len(top_now) > 10 and not top_now[:1].buy.values == 0:
                 time_d = time.time()
@@ -226,25 +230,38 @@ if __name__ == "__main__":
                     top_all = top_all[top_all.buy > 0]
                     codelist = top_all.index.tolist()
                     log.info('toTDXlist:%s' % len(codelist))
-                    data = tdd.get_tdx_all_day_LastDF(codelist)
-                    log.debug("TdxLastP: %s %s" % (len(data), data.columns.values))
-                    data.rename(columns={'low': 'llow'}, inplace=True)
-                    data.rename(columns={'high': 'lhigh'}, inplace=True)
-                    data.rename(columns={'close': 'lastp'}, inplace=True)
-                    data.rename(columns={'vol': 'lvol'}, inplace=True)
-                    data = data.loc[:, ['llow', 'lhigh', 'lastp', 'lvol', 'date']]
+                    tdxdata = tdd.get_tdx_all_day_LastDF(codelist)
+                    log.debug("TdxLastP: %s %s" % (len(tdxdata), tdxdata.columns.values))
+                    tdxdata.rename(columns={'low': 'llow'}, inplace=True)
+                    tdxdata.rename(columns={'high': 'lhigh'}, inplace=True)
+                    tdxdata.rename(columns={'close': 'lastp'}, inplace=True)
+                    tdxdata.rename(columns={'vol': 'lvol'}, inplace=True)
+                    tdxdata = tdxdata.loc[:, ['llow', 'lhigh', 'lastp', 'lvol', 'date']]
                     # data.drop('amount',axis=0,inplace=True)
-                    log.debug("TDX Col:%s" % data.columns.values)
+                    log.debug("TDX Col:%s" % tdxdata.columns.values)
                     # df_now=top_all.merge(data,on='code',how='left')
                     # df_now=pd.merge(top_all,data,left_index=True,right_index=True,how='left')
-                    top_all = top_all.merge(data, left_index=True, right_index=True, how='left')
+                    top_all = top_all.merge(tdxdata, left_index=True, right_index=True, how='left')
                     log.info('Top-merge_now:%s' % (top_all[:1]))
                     top_all = top_all[top_all['llow'] > 0]
+
                     radio_t = sl.get_work_time_ratio()
-                    if top_now.loc[symbol, 'volume'] > 0:
-                        top_now.loc[symbol, 'volume'] = round(top_now.loc[symbol, 'volume'] / radio_t, 1)
-                        top_now.loc[symbol, 'volume'] = round(
-                            top_now.loc[symbol, 'volume'] / top_all.loc[symbol, 'lvol'], 1)
+                    if top_all[:1].volume.values > 0:
+                        # top_now.loc[symbol, 'volume'] = round(top_now.loc[symbol, 'volume'] / radio_t, 1)
+                        # top_now.loc[symbol, 'volume'] = round(
+                        #     top_now.loc[symbol, 'volume'] / top_all.loc[symbol, 'lvol'], 1)
+                        top_all['volume'] =top_all['volume'].apply(lambda x:round(x / radio_t, 1))
+                        # df['J3'] = df.apply(lambda row:lst[row['J1']:row['J2']],axis=1)
+                        # import pandas as pd
+                        # pdA = pd.DataFrame(A)
+                        # pdB = pd.DataFrame(B)
+                        # C4 = np.asarray(map(lambda x,y: x**y, pdA.values, pdB.values))
+                        # pdC = pd.DataFrame(C4)
+                        # top_all['volume'] = round(
+                            # top_now.loc[symbol, 'volume'] / top_all.loc[symbol, 'lvol'], 1)
+                        top_all['volume']=(map(lambda x,y: round(x/y,1), top_all['volume'].values, top_all['lvol'].values))
+                        # top_all['volume']=np.asarray(map(lambda x,y: round(x/y,1), top_all['volume'].values, top_all['lvol'].values))
+                        # print top_all[:1]
 
                     time_s = time.time()
                     # import sys
@@ -334,7 +351,7 @@ if __name__ == "__main__":
 
                 # print len(top_dif),top_dif[:1]
                 print ("A:%s N:%s K:%s %s G:%s" % (
-                    len(df), len(top_now), len(top_all),
+                    df_count, now_count, len(top_all),
                     len(top_now)-len(top_all), len(top_dif))),
                 print "Rt:%0.3f" % (float(time.time() - time_Rt))
                 if 'counts' in top_dif.columns.values:
@@ -367,7 +384,7 @@ if __name__ == "__main__":
                 else:
                     time.sleep(60)
             else:
-                # break
+                break
                 # time.sleep(5)
                 # pass
 
