@@ -14,7 +14,8 @@ def getLogger(name):
 
         logging.basicConfig(
             # level    = logging.DEBUG,
-            format   = now +":" + name + ' LINE %(lineno)-4d  %(levelname)-8s %(message)s',
+            # format   = now +":" + name + ' LINE %(lineno)-4d  %(levelname)-8s %(message)s',
+            format="[%(asctime)s] %(name)s:%(levelname)s: %(message)s",
             datefmt  = '%m-%d %H:%M',
             filename =  "stock.log",
             filemode = 'w');

@@ -20,19 +20,16 @@ from pandas.compat import StringIO
 # from tushare.util import dateu as du
 import math
 import singleAnalyseUtil as sl
-# import multiprocessing
 
 from multiprocessing import cpu_count
 from multiprocessing.dummy import Pool as ThreadPool
-# import tdx_data_Day as tdd
-
-# import sys
 try:
     from urllib.request import urlopen, Request
 except ImportError:
     from urllib2 import urlopen, Request
 
 from LoggerFactory import *
+import requests
 
 log=getLogger('Realdata')
 # import tabulate as tbl
@@ -117,7 +114,7 @@ def to_mp_run_op(cmd, urllist,arg=1):
     # print "time:MP", (time.time() - n_t)
     return results
 
-def _get_url_data(url):
+def _get_url_data_old(url):
     # headers = {'User-Agent':'Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.6) Gecko/20091201 Firefox/3.5.6'}
     headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.2; rv:16.0) Gecko/20100101 Firefox/16.0',
                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
@@ -128,6 +125,16 @@ def _get_url_data(url):
     fp.close()
     return data
 
+def _get_url_data(url):
+    # headers = {'User-Agent':'Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.6) Gecko/20091201 Firefox/3.5.6'}
+    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.2; rv:16.0) Gecko/20100101 Firefox/16.0',
+               'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+               'Connection': 'keep-alive'}
+    data = requests.get(url, headers=headers)
+    # fp = urlopen(req, timeout=5)
+    # data = fp.read()
+    # fp.close()
+    return data.text
 
 def _write_to_csv(df, filename,indexCode='code'):
     TODAY = datetime.date.today()
@@ -816,7 +823,8 @@ def _code_to_symbol(code):
 
 if __name__ == '__main__':
     # df = get_sina_all_json_dd('0', '3')
-    # df=get_sina_Market_json('all')
+    df=get_sina_Market_json('all')
+    print df[:1]
     # df=get_market_price_sina_dd_realTime(df,'0','1')
     # df=get_sina_dd_count_price_realTime()
     # df=df.drop_duplicates('code')

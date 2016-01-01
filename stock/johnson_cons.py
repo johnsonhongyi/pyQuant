@@ -135,6 +135,12 @@ DFCFW_FUND_FLOW_ALL="http://s1.dfcfw.com/js/index.js?rt="
 TDX_Day_columns=['code','date','open','high','low','close','vol','amount']
 
 
+SINA_Total_Columns=['code','name', 'open', 'close', 'now', 'high', 'low', 'buy', 'sell', 'turnover',
+                                             'volume', 'bid1_volume', 'bid1', 'bid2_volume', 'bid2', 'bid3_volume',
+                                             'bid3', 'bid4_volume', 'bid4', 'bid5_volume', 'bid5', 'ask1_volume',
+                                             'ask1', 'ask2_volume', 'ask2', 'ask3_volume', 'ask3', 'ask4_volume',
+                                             'ask4', 'ask5_volume', 'ask5']
+
 
 
 
