@@ -110,12 +110,15 @@ class Sina:
     def format_response_data(self):
         stocks_detail = ''.join(self.stock_data)
         result = self.grep_stock_detail.finditer(stocks_detail)
-        stock_dict = dict()
+        # stock_dict = dict()
         list=[]
         for stock_match_object in result:
             stock = stock_match_object.groups()
             fn=(lambda x:x)
             list.append(map(fn,stock))
+        df = pd.DataFrame(list,columns=ct.SINA_Total_Columns)
+        return df
+
             # stock_dict[stock[0]] = dict(
             #     name=stock[1],
             #     open=float(stock[2]),
@@ -148,14 +151,12 @@ class Sina:
             #     ask5_volume=int(stock[29]),
             #     ask5=float(stock[30]),)
 
-        df = pd.DataFrame(list,columns=ct.SINA_Total_Columns)
         # df = pd.DataFrame.from_dict(stock_dict, orient='columns',
         #                             columns=['name', 'open', 'close', 'now', 'high', 'low', 'buy', 'sell', 'turnover',
         #                                      'volume', 'bid1_volume', 'bid1', 'bid2_volume', 'bid2', 'bid3_volume',
         #                                      'bid3', 'bid4_volume', 'bid4', 'bid5_volume', 'bid5', 'ask1_volume',
         #                                      'ask1', 'ask2_volume', 'ask2', 'ask3_volume', 'ask3', 'ask4_volume',
         #                                      'ask4', 'ask5_volume', 'ask5'])
-        return df
         # return stock_dict
 
 
