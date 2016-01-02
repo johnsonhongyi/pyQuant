@@ -11,15 +11,14 @@
 import re
 import sys
 import time
-import traceback
 # import urllib2
 
 # from pandas import DataFrame
 import pandas as pd
-import johnson_cons as ct
-import singleAnalyseUtil as sl
-import realdatajson as rl
-import types
+import stock.JohhnsonUtil.johnson_cons as ct
+from stock.JohhnsonUtil import singleAnalyseUtil as sl
+from stock.JSONData import realdatajson as rl
+
 # import json
 # try:
 #     from urllib.request import urlopen, Request

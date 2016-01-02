@@ -13,17 +13,19 @@ status_dict={u"中性盘":"normal",u"买盘":"up",u"卖盘":"down"}
 url_real_sina="http://finance.sina.com.cn/realstock/"
 url_real_sina_top="http://vip.stock.finance.sina.com.cn/mkt/#stock_sh_up"
 url_real_east="http://quote.eastmoney.com/sz000004.html"
-from bs4 import BeautifulSoup
-import urllib2
-from pandas import Series,DataFrame
 import re
-import johnson_cons as ct
-import time
-import singleAnalyseUtil as sl
-import realdatajson as rl
-import pandas as pd
-import traceback
 import sys
+import time
+import urllib2
+
+import pandas as pd
+from bs4 import BeautifulSoup
+from pandas import DataFrame
+
+import stock.JohhnsonUtil.johnson_cons as ct
+from stock.JSONData import realdatajson as rl
+from stock.JohhnsonUtil import singleAnalyseUtil as sl
+
 
 def downloadpage(url):
     fp = urllib2.urlopen(url)

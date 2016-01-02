@@ -1,9 +1,16 @@
 #!/usr/bin/python
 # -*- encoding: gbk -*-
 from __future__ import division
+
+import StringIO
+import datetime
+import getopt
+import glob
+import os
+import re
+import string
+import zipfile
 from   struct import *
-import os, time, datetime, string, sys, math, re, shutil, glob
-import zipfile, StringIO, getopt
 
 # from readths2 import *
 # 2010-09-02 by wanghp

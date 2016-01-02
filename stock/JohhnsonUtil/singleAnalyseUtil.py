@@ -1,14 +1,18 @@
 # -*- coding: UTF-8 -*-
-import tushare as ts
-import emacount as ema
+import datetime
+import sys
 import time
 import types
-import realdatajson as rd
-import johnson_cons as ct
+
 import pandas as pd
-import datetime
-# import sys, traceback
-import fundflowUtil as ffu
+import tushare as ts
+# print sys.path
+
+import stock.JSONData.fundflowUtil as ffu
+import johnson_cons as ct
+from stock.JSONData import realdatajson as rd
+import emacount as ema
+
 
 try:
     from urllib.request import urlopen, Request
@@ -86,27 +90,6 @@ def get_work_time_ratio():
     return ratio_t
 
 
-def get_div_list(ls, n):
-    # if isinstance(codeList, list) or isinstance(codeList, set) or isinstance(codeList, tuple) or isinstance(codeList, pd.Series):
-
-    if not isinstance(ls, list) or not isinstance(n, int):
-        return []
-    ls_len = len(ls)
-    if n <= 0 or 0 == ls_len:
-        return []
-    if n > ls_len:
-        return []
-    elif n == ls_len:
-        return [[i] for i in ls]
-    else:
-        j = (ls_len / n) + 1
-        k = ls_len % n
-        ls_return = []
-        for i in xrange(0, (n - 1) * j, j):
-            ls_return.append(ls[i:i + j])
-        ls_return.append(ls[(n - 1) * j:])
-        return ls_return
-
 
 def code_to_tdxblk(code):
     """
@@ -150,18 +133,6 @@ def write_to_blocknew(p_name, data, append=True):
             # raw = pack('IfffffII', t, i[2], i[3], i[4], i[5], i[6], i[7], i[8])
     ## end for
     fout.close()
-
-
-def get_url_data(url):
-    # headers = {'User-Agent':'Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.6) Gecko/20091201 Firefox/3.5.6'}
-    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.2; rv:16.0) Gecko/20100101 Firefox/16.0',
-               'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-               'Connection': 'keep-alive'}
-    req = Request(url, headers=headers)
-    fp = urlopen(req, timeout=5)
-    data = fp.read()
-    fp.close()
-    return data
 
 
 def get_all_toplist():
@@ -399,9 +370,6 @@ def get_hot_loop(timedelay, percent=3):
         # _write_to_csv(df,'tick-data')
         # print ""
     time.sleep(timedelay)
-
-
-import sys
 
 
 def get_code_search_loop(num_input, code='', timed=60, dayl='10', ave=None):

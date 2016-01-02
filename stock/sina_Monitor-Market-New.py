@@ -15,6 +15,7 @@ from pandas import DataFrame
 
 import stock.JohhnsonUtil.johnson_cons as ct
 from stock.JSONData import realdatajson as rl
+from stock.JSONData import sina_data
 from stock.JSONData import tdx_data_Day as tdd
 from stock.JohhnsonUtil import LoggerFactory as LogF
 from stock.JohhnsonUtil import singleAnalyseUtil as sl
@@ -178,10 +179,10 @@ if __name__ == "__main__":
     all_diffpath = tdd.get_tdx_dir_blocknew() + '062.blk'
     while 1:
         try:
-            df = rl.get_sina_Market_json('all')
+            df = sina_data.Sina().all
             top_now = rl.get_market_price_sina_dd_realTime(df, vol, type)
-            df_count=len(df)
-            now_count=len(top_now)
+            df_count = len(df)
+            now_count = len(top_now)
             del df
             gc.collect()
             time_Rt = time.time()
@@ -215,7 +216,7 @@ if __name__ == "__main__":
                         # top_now.loc[symbol, 'volume'] = round(top_now.loc[symbol, 'volume'] / radio_t, 1)
                         # top_now.loc[symbol, 'volume'] = round(
                         #     top_now.loc[symbol, 'volume'] / top_all.loc[symbol, 'lvol'], 1)
-                        top_all['volume'] =top_all['volume'].apply(lambda x:round(x / radio_t, 1))
+                        top_all['volume'] = top_all['volume'].apply(lambda x: round(float(x) / radio_t, 1))
                         # df['J3'] = df.apply(lambda row:lst[row['J1']:row['J2']],axis=1)
                         # import pandas as pd
                         # pdA = pd.DataFrame(A)
@@ -223,8 +224,9 @@ if __name__ == "__main__":
                         # C4 = np.asarray(map(lambda x,y: x**y, pdA.values, pdB.values))
                         # pdC = pd.DataFrame(C4)
                         # top_all['volume'] = round(
-                            # top_now.loc[symbol, 'volume'] / top_all.loc[symbol, 'lvol'], 1)
-                        top_all['volume']=(map(lambda x,y: round(x/y,1), top_all['volume'].values, top_all['lvol'].values))
+                        # top_now.loc[symbol, 'volume'] / top_all.loc[symbol, 'lvol'], 1)
+                        top_all['volume'] = (
+                            map(lambda x, y: round(x / y, 1), top_all['volume'].values, top_all['lvol'].values))
                         # top_all['volume']=np.asarray(map(lambda x,y: round(x/y,1), top_all['volume'].values, top_all['lvol'].values))
                         # print top_all[:1]
 
@@ -318,10 +320,11 @@ if __name__ == "__main__":
                 # print len(top_dif),top_dif[:1]
                 print ("A:%s N:%s K:%s %s G:%s" % (
                     df_count, now_count, len(top_all),
-                    len(top_now)-len(top_all), len(top_dif))),
+                    len(top_now) - len(top_all), len(top_dif))),
                 print "Rt:%0.3f" % (float(time.time() - time_Rt))
                 if 'counts' in top_dif.columns.values:
-                    top_dif = top_dif.sort_values(by=['diff','volume', 'percent', 'counts', 'ratio'], ascending=[0,0, 0, 1, 1])
+                    top_dif = top_dif.sort_values(by=['diff', 'volume', 'percent', 'counts', 'ratio'],
+                                                  ascending=[0, 0, 0, 1, 1])
                 else:
                     print "Good Morning!!!"
                     top_dif = top_dif.sort_values(by=['diff', 'percent', 'ratio'], ascending=[0, 0, 1])
@@ -329,8 +332,6 @@ if __name__ == "__main__":
                     time_s = time.time()
                 # top_all=top_all.sort_values(by=['percent','diff','counts','ratio'],ascending=[0,0,1,1])
                 print rl.format_for_print(top_dif[:10])
-                print rl.format_for_print(top_all[:1])
-
                 # print rl.format_for_print(top_dif[-1:])
                 # print "staus",status
                 if status:

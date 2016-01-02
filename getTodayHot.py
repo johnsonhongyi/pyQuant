@@ -1,5 +1,6 @@
 import tushare as ts
-import stock.emacount as ema
+
+import stock.JohhnsonUtil.emacount as ema
 
 #get now hot 10
 date_top={}

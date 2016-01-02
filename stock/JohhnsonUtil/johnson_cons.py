@@ -118,6 +118,14 @@ JSON_Market_Center_CountURL="http://vip.stock.finance.sina.com.cn/quotes_service
 # http://vip.stock.finance.sina.com.cn/quotes_service/api/json_v2.php/Market_Center.getHQNodeData?num=80&sort=changepercent&asc=0&node=hs_a&symbol=&_s_r_a=page&page=1
 SINA_Market_KEY={'sh':'sh_a','sz':'sz_a','cyb':'cyb'}
 SINA_Market_COLUMNS = ['code', 'name', 'trade', 'buy', 'percent', 'open', 'high', 'low', 'volume', 'ticktime', 'ratio']
+SINA_Total_Columns_Clean = ['code', 'name', 'trade', 'buy', 'percent', 'open', 'close', 'high', 'low', 'volume',
+                            'ratio']
+SINA_Total_Columns = ['code', 'name', 'open', 'close', 'trade', 'high', 'low', 'buy', 'sell', 'volume',
+                      'turnover', 'bid1_volume', 'bid1', 'bid2_volume', 'bid2', 'bid3_volume',
+                      'bid3', 'bid4_volume', 'bid4', 'bid5_volume', 'bid5', 'ask1_volume',
+                      'ask1', 'ask2_volume', 'ask2', 'ask3_volume', 'ask3', 'ask4_volume',
+                      'ask4', 'ask5_volume', 'ask5']
+
 SINA_DD_Clean_Count_Columns=['name','percent','diff','counts','trade','high','open','low','ratio']
 SINA_Market_Clean_UP_Columns=['name','buy','diff','volume','percent','ratio','high','open','low','counts']
 SINA_Market_Clean_Columns=['name','buy','diff','volume','percent','ratio','high','open','low']
@@ -135,11 +143,6 @@ DFCFW_FUND_FLOW_ALL="http://s1.dfcfw.com/js/index.js?rt="
 TDX_Day_columns=['code','date','open','high','low','close','vol','amount']
 
 
-SINA_Total_Columns=['code','name', 'open', 'close', 'now', 'high', 'low', 'buy', 'sell', 'turnover',
-                                             'volume', 'bid1_volume', 'bid1', 'bid2_volume', 'bid2', 'bid3_volume',
-                                             'bid3', 'bid4_volume', 'bid4', 'bid5_volume', 'bid5', 'ask1_volume',
-                                             'ask1', 'ask2_volume', 'ask2', 'ask3_volume', 'ask3', 'ask4_volume',
-                                             'ask4', 'ask5_volume', 'ask5']
 
 
 

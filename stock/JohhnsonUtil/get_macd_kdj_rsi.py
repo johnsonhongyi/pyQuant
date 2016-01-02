@@ -1,14 +1,12 @@
 #coding=utf-8
-import tushare as ts
-import talib as ta
+import datetime
+import os
+import time
+
 import numpy as np
 import pandas as pd
-import os,time,sys,re,datetime
-import csv
-import scipy
-import smtplib
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
+import talib as ta
+import tushare as ts
 
 
 #http://blog.sina.com.cn/s/blog_620987bf0102vlmz.html

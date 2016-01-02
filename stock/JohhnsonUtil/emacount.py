@@ -1,5 +1,6 @@
-import tushare as ts
 from datetime import timedelta, date
+
+import tushare as ts
 
 stocklist = ['601198']
 

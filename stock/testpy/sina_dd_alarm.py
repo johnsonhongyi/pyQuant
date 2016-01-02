@@ -6,17 +6,14 @@
 #               'sz50': 'sh000016', 'zxb': 'sz399005', 'cyb': 'sz399006'}
 # P_TYPE = {'http': 'http://', 'ftp': 'ftp://'}
 
-import tushare as ts
 import time
-import json
+
 import lxml.html
-from lxml import etree
 import pandas as pd
-import numpy as np
-import johnson_cons as ct
-import re
+from lxml import etree
 from pandas.compat import StringIO
-from tushare.util import dateu as du
+
+from stock.JohhnsonUtil import johnson_cons as ct
 
 try:
     from urllib.request import urlopen, Request

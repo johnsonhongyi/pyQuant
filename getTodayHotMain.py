@@ -1,7 +1,9 @@
-import tushare as ts
 import sys
-import stock.emacount as ema
-import stock.singleAnalyseUtil as sl
+
+import tushare as ts
+
+import stock.JohhnsonUtil.emacount as ema
+import stock.JohhnsonUtil.singleAnalyseUtil as sl
 
 
 # get now hot 10

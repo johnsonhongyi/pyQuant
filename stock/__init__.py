@@ -5,5 +5,7 @@ __author__ = 'Johnson'
 for trading data
 """
 # from pyQuant.stock.emacount import (get_ts_start_date,getdata_ema_trend)
-import emacount
-import singleAnalyseUtil
+# from stock.JSONData import emacount
+# from stock.JohhnsonUtil import singleAnalyseUtil
+# import JSONData,JohhnsonUtil
+# import JSONData,JohhnsonUtil

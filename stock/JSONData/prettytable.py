@@ -34,12 +34,15 @@ __version__ = "0.7.2"
 
 import copy
 import csv
+import itertools
 import random
 import re
-import textwrap
-import itertools
-import unicodedata
 import sys
+import textwrap
+import unicodedata
+
+from stock.JohhnsonUtil import commonTips as cct
+
 # reload(sys)
 # sys.setdefaultencoding('utf-8')
 # print (sys.getdefaultencoding())
@@ -122,8 +125,10 @@ class PrettyTable(object):
         valign - default valign for each row (None, "t", "m" or "b")
         reversesort - True or False to sort in descending or ascending order"""
 
-        # self.encoding = kwargs.get("encoding", "UTF-8")
-        self.encoding = kwargs.get("encoding", "gbk")
+        if cct.get_sys_system().find('Win') == 0:
+            self.encoding = kwargs.get("encoding", "gbk")
+        else:
+            self.encoding = kwargs.get("encoding", "UTF-8")
 
         # Data
         self._field_names = []

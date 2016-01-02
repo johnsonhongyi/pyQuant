@@ -1,14 +1,8 @@
 # coding=utf-8
-import tushare as ts
-import talib as ta
 import numpy as np
 import pandas as pd
-import os, time, sys, re, datetime
-import csv
-import scipy
-import smtplib
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
+import talib as ta
+import tushare as ts
 
 
 def get_BBANDS(df):

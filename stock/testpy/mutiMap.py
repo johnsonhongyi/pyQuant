@@ -1,10 +1,10 @@
-import urllib2
-from multiprocessing.dummy import Pool as ThreadPool
-import time
 import multiprocessing
-import stock.emacount as ema
-import stock.singleAnalyseUtil as sl
+import time
+
 import tushare as ts
+
+import stock.JohhnsonUtil.singleAnalyseUtil as sl
+
 start = time.time()
 
 # import realdatajson as rl
