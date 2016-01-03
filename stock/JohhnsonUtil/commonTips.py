@@ -4,15 +4,26 @@ import os
 import platform
 import re
 import time
+from compiler.ast import flatten
 from multiprocessing.pool import ThreadPool, cpu_count
 
+import trollius as asyncio
+from trollius.coroutines import From
+
 from stock.JohhnsonUtil import johnson_cons as ct
+
+# log = log.getLogger('commonTipss')
+
 
 try:
     from urllib.request import urlopen, Request
 except ImportError:
     from urllib2 import urlopen, Request
+import requests
 
+
+def get_cpu_count():
+    return cpu_count()
 
 def get_os_path_sep():
     return os.path.sep
@@ -32,7 +43,7 @@ def get_now_time():
     return d_time
 
 
-def get_url_data(url):
+def get_url_data_R(url):
     # headers = {'User-Agent':'Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.6) Gecko/20091201 Firefox/3.5.6'}
     headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.2; rv:16.0) Gecko/20100101 Firefox/16.0',
                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
@@ -44,6 +55,17 @@ def get_url_data(url):
     return data
 
 
+def get_url_data(url):
+    # headers = {'User-Agent':'Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.6) Gecko/20091201 Firefox/3.5.6'}
+    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.2; rv:16.0) Gecko/20100101 Firefox/16.0',
+               'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+               'Connection': 'keep-alive'}
+    data = requests.get(url, headers=headers)
+    # fp = urlopen(req, timeout=5)
+    # data = fp.read()
+    # fp.close()
+    return data.text
+
 def get_div_list(ls, n):
     # if isinstance(codeList, list) or isinstance(codeList, set) or isinstance(codeList, tuple) or isinstance(codeList, pd.Series):
 
@@ -53,22 +75,62 @@ def get_div_list(ls, n):
     if n <= 0 or 0 == ls_len:
         return []
     if n > ls_len:
-        return []
+        return ls
     elif n == ls_len:
         return [[i] for i in ls]
     else:
-        j = (ls_len / n) + 1
+        # j = (ls_len / n) + 1
+        j = (ls_len / n)
         k = ls_len % n
+        # print "K:",k
         ls_return = []
+        z = 0
         for i in xrange(0, (n - 1) * j, j):
-            ls_return.append(ls[i:i + j])
-        ls_return.append(ls[(n - 1) * j:])
+            if z < k:
+                # if i==0:
+                #     z+=1
+                #     ls_return.append(ls[i+z*1-1:i+j+z*1])
+                #     print i+z*1-1,i+j+z*1
+                # else:
+                z += 1
+                ls_return.append(ls[i + z * 1 - 1:i + j + z * 1])
+                # print i+z*1-1,i+j+z*1
+            else:
+                ls_return.append(ls[i + k:i + j + k])
+                # print i+k,i + j+k
+        # print (n - 1) * j+k,len(ls)
+        ls_return.append(ls[(n - 1) * j + k:])
         return ls_return
+
+
+def to_asyncio_run(urllist, cmd):
+    results = []
+
+    # print "asyncio",
+    @asyncio.coroutine
+    def get_loop_cmd(cmd, url_s):
+        loop = asyncio.get_event_loop()
+        result = yield From(loop.run_in_executor(None, cmd, url_s))
+        results.append(result)
+
+    threads = []
+    for url_s in urllist:
+        threads.append(get_loop_cmd(cmd, url_s))
+    try:
+        loop = asyncio.get_event_loop()
+    except RuntimeError:
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+    loop.run_until_complete(asyncio.wait(threads))
+    return results
 
 
 def to_mp_run(cmd, urllist):
     # n_t=time.time()
+    print "mp:%s" % len(urllist),
+
     pool = ThreadPool(cpu_count())
+    # pool = ThreadPool(4)
     # print cpu_count()
     # pool = multiprocessing.Pool(processes=8)
     # for code in codes:
@@ -80,30 +142,15 @@ def to_mp_run(cmd, urllist):
 
     pool.close()
     pool.join()
+    results = flatten(results)
     # print "time:MP", (time.time() - n_t)
     return results
 
 
-def to_mp_run_async(cmd, urllist):
+def to_mp_run_async(cmd, urllist, arg=1):
     # n_t=time.time()
-    pool = ThreadPool(cpu_count())
-    # print cpu_count()
-    # pool = multiprocessing.Pool(processes=8)
-    # for code in codes:
-    #     results=pool.apply_async(sl.get_multiday_ave_compare_silent_noreal,(code,60))
-    # result=[]
-    results = pool.map(cmd, urllist)
-    # for code in urllist:
-    # result.append(pool.apply_async(cmd,(code,)))
+    print "mp_async:%s" % len(urllist),
 
-    pool.close()
-    pool.join()
-    # print "time:MP", (time.time() - n_t)
-    return results
-
-
-def to_mp_run_op(cmd, urllist, arg=1):
-    # n_t=time.time()
     pool = ThreadPool(cpu_count())
     # print arg
     # print cpu_count()
@@ -116,37 +163,19 @@ def to_mp_run_op(cmd, urllist, arg=1):
     # result.append(pool.apply_async(cmd,(code,)))
     results = []
     for code in urllist:
-        result = pool.apply_async(cmd, (code, arg))
+        # result = pool.apply_async(cmd, (code, arg))
+        result = pool.apply_async(cmd, (code,))
         results.append(result)
     pool.close()
     pool.join()
+    results = flatten(map(lambda x: x.get(), results))
+    # results=lambda L: sum(map(results,L),[]) if isinstance(L,list) else [L]
+    # print results
+    # import sys
+    # sys.exit(0)
+    # results=flatten(results)
     # print "time:MP", (time.time() - n_t)
     return results
-
-
-def _get_url_data_old(url):
-    # headers = {'User-Agent':'Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.6) Gecko/20091201 Firefox/3.5.6'}
-    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.2; rv:16.0) Gecko/20100101 Firefox/16.0',
-               'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-               'Connection': 'keep-alive'}
-    req = Request(url, headers=headers)
-    fp = urlopen(req, timeout=5)
-    data = fp.read()
-    fp.close()
-    return data
-
-
-def _get_url_data(url):
-    # headers = {'User-Agent':'Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.6) Gecko/20091201 Firefox/3.5.6'}
-    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.2; rv:16.0) Gecko/20100101 Firefox/16.0',
-               'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-               'Connection': 'keep-alive'}
-    data = requests.get(url, headers=headers)
-    # fp = urlopen(req, timeout=5)
-    # data = fp.read()
-    # fp.close()
-    return data.text
-
 
 def _write_to_csv(df, filename, indexCode='code'):
     TODAY = datetime.date.today()
@@ -177,8 +206,8 @@ def symbol_to_code(symbol):
     """
         生成symbol代码标志
     """
-    if code in ct.INDEX_LABELS:
-        return ct.INDEX_LIST[code]
+    if symbol in ct.INDEX_LABELS:
+        return ct.INDEX_LIST[symbol]
     else:
         if len(symbol) != 8:
             return ''
@@ -218,3 +247,7 @@ def get_run_path():
         print "error"
         raise TypeError('log path error.')
     return path
+
+
+if __name__ == '__main__':
+    pass

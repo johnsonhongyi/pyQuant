@@ -298,10 +298,11 @@ python %s -t txt 999999 20070101 20070302
 
 
 if __name__ == '__main__':
-    # df = get_tdx_day_to_df_last('601198',1)
-    # print df
+    df = get_tdx_day_to_df_last('601198', 10)
+    print df
+    import sys
 
-    # sys.exit(0)
+    sys.exit(0)
     time_t = time.time()
     # df = get_tdx_allday_lastDF()
     # print "date<2015-08-25:",len(df[(df.date< '2015-08-25')])

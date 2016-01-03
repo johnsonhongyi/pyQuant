@@ -2,7 +2,6 @@
 # !/usr/bin/env python
 
 import gc
-import logging
 import re
 import sys
 import time
@@ -160,14 +159,14 @@ if __name__ == "__main__":
     # parsehtml(downloadpage(url_s))
     # StreamHandler(sys.stdout).push_application()
     log = LogF.getLogger('SinaMarket')
-    log.setLevel(logging.DEBUG)
+    # log.setLevel(logging.DEBUG)
 
     # handler=StderrHandler(format_string='{record.channel}: {record.message) [{record.extra[cwd]}]')
     # log.level=log.debug
     # error_handler = SyslogHandler('Sina-M-Log', level='ERROR')
     status = False
     vol = '0'
-    type = '4'
+    type = '2'
     # cut_num=10000
     success = 0
     top_all = pd.DataFrame()
@@ -329,7 +328,7 @@ if __name__ == "__main__":
                     time_s = time.time()
                 # top_all=top_all.sort_values(by=['percent','diff','counts','ratio'],ascending=[0,0,1,1])
                 print rl.format_for_print(top_dif[:10])
-                print rl.format_for_print(top_all[:1])
+                # print rl.format_for_print(top_all[:1])
 
                 # print rl.format_for_print(top_dif[-1:])
                 # print "staus",status

@@ -13,6 +13,8 @@ sys.path.append('/Users/Johnson/Documents/Quant/pyQuant/')
 from stock.JohhnsonUtil import johnson_cons as ct
 from stock.JohhnsonUtil import commonTips as cct
 from stock.JohhnsonUtil import LoggerFactory
+import trollius as asyncio
+from trollius.coroutines import From
 
 log = LoggerFactory.getLogger('Sina_data')
 
@@ -62,18 +64,14 @@ class StockCode:
 
 # -*- encoding: utf-8 -*-
 
-import trollius as asyncio
-from trollius.coroutines import From
-
 
 class Sina:
     """新浪免费行情获取"""
 
     def __init__(self):
-        # self.grep_stock_detail = re.compile(r'(00\d+|30\d+|60\d+)=([^\s\u4e00-\u9fa5]*[0-9a-zA-Z]+.),%s' % (r',([\.\d]+)' * 29,))
-        # self.grep_stock_detail = re.compile(r'(00\d{4}|30\d{4}|60\d{4})=([^,]+?)%s' % (r',([\.\d]+)' * 29,))
-        # self.grep_stock_detail = re.compile(r'(00\d{4}|30\d{4}|60\d{4})=([^,]+?)%s' % (r',([\.\d]+)' * 29,))
-        self.grep_stock_detail = re.compile(r'(\d+)=([^,]+?)%s' % (r',([\.\d]+)' * 29,))
+        # self.grep_stock_detail = re.compile(r'(\d+)=([^\S][^,]+?)%s' % (r',([\.\d]+)' * 29,))   #\n特例A (4)
+        self.grep_stock_detail = re.compile(r'(\d+)=([^\n][^,]+.)%s' % (r',([\.\d]+)' * 29,))  # 去除\n特例A(3356)
+        # self.grep_stock_detail = re.compile(r'(00\d{4}|30\d{4}|60\d{4})=([^\n][^,]+.)%s' % (r',([\.\d]+)' * 29,))   #去除\n特例A(股票2432)
         self.sina_stock_api = 'http://hq.sinajs.cn/?format=text&list='
         self.stock_data = []
         self.stock_codes = []
@@ -105,7 +103,6 @@ class Sina:
     #     self.stock_data.append(response.text)
     @property
     def all(self):
-        print ("Market-df:%s time: %s" % (format((time.time() - self.stockcode.start_t), '.4f'), cct.get_now_time()))
         return self.get_stock_data()
 
     @asyncio.coroutine
@@ -189,6 +186,8 @@ class Sina:
         df = df.drop_duplicates('code')
         df = df.loc[:, ct.SINA_Total_Columns_Clean]
         df = df.fillna(0)
+        print ("Market-df:%s %s time: %s" % (
+        format((time.time() - self.stockcode.start_t), '.3f'), len(df), cct.get_now_time()))
         return df
         # df = pd.DataFrame.from_dict(stock_dict, orient='columns',
         #                             columns=['name', 'open', 'close', 'now', 'high', 'low', 'buy', 'sell', 'turnover',
@@ -206,6 +205,11 @@ if __name__ == "__main__":
     df = sina.all
     print time.time() - times
     print len(df.index)
+    print df[:4]
+    print df[df.code == '000024']
+    print df[df.code == '002788']
+    print df[df.code == '150027']
+    print df[df.code == '200024']
     # print df.code
     # print len(df.index)
 

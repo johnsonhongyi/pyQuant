@@ -67,8 +67,7 @@ def _parsing_Market_price_json(url):
     # url="http://vip.stock.finance.sina.com.cn/quotes_service/api/json_v2.php/Market_Center.getHQNodeData?page=1&num=50&sort=changepercent&asc=0&node=sh_a&symbol="
     # request = Request(ct.SINA_DAY_PRICE_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'],
     #                              ct.PAGES['jv'], pageNum))
-    request = Request(url)
-    text = urlopen(request, timeout=10).read()
+    text = cct.get_url_data(url)
     if text == 'null':
         return None
     reg = re.compile(r'\,(.*?)\:')
@@ -83,9 +82,8 @@ def _parsing_Market_price_json(url):
     else:
         jstr = json.dumps(text, encoding='GBK')
     js = json.loads(jstr)
-    # print js
     # df = pd.DataFrame(pd.read_json(js, dtype={'code':object}),columns=ct.MARKET_COLUMNS)
-    # log.debug("Market json:%s"%js[:280])
+    # log.debug("Market json:%s"%js[:1])
     df = pd.DataFrame(pd.read_json(js, dtype={'code': object}),
                       columns=ct.SINA_Market_COLUMNS)
     # print df[:1]
@@ -124,7 +122,7 @@ def _get_sina_Market_url(market='sh_a', count=None, num='1000'):
     return urllist
 
 
-def get_sina_Market_json(market='sh_a',showtime=True,num='2000', retry_count=3, pause=0.001):
+def get_sina_Market_json(market='sh_a', showtime=True, num='1000', retry_count=3, pause=0.001):
     start_t = time.time()
     # url="http://vip.stock.finance.sina.com.cn/quotes_service/api/json_v2.php/Market_Center.getHQNodeData?page=1&num=50&sort=changepercent&asc=0&node=sh_a&symbol="
     # SINA_REAL_PRICE_DD = '%s%s/quotes_service/api/json_v2.php/Market_Center.getHQNodeData?page=1&num=%s&sort=changepercent&asc=0&node=%s&symbol=%s'
@@ -151,7 +149,8 @@ def get_sina_Market_json(market='sh_a',showtime=True,num='2000', retry_count=3, 
     # data['code'] = symbol
     # df = df.append(data, ignore_index=True)
 
-    results = cct.to_mp_run(_parsing_Market_price_json, url_list)
+    # results = cct.to_mp_run(_parsing_Market_price_json, url_list)
+    results = cct.to_asyncio_run(url_list, _parsing_Market_price_json)
 
     if len(results)>0:
         df = df.append(results, ignore_index=True)
@@ -172,7 +171,8 @@ def get_sina_Market_json(market='sh_a',showtime=True,num='2000', retry_count=3, 
         #     newdf = _parsing_dayprice_json(i)
         #     df = df.append(newdf, ignore_index=True)
         # print len(df.index)
-        if showtime: print ("Market-df:%s time: %s" % (format((time.time() - start_t), '.1f'), cct.get_now_time()))
+        if showtime: print (
+        "Market-df:%s %s time: %s" % (format((time.time() - start_t), '.1f'), len(df), cct.get_now_time()))
         # print type(df)
         return df
     else:
@@ -196,7 +196,7 @@ def _get_sina_json_dd_url(vol='0', type='3', num='10000', count=None):
                 page_count = int(math.ceil(int(count) / int(num)))
                 for page in range(1, page_count + 1):
                     # print page
-                    url = ct.JSON_DD_Data_URL_Page % ('10000', page, ct.DD_VOL_List[vol], type)
+                    url = ct.JSON_DD_Data_URL_Page % (int(num), page, ct.DD_VOL_List[vol], type)
                     urllist.append(url)
             else:
                 url = ct.JSON_DD_Data_URL_Page % (count, '1', ct.DD_VOL_List[vol], type)
@@ -244,6 +244,8 @@ def _parsing_sina_dd_price_json(url):
     # request = Request(url)
     # text = urlopen(request, timeout=10).read()
     text = cct.get_url_data(url)
+    # print(len(text))
+    # return text
     if len(text) < 10:
         return ''
     reg = re.compile(r'\,(.*?)\:')
@@ -278,21 +280,32 @@ def get_sina_all_json_dd(vol='0', type='3', num='10000', retry_count=3, pause=0.
     """
     # ct._write_head()
     url_list = _get_sina_json_dd_url(vol, type, num)
+    # print url_list
     df = pd.DataFrame()
     # data['code'] = symbol
     # df = df.append(data, ignore_index=True)
 
-    data = cct.to_mp_run(_parsing_sina_dd_price_json, url_list)
-    # data='null'
-    # print len('null')
-    # print len(data)
+    data = cct.to_asyncio_run(url_list, _parsing_sina_dd_price_json)
+    # data = cct.to_mp_run(_parsing_sina_dd_price_json, url_list)
+    # data = cct.to_mp_run_async(_parsing_sina_dd_price_json, url_list)
+
+
+
+    # if len(url_list)>cct.get_cpu_count():
+    #     divs=cct.get_cpu_count()
+    # else:
+    #     divs=len(url_list)
+    #
+    # if len(url_list)>=divs:
+    #     print len(url_list),
+    #     dl=cct.get_div_list(url_list,divs)
+    #     data=cct.to_mp_run_async(cct.to_asyncio_run,dl,_parsing_sina_dd_price_json)
+    # else:
+    #     data=cct.to_asyncio_run(url_list,_parsing_sina_dd_price_json)
+
     if len(data)>0:
         df = df.append(data, ignore_index=True)
-    # print "df",df.empty
-    # for url in url_list:
-    #     # print url
-    #     data = _parsing_sina_dd_price_json(url)
-    #     df=df.append(data,ignore_index=True)
+        log.debug("get_sina_all_json_dd:%s" % df[:1])
 
     if not df.empty:
         # for i in range(2, ct.PAGE_NUM[0]):
@@ -305,7 +318,6 @@ def get_sina_all_json_dd(vol='0', type='3', num='10000', retry_count=3, pause=0.
         print
         print ("no data  json-df: %0.2f"%((time.time() - start_t)))
         return ''
-
 
 def _today_ticks(symbol, tdate, pageNo, retry_count, pause):
     ct._write_console()
@@ -554,8 +566,10 @@ def get_market_price_sina_dd_realTime(dp='',vol='0',type='3'):
 
 if __name__ == '__main__':
     # df = get_sina_all_json_dd('0', '3')
-    df=get_sina_Market_json('all')
+    # df=get_sina_Market_json('all')
+    df = get_sina_all_json_dd('0', '1')
     print len(df)
+    print df[:2]
     # df=get_market_price_sina_dd_realTime(df,'0','1')
     # df=get_sina_dd_count_price_realTime()
     # df=df.drop_duplicates('code')
