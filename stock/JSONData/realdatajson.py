@@ -10,18 +10,18 @@ from __future__ import division
 
 import json
 import math
+import sys
 import time
 
 import lxml.html
 import pandas as pd
 from lxml import etree
 from pandas.compat import StringIO
-import sys
 sys.path.append("..")
 import JohhnsonUtil.johnson_cons as ct
 from JohhnsonUtil import LoggerFactory
 from JSONData.prettytable import *
-
+from JohhnsonUtil import commonTips as cct
 try:
     from urllib.request import urlopen, Request
 except ImportError:
@@ -142,7 +142,7 @@ def get_sina_Market_json(market='sh_a', showtime=True, num='1000', retry_count=3
         # print url_list
     else:
         url_list=_get_sina_Market_url(ct.SINA_Market_KEY[market], num=num)
-
+    log.debug("Market_jsonURL: %s" % url_list[0])
     # print url_list
     # print "url:",url_list
     df = pd.DataFrame()
@@ -154,7 +154,7 @@ def get_sina_Market_json(market='sh_a', showtime=True, num='1000', retry_count=3
 
     if len(results)>0:
         df = df.append(results, ignore_index=True)
-        df['volume']= df['volume'].apply(lambda x:x/100)
+        # df['volume']= df['volume'].apply(lambda x:x/100)
         df['ratio']=df['ratio'].apply(lambda x:round(x,1))
         df['percent']=df['percent'].apply(lambda x:round(x,1))
         df=df.drop_duplicates()
@@ -305,6 +305,7 @@ def get_sina_all_json_dd(vol='0', type='3', num='10000', retry_count=3, pause=0.
 
     if len(data)>0:
         df = df.append(data, ignore_index=True)
+        log.debug("dd.columns:%s" % df.columns.values)
         log.debug("get_sina_all_json_dd:%s" % df[:1])
 
     if not df.empty:
@@ -312,7 +313,7 @@ def get_sina_all_json_dd(vol='0', type='3', num='10000', retry_count=3, pause=0.
         #     newdf = _parsing_dayprice_json(i)
         #     df = df.append(newdf, ignore_index=True)
         # print len(df.index)
-        print (" json-df: %0.2f"%((time.time() - start_t))),
+        print (" dd-df: %0.2f" % ((time.time() - start_t))),
         return df
     else:
         print
@@ -387,23 +388,30 @@ def get_sina_dd_count_price_realTime(df='',mtype='all'):
         df=df.sort_values(by='counts',ascending=0)
         df=df.drop_duplicates('code')
         # df=df[df.price >df.prev_price]
-        df=df.loc[:,['code','name','counts']]
+        df = df.loc[:, ['code', 'name', 'counts', 'prev_price']]
+        log.info("df.market:%s" % df[:1])
+
         # dz.loc['sh600110','counts']=dz.loc['sh600110'].values[1]+3
         df=df.set_index('code')
-        df=df.iloc[0:,0:2]
+        # df=df.iloc[0:,0:2]
         df['diff']=0
 
         dp=get_sina_Market_json(mtype)
+        log.info("dp.market:%s" % dp[:1])
         if len(dp)>10:
             dp=dp.dropna('index')
             dp=dp.drop_duplicates('code')
+            log.info("dp to dm.market:%s" % dp[:1])
             dm=pd.merge(df,dp,on='name',how='left')
             # dm=dm.drop_duplicates('code')
             dm=dm.set_index('code')
             dm=dm.dropna('index')
+            log.info("dm.market2:%s" % dm[:1])
             dm.loc[dm.percent>9.9,'percent']=10
             # print dm[-1:]
             dm=dm.loc[:,ct.SINA_DD_Clean_Count_Columns]
+            dm.rename(columns={'prev_price': 'prev_p'}, inplace=True)
+
             # print dm[-1:]
         else:
             dm=df
@@ -521,10 +529,14 @@ def get_market_price_sina_dd_realTime(dp='',vol='0',type='3'):
         log.info("Market_realTime:%s"%len(dp))
         # dp=dp.set_index('code')
         dp=dp.dropna('index')
+        # if dp[:1].volume.values >0:
+        # log.debug("dp.volume>0:%s"%dp[:1].volume.values)
+        # dp['volume']=dp['volume'].apply(lambda x:round(x/100,1))
         # dp=dp.loc[:,'trade':].astype(float)
-        log.debug("DP:%s" % dp[:1])
+        log.info("DP:%s" % dp[:2])
         if dp[:1].buy.values <> 0 and dp[:1].percent.values == 0 and dp[:1].close.values <> 0:
             dp['percent'] = (map(lambda x, y: round((x - y) / y * 100, 1), dp['buy'].values, dp['close'].values))
+            log.info("DP-1-percent==0:%s" % dp[:1].percent)
 
         dp.loc[dp.percent>9.9,'percent']=10
         dp['diff']=0
@@ -536,7 +548,8 @@ def get_market_price_sina_dd_realTime(dp='',vol='0',type='3'):
             df=df.sort_values(by='counts',ascending=0)
             df=df.drop_duplicates('code')
             # df=df[df.price >df.prev_price]
-            df=df.loc[:,['name','counts','kind']]
+            log.info("sina-DD:%s" % df[:1])
+            df = df.loc[:, ['name', 'counts', 'kind', 'prev_price']]
             # print df[df.counts>0][:2]
             dm=pd.merge(dp,df,on='name',how='left')
             log.info("dmMerge:%s"%dm[:1])
@@ -545,6 +558,8 @@ def get_market_price_sina_dd_realTime(dp='',vol='0',type='3'):
             dm.counts=dm.counts.astype(int)
             dm=dm.drop_duplicates('code')
             dm=dm.set_index('code')
+            dm.rename(columns={'prev_price': 'prev_p'}, inplace=True)
+
             # print dm.sort_values(by=['counts','percent','diff','ratio'],ascending=[0,0,0,1])[:2]
             # dm=dm.fillna(int(0))
             # dm.ratio=dm.ratio
@@ -567,7 +582,11 @@ def get_market_price_sina_dd_realTime(dp='',vol='0',type='3'):
 if __name__ == '__main__':
     # df = get_sina_all_json_dd('0', '3')
     # df=get_sina_Market_json('all')
-    df = get_sina_all_json_dd('0', '1')
+    dd = get_sina_all_json_dd('0', '4')
+    print ""
+    print dd[:2]
+    df = get_sina_dd_count_price_realTime(dd)
+    # df = get_sina_all_json_dd('0', '1')
     print len(df)
     print df[:2]
     # df=get_market_price_sina_dd_realTime(df,'0','1')

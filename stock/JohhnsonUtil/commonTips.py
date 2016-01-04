@@ -250,4 +250,4 @@ def get_run_path():
 
 
 if __name__ == '__main__':
-    pass
+    print get_run_path()

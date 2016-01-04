@@ -126,8 +126,10 @@ SINA_Total_Columns = ['code', 'name', 'open', 'close', 'trade', 'high', 'low', '
                       'ask1', 'ask2_volume', 'ask2', 'ask3_volume', 'ask3', 'ask4_volume',
                       'ask4', 'ask5_volume', 'ask5']
 
-SINA_DD_Clean_Count_Columns=['name','percent','diff','counts','trade','high','open','low','ratio']
-SINA_Market_Clean_UP_Columns=['name','buy','diff','volume','percent','ratio','high','open','low','counts']
+SINA_DD_Clean_Count_Columns = ['name', 'percent', 'diff', 'counts', 'trade', 'high', 'open', 'low', 'ratio', 'volume',
+                               'prev_price']
+SINA_Market_Clean_UP_Columns = ['name', 'buy', 'diff', 'volume', 'percent', 'ratio', 'high', 'open', 'low', 'counts',
+                                'prev_p']
 SINA_Market_Clean_Columns=['name','buy','diff','volume','percent','ratio','high','open','low']
 # SINA_Market_Clean_UP_Columns=['name','buy','diff','percent','trade','high','ratio','open','low','counts']
 

@@ -7,6 +7,7 @@ import sys
 import time
 import traceback
 import urllib2
+
 import pandas as pd
 from bs4 import BeautifulSoup
 from pandas import DataFrame
@@ -171,6 +172,7 @@ if __name__ == "__main__":
     top_all = pd.DataFrame()
     time_s = time.time()
     delay_time = 1800
+    First = True
     base_path = tdd.get_tdx_dir()
     block_path = tdd.get_tdx_dir_blocknew() + '063.blk'
     all_diffpath = tdd.get_tdx_dir_blocknew() + '062.blk'
@@ -184,7 +186,9 @@ if __name__ == "__main__":
             gc.collect()
             radio_t = sl.get_work_time_ratio()
             time_Rt = time.time()
+            # top_now = top_now[top_now.buy > 0]
             if len(top_now) > 10 and not top_now[:1].buy.values == 0:
+                # if len(top_now) > 10 and not top_now[:1].buy.values == 0:
                 time_d = time.time()
                 #     top_now=top_now[top_now['percent']>=0]
                 if len(top_all) == 0:
@@ -209,23 +213,17 @@ if __name__ == "__main__":
                     log.info('Top-merge_now:%s' % (top_all[:1]))
                     top_all = top_all[top_all['llow'] > 0]
 
-                    radio_t = sl.get_work_time_ratio()
                     if top_all[:1].volume.values > 0:
-                        # top_now.loc[symbol, 'volume'] = round(top_now.loc[symbol, 'volume'] / radio_t, 1)
-                        # top_now.loc[symbol, 'volume'] = round(
-                        #     top_now.loc[symbol, 'volume'] / top_all.loc[symbol, 'lvol'], 1)
-                        top_all['volume'] =top_all['volume'].apply(lambda x:round(x / radio_t, 1))
-                        # df['J3'] = df.apply(lambda row:lst[row['J1']:row['J2']],axis=1)
-                        # import pandas as pd
-                        # pdA = pd.DataFrame(A)
-                        # pdB = pd.DataFrame(B)
+                        # top_all['volume'] = top_all['volume'].apply(lambda x: round(float(x) / radio_t, 1))
                         # C4 = np.asarray(map(lambda x,y: x**y, pdA.values, pdB.values))
-                        # pdC = pd.DataFrame(C4)
                         # top_all['volume'] = round(
-                            # top_now.loc[symbol, 'volume'] / top_all.loc[symbol, 'lvol'], 1)
-                        top_all['volume']=(map(lambda x,y: round(x/y,1), top_all['volume'].values, top_all['lvol'].values))
+                        # top_now.loc[symbol, 'volume'] / top_all.loc[symbol, 'lvol'], 1)
+                        top_all['volume'] = (
+                            map(lambda x, y: round(x / y / radio_t, 1), top_all['volume'].values,
+                                top_all['lvol'].values))
                         # top_all['volume']=np.asarray(map(lambda x,y: round(x/y,1), top_all['volume'].values, top_all['lvol'].values))
                         # print top_all[:1]
+                        log.debug("First:vol/vol/:%s  vol:%s" % (radio_t, top_all[-1:].volume.values))
 
                     time_s = time.time()
                     # import sys
@@ -249,18 +247,22 @@ if __name__ == "__main__":
                             # print count_a,count_n
                             # print count_n,count_a
                             if not count_n == count_a:
+                                # log.info("n_buy-a_buy:%s" % (count_n - count_a))
                                 top_now.loc[symbol, 'diff'] = round(
                                     ((float(count_n) - float(count_a)) / float(count_a) * 100), 1)
                                 if status_change and 'counts' in top_now.columns.values:
                                     # print "change:",time.time()-time_s
                                     # top_now.loc[symbol,'lastp']=top_all.loc[symbol,'lastp']
-                                    top_all.loc[symbol, 'buy':'counts'] = top_now.loc[symbol, 'buy':'counts']
+                                    # top_all.loc[symbol, 'buy':'counts'] = top_now.loc[symbol, 'buy':'counts']
+                                    top_all.loc[symbol, 'buy':'prev_price'] = top_now.loc[symbol, 'buy':'prev_price']
                                 else:
                                     # top_now.loc[symbol,'lastp']=top_all.loc[symbol,'lastp']
                                     top_all.loc[symbol, 'diff':'low'] = top_now.loc[symbol, 'diff':'low']
                             elif 'counts' in top_now.columns.values:
+                                # log.info("n_buy==a_buy:update Counts")
                                 top_all.loc[symbol, 'volume':'counts'] = top_now.loc[symbol, 'volume':'counts']
                             else:
+                                log.info("n_buy==a_buy:no counts update low")
                                 top_all.loc[symbol, 'volume':'low'] = top_now.loc[symbol, 'volume':'low']
 
                                 # top_all.loc[symbol]=top_now.loc[symbol]?
@@ -283,7 +285,6 @@ if __name__ == "__main__":
                 # top_all = top_all[top_all.trade >= top_all.high*0.99]
                 # top_all = top_all[top_all.buy >= top_all.lastp]
                 # top_all = top_all[top_all.percent >= 0]
-
                 top_dif = top_all
                 log.info('dif1:%s' % len(top_dif))
                 log.info(top_dif[:1])
@@ -303,38 +304,53 @@ if __name__ == "__main__":
                 log.debug('dif4 open>lastp:%s' % len(top_dif))
                 log.debug('dif4-2:%s' % top_dif[:1])
 
+                # top_dif = top_dif[top_dif.percent >= 0]
+
+                if len(top_dif) == 0:
+                    print "DataFrame is Empty!!!!!!"
+                    log.debug("DataFrame is Empty!!!!!!")
+                    top_dif = top_all
+
+                if First:
+                    First = False
+                    log.debug("First:")
+                else:
+                    log.debug("Second:vol/vol/:%s" % radio_t)
+                    # top_dif['volume'] = top_dif['volume'].apply(lambda x: round(x / radio_t, 1))
+                    top_dif['volume'] = (
+                        map(lambda x, y: round(x / y / radio_t, 1), top_dif['volume'].values, top_dif['lvol'].values))
+                    top_dif = top_dif[top_dif.volume > 1]
+
+                log.debug('dif6 vol:%s' % (top_dif[:1].volume.values))
+
+                log.debug('dif6 vol>lvol:%s' % len(top_dif))
+
                 # top_dif = top_dif[top_dif.buy >= top_dif.open*0.99]
                 # log.debug('dif5 buy>open:%s'%len(top_dif))
                 # top_dif = top_dif[top_dif.trade >= top_dif.buy]
 
                 # df['volume']= df['volume'].apply(lambda x:x/100)
 
-                top_dif['volume'] =top_dif['volume'].apply(lambda x:round(x / radio_t, 1))
-                top_dif['volume']=(map(lambda x,y: round(x/y,1), top_dif['volume'].values, top_dif['lvol'].values))
 
-                top_dif = top_dif[top_dif.volume >= 1]
-
-                log.debug('dif6 vol>lvol:%s' % len(top_dif))
-                # top_dif = top_dif[top_dif.percent >= 0]
-
-                # print len(top_dif),top_dif[:1]
                 print ("A:%s N:%s K:%s %s G:%s" % (
                     df_count, now_count, len(top_all),
-                    len(top_now)-len(top_all), len(top_dif))),
+                    len(top_now) - len(top_all), len(top_dif))),
                 print "Rt:%0.3f" % (float(time.time() - time_Rt))
                 if 'counts' in top_dif.columns.values:
-                    top_dif = top_dif.sort_values(by=['diff','volume', 'percent', 'counts', 'ratio'], ascending=[0,0, 0, 1, 1])
+                    top_dif = top_dif.sort_values(by=['diff', 'volume', 'percent', 'counts', 'ratio'],
+                                                  ascending=[0, 0, 0, 1, 1])
                 else:
                     print "Good Morning!!!"
                     top_dif = top_dif.sort_values(by=['diff', 'percent', 'ratio'], ascending=[0, 0, 1])
                 if time_d - time_s > delay_time:
                     time_s = time.time()
-                # top_all=top_all.sort_values(by=['percent','diff','counts','ratio'],ascending=[0,0,1,1])
-                print rl.format_for_print(top_dif[:10])
-                # print rl.format_for_print(top_all[:1])
 
-                # print rl.format_for_print(top_dif[-1:])
+                # top_all=top_all.sort_values(by=['percent','diff','counts','ratio'],ascending=[0,0,1,1])
+                # print rl.format_for_print(top_dif[:10])
+                print rl.format_for_print(top_dif[:10])
+                # print top_all.loc['000025',:]
                 # print "staus",status
+
                 if status:
                     for code in top_dif[:10].index:
                         code = re.findall('(\d+)', code)
@@ -378,9 +394,9 @@ if __name__ == "__main__":
                         sl.write_to_blocknew(block_path, codew[:10], False)
                         sl.write_to_blocknew(all_diffpath, codew, False)
                     print "wri ok"
+                    # time.sleep(2)
                 else:
                     sys.exit(0)
-                    # time.sleep(2)
         except (KeyboardInterrupt) as e:
             # print "key"
             print "KeyboardInterrupt:", e

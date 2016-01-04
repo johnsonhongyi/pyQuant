@@ -3,8 +3,9 @@
 import json
 import os
 import re
-import time
 import sys
+import time
+
 sys.path.append("..")
 import pandas as pd
 import requests
@@ -69,8 +70,10 @@ class Sina:
 
     def __init__(self):
         # self.grep_stock_detail = re.compile(r'(\d+)=([^\S][^,]+?)%s' % (r',([\.\d]+)' * 29,))   #\n特例A (4)
-        self.grep_stock_detail = re.compile(r'(\d+)=([^\n][^,]+.)%s' % (r',([\.\d]+)' * 29,))  # 去除\n特例A(3356)
+        # self.grep_stock_detail = re.compile(r'(\d+)=([^\n][^,]+.)%s' % (r',([\.\d]+)' * 29,))  # 去除\n特例A(3356)
         # self.grep_stock_detail = re.compile(r'(00\d{4}|30\d{4}|60\d{4})=([^\n][^,]+.)%s' % (r',([\.\d]+)' * 29,))   #去除\n特例A(股票2432)
+        self.grep_stock_detail = re.compile(
+            r'(00\d{4}|30\d{4}|60\d{4})=([^\n][^,]+.)%s' % (r',([\.\d]+)' * 29,))  # 去除\n特例A(股票2432)
         self.sina_stock_api = 'http://hq.sinajs.cn/?format=text&list='
         self.stock_data = []
         self.stock_codes = []

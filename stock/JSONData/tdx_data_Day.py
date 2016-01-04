@@ -3,12 +3,13 @@
 from __future__ import division
 
 import os
+import sys
 import time
 from struct import *
+
 import numpy as np
 import pandas as pd
 from pandas import Series
-import sys
 sys.path.append("..")
 from JSONData import realdatajson as rl
 from JohhnsonUtil import LoggerFactory
@@ -104,13 +105,13 @@ def get_tdx_day_to_df_dict(code):
         a = unpack('IIIIIfII', buf[b:e])
         # tdate=str(a[0])
         tdate = str(a[0])[:4] + '-' + str(a[0])[4:6] + '-' + str(a[0])[6:8]
-        topen = str(a[1] / 100.0)
-        thigh = str(a[2] / 100.0)
-        tlow = str(a[3] / 100.0)
-        tclose = str(a[4] / 100.0)
-        amount = str(a[5] / 10.0)
-        tvol = str(a[6])  # int
-        tpre = str(a[7])  # back
+        topen = float(a[1] / 100.0)
+        thigh = float(a[2] / 100.0)
+        tlow = float(a[3] / 100.0)
+        tclose = float(a[4] / 100.0)
+        amount = float(a[5] / 10.0)
+        tvol = int(a[6])  # int
+        tpre = int(a[7])  # back
         # line=str(a[0])+' '+str(a[1]/100.0)+' '+str(a[2]/100.0)+' '+str(a[3]/100.0)+\
         # ' '+str(a[4]/100.0)+' '+str(a[5]/10.0)+' '+str(a[6])+' '+str(a[7])+' '+'\n'
         # print line
@@ -155,13 +156,13 @@ def get_tdx_day_to_df(code):
         # dt=datetime.date(int(str(a[0])[:4]),int(str(a[0])[4:6]),int(str(a[0])[6:8]))
         tdate = str(a[0])[:4] + '-' + str(a[0])[4:6] + '-' + str(a[0])[6:8]
         # tdate=dt.strftime('%Y-%m-%d')
-        topen = str(a[1] / 100.0)
-        thigh = str(a[2] / 100.0)
-        tlow = str(a[3] / 100.0)
-        tclose = str(a[4] / 100.0)
-        amount = str(a[5] / 10.0)
-        tvol = str(a[6])  # int
-        tpre = str(a[7])  # back
+        topen = float(a[1] / 100.0)
+        thigh = float(a[2] / 100.0)
+        tlow = float(a[3] / 100.0)
+        tclose = float(a[4] / 100.0)
+        amount = float(a[5] / 10.0)
+        tvol = int(a[6])  # int
+        tpre = int(a[7])  # back
         dt_list.append(
             {'code': code, 'date': tdate, 'open': topen, 'high': thigh, 'low': tlow, 'close': tclose, 'amount': amount,
              'vol': tvol, 'pre': tpre})
@@ -196,13 +197,13 @@ def get_tdx_day_to_df_last(code, dayl=1):
         ofile.close()
         a = unpack('IIIIIfII', buf[b:e])
         tdate = str(a[0])[:4] + '-' + str(a[0])[4:6] + '-' + str(a[0])[6:8]
-        topen = str(a[1] / 100.0)
-        thigh = str(a[2] / 100.0)
-        tlow = str(a[3] / 100.0)
-        tclose = str(a[4] / 100.0)
-        amount = str(a[5] / 10.0)
-        tvol = str(a[6])  # int
-        # tpre = str(a[7])  # back
+        topen = float(a[1] / 100.0)
+        thigh = float(a[2] / 100.0)
+        tlow = float(a[3] / 100.0)
+        tclose = float(a[4] / 100.0)
+        amount = float(a[5] / 10.0)
+        tvol = int(a[6])  # int
+        # tpre = int(a[7])  # back
         dt_list = Series(
             {'code': code, 'date': tdate, 'open': topen, 'high': thigh, 'low': tlow, 'close': tclose, 'amount': amount,
              'vol': tvol})
@@ -227,13 +228,13 @@ def get_tdx_day_to_df_last(code, dayl=1):
         for i in xrange(no):
             a = unpack('IIIIIfII', buf[-e:b])
             tdate = str(a[0])[:4] + '-' + str(a[0])[4:6] + '-' + str(a[0])[6:8]
-            topen = str(a[1] / 100.0)
-            thigh = str(a[2] / 100.0)
-            tlow = str(a[3] / 100.0)
-            tclose = str(a[4] / 100.0)
-            amount = str(a[5] / 10.0)
-            tvol = str(a[6])  # int
-            # tpre = str(a[7])  # back
+            topen = float(a[1] / 100.0)
+            thigh = float(a[2] / 100.0)
+            tlow = float(a[3] / 100.0)
+            tclose = float(a[4] / 100.0)
+            amount = float(a[5] / 10.0)
+            tvol = int(a[6])  # int
+            # tpre = int(a[7])  # back
             dt_list.append({'code': code, 'date': tdate, 'open': topen, 'high': thigh, 'low': tlow, 'close': tclose,
                             'amount': amount, 'vol': tvol})
             # print series
@@ -259,7 +260,7 @@ def get_tdx_all_day_LastDF(codeList):
     df = pd.DataFrame(results, columns=ct.TDX_Day_columns)
     df = df.set_index('code')
     df.loc[:, 'open':] = df.loc[:, 'open':].astype(float)
-    df.vol = df.vol.apply(lambda x: x / 100)
+    # df.vol = df.vol.apply(lambda x: x / 100)
     log.info("get_to_mp:%s" % (len(df)))
 
     # print len(df)
