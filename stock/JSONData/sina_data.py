@@ -3,16 +3,15 @@
 import json
 import os
 import re
-import sys
 import time
-
+import sys
+sys.path.append("..")
 import pandas as pd
 import requests
 
-sys.path.append('/Users/Johnson/Documents/Quant/pyQuant/')
-from stock.JohhnsonUtil import johnson_cons as ct
-from stock.JohhnsonUtil import commonTips as cct
-from stock.JohhnsonUtil import LoggerFactory
+from JohhnsonUtil import johnson_cons as ct
+from JohhnsonUtil import commonTips as cct
+from JohhnsonUtil import LoggerFactory
 import trollius as asyncio
 from trollius.coroutines import From
 

@@ -10,7 +10,7 @@ from multiprocessing.pool import ThreadPool, cpu_count
 import trollius as asyncio
 from trollius.coroutines import From
 
-from stock.JohhnsonUtil import johnson_cons as ct
+import johnson_cons as ct
 
 # log = log.getLogger('commonTipss')
 

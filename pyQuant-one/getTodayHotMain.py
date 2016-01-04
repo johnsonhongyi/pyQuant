@@ -1,9 +1,7 @@
-import sys
-
 import tushare as ts
-
-import pyQuant.stock.singleAnalyseUtil as sl
-import stock.JohhnsonUtil.emacount as ema
+import sys
+import stock.emacount as ema
+import stock.singleAnalyseUtil as sl
 
 
 # get now hot 10

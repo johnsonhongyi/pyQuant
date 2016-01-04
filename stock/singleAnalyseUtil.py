@@ -8,10 +8,10 @@ import pandas as pd
 import tushare as ts
 # print sys.path
 
-import stock.JSONData.fundflowUtil as ffu
-import johnson_cons as ct
-from stock.JSONData import realdatajson as rd
-import emacount as ema
+import JSONData.fundflowUtil as ffu
+import JohhnsonUtil.johnson_cons as ct
+from JSONData import realdatajson as rd
+import JohhnsonUtil.emacount as ema
 
 
 try:

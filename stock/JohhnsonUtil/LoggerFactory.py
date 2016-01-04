@@ -4,7 +4,8 @@ Created on 2015-3-11
 @author: Casey
 '''
 import logging
-
+import sys
+sys.path.append("..")
 import commonTips as cct
 
 # from logbook import StderrHandler
@@ -57,6 +58,36 @@ def set_log_file(console, level_s='DEBUG'):
     console.setFormatter(formatter)
     logging.getLogger('').addHandler(console)
 
+
+class CheloExtendedLogger(logging.Logger):
+    """
+    Custom logger class with additional levels and methods
+    """
+    WARNPFX = logging.WARNING+1
+
+    def __init__(self, name):
+        logging.Logger.__init__(self, name, logging.DEBUG)
+
+        logging.addLevelName(self.WARNPFX, 'WARNING')
+
+        console = logging.StreamHandler()
+        console.setLevel(logging.DEBUG)
+        # create formatter and add it to the handlers
+        formatter = logging.Formatter("%(asctime)s [%(funcName)s: %(filename)s,%(lineno)d] %(message)s")
+        console.setFormatter(formatter)
+
+        # add the handlers to logger
+        self.addHandler(console)
+
+        return
+
+    def warnpfx(self, msg, *args, **kw):
+        self.log(self.WARNPFX, "! PFXWRN %s" % msg, *args, **kw)
+
+
+    # logging.setLoggerClass(CheloExtendedLogger)
+    # rrclogger = logging.getLogger("rrcheck")
+    # rrclogger.setLevel(logging.INFO)
 
 # def set_log_format():
 #     console = logging.StreamHandler()

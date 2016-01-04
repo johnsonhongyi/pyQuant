@@ -11,14 +11,15 @@
 import re
 import sys
 import time
+import traceback
 # import urllib2
 
 # from pandas import DataFrame
 import pandas as pd
-import JohhnsonUtil.johnson_cons as ct
+import johnson_cons as ct
 import singleAnalyseUtil as sl
-from JSONData import realdatajson as rl
-
+import realdatajson as rl
+import types
 # import json
 # try:
 #     from urllib.request import urlopen, Request
@@ -146,7 +147,37 @@ if __name__ == "__main__":
             else:
                 # print top_now[:10]
                 print "no data"
-            time.sleep(60)
+            int_time = sl.get_now_time_int()
+            if sl.get_work_time_now():
+                if int_time < 926:
+                    time.sleep(5)
+                else:
+                    time.sleep(60)
+            else:
+                # break
+                # time.sleep(5)
+                st = raw_input("status:[go(g),clear(c),quit(q,e),W(w),Wa(a)]:")
+                if len(st) == 0:
+                    status = False
+                elif st == 'g' or st == 'go':
+                    status = True
+                    for code in top_dif[:10].index:
+                        code = re.findall('(\d+)', code)
+                        if len(code) > 0:
+                            code = code[0]
+                            kind = sl.get_multiday_ave_compare_silent(code)
+                elif st == 'clear' or st == 'c':
+                    top_all = pd.DataFrame()
+                    status = False
+                elif st == 'w' or st == 'a':
+                    codew = (top_dif.index).tolist()
+                    if st == 'a':
+                        sl.write_to_blocknew(block_path, codew[:10])
+                        sl.write_to_blocknew(all_diffpath, codew)
+                    else:
+                        sl.write_to_blocknew(block_path, codew[:10], False)
+                        sl.write_to_blocknew(all_diffpath, codew, False)
+                    print "wri ok"
 
 
 

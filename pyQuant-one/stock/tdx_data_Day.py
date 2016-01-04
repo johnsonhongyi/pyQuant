@@ -1,39 +1,41 @@
 # -*- encoding: utf-8 -*-
-# !/usr/bin/python
+#!/usr/bin/python
 from __future__ import division
-
-import os
-import time
+# import getopt
 from struct import *
-import numpy as np
+import os, time
 import pandas as pd
 from pandas import Series
-import sys
-sys.path.append("..")
-from JSONData import realdatajson as rl
-from JohhnsonUtil import LoggerFactory
-from JohhnsonUtil import commonTips as cct
-from JohhnsonUtil import johnson_cons as ct
+import realdatajson as rl
+import johnson_cons as ct
+import numpy as np
+from datetime import date
+import platform
+import LoggerFactory
 
 # import logbook
 
 
 # log=logbook.Logger('TDX_day')
 log = LoggerFactory.getLogger('TDX_Day')
-# log.setLevel(logging.DEBUG)
+# log.level='info'
 
 path_sep = os.path.sep
 
 
+def get_today():
+    TODAY = date.today()
+    today = TODAY.strftime('%Y-%m-%d')
+    return today
+
+
 def get_tdx_dir():
-    os_sys = cct.get_sys_system()
-    os_platform = cct.get_sys_platform()
+    os_platform = platform.platform()
+    os_sys = platform.system()
     if os_sys.find('Darwin') == 0:
         log.info("DarwinFind:%s" % os_sys)
         basedir = r'/Users/Johnson/Documents/Johnson/WinTools/zd_pazq'.replace('/', path_sep).replace('\\',
                                                                                                       path_sep)  # 如果你的安装路径不同,请改这里
-        log.info("Mac:%s" % os_platform)
-
     elif os_sys.find('Win') == 0:
         log.info("Windows:%s" % os_sys)
         if os_platform.find('XP'):
@@ -52,22 +54,20 @@ def get_tdx_dir_blocknew():
     return blocknew_path
 
 
-basedir = get_tdx_dir()
 # path_sep = os.path.sep
-# exp_dir = get_tdx_dir() + r'/T0002/export/'
+exp_dir = get_tdx_dir() + r'/T0002/export/'
 blocknew = r'/Users/Johnson/Documents/Johnson/WinTools/zd_pazq/T0002/blocknew'
 # blocknew = 'Z:\Documents\Johnson\WinTools\zd_pazq\T0002\blocknew'
 # exp_dir    = basedir + r'\T0002\export_back'
-lc5_dir_sh = basedir + r'\Vipdoc\sh\fzline'
+lc5_dir_sh = get_tdx_dir() + r'\Vipdoc\sh\fzline'
 # lc5_dir_sh =  r'D:\2965\ydzqwsjy\Vipdoc\sh\fzline'
-lc5_dir_sz = basedir + r'\Vipdoc\sz\fzline'
-lc5_dir = basedir + r'\Vipdoc\%s\fzline'
-day_dir = basedir + r'\Vipdoc\%s\lday/'
-day_dir_sh = basedir + r'\Vipdoc\sh\lday/'
-day_dir_sz = basedir + r'/Vipdoc/sz/lday/'
+lc5_dir_sz = get_tdx_dir() + r'\Vipdoc\sz\fzline'
+lc5_dir = get_tdx_dir() + r'\Vipdoc\%s\fzline'
+day_dir = get_tdx_dir() + r'\Vipdoc\%s\lday/'
+day_dir_sh = get_tdx_dir() + r'\Vipdoc\sh\lday/'
+day_dir_sz = get_tdx_dir() + r'/Vipdoc/sz/lday/'
 
 day_path = {'sh': day_dir_sh, 'sz': day_dir_sz}
-
 
 # stkdict = {}  # 存储股票ID和上海市、深圳市的对照
 
@@ -78,7 +78,7 @@ day_path = {'sh': day_dir_sh, 'sz': day_dir_sz}
 
 def get_tdx_day_to_df_dict(code):
     # time_s=time.time()
-    code_u = cct.code_to_symbol(code)
+    code_u = rl._code_to_symbol(code)
     day_path = day_dir % 'sh' if code[:1] in ['5', '6', '9'] else day_dir % 'sz'
     p_day_dir = day_path.replace('/', path_sep).replace('\\', path_sep)
     # p_exp_dir=exp_dir.replace('/',path_sep).replace('\\',path_sep)
@@ -86,7 +86,7 @@ def get_tdx_day_to_df_dict(code):
     file_path = p_day_dir + code_u + '.day'
     if not os.path.exists(file_path):
         ds = Series(
-            {'code': code, 'date': cct.get_today(), 'open': 0, 'high': 0, 'low': 0, 'close': 0, 'amount': 0,
+            {'code': code, 'date': get_today(), 'open': 0, 'high': 0, 'low': 0, 'close': 0, 'amount': 0,
              'vol': 0})
         return ds
     ofile = open(file_path, 'rb')
@@ -104,13 +104,13 @@ def get_tdx_day_to_df_dict(code):
         a = unpack('IIIIIfII', buf[b:e])
         # tdate=str(a[0])
         tdate = str(a[0])[:4] + '-' + str(a[0])[4:6] + '-' + str(a[0])[6:8]
-        topen = str(a[1] / 100.0)
-        thigh = str(a[2] / 100.0)
-        tlow = str(a[3] / 100.0)
-        tclose = str(a[4] / 100.0)
-        amount = str(a[5] / 10.0)
-        tvol = str(a[6])  # int
-        tpre = str(a[7])  # back
+        topen = float(a[1] / 100.0)
+        thigh = float(a[2] / 100.0)
+        tlow = float(a[3] / 100.0)
+        tclose = float(a[4] / 100.0)
+        amount = float(a[5] / 10.0)
+        tvol = int(a[6])  # int
+        tpre = int(a[7])  # back
         # line=str(a[0])+' '+str(a[1]/100.0)+' '+str(a[2]/100.0)+' '+str(a[3]/100.0)+\
         # ' '+str(a[4]/100.0)+' '+str(a[5]/10.0)+' '+str(a[6])+' '+str(a[7])+' '+'\n'
         # print line
@@ -130,15 +130,15 @@ def get_tdx_day_to_df_dict(code):
 def get_tdx_day_to_df(code):
     # time_s=time.time()
     # print code
-    code_u = cct.code_to_symbol(code)
+    code_u = rl._code_to_symbol(code)
     day_path = day_dir % 'sh' if code[:1] in ['5', '6', '9'] else day_dir % 'sz'
     p_day_dir = day_path.replace('/', path_sep).replace('\\', path_sep)
-    # p_exp_dir = exp_dir.replace('/', path_sep).replace('\\', path_sep)
+    p_exp_dir = exp_dir.replace('/', path_sep).replace('\\', path_sep)
     # print p_day_dir,p_exp_dir
     file_path = p_day_dir + code_u + '.day'
     if not os.path.exists(file_path):
         ds = Series(
-            {'code': code, 'date': cct.get_today(), 'open': 0, 'high': 0, 'low': 0, 'close': 0, 'amount': 0,
+            {'code': code, 'date': get_today(), 'open': 0, 'high': 0, 'low': 0, 'close': 0, 'amount': 0,
              'vol': 0})
         return ds
 
@@ -155,13 +155,13 @@ def get_tdx_day_to_df(code):
         # dt=datetime.date(int(str(a[0])[:4]),int(str(a[0])[4:6]),int(str(a[0])[6:8]))
         tdate = str(a[0])[:4] + '-' + str(a[0])[4:6] + '-' + str(a[0])[6:8]
         # tdate=dt.strftime('%Y-%m-%d')
-        topen = str(a[1] / 100.0)
-        thigh = str(a[2] / 100.0)
-        tlow = str(a[3] / 100.0)
-        tclose = str(a[4] / 100.0)
-        amount = str(a[5] / 10.0)
-        tvol = str(a[6])  # int
-        tpre = str(a[7])  # back
+        topen = float(a[1] / 100.0)
+        thigh = float(a[2] / 100.0)
+        tlow = float(a[3] / 100.0)
+        tclose = float(a[4] / 100.0)
+        amount = float(a[5] / 10.0)
+        tvol = int(a[6])  # int
+        tpre = int(a[7])  # back
         dt_list.append(
             {'code': code, 'date': tdate, 'open': topen, 'high': thigh, 'low': tlow, 'close': tclose, 'amount': amount,
              'vol': tvol, 'pre': tpre})
@@ -174,7 +174,7 @@ def get_tdx_day_to_df(code):
 
 
 def get_tdx_day_to_df_last(code, dayl=1):
-    code_u = cct.code_to_symbol(code)
+    code_u = rl._code_to_symbol(code)
     day_path = day_dir % 'sh' if code[:1] in ['5', '6', '9'] else day_dir % 'sz'
     p_day_dir = day_path.replace('/', path_sep).replace('\\', path_sep)
     # p_exp_dir=exp_dir.replace('/',path_sep).replace('\\',path_sep)
@@ -182,7 +182,7 @@ def get_tdx_day_to_df_last(code, dayl=1):
     file_path = p_day_dir + code_u + '.day'
     if not os.path.exists(file_path):
         ds = Series(
-            {'code': code, 'date': cct.get_today(), 'open': 0, 'high': 0, 'low': 0, 'close': 0, 'amount': 0,
+            {'code': code, 'date': get_today(), 'open': 0, 'high': 0, 'low': 0, 'close': 0, 'amount': 0,
              'vol': 0})
         return ds
     ofile = file(file_path, 'rb')
@@ -196,12 +196,12 @@ def get_tdx_day_to_df_last(code, dayl=1):
         ofile.close()
         a = unpack('IIIIIfII', buf[b:e])
         tdate = str(a[0])[:4] + '-' + str(a[0])[4:6] + '-' + str(a[0])[6:8]
-        topen = str(a[1] / 100.0)
-        thigh = str(a[2] / 100.0)
-        tlow = str(a[3] / 100.0)
-        tclose = str(a[4] / 100.0)
-        amount = str(a[5] / 10.0)
-        tvol = str(a[6])  # int
+        topen = float(a[1] / 100.0)
+        thigh = float(a[2] / 100.0)
+        tlow = float(a[3] / 100.0)
+        tclose = float(a[4] / 100.0)
+        amount = float(a[5] / 10.0)
+        tvol = int(a[6])  # int
         # tpre = str(a[7])  # back
         dt_list = Series(
             {'code': code, 'date': tdate, 'open': topen, 'high': thigh, 'low': tlow, 'close': tclose, 'amount': amount,
@@ -227,12 +227,12 @@ def get_tdx_day_to_df_last(code, dayl=1):
         for i in xrange(no):
             a = unpack('IIIIIfII', buf[-e:b])
             tdate = str(a[0])[:4] + '-' + str(a[0])[4:6] + '-' + str(a[0])[6:8]
-            topen = str(a[1] / 100.0)
-            thigh = str(a[2] / 100.0)
-            tlow = str(a[3] / 100.0)
-            tclose = str(a[4] / 100.0)
-            amount = str(a[5] / 10.0)
-            tvol = str(a[6])  # int
+            topen = float(a[1] / 100.0)
+            thigh = float(a[2] / 100.0)
+            tlow = float(a[3] / 100.0)
+            tclose = float(a[4] / 100.0)
+            amount = float(a[5] / 10.0)
+            tvol = int(a[6])  # int
             # tpre = str(a[7])  # back
             dt_list.append({'code': code, 'date': tdate, 'open': topen, 'high': thigh, 'low': tlow, 'close': tclose,
                             'amount': amount, 'vol': tvol})
@@ -255,10 +255,10 @@ def get_tdx_all_day_LastDF(codeList):
     time_t = time.time()
     # df = rl.get_sina_Market_json(market)
     # code_list = np.array(df.code)
-    results = cct.to_mp_run(get_tdx_day_to_df_last, codeList)
+    results = rl.to_mp_run(get_tdx_day_to_df_last, codeList)
     df = pd.DataFrame(results, columns=ct.TDX_Day_columns)
     df = df.set_index('code')
-    df.loc[:, 'open':] = df.loc[:, 'open':].astype(float)
+    # df.loc[:, 'open':] = df.loc[:, 'open':].apply(lambda x:x.astype(float))
     df.vol = df.vol.apply(lambda x: x / 100)
     log.info("get_to_mp:%s" % (len(df)))
 
@@ -274,7 +274,7 @@ def get_tdx_all_day_DayL_DF(market='cyb', dayl=1):
     df = rl.get_sina_Market_json(market)
     code_list = np.array(df.code)
     log.info('code_list:%s' % len(code_list))
-    results = cct.to_mp_run_op(get_tdx_day_to_df_last, code_list, dayl)
+    results = rl.to_mp_run_op(get_tdx_day_to_df_last, code_list, dayl)
     log.info("get_to_mp_op:%s" % (len(results)))
     # df = pd.DataFrame(results, columns=ct.TDX_Day_columns)
     # df = df.set_index('code')
@@ -298,11 +298,11 @@ python %s -t txt 999999 20070101 20070302
 
 
 if __name__ == '__main__':
-    df = get_tdx_day_to_df_last('601198', 10)
-    print df
+    # df = get_tdx_day_to_df_last('601198',1)
+    # print df
     import sys
 
-    sys.exit(0)
+    # sys.exit(0)
     time_t = time.time()
     # df = get_tdx_allday_lastDF()
     # print "date<2015-08-25:",len(df[(df.date< '2015-08-25')])
@@ -319,19 +319,19 @@ if __name__ == '__main__':
     # print len(code_list)
 
 
-    # results = cct.to_mp_run_op(get_tdx_day_to_df_last,code_list,2)
+    # results = rl.to_mp_run_op(get_tdx_day_to_df_last,code_list,2)
     # df=pd.DataFrame((x.get() for x in results),columns=ct.TDX_Day_columns)
     # print df[:1]
 
     # get_tdx_allday_lastDF()
 
-    # results=cct.to_mp_run(get_tdx_day_to_df,code_list)
+    # results=rl.to_mp_run(get_tdx_day_to_df,code_list)
     # print results[:2]
     # print len(results)
-    # df = rl.get_sina_Market_json('all')
-    # print(len(df))
-    # code_list = np.array(df.code)
-    # get_tdx_all_day_LastDF(code_list)
+    df = rl.get_sina_Market_json('all')
+    print(len(df))
+    code_list = np.array(df.code)
+    get_tdx_all_day_LastDF(code_list)
     get_tdx_all_day_DayL_DF('all')
     # time.sleep(5)
     # print len(df)

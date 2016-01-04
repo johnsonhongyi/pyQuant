@@ -1,26 +1,37 @@
 # -*- coding:utf-8 -*-
 # !/usr/bin/env python
 
-import gc
-import re
-import sys
-import time
-import traceback
-import urllib2
-import pandas as pd
-from bs4 import BeautifulSoup
-from pandas import DataFrame
-# import sys
-# print sys.path
 
-import JohhnsonUtil.johnson_cons as ct
-from JSONData import realdatajson as rl
-from JSONData import tdx_data_Day as tdd
-from JohhnsonUtil import LoggerFactory
+# import sys
+#
+# reload(sys)
+#
+# sys.setdefaultencoding('utf-8')
+# url_s = "http://vip.stock.finance.sina.com.cn/quotes_service/view/cn_bill_all.php?num=100&page=1&sort=ticktime&asc=0&volume=0&type=1"
+# url_b = "http://vip.stock.finance.sina.com.cn/quotes_service/view/cn_bill_all.php?num=100&page=1&sort=ticktime&asc=0&volume=100000&type=0"
+# status_dict = {u"中性盘": "normal", u"买盘": "up", u"卖盘": "down"}
+# url_real_sina = "http://finance.sina.com.cn/realstock/"
+# url_real_sina_top = "http://vip.stock.finance.sina.com.cn/mkt/#stock_sh_up"
+# url_real_east = "http://quote.eastmoney.com/sz000004.html"
+from bs4 import BeautifulSoup
+import urllib2
+from pandas import Series, DataFrame
+import re
+import johnson_cons as ct
+import time
 import singleAnalyseUtil as sl
+import realdatajson as rl
+import pandas as pd
+import traceback
+import sys
+import numpy as np
+import tdx_data_Day as tdd
+from LoggerFactory import *
+import gc
 
 # from logbook import Logger,StreamHandler,SyslogHandler
 # from logbook import StderrHandler
+
 
 def downloadpage(url):
     fp = urllib2.urlopen(url)
@@ -63,6 +74,7 @@ def get_sina_all_dd(vol='0', type='0', retry_count=3, pause=0.001):
         try:
             ct._write_console()
             url = get_sina_url(vol, type)
+            # url= ct.SINA_DD_VRatio % (ct.P_TYPE['http'], ct.DOMAINS['vsf'], ct.PAGES['sinadd_all'],ct.DD_VOL_List[vol], ct.DD_TYPE_List[type])
             page = urllib2.urlopen(url)
             html_doc = page.read()
             # print (html_doc)
@@ -154,11 +166,36 @@ def get_sina_all_dd(vol='0', type='0', retry_count=3, pause=0.001):
         raise IOError(ct.NETWORK_URL_ERROR_MSG)
 
 
+def log_format(record, handler):
+    handler = StderrHandler()
+    # handler.format_string = '{record.channel}: {record.message}'
+    handler.format_string = '{record.channel}: {record.message) [{record.extra[cwd]}]'
+    return record.message
+
+    # from logbook import FileHandler
+    # log_handler = FileHandler('application.log')
+    # log_handler.push_application()
+
+
+def set_log_file():
+    console = logging.StreamHandler()
+    console.setLevel(logging.WARNING)
+    formatter = logging.Formatter('%(name)-12s: %(levelname)-8s %(message)s')
+    console.setFormatter(formatter)
+    logging.getLogger('').addHandler(console)
+
+
 if __name__ == "__main__":
     # parsehtml(downloadpage(url_s))
     # StreamHandler(sys.stdout).push_application()
-    log = LoggerFactory.getLogger('SinaMarket')
+    log = getLogger('SinaMarket')
+    # log.setLevel(logging.INFO)
     # log.setLevel(logging.DEBUG)
+    # console = logging.StreamHandler()
+    # console.setLevel(logging.WARNING)
+    # formatter = logging.Formatter('%(name)-12s: %(levelname)-8s %(message)s')
+    # console.setFormatter(formatter)
+    # logging.getLogger('').addHandler(console)
 
     # handler=StderrHandler(format_string='{record.channel}: {record.message) [{record.extra[cwd]}]')
     # log.level=log.debug
@@ -167,13 +204,15 @@ if __name__ == "__main__":
     vol = '0'
     type = '2'
     # cut_num=10000
-    success = 0
+    First = True
     top_all = pd.DataFrame()
     time_s = time.time()
     delay_time = 1800
     base_path = tdd.get_tdx_dir()
     block_path = tdd.get_tdx_dir_blocknew() + '063.blk'
     all_diffpath = tdd.get_tdx_dir_blocknew() + '062.blk'
+    rongduan=1
+    rongduan_status=True
     while 1:
         try:
             df = rl.get_sina_Market_json('all')
@@ -184,14 +223,15 @@ if __name__ == "__main__":
             gc.collect()
             radio_t = sl.get_work_time_ratio()
             time_Rt = time.time()
-            if len(top_now) > 10 and not top_now[:1].buy.values == 0:
+            log.debug("top_now:%s %s"%(top_now[:1],len(top_now)))
+            if len(top_now) > 10 and top_now[:1].buy.values >= 0:
                 time_d = time.time()
                 #     top_now=top_now[top_now['percent']>=0]
                 if len(top_all) == 0:
                     top_all = top_now
                     # top_all['llow'] = 0
                     # top_all['lastp'] = 0
-                    top_all = top_all[top_all.buy > 0]
+                    top_all = top_all[top_all.buy >= 0]
                     codelist = top_all.index.tolist()
                     log.info('toTDXlist:%s' % len(codelist))
                     tdxdata = tdd.get_tdx_all_day_LastDF(codelist)
@@ -201,6 +241,7 @@ if __name__ == "__main__":
                     tdxdata.rename(columns={'close': 'lastp'}, inplace=True)
                     tdxdata.rename(columns={'vol': 'lvol'}, inplace=True)
                     tdxdata = tdxdata.loc[:, ['llow', 'lhigh', 'lastp', 'lvol', 'date']]
+                    # print tdxdata[:1].lastp.dtype
                     # data.drop('amount',axis=0,inplace=True)
                     log.debug("TDX Col:%s" % tdxdata.columns.values)
                     # df_now=top_all.merge(data,on='code',how='left')
@@ -209,7 +250,6 @@ if __name__ == "__main__":
                     log.info('Top-merge_now:%s' % (top_all[:1]))
                     top_all = top_all[top_all['llow'] > 0]
 
-                    radio_t = sl.get_work_time_ratio()
                     if top_all[:1].volume.values > 0:
                         # top_now.loc[symbol, 'volume'] = round(top_now.loc[symbol, 'volume'] / radio_t, 1)
                         # top_now.loc[symbol, 'volume'] = round(
@@ -244,6 +284,8 @@ if __name__ == "__main__":
                         if symbol in top_all.index and top_all.loc[symbol, 'buy'] <> 0:
                             # if top_all.loc[symbol,'diff'] == 0:
                             # print "code:",symbol
+
+
                             count_n = top_now.loc[symbol, 'buy']
                             count_a = top_all.loc[symbol, 'buy']
                             # print count_a,count_n
@@ -285,36 +327,40 @@ if __name__ == "__main__":
                 # top_all = top_all[top_all.percent >= 0]
 
                 top_dif = top_all
-                log.info('dif1:%s' % len(top_dif))
-                log.info(top_dif[:1])
-                top_dif = top_dif[top_dif.buy > top_dif.lastp]
-                log.debug('dif2:%s' % len(top_dif))
-                # log.debug('dif2:%s' % top_dif[:1])
-                # log
+                if not top_dif[:1].buy.values ==0:
+                    log.info('dif1:%s' % len(top_dif))
+                    log.info(top_dif[:1])
+                    top_dif = top_dif[top_dif.buy > top_dif.lastp]
+                    log.debug('dif2-buy-lastp:%s' % (top_dif[:1].low.values-top_dif[:1].lastp.values))
+                    # print('dif2:%s' % (top_dif[:1].low.values-top_dif[:1].lastp.values))
+                    log.debug('dif2:%s' % len(top_dif))
 
-                # if top_dif[:1].llow.values <> 0:
-                top_dif = top_dif[top_dif.low >= top_dif.llow]
-                log.debug('diff2-1:%s' % len(top_dif))
+                    # if top_dif[:1].llow.values <> 0:
+                    top_dif = top_dif[top_dif.low > top_dif.llow]
+                    log.debug('diff2-1:%s' % len(top_dif))
 
-                top_dif = top_dif[top_dif.low >= top_dif.lastp]
-                log.debug('dif3 low<>0 :%s' % len(top_dif))
+                    top_dif = top_dif[top_dif.low > top_dif.lastp]
+                    log.debug('dif2:low-lastp:%s' %(top_dif[:1].low-top_dif[:1].lastp))
+                    log.debug('dif3 low<>0 :%s' % len(top_dif))
 
-                top_dif = top_dif[top_dif.open >= top_dif.lastp]
-                log.debug('dif4 open>lastp:%s' % len(top_dif))
-                log.debug('dif4-2:%s' % top_dif[:1])
+                    top_dif = top_dif[top_dif.open > top_dif.lastp]
+                    log.debug('dif4 open>lastp:%s' % len(top_dif))
 
                 # top_dif = top_dif[top_dif.buy >= top_dif.open*0.99]
                 # log.debug('dif5 buy>open:%s'%len(top_dif))
                 # top_dif = top_dif[top_dif.trade >= top_dif.buy]
 
                 # df['volume']= df['volume'].apply(lambda x:x/100)
+                    if not First:
+                        First=False
+                    else:
+                        top_dif['volume'] =top_dif['volume'].apply(lambda x:round(x / radio_t, 1))
+                        top_dif['volume']=(map(lambda x,y: round(x/y,1), top_dif['volume'].values, top_dif['lvol'].values))
 
-                top_dif['volume'] =top_dif['volume'].apply(lambda x:round(x / radio_t, 1))
-                top_dif['volume']=(map(lambda x,y: round(x/y,1), top_dif['volume'].values, top_dif['lvol'].values))
+                    log.debug('dif6 vol:%s' % (top_dif[:1].volume))
+                    top_dif = top_dif[top_dif.volume > 1]
 
-                top_dif = top_dif[top_dif.volume >= 1]
-
-                log.debug('dif6 vol>lvol:%s' % len(top_dif))
+                    log.debug('dif6 vol>lvol:%s' % len(top_dif))
                 # top_dif = top_dif[top_dif.percent >= 0]
 
                 # print len(top_dif),top_dif[:1]
@@ -331,8 +377,6 @@ if __name__ == "__main__":
                     time_s = time.time()
                 # top_all=top_all.sort_values(by=['percent','diff','counts','ratio'],ascending=[0,0,1,1])
                 print rl.format_for_print(top_dif[:10])
-                # print rl.format_for_print(top_all[:1])
-
                 # print rl.format_for_print(top_dif[-1:])
                 # print "staus",status
                 if status:
@@ -346,7 +390,18 @@ if __name__ == "__main__":
                             # else:
                             #     print "\t No RealTime Data"
             else:
-                print "\tNo Data"
+                if sl.get_work_time_now():
+                    # not top_now[:1].buy.values == 0
+                    if rongduan_status:
+                        print u"\tNo Data 熔断了: %s"%(rongduan)
+                        rongduan=2
+                        rongduan_status=False
+                    else:
+                        print u"\tNo Data 熔断了: %s"%(rongduan)
+                        break
+                        # st=raw_input("No Data")
+                else:
+                    print "\tNo Data"
             int_time = sl.get_now_time_int()
             if sl.get_work_time_now():
                 if int_time < 926:
@@ -378,8 +433,6 @@ if __name__ == "__main__":
                         sl.write_to_blocknew(block_path, codew[:10], False)
                         sl.write_to_blocknew(all_diffpath, codew, False)
                     print "wri ok"
-                else:
-                    sys.exit(0)
                     # time.sleep(2)
         except (KeyboardInterrupt) as e:
             # print "key"
@@ -411,6 +464,7 @@ if __name__ == "__main__":
                     sl.write_to_blocknew(all_diffpath, codew, False)
                 print "wri ok"
                 # time.sleep(2)
+
             else:
                 sys.exit(0)
         except (IOError, EOFError, Exception) as e:

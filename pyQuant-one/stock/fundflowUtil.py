@@ -1,13 +1,11 @@
 #-*- coding:utf-8 -*-
 
+import johnson_cons as ct
+import singleAnalyseUtil as sl
 import re
-import sys
-sys.path.append("..")
-import JohhnsonUtil.commonTips as cct
-import JohhnsonUtil.johnson_cons as ct
 
 def get_dfcfw_fund_flow(url):
-    data = cct.get_url_data(url)
+    data=sl.get_url_data(url)
     # vollist=re.findall('{data:(\d+)',code)
     vol_l=re.findall('\"([\d\D]+?)\"',data)
     dd={}
@@ -27,5 +25,5 @@ def get_dfcfw_fund_flow(url):
 
 
 if __name__ == "__main__":
-    ff = get_dfcfw_fund_flow(ct.DFCFW_FUND_FLOW_URL % ct.SINA_Market_KEY_TO_DFCFW['sh'])
+    ff=get_dfcfw_fund_flow()
     print "%.1f"%(float(ff['zzb']))

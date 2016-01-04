@@ -3,7 +3,7 @@ import time
 
 import tushare as ts
 
-import stock.JohhnsonUtil.singleAnalyseUtil as sl
+import pyQuant.stock.singleAnalyseUtil as sl
 
 start = time.time()
 

@@ -12,12 +12,12 @@ import pandas as pd
 from bs4 import BeautifulSoup
 from pandas import DataFrame
 
-import stock.JohhnsonUtil.johnson_cons as ct
-from stock.JSONData import realdatajson as rl
-from stock.JSONData import sina_data
-from stock.JSONData import tdx_data_Day as tdd
-from stock.JohhnsonUtil import LoggerFactory as LogF
-from stock.JohhnsonUtil import singleAnalyseUtil as sl
+import JohhnsonUtil.johnson_cons as ct
+from JSONData import realdatajson as rl
+from JSONData import sina_data
+from JSONData import tdx_data_Day as tdd
+from JohhnsonUtil import LoggerFactory as LogF
+import singleAnalyseUtil as sl
 
 
 # from logbook import Logger,StreamHandler,SyslogHandler
@@ -184,6 +184,7 @@ if __name__ == "__main__":
             now_count = len(top_now)
             del df
             gc.collect()
+            radio_t = sl.get_work_time_ratio()
             time_Rt = time.time()
             if len(top_now) > 10 and not top_now[:1].buy.values == 0:
                 time_d = time.time()
@@ -210,7 +211,6 @@ if __name__ == "__main__":
                     log.info('Top-merge_now:%s' % (top_all[:1]))
                     top_all = top_all[top_all['llow'] > 0]
 
-                    radio_t = sl.get_work_time_ratio()
                     if top_all[:1].volume.values > 0:
                         # top_now.loc[symbol, 'volume'] = round(top_now.loc[symbol, 'volume'] / radio_t, 1)
                         # top_now.loc[symbol, 'volume'] = round(
@@ -285,7 +285,6 @@ if __name__ == "__main__":
                 # top_all = top_all[top_all.trade >= top_all.high*0.99]
                 # top_all = top_all[top_all.buy >= top_all.lastp]
                 # top_all = top_all[top_all.percent >= 0]
-
                 top_dif = top_all
                 log.info('dif1:%s' % len(top_dif))
                 log.info(top_dif[:1])
@@ -305,6 +304,8 @@ if __name__ == "__main__":
                 log.debug('dif4 open>lastp:%s' % len(top_dif))
                 log.debug('dif4-2:%s' % top_dif[:1])
 
+                top_dif['volume'] =top_dif['volume'].apply(lambda x:round(x / radio_t, 1))
+                top_dif['volume']=(map(lambda x,y: round(x/y,1), top_dif['volume'].values, top_dif['lvol'].values))
                 # top_dif = top_dif[top_dif.buy >= top_dif.open*0.99]
                 # log.debug('dif5 buy>open:%s'%len(top_dif))
                 # top_dif = top_dif[top_dif.trade >= top_dif.buy]
@@ -353,10 +354,33 @@ if __name__ == "__main__":
                 else:
                     time.sleep(60)
             else:
-                break
+                # break
                 # time.sleep(5)
-                # pass
-
+                st = raw_input("status:[go(g),clear(c),quit(q,e),W(w),Wa(a)]:")
+                if len(st) == 0:
+                    status = False
+                elif st == 'g' or st == 'go':
+                    status = True
+                    for code in top_dif[:10].index:
+                        code = re.findall('(\d+)', code)
+                        if len(code) > 0:
+                            code = code[0]
+                            kind = sl.get_multiday_ave_compare_silent(code)
+                elif st == 'clear' or st == 'c':
+                    top_all = pd.DataFrame()
+                    status = False
+                elif st == 'w' or st == 'a':
+                    codew = (top_dif.index).tolist()
+                    if st == 'a':
+                        sl.write_to_blocknew(block_path, codew[:10])
+                        sl.write_to_blocknew(all_diffpath, codew)
+                    else:
+                        sl.write_to_blocknew(block_path, codew[:10], False)
+                        sl.write_to_blocknew(all_diffpath, codew, False)
+                    print "wri ok"
+                    # time.sleep(2)
+                else:
+                    sys.exit(0)
         except (KeyboardInterrupt) as e:
             # print "key"
             print "KeyboardInterrupt:", e
@@ -387,7 +411,6 @@ if __name__ == "__main__":
                     sl.write_to_blocknew(all_diffpath, codew, False)
                 print "wri ok"
                 # time.sleep(2)
-
             else:
                 sys.exit(0)
         except (IOError, EOFError, Exception) as e:
