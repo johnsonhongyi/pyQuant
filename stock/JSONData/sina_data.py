@@ -70,10 +70,10 @@ class Sina:
 
     def __init__(self):
         # self.grep_stock_detail = re.compile(r'(\d+)=([^\S][^,]+?)%s' % (r',([\.\d]+)' * 29,))   #\n特例A (4)
-        # self.grep_stock_detail = re.compile(r'(\d+)=([^\n][^,]+.)%s' % (r',([\.\d]+)' * 29,))  # 去除\n特例A(3356)
+        self.grep_stock_detail = re.compile(r'(\d+)=([^\n][^,]+.)%s' % (r',([\.\d]+)' * 29,))  # 去除\n特例A(3356)
         # self.grep_stock_detail = re.compile(r'(00\d{4}|30\d{4}|60\d{4})=([^\n][^,]+.)%s' % (r',([\.\d]+)' * 29,))   #去除\n特例A(股票2432)
-        self.grep_stock_detail = re.compile(
-            r'(00\d{4}|30\d{4}|60\d{4})=([^\n][^,]+.)%s' % (r',([\.\d]+)' * 29,))  # 去除\n特例A(股票2432)
+        # ^(?!64)\d+$
+        # self.grep_stock_detail = re.compile(r'([0][^0]\d+.)=([^\n][^,]+.)%s' % (r',([\.\d]+)' * 29,))  # 去除\n特例A(股票2432)
         self.sina_stock_api = 'http://hq.sinajs.cn/?format=text&list='
         self.stock_data = []
         self.stock_codes = []
@@ -146,6 +146,7 @@ class Sina:
         list_s = []
         for stock_match_object in result:
             stock = stock_match_object.groups()
+            # print stock
             # fn=(lambda x:x)
             # list.append(map(fn,stock))
             # df = pd.DataFrame(list,columns=ct.SINA_Total_Columns)

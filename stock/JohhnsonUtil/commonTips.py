@@ -34,6 +34,29 @@ def get_today():
     today = TODAY.strftime('%Y-%m-%d')
     return today
 
+def get_now_time_int():
+    now_t = datetime.datetime.now().strftime("%H%M")
+    return int(now_t)
+
+
+def get_work_time():
+    now_t = str(get_now_time()).replace(':', '')
+    # now_t = int(now_t)
+    if (now_t > '1131' and now_t < '1300') or (now_t < '0920' or now_t > '1502'):
+        # return False
+        return False
+    else:
+        return True
+
+
+# def get_work_time_now():
+#     now_t = str(get_now_time()).replace(':', '')
+#     # now_t = int(now_t)
+#     if (now_t > '1131' and now_t < '1300') or (now_t < '0915' or now_t > '1502'):
+#         # return False
+#         return False
+#     else:
+#         return True
 
 def get_now_time():
     # now = time.time()
@@ -42,6 +65,29 @@ def get_now_time():
     d_time = time.strftime("%H:%M", now)
     return d_time
 
+def get_work_time_ratio():
+    now = time.localtime()
+    ymd = time.strftime("%Y:%m:%d:", now)
+    hm1 = '09:30'
+    hm2 = '13:00'
+    all_work_time = 14400
+    d1 = datetime.datetime.now()
+    now_t = int(datetime.datetime.now().strftime("%H%M"))
+    # d2 = datetime.datetime.strptime('201510111011','%Y%M%d%H%M')
+    if now_t < 1130:
+        d2 = datetime.datetime.strptime(ymd + hm1, '%Y:%m:%d:%H:%M')
+        ds = float((d1 - d2).seconds)
+        ratio_t = round(ds / all_work_time, 3)
+
+    elif now_t > 1130 and now_t < 1300:
+        ratio_t = 0.5
+    elif now_t >1501:
+        ratio_t = 1.0
+    else:
+        d2 = datetime.datetime.strptime(ymd + hm2, '%Y:%m:%d:%H:%M')
+        ds = float((d1 - d2).seconds)
+        ratio_t = round((ds+7200) / all_work_time, 3)
+    return ratio_t
 
 def get_url_data_R(url):
     # headers = {'User-Agent':'Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.6) Gecko/20091201 Firefox/3.5.6'}
@@ -60,7 +106,7 @@ def get_url_data(url):
     headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.2; rv:16.0) Gecko/20100101 Firefox/16.0',
                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
                'Connection': 'keep-alive'}
-    data = requests.get(url, headers=headers)
+    data = requests.get(url, headers=headers,timeout=10)
     # fp = urlopen(req, timeout=5)
     # data = fp.read()
     # fp.close()
@@ -188,6 +234,17 @@ def _write_to_csv(df, filename, indexCode='code'):
     print ("write csv")
     # df.to_csv(filename, encoding='gbk', index=False)
 
+def code_to_tdxblk(code):
+    """
+        生成symbol代码标志
+    """
+    if code in ct.INDEX_LABELS:
+        return ct.INDEX_LIST[code]
+    else:
+        if len(code) != 6:
+            return ''
+        else:
+            return '1%s' % code if code[:1] in ['5', '6'] else '0%s' % code
 
 def code_to_symbol(code):
     """
@@ -227,6 +284,35 @@ def code_to_tdx_blk(code):
         else:
             return '1%s' % code if code[:1] in ['5', '6'] else '0%s' % code
 
+def write_to_blocknew(p_name, data, append=True):
+    if append:
+        fout = open(p_name, 'ab+')
+        flist = fout.readlines()
+    else:
+        fout = open(p_name, 'wb')
+    # x=0
+    for i in data:
+        # print type(i)
+        if append and len(flist) > 0:
+            wstatus = True
+            for ic in flist:
+                # print code_to_tdxblk(i),ic
+                if code_to_tdxblk(i).strip() == ic.strip():
+                    wstatus = False
+            if wstatus:
+                # if x==0:
+                #     x+=1
+                #     raw='\r\n'+code_to_tdxblk(i)+'\r\n'
+                # else:
+                raw = code_to_tdxblk(i) + '\r\n'
+                fout.write(raw)
+        else:
+            raw = code_to_tdxblk(i) + '\r\n'
+            fout.write(raw)
+
+            # raw = pack('IfffffII', t, i[2], i[3], i[4], i[5], i[6], i[7], i[8])
+    ## end for
+    fout.close()
 
 def get_sys_platform():
     return platform.platform()

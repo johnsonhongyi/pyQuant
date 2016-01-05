@@ -25,6 +25,7 @@ from pandas import DataFrame
 import JohhnsonUtil.johnson_cons as ct
 from JSONData import realdatajson as rl
 import singleAnalyseUtil as sl
+from JSONData import tdx_data_Day as tdd
 
 
 def downloadpage(url):
@@ -162,7 +163,9 @@ if __name__ == "__main__":
     success=0
     top_all=pd.DataFrame()
     time_s=time.time()
-    delay_time=1800
+    delay_time=3600
+    base_path = tdd.get_tdx_dir()
+    block_path = tdd.get_tdx_dir_blocknew() + '064.blk'
     while 1:
         try:
             df=rl.get_sina_all_json_dd(vol,type)
@@ -235,7 +238,40 @@ if __name__ == "__main__":
 
             else:
                 print "no data"
-            time.sleep(60)
+            int_time = sl.get_now_time_int()
+            if sl.get_work_time_now():
+                if int_time < 926:
+                    time.sleep(60)
+                else:
+                    time.sleep(60)
+            else:
+                # break
+                # time.sleep(5)
+                st = raw_input("status:[go(g),clear(c),quit(q,e),W(w),Wa(a)]:")
+                if len(st) == 0:
+                    status = False
+                elif st == 'g' or st == 'go':
+                    status = True
+                    for code in top_all[:10].index:
+                        code = re.findall('(\d+)', code)
+                        if len(code) > 0:
+                            code = code[0]
+                            kind = sl.get_multiday_ave_compare_silent(code)
+                elif st == 'clear' or st == 'c':
+                    top_all = pd.DataFrame()
+                    status = False
+                elif st == 'w' or st == 'a':
+                    codew = (top_all.index).tolist()
+                    if st == 'a':
+                        sl.write_to_blocknew(block_path, codew[:20])
+                        # sl.write_to_blocknew(all_diffpath, codew)
+                    else:
+                        sl.write_to_blocknew(block_path, codew[:20], False)
+                        # sl.write_to_blocknew(all_diffpath, codew, False)
+                    print "wri ok:%s"%block_path
+                    # time.sleep(2)
+                else:
+                    sys.exit(0)
 
         except (KeyboardInterrupt) as e:
             # print "key"
@@ -255,8 +291,8 @@ if __name__ == "__main__":
                 top_all=pd.DataFrame()
                 status=False
             elif st == 'w' or st == 'a':
-                base_path=r"E:\DOC\Parallels\WinTools\zd_pazq\T0002\blocknew\\"
-                block_path=base_path+'064.blk'
+                # base_path=r"E:\DOC\Parallels\WinTools\zd_pazq\T0002\blocknew\\"
+                # block_path=base_path+'064.blk'
                 # all_diffpath=base_path+'\065.blk'
                 codew=top_all[:20].index.tolist()
                 if st=='a':

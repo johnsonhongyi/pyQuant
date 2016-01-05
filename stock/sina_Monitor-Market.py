@@ -18,6 +18,7 @@ import JohhnsonUtil.johnson_cons as ct
 from JSONData import realdatajson as rl
 from JSONData import tdx_data_Day as tdd
 from JohhnsonUtil import LoggerFactory
+from JohhnsonUtil import commonTips as cct
 import singleAnalyseUtil as sl
 
 # from logbook import Logger,StreamHandler,SyslogHandler
@@ -171,11 +172,11 @@ if __name__ == "__main__":
     success = 0
     top_all = pd.DataFrame()
     time_s = time.time()
-    delay_time = 1800
+    delay_time = 60
     First = True
     base_path = tdd.get_tdx_dir()
     block_path = tdd.get_tdx_dir_blocknew() + '063.blk'
-    all_diffpath = tdd.get_tdx_dir_blocknew() + '062.blk'
+    # all_diffpath = tdd.get_tdx_dir_blocknew() + '062.blk'
     while 1:
         try:
             df = rl.get_sina_Market_json('all')
@@ -184,7 +185,7 @@ if __name__ == "__main__":
             now_count=len(top_now)
             del df
             gc.collect()
-            radio_t = sl.get_work_time_ratio()
+            radio_t = cct.get_work_time_ratio()
             time_Rt = time.time()
             # top_now = top_now[top_now.buy > 0]
             if len(top_now) > 10 and not top_now[:1].buy.values == 0:
@@ -254,7 +255,7 @@ if __name__ == "__main__":
                                     # print "change:",time.time()-time_s
                                     # top_now.loc[symbol,'lastp']=top_all.loc[symbol,'lastp']
                                     # top_all.loc[symbol, 'buy':'counts'] = top_now.loc[symbol, 'buy':'counts']
-                                    top_all.loc[symbol, 'buy':'prev_price'] = top_now.loc[symbol, 'buy':'prev_price']
+                                    top_all.loc[symbol, 'buy':'prev_p'] = top_now.loc[symbol, 'buy':'prev_p']
                                 else:
                                     # top_now.loc[symbol,'lastp']=top_all.loc[symbol,'lastp']
                                     top_all.loc[symbol, 'diff':'low'] = top_now.loc[symbol, 'diff':'low']
@@ -307,8 +308,7 @@ if __name__ == "__main__":
                 # top_dif = top_dif[top_dif.percent >= 0]
 
                 if len(top_dif) == 0:
-                    print "DataFrame is Empty!!!!!!"
-                    log.debug("DataFrame is Empty!!!!!!")
+                    print "No G,DataFrame is Empty!!!!!!"
                     top_dif = top_all
 
                 if First:
@@ -363,10 +363,11 @@ if __name__ == "__main__":
                             #     print "\t No RealTime Data"
             else:
                 print "\tNo Data"
-            int_time = sl.get_now_time_int()
-            if sl.get_work_time_now():
+
+            int_time = cct.get_now_time_int()
+            if cct.get_work_time():
                 if int_time < 926:
-                    time.sleep(5)
+                    time.sleep(10)
                 else:
                     time.sleep(60)
             else:
@@ -388,12 +389,13 @@ if __name__ == "__main__":
                 elif st == 'w' or st == 'a':
                     codew = (top_dif.index).tolist()
                     if st == 'a':
-                        sl.write_to_blocknew(block_path, codew[:10])
-                        sl.write_to_blocknew(all_diffpath, codew)
+                        cct.write_to_blocknew(block_path, codew[:10])
+                        # cct.write_to_blocknew(all_diffpath, codew)
                     else:
-                        sl.write_to_blocknew(block_path, codew[:10], False)
-                        sl.write_to_blocknew(all_diffpath, codew, False)
-                    print "wri ok"
+                        cct.write_to_blocknew(block_path, codew[:10], False)
+                        # cct.write_to_blocknew(all_diffpath, codew, False)
+                    print "wri ok:%s"%block_path
+
                     # time.sleep(2)
                 else:
                     sys.exit(0)
@@ -420,12 +422,13 @@ if __name__ == "__main__":
             elif st == 'w' or st == 'a':
                 codew = (top_dif.index).tolist()
                 if st == 'a':
-                    sl.write_to_blocknew(block_path, codew[:10])
-                    sl.write_to_blocknew(all_diffpath, codew)
+                    cct.write_to_blocknew(block_path, codew[:10])
+                    # cct.write_to_blocknew(all_diffpath, codew)
                 else:
-                    sl.write_to_blocknew(block_path, codew[:10], False)
-                    sl.write_to_blocknew(all_diffpath, codew, False)
-                print "wri ok"
+                    cct.write_to_blocknew(block_path, codew[:10], False)
+                    # cct.write_to_blocknew(all_diffpath, codew, False)
+                print "wri ok:%s"%block_path
+
                 # time.sleep(2)
             else:
                 sys.exit(0)

@@ -16,8 +16,10 @@ import time
 # from pandas import DataFrame
 import pandas as pd
 import JohhnsonUtil.johnson_cons as ct
+import JohhnsonUtil.commonTips as cct
 import singleAnalyseUtil as sl
 from JSONData import realdatajson as rl
+from JSONData import tdx_data_Day as tdd
 
 # import json
 # try:
@@ -83,7 +85,11 @@ if __name__ == "__main__":
     code_a={}
     success = 0
     time_s=time.time()
-    delay_time=900
+    delay_time=3600
+    base_path = tdd.get_tdx_dir()
+    block_path = tdd.get_tdx_dir_blocknew() + '065.blk'
+    # all_diffpath = tdd.get_tdx_dir_blocknew() + '062.blk'
+
     while 1:
         try:
             df=rl.get_sina_all_json_dd(vol,type)
@@ -145,8 +151,41 @@ if __name__ == "__main__":
                             kind=sl.get_multiday_ave_compare_silent(code)
             else:
                 # print top_now[:10]
-                print "no data"
-            time.sleep(60)
+                print "\tNo data"
+            int_time = cct.get_now_time_int()
+            if cct.get_work_time():
+                if int_time < 926:
+                    time.sleep(60)
+                else:
+                    time.sleep(60)
+            else:
+                # break
+                # time.sleep(5)
+                st = raw_input("status:[go(g),clear(c),quit(q,e),W(w),Wa(a)]:")
+                if len(st) == 0:
+                    status = False
+                elif st == 'g' or st == 'go':
+                    status = True
+                    for code in top_all[:10].index:
+                        code = re.findall('(\d+)', code)
+                        if len(code) > 0:
+                            code = code[0]
+                            kind = sl.get_multiday_ave_compare_silent(code)
+                elif st == 'clear' or st == 'c':
+                    top_all = pd.DataFrame()
+                    status = False
+                elif st == 'w' or st == 'a':
+                    codew = (top_all.index).tolist()
+                    if st == 'a':
+                        cct.write_to_blocknew(block_path, codew[:20])
+                        # cct.write_to_blocknew(all_diffpath, codew)
+                    else:
+                        cct.write_to_blocknew(block_path, codew[:20], False)
+                        # cct.write_to_blocknew(all_diffpath, codew, False)
+                    print "wri ok:%s"%block_path
+                    # time.sleep(2)
+                else:
+                    sys.exit(0)
 
 
 
@@ -168,17 +207,18 @@ if __name__ == "__main__":
                 top_all=pd.DataFrame()
                 status=False
             elif st == 'w' or st == 'a':
-                base_path=r"E:\DOC\Parallels\WinTools\zd_pazq\T0002\blocknew\\"
-                block_path=base_path+'065.blk'
+                # base_path=r"E:\DOC\Parallels\WinTools\zd_pazq\T0002\blocknew\\"
+                # block_path=base_path+'065.blk'
                 # all_diffpath=base_path+'\062.blk'
                 codew=top_all[:20].index.tolist()
                 if st=='a':
-                    sl.write_to_blocknew(block_path,codew)
-                    # sl.write_to_blocknew(all_diffpath,codew)
+                    cct.write_to_blocknew(block_path,codew)
+                    # cct.write_to_blocknew(all_diffpath,codew)
                 else:
-                    sl.write_to_blocknew(block_path,codew,False)
-                    # sl.write_to_blocknew(all_diffpath,codew,False)
-                print "wri ok"
+                    cct.write_to_blocknew(block_path,codew,False)
+                    # cct.write_to_blocknew(all_diffpath,codew,False)
+                print "wri ok:%s"%block_path
+
                 # time.sleep(5)
 
             else:

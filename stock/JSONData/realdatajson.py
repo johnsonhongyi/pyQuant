@@ -184,11 +184,13 @@ def _get_sina_json_dd_url(vol='0', type='3', num='10000', count=None):
     urllist = []
     if count == None:
         url = ct.JSON_DD_CountURL % (ct.DD_VOL_List[vol], type)
-        # print url
+        log.debug("_json_dd_url:%s"%url)
         data = cct.get_url_data(url)
         # return []
         # print data.find('abc')
         count = re.findall('(\d+)', data, re.S)
+        log.debug("_json_dd_url_count:%s"%count)
+        # print count
         if len(count) > 0:
             count = count[0]
             print ("Big:%s"%(count)),
@@ -201,6 +203,8 @@ def _get_sina_json_dd_url(vol='0', type='3', num='10000', count=None):
             else:
                 url = ct.JSON_DD_Data_URL_Page % (count, '1', ct.DD_VOL_List[vol], type)
                 urllist.append(url)
+        else:
+            return []
     else:
         url = ct.JSON_DD_CountURL % (ct.DD_VOL_List[vol], type)
         # print url
@@ -284,12 +288,11 @@ def get_sina_all_json_dd(vol='0', type='3', num='10000', retry_count=3, pause=0.
     df = pd.DataFrame()
     # data['code'] = symbol
     # df = df.append(data, ignore_index=True)
-
-    data = cct.to_asyncio_run(url_list, _parsing_sina_dd_price_json)
+    if len(url_list)>0:
+        log.debug("json_dd_url:%s"%url_list[0])
+        data = cct.to_asyncio_run(url_list, _parsing_sina_dd_price_json)
     # data = cct.to_mp_run(_parsing_sina_dd_price_json, url_list)
     # data = cct.to_mp_run_async(_parsing_sina_dd_price_json, url_list)
-
-
 
     # if len(url_list)>cct.get_cpu_count():
     #     divs=cct.get_cpu_count()
@@ -303,22 +306,25 @@ def get_sina_all_json_dd(vol='0', type='3', num='10000', retry_count=3, pause=0.
     # else:
     #     data=cct.to_asyncio_run(url_list,_parsing_sina_dd_price_json)
 
-    if len(data)>0:
-        df = df.append(data, ignore_index=True)
-        log.debug("dd.columns:%s" % df.columns.values)
-        log.debug("get_sina_all_json_dd:%s" % df[:1])
+        if len(data)>0:
+            df = df.append(data, ignore_index=True)
+            log.debug("dd.columns:%s" % df.columns.values)
+            log.debug("get_sina_all_json_dd:%s" % df[:1])
 
-    if not df.empty:
-        # for i in range(2, ct.PAGE_NUM[0]):
-        #     newdf = _parsing_dayprice_json(i)
-        #     df = df.append(newdf, ignore_index=True)
-        # print len(df.index)
-        print (" dd-df: %0.2f" % ((time.time() - start_t))),
-        return df
+        if not df.empty:
+            # for i in range(2, ct.PAGE_NUM[0]):
+            #     newdf = _parsing_dayprice_json(i)
+            #     df = df.append(newdf, ignore_index=True)
+            # print len(df.index)
+            print (" dd-df: %0.2f" % ((time.time() - start_t))),
+            return df
+        else:
+            print
+            print ("no data  json-df: %0.2f"%((time.time() - start_t)))
+            return ''
     else:
         print
-        print ("no data  json-df: %0.2f"%((time.time() - start_t)))
-        return ''
+        print ("url null json-df: %0.2f "%((time.time() - start_t)))
 
 def _today_ticks(symbol, tdate, pageNo, retry_count, pause):
     ct._write_console()
@@ -410,6 +416,7 @@ def get_sina_dd_count_price_realTime(df='',mtype='all'):
             dm.loc[dm.percent>9.9,'percent']=10
             # print dm[-1:]
             dm=dm.loc[:,ct.SINA_DD_Clean_Count_Columns]
+            dm.prev_price=dm.prev_price.fillna(0.0)
             dm.rename(columns={'prev_price': 'prev_p'}, inplace=True)
 
             # print dm[-1:]
@@ -534,9 +541,11 @@ def get_market_price_sina_dd_realTime(dp='',vol='0',type='3'):
         # dp['volume']=dp['volume'].apply(lambda x:round(x/100,1))
         # dp=dp.loc[:,'trade':].astype(float)
         log.info("DP:%s" % dp[:2])
-        if dp[:1].buy.values <> 0 and dp[:1].percent.values == 0 and dp[:1].close.values <> 0:
-            dp['percent'] = (map(lambda x, y: round((x - y) / y * 100, 1), dp['buy'].values, dp['close'].values))
-            log.info("DP-1-percent==0:%s" % dp[:1].percent)
+        if dp[:1].buy.values <> 0 and dp[:1].percent.values == 0 :
+            if 'close' in dp.columns:
+                if dp[:1].close.values <> 0:
+                    dp['percent'] = (map(lambda x, y: round((x - y) / y * 100, 1), dp['buy'].values, dp['close'].values))
+                    log.info("DP-1-percent==0:%s" % dp[:1].percent)
 
         dp.loc[dp.percent>9.9,'percent']=10
         dp['diff']=0
@@ -555,19 +564,19 @@ def get_market_price_sina_dd_realTime(dp='',vol='0',type='3'):
             log.info("dmMerge:%s"%dm[:1])
             # print dm[dm.counts>0][:2]
             dm.counts=dm.counts.fillna(0)
+            dm.prev_price=dm.prev_price.fillna(0.0)
             dm.counts=dm.counts.astype(int)
             dm=dm.drop_duplicates('code')
             dm=dm.set_index('code')
             dm.rename(columns={'prev_price': 'prev_p'}, inplace=True)
-
             # print dm.sort_values(by=['counts','percent','diff','ratio'],ascending=[0,0,0,1])[:2]
             # dm=dm.fillna(int(0))
             # dm.ratio=dm.ratio
             dm=dm.loc[:,ct.SINA_Market_Clean_UP_Columns]
-
         else:
             dp=dp.set_index('code')
             dm=dp.loc[:,ct.SINA_Market_Clean_Columns]
+            # dm['prev_p']=0.0
                     # ['name','buy','diff','percent','ratio','high','open','volume','low','counts']
                     #['name','buy','diff','percent','trade','high','ratio','volume','counts']
 

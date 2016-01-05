@@ -10,9 +10,12 @@ import tushare as ts
 
 import JSONData.fundflowUtil as ffu
 import JohhnsonUtil.johnson_cons as ct
+import JohhnsonUtil.commonTips as cct
 from JSONData import realdatajson as rd
 import JohhnsonUtil.emacount as ema
+from JohhnsonUtil import LoggerFactory
 
+log=LoggerFactory.getLogger("SingleAU")
 
 try:
     from urllib.request import urlopen, Request
@@ -20,120 +23,16 @@ except ImportError:
     from urllib2 import urlopen, Request
 
 
-def get_today():
-    TODAY = datetime.date.today()
-    today = TODAY.strftime('%Y-%m-%d')
-    return today
+# def get_today():
+#     TODAY = datetime.date.today()
+#     today = TODAY.strftime('%Y-%m-%d')
+#     return today
 
 
 def time_sleep(timemin):
     time1 = time.time()
     time.sleep(timemin)
     return True
-
-
-def get_now_time_int():
-    now_t = datetime.datetime.now().strftime("%H%M")
-    return int(now_t)
-
-
-def get_now_time():
-    # now = time.time()
-    now = time.localtime()
-    # d_time=time.strftime("%Y-%m-%d %H:%M:%S",now)
-    d_time = time.strftime("%H:%M", now)
-    return d_time
-
-
-def get_work_time():
-    now_t = str(get_now_time()).replace(':', '')
-    # now_t = int(now_t)
-    if (now_t > '1131' and now_t < '1300') or (now_t < '0920' or now_t > '1502'):
-        # return False
-        return True
-    else:
-        return True
-
-
-def get_work_time_now():
-    now_t = str(get_now_time()).replace(':', '')
-    # now_t = int(now_t)
-    if (now_t > '1131' and now_t < '1300') or (now_t < '0915' or now_t > '1502'):
-        # return False
-        return False
-    else:
-        return True
-
-
-def get_work_time_ratio():
-    now = time.localtime()
-    ymd = time.strftime("%Y:%m:%d:", now)
-    hm1 = '09:30'
-    hm2 = '13:00'
-    all_work_time = 14400
-    d1 = datetime.datetime.now()
-    now_t = int(datetime.datetime.now().strftime("%H%M"))
-    # d2 = datetime.datetime.strptime('201510111011','%Y%M%d%H%M')
-    if now_t < 1130:
-        d2 = datetime.datetime.strptime(ymd + hm1, '%Y:%m:%d:%H:%M')
-        ds = float((d1 - d2).seconds)
-        ratio_t = round(ds / all_work_time, 3)
-
-    elif now_t > 1130 and now_t < 1300:
-        ratio_t = 0.5
-    elif now_t >1501:
-        ratio_t = 1.0
-    else:
-        d2 = datetime.datetime.strptime(ymd + hm2, '%Y:%m:%d:%H:%M')
-        ds = float((d1 - d2).seconds)
-        ratio_t = round((ds+7200) / all_work_time, 3)
-    return ratio_t
-
-
-
-def code_to_tdxblk(code):
-    """
-        生成symbol代码标志
-    """
-    if code in ct.INDEX_LABELS:
-        return ct.INDEX_LIST[code]
-    else:
-        if len(code) != 6:
-            return ''
-        else:
-            return '1%s' % code if code[:1] in ['5', '6'] else '0%s' % code
-
-
-def write_to_blocknew(p_name, data, append=True):
-    if append:
-        fout = open(p_name, 'ab+')
-        flist = fout.readlines()
-    else:
-        fout = open(p_name, 'wb')
-    # x=0
-    for i in data:
-        # print type(i)
-        if append and len(flist) > 0:
-            wstatus = True
-            for ic in flist:
-                # print code_to_tdxblk(i),ic
-                if code_to_tdxblk(i).strip() == ic.strip():
-                    wstatus = False
-            if wstatus:
-                # if x==0:
-                #     x+=1
-                #     raw='\r\n'+code_to_tdxblk(i)+'\r\n'
-                # else:
-                raw = code_to_tdxblk(i) + '\r\n'
-                fout.write(raw)
-        else:
-            raw = code_to_tdxblk(i) + '\r\n'
-            fout.write(raw)
-
-            # raw = pack('IfffffII', t, i[2], i[3], i[4], i[5], i[6], i[7], i[8])
-    ## end for
-    fout.close()
-
 
 def get_all_toplist():
     # gold = {}
@@ -317,7 +216,9 @@ def get_hot_count(changepercent):
         print (
             "%s topT: %s top>%s: %s " % (
                 f_print(4, market), f_print(3, len(topTen)), changepercent, f_print(4, len(top)))),
-        ff = ffu.get_dfcfw_fund_flow(ct.DFCFW_FUND_FLOW_URL % ct.SINA_Market_KEY_TO_DFCFW[market])
+        url=ct.DFCFW_FUND_FLOW_URL % ct.SINA_Market_KEY_TO_DFCFW[market]
+        log.debug("ffurl:%s"%url)
+        ff = ffu.get_dfcfw_fund_flow(url)
         if len(ff) > 0:
             zlr = float(ff['zlr'])
             zzb = float(ff['zzb'])
@@ -404,7 +305,7 @@ if __name__ == '__main__':
     while 1:
         try:
             if not status:
-                get_hot_loop(120, 3)
+                get_hot_count(3)
             if status:
                 # status=True
                 if not num_input:
@@ -422,6 +323,23 @@ if __name__ == '__main__':
                         ave = get_code_search_loop(num_input, code, dayl=days, ave=ave)
                     code = num_input
 
+            int_time = cct.get_now_time_int()
+            if cct.get_work_time():
+                if int_time < 1000:
+                    time.sleep(60)
+                else:
+                    time.sleep(120)
+            else:
+                st = raw_input("status:[go(g),clear(c),quit(q,e)]:")
+                if len(st) == 0:
+                    status = False
+                elif st == 'g' or st == 'go':
+                    status = True
+                    num_input = ''
+                    ave = None
+                    code = ''
+                else:
+                    sys.exit(0)
         except (KeyboardInterrupt) as e:
             # print "key"
             print "KeyboardInterrupt:", e
