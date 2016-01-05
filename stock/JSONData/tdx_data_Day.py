@@ -49,7 +49,7 @@ def get_tdx_dir():
 
 
 def get_tdx_dir_blocknew():
-    blocknew_path = get_tdx_dir() + r'/T0002/'.replace('/', path_sep).replace('\\', path_sep)
+    blocknew_path = get_tdx_dir() + r'/T0002/blocknew/'.replace('/', path_sep).replace('\\', path_sep)
     return blocknew_path
 
 
