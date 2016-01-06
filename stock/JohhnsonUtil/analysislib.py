@@ -5,18 +5,41 @@ import talib as ta
 import tushare as ts
 
 
-def get_BBANDS(df):
+def get_BBANDS_Status(df):
+    if len(df) < 20:
+        print "Data no 20 day"
+        return ''
     df = df.sort_index(axis=0, by=None, ascending=True)
     upperband, middleband, lowerband = ta.BBANDS(np.array(df['close']), timeperiod=20, nbdevdn=2, matype=0)
     df['upperband'] = pd.Series(upperband, index=df.index)  # K
     df['middleband'] = pd.Series(middleband, index=df.index)  # D
     df['lowerband'] = pd.Series(lowerband, index=df.index)  # D
     df = df.sort_index(axis=0, by=None, ascending=False)
-
-    print df[:10]
+    # df = df.dropna()
+    # print df[:10]
 
     return df
 
+
+def get_KDJ_Status(df):
+    # 参数9,3,3
+    df = df.sort_index()
+
+    slowk, slowd = ta.STOCH(np.array(df['high']), np.array(df['low']), np.array(df['close']), fastk_period=9,
+                            slowk_period=3, slowk_matype=0, slowd_period=3, slowd_matype=0)
+    # slowkMA5 = ta.MA(slowk, timeperiod=5, matype=0)
+    # slowkMA10 = ta.MA(slowk, timeperiod=10, matype=0)
+    # slowkMA20 = ta.MA(slowk, timeperiod=20, matype=0)
+    # slowdMA5 = ta.MA(slowd, timeperiod=5, matype=0)
+    # slowdMA10 = ta.MA(slowd, timeperiod=10, matype=0)
+    # slowdMA20 = ta.MA(slowd, timeperiod=20, matype=0)
+
+    # 16-17 K,D
+    df['slowk'] = pd.Series(slowk, index=df.index)  # K
+    df['slowd'] = pd.Series(slowd, index=df.index)  # D
+    # df=df.dropna()
+    df.sort_index(ascending=False, inplace=True)
+    return df
 
 def Get_MACD_Cross(df):
     # 参数12,26,9
@@ -222,4 +245,7 @@ def Get_RSI(df):
 
 if __name__ == '__main__':
     df=ts.get_hist_data('601198')
-    db=get_BBANDS(df)
+    db = get_BBANDS_Status(df)
+    print db[:1]
+    db = get_KDJ_Status(db)
+    print db[:1]

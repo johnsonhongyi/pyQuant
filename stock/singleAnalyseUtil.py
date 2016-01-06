@@ -3,6 +3,7 @@ import datetime
 import sys
 import time
 import types
+
 import pandas as pd
 import tushare as ts
 # print sys.path
@@ -275,7 +276,7 @@ def get_hot_countNew(changepercent):
             zlr = float(ff['zlr'])
             zzb = float(ff['zzb'])
             # zt=str(ff['time'])
-            print (u"流入: %0.1f亿 比: %0.1f%%" % (zlr, zzb))
+            print (u"流入: %s亿 比: %s%%" % (f_print(4, zlr), f_print(4, zzb)))
 
         allTop = allTop.append(df, ignore_index=True)
 
@@ -286,7 +287,7 @@ def get_hot_countNew(changepercent):
     crashTen = df[df['percent'] < -9.8]['code']
     crash = df[df['percent'] < -changepercent]['code']
     print (
-        u"\t\tA:%s topT:%s top>%s:%s" % (
+        u" \tA:%s topT:%s top>%s:%s" % (
             f_print(4, count), f_print(3, len(topTen)), changepercent, f_print(4, len(top)))),
     print (u"crashT:%s crash<-%s:%s" % (f_print(3, len(crashTen)), changepercent, f_print(4, len(crash)))),
     ff = ffu.get_dfcfw_fund_flow(ct.DFCFW_FUND_FLOW_ALL)
@@ -294,18 +295,18 @@ def get_hot_countNew(changepercent):
         zlr = float(ff['zlr'])
         zzb = float(ff['zzb'])
         zt = str(ff['time'])
-        print (u"流入: %0.1f亿 占比: %0.1f%% %s" % (zlr, zzb, zt))
+        print (u"流入: %s亿 占比: %s%% %s" % (f_print(4, zlr), f_print(4, zzb), f_print(4, zt)))
     ff = ffu.get_dfcfw_fund_SHSZ(ct.DFCFW_ZS_SHSZ)
     hgt = ffu.get_dfcfw_fund_HGT(ct.DFCFW_FUND_FLOW_HGT)
     log.debug("shzs:%s" % ff)
     log.debug("hgt:%s" % hgt)
     if len(ff) > 0:
-        print ("\tSH: %s u:%s vol: %s sz: %s u:%s vol: %s" % (
-            f_print(6, ff['scent']), f_print(6, ff['sup']), f_print(6, ff['svol']), f_print(6, ff['zcent']),
-            f_print(6, ff['zup']),
-            f_print(6, ff['zvol']))),
+        print ("\tSH: %s u:%s vo: %s sz: %s u:%s vo: %s" % (
+            f_print(4, ff['scent']), f_print(4, ff['sup']), f_print(5, ff['svol']), f_print(4, ff['zcent']),
+            f_print(4, ff['zup']),
+            f_print(5, ff['zvol']))),
     if len(hgt) > 0:
-        print ("hgt: %s ggt: %s" % (f_print(6, hgt['hgt']), f_print(6, hgt['ggt'])))
+        print ("hgt: %s ggt: %s" % (f_print(5, hgt['hgt']), f_print(5, hgt['ggt'])))
 
     return allTop
 
