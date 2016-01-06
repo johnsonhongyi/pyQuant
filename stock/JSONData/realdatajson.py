@@ -323,8 +323,8 @@ def get_sina_all_json_dd(vol='0', type='3', num='10000', retry_count=3, pause=0.
             print ("no data  json-df: %0.2f"%((time.time() - start_t)))
             return ''
     else:
-        print
-        print ("url null json-df: %0.2f "%((time.time() - start_t)))
+        print ("Url null json-df: %0.2f "%((time.time() - start_t)))
+        return ''
 
 def _today_ticks(symbol, tdate, pageNo, retry_count, pause):
     ct._write_console()

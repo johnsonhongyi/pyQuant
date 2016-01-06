@@ -3,7 +3,6 @@ import datetime
 import sys
 import time
 import types
-
 import pandas as pd
 import tushare as ts
 # print sys.path
@@ -15,7 +14,7 @@ from JSONData import realdatajson as rd
 import JohhnsonUtil.emacount as ema
 from JohhnsonUtil import LoggerFactory
 
-log=LoggerFactory.getLogger("SingleAU")
+log = LoggerFactory.getLogger("SingleAU")
 
 try:
     from urllib.request import urlopen, Request
@@ -33,6 +32,7 @@ def time_sleep(timemin):
     time1 = time.time()
     time.sleep(timemin)
     return True
+
 
 def get_all_toplist():
     # gold = {}
@@ -197,7 +197,7 @@ def get_today_tick_ave(code, ave=None):
 
 
 def f_print(lens, datastr):
-    data = ('{0:%s}' % (lens)).format(datastr)
+    data = ('{0:%s}' % (lens)).format(str(datastr))
     return data
 
 
@@ -216,8 +216,8 @@ def get_hot_count(changepercent):
         print (
             "%s topT: %s top>%s: %s " % (
                 f_print(4, market), f_print(3, len(topTen)), changepercent, f_print(4, len(top)))),
-        url=ct.DFCFW_FUND_FLOW_URL % ct.SINA_Market_KEY_TO_DFCFW[market]
-        log.debug("ffurl:%s"%url)
+        url = ct.DFCFW_FUND_FLOW_URL % ct.SINA_Market_KEY_TO_DFCFW[market]
+        log.debug("ffurl:%s" % url)
         ff = ffu.get_dfcfw_fund_flow(url)
         if len(ff) > 0:
             zlr = float(ff['zlr'])
@@ -249,6 +249,64 @@ def get_hot_count(changepercent):
             f_print(3, len(crashTen)), changepercent, f_print(4, (len(crash))), zlr, zzb, zt))
     else:
         print (u"crashT:%s crash<-%s:%s" % (f_print(3, len(crashTen)), changepercent, f_print(4, len(crash))))
+    return allTop
+
+
+def get_hot_countNew(changepercent):
+    allTop = pd.DataFrame()
+    for market in ct.SINA_Market_KEY:
+        df = rd.get_sina_Market_json(market, False)
+        # count=len(df.index)
+        # print df[:1]
+        top = df[df['percent'] > changepercent]['code']
+        topTen = df[df['percent'] > 9.9]['code']
+        crashTen = df[df['percent'] < -9.8]['code']
+        crash = df[df['percent'] < -changepercent]['code']
+        # top=df[ df['changepercent'] <6]
+
+        print (
+            "%s topT: %s top>%s: %s " % (
+                f_print(4, market), f_print(3, len(topTen)), changepercent, f_print(4, len(top)))),
+        url = ct.DFCFW_FUND_FLOW_URL % ct.SINA_Market_KEY_TO_DFCFW[market]
+        log.debug("ffurl:%s" % url)
+        print (u"crashT:%s crash<-%s:%s" % (f_print(4, len(crashTen)), changepercent, f_print(4, len(crash)))),
+        ff = ffu.get_dfcfw_fund_flow(url)
+        if len(ff) > 0:
+            zlr = float(ff['zlr'])
+            zzb = float(ff['zzb'])
+            # zt=str(ff['time'])
+            print (u"流入: %0.1f亿 比: %0.1f%%" % (zlr, zzb))
+
+        allTop = allTop.append(df, ignore_index=True)
+
+    df = allTop
+    count = len(df.index)
+    top = df[df['percent'] > changepercent]['code']
+    topTen = df[df['percent'] > 9.9]['code']
+    crashTen = df[df['percent'] < -9.8]['code']
+    crash = df[df['percent'] < -changepercent]['code']
+    print (
+        u"\t\tA:%s topT:%s top>%s:%s" % (
+            f_print(4, count), f_print(3, len(topTen)), changepercent, f_print(4, len(top)))),
+    print (u"crashT:%s crash<-%s:%s" % (f_print(3, len(crashTen)), changepercent, f_print(4, len(crash)))),
+    ff = ffu.get_dfcfw_fund_flow(ct.DFCFW_FUND_FLOW_ALL)
+    if len(ff) > 0:
+        zlr = float(ff['zlr'])
+        zzb = float(ff['zzb'])
+        zt = str(ff['time'])
+        print (u"流入: %0.1f亿 占比: %0.1f%% %s" % (zlr, zzb, zt))
+    ff = ffu.get_dfcfw_fund_SHSZ(ct.DFCFW_ZS_SHSZ)
+    hgt = ffu.get_dfcfw_fund_HGT(ct.DFCFW_FUND_FLOW_HGT)
+    log.debug("shzs:%s" % ff)
+    log.debug("hgt:%s" % hgt)
+    if len(ff) > 0:
+        print ("\tSH: %s u:%s vol: %s sz: %s u:%s vol: %s" % (
+            f_print(6, ff['scent']), f_print(6, ff['sup']), f_print(6, ff['svol']), f_print(6, ff['zcent']),
+            f_print(6, ff['zup']),
+            f_print(6, ff['zvol']))),
+    if len(hgt) > 0:
+        print ("hgt: %s ggt: %s" % (f_print(6, hgt['hgt']), f_print(6, hgt['ggt'])))
+
     return allTop
 
 
@@ -305,7 +363,7 @@ if __name__ == '__main__':
     while 1:
         try:
             if not status:
-                get_hot_count(3)
+                get_hot_countNew(3)
             if status:
                 # status=True
                 if not num_input:

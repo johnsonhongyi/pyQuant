@@ -158,6 +158,14 @@ if __name__ == "__main__":
                     time.sleep(60)
                 else:
                     time.sleep(60)
+            elif cct.get_work_duration():
+                while 1:
+                    time.sleep(60)
+                    if cct.get_work_duration():
+                        print ".",
+                        time.sleep(60)
+                    else:
+                        break
             else:
                 # break
                 # time.sleep(5)

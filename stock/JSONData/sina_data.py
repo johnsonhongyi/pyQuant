@@ -189,6 +189,7 @@ class Sina:
         df = df.drop_duplicates('code')
         df = df.loc[:, ct.SINA_Total_Columns_Clean]
         df = df.fillna(0)
+        df=df.sort_values(by='code',ascending=0)
         print ("Market-df:%s %s time: %s" % (
         format((time.time() - self.stockcode.start_t), '.3f'), len(df), cct.get_now_time()))
         return df

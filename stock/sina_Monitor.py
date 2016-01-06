@@ -23,6 +23,7 @@ from bs4 import BeautifulSoup
 from pandas import DataFrame
 
 import JohhnsonUtil.johnson_cons as ct
+import JohhnsonUtil.commonTips as cct
 from JSONData import realdatajson as rl
 import singleAnalyseUtil as sl
 from JSONData import tdx_data_Day as tdd
@@ -238,12 +239,20 @@ if __name__ == "__main__":
 
             else:
                 print "no data"
-            int_time = sl.get_now_time_int()
-            if sl.get_work_time_now():
+            int_time = cct.get_now_time_int()
+            if cct.get_work_time():
                 if int_time < 926:
                     time.sleep(60)
                 else:
                     time.sleep(60)
+            elif cct.get_work_duration():
+                while 1:
+                    time.sleep(60)
+                    if cct.get_work_duration():
+                        print ".",
+                        time.sleep(60)
+                    else:
+                        break
             else:
                 # break
                 # time.sleep(5)
@@ -263,11 +272,11 @@ if __name__ == "__main__":
                 elif st == 'w' or st == 'a':
                     codew = (top_all.index).tolist()
                     if st == 'a':
-                        sl.write_to_blocknew(block_path, codew[:20])
-                        # sl.write_to_blocknew(all_diffpath, codew)
+                        cct.write_to_blocknew(block_path, codew[:20])
+                        # cct.write_to_blocknew(all_diffpath, codew)
                     else:
-                        sl.write_to_blocknew(block_path, codew[:20], False)
-                        # sl.write_to_blocknew(all_diffpath, codew, False)
+                        cct.write_to_blocknew(block_path, codew[:20], False)
+                        # cct.write_to_blocknew(all_diffpath, codew, False)
                     print "wri ok:%s"%block_path
                     # time.sleep(2)
                 else:
@@ -296,11 +305,11 @@ if __name__ == "__main__":
                 # all_diffpath=base_path+'\065.blk'
                 codew=top_all[:20].index.tolist()
                 if st=='a':
-                    sl.write_to_blocknew(block_path,codew)
-                    # sl.write_to_blocknew(all_diffpath,codew)
+                    cct.write_to_blocknew(block_path,codew)
+                    # cct.write_to_blocknew(all_diffpath,codew)
                 else:
-                    sl.write_to_blocknew(block_path,codew,False)
-                    # sl.write_to_blocknew(all_diffpath,codew,False)
+                    cct.write_to_blocknew(block_path,codew,False)
+                    # cct.write_to_blocknew(all_diffpath,codew,False)
                 print "wri ok"
                 # time.sleep(5)
             else:
