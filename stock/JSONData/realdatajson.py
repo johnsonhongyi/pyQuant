@@ -541,7 +541,7 @@ def get_market_price_sina_dd_realTime(dp='',vol='0',type='3'):
         # dp['volume']=dp['volume'].apply(lambda x:round(x/100,1))
         # dp=dp.loc[:,'trade':].astype(float)
         log.info("DP:%s" % dp[:2])
-        if dp[:1].buy.values <> 0 and dp[:1].percent.values == 0 :
+        if len(dp[dp['buy'] > 0]) > 10 and len(dp[dp['percent'] > 0]) > 10:
             if 'close' in dp.columns:
                 if dp[:1].close.values <> 0:
                     dp['percent'] = (map(lambda x, y: round((x - y) / y * 100, 1), dp['buy'].values, dp['close'].values))
