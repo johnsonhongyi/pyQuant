@@ -241,8 +241,13 @@ if __name__ == "__main__":
                 print "no data"
             int_time = cct.get_now_time_int()
             if cct.get_work_time():
-                if int_time < 926:
-                    time.sleep(60)
+                if int_time < 930:
+                    while 1:
+                        time.sleep(60)
+                        if cct.get_now_time_int() < 931:
+                            time.sleep(60)
+                        else:
+                            break
                 else:
                     time.sleep(60)
             elif cct.get_work_duration():

@@ -193,10 +193,9 @@ def to_mp_run(cmd, urllist):
     return results
 
 
-def to_mp_run_async(cmd, urllist, arg=1):
+def to_mp_run_async(cmd, urllist,*args):
     # n_t=time.time()
     print "mp_async:%s" % len(urllist),
-
     pool = ThreadPool(cpu_count())
     # print arg
     # print cpu_count()
@@ -210,16 +209,14 @@ def to_mp_run_async(cmd, urllist, arg=1):
     results = []
     for code in urllist:
         # result = pool.apply_async(cmd, (code, arg))
-        result = pool.apply_async(cmd, (code,))
+        # arg=(code)+','+(args)
+        # print arg
+        result = pool.apply_async(cmd,(code,)+args).get()
         results.append(result)
     pool.close()
     pool.join()
-    results = flatten(map(lambda x: x.get(), results))
-    # results=lambda L: sum(map(results,L),[]) if isinstance(L,list) else [L]
-    # print results
-    # import sys
-    # sys.exit(0)
-    # results=flatten(results)
+    # results = flatten(map(lambda x: x.get(), results))
+    # results = flatten( results)
     # print "time:MP", (time.time() - n_t)
     return results
 
@@ -256,7 +253,7 @@ def code_to_symbol(code):
         if len(code) != 6:
             return ''
         else:
-            return 'sh%s' % code if code[:1] in ['5', '6'] else 'sz%s' % code
+            return 'sh%s' % code if code[:1] in ['5', '6','9'] else 'sz%s' % code
 
 
 def symbol_to_code(symbol):

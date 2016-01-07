@@ -5,6 +5,10 @@ import sys
 sys.path.append("..")
 import JohhnsonUtil.commonTips as cct
 import JohhnsonUtil.johnson_cons as ct
+import JohhnsonUtil.LoggerFactory as LoggerFactory
+import tdx_data_Day as tdd
+log = LoggerFactory.getLogger("FundFlow")
+# log.setLevel(LoggerFactory.DEBUG)
 
 def get_dfcfw_fund_flow(url):
     data = cct.get_url_data_R(url)
@@ -30,8 +34,10 @@ def get_dfcfw_fund_HGT(url):
     # print vol_l
     if len(vol_l)==1:
         data=vol_l[0].split(',')
-        dd['ggt']=data[0]
-        dd['hgt']=data[6]
+        log.info("D0:%s"%data[0])
+        log.debug("hgt:%s"%re.findall(ur'([\d.]+)([\u4e00-\u9fa5]+)',data[0].decode('utf8')))
+        dd['ggt']=data[0].decode('utf8')
+        dd['hgt']=data[6].decode('utf8')
         # dd['zzb']=data[1]
         # dd['sjlr']=data[2]
         # dd['sjzb']=data[3]
@@ -50,11 +56,15 @@ def get_dfcfw_fund_SHSZ(url):
     if len(vol_l)==2:
         # for x in range(len(vol_l):
         data=vol_l[0].split(',')
-        dd['svol']=round(float(data[3])/100000000,2)
+        data2=vol_l[1].split(',')
+        if len(data[3]) >2:
+            dd['svol']=round(float(data[3])/100000000,2)
+            dd['zvol']=round(float(data2[3])/100000000,2)
+        else:
+            dd['svol']=data[3]
+            dd['zvol']=data2[3]
         dd['scent']=data[5]
         dd['sup']=data[6].split('|')[0]
-        data2=vol_l[1].split(',')
-        dd['zvol']=round(float(data2[3])/100000000,2)
         dd['zcent']=data2[5]
         dd['zup']=data2[7].split('|')[0]
         # dd['zzb']=data[1]
@@ -65,15 +75,23 @@ def get_dfcfw_fund_SHSZ(url):
         print "Fund:Null:%s url:%s"%(data,url)
     return dd
 
+def get_zs_VolRatio():
+    list=['000001','399001','399006','399005']
+    df = tdd.get_tdx_all_day_LastDF(list,type=1)
+    return df
 
 if __name__ == "__main__":
-    ff = get_dfcfw_fund_flow(ct.DFCFW_FUND_FLOW_URL % ct.SINA_Market_KEY_TO_DFCFW['sh'])
-    print "%.1f" % (float(ff['zzb']))
-    print ff
-
+    # ff = get_dfcfw_fund_flow(ct.DFCFW_FUND_FLOW_URL % ct.SINA_Market_KEY_TO_DFCFW['sh'])
+    # print "%.1f" % (float(ff['zzb']))
+    # print ff
+    #
+    # # pp=get_dfcfw_fund_HGT(ct.DFCFW_FUND_FLOW_HGT)
+    # # for x in pp.keys():
+    # #     print pp[x]
+    #
+    pp=get_dfcfw_fund_SHSZ(ct.DFCFW_ZS_SHSZ)
+    print pp
+    print get_zs_VolRatio()
     # pp=get_dfcfw_fund_HGT(ct.DFCFW_FUND_FLOW_HGT)
     # for x in pp.keys():
     #     print pp[x]
-
-    pp=get_dfcfw_fund_SHSZ(ct.DFCFW_ZS_SHSZ)
-    print pp

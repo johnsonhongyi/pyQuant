@@ -15,7 +15,7 @@ from JohhnsonUtil import commonTips as cct
 from JohhnsonUtil import LoggerFactory
 import trollius as asyncio
 from trollius.coroutines import From
-
+import tdx_data_Day as tdd
 log = LoggerFactory.getLogger('Sina_data')
 
 class StockCode:
@@ -52,7 +52,6 @@ class StockCode:
             response = requests.get(all_stock_codes_url)
             stock_codes = grep_stock_codes.findall(response.text)
             print len(stock_codes)
-
             with open(self.stock_code_path, 'w') as f:
                 f.write(json.dumps(dict(stock=stock_codes)))
             return stock_codes
@@ -79,9 +78,23 @@ class Sina:
         self.stock_codes = []
         self.stock_with_exchange_list = []
         self.max_num = 850
+        self.start_t = time.time()
+        self.dataframe=pd.DataFrame()
+
+    def load_stock_codes(self):
+        with open(self.stock_code_path) as f:
+            self.stock_codes = json.load(f)['stock']
+
+    # def get_stocks_by_range(self, index):
+    #
+    #     response = requests.get(self.sina_stock_api + self.stock_list[index])
+    #     self.stock_data.append(response.text)
+    @property
+    def all(self):
         self.stockcode = StockCode()
         self.stock_code_path = self.stockcode.stock_code_path
         self.stock_codes = self.stockcode.get_stock_codes()
+        # print type(self.stock_codes)
         self.load_stock_codes()
         self.stock_with_exchange_list = list(
             map(lambda stock_code: ('sh%s' if stock_code.startswith(('5', '6', '9')) else 'sz%s') % stock_code,
@@ -94,17 +107,6 @@ class Sina:
             num_end = self.max_num * (range_start + 1)
             request_list = ','.join(self.stock_with_exchange_list[num_start:num_end])
             self.stock_list.append(request_list)
-
-    def load_stock_codes(self):
-        with open(self.stock_code_path) as f:
-            self.stock_codes = json.load(f)['stock']
-
-    # def get_stocks_by_range(self, index):
-    #
-    #     response = requests.get(self.sina_stock_api + self.stock_list[index])
-    #     self.stock_data.append(response.text)
-    @property
-    def all(self):
         return self.get_stock_data()
 
     @asyncio.coroutine
@@ -139,6 +141,23 @@ class Sina:
     #
     #     return self.format_response_data()
 
+    def get_stock_list_data(self,ulist):
+        self.stock_codes = ulist
+        print type(self.stock_codes)
+        # self.stock_with_exchange_list = list(
+        #     map(lambda stock_code: ('sh%s' if stock_code.startswith(('5', '6', '9')) else 'sz%s') % stock_code,
+        #         ulist))
+        self.stock_codes = map(lambda stock_code: ('sh%s' if stock_code.startswith(('5', '6', '9')) else 'sz%s') % stock_code,ulist)
+        self.url = self.sina_stock_api + ','.join(self.stock_codes)
+        print self.url
+        response = requests.get(self.url)
+        self.stock_data.append(response.text)
+        self.dataframe=self.format_response_data()
+        self.get_tdx_dd()
+        return self.dataframe
+    def get_tdx_dd(self):
+        df=tdd.get_tdx_all_day_LastDF(self.stock_codes)
+        print df
     def format_response_data(self):
         stocks_detail = ''.join(self.stock_data)
         result = self.grep_stock_detail.finditer(stocks_detail)
@@ -191,7 +210,7 @@ class Sina:
         df = df.fillna(0)
         df=df.sort_values(by='code',ascending=0)
         print ("Market-df:%s %s time: %s" % (
-        format((time.time() - self.stockcode.start_t), '.3f'), len(df), cct.get_now_time()))
+        format((time.time() - self.start_t), '.3f'), len(df), cct.get_now_time()))
         return df
         # df = pd.DataFrame.from_dict(stock_dict, orient='columns',
         #                             columns=['name', 'open', 'close', 'now', 'high', 'low', 'buy', 'sell', 'turnover',
@@ -205,15 +224,16 @@ class Sina:
 if __name__ == "__main__":
     times = time.time()
     sina = Sina()
-    # sina.
-    df = sina.all
+    # df = sina.all
+    list=['000001','399001','399006','399005']
+    df=sina.get_stock_list_data(list)
     print time.time() - times
     print len(df.index)
     print df[:4]
-    print df[df.code == '000024']
-    print df[df.code == '002788']
-    print df[df.code == '150027']
-    print df[df.code == '200024']
+    # print df[df.code == '000024']
+    # print df[df.code == '002788']
+    # print df[df.code == '150027']
+    # print df[df.code == '200024']
     # print df.code
     # print len(df.index)
 

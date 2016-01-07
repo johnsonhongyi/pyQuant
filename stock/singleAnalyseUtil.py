@@ -306,7 +306,7 @@ def get_hot_countNew(changepercent):
             f_print(4, ff['zup']),
             f_print(5, ff['zvol']))),
     if len(hgt) > 0:
-        print ("hgt: %s ggt: %s" % (f_print(5, hgt['hgt']), f_print(5, hgt['ggt'])))
+        print ("hgt: %s ggt: %s" % (hgt['hgt'],hgt['ggt']))
 
     return allTop
 

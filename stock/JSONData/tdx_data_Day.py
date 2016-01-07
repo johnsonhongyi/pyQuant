@@ -1,15 +1,14 @@
 # -*- encoding: utf-8 -*-
 # !/usr/bin/python
 from __future__ import division
-
 import os
 import sys
 import time
 from struct import *
-
 import numpy as np
 import pandas as pd
 from pandas import Series
+
 sys.path.append("..")
 from JSONData import realdatajson as rl
 from JohhnsonUtil import LoggerFactory
@@ -174,9 +173,15 @@ def get_tdx_day_to_df(code):
     return df
 
 
-def get_tdx_day_to_df_last(code, dayl=1):
+def get_tdx_day_to_df_last(code,dayl='1',type=0):
+    # dayl=int(dayl)
+    # type=int(type)
+    # print "t:",dayl,"type",type
+    if not type == 0:
+        f = (lambda x: str((1000000 - int(x))) if x.startswith('0') else x)
+        code = f(code)
     code_u = cct.code_to_symbol(code)
-    day_path = day_dir % 'sh' if code[:1] in ['5', '6', '9'] else day_dir % 'sz'
+    day_path = day_dir % 'sh' if code.startswith(('5', '6', '9')) else day_dir % 'sz'
     p_day_dir = day_path.replace('/', path_sep).replace('\\', path_sep)
     # p_exp_dir=exp_dir.replace('/',path_sep).replace('\\',path_sep)
     # print p_day_dir,p_exp_dir
@@ -252,30 +257,48 @@ def get_tdx_day_to_df_last(code, dayl=1):
 # usage 使用说明
 #
 #############################################################
-def get_tdx_all_day_LastDF(codeList):
+def get_tdx_all_day_LastDF(codeList,type=0):
     time_t = time.time()
     # df = rl.get_sina_Market_json(market)
     # code_list = np.array(df.code)
-    results = cct.to_mp_run(get_tdx_day_to_df_last, codeList)
+    # if type==0:
+    #     results = cct.to_mp_run(get_tdx_day_to_df_last, codeList)
+    # else:
+    results = cct.to_mp_run_async(get_tdx_day_to_df_last, codeList,1,type)
     df = pd.DataFrame(results, columns=ct.TDX_Day_columns)
     df = df.set_index('code')
     df.loc[:, 'open':] = df.loc[:, 'open':].astype(float)
     # df.vol = df.vol.apply(lambda x: x / 100)
     log.info("get_to_mp:%s" % (len(df)))
-
     # print len(df)
     # print "<2015-08-25",len(df[(df.date< '2015-08-25')])
     # print "06-25-->8-25'",len(df[(df.date< '2015-08-25')&(df.date > '2015-06-25')])
     log.info("TDXTime:%s" % (time.time() - time_t))
     return df
 
+def get_tdx_all_StockList_DF(code_list, dayl=1,type=0):
+    time_t = time.time()
+    # df = rl.get_sina_Market_json(market)
+    # code_list = np.array(df.code)
+    # log.info('code_list:%s' % len(code_list))
+    results = cct.to_mp_run_async(get_tdx_day_to_df_last, code_list, dayl,type)
+    log.info("get_to_mp_op:%s" % (len(results)))
+    # df = pd.DataFrame(results, columns=ct.TDX_Day_columns)
+    # df = df.set_index('code')
+    # print df[:1]
+
+    # print len(df),df[:1]
+    # print "<2015-08-25",len(df[(df.date< '2015-08-25')])
+    # print "06-25-->8-25'",len(df[(df.date< '2015-08-25')&(df.date > '2015-06-25')])
+    print "t:", time.time() - time_t
+    return results
 
 def get_tdx_all_day_DayL_DF(market='cyb', dayl=1):
     time_t = time.time()
     df = rl.get_sina_Market_json(market)
     code_list = np.array(df.code)
     log.info('code_list:%s' % len(code_list))
-    results = cct.to_mp_run_op(get_tdx_day_to_df_last, code_list, dayl)
+    results = cct.to_mp_run_async(get_tdx_day_to_df_last, code_list, dayl)
     log.info("get_to_mp_op:%s" % (len(results)))
     # df = pd.DataFrame(results, columns=ct.TDX_Day_columns)
     # df = df.set_index('code')
@@ -299,8 +322,14 @@ python %s -t txt 999999 20070101 20070302
 
 
 if __name__ == '__main__':
-    df = get_tdx_day_to_df_last('601198', 10)
+    # df = get_tdx_day_to_df_last('000001', 10, 1)
+    # print df[:1]
+    list=['000001','399001','399006','399005']
+    # list=['000001']
+    df = get_tdx_all_day_LastDF(list,type=1)
     print df
+    # df= get_tdx_all_StockList_DF(list,1,1)
+    # print df[:6]
     import sys
 
     sys.exit(0)

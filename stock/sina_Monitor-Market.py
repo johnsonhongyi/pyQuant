@@ -233,6 +233,7 @@ if __name__ == "__main__":
                     if 'counts' in top_now.columns.values:
                         if not 'counts' in top_all.columns.values:
                             top_all['counts'] = 0
+                            top_all['prev_p'] = 0
                     if time_d - time_s > delay_time:
                         status_change = True
                     else:
@@ -367,7 +368,7 @@ if __name__ == "__main__":
             int_time = cct.get_now_time_int()
             if cct.get_work_time():
                 if int_time < 926:
-                    time.sleep(10)
+                    time.sleep(30)
                 else:
                     time.sleep(60)
             elif cct.get_work_duration():

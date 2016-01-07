@@ -18,7 +18,7 @@ from JSONData import realdatajson as rl
 from JSONData import sina_data
 from JSONData import tdx_data_Day as tdd
 from JohhnsonUtil import commonTips as cct
-from JohhnsonUtil import LoggerFactory as LogF
+from JohhnsonUtil import LoggerFactory as LoggerFactory
 
 
 # from logbook import Logger,StreamHandler,SyslogHandler
@@ -160,8 +160,8 @@ def get_sina_all_dd(vol='0', type='0', retry_count=3, pause=0.001):
 if __name__ == "__main__":
     # parsehtml(downloadpage(url_s))
     # StreamHandler(sys.stdout).push_application()
-    log = LogF.getLogger('SinaMarket')
-    # log.setLevel(logging.DEBUG)
+    log = LoggerFactory.getLogger('SinaMarket')
+    # log.setLevel(LoggerFactory.DEBUG)
 
     # handler=StderrHandler(format_string='{record.channel}: {record.message) [{record.extra[cwd]}]')
     # log.level=log.debug
@@ -234,6 +234,7 @@ if __name__ == "__main__":
                     if 'counts' in top_now.columns.values:
                         if not 'counts' in top_all.columns.values:
                             top_all['counts'] = 0
+                            top_all['prev_p'] = 0
                     if time_d - time_s > delay_time:
                         status_change = True
                     else:
@@ -368,7 +369,7 @@ if __name__ == "__main__":
             int_time = cct.get_now_time_int()
             if cct.get_work_time():
                 if int_time < 926:
-                    time.sleep(10)
+                    time.sleep(30)
                 else:
                     time.sleep(60)
             elif cct.get_work_duration():
