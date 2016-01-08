@@ -21,10 +21,11 @@ except ImportError:
     from urllib2 import urlopen, Request
 import requests
 
-def set_console(width=80,height=15):
+def set_console(width=80,height=15,color=3):
     # mode con cp select=936
     os.system("mode con: cols=%s lines=%s"%(width,height))
     os.system('title=%s'%sys.argv[0])
+    os.system('color %s'%color)
 
 def get_cpu_count():
     return cpu_count()
