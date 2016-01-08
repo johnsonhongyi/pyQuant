@@ -160,11 +160,10 @@ if __name__ == "__main__":
     # parsehtml(downloadpage(url_s))
     # StreamHandler(sys.stdout).push_application()
     log = LoggerFactory.getLogger('SinaMarket')
-    # log.setLevel(logging.DEBUG)
+    # log=LoggerFactory.JohnsonLoger('SinaMarket').setLevel(LoggerFactory.DEBUG)
+    # log.setLevel(LoggerFactory.DEBUG)
 
-    # handler=StderrHandler(format_string='{record.channel}: {record.message) [{record.extra[cwd]}]')
-    # log.level=log.debug
-    # error_handler = SyslogHandler('Sina-M-Log', level='ERROR')
+    cct.set_console(130,15)
     status = False
     vol = '0'
     type = '2'
@@ -172,7 +171,7 @@ if __name__ == "__main__":
     success = 0
     top_all = pd.DataFrame()
     time_s = time.time()
-    delay_time = 60
+    delay_time = 3600
     First = True
     base_path = tdd.get_tdx_dir()
     block_path = tdd.get_tdx_dir_blocknew() + '063.blk'
@@ -187,10 +186,19 @@ if __name__ == "__main__":
             gc.collect()
             radio_t = cct.get_work_time_ratio()
             time_Rt = time.time()
-            # top_now = top_now[top_now.buy > 0]
-            if len(top_now) > 10 and not top_now[:1].buy.values == 0:
+            time_d = time.time()
+            if time_d - time_s > delay_time:
+                status_change = True
+                log.info("chane clear top")
+                time_s = time.time()
+                top_all=pd.DataFrame()
+
+            else:
+                status_change = False
+            print len(top_now[top_now['buy'] > 0])
+            if len(top_now) > 10 and len(top_now[:20][top_now[:20]['buy'] > 0]) > 3:
+
                 # if len(top_now) > 10 and not top_now[:1].buy.values == 0:
-                time_d = time.time()
                 #     top_now=top_now[top_now['percent']>=0]
                 if len(top_all) == 0:
                     top_all = top_now
@@ -214,19 +222,19 @@ if __name__ == "__main__":
                     log.info('Top-merge_now:%s' % (top_all[:1]))
                     top_all = top_all[top_all['llow'] > 0]
 
-                    if top_all[:1].volume.values > 0:
-                        # top_all['volume'] = top_all['volume'].apply(lambda x: round(float(x) / radio_t, 1))
-                        # C4 = np.asarray(map(lambda x,y: x**y, pdA.values, pdB.values))
-                        # top_all['volume'] = round(
-                        # top_now.loc[symbol, 'volume'] / top_all.loc[symbol, 'lvol'], 1)
-                        top_all['volume'] = (
-                            map(lambda x, y: round(x / y / radio_t, 1), top_all['volume'].values,
-                                top_all['lvol'].values))
-                        # top_all['volume']=np.asarray(map(lambda x,y: round(x/y,1), top_all['volume'].values, top_all['lvol'].values))
-                        # print top_all[:1]
-                        log.debug("First:vol/vol/:%s  vol:%s" % (radio_t, top_all[-1:].volume.values))
+                    # if len(top_all[:5][top_all[:5]['volume'] > 0]) > 3:
+                    #
+                    #     # top_all['volume'] = top_all['volume'].apply(lambda x: round(float(x) / radio_t, 1))
+                    #     # C4 = np.asarray(map(lambda x,y: x**y, pdA.values, pdB.values))
+                    #     # top_all['volume'] = round(
+                    #     # top_now.loc[symbol, 'volume'] / top_all.loc[symbol, 'lvol'], 1)
+                    #     top_all['volume'] = (
+                    #         map(lambda x, y: round(x / y / radio_t, 1), top_all['volume'].values,
+                    #             top_all['lvol'].values))
+                    #     # top_all['volume']=np.asarray(map(lambda x,y: round(x/y,1), top_all['volume'].values, top_all['lvol'].values))
+                    #     # print top_all[:1]
+                    #     log.debug("First:vol/vol/:%s  vol:%s" % (radio_t, top_all[-1:].volume.values))
 
-                    time_s = time.time()
                     # import sys
                     # sys.exit(0)
                 else:
@@ -234,10 +242,6 @@ if __name__ == "__main__":
                         if not 'counts' in top_all.columns.values:
                             top_all['counts'] = 0
                             top_all['prev_p'] = 0
-                    if time_d - time_s > delay_time:
-                        status_change = True
-                    else:
-                        status_change = False
 
                     for symbol in top_now.index:
                         # code = rl._symbol_to_code(symbol)
@@ -308,19 +312,15 @@ if __name__ == "__main__":
 
                 # top_dif = top_dif[top_dif.percent >= 0]
 
-                if len(top_dif) == 0:
-                    print "No G,DataFrame is Empty!!!!!!"
-                    top_dif = top_all
-
-                if First:
-                    First = False
-                    log.debug("First:")
-                else:
+                if len(top_dif[:5][top_dif[:5]['volume'] > 0]) > 3:
                     log.debug("Second:vol/vol/:%s" % radio_t)
                     # top_dif['volume'] = top_dif['volume'].apply(lambda x: round(x / radio_t, 1))
                     top_dif['volume'] = (
                         map(lambda x, y: round(x / y / radio_t, 1), top_dif['volume'].values, top_dif['lvol'].values))
-                    top_dif = top_dif[top_dif.volume > 1]
+                    # top_dif = top_dif[top_dif.volume > 0.5]
+                # print top_dif[-2:]
+                if len(top_dif) == 0:
+                    print "No G,DataFrame is Empty!!!!!!"
 
                 log.debug('dif6 vol:%s' % (top_dif[:1].volume.values))
 
@@ -343,8 +343,6 @@ if __name__ == "__main__":
                 else:
                     print "Good Morning!!!"
                     top_dif = top_dif.sort_values(by=['diff', 'percent', 'ratio'], ascending=[0, 0, 1])
-                if time_d - time_s > delay_time:
-                    time_s = time.time()
 
                 # top_all=top_all.sort_values(by=['percent','diff','counts','ratio'],ascending=[0,0,1,1])
                 # print rl.format_for_print(top_dif[:10])
@@ -378,6 +376,8 @@ if __name__ == "__main__":
                         print ".",
                         time.sleep(60)
                     else:
+                        top_all = pd.DataFrame()
+                        print "."
                         break
             else:
                 st = raw_input("status:[go(g),clear(c),quit(q,e),W(w),Wa(a)]:")

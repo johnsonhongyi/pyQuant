@@ -27,9 +27,11 @@ NOTSET = 0
 # print(log_path)
 
 # http://blog.sina.com.cn/s/blog_411fed0c0100wkvj.html
+
 def getLogger(name):
     # now = time.strftime('%Y-%m-%d %H:%M:%S')
     # path_sep = cct.get_os_path_sep()
+    log_path = cct.get_run_path() + 'stock.log'
     logging.basicConfig(
         # level    =eval('logging.%s'%(level_s)),
         # level=logging.DEBUG,
@@ -67,32 +69,64 @@ def set_log_file(console, level_s='DEBUG'):
     logging.getLogger('').addHandler(console)
 
 
-class CheloExtendedLogger(logging.Logger):
+class JohnsonLoger(logging.Logger):
     """
     Custom logger class with additional levels and methods
     """
-    WARNPFX = logging.WARNING+1
+    # WARNPFX = logging.WARNING+1
+    # CRITICAL = 50
+    # FATAL = CRITICAL
+    # ERROR = 40
+    # WARNING = 30
+    # WARN = WARNING
+    # INFO = 20
+    # DEBUG = 10
+    # NOTSET = 0
 
     def __init__(self, name):
-        logging.Logger.__init__(self, name, logging.DEBUG)
+        # now = time.strftime('%Y-%m-%d %H:%M:%S')
+        # path_sep = cct.get_os_path_sep()
+        self.name=name
+        log_path = cct.get_run_path() + 'stock.log'
+        logging.basicConfig(
+            # level    =eval('logging.%s'%(level_s)),
+            # level=DEBUG,
+            # format   = now +":" + name + ' LINE %(lineno)-4d  %(levelname)-8s %(message)s',
+            format="[%(asctime)s] %(name)s:%(levelname)s: %(message)s",
+            datefmt='%m-%d %H:%M',
+            filename=log_path,
+            filemode='w');
+        self.console=logging.StreamHandler();
+        self.console.setLevel(logging.DEBUG);
+        formatter = logging.Formatter(self.name + ': LINE %(lineno)-4d : %(levelname)-8s %(message)s');
+        self.console.setFormatter(formatter);
+        self.logger = logging.getLogger(self.name)
+        self.logger.addHandler(self.console);
+        self.setLevel(ERROR)
 
-        logging.addLevelName(self.WARNPFX, 'WARNING')
-
-        console = logging.StreamHandler()
-        console.setLevel(logging.DEBUG)
-        # create formatter and add it to the handlers
-        formatter = logging.Formatter("%(asctime)s [%(funcName)s: %(filename)s,%(lineno)d] %(message)s")
-        console.setFormatter(formatter)
-
-        # add the handlers to logger
-        self.addHandler(console)
-
-        return
+        # return self.logger
 
     def warnpfx(self, msg, *args, **kw):
         self.log(self.WARNPFX, "! PFXWRN %s" % msg, *args, **kw)
 
+    def setLevel(self, level):
+        self.logger.setLevel(level)
+        return self.logger
 
+    def debug(self,message):
+        self.logger.debug(message)
+
+    def info(self,message):
+        self.logger.info(message)
+
+    def warn(self,message):
+        self.logger.warn(message)
+
+    def error(self,message):
+        self.logger.error(message)
+
+    def cri(self,message):
+        self.logger.critical(message)
     # logging.setLoggerClass(CheloExtendedLogger)
     # rrclogger = logging.getLogger("rrcheck")
     # rrclogger.setLevel(logging.INFO)
@@ -106,3 +140,4 @@ class CheloExtendedLogger(logging.Logger):
 
 if __name__ == '__main__':
     getLogger("www").debug("www")
+    # log=JohnsonLoger("www").setDebugLevel(DEBUG)

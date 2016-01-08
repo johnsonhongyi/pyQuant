@@ -12,7 +12,7 @@ import json
 import math
 import sys
 import time
-
+import re
 import lxml.html
 import pandas as pd
 from lxml import etree
@@ -28,6 +28,7 @@ except ImportError:
     from urllib2 import urlopen, Request
 
 log=LoggerFactory.getLogger('Realdata')
+# log=LoggerFactory.JohnsonLoger('Realdata')
 
 
 def set_default_encode(code='utf-8'):
@@ -184,7 +185,7 @@ def _get_sina_json_dd_url(vol='0', type='3', num='10000', count=None):
     urllist = []
     if count == None:
         url = ct.JSON_DD_CountURL % (ct.DD_VOL_List[vol], type)
-        log.debug("_json_dd_url:%s"%url)
+        log.info("_json_dd_url:%s"%url)
         data = cct.get_url_data(url)
         # return []
         # print data.find('abc')
@@ -289,7 +290,7 @@ def get_sina_all_json_dd(vol='0', type='3', num='10000', retry_count=3, pause=0.
     # data['code'] = symbol
     # df = df.append(data, ignore_index=True)
     if len(url_list)>0:
-        log.debug("json_dd_url:%s"%url_list[0])
+        log.info("json_dd_url:%s"%url_list[0])
         data = cct.to_asyncio_run(url_list, _parsing_sina_dd_price_json)
     # data = cct.to_mp_run(_parsing_sina_dd_price_json, url_list)
     # data = cct.to_mp_run_async(_parsing_sina_dd_price_json, url_list)
@@ -309,6 +310,7 @@ def get_sina_all_json_dd(vol='0', type='3', num='10000', retry_count=3, pause=0.
         if len(data)>0:
             df = df.append(data, ignore_index=True)
             log.debug("dd.columns:%s" % df.columns.values)
+            #['code' 'name' 'ticktime' 'price' 'volume' 'prev_price' 'kind']
             log.debug("get_sina_all_json_dd:%s" % df[:1])
 
         if not df.empty:
@@ -320,10 +322,10 @@ def get_sina_all_json_dd(vol='0', type='3', num='10000', retry_count=3, pause=0.
             return df
         else:
             print
-            print ("no data  json-df: %0.2f"%((time.time() - start_t)))
+            print ("no data  json-df: %0.2f"%((time.time() - start_t))),
             return ''
     else:
-        print ("Url null json-df: %0.2f "%((time.time() - start_t)))
+        print ("Url null json-df: %0.2f "%((time.time() - start_t))),
         return ''
 
 def _today_ticks(symbol, tdate, pageNo, retry_count, pause):
@@ -540,10 +542,10 @@ def get_market_price_sina_dd_realTime(dp='',vol='0',type='3'):
         # log.debug("dp.volume>0:%s"%dp[:1].volume.values)
         # dp['volume']=dp['volume'].apply(lambda x:round(x/100,1))
         # dp=dp.loc[:,'trade':].astype(float)
-        log.info("DP:%s" % dp[:2])
-        if len(dp[dp['buy'] > 0]) > 10 and len(dp[dp['percent'] > 0]) > 10:
+        log.info("DP:%s" % dp[:1])
+        if len(dp[:10][dp[:10]['buy'] > 0]) > 2 and len(dp[:10][dp[:10]['percent'] == 0]) > 2:
             if 'close' in dp.columns:
-                if dp[:1].close.values <> 0:
+                if len(dp[:5][dp[:5]['close'] > 0]) > 2:
                     dp['percent'] = (map(lambda x, y: round((x - y) / y * 100, 1), dp['buy'].values, dp['close'].values))
                     log.info("DP-1-percent==0:%s" % dp[:1].percent)
 

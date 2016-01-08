@@ -3,7 +3,6 @@ import datetime
 import sys
 import time
 import types
-
 import pandas as pd
 import tushare as ts
 # print sys.path
@@ -300,13 +299,16 @@ def get_hot_countNew(changepercent):
     hgt = ffu.get_dfcfw_fund_HGT(ct.DFCFW_FUND_FLOW_HGT)
     log.debug("shzs:%s" % ff)
     log.debug("hgt:%s" % hgt)
+    # if len(ff) > 0:
+    #     print ("\tSH: %s u:%s vo: %s sz: %s u:%s vo: %s" % (
+    #         f_print(4, ff['scent']), f_print(4, ff['sup']), f_print(5, ff['svol']), f_print(4, ff['zcent']),
+    #         f_print(4, ff['zup']),
+    #         f_print(5, ff['zvol']))),
     if len(ff) > 0:
-        print ("\tSH: %s u:%s vo: %s sz: %s u:%s vo: %s" % (
-            f_print(4, ff['scent']), f_print(4, ff['sup']), f_print(5, ff['svol']), f_print(4, ff['zcent']),
-            f_print(4, ff['zup']),
-            f_print(5, ff['zvol']))),
+        print (u"\tSh: %s Vr:  %s Sz: %s Vr: %s " % (
+        f_print(4, ff['scent']), f_print(5, ff['svol']), f_print(4, ff['zcent']), f_print(5, ff['zvol']))),
     if len(hgt) > 0:
-        print ("hgt: %s ggt: %s" % (hgt['hgt'],hgt['ggt']))
+        print ("Hgt: %s Ggt: %s" % (hgt['hgt'], hgt['ggt']))
 
     return allTop
 
@@ -347,6 +349,8 @@ def get_code_search_loop(num_input, code='', timed=60, dayl='10', ave=None):
 if __name__ == '__main__':
     # get_multiday_ave_compare('601198')
     # print len(sys.argv)
+    cct.set_console(100,15)
+
     if len(sys.argv) == 2:
         status = True
         num_input = sys.argv[1]
@@ -388,6 +392,29 @@ if __name__ == '__main__':
                     time.sleep(60)
                 else:
                     time.sleep(120)
+            int_time = cct.get_now_time_int()
+            if cct.get_work_time():
+                if int_time < 930:
+                    while 1:
+                        time.sleep(60)
+                        if cct.get_now_time_int() < 931:
+                            time.sleep(60)
+                            print ".",
+                        else:
+                            print "."
+                            break
+                else:
+                    time.sleep(60)
+            elif cct.get_work_duration():
+                while 1:
+                    time.sleep(60)
+                    if cct.get_work_duration():
+                        print ".",
+                        time.sleep(60)
+                    else:
+                        top_all = pd.DataFrame()
+                        break
+
             else:
                 st = raw_input("status:[go(g),clear(c),quit(q,e)]:")
                 if len(st) == 0:

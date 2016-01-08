@@ -1,6 +1,6 @@
 # -*- encoding: utf-8 -*-
 import datetime
-import os
+import os,sys
 import platform
 import re
 import time
@@ -21,6 +21,10 @@ except ImportError:
     from urllib2 import urlopen, Request
 import requests
 
+def set_console(width=80,height=15):
+    # mode con cp select=936
+    os.system("mode con: cols=%s lines=%s"%(width,height))
+    os.system('title=%s'%sys.argv[0])
 
 def get_cpu_count():
     return cpu_count()
@@ -41,8 +45,8 @@ def get_now_time_int():
 
 def get_work_time():
     now_t = str(get_now_time()).replace(':', '')
-    # now_t = int(now_t)
-    if (now_t > '1131' and now_t < '1300') or (now_t < '0920' or now_t > '1502'):
+    now_t = int(now_t)
+    if (now_t > 1131 and now_t < 1300) or now_t < 916 or now_t > 1502:
         # return False
         return False
     else:
@@ -52,7 +56,7 @@ def get_work_time():
 def get_work_duration():
     int_time = get_now_time_int()
     # now_t = int(now_t)
-    if (int_time > 830 and int_time <915) or (int_time > 1130 and int_time <1300 ):
+    if (int_time > 830 and int_time <916) or (int_time > 1130 and int_time <1300 ):
         # return False
         return True
     else:
@@ -195,7 +199,7 @@ def to_mp_run(cmd, urllist):
 
 def to_mp_run_async(cmd, urllist,*args):
     # n_t=time.time()
-    print "mp_async:%s" % len(urllist),
+    # print "mp_async:%s" % len(urllist),
     pool = ThreadPool(cpu_count())
     # print arg
     # print cpu_count()
@@ -219,6 +223,10 @@ def to_mp_run_async(cmd, urllist,*args):
     # results = flatten( results)
     # print "time:MP", (time.time() - n_t)
     return results
+
+def f_print(lens, datastr):
+    data = ('{0:%s}' % (lens)).format(str(datastr))
+    return data
 
 def _write_to_csv(df, filename, indexCode='code'):
     TODAY = datetime.date.today()

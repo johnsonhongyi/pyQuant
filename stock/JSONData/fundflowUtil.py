@@ -58,8 +58,8 @@ def get_dfcfw_fund_SHSZ(url):
         data=vol_l[0].split(',')
         data2=vol_l[1].split(',')
         if len(data[3]) >2:
-            dd['svol']=round(float(data[3])/100000000,2)
-            dd['zvol']=round(float(data2[3])/100000000,2)
+            dd['svol']=round(float(data[3])/100000000,1)
+            dd['zvol']=round(float(data2[3])/100000000,1)
         else:
             dd['svol']=data[3]
             dd['zvol']=data2[3]
@@ -67,17 +67,27 @@ def get_dfcfw_fund_SHSZ(url):
         dd['sup']=data[6].split('|')[0]
         dd['zcent']=data2[5]
         dd['zup']=data2[7].split('|')[0]
+        df=get_zs_VolRatio()
+        if len(df['amount'])>0:
+            radio_t = cct.get_work_time_ratio()
+            # print df.loc['399001','amount']/10000000
+            dd['svol']="%s->%s"%((dd['svol'],round(dd['svol']/(df.loc['999999','amount']/10000000)/radio_t,1)))
+            dd['zvol']="%s->%s"%((dd['zvol'],round(dd['zvol']/(df.loc['399001','amount']/10000000)/radio_t,1)))
         # dd['zzb']=data[1]
         # dd['sjlr']=data[2]
         # dd['sjzb']=data[3]
         # dd['time']=vol_l[1]
+
     else:
         print "Fund:Null:%s url:%s"%(data,url)
     return dd
 
 def get_zs_VolRatio():
-    list=['000001','399001','399006','399005']
+    list=['000001','399001']
+    # list=['000001','399001','399006','399005']
     df = tdd.get_tdx_all_day_LastDF(list,type=1)
+    if not len(df)==len(list):
+        return ''
     return df
 
 if __name__ == "__main__":

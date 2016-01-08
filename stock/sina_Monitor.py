@@ -157,6 +157,8 @@ def get_sina_all_dd(vol='0', type='0', retry_count=3, pause=0.001):
 
 if __name__ == "__main__":
     # parsehtml(downloadpage(url_s))
+
+    cct.set_console()
     status=False
     vol = '0'
     type = '2'
@@ -175,9 +177,16 @@ if __name__ == "__main__":
                 print len(df)
             top_now = rl.get_sina_dd_count_price_realTime(df)
             # print len(top_now)
+            time_d = time.time()
+            if time_d - time_s > delay_time:
+                status_change = True
+                time_s = time.time()
+                top_all=pd.DataFrame()
+
+            else:
+                status_change = False
             if len(top_now)>10 and len(top_now.columns)>4:
                 top_now = top_now[top_now.trade >= top_now.high*0.98]
-                time_d=time.time()
                 if 'percent' in top_now.columns.values:
                     top_now=top_now[top_now['percent']>0]
                 if len(top_all) == 0:
@@ -196,7 +205,7 @@ if __name__ == "__main__":
                             # print count_n,count_a
                             if not count_n==count_a:
                                 top_now.loc[symbol,'diff']=count_n-count_a
-                                if time_d-time_s>delay_time:
+                                if status_change:
                                     # print "change:",time.time()-time_s
                                     top_all.loc[symbol]=top_now.loc[symbol]
                                 else:
@@ -215,9 +224,6 @@ if __name__ == "__main__":
                 # top_all=top_all.sort_values(by=['diff','ratio','percent','counts'],ascending=[0,1,0,1])
                 # top_all=top_all.sort_values(by=['diff','percent','counts','ratio'],ascending=[0,0,1,1])
                 top_all=top_all.sort_values(by=['diff','counts','ratio'],ascending=[0,0,1])
-                if time_d-time_s>delay_time:
-                    time_s=time.time()
-
                 # top_all=top_all.sort_values(by=['percent','diff','counts','ratio'],ascending=[0,0,1,1])
 
 
@@ -246,7 +252,10 @@ if __name__ == "__main__":
                         time.sleep(60)
                         if cct.get_now_time_int() < 931:
                             time.sleep(60)
+                            print ".",
                         else:
+                            top_all=pd.DataFrame()
+                            print "."
                             break
                 else:
                     time.sleep(60)

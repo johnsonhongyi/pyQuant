@@ -78,6 +78,7 @@ def get_sina_url(vol='0', type='0', pageCount='100'):
 
 if __name__ == "__main__":
 
+    cct.set_console()
     status=False
     vol = '0'
     type = '2'
@@ -95,13 +96,19 @@ if __name__ == "__main__":
             df=rl.get_sina_all_json_dd(vol,type)
             top_now = rl.get_sina_dd_count_price_realTime(df)
             # print type(top_now)
+            time_d = time.time()
+            if time_d - time_s > delay_time:
+                status_change = True
+                time_s = time.time()
+                top_all=pd.DataFrame()
+
+            else:
+                status_change = False
             if len(top_now)>10 and len(top_now.columns)>4:
-                time_d=time.time()
                 # if 'percent' in top_now.columns.values:
                 #     top_now=top_now[top_now['percent']>0]
                 if len(top_all) == 0:
                     top_all = top_now
-                    time_s=time.time()
                     # dd=dd.fillna(0)
                 else:
                     top_now = top_now[top_now.trade >= top_now.high*0.98]
@@ -118,7 +125,7 @@ if __name__ == "__main__":
                             # print "count_a:",count_a
                             if not count_n==count_a:
                                 top_now.loc[symbol,'diff']=round((count_n-count_a),1)
-                                if time_d-time_s>delay_time:
+                                if status_change:
                                     # print "change:",time.time()-time_s
                                     top_all.loc[symbol]=top_now.loc[symbol]
                                 else:
@@ -134,8 +141,6 @@ if __name__ == "__main__":
                 # top_all=top_all.sort_values(by=['diff','counts'],ascending=[0,0])
                 # top_all=top_all.sort_values(by=['diff','percent','counts','ratio'],ascending=[0,0,1,1])
                 top_all=top_all.sort_values(by=['diff','percent','counts','ratio'],ascending=[0,0,1,1])
-                if time_d-time_s>delay_time:
-                    time_s=time.time()
                 # print top_all
                 # print pt.PrettyTable([''] + list(top_all.columns))
                 # print tbl.tabulate(top_all,headers='keys', tablefmt='psql')
@@ -159,7 +164,10 @@ if __name__ == "__main__":
                         time.sleep(60)
                         if cct.get_now_time_int() < 931:
                             time.sleep(60)
+                            print ".",
                         else:
+                            top_all=pd.DataFrame()
+                            print "."
                             break
                 else:
                      time.sleep(60)
@@ -170,6 +178,8 @@ if __name__ == "__main__":
                         print ".",
                         time.sleep(60)
                     else:
+                        top_all=pd.DataFrame()
+                        print "."
                         break
             else:
                 # break

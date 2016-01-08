@@ -143,13 +143,12 @@ class Sina:
 
     def get_stock_list_data(self,ulist):
         self.stock_codes = ulist
-        print type(self.stock_codes)
         # self.stock_with_exchange_list = list(
         #     map(lambda stock_code: ('sh%s' if stock_code.startswith(('5', '6', '9')) else 'sz%s') % stock_code,
         #         ulist))
         self.stock_codes = map(lambda stock_code: ('sh%s' if stock_code.startswith(('5', '6', '9')) else 'sz%s') % stock_code,ulist)
         self.url = self.sina_stock_api + ','.join(self.stock_codes)
-        print self.url
+        log.info("stock_list:%s"%self.url)
         response = requests.get(self.url)
         self.stock_data.append(response.text)
         self.dataframe=self.format_response_data()
@@ -224,12 +223,13 @@ class Sina:
 if __name__ == "__main__":
     times = time.time()
     sina = Sina()
-    # df = sina.all
-    list=['000001','399001','399006','399005']
-    df=sina.get_stock_list_data(list)
-    print time.time() - times
-    print len(df.index)
-    print df[:4]
+    df = sina.all
+    print df[:1]
+    # list=['000001','399001','399006','399005']
+    # df=sina.get_stock_list_data(list)
+    # print time.time() - times
+    # print len(df.index)
+    # print df[:4]
     # print df[df.code == '000024']
     # print df[df.code == '002788']
     # print df[df.code == '150027']
