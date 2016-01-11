@@ -23,9 +23,10 @@ import requests
 
 def set_console(width=80,height=15,color=3):
     # mode con cp select=936
-    os.system("mode con: cols=%s lines=%s"%(width,height))
-    os.system('title=%s'%sys.argv[0])
-    os.system('color %s'%color)
+    # os.system("mode con: cols=%s lines=%s"%(width,height))
+    # os.system('title=%s'%sys.argv[0])
+    # os.system('color %s'%color)
+    pass
 
 def get_cpu_count():
     return cpu_count()
@@ -79,14 +80,14 @@ def get_work_time_ratio():
     d1 = datetime.datetime.now()
     now_t = int(datetime.datetime.now().strftime("%H%M"))
     # d2 = datetime.datetime.strptime('201510111011','%Y%M%d%H%M')
-    if now_t < 1130:
+    if now_t>930 and now_t < 1130:
         d2 = datetime.datetime.strptime(ymd + hm1, '%Y:%m:%d:%H:%M')
         ds = float((d1 - d2).seconds)
         ratio_t = round(ds / all_work_time, 3)
 
     elif now_t > 1130 and now_t < 1300:
         ratio_t = 0.5
-    elif now_t >1501:
+    elif now_t >1501 or now_t <930:
         ratio_t = 1.0
     else:
         d2 = datetime.datetime.strptime(ymd + hm2, '%Y:%m:%d:%H:%M')
@@ -343,3 +344,4 @@ def get_run_path():
 
 if __name__ == '__main__':
     print get_run_path()
+    print get_work_time_ratio()

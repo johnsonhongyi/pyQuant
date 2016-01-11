@@ -165,7 +165,7 @@ if __name__ == "__main__":
     # log.level=log.debug
     # error_handler = SyslogHandler('Sina-M-Log', level='ERROR')
 
-    cct.set_console(160,15)
+    cct.set_console(160, 15)
     status = False
     vol = '0'
     type = '2'
@@ -195,17 +195,19 @@ if __name__ == "__main__":
             if time_d - time_s > delay_time:
                 status_change = True
                 time_s = time.time()
-                top_all=pd.DataFrame()
+                top_all = pd.DataFrame()
             else:
                 status_change = False
-            if len(top_now) > 10 and len(top_now[:20][top_now[:20]['buy'] > 0]) > 3:
+            # print ("Buy>0:%s" % len(top_now[top_now['buy'] > 0])),
+            if len(top_now) > 10 or cct.get_work_time():
+                # if len(top_now) > 10 and len(top_now[:20][top_now[:20]['buy'] > 0]) > 3:
                 # if len(top_now) > 10 and not top_now[:1].buy.values == 0:
                 #     top_now=top_now[top_now['percent']>=0]
                 if len(top_all) == 0:
                     top_all = top_now
                     # top_all['llow'] = 0
                     # top_all['lastp'] = 0
-                    top_all = top_all[top_all.buy > 0]
+                    # top_all = top_all[top_all.buy > 0]
                     codelist = top_all.index.tolist()
                     log.info('toTDXlist:%s' % len(codelist))
                     tdxdata = tdd.get_tdx_all_day_LastDF(codelist)
@@ -235,8 +237,8 @@ if __name__ == "__main__":
                     #     # print top_all[:1]
                     #     log.debug("First:vol/vol/:%s" % radio_t)
 
-                        # import sys
-                        # sys.exit(0)
+                    # import sys
+                    # sys.exit(0)
                 else:
                     if 'counts' in top_now.columns.values:
                         if not 'counts' in top_all.columns.values:
@@ -256,7 +258,7 @@ if __name__ == "__main__":
                                 top_now.loc[symbol, 'diff'] = round(
                                     ((float(count_n) - float(count_a)) / float(count_a) * 100), 1)
                                 if status_change and 'counts' in top_now.columns.values:
-                                    print "change:",time.time()-time_s
+                                    print "change:", time.time() - time_s
                                     # top_now.loc[symbol,'lastp']=top_all.loc[symbol,'lastp']
                                     # top_all.loc[symbol, 'buy':'counts'] = top_now.loc[symbol, 'buy':'counts']
                                     top_all.loc[symbol, 'buy':'prev_p'] = top_now.loc[symbol, 'buy':'prev_p']
@@ -335,8 +337,8 @@ if __name__ == "__main__":
 
 
                 print ("A:%s N:%s K:%s %s G:%s" % (
-                    df_count, now_count, len(top_all),
-                    len(top_now) - len(top_all), len(top_dif))),
+                    df_count, now_count, len(top_all[top_all['buy'] > 0]),
+                    len(top_now[top_now['volume'] <= 0]), len(top_dif))),
                 print "Rt:%0.3f" % (float(time.time() - time_Rt))
                 if 'counts' in top_dif.columns.values:
                     top_dif = top_dif.sort_values(by=['diff', 'volume', 'percent', 'counts', 'ratio'],

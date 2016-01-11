@@ -163,6 +163,7 @@ if __name__ == "__main__":
     # log=LoggerFactory.JohnsonLoger('SinaMarket').setLevel(LoggerFactory.DEBUG)
     # log.setLevel(LoggerFactory.DEBUG)
 
+
     cct.set_console(130,15)
     status = False
     vol = '0'
@@ -195,16 +196,18 @@ if __name__ == "__main__":
 
             else:
                 status_change = False
-            print len(top_now[top_now['buy'] > 0])
-            if len(top_now) > 10 and len(top_now[:20][top_now[:20]['buy'] > 0]) > 3:
-
+            # print ("Buy>0:%s"%len(top_now[top_now['buy'] > 0])),
+            log.info("top_now['buy']:%s"%(top_now[:2]['buy']))
+            log.info("top_now.buy[:30]>0:%s"%len(top_now[:30][top_now[:30]['buy'] > 0]))
+            if len(top_now) > 10 or cct.get_work_time():
+            # if len(top_now) > 10 or len(top_now[:10][top_now[:10]['buy'] > 0]) > 3:
                 # if len(top_now) > 10 and not top_now[:1].buy.values == 0:
                 #     top_now=top_now[top_now['percent']>=0]
                 if len(top_all) == 0:
                     top_all = top_now
                     # top_all['llow'] = 0
                     # top_all['lastp'] = 0
-                    top_all = top_all[top_all.buy > 0]
+                    # top_all = top_all[top_all.buy > 0]
                     codelist = top_all.index.tolist()
                     log.info('toTDXlist:%s' % len(codelist))
                     tdxdata = tdd.get_tdx_all_day_LastDF(codelist)
@@ -334,8 +337,8 @@ if __name__ == "__main__":
 
 
                 print ("A:%s N:%s K:%s %s G:%s" % (
-                    df_count, now_count, len(top_all),
-                    len(top_now) - len(top_all), len(top_dif))),
+                    df_count, now_count, len(top_all[top_all['buy'] > 0]),
+                    len(top_now[top_now['volume'] <= 0]), len(top_dif))),
                 print "Rt:%0.3f" % (float(time.time() - time_Rt))
                 if 'counts' in top_dif.columns.values:
                     top_dif = top_dif.sort_values(by=['diff', 'volume', 'percent', 'counts', 'ratio'],

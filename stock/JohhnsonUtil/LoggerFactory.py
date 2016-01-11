@@ -34,8 +34,8 @@ def getLogger(name):
     log_path = cct.get_run_path() + 'stock.log'
     logging.basicConfig(
         # level    =eval('logging.%s'%(level_s)),
-        # level=logging.DEBUG,
         # format   = now +":" + name + ' LINE %(lineno)-4d  %(levelname)-8s %(message)s',
+        # level=logging.DEBUG,
         format="[%(asctime)s] %(name)s:%(levelname)s: %(message)s",
         datefmt='%m-%d %H:%M',
         filename=log_path,

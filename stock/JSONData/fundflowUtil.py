@@ -63,6 +63,7 @@ def get_dfcfw_fund_SHSZ(url):
         else:
             dd['svol']=data[3]
             dd['zvol']=data2[3]
+            # print data[3],data2[3]
         dd['scent']=data[5]
         dd['sup']=data[6].split('|')[0]
         dd['zcent']=data2[5]
@@ -70,9 +71,15 @@ def get_dfcfw_fund_SHSZ(url):
         df=get_zs_VolRatio()
         if len(df['amount'])>0:
             radio_t = cct.get_work_time_ratio()
-            # print df.loc['399001','amount']/10000000
-            dd['svol']="%s->%s"%((dd['svol'],round(dd['svol']/(df.loc['999999','amount']/10000000)/radio_t,1)))
-            dd['zvol']="%s->%s"%((dd['zvol'],round(dd['zvol']/(df.loc['399001','amount']/10000000)/radio_t,1)))
+            # print radio_t
+            # print df.loc['999999','amount']
+            # print type(dd['svol'])
+            log.debug("type:%s"%type(dd['svol']))
+            if isinstance(dd['svol'],str) and dd['svol'].find('-')==0:
+                log.info("svol:%s"%dd['svol'])
+            else:
+                dd['svol']="%s->%s"%((dd['svol'],round(dd['svol']/(df.loc['999999','amount']/10000000)/radio_t,1)))
+                dd['zvol']="%s->%s"%((dd['zvol'],round(dd['zvol']/(df.loc['399001','amount']/10000000)/radio_t,1)))
         # dd['zzb']=data[1]
         # dd['sjlr']=data[2]
         # dd['sjzb']=data[3]
@@ -102,6 +109,8 @@ if __name__ == "__main__":
     pp=get_dfcfw_fund_SHSZ(ct.DFCFW_ZS_SHSZ)
     print pp
     print get_zs_VolRatio()
+    a='abc'
+    print isinstance(a,str)
     # pp=get_dfcfw_fund_HGT(ct.DFCFW_FUND_FLOW_HGT)
     # for x in pp.keys():
     #     print pp[x]
