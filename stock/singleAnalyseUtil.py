@@ -14,7 +14,8 @@ from JSONData import realdatajson as rd
 import JohhnsonUtil.emacount as ema
 from JohhnsonUtil import LoggerFactory
 
-log = LoggerFactory.getLogger("SingleAU")
+log = LoggerFactory.getLogger("SingleSAU")
+# log.setLevel(LoggerFactory.DEBUG)
 
 try:
     from urllib.request import urlopen, Request
@@ -257,11 +258,20 @@ def get_hot_countNew(changepercent):
     for market in ct.SINA_Market_KEY:
         df = rd.get_sina_Market_json(market, False)
         # count=len(df.index)
-        # print df[:1]
-        top = df[df['percent'] > changepercent]['code']
-        topTen = df[df['percent'] > 9.9]['code']
-        crashTen = df[df['percent'] < -9.8]['code']
-        crash = df[df['percent'] < -changepercent]['code']
+        log.info("market:%s"%df[:1])
+        df=df.dropna()
+        if 'percent' in df.columns.values: 
+        # and len(df[:20][df[:20]['percent']>0])>3:
+            top = df[df['percent'] > changepercent]['code']
+            topTen = df[df['percent'] > 9.9]['code']
+            crashTen = df[df['percent'] < -9.8]['code']
+            crash = df[df['percent'] < -changepercent]['code']
+        else:
+            log.info("market No Percent:%s"%df[:1])
+            top=0
+            topTen=0
+            crashTen=0
+            crash=0
         # top=df[ df['changepercent'] <6]
 
         print (

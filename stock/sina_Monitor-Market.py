@@ -271,7 +271,7 @@ if __name__ == "__main__":
                                 # log.info("n_buy==a_buy:update Counts")
                                 top_all.loc[symbol, 'volume':'counts'] = top_now.loc[symbol, 'volume':'counts']
                             else:
-                                log.info("n_buy==a_buy:no counts update low")
+                                # log.info("n_buy==a_buy:no counts update low")
                                 top_all.loc[symbol, 'volume':'low'] = top_now.loc[symbol, 'volume':'low']
 
                                 # top_all.loc[symbol]=top_now.loc[symbol]?

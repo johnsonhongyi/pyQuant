@@ -23,7 +23,7 @@ def get_dfcfw_fund_flow(url):
         dd['sjzb'] = round(float(data[3]), 1)
         dd['time']=vol_l[1]
     else:
-        print "Fund:is null%s"%url
+        log.info("Fund_f NO Url:%s"%url)
     return dd
 
 def get_dfcfw_fund_HGT(url):
@@ -43,7 +43,8 @@ def get_dfcfw_fund_HGT(url):
         # dd['sjzb']=data[3]
         # dd['time']=vol_l[1]
     else:
-        print "Fund:Null%s %s"%(data,url)
+        # print "Fund:Null%s %s"%(data,url)
+        log.info("Fund_f NO Url:%s"%url)
     return dd
 
 def get_dfcfw_fund_SHSZ(url):
@@ -74,7 +75,7 @@ def get_dfcfw_fund_SHSZ(url):
             # print radio_t
             # print df.loc['999999','amount']
             # print type(dd['svol'])
-            log.debug("type:%s"%type(dd['svol']))
+            log.debug("type:%s radio_t:%s"%(type(dd['svol']),radio_t))
             if isinstance(dd['svol'],str) and dd['svol'].find('-')==0:
                 log.info("svol:%s"%dd['svol'])
             else:
@@ -86,7 +87,7 @@ def get_dfcfw_fund_SHSZ(url):
         # dd['time']=vol_l[1]
 
     else:
-        print "Fund:Null:%s url:%s"%(data,url)
+        log.info("Fund_f NO Url:%s"%url)
     return dd
 
 def get_zs_VolRatio():
