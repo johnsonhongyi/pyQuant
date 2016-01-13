@@ -27,7 +27,8 @@ import JohhnsonUtil.commonTips as cct
 from JSONData import realdatajson as rl
 import singleAnalyseUtil as sl
 from JSONData import tdx_data_Day as tdd
-
+from JohhnsonUtil import LoggerFactory as LoggerFactory
+import gc
 
 def downloadpage(url):
     fp = urllib2.urlopen(url)
@@ -158,6 +159,9 @@ def get_sina_all_dd(vol='0', type='0', retry_count=3, pause=0.001):
 if __name__ == "__main__":
     # parsehtml(downloadpage(url_s))
 
+    log = LoggerFactory.getLogger('SinaMarket')
+    # log.setLevel(LoggerFactory.DEBUG)
+    
     cct.set_console()
     status=False
     vol = '0'
@@ -208,10 +212,12 @@ if __name__ == "__main__":
                                 if status_change:
                                     # print "change:",time.time()-time_s
                                     top_all.loc[symbol]=top_now.loc[symbol]
-                                else:
-                                    top_all.loc[symbol,['percent','diff','trade','high','open','low','ratio']]=top_now.loc[symbol,['percent','diff','trade','high','open','low','ratio']]
                             else:
-                                top_all.loc[symbol,['percent','trade','high','open','low','ratio']]=top_now.loc[symbol,['percent','diff','trade','high','open','low','ratio']]
+                                top_all.loc[symbol,['percent','diff']]=top_now.loc[symbol,['percent','diff']]
+                                top_all.loc[symbol,'trade':]=top_now.loc[symbol,'trade':]
+                                    # top_all.loc[symbol,['percent','diff','trade','high','open','low','ratio']]=top_now.loc[symbol,['percent','diff','trade','high','open','low','ratio']]
+                            # else:
+                                # top_all.loc[symbol,['percent','trade','high','open','low','ratio']]=top_now.loc[symbol,['percent','diff','trade','high','open','low','ratio']]
                             # top_all.loc[symbol]=top_now.loc[symbol]?
                             # top_all.loc[symbol,'diff']=top_now.loc[symbol,'counts']-top_all.loc[symbol,'counts']
 
@@ -223,7 +229,38 @@ if __name__ == "__main__":
                 # top_all=top_all.sort_values(by=['diff','percent','counts'],ascending=[0,0,1])
                 # top_all=top_all.sort_values(by=['diff','ratio','percent','counts'],ascending=[0,1,0,1])
                 # top_all=top_all.sort_values(by=['diff','percent','counts','ratio'],ascending=[0,0,1,1])
-                top_all=top_all.sort_values(by=['diff','counts','ratio'],ascending=[0,0,1])
+                
+                top_bak=top_all
+                codelist = top_all.index.tolist()
+                if len(codelist)>0:
+                    log.info('toTDXlist:%s' % len(codelist))
+                    tdxdata = tdd.get_tdx_all_day_LastDF(codelist)
+                    log.debug("TdxLastP: %s %s" % (len(tdxdata), tdxdata.columns.values))
+                    tdxdata.rename(columns={'low': 'llow'}, inplace=True)
+                    tdxdata.rename(columns={'high': 'lhigh'}, inplace=True)
+                    tdxdata.rename(columns={'close': 'lastp'}, inplace=True)
+                    tdxdata.rename(columns={'vol': 'lvol'}, inplace=True)
+                    tdxdata = tdxdata.loc[:, ['llow', 'lhigh', 'lastp', 'lvol', 'date']]
+                    # data.drop('amount',axis=0,inplace=True)
+                    log.debug("TDX Col:%s" % tdxdata.columns.values)
+                    # df_now=top_all.merge(data,on='code',how='left')
+                    # df_now=pd.merge(top_all,data,left_index=True,right_index=True,how='left')
+                    top_all = top_all.merge(tdxdata, left_index=True, right_index=True, how='left')
+                    log.info('Top-merge_now:%s' % (top_all[:1]))
+                    top_all = top_all[top_all['llow'] > 0]
+                    log.info("df:%s"%top_all[:1])
+                    radio_t = cct.get_work_time_ratio()
+                    log.debug("Second:vol/vol/:%s" % radio_t)
+                    # top_dif['volume'] = top_dif['volume'].apply(lambda x: round(x / radio_t, 1))
+                    log.debug("top_diff:vol")
+                    top_all['volume'] = (
+                        map(lambda x, y: round(x / y / radio_t, 1), top_all['volume'].values, top_all['lvol'].values))
+                    
+                    top_all = top_all[top_all.prev_p >= top_all.lhigh]
+                    top_all=top_all.loc[:,['name','percent','diff','counts','volume','trade','prev_p','ratio']]
+                
+                print "G:%s"%len(top_all)
+                top_all=top_all.sort_values(by=['diff','counts','volume','ratio'],ascending=[0,0,0,1])
                 # top_all=top_all.sort_values(by=['percent','diff','counts','ratio'],ascending=[0,0,1,1])
 
 
@@ -242,6 +279,9 @@ if __name__ == "__main__":
                         if len(code)>0:
                             code=code[0]
                             kind=sl.get_multiday_ave_compare_silent(code)
+                top_all=top_bak
+                del top_bak
+                gc.collect()
 
             else:
                 print "no data"

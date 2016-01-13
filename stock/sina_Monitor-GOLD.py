@@ -20,6 +20,9 @@ import JohhnsonUtil.commonTips as cct
 import singleAnalyseUtil as sl
 from JSONData import realdatajson as rl
 from JSONData import tdx_data_Day as tdd
+from JohhnsonUtil import LoggerFactory as LoggerFactory
+import gc
+log = LoggerFactory.getLogger('SinaMonitor-Gold')
 
 # import json
 # try:
@@ -79,6 +82,7 @@ def get_sina_url(vol='0', type='0', pageCount='100'):
 if __name__ == "__main__":
 
     cct.set_console()
+    # log.setLevel(LoggerFactory.DEBUG)
     status=False
     vol = '0'
     type = '2'
@@ -138,9 +142,45 @@ if __name__ == "__main__":
 
                         else:
                             top_all.append(top_now.loc[symbol])
+                            
+                            
+                top_bak=top_all
+                codelist = top_all.index.tolist()
+                if len(codelist)>0:
+                    log.info('toTDXlist:%s' % len(codelist))
+                    tdxdata = tdd.get_tdx_all_day_LastDF(codelist)
+                    log.debug("TdxLastP: %s %s" % (len(tdxdata), tdxdata.columns.values))
+                    tdxdata.rename(columns={'low': 'llow'}, inplace=True)
+                    tdxdata.rename(columns={'high': 'lhigh'}, inplace=True)
+                    tdxdata.rename(columns={'close': 'lastp'}, inplace=True)
+                    tdxdata.rename(columns={'vol': 'lvol'}, inplace=True)
+                    tdxdata = tdxdata.loc[:, ['llow', 'lhigh', 'lastp', 'lvol', 'date']]
+                    # data.drop('amount',axis=0,inplace=True)
+                    log.debug("TDX Col:%s" % tdxdata.columns.values)
+                    # df_now=top_all.merge(data,on='code',how='left')
+                    # df_now=pd.merge(top_all,data,left_index=True,right_index=True,how='left')
+                    top_all = top_all.merge(tdxdata, left_index=True, right_index=True, how='left')
+                    log.info('Top-merge_now:%s' % (top_all[:1]))
+                    top_all = top_all[top_all['llow'] > 0]
+                    log.info("df:%s"%top_all[:1])
+                    radio_t = cct.get_work_time_ratio()
+                    log.debug("Second:vol/vol/:%s" % radio_t)
+                    # top_dif['volume'] = top_dif['volume'].apply(lambda x: round(x / radio_t, 1))
+                    log.debug("top_diff:vol")
+                    top_all['volume'] = (
+                        map(lambda x, y: round(x / y / radio_t, 1), top_all['volume'].values, top_all['lvol'].values))
+                    
+                    top_all = top_all[top_all.prev_p >= top_all.lhigh]
+                    top_all=top_all.loc[:,['name','percent','diff','counts','volume','trade','prev_p','ratio']]
+                
+                print "G:%s"%len(top_all)
+                top_all=top_all.sort_values(by=['diff','counts','volume','ratio'],ascending=[0,0,0,1])            
+                # top_all=top_all.sort_values(by=['diff','percent','counts','ratio'],ascending=[0,0,1,1])
+                
                 # top_all=top_all.sort_values(by=['diff','counts'],ascending=[0,0])
                 # top_all=top_all.sort_values(by=['diff','percent','counts','ratio'],ascending=[0,0,1,1])
-                top_all=top_all.sort_values(by=['diff','percent','counts','ratio'],ascending=[0,0,1,1])
+
+                
                 # print top_all
                 # print pt.PrettyTable([''] + list(top_all.columns))
                 # print tbl.tabulate(top_all,headers='keys', tablefmt='psql')

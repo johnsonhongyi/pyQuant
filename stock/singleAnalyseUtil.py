@@ -268,10 +268,10 @@ def get_hot_countNew(changepercent):
             crash = df[df['percent'] < -changepercent]['code']
         else:
             log.info("market No Percent:%s"%df[:1])
-            top=0
-            topTen=0
-            crashTen=0
-            crash=0
+            top='0'
+            topTen='0'
+            crashTen='0'
+            crash='0'
         # top=df[ df['changepercent'] <6]
 
         print (

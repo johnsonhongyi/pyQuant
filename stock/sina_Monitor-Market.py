@@ -303,19 +303,22 @@ if __name__ == "__main__":
                 # log
 
                 # if top_dif[:1].llow.values <> 0:
-                top_dif = top_dif[top_dif.low >= top_dif.llow]
-                log.debug('diff2-1:%s' % len(top_dif))
+                if len(top_dif[:5][top_dif[:5]['low'] > 0]) > 3:
+                    log.debug('diff2-0-low>0')
+                    top_dif = top_dif[top_dif.low >= top_dif.llow]
+                    log.debug('diff2-1:%s' % len(top_dif))
+                    
+                     
+                    top_dif = top_dif[top_dif.low >= top_dif.lastp]
+                    log.debug('dif3 low<>0 :%s' % len(top_dif))
 
-                top_dif = top_dif[top_dif.low >= top_dif.lastp]
-                log.debug('dif3 low<>0 :%s' % len(top_dif))
-
-                top_dif = top_dif[top_dif.open >= top_dif.lastp]
-                log.debug('dif4 open>lastp:%s' % len(top_dif))
-                log.debug('dif4-2:%s' % top_dif[:1])
-
-                # top_dif = top_dif[top_dif.percent >= 0]
-
-                if len(top_dif[:5][top_dif[:5]['volume'] > 0]) > 3:
+                    top_dif = top_dif[top_dif.open >= top_dif.lastp]
+                    log.debug('dif4 open>lastp:%s' % len(top_dif))
+                    log.debug('dif4-2:%s' % top_dif[:1])
+                    # top_dif = top_dif[top_dif.low >= top_dif.lhigh]
+                    # top_dif = top_dif[top_dif.percent >= 0]
+                    log.debug("dif5-percent>0:%s"%len(top_dif))
+                # if len(top_dif[:5][top_dif[:5]['volume'] > 0]) > 3:
                     log.debug("Second:vol/vol/:%s" % radio_t)
                     # top_dif['volume'] = top_dif['volume'].apply(lambda x: round(x / radio_t, 1))
                     top_dif['volume'] = (
