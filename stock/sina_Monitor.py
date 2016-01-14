@@ -166,7 +166,7 @@ if __name__ == "__main__":
     status=False
     vol = '0'
     type = '2'
-    cut_num=100000
+    cut_num=20000
     success=0
     top_all=pd.DataFrame()
     time_s=time.time()
@@ -178,7 +178,7 @@ if __name__ == "__main__":
             df=rl.get_sina_all_json_dd(vol,type)
             if len(df) >cut_num:
                 df=df[:cut_num]
-                print len(df)
+                print len(df),
             top_now = rl.get_sina_dd_count_price_realTime(df)
             # print len(top_now)
             time_d = time.time()
@@ -256,7 +256,7 @@ if __name__ == "__main__":
                     top_all['volume'] = (
                         map(lambda x, y: round(x / y / radio_t, 1), top_all['volume'].values, top_all['lvol'].values))
                     
-                    top_all = top_all[top_all.prev_p >= top_all.lhigh]
+                    # top_all = top_all[top_all.prev_p >= top_all.lhigh]
                     top_all=top_all.loc[:,['name','percent','diff','counts','volume','trade','prev_p','ratio']]
                 
                 print "G:%s"%len(top_all)
