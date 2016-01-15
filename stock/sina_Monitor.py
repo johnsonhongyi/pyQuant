@@ -206,12 +206,9 @@ if __name__ == "__main__":
                             # print "code:",symbol
                             count_n=top_now.loc[symbol,'counts']
                             count_a=top_all.loc[symbol,'counts']
-                            # print count_n,count_a
-                            if not count_n==count_a:
-                                top_now.loc[symbol,'diff']=count_n-count_a
-                                if status_change:
-                                    # print "change:",time.time()-time_s
-                                    top_all.loc[symbol]=top_now.loc[symbol]
+                            top_now.loc[symbol,'diff']=count_n-count_a
+                            if status_change:
+                                top_all.loc[symbol]=top_now.loc[symbol]
                             else:
                                 top_all.loc[symbol,['percent','diff']]=top_now.loc[symbol,['percent','diff']]
                                 top_all.loc[symbol,'trade':]=top_now.loc[symbol,'trade':]

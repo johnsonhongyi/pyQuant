@@ -125,20 +125,20 @@ if __name__ == "__main__":
                             # print "code:",symbol
                             count_n=top_now.loc[symbol,'percent']
                             count_a=top_all.loc[symbol,'percent']
-                            # print "count_n:",count_n
-                            # print "count_a:",count_a
-                            if not count_n==count_a:
-                                top_now.loc[symbol,'diff']=round((count_n-count_a),1)
-                                if status_change:
-                                    # print "change:",time.time()-time_s
-                                    top_all.loc[symbol]=top_now.loc[symbol]
-                                else:
-                                    top_all.loc[symbol,'diff':]=top_now.loc[symbol,'diff':]
+                            top_now.loc[symbol,'diff']=count_n-count_a
+                            if status_change:
+                                top_all.loc[symbol]=top_now.loc[symbol]
                             else:
-                                top_all.loc[symbol,'counts':]=top_now.loc[symbol,'counts':]
-                            # top_all.loc[symbol]=top_now.loc[symbol]
+                                top_all.loc[symbol,['percent','diff']]=top_now.loc[symbol,['percent','diff']]
+                                top_all.loc[symbol,'trade':]=top_now.loc[symbol,'trade':]
+                            # if not count_n==count_a:
+                                # top_now.loc[symbol,'diff']=round((count_n-count_a),1)
+                                # if status_change:
+                                    # top_all.loc[symbol]=top_now.loc[symbol]
+                                # else:
+                                    # top_all.loc[symbol,'diff':]=top_now.loc[symbol,'diff':]
                             # else:
-                                # value=top_all.loc[symbol,'diff']
+                                # top_all.loc[symbol,'counts':]=top_now.loc[symbol,'counts':]
 
                         else:
                             top_all.append(top_now.loc[symbol])

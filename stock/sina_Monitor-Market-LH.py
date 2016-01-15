@@ -179,7 +179,7 @@ if __name__ == "__main__":
     # all_diffpath = tdd.get_tdx_dir_blocknew() + '062.blk'
     while 1:
         try:
-            df = rl.get_sina_Market_json('all')
+            df = rl.get_sina_Market_json('cyb')
             top_now = rl.get_market_price_sina_dd_realTime(df, vol, type)
             df_count=len(df)
             now_count=len(top_now)
@@ -230,7 +230,16 @@ if __name__ == "__main__":
                         if not 'counts' in top_all.columns.values:
                             top_all['counts'] = 0
                             top_all['prev_p'] = 0
-
+                    for symbol in top_now.index:
+                        if symbol in top_all.index and top_all.loc[symbol, 'buy'] <> 0:
+                            # if top_all.loc[symbol,'diff'] == 0:
+                            if status_change and 'counts' in top_now.columns.values:
+                                # top_now.loc[symbol,'lastp']=top_all.loc[symbol,'lastp']
+                                # top_all.loc[symbol, 'buy':'counts'] = top_now.loc[symbol, 'buy':'counts']
+                                top_all.loc[symbol, 'buy':'prev_p'] = top_now.loc[symbol, 'buy':'prev_p']
+                            else:
+                                # top_now.loc[symbol,'lastp']=top_all.loc[symbol,'lastp']
+                                top_all.loc[symbol, 'buy':'low'] = top_now.loc[symbol, 'buy':'low']
                 
                 top_dif = top_all
 
@@ -279,8 +288,8 @@ if __name__ == "__main__":
                     len(top_now[top_now['volume'] <= 0]), len(top_dif))),
                 print "Rt:%0.3f" % (float(time.time() - time_Rt))
                 if 'counts' in top_dif.columns.values:
-                    top_dif = top_dif.sort_values(by=['diff', 'volume', 'percent', 'counts', 'ratio'],
-                                                  ascending=[0, 0, 0, 1, 1])
+                    top_dif = top_dif.sort_values(by=['diff',  'percent','volume', 'counts', 'ratio'],
+                                                  ascending=[0, 0, 0, 1, 0])
                 else:
                     print "Good Morning!!!"
                     top_dif = top_dif.sort_values(by=['diff', 'percent', 'ratio'], ascending=[0, 0, 1])

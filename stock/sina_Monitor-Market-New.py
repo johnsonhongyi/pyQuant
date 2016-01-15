@@ -268,10 +268,10 @@ if __name__ == "__main__":
                                     top_all.loc[symbol, 'diff':'low'] = top_now.loc[symbol, 'diff':'low']
                             elif 'counts' in top_now.columns.values:
                                 # log.info("n_buy==a_buy:update Counts")
-                                top_all.loc[symbol, 'volume':'counts'] = top_now.loc[symbol, 'volume':'counts']
+                                top_all.loc[symbol, 'diff':'counts'] = top_now.loc[symbol, 'diff':'counts']
                             else:
                                 # log.info("n_buy==a_buy:no counts update low")
-                                top_all.loc[symbol, 'volume':'low'] = top_now.loc[symbol, 'volume':'low']
+                                top_all.loc[symbol, 'diff':'low'] = top_now.loc[symbol, 'diff':'low']
 
                                 # top_all.loc[symbol]=top_now.loc[symbol]?
                                 # top_all.loc[symbol,'diff']=top_now.loc[symbol,'counts']-top_all.loc[symbol,'counts']

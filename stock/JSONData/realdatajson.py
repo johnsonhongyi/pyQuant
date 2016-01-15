@@ -81,7 +81,8 @@ def _parsing_Market_price_json(url):
     if ct.PY3:
         jstr = json.dumps(text)
     else:
-        jstr = json.dumps(text, encoding='GBK')
+        # jstr = json.dumps(text, encoding='GBK')
+        jstr = json.dumps(text)
     js = json.loads(jstr)
     # df = pd.DataFrame(pd.read_json(js, dtype={'code':object}),columns=ct.MARKET_COLUMNS)
     # log.debug("Market json:%s"%js[:1])
@@ -261,7 +262,8 @@ def _parsing_sina_dd_price_json(url):
     if ct.PY3:
         jstr = json.dumps(text)
     else:
-        jstr = json.dumps(text, encoding='GBK')
+        # jstr = json.dumps(text, encoding='GBK')
+        jstr = json.dumps(text)
     js = json.loads(jstr)
     df = pd.DataFrame(pd.read_json(js, dtype={'code': object}),
                       columns=ct.DAY_REAL_DD_COLUMNS)
