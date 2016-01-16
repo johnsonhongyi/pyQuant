@@ -10,9 +10,10 @@ from __future__ import division
 
 import json
 import math
+import re
 import sys
 import time
-import re
+
 import lxml.html
 import pandas as pd
 from lxml import etree
@@ -124,7 +125,7 @@ def _get_sina_Market_url(market='sh_a', count=None, num='1000'):
     return urllist
 
 
-def get_sina_Market_json(market='sh_a', showtime=True, num='1000', retry_count=3, pause=0.001):
+def get_sina_Market_json(market='sh', showtime=True, num='1000', retry_count=3, pause=0.001):
     start_t = time.time()
     # url="http://vip.stock.finance.sina.com.cn/quotes_service/api/json_v2.php/Market_Center.getHQNodeData?page=1&num=50&sort=changepercent&asc=0&node=sh_a&symbol="
     # SINA_REAL_PRICE_DD = '%s%s/quotes_service/api/json_v2.php/Market_Center.getHQNodeData?page=1&num=%s&sort=changepercent&asc=0&node=%s&symbol=%s'

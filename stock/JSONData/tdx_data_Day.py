@@ -1,10 +1,11 @@
 # -*- encoding: utf-8 -*-
 # !/usr/bin/python
 from __future__ import division
+
 import os
-import sys
 import time
 from struct import *
+
 import numpy as np
 import pandas as pd
 from pandas import Series
@@ -20,7 +21,7 @@ from JohhnsonUtil import johnson_cons as ct
 
 # log=logbook.Logger('TDX_day')
 log = LoggerFactory.getLogger('TDX_Day')
-# log.setLevel(logging.DEBUG)
+# log.setLevel(LoggerFactory.DEBUG)
 
 path_sep = os.path.sep
 
@@ -65,7 +66,7 @@ lc5_dir = basedir + r'\Vipdoc\%s\fzline'
 day_dir = basedir + r'\Vipdoc\%s\lday/'
 day_dir_sh = basedir + r'\Vipdoc\sh\lday/'
 day_dir_sz = basedir + r'/Vipdoc/sz/lday/'
-
+exp_path = basedir + "/T0002/export/".replace('/', path_sep).replace('\\', path_sep)
 day_path = {'sh': day_dir_sh, 'sz': day_dir_sz}
 
 
@@ -75,6 +76,55 @@ day_path = {'sh': day_dir_sh, 'sz': day_dir_sz}
 
 
 # http://www.douban.com/note/504811026/
+def get_tdx_Exp_day_to_df(code, type='f'):
+    # time_s=time.time()
+    # print code
+    code_u = cct.code_to_symbol(code)
+    # day_path = day_dir % 'sh' if code[:1] in ['5', '6', '9'] else day_dir % 'sz'
+    if type == 'f':
+        file_path = exp_path + path_sep + 'forwardp' + path_sep + code_u.upper() + ".txt"
+    else:
+        file_path = exp_path + path_sep + 'backp' + path_sep + code_u.upper() + ".txt"
+    log.info("daypath:%s" % file_path)
+    # p_day_dir = day_path.replace('/', path_sep).replace('\\', path_sep)
+    # p_exp_dir = exp_dir.replace('/', path_sep).replace('\\', path_sep)
+    # print p_day_dir,p_exp_dir
+    if not os.path.exists(file_path):
+        ds = Series(
+            {'code': code, 'date': cct.get_today(), 'open': 0, 'high': 0, 'low': 0, 'close': 0, 'amount': 0,
+             'vol': 0})
+        return ds
+
+    ofile = open(file_path, 'rb')
+    buf = ofile.readlines()
+    ofile.close()
+    num = len(buf)
+    no = num - 1
+    dt_list = []
+    for i in xrange(no):
+        a = buf[i].split(',')
+        # 01/15/2016,27.57,28.15,26.30,26.97,714833.15,1946604544.000
+        # da=a[0].split('/')
+        tdate = a[0]
+        # tdate=dt.strftime('%Y-%m-%d')
+        topen = float(a[1])
+        thigh = float(a[2])
+        tlow = float(a[3])
+        tclose = float(a[4])
+        amount = round(float(a[5]) / 100, 2)
+        tvol = round(float(a[6].replace('\r\n', '')), 1)  # int
+        # tpre = int(a[7])  # back
+        dt_list.append(
+            {'code': code, 'date': tdate, 'open': topen, 'high': thigh, 'low': tlow, 'close': tclose, 'amount': amount,
+             'vol': tvol})
+    df = pd.DataFrame(dt_list, columns=ct.TDX_Day_columns)
+    df = df.set_index('date')
+    df.sort_index(ascending=False, inplace=True)
+    # print "time:",(time.time()-time_s)*1000
+    return df
+
+
+
 
 def get_tdx_day_to_df_dict(code):
     # time_s=time.time()
@@ -331,12 +381,11 @@ python %s -t txt 999999 20070101 20070302
 
 
 if __name__ == '__main__':
-    # df = get_tdx_day_to_df_last('000001', 10, 1)
-    # print df[:1]
-    list=['000001','399001','399006','399005']
-    # list=['000001']
-    df = get_tdx_all_day_LastDF(list,type=1)
-    print df
+    # list=['000001','399001','399006','399005']
+    # df = get_tdx_all_day_LastDF(list,type=1)
+    # print df
+    df = get_tdx_Exp_day_to_df('601198')
+    print df[:1]
     # df= get_tdx_all_StockList_DF(list,1,1)
     # print df[:6]
     import sys
