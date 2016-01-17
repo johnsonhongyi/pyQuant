@@ -5,7 +5,6 @@ import pandas as pd
 
 import LineHistogram as lrh
 from JSONData import realdatajson as rl
-from JohhnsonUtil import commonTips as cct
 
 if __name__ == "__main__":
     # df=sina_data.Sina().all.set_index('code')
@@ -26,10 +25,11 @@ if __name__ == "__main__":
         return gold_f
 
 
-    # print ("gold:%s"%gold_f[gold_f['percent']>0])
-    result = cct.to_mp_run(get_market_status, ['sh', 'sz'])
-    df = pd.DataFrame()
-    for x in result:
-        df = df.append(x)
-    print len(df)
-    df.iloc[:, 0:2].to_csv('stock-macd-kdj.csv', encoding='utf8')
+    # result = cct.to_mp_run(get_market_status, ['sh', 'sz'])
+    # df = pd.DataFrame()
+    # for x in result:
+    #     df = df.append(x)
+    # print len(df)
+    # df.iloc[:, 0:2].to_csv('stock-Line.csv', encoding='utf8')
+    result = get_market_status('cyb')
+    print ("gold:%s" % result.iloc[:2, 0:3])

@@ -4,15 +4,15 @@
 import pandas as pd
 import statsmodels.api as sm
 from pylab import *
+from sklearn.linear_model import LinearRegression
 from statsmodels import regression
 
 from JohhnsonUtil import LoggerFactory as LoggerFactory
+from JohhnsonUtil import zoomPan
 
 log = LoggerFactory.getLogger('Linehistogram')
 # log.setLevel(LoggerFactory.DEBUG)
 from JSONData import tdx_data_Day as tdd
-
-
 # 取得股票的价格
 # start = '2015-09-05'
 # end = '2016-01-04'
@@ -20,6 +20,37 @@ from JSONData import tdx_data_Day as tdd
 # end = '2016-01-13'
 # code = '300191'
 # code = '000738'
+
+def LIS(X):
+    N = len(X)
+    P = [0] * N
+    M = [0] * (N + 1)
+    L = 0
+    for i in range(N):
+        lo = 1
+        hi = L
+        while lo <= hi:
+            mid = (lo + hi) // 2
+            if (X[M[mid]] < X[i]):
+                lo = mid + 1
+            else:
+                hi = mid - 1
+
+        newL = lo
+        P[i] = M[newL - 1]
+        M[newL] = i
+
+        if (newL > L):
+            L = newL
+
+    S = []
+    pos = []
+    k = M[L]
+    for i in range(L - 1, -1, -1):
+        S.append(X[k])
+        pos.append(k)
+        k = P[k]
+    return S[::-1], pos[::-1]
 
 def get_linear_model_status(code):
     df = tdd.get_tdx_Exp_day_to_df(code, 'f').sort_index(ascending=True)
@@ -60,17 +91,18 @@ def get_linear_model_histogram(code):
     # 画出价格随时间变化的图像
     # _, ax = plt.subplots()
     # fig = plt.figure()
-    fig = plt.figure(figsize=(16, 10), dpi=72)
+    fig = plt.figure(figsize=(16, 10))
+    # fig = plt.figure(figsize=(16, 10), dpi=72)
 
     # plt.subplots_adjust(bottom=0.1, right=0.8, top=0.9)
     plt.subplots_adjust(left=0.05, bottom=0.08, right=0.95, top=0.95, wspace=0.15, hspace=0.25)
     # set (gca,'Position',[0,0,512,512])
     # fig.set_size_inches(18.5, 10.5)
     # fig=plt.fig(figsize=(14,8))
-    ax = fig.add_subplot(321)
-    ax.plot(asset)
-    ticks = ax.get_xticks()
-    ax.set_xticklabels([dates[i] for i in ticks[:-1]])  # Label x-axis with dates
+    ax1 = fig.add_subplot(321)
+    ax1.plot(asset)
+    ticks = ax1.get_xticks()
+    ax1.set_xticklabels([dates[i] for i in ticks[:-1]])  # Label x-axis with dates
 
     # 拟合
     X = np.arange(len(asset))
@@ -101,12 +133,16 @@ def get_linear_model_histogram(code):
     plt.title(code, fontsize=14)
     # plt.legend([code]);
     # plt.legend([code, 'Value center line', 'Value interval line']);
-
     # fig=plt.fig()
     # fig.figsize = [14,8]
-    ax = fig.add_subplot(322)
-    ticks = ax.get_xticks()
-    ax.set_xticklabels([dates[i] for i in ticks[:-1]])
+    scale = 1.1
+    zp = zoomPan.ZoomPan()
+    figZoom = zp.zoom_factory(ax1, base_scale=scale)
+    figPan = zp.pan_factory(ax1)
+
+    ax2 = fig.add_subplot(322)
+    ticks = ax2.get_xticks()
+    ax2.set_xticklabels([dates[i] for i in ticks[:-1]])
     # plt.plot(X, Y_hat, 'k', alpha=0.9)
     n = 5
     d = (-c_high + c_low) / n
@@ -115,19 +151,19 @@ def get_linear_model_histogram(code):
         Y = X * b + a - c
         plt.plot(X, Y, 'r', alpha=0.9);
         c = c + d
-    ax.plot(asset)
+    ax2.plot(asset)
     plt.xlabel('Date', fontsize=14)
     plt.ylabel('Price', fontsize=14)
     # plt.title(code, fontsize=14)
     # plt.legend([code])
 
     # 将Y-Y_hat股价偏离中枢线的距离单画出一张图显示，对其边界线之间的区域进行均分，大于0的区间为高估，小于0的区间为低估，0为价值中枢线。
-    ax = fig.add_subplot(323)
+    ax3 = fig.add_subplot(323)
     distance = (asset.values.T - Y_hat)
     # distance = (asset.values.T-Y_hat)[0]
-    ax.plot(distance)
-    ticks = ax.get_xticks()
-    ax.set_xticklabels([dates[i] for i in ticks[:-1]])
+    ax3.plot(distance)
+    ticks = ax3.get_xticks()
+    ax3.set_xticklabels([dates[i] for i in ticks[:-1]])
     n = 5
     d = (-c_high + c_low) / n
     c = c_high
@@ -142,7 +178,7 @@ def get_linear_model_histogram(code):
 
     # 统计出每个区域内各股价的频数，得到直方图，为了更精细的显示各个区域的频数，这里将整个边界区间分成100份。
 
-    ax = fig.add_subplot(324)
+    ax4 = fig.add_subplot(324)
     log.info("assert:len:%s %s" % (len(asset.values.T - Y_hat), (asset.values.T - Y_hat)[0]))
     # distance = map(lambda x:int(x),(asset.values.T - Y_hat)/Y_hat*100)
     # now_distanse=int((asset.iat[-1]-Y_hat[-1])/Y_hat[-1]*100)
@@ -165,11 +201,12 @@ def get_linear_model_histogram(code):
     # print(os.path.abspath(os.path.curdir))
 
 
-    ax = fig.add_subplot(515)
+    ax5 = fig.add_subplot(325)
+    # fig.figsize=(5, 10)
     log.info("assert:len:%s %s" % (len(asset.values.T - Y_hat), (asset.values.T - Y_hat)[0]))
     # distance = map(lambda x:int(x),(asset.values.T - Y_hat)/Y_hat*100)
     distance = (asset.values.T - Y_hat) / Y_hat * 100
-    now_distanse = int((asset.iat[-1] - Y_hat[-1]) / Y_hat[-1] * 100)
+    now_distanse = ((asset.iat[-1] - Y_hat[-1]) / Y_hat[-1] * 100)
     log.debug("dis:%s now:%s" % (distance[:2], now_distanse))
     log.debug("now_distanse:%s" % now_distanse)
     # n, bins = np.histogram(distance, 50)
@@ -183,11 +220,46 @@ def get_linear_model_histogram(code):
     plt.ylabel('Frequency', fontsize=14)
     # plt.title('Undervalue & Overvalue Statistical Chart', fontsize=14)
     plt.legend([code, asset.iat[-1]])
-    # plt.tight_layout()
-    plt.show()
-    # import matplotlib
-    # print matplotlib.rcParams['backend']
 
+    ax6 = fig.add_subplot(326)
+    h = df.loc[:, ['open', 'close', 'high', 'low']]
+    highp = h['high'].values
+    lowp = h['low'].values
+    openp = h['open'].values
+    closep = h['close'].values
+    lr = LinearRegression()
+    x = np.atleast_2d(np.linspace(0, len(closep), len(closep))).T
+    lr.fit(x, closep)
+    LinearRegression(copy_X=True, fit_intercept=True, n_jobs=1, normalize=False)
+    xt = np.atleast_2d(np.linspace(0, len(closep) + 200, len(closep) + 200)).T
+    yt = lr.predict(xt)
+    bV = []
+    bP = []
+    for i in range(1, len(highp) - 1):
+        if highp[i] <= highp[i - 1] and highp[i] < highp[i + 1] and lowp[i] <= lowp[i - 1] and lowp[i] < lowp[i + 1]:
+            bV.append(lowp[i])
+            bP.append(i)
+
+    d, p = LIS(bV)
+
+    idx = []
+    for i in range(len(p)):
+        idx.append(bP[p[i]])
+    lr = LinearRegression()
+    X = np.atleast_2d(np.array(idx)).T
+    Y = np.array(d)
+    lr.fit(X, Y)
+    estV = lr.predict(xt)
+    plt.grid(True)
+    ax6.plot(closep, linewidth=2)
+    ax6.plot(idx, d, 'ko')
+    ax6.plot(xt, estV, '-r', linewidth=3)
+    ax6.plot(xt, yt, '-g', linewidth=3)
+    # plt.tight_layout()
+    zp2 = zoomPan.ZoomPan()
+    figZoom = zp2.zoom_factory(ax6, base_scale=scale)
+    figPan = zp2.pan_factory(ax6)
+    show()
 
 if __name__ == "__main__":
     # status=get_linear_model_status('601198')
@@ -197,10 +269,13 @@ if __name__ == "__main__":
     if len(sys.argv) == 2:
         num_input = sys.argv[1]
     elif (len(sys.argv) > 2):
-        pass
-    else:
-        print ("please input code")
+        print ("argv error")
         sys.exit(0)
+    # else:
+    #     print ("please input code:")
+    #     sys.exit(0)
+    num_input = '999999'
+    # num_input=raw_input("Please input code:")
     while 1:
         try:
             if not len(num_input) == 6:
