@@ -13,6 +13,8 @@ from JohhnsonUtil import zoomPan
 log = LoggerFactory.getLogger('Linehistogram')
 # log.setLevel(LoggerFactory.DEBUG)
 from JSONData import tdx_data_Day as tdd
+
+
 # 取得股票的价格
 # start = '2015-09-05'
 # end = '2016-01-04'
@@ -51,6 +53,7 @@ def LIS(X):
         pos.append(k)
         k = P[k]
     return S[::-1], pos[::-1]
+
 
 def get_linear_model_status(code):
     df = tdd.get_tdx_Exp_day_to_df(code, 'f').sort_index(ascending=True)
@@ -124,13 +127,14 @@ def get_linear_model_histogram(code):
     i = (asset.values.T - Y_hat).argmax()
     c_high = X[i] * b + a - asset.values[i]
     Y_hathigh = X * b + a - c_high
-
     plt.plot(X, Y_hat, 'k', alpha=0.9);
     plt.plot(X, Y_hatlow, 'r', alpha=0.9);
     plt.plot(X, Y_hathigh, 'r', alpha=0.9);
     plt.xlabel('Date', fontsize=14)
     plt.ylabel('Price', fontsize=14)
     plt.title(code, fontsize=14)
+    plt.grid(True)
+
     # plt.legend([code]);
     # plt.legend([code, 'Value center line', 'Value interval line']);
     # fig=plt.fig()
@@ -154,6 +158,8 @@ def get_linear_model_histogram(code):
     ax2.plot(asset)
     plt.xlabel('Date', fontsize=14)
     plt.ylabel('Price', fontsize=14)
+    plt.grid(True)
+
     # plt.title(code, fontsize=14)
     # plt.legend([code])
 
@@ -173,6 +179,8 @@ def get_linear_model_histogram(code):
         c = c + d
     plt.xlabel('Date', fontsize=14)
     plt.ylabel('Price-center price', fontsize=14)
+    plt.grid(True)
+
     # plt.title(code, fontsize=14)
     # plt.legend([code])
 
@@ -196,6 +204,8 @@ def get_linear_model_histogram(code):
     plt.ylabel('Frequency', fontsize=14)
     # plt.title('Undervalue & Overvalue Statistical Chart', fontsize=14)
     plt.legend([code, asset.iat[-1]])
+    plt.grid(True)
+
     # plt.show()
     # import os
     # print(os.path.abspath(os.path.curdir))
@@ -220,6 +230,8 @@ def get_linear_model_histogram(code):
     plt.ylabel('Frequency', fontsize=14)
     # plt.title('Undervalue & Overvalue Statistical Chart', fontsize=14)
     plt.legend([code, asset.iat[-1]])
+    plt.grid(True)
+
 
     ax6 = fig.add_subplot(326)
     h = df.loc[:, ['open', 'close', 'high', 'low']]
@@ -250,16 +262,18 @@ def get_linear_model_histogram(code):
     Y = np.array(d)
     lr.fit(X, Y)
     estV = lr.predict(xt)
-    plt.grid(True)
     ax6.plot(closep, linewidth=2)
     ax6.plot(idx, d, 'ko')
     ax6.plot(xt, estV, '-r', linewidth=3)
     ax6.plot(xt, yt, '-g', linewidth=3)
+    plt.grid(True)
+
     # plt.tight_layout()
     zp2 = zoomPan.ZoomPan()
     figZoom = zp2.zoom_factory(ax6, base_scale=scale)
     figPan = zp2.pan_factory(ax6)
     show()
+
 
 if __name__ == "__main__":
     # status=get_linear_model_status('601198')
