@@ -6,11 +6,10 @@ import statsmodels.api as sm
 from pylab import *
 from sklearn.linear_model import LinearRegression
 from statsmodels import regression
-import tushare as ts
 
 from JohhnsonUtil import LoggerFactory as LoggerFactory
 from JohhnsonUtil import zoompan
-import JohhnsonUtil.commonTips as cct
+
 log = LoggerFactory.getLogger('Linehistogram')
 # log.setLevel(LoggerFactory.DEBUG)
 from JSONData import tdx_data_Day as tdd
@@ -307,7 +306,7 @@ if __name__ == "__main__":
     # else:
     #     print ("please input code:")
     #     sys.exit(0)
-    num_input = '999999'
+    num_input = '601608'
     # num_input=raw_input("Please input code:")
     while 1:
         try:

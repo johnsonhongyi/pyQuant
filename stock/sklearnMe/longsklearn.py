@@ -12,7 +12,7 @@ from JohhnsonUtil import LoggerFactory as LoggerFactory
 log = LoggerFactory.getLogger('LongSklearn')
 # log.setLevel(LoggerFactory.DEBUG)
 from JSONData import tdx_data_Day as tdd
-from JohhnsonUtil import zoomPan
+from JohhnsonUtil import zoompan
 
 
 def LIS(X):
@@ -107,7 +107,7 @@ def longsklearn(code='999999'):
     # ax2.plot(f(xt),f(yt),'-g',linewidth=5)
     # # plt.show()
     scale = 1.1
-    zp = zoomPan.ZoomPan()
+    zp = zoompan.ZoomPan()
     figZoom = zp.zoom_factory(ax, base_scale=scale)
     figPan = zp.pan_factory(ax)
     show()
