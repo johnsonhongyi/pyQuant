@@ -152,11 +152,11 @@ class Sina:
         response = requests.get(self.url)
         self.stock_data.append(response.text)
         self.dataframe=self.format_response_data()
-        self.get_tdx_dd()
+        # self.get_tdx_dd()
         return self.dataframe
     def get_tdx_dd(self):
         df=tdd.get_tdx_all_day_LastDF(self.stock_codes)
-        print df
+        # print df
     def format_response_data(self):
         stocks_detail = ''.join(self.stock_data)
         result = self.grep_stock_detail.finditer(stocks_detail)
@@ -223,8 +223,9 @@ class Sina:
 if __name__ == "__main__":
     times = time.time()
     sina = Sina()
-    df = sina.all
-    print df[:1]
+    code='601198'
+    df = sina.get_stock_list_data(['601198','002399','601608'])
+    print df
     # list=['000001','399001','399006','399005']
     # df=sina.get_stock_list_data(list)
     # print time.time() - times

@@ -15,7 +15,8 @@ from JSONData import realdatajson as rl
 from JohhnsonUtil import LoggerFactory
 from JohhnsonUtil import commonTips as cct
 from JohhnsonUtil import johnson_cons as ct
-
+import tushare as ts
+# import datetime
 # import logbook
 
 
@@ -114,6 +115,8 @@ def get_tdx_Exp_day_to_df(code, type='f'):
         amount = round(float(a[5]) / 100, 2)
         tvol = round(float(a[6].replace('\r\n', '')), 1)  # int
         # tpre = int(a[7])  # back
+        if int(amount)==0:
+            continue
         dt_list.append(
             {'code': code, 'date': tdate, 'open': topen, 'high': thigh, 'low': tlow, 'close': tclose, 'amount': amount,
              'vol': tvol})
@@ -123,9 +126,59 @@ def get_tdx_Exp_day_to_df(code, type='f'):
     # print "time:",(time.time()-time_s)*1000
     return df
 
-
-
-
+INDEX_LIST = {'sh': 'sh000001', 'sz': 'sz399001', 'hs300': 'sz399300',
+              'sz50': 'sh000016', 'zxb': 'sz399005', 'cyb': 'sz399006'}
+              
+def get_tdx_append_now_df(code,type='f'):
+    df = get_tdx_Exp_day_to_df(code,type).sort_index(ascending=True)
+    # print df[:1]
+    today = cct.get_today()
+    tdx_last_day=df.index[-1]
+    log.info("tdx_last_day:%s"%tdx_last_day)
+    duration=cct.get_today_duration(tdx_last_day)
+    index_status=False
+    if code=='999999':
+        code='sh'
+        index_status=True
+    elif code.startswith('399'):
+        index_status=True
+        for k in INDEX_LIST.keys():
+            if INDEX_LIST[k].find(code)>0:
+                code=k
+            
+    
+    if duration >= 1:
+        ds = ts.get_hist_data(code,start=tdx_last_day,end=today)
+        if len(ds) > 1:
+            ds=ds[:len(ds)-1]
+            ds['code']=code
+            ds['vol']=0
+            ds=ds.loc[:,['code','open','high','low','close','vol','volume']]
+            ds.rename(columns={'volume': 'amount'}, inplace=True)
+            ds.sort_index(ascending=True,inplace=True)
+            log.debug("ds:%s"%ds[:1])
+            df=df.append(ds)
+            # pd.concat([df,ds],axis=0, join='outer')
+            # result=pd.concat([df,ds])
+        if  cct.get_work_time() and not index_status:
+            dm = rl.get_sina_Market_json('all').set_index('code')
+            log.debug("dm:%s"%dm[-1:])
+            dm.rename(columns={'volume': 'amount','trade':'close'}, inplace=True)
+            # c_name=dm.loc[code,['name']]
+            dm_code=dm.loc[code,['open','high','low','close','amount']]
+            dm_code['amount']=round(dm_code['amount']/100,2)
+            dm_code['code']=code
+            dm_code['vol']=0
+            # dm_code['date']=today
+            dm_code.name=today
+            df=df.append(dm_code)
+            # df['name']=c_name
+            # log.debug("c_name:%s"%(c_name))
+            log.debug("df[-3:]:%s"%(df[-3:]))
+            df['name']=dm.loc[code,'name']
+        log.debug("df:%s"%df[-3:])
+    return df 
+            
 def get_tdx_day_to_df_dict(code):
     # time_s=time.time()
     code_u = cct.code_to_symbol(code)
@@ -370,6 +423,28 @@ def get_tdx_search_day_DF(market='cyb'):
     print "t:", time.time() - time_t
     return results
 
+def get_tdx_stock_period_to_type(stock_data,type='w'):
+    period_type= type
+    #转换周最后一日变量
+    stock_data.index = pd.to_datetime(stock_data.index)
+    period_stock_data = stock_data.resample(period_type,how='last')
+    #周数据的每日change连续相乘
+    # period_stock_data['percent']=stock_data['percent'].resample(period_type,how=lambda x:(x+1.0).prod()-1.0)
+    #周数据open等于第一日
+    period_stock_data['open']=stock_data['open'].resample(period_type,how='first')
+    #周high等于Max high
+    period_stock_data['high']=stock_data['high'].resample(period_type,how='max')
+    period_stock_data['low']=stock_data['low'].resample(period_type,how='min')
+    #volume等于所有数据和
+    period_stock_data['amount']=stock_data['amount'].resample(period_type,how='sum')
+    period_stock_data['vol']=stock_data['vol'].resample(period_type,how='sum')
+    #计算周线turnover,【traded_market_value】 流通市值【market_value】 总市值【turnover】 换手率，成交量/流通股本
+    # period_stock_data['turnover']=period_stock_data['vol']/(period_stock_data['traded_market_value'])/period_stock_data['close']
+    #去除无交易纪录
+    period_stock_data=period_stock_data[period_stock_data['code'].notnull()]
+    period_stock_data.reset_index(inplace=True)
+    return period_stock_data
+
 def usage(p):
     print """
 python %s [-t txt|zip] stkid [from] [to]
@@ -381,14 +456,26 @@ python %s -t txt 999999 20070101 20070302
 
 
 if __name__ == '__main__':
+    import sys
     # list=['000001','399001','399006','399005']
     # df = get_tdx_all_day_LastDF(list,type=1)
     # print df
-    df = get_tdx_Exp_day_to_df('601198')
-    print df[:1]
+    # get_tdx_append_now_df('999999')
+    # sys.exit(0)
+    time_s=time.time()
+    df = get_tdx_Exp_day_to_df('999999')
+    print "t:",time.time()-time_s
+    print len(df),df[:1]
+    # df.sort_index(ascending=True,inplace=True)
+    # df.index=df.index.apply(lambda x:datetime.time)
+    df.index = pd.to_datetime(df.index)
+    dd = get_tdx_stock_period_to_type(df,'m')
+    print "t:",time.time()-time_s
+    print len(dd)
+    print dd[-1:]
     # df= get_tdx_all_StockList_DF(list,1,1)
     # print df[:6]
-    import sys
+
 
     sys.exit(0)
     time_t = time.time()

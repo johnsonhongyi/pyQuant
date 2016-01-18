@@ -6,10 +6,11 @@ import statsmodels.api as sm
 from pylab import *
 from sklearn.linear_model import LinearRegression
 from statsmodels import regression
+import tushare as ts
 
 from JohhnsonUtil import LoggerFactory as LoggerFactory
-from JohhnsonUtil import zoomPan
-
+from JohhnsonUtil import zoompan
+import JohhnsonUtil.commonTips as cct
 log = LoggerFactory.getLogger('Linehistogram')
 # log.setLevel(LoggerFactory.DEBUG)
 from JSONData import tdx_data_Day as tdd
@@ -54,8 +55,8 @@ def LIS(X):
         k = P[k]
     return S[::-1], pos[::-1]
 
-
-def get_linear_model_status(code):
+    
+def get_linear_model_status(code,type='M'):
     df = tdd.get_tdx_Exp_day_to_df(code, 'f').sort_index(ascending=True)
     asset = df['close']
     log.info("df:%s" % asset[:1])
@@ -70,21 +71,38 @@ def get_linear_model_status(code):
     if Y_hat[-1] > Y_hat[1]:
         log.debug("u:%s" % Y_hat[-1])
         log.debug("price:" % asset.iat[-1])
-        if asset.iat[-1] - Y_hat[-1] > 0:
-            return True, len(asset)
+        if type.upper()=='M':
+            diff=asset.iat[-1] - Y_hat[-1]
+            if diff > 0:
+                return True, len(asset),diff
+            else:
+                return False,len(asset),diff
+        elif type.upper()=='L':
+            i = (asset.values.T - Y_hat).argmin()
+            c_low = X[i] * b + a - asset.values[i]
+            Y_hatlow = X * b + a - c_low
+            diff=asset.iat[-1] - Y_hatlow[-1]
+            if asset.iat[-1] - Y_hatlow[-1] > 0:
+                return True,len(asset),diff
+            else:
+                return False,len(asset),diff
     else:
         log.debug("d:%s" % Y_hat[1])
-        return False, len(asset)
-    return False, len(asset)
+        return False, 0,0
+    return False,0,0
 
 
-def get_linear_model_histogram(code):
+def get_linear_model_histogram(code,type='d'):
     # 399001','cyb':'zs399006','zxb':'zs399005
     # code = '999999'
     # code = '601608'
     # code = '000002'
     # asset = ts.get_hist_data(code)['close'].sort_index(ascending=True)
-    df = tdd.get_tdx_Exp_day_to_df(code, 'f').sort_index(ascending=True)
+    # df = tdd.get_tdx_Exp_day_to_df(code, 'f').sort_index(ascending=True)
+    df=tdd.get_tdx_append_now_df(code,'f')
+    if not type == 'd':
+        df=tdd.get_tdx_stock_period_to_type(df,'w')
+    # print df[:1]
     asset = df['close']
 
     log.info("df:%s" % asset[:1])
@@ -140,11 +158,11 @@ def get_linear_model_histogram(code):
     # fig=plt.fig()
     # fig.figsize = [14,8]
     scale = 1.1
-    zp = zoomPan.ZoomPan()
+    zp = zoompan.ZoomPan()
     figZoom = zp.zoom_factory(ax1, base_scale=scale)
     figPan = zp.pan_factory(ax1)
 
-    ax2 = fig.add_subplot(322)
+    ax2 = fig.add_subplot(323)
     ticks = ax2.get_xticks()
     ax2.set_xticklabels([dates[i] for i in ticks[:-1]])
     # plt.plot(X, Y_hat, 'k', alpha=0.9)
@@ -164,7 +182,7 @@ def get_linear_model_histogram(code):
     # plt.legend([code])
 
     # 将Y-Y_hat股价偏离中枢线的距离单画出一张图显示，对其边界线之间的区域进行均分，大于0的区间为高估，小于0的区间为低估，0为价值中枢线。
-    ax3 = fig.add_subplot(323)
+    ax3 = fig.add_subplot(324)
     distance = (asset.values.T - Y_hat)
     # distance = (asset.values.T-Y_hat)[0]
     ax3.plot(distance)
@@ -186,7 +204,7 @@ def get_linear_model_histogram(code):
 
     # 统计出每个区域内各股价的频数，得到直方图，为了更精细的显示各个区域的频数，这里将整个边界区间分成100份。
 
-    ax4 = fig.add_subplot(324)
+    ax4 = fig.add_subplot(325)
     log.info("assert:len:%s %s" % (len(asset.values.T - Y_hat), (asset.values.T - Y_hat)[0]))
     # distance = map(lambda x:int(x),(asset.values.T - Y_hat)/Y_hat*100)
     # now_distanse=int((asset.iat[-1]-Y_hat[-1])/Y_hat[-1]*100)
@@ -211,7 +229,7 @@ def get_linear_model_histogram(code):
     # print(os.path.abspath(os.path.curdir))
 
 
-    ax5 = fig.add_subplot(325)
+    ax5 = fig.add_subplot(326)
     # fig.figsize=(5, 10)
     log.info("assert:len:%s %s" % (len(asset.values.T - Y_hat), (asset.values.T - Y_hat)[0]))
     # distance = map(lambda x:int(x),(asset.values.T - Y_hat)/Y_hat*100)
@@ -233,7 +251,7 @@ def get_linear_model_histogram(code):
     plt.grid(True)
 
 
-    ax6 = fig.add_subplot(326)
+    ax6 = fig.add_subplot(322)
     h = df.loc[:, ['open', 'close', 'high', 'low']]
     highp = h['high'].values
     lowp = h['low'].values
@@ -269,7 +287,7 @@ def get_linear_model_histogram(code):
     plt.grid(True)
 
     # plt.tight_layout()
-    zp2 = zoomPan.ZoomPan()
+    zp2 = zoompan.ZoomPan()
     figZoom = zp2.zoom_factory(ax6, base_scale=scale)
     figPan = zp2.pan_factory(ax6)
     show()
@@ -278,6 +296,7 @@ def get_linear_model_histogram(code):
 if __name__ == "__main__":
     # status=get_linear_model_status('601198')
     # print status
+    # get_tdx_and_now_data('002399')
     # sys.exit(0)
 
     if len(sys.argv) == 2:

@@ -9,9 +9,8 @@ from multiprocessing.pool import ThreadPool, cpu_count
 
 import trollius as asyncio
 from trollius.coroutines import From
-
 import johnson_cons as ct
-
+import pandas as pd
 # log = log.getLogger('commonTipss')
 
 
@@ -40,6 +39,12 @@ def get_today():
     today = TODAY.strftime('%Y-%m-%d')
     return today
 
+def get_today_duration(datastr):
+    today = datetime.date.today()
+    last_day = datetime.datetime.strptime(datastr,'%Y-%m-%d').date()
+    duration_day=(today-last_day).days
+    return int(duration_day)
+    
 def get_now_time_int():
     now_t = datetime.datetime.now().strftime("%H%M")
     return int(now_t)
@@ -341,6 +346,29 @@ def get_run_path():
         raise TypeError('log path error.')
     return path
 
+def get_stock_tdx_period_to_type(stock_data,type='w'):
+    period_type= type
+    #转换周最后一日变量
+    stock_data.index = pd.to_datetime(stock_data.index)
+    period_stock_data = stock_data.resample(period_type,how='last')
+    #周数据的每日change连续相乘
+    # period_stock_data['percent']=stock_data['percent'].resample(period_type,how=lambda x:(x+1.0).prod()-1.0)
+    #周数据open等于第一日
+    period_stock_data['open']=stock_data['open'].resample(period_type,how='first')
+    #周high等于Max high
+    period_stock_data['high']=stock_data['high'].resample(period_type,how='max')
+    period_stock_data['low']=stock_data['low'].resample(period_type,how='min')
+    #volume等于所有数据和
+    period_stock_data['amount']=stock_data['amount'].resample(period_type,how='sum')
+    period_stock_data['vol']=stock_data['vol'].resample(period_type,how='sum')
+    #计算周线turnover,【traded_market_value】 流通市值【market_value】 总市值【turnover】 换手率，成交量/流通股本
+    # period_stock_data['turnover']=period_stock_data['vol']/(period_stock_data['traded_market_value'])/period_stock_data['close']
+    #去除无交易纪录
+    period_stock_data=period_stock_data[period_stock_data['code'].notnull()]
+    period_stock_data.reset_index(inplace=True)
+    return period_stock_data
+
+    
 
 if __name__ == '__main__':
     print get_run_path()
