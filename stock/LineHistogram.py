@@ -1,16 +1,18 @@
 # -*- coding:utf-8 -*-
 # 导入需要用到的库
 # %matplotlib inline
+import sys
+
+import numpy as np
 import pandas as pd
 import statsmodels.api as sm
 from pylab import plt,show
-import numpy as np
 from sklearn.linear_model import LinearRegression
 from statsmodels import regression
-import sys
+
 from JohhnsonUtil import LoggerFactory as LoggerFactory
-from JohhnsonUtil import zoompan
 from JohhnsonUtil import commonTips as cct
+from JohhnsonUtil import zoompan
 
 log = LoggerFactory.getLogger('Linehistogram')
 # log.setLevel(LoggerFactory.DEBUG)
@@ -93,16 +95,16 @@ def get_linear_model_status(code,type='M'):
     return False,0,0
 
 
-def get_linear_model_histogram(code,type='d',start=None,end=None):
+def get_linear_model_histogram(code, ptype='f', dtype='d', start=None, end=None):
     # 399001','cyb':'zs399006','zxb':'zs399005
     # code = '999999'
     # code = '601608'
     # code = '000002'
     # asset = ts.get_hist_data(code)['close'].sort_index(ascending=True)
     # df = tdd.get_tdx_Exp_day_to_df(code, 'f').sort_index(ascending=True)
-    df=tdd.get_tdx_append_now_df(code,'f',start,end)
-    if not type == 'd':
-        df=tdd.get_tdx_stock_period_to_type(df,type,start,end)
+    df = tdd.get_tdx_append_now_df(code, ptype, start, end)
+    if not dtype == 'd':
+        df = tdd.get_tdx_stock_period_to_type(df, dtype)
     # print df[:1]
     asset = df['close']
 
@@ -293,10 +295,14 @@ def get_linear_model_histogram(code,type='d',start=None,end=None):
     figPan = zp2.pan_factory(ax6)
     show()
 
-def main(input):
+
+def parseArgmain():
+    # from ConfigParser import ConfigParser
+    # import shlex
+
+
     import argparse
     # parser = argparse.ArgumentParser()
-    parser = argparse.ArgumentParser(description='I print fibonacci sequence')
     # parser.add_argument('-s', '--start', type=int, dest='start',
                         # help='Start date', required=True)
     # parser.add_argument('-e', '--end', type=int, dest='end',
@@ -306,14 +312,19 @@ def main(input):
     # parser.add_argument('foo', type=int, choices=xrange(5, 10))
     # args = parser.parse_args()
     # print args.square**2
-    parser = argparse.ArgumentParser(description='LinearRegression matplotlib')
-    parser.add_argument('code',type=str, nargs='?',help='code or 999999')
-    parser.add_argument('-d','--dtype',type=str,nargs='?',choices=['d','w','m'],default='d',help='DateType')
-    parser.add_argument('-s','--start',type=str,help='start')
-    parser.add_argument('-e','--end',type=str,help='end')
+    parser = argparse.ArgumentParser()
+    # parser = argparse.ArgumentParser(description='LinearRegression Show')
+    parser.add_argument('code', type=str, nargs='?', help='999999')
+    parser.add_argument('start', nargs='?', type=str, help='20150612')
+    parser.add_argument('-e', action="store", dest="end", type=str, help='end')
+    parser.add_argument('-d', action="store", dest="dtype", type=str, nargs='?', choices=['d', 'w', 'm'], default='d',
+                        help='DateType')
+    parser.add_argument('-p', action="store", dest="ptype", type=str, choices=['f', 'b'], default='f',
+                        help='Price Forward or back')
+    # parser.add_argument('-help',type=str,help='Price Forward or back')
     # args = parser.parse_args()
-    args=parser.parse_args(input)
-    return args
+    # args=parser.parse_args(input)
+    return parser
     # def getArgs():
       # parse=argparse.ArgumentParser()
       # parse.add_argument('-u',type=str)
@@ -344,37 +355,42 @@ if __name__ == "__main__":
     elif (len(sys.argv) > 2):
         print ("argv error")
         sys.exit(0)
+
     # else:
     #     print ("please input code:")
     #     sys.exit(0)
     # num_input = '601608'
     # num_input=raw_input("Please input code:")
+    parser = parseArgmain()
+    parser.print_help()
     while 1:
         try:
             if not len(num_input) == 6:
                 num_input = raw_input("please input code:")
                 if len(num_input)>0:
-                    args=main(num_input.split())
+                    args = parser.parse_args(num_input.split())
                     num_input=args.code
-                    print args.code,args.dtype,args.start,args.end
+                    # print args.code,args.ptype,args.dtype,
+                    start = cct.day8_to_day10(args.start)
+                    end = cct.day8_to_day10(args.end)
+                    # print start,end
                 if num_input == 'ex' or num_input == 'qu' \
                         or num_input == 'q' or num_input == "e":
                     sys.exit()
                 elif len(num_input)==6:
                     code=args.code
-                    if args.start:
-                        if args.end:
-                            get_linear_model_histogram(code,args.dtype,args.start,args.end)
-                        else:
-                            get_linear_model_histogram(code,args.dtype,args.start)
-                    elif args.end:
-                        get_linear_model_histogram(code,args.dtype,end=args.end)
-                    else:
-                        get_linear_model_histogram(code,args.dtype)
-                num_input = ''
+                    get_linear_model_histogram(code, args.ptype, args.dtype, start, end)
+                    num_input = ''
+
+                    #         else:
+                    #             get_linear_model_histogram(code,args.dtype,args.start)
+                    #     elif args.end:
+                    #         get_linear_model_histogram(code,args.dtype,end=args.end)
+                    #     else:
+                    #         get_linear_model_histogram(code,args.dtype)
+                    # num_input = ''
                 # elif len(num_input) == 6:
                     # get_linear_model_histogram(num_input)
-                    # num_input = ''
                 # elif len(num_input) == 8:
                     # data=num_input.split(' ')
                     # if len(data)>2:

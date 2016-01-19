@@ -10,7 +10,49 @@ parser.add_argument('-e', '--end', type=int, dest='end',
                     help='End of the sequence', required=True)
 parser.add_argument('-v', '--verbose', action='store_true', dest='verbose',
                     help='Enable debug info')
-                    
+# from ConfigParser import ConfigParser
+#
+# import shlex
+# config = ConfigParser()
+#
+# config.read('argparse_with_shlex.ini')
+#
+# config_value = config.get('cli', 'options')
+#
+# print 'Config  :',config_value
+#
+#
+#
+# argument_list = shlex.split(config_value)
+#
+# print 'Arg List:', argument_list
+#
+#
+#
+# print 'Results :', parser.parse_args(argument_list)
+#
+#     执行结果：
+#
+# # python argparse_with_shlex.py
+#
+# Config  : -a -b 2
+#
+# Arg List: ['-a', '-b', '2']
+#
+# Results : Namespace(a=True, b='2', c=None)
+#
+#     其中ini文件的内容如下：
+#
+# # vi argparse_with_shlex.ini
+#
+# [cli]
+#
+# options = -a -b 2
+#
+#     上面例子使用了ConfigParser来读取配置，再用shlex来切割参数。可以通过fromfile_prefix_chars 告知argparse输入参数为文件。
+
+
+
 import logging
 logger = logging.getLogger('fib')
 logger.setLevel(logging.DEBUG)

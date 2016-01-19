@@ -3,7 +3,6 @@
 from __future__ import division
 
 import os
-import sys
 import time
 from struct import *
 
@@ -78,12 +77,10 @@ day_path = {'sh': day_dir_sh, 'sz': day_dir_sz}
 
 # http://www.douban.com/note/504811026/
 def get_tdx_Exp_day_to_df(code, type='f',start=None,end=None):
-    # time_s=time.time()
-    # print code
-    start=cct.day8_to_day10(start)
-    end=cct.day8_to_day10(end)
-    code_u = cct.code_to_symbol(code)
+    # start=cct.day8_to_day10(start)
+    # end=cct.day8_to_day10(end)
     # day_path = day_dir % 'sh' if code[:1] in ['5', '6', '9'] else day_dir % 'sz'
+    code_u = cct.code_to_symbol(code)
     if type == 'f':
         file_path = exp_path + path_sep + 'forwardp' + path_sep + code_u.upper() + ".txt"
     elif type == 'b':
@@ -144,6 +141,10 @@ def get_tdx_append_now_df(code,type='f',start=None,end=None):
     # end=cct.day8_to_day10(end)
     df = get_tdx_Exp_day_to_df(code,type,start,end).sort_index(ascending=True)
     # print df[:1]
+    if end:
+        if not end == df.index[-1]:
+            print(end, df.index[-1])
+        return df
     today = cct.get_today()
     tdx_last_day=df.index[-1]
     log.info("tdx_last_day:%s"%tdx_last_day)
