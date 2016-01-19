@@ -139,7 +139,9 @@ def get_sina_Market_json(market='sh', showtime=True, num='1000', retry_count=3, 
     # ct._write_head()
     if market=='all':
         url_list=[]
-        for m in ct.SINA_Market_KEY.values():
+        # for m in ct.SINA_Market_KEY.values():
+        for m in ['sh_a','sz_a']:
+        
             list=_get_sina_Market_url(m, num=num)
             for l in list:url_list.append(l)
         # print url_list

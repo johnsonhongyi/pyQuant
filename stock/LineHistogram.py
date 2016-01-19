@@ -3,12 +3,14 @@
 # %matplotlib inline
 import pandas as pd
 import statsmodels.api as sm
-from pylab import *
+from pylab import plt,show
+import numpy as np
 from sklearn.linear_model import LinearRegression
 from statsmodels import regression
-
+import sys
 from JohhnsonUtil import LoggerFactory as LoggerFactory
 from JohhnsonUtil import zoompan
+from JohhnsonUtil import commonTips as cct
 
 log = LoggerFactory.getLogger('Linehistogram')
 # log.setLevel(LoggerFactory.DEBUG)
@@ -91,16 +93,16 @@ def get_linear_model_status(code,type='M'):
     return False,0,0
 
 
-def get_linear_model_histogram(code,type='d'):
+def get_linear_model_histogram(code,type='d',start=None,end=None):
     # 399001','cyb':'zs399006','zxb':'zs399005
     # code = '999999'
     # code = '601608'
     # code = '000002'
     # asset = ts.get_hist_data(code)['close'].sort_index(ascending=True)
     # df = tdd.get_tdx_Exp_day_to_df(code, 'f').sort_index(ascending=True)
-    df=tdd.get_tdx_append_now_df(code,'f')
+    df=tdd.get_tdx_append_now_df(code,'f',start,end)
     if not type == 'd':
-        df=tdd.get_tdx_stock_period_to_type(df,'w')
+        df=tdd.get_tdx_stock_period_to_type(df,type,start,end)
     # print df[:1]
     asset = df['close']
 
@@ -291,13 +293,52 @@ def get_linear_model_histogram(code,type='d'):
     figPan = zp2.pan_factory(ax6)
     show()
 
+def main(input):
+    import argparse
+    # parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(description='I print fibonacci sequence')
+    # parser.add_argument('-s', '--start', type=int, dest='start',
+                        # help='Start date', required=True)
+    # parser.add_argument('-e', '--end', type=int, dest='end',
+                        # help='End date', required=True)
+    # parser.add_argument('-v', '--verbose', action='store_true', dest='verbose',
+                        # help='Enable debug info')
+    # parser.add_argument('foo', type=int, choices=xrange(5, 10))
+    # args = parser.parse_args()
+    # print args.square**2
+    parser = argparse.ArgumentParser(description='LinearRegression matplotlib')
+    parser.add_argument('code',type=str, nargs='?',help='code or 999999')
+    parser.add_argument('-d','--dtype',type=str,nargs='?',choices=['d','w','m'],default='d',help='DateType')
+    parser.add_argument('-s','--start',type=str,help='start')
+    parser.add_argument('-e','--end',type=str,help='end')
+    # args = parser.parse_args()
+    args=parser.parse_args(input)
+    return args
+    # def getArgs():
+      # parse=argparse.ArgumentParser()
+      # parse.add_argument('-u',type=str)
+      # parse.add_argument('-d',type=str)
+      # parse.add_argument('-o',type=str)
+      # args=parse.parse_args()
+      # return vars(args)
+    # if args.verbose:
+        # logger.setLevel(logging.DEBUG)
+    # else:
+        # logger.setLevel(logging.ERROR)
+
 
 if __name__ == "__main__":
     # status=get_linear_model_status('601198')
     # print status
     # get_tdx_and_now_data('002399')
     # sys.exit(0)
-
+    
+    # args=main(raw_input('input').split())
+    # print (args.d)
+    # sys.exit()
+    
+    cct.set_console(100,15)
+    num_input=''
     if len(sys.argv) == 2:
         num_input = sys.argv[1]
     elif (len(sys.argv) > 2):
@@ -306,21 +347,56 @@ if __name__ == "__main__":
     # else:
     #     print ("please input code:")
     #     sys.exit(0)
-    num_input = '601608'
+    # num_input = '601608'
     # num_input=raw_input("Please input code:")
     while 1:
         try:
             if not len(num_input) == 6:
                 num_input = raw_input("please input code:")
+                if len(num_input)>0:
+                    args=main(num_input.split())
+                    num_input=args.code
+                    print args.code,args.dtype,args.start,args.end
                 if num_input == 'ex' or num_input == 'qu' \
                         or num_input == 'q' or num_input == "e":
                     sys.exit()
-                elif len(num_input) == 6:
-                    get_linear_model_histogram(num_input)
-                    num_input = ''
-            else:
-                get_linear_model_histogram(num_input)
+                elif len(num_input)==6:
+                    code=args.code
+                    if args.start:
+                        if args.end:
+                            get_linear_model_histogram(code,args.dtype,args.start,args.end)
+                        else:
+                            get_linear_model_histogram(code,args.dtype,args.start)
+                    elif args.end:
+                        get_linear_model_histogram(code,args.dtype,end=args.end)
+                    else:
+                        get_linear_model_histogram(code,args.dtype)
                 num_input = ''
+                # elif len(num_input) == 6:
+                    # get_linear_model_histogram(num_input)
+                    # num_input = ''
+                # elif len(num_input) == 8:
+                    # data=num_input.split(' ')
+                    # if len(data)>2:
+                        # code=data[0]
+                        # type=data[1]
+                        # if type in ['d','w','m']:
+                            # get_linear_model_histogram(code,type)
+                            # num_input = ''
+                # elif len(num_input) > 8:
+                    # data=num_input.split(' ')
+                    # if len(data)==3:
+                        # code=data[0]
+                        # type=data[1]
+                        # start=data[2]
+                        # if type in ['d','w','m']:
+                            # get_linear_model_histogram(code,type)
+                            # num_input = ''
+                        # else:
+                            # get_linear_model_histogram(code)
+            # else:
+                # get_linear_model_histogram(num_input)
+                # num_input = ''
         except (KeyboardInterrupt) as e:
             print "KeyboardInterrupt:", e
             st = raw_input("status:[go(g),clear(c),quit(q,e)]:")

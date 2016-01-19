@@ -23,7 +23,7 @@ import requests
 def set_console(width=80,height=15,color=3):
     # mode con cp select=936
     # os.system("mode con: cols=%s lines=%s"%(width,height))
-    # os.system('title=%s'%sys.argv[0])
+    os.system('title=%s'%sys.argv[0])
     # os.system('color %s'%color)
     pass
 
@@ -33,6 +33,13 @@ def get_cpu_count():
 def get_os_path_sep():
     return os.path.sep
 
+def day8_to_day10(start):
+    if start:
+        start=str(start)
+        if len(start)==8:
+            start=start[:4]+'-'+start[4:6]+'-'+start[6:]
+            return start
+    return None
 
 def get_today():
     TODAY = datetime.date.today()

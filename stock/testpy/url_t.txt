@@ -115,3 +115,25 @@ var rzrqhuizong=["2016-01-12,上海,610486743606,21769602015,1687383077,61217412
 sina:
 http://vip.stock.finance.sina.com.cn/quotes_service/api/json_v2.php/Market_Center.getHQNodeData?page=1&num=40&sort=symbol&asc=1&node=new_stock&symbol=&_s_r_a=init
 node: new_stock
+
+
+
+ df = ts.get_hist_data('sh',start='2015-06-12')
+
+ len(df)
+ 148
+
+ df = ts.get_hist_data('sh',start='2015-06-12',end='2015-08-26')
+
+ len(df)
+ 53
+
+ df = ts.get_hist_data('sh',start='2015-08-26',end='2015-12-23')
+
+ len(df)
+ 79
+
+ df = ts.get_hist_data('sh',start='2015-12-23')
+
+ len(df)
+ 18

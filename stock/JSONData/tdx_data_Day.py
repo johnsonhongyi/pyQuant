@@ -77,15 +77,19 @@ day_path = {'sh': day_dir_sh, 'sz': day_dir_sz}
 
 
 # http://www.douban.com/note/504811026/
-def get_tdx_Exp_day_to_df(code, type='f'):
+def get_tdx_Exp_day_to_df(code, type='f',start=None,end=None):
     # time_s=time.time()
     # print code
+    start=cct.day8_to_day10(start)
+    end=cct.day8_to_day10(end)
     code_u = cct.code_to_symbol(code)
     # day_path = day_dir % 'sh' if code[:1] in ['5', '6', '9'] else day_dir % 'sz'
     if type == 'f':
         file_path = exp_path + path_sep + 'forwardp' + path_sep + code_u.upper() + ".txt"
-    else:
+    elif type == 'b':
         file_path = exp_path + path_sep + 'backp' + path_sep + code_u.upper() + ".txt"
+    else:
+        return ''
     log.info("daypath:%s" % file_path)
     # p_day_dir = day_path.replace('/', path_sep).replace('\\', path_sep)
     # p_exp_dir = exp_dir.replace('/', path_sep).replace('\\', path_sep)
@@ -121,16 +125,24 @@ def get_tdx_Exp_day_to_df(code, type='f'):
             {'code': code, 'date': tdate, 'open': topen, 'high': thigh, 'low': tlow, 'close': tclose, 'amount': amount,
              'vol': tvol})
     df = pd.DataFrame(dt_list, columns=ct.TDX_Day_columns)
+    # df.sort_index(ascending=False, inplace=True)
+    if start and end:
+        df = df[(df.date>=start) & (df.date<=end)]
+    elif end:
+        df = df[df.date<=end]
+    elif start:
+        df = df[df.date>=start]
     df = df.set_index('date')
-    df.sort_index(ascending=False, inplace=True)
     # print "time:",(time.time()-time_s)*1000
     return df
 
 INDEX_LIST = {'sh': 'sh000001', 'sz': 'sz399001', 'hs300': 'sz399300',
               'sz50': 'sh000016', 'zxb': 'sz399005', 'cyb': 'sz399006'}
               
-def get_tdx_append_now_df(code,type='f'):
-    df = get_tdx_Exp_day_to_df(code,type).sort_index(ascending=True)
+def get_tdx_append_now_df(code,type='f',start=None,end=None):    
+    # start=cct.day8_to_day10(start)
+    # end=cct.day8_to_day10(end)
+    df = get_tdx_Exp_day_to_df(code,type,start,end).sort_index(ascending=True)
     # print df[:1]
     today = cct.get_today()
     tdx_last_day=df.index[-1]
@@ -146,7 +158,7 @@ def get_tdx_append_now_df(code,type='f'):
             if INDEX_LIST[k].find(code)>0:
                 code=k
             
-    
+    log.debug("duration:%s"%duration)
     if duration >= 1:
         ds = ts.get_hist_data(code,start=tdx_last_day,end=today)
         if len(ds) > 1:
@@ -162,11 +174,13 @@ def get_tdx_append_now_df(code,type='f'):
             # result=pd.concat([df,ds])
         if  cct.get_work_time() and not index_status:
             dm = rl.get_sina_Market_json('all').set_index('code')
+            # dm=dm.drop_duplicates()
             log.debug("dm:%s"%dm[-1:])
             dm.rename(columns={'volume': 'amount','trade':'close'}, inplace=True)
             # c_name=dm.loc[code,['name']]
             dm_code=dm.loc[code,['open','high','low','close','amount']]
-            dm_code['amount']=round(dm_code['amount']/100,2)
+            log.debug("dm_code:%s"%dm_code['amount'])
+            dm_code['amount']=round(float(dm_code['amount'])/100,2)
             dm_code['code']=code
             dm_code['vol']=0
             # dm_code['date']=today
@@ -469,7 +483,7 @@ if __name__ == '__main__':
     # df.sort_index(ascending=True,inplace=True)
     # df.index=df.index.apply(lambda x:datetime.time)
     df.index = pd.to_datetime(df.index)
-    dd = get_tdx_stock_period_to_type(df,'m')
+    dd = get_tdx_stock_period_to_type(df)
     print "t:",time.time()-time_s
     print len(dd)
     print dd[-1:]
