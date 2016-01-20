@@ -7,7 +7,6 @@ import sys
 import time
 import traceback
 import urllib2
-
 import pandas as pd
 from bs4 import BeautifulSoup
 from pandas import DataFrame
@@ -20,6 +19,7 @@ from JSONData import tdx_data_Day as tdd
 from JohhnsonUtil import LoggerFactory
 from JohhnsonUtil import commonTips as cct
 import singleAnalyseUtil as sl
+
 
 # from logbook import Logger,StreamHandler,SyslogHandler
 # from logbook import StderrHandler
@@ -164,7 +164,7 @@ if __name__ == "__main__":
     # log.setLevel(LoggerFactory.DEBUG)
 
 
-    cct.set_console(130,15)
+    cct.set_console(130, 15)
     status = False
     vol = '0'
     type = '2'
@@ -181,8 +181,8 @@ if __name__ == "__main__":
         try:
             df = rl.get_sina_Market_json('cyb')
             top_now = rl.get_market_price_sina_dd_realTime(df, vol, type)
-            df_count=len(df)
-            now_count=len(top_now)
+            df_count = len(df)
+            now_count = len(top_now)
             del df
             gc.collect()
             radio_t = cct.get_work_time_ratio()
@@ -192,15 +192,15 @@ if __name__ == "__main__":
                 status_change = True
                 log.info("chane clear top")
                 time_s = time.time()
-                top_all=pd.DataFrame()
+                top_all = pd.DataFrame()
 
             else:
                 status_change = False
             # print ("Buy>0:%s"%len(top_now[top_now['buy'] > 0])),
-            log.info("top_now['buy']:%s"%(top_now[:2]['buy']))
-            log.info("top_now.buy[:30]>0:%s"%len(top_now[:30][top_now[:30]['buy'] > 0]))
+            log.info("top_now['buy']:%s" % (top_now[:2]['buy']))
+            log.info("top_now.buy[:30]>0:%s" % len(top_now[:30][top_now[:30]['buy'] > 0]))
             if len(top_now) > 10 or cct.get_work_time():
-            # if len(top_now) > 10 or len(top_now[:10][top_now[:10]['buy'] > 0]) > 3:
+                # if len(top_now) > 10 or len(top_now[:10][top_now[:10]['buy'] > 0]) > 3:
                 # if len(top_now) > 10 and not top_now[:1].buy.values == 0:
                 #     top_now=top_now[top_now['percent']>=0]
                 if len(top_all) == 0:
@@ -240,7 +240,7 @@ if __name__ == "__main__":
                             else:
                                 # top_now.loc[symbol,'lastp']=top_all.loc[symbol,'lastp']
                                 top_all.loc[symbol, 'buy':'low'] = top_now.loc[symbol, 'buy':'low']
-                
+
                 top_dif = top_all
 
                 # if top_dif[:1].llow.values <> 0:
@@ -251,24 +251,27 @@ if __name__ == "__main__":
                     # top_dif = top_dif[top_dif.low >= top_dif.lastp]
                     # log.debug('dif3 low<>0 :%s' % len(top_dif))
                     top_dif = top_dif[top_dif.open > 0]
-                    top_dif = top_dif[top_dif.open >= top_dif.low*0.995]
+                    top_dif = top_dif[top_dif.open >= top_dif.low * 0.995]
                     top_dif = top_dif[top_dif.buy >= top_dif.lhigh]
                     log.debug('dif4 open>low0.99:%s' % len(top_dif))
                     log.debug('dif4-2:%s' % top_dif[:1])
+
+                    # if cct.get_work_time() and cct.get_now_time_int() > 930:
                     top_dif = top_dif[top_dif.percent >= 0]
-                    log.debug("dif5-percent>0:%s"%len(top_dif))
+                    log.debug("dif5-percent>0:%s" % len(top_dif))
                     log.debug("Second:vol/vol/:%s" % radio_t)
                     top_dif['volume'] = (
                         map(lambda x, y: round(x / y / radio_t, 1), top_dif['volume'].values, top_dif['lvol'].values))
                     # top_dif = top_dif[top_dif.volume > 3]
                     top_dif['diff'] = (
-                        map(lambda x, y: round(((float(x) - float(y)) / float(y) * 100), 1), top_dif['buy'].values, top_dif['open'].values))
+                        map(lambda x, y: round(((float(x) - float(y)) / float(y) * 100), 1), top_dif['buy'].values,
+                            top_dif['open'].values))
                 else:
                     log.info('dif1:%s' % len(top_dif))
                     log.info(top_dif[:1])
                     top_dif = top_dif[top_dif.buy > top_dif.lastp]
                     log.debug('dif2:%s' % len(top_dif))
-                    
+
                 if len(top_dif) == 0:
                     print "No G,DataFrame is Empty!!!!!!"
 
@@ -288,7 +291,7 @@ if __name__ == "__main__":
                     len(top_now[top_now['volume'] <= 0]), len(top_dif))),
                 print "Rt:%0.3f" % (float(time.time() - time_Rt))
                 if 'counts' in top_dif.columns.values:
-                    top_dif = top_dif.sort_values(by=['diff',  'percent','volume', 'counts', 'ratio'],
+                    top_dif = top_dif.sort_values(by=['diff', 'percent', 'volume', 'counts', 'ratio'],
                                                   ascending=[0, 0, 0, 1, 0])
                 else:
                     print "Good Morning!!!"
@@ -317,6 +320,10 @@ if __name__ == "__main__":
             if cct.get_work_time():
                 if int_time < 926:
                     time.sleep(30)
+                elif int_time < 930:
+                    top_all = pd.DataFrame()
+                    time_s = time.time()
+                    time.sleep((930 - int_time) * 60)
                 else:
                     time.sleep(60)
             elif cct.get_work_duration():
@@ -327,6 +334,7 @@ if __name__ == "__main__":
                         time.sleep(60)
                     else:
                         top_all = pd.DataFrame()
+                        time_s = time.time()
                         print "."
                         break
             else:
@@ -351,7 +359,7 @@ if __name__ == "__main__":
                     else:
                         cct.write_to_blocknew(block_path, codew[:10], False)
                         # cct.write_to_blocknew(all_diffpath, codew, False)
-                    print "wri ok:%s"%block_path
+                    print "wri ok:%s" % block_path
 
                     # time.sleep(2)
                 else:
@@ -384,7 +392,7 @@ if __name__ == "__main__":
                 else:
                     cct.write_to_blocknew(block_path, codew[:10], False)
                     # cct.write_to_blocknew(all_diffpath, codew, False)
-                print "wri ok:%s"%block_path
+                print "wri ok:%s" % block_path
 
                 # time.sleep(2)
             else:

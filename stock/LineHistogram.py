@@ -2,14 +2,12 @@
 # 导入需要用到的库
 # %matplotlib inline
 import sys
-
 import numpy as np
 import pandas as pd
 import statsmodels.api as sm
-from pylab import plt,show
+from pylab import plt, show
 from sklearn.linear_model import LinearRegression
 from statsmodels import regression
-
 from JohhnsonUtil import LoggerFactory as LoggerFactory
 from JohhnsonUtil import commonTips as cct
 from JohhnsonUtil import zoompan
@@ -58,9 +56,12 @@ def LIS(X):
         k = P[k]
     return S[::-1], pos[::-1]
 
-    
-def get_linear_model_status(code,type='M'):
-    df = tdd.get_tdx_Exp_day_to_df(code, 'f').sort_index(ascending=True)
+
+def get_linear_model_status(code, ptype='f', dtype='d', start=None, end=None):
+    df = tdd.get_tdx_append_now_df(code, ptype, start, end).sort_index(ascending=True)
+    if not dtype == 'd':
+        df = tdd.get_tdx_stock_period_to_type(df, dtype).sort_index(ascending=True)
+    # df = tdd.get_tdx_Exp_day_to_df(code, 'f').sort_index(ascending=True)
     asset = df['close']
     log.info("df:%s" % asset[:1])
     asset = asset.dropna()
@@ -74,25 +75,25 @@ def get_linear_model_status(code,type='M'):
     if Y_hat[-1] > Y_hat[1]:
         log.debug("u:%s" % Y_hat[-1])
         log.debug("price:" % asset.iat[-1])
-        if type.upper()=='M':
-            diff=asset.iat[-1] - Y_hat[-1]
+        if type.upper() == 'M':
+            diff = asset.iat[-1] - Y_hat[-1]
             if diff > 0:
-                return True, len(asset),diff
+                return True, len(asset), diff
             else:
-                return False,len(asset),diff
-        elif type.upper()=='L':
+                return False, len(asset), diff
+        elif type.upper() == 'L':
             i = (asset.values.T - Y_hat).argmin()
             c_low = X[i] * b + a - asset.values[i]
             Y_hatlow = X * b + a - c_low
-            diff=asset.iat[-1] - Y_hatlow[-1]
+            diff = asset.iat[-1] - Y_hatlow[-1]
             if asset.iat[-1] - Y_hatlow[-1] > 0:
-                return True,len(asset),diff
+                return True, len(asset), diff
             else:
-                return False,len(asset),diff
+                return False, len(asset), diff
     else:
         log.debug("d:%s" % Y_hat[1])
-        return False, 0,0
-    return False,0,0
+        return False, 0, 0
+    return False, 0, 0
 
 
 def get_linear_model_histogram(code, ptype='f', dtype='d', start=None, end=None):
@@ -102,12 +103,10 @@ def get_linear_model_histogram(code, ptype='f', dtype='d', start=None, end=None)
     # code = '000002'
     # asset = ts.get_hist_data(code)['close'].sort_index(ascending=True)
     # df = tdd.get_tdx_Exp_day_to_df(code, 'f').sort_index(ascending=True)
-    df = tdd.get_tdx_append_now_df(code, ptype, start, end)
+    df = tdd.get_tdx_append_now_df(code, ptype, start, end).sort_index(ascending=True)
     if not dtype == 'd':
-        df = tdd.get_tdx_stock_period_to_type(df, dtype)
-    # print df[:1]
+        df = tdd.get_tdx_stock_period_to_type(df, dtype).sort_index(ascending=True)
     asset = df['close']
-
     log.info("df:%s" % asset[:1])
     asset = asset.dropna()
     dates = asset.index
@@ -253,7 +252,6 @@ def get_linear_model_histogram(code, ptype='f', dtype='d', start=None, end=None)
     plt.legend([code, asset.iat[-1]])
     plt.grid(True)
 
-
     ax6 = fig.add_subplot(322)
     h = df.loc[:, ['open', 'close', 'high', 'low']]
     highp = h['high'].values
@@ -304,11 +302,11 @@ def parseArgmain():
     import argparse
     # parser = argparse.ArgumentParser()
     # parser.add_argument('-s', '--start', type=int, dest='start',
-                        # help='Start date', required=True)
+    # help='Start date', required=True)
     # parser.add_argument('-e', '--end', type=int, dest='end',
-                        # help='End date', required=True)
+    # help='End date', required=True)
     # parser.add_argument('-v', '--verbose', action='store_true', dest='verbose',
-                        # help='Enable debug info')
+    # help='Enable debug info')
     # parser.add_argument('foo', type=int, choices=xrange(5, 10))
     # args = parser.parse_args()
     # print args.square**2
@@ -316,7 +314,8 @@ def parseArgmain():
     # parser = argparse.ArgumentParser(description='LinearRegression Show')
     parser.add_argument('code', type=str, nargs='?', help='999999')
     parser.add_argument('start', nargs='?', type=str, help='20150612')
-    parser.add_argument('-e', action="store", dest="end", type=str, help='end')
+    # parser.add_argument('e', nargs='?',action="store", dest="end", type=str, help='end')
+    parser.add_argument('end', nargs='?', type=str, help='20160101')
     parser.add_argument('-d', action="store", dest="dtype", type=str, nargs='?', choices=['d', 'w', 'm'], default='d',
                         help='DateType')
     parser.add_argument('-p', action="store", dest="ptype", type=str, choices=['f', 'b'], default='f',
@@ -326,16 +325,16 @@ def parseArgmain():
     # args=parser.parse_args(input)
     return parser
     # def getArgs():
-      # parse=argparse.ArgumentParser()
-      # parse.add_argument('-u',type=str)
-      # parse.add_argument('-d',type=str)
-      # parse.add_argument('-o',type=str)
-      # args=parse.parse_args()
-      # return vars(args)
+    # parse=argparse.ArgumentParser()
+    # parse.add_argument('-u',type=str)
+    # parse.add_argument('-d',type=str)
+    # parse.add_argument('-o',type=str)
+    # args=parse.parse_args()
+    # return vars(args)
     # if args.verbose:
-        # logger.setLevel(logging.DEBUG)
+    # logger.setLevel(logging.DEBUG)
     # else:
-        # logger.setLevel(logging.ERROR)
+    # logger.setLevel(logging.ERROR)
 
 
 if __name__ == "__main__":
@@ -343,13 +342,13 @@ if __name__ == "__main__":
     # print status
     # get_tdx_and_now_data('002399')
     # sys.exit(0)
-    
+
     # args=main(raw_input('input').split())
     # print (args.d)
     # sys.exit()
-    
-    cct.set_console(100,15)
-    num_input=''
+
+    cct.set_console(100, 15)
+    num_input = ''
     if len(sys.argv) == 2:
         num_input = sys.argv[1]
     elif (len(sys.argv) > 2):
@@ -367,9 +366,9 @@ if __name__ == "__main__":
         try:
             if not len(num_input) == 6:
                 num_input = raw_input("please input code:")
-                if len(num_input)>0:
+                if len(num_input) > 0:
                     args = parser.parse_args(num_input.split())
-                    num_input=args.code
+                    num_input = args.code
                     # print args.code,args.ptype,args.dtype,
                     start = cct.day8_to_day10(args.start)
                     end = cct.day8_to_day10(args.end)
@@ -377,8 +376,8 @@ if __name__ == "__main__":
                 if num_input == 'ex' or num_input == 'qu' \
                         or num_input == 'q' or num_input == "e":
                     sys.exit()
-                elif len(num_input)==6:
-                    code=args.code
+                elif len(num_input) == 6:
+                    code = args.code
                     get_linear_model_histogram(code, args.ptype, args.dtype, start, end)
                     num_input = ''
 
@@ -389,30 +388,30 @@ if __name__ == "__main__":
                     #     else:
                     #         get_linear_model_histogram(code,args.dtype)
                     # num_input = ''
-                # elif len(num_input) == 6:
+                    # elif len(num_input) == 6:
                     # get_linear_model_histogram(num_input)
-                # elif len(num_input) == 8:
+                    # elif len(num_input) == 8:
                     # data=num_input.split(' ')
                     # if len(data)>2:
-                        # code=data[0]
-                        # type=data[1]
-                        # if type in ['d','w','m']:
-                            # get_linear_model_histogram(code,type)
-                            # num_input = ''
-                # elif len(num_input) > 8:
+                    # code=data[0]
+                    # type=data[1]
+                    # if type in ['d','w','m']:
+                    # get_linear_model_histogram(code,type)
+                    # num_input = ''
+                    # elif len(num_input) > 8:
                     # data=num_input.split(' ')
                     # if len(data)==3:
-                        # code=data[0]
-                        # type=data[1]
-                        # start=data[2]
-                        # if type in ['d','w','m']:
-                            # get_linear_model_histogram(code,type)
-                            # num_input = ''
-                        # else:
-                            # get_linear_model_histogram(code)
-            # else:
-                # get_linear_model_histogram(num_input)
-                # num_input = ''
+                    # code=data[0]
+                    # type=data[1]
+                    # start=data[2]
+                    # if type in ['d','w','m']:
+                    # get_linear_model_histogram(code,type)
+                    # num_input = ''
+                    # else:
+                    # get_linear_model_histogram(code)
+                    # else:
+                    # get_linear_model_histogram(num_input)
+                    # num_input = ''
         except (KeyboardInterrupt) as e:
             print "KeyboardInterrupt:", e
             st = raw_input("status:[go(g),clear(c),quit(q,e)]:")

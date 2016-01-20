@@ -7,7 +7,6 @@ import sys
 import time
 import traceback
 import urllib2
-
 import pandas as pd
 from bs4 import BeautifulSoup
 from pandas import DataFrame
@@ -20,6 +19,7 @@ from JSONData import tdx_data_Day as tdd
 from JohhnsonUtil import LoggerFactory
 from JohhnsonUtil import commonTips as cct
 import singleAnalyseUtil as sl
+
 
 # from logbook import Logger,StreamHandler,SyslogHandler
 # from logbook import StderrHandler
@@ -164,7 +164,7 @@ if __name__ == "__main__":
     # log.setLevel(LoggerFactory.DEBUG)
 
 
-    cct.set_console(130,15)
+    cct.set_console(130, 15)
     status = False
     vol = '0'
     type = '2'
@@ -181,8 +181,8 @@ if __name__ == "__main__":
         try:
             df = rl.get_sina_Market_json('all')
             top_now = rl.get_market_price_sina_dd_realTime(df, vol, type)
-            df_count=len(df)
-            now_count=len(top_now)
+            df_count = len(df)
+            now_count = len(top_now)
             del df
             gc.collect()
             radio_t = cct.get_work_time_ratio()
@@ -192,15 +192,15 @@ if __name__ == "__main__":
                 status_change = True
                 log.info("chane clear top")
                 time_s = time.time()
-                top_all=pd.DataFrame()
+                top_all = pd.DataFrame()
 
             else:
                 status_change = False
             # print ("Buy>0:%s"%len(top_now[top_now['buy'] > 0])),
-            log.info("top_now['buy']:%s"%(top_now[:2]['buy']))
-            log.info("top_now.buy[:30]>0:%s"%len(top_now[:30][top_now[:30]['buy'] > 0]))
+            log.info("top_now['buy']:%s" % (top_now[:2]['buy']))
+            log.info("top_now.buy[:30]>0:%s" % len(top_now[:30][top_now[:30]['buy'] > 0]))
             if len(top_now) > 10 or cct.get_work_time():
-            # if len(top_now) > 10 or len(top_now[:10][top_now[:10]['buy'] > 0]) > 3:
+                # if len(top_now) > 10 or len(top_now[:10][top_now[:10]['buy'] > 0]) > 3:
                 # if len(top_now) > 10 and not top_now[:1].buy.values == 0:
                 #     top_now=top_now[top_now['percent']>=0]
                 if len(top_all) == 0:
@@ -245,45 +245,49 @@ if __name__ == "__main__":
                         if not 'counts' in top_all.columns.values:
                             top_all['counts'] = 0
                             top_all['prev_p'] = 0
-
-                    for symbol in top_now.index:
-                        # code = rl._symbol_to_code(symbol)
-                        if symbol in top_all.index and top_all.loc[symbol, 'buy'] <> 0:
-                            # if top_all.loc[symbol,'diff'] == 0:
-                            # print "code:",symbol
-                            count_n = top_now.loc[symbol, 'buy']
-                            count_a = top_all.loc[symbol, 'buy']
-                            # print count_a,count_n
-                            # print count_n,count_a
-                            if not count_n == count_a:
-                                # log.info("n_buy-a_buy:%s" % (count_n - count_a))
-                                top_now.loc[symbol, 'diff'] = round(
-                                    ((float(count_n) - float(count_a)) / float(count_a) * 100), 1)
-                                if status_change and 'counts' in top_now.columns.values:
-                                    # print "change:",time.time()-time_s
-                                    # top_now.loc[symbol,'lastp']=top_all.loc[symbol,'lastp']
-                                    # top_all.loc[symbol, 'buy':'counts'] = top_now.loc[symbol, 'buy':'counts']
-                                    top_all.loc[symbol, 'buy':'prev_p'] = top_now.loc[symbol, 'buy':'prev_p']
+                        for symbol in top_now.index:
+                            # code = rl._symbol_to_code(symbol)
+                            if symbol in top_all.index and top_all.loc[symbol, 'buy'] <> 0:
+                                # if top_all.loc[symbol,'diff'] == 0:
+                                # print "code:",symbol
+                                count_n = top_now.loc[symbol, 'buy']
+                                count_a = top_all.loc[symbol, 'buy']
+                                # print count_a,count_n
+                                # print count_n,count_a
+                                # 
+                                if cct.get_now_time_int() < 925:
+                                    # if not count_n == count_a:
+                                    top_all.loc[symbol, 'buy'] = top_now.loc[symbol, 'buy']
                                 else:
-                                    # top_now.loc[symbol,'lastp']=top_all.loc[symbol,'lastp']
-                                    top_all.loc[symbol, 'diff':'low'] = top_now.loc[symbol, 'diff':'low']
-                            elif 'counts' in top_now.columns.values:
-                                # log.info("n_buy==a_buy:update Counts")
-                                top_all.loc[symbol, 'diff':'counts'] = top_now.loc[symbol, 'diff':'counts']
-                            else:
-                                # log.info("n_buy==a_buy:no counts update low")
-                                top_all.loc[symbol, 'diff':'low'] = top_now.loc[symbol, 'diff':'low']
+                                    if not count_n == count_a:
+                                        # log.info("n_buy-a_buy:%s" % (count_n - count_a))
+                                        top_now.loc[symbol, 'diff'] = round(
+                                            ((float(count_n) - float(count_a)) / float(count_a) * 100), 1)
+                                        if status_change and 'counts' in top_now.columns.values:
+                                            # print "change:",time.time()-time_s
+                                            # top_now.loc[symbol,'lastp']=top_all.loc[symbol,'lastp']
+                                            # top_all.loc[symbol, 'buy':'counts'] = top_now.loc[symbol, 'buy':'counts']
+                                            top_all.loc[symbol, 'buy':'prev_p'] = top_now.loc[symbol, 'buy':'prev_p']
+                                        else:
+                                            # top_now.loc[symbol,'lastp']=top_all.loc[symbol,'lastp']
+                                            top_all.loc[symbol, 'diff':'low'] = top_now.loc[symbol, 'diff':'low']
+                                    elif 'counts' in top_now.columns.values:
+                                        # log.info("n_buy==a_buy:update Counts")
+                                        top_all.loc[symbol, 'diff':'counts'] = top_now.loc[symbol, 'diff':'counts']
+                                    else:
+                                        # log.info("n_buy==a_buy:no counts update low")
+                                        top_all.loc[symbol, 'diff':'low'] = top_now.loc[symbol, 'diff':'low']
 
-                                # top_all.loc[symbol]=top_now.loc[symbol]?
-                                # top_all.loc[symbol,'diff']=top_now.loc[symbol,'counts']-top_all.loc[symbol,'counts']
+                                        # top_all.loc[symbol]=top_now.loc[symbol]?
+                                        # top_all.loc[symbol,'diff']=top_now.loc[symbol,'counts']-top_all.loc[symbol,'counts']
 
-                                # else:
-                                # value=top_all.loc[symbol,'diff']
+                                        # else:
+                                        # value=top_all.loc[symbol,'diff']
 
-                                # else:
-                                #     if float(top_now.loc[symbol,'low'])>float(top_all.loc[symbol,'lastp']):
-                                #         # top_all.append(top_now.loc[symbol])
-                                #         print "not all ???"
+                                        # else:
+                                        #     if float(top_now.loc[symbol,'low'])>float(top_all.loc[symbol,'lastp']):
+                                        #         # top_all.append(top_now.loc[symbol])
+                                        #         print "not all ???"
 
                 # top_all=top_all.sort_values(by=['diff','percent','counts'],ascending=[0,0,1])
                 # top_all=top_all.sort_values(by=['diff','ratio','percent','counts'],ascending=[0,1,0,1])
@@ -294,6 +298,10 @@ if __name__ == "__main__":
                 # top_all = top_all[top_all.trade >= top_all.high*0.99]
                 # top_all = top_all[top_all.buy >= top_all.lastp]
                 # top_all = top_all[top_all.percent >= 0]
+                if cct.get_now_time_int() < 925:
+                    top_all['diff'] = (
+                        map(lambda x, y: round((x - y) / y * 100, 1), top_all['buy'].values, top_all['lastp'].values))
+
                 top_dif = top_all
                 log.info('dif1:%s' % len(top_dif))
                 log.info(top_dif[:1])
@@ -307,8 +315,7 @@ if __name__ == "__main__":
                     log.debug('diff2-0-low>0')
                     top_dif = top_dif[top_dif.low >= top_dif.llow]
                     log.debug('diff2-1:%s' % len(top_dif))
-                    
-                     
+
                     top_dif = top_dif[top_dif.low >= top_dif.lastp]
                     log.debug('dif3 low<>0 :%s' % len(top_dif))
 
@@ -316,9 +323,12 @@ if __name__ == "__main__":
                     log.debug('dif4 open>lastp:%s' % len(top_dif))
                     log.debug('dif4-2:%s' % top_dif[:1])
                     # top_dif = top_dif[top_dif.low >= top_dif.lhigh]
+
+                    # if cct.get_work_time() and cct.get_now_time_int() > 930:
                     # top_dif = top_dif[top_dif.percent >= 0]
-                    log.debug("dif5-percent>0:%s"%len(top_dif))
-                # if len(top_dif[:5][top_dif[:5]['volume'] > 0]) > 3:
+                    log.debug("dif5-percent>0:%s" % len(top_dif))
+
+                    # if len(top_dif[:5][top_dif[:5]['volume'] > 0]) > 3:
                     log.debug("Second:vol/vol/:%s" % radio_t)
                     # top_dif['volume'] = top_dif['volume'].apply(lambda x: round(x / radio_t, 1))
                     top_dif['volume'] = (
@@ -373,6 +383,10 @@ if __name__ == "__main__":
             if cct.get_work_time():
                 if int_time < 926:
                     time.sleep(30)
+                elif int_time < 930:
+                    top_all = pd.DataFrame()
+                    time_s = time.time()
+                    time.sleep((930 - int_time) * 60)
                 else:
                     time.sleep(60)
             elif cct.get_work_duration():
@@ -383,6 +397,7 @@ if __name__ == "__main__":
                         time.sleep(60)
                     else:
                         top_all = pd.DataFrame()
+                        time_s = time.time()
                         print "."
                         break
             else:
@@ -407,7 +422,7 @@ if __name__ == "__main__":
                     else:
                         cct.write_to_blocknew(block_path, codew[:10], False)
                         # cct.write_to_blocknew(all_diffpath, codew, False)
-                    print "wri ok:%s"%block_path
+                    print "wri ok:%s" % block_path
 
                     # time.sleep(2)
                 else:
@@ -440,7 +455,7 @@ if __name__ == "__main__":
                 else:
                     cct.write_to_blocknew(block_path, codew[:10], False)
                     # cct.write_to_blocknew(all_diffpath, codew, False)
-                print "wri ok:%s"%block_path
+                print "wri ok:%s" % block_path
 
                 # time.sleep(2)
             else:

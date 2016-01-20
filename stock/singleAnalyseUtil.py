@@ -258,20 +258,20 @@ def get_hot_countNew(changepercent):
     for market in ct.SINA_Market_KEY:
         df = rd.get_sina_Market_json(market, False)
         # count=len(df.index)
-        log.info("market:%s"%df[:1])
-        df=df.dropna()
-        if 'percent' in df.columns.values: 
-        # and len(df[:20][df[:20]['percent']>0])>3:
+        log.info("market:%s" % df[:1])
+        df = df.dropna()
+        if 'percent' in df.columns.values:
+            # and len(df[:20][df[:20]['percent']>0])>3:
             top = df[df['percent'] > changepercent]['code']
             topTen = df[df['percent'] > 9.9]['code']
             crashTen = df[df['percent'] < -9.8]['code']
             crash = df[df['percent'] < -changepercent]['code']
         else:
-            log.info("market No Percent:%s"%df[:1])
-            top='0'
-            topTen='0'
-            crashTen='0'
-            crash='0'
+            log.info("market No Percent:%s" % df[:1])
+            top = '0'
+            topTen = '0'
+            crashTen = '0'
+            crash = '0'
         # top=df[ df['changepercent'] <6]
 
         print (
@@ -316,7 +316,7 @@ def get_hot_countNew(changepercent):
     #         f_print(5, ff['zvol']))),
     if len(ff) > 0:
         print (u"\tSh: %s Vr:  %s Sz: %s Vr: %s " % (
-        f_print(4, ff['scent']), f_print(5, ff['svol']), f_print(4, ff['zcent']), f_print(5, ff['zvol']))),
+            f_print(4, ff['scent']), f_print(5, ff['svol']), f_print(4, ff['zcent']), f_print(5, ff['zvol']))),
     if len(hgt) > 0:
         print ("Hgt: %s Ggt: %s" % (hgt['hgt'], hgt['ggt']))
 
@@ -359,7 +359,7 @@ def get_code_search_loop(num_input, code='', timed=60, dayl='10', ave=None):
 if __name__ == '__main__':
     # get_multiday_ave_compare('601198')
     # print len(sys.argv)
-    cct.set_console(100,15)
+    cct.set_console(100, 15)
 
     if len(sys.argv) == 2:
         status = True
