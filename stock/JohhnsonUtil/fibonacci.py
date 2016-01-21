@@ -11,11 +11,16 @@ def getFibonacci(num):
             a, b = b, a + b
     return res
 
+nduration=fib1
+
+high_p
+close_p
+
 
 if __name__ == '__main__':
     n = 40
 
     time_s = time.time()
-    res = getFibonacci(10000)
+    res = getFibonacci(300)
     print(res)
     print("fib1-t:%s" % (time.time() - time_s))

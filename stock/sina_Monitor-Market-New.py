@@ -254,7 +254,7 @@ if __name__ == "__main__":
                             count_a = top_all.loc[symbol, 'buy']
                             # print count_a,count_n
                             # print count_n,count_a
-                            if cct.get_now_time_int() < 925:
+                            if cct.get_now_time_int() < 930:
                                 # if not count_n == count_a:
                                 top_all.loc[symbol, 'buy'] = top_now.loc[symbol, 'buy']
                             else:
@@ -297,7 +297,7 @@ if __name__ == "__main__":
                 # top_all = top_all[top_all.trade >= top_all.high*0.99]
                 # top_all = top_all[top_all.buy >= top_all.lastp]
                 # top_all = top_all[top_all.percent >= 0]
-                if cct.get_now_time_int() < 925:
+                if cct.get_now_time_int() < 930:
                     top_all['diff'] = (
                         map(lambda x, y: round((x - y) / y * 100, 1), top_all['buy'].values, top_all['lastp'].values))
 
@@ -385,7 +385,7 @@ if __name__ == "__main__":
                 print "\tNo Data"
             int_time = cct.get_now_time_int()
             if cct.get_work_time():
-                if int_time < 925:
+                if int_time < 930:
                     time.sleep(30)
                 elif int_time < 930:
                     top_all = pd.DataFrame()

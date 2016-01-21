@@ -175,7 +175,7 @@ if __name__ == "__main__":
     delay_time = 3600
     First = True
     base_path = tdd.get_tdx_dir()
-    block_path = tdd.get_tdx_dir_blocknew() + '063.blk'
+    block_path = tdd.get_tdx_dir_blocknew() + '067.blk'
     # all_diffpath = tdd.get_tdx_dir_blocknew() + '062.blk'
     while 1:
         try:
@@ -263,14 +263,18 @@ if __name__ == "__main__":
                     top_dif['volume'] = (
                         map(lambda x, y: round(x / y / radio_t, 1), top_dif['volume'].values, top_dif['lvol'].values))
                     # top_dif = top_dif[top_dif.volume > 3]
+                    
                     top_dif['diff'] = (
                         map(lambda x, y: round(((float(x) - float(y)) / float(y) * 100), 1), top_dif['buy'].values,
-                            top_dif['open'].values))
+                            top_dif['lastp'].values))
                 else:
                     log.info('dif1:%s' % len(top_dif))
                     log.info(top_dif[:1])
                     top_dif = top_dif[top_dif.buy > top_dif.lastp]
                     log.debug('dif2:%s' % len(top_dif))
+                    top_dif['diff'] = (
+                        map(lambda x, y: round(((float(x) - float(y)) / float(y) * 100), 1), top_dif['buy'].values,
+                            top_dif['lastp'].values))
 
                 if len(top_dif) == 0:
                     print "No G,DataFrame is Empty!!!!!!"

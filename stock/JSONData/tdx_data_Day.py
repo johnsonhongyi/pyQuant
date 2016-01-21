@@ -124,11 +124,11 @@ def get_tdx_Exp_day_to_df(code, type='f',start=None,end=None):
              'vol': tvol})
     df = pd.DataFrame(dt_list, columns=ct.TDX_Day_columns)
     # df.sort_index(ascending=False, inplace=True)
-    if start and end:
+    if not start==None and not end==None:
         df = df[(df.date>=start) & (df.date<=end)]
-    elif end:
+    elif not end ==None:
         df = df[df.date<=end]
-    elif start:
+    elif not start==None:
         df = df[df.date>=start]
     df = df.set_index('date')
     # print "time:",(time.time()-time_s)*1000
@@ -142,7 +142,7 @@ def get_tdx_append_now_df(code,type='f',start=None,end=None):
     # end=cct.day8_to_day10(end)
     df = get_tdx_Exp_day_to_df(code,type,start,end).sort_index(ascending=True)
     # print df[:1]
-    if end:
+    if not end==None:
         if not end == df.index[-1]:
             print(end, df.index[-1])
         return df

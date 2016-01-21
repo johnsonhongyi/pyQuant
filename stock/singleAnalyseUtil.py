@@ -253,7 +253,7 @@ def get_hot_count(changepercent):
     return allTop
 
 
-def get_hot_countNew(changepercent):
+def get_hot_countNew(changepercent,rzrq):
     allTop = pd.DataFrame()
     for market in ct.SINA_Market_KEY:
         df = rd.get_sina_Market_json(market, False)
@@ -305,8 +305,8 @@ def get_hot_countNew(changepercent):
         zzb = float(ff['zzb'])
         zt = str(ff['time'])
         print (u"流入: %s亿 占比: %s%% %s" % (f_print(4, zlr), f_print(4, zzb), f_print(4, zt)))
-    ff = ffu.get_dfcfw_fund_SHSZ(ct.DFCFW_ZS_SHSZ)
-    hgt = ffu.get_dfcfw_fund_HGT(ct.DFCFW_FUND_FLOW_HGT)
+    ff = ffu.get_dfcfw_fund_SHSZ()
+    hgt = ffu.get_dfcfw_fund_HGT()
     log.debug("shzs:%s" % ff)
     log.debug("hgt:%s" % hgt)
     # if len(ff) > 0:
@@ -318,8 +318,15 @@ def get_hot_countNew(changepercent):
         print (u"\tSh: %s Vr:  %s Sz: %s Vr: %s " % (
             f_print(4, ff['scent']), f_print(5, ff['svol']), f_print(4, ff['zcent']), f_print(5, ff['zvol']))),
     if len(hgt) > 0:
-        print ("Hgt: %s Ggt: %s" % (hgt['hgt'], hgt['ggt']))
+        print ("Hgt: %s Ggt: %s" % (hgt['hgt'], hgt['ggt']))    
+    
+    if len(rzrq) > 0:
+        print (u"\t\t\t\t\t    Sh: %s sz:  %s All: %s diff: %s亿" % (
+            f_print(5, rzrq['sh']), f_print(5, rzrq['sz']), f_print(4, rzrq['all']), f_print(5, rzrq['diff']))) 
+    
 
+        
+        
     return allTop
 
 
@@ -375,10 +382,13 @@ if __name__ == '__main__':
     ave = None
     days = '20'
     success = 0
+    rzrq=ffu.get_dfcfw_rzrq_SHSZ()
     while 1:
         try:
             if not status:
-                get_hot_countNew(3)
+                if len(rzrq)==0:
+                    rzrq=ffu.get_dfcfw_rzrq_SHSZ()
+                get_hot_countNew(3,rzrq)
             if status:
                 # status=True
                 if not num_input:

@@ -1,6 +1,7 @@
 # -*- coding:utf-8 -*-
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 from matplotlib.pyplot import show
 # from research_api import *
 from sklearn.linear_model import LinearRegression
@@ -250,14 +251,19 @@ RL:=IF(CURRBARSCOUNT>=MIN(BC2,TC2)-10,UTL,CONST(REF(UTL,MIN(BC2,TC2)-11)));{限�
 上轨:IF(NP>FP,IF(ATL<=RH,ATL,DRAWNULL),IF(ATL>=RL,ATL,DRAWNULL)),COLORWHITE,LINETHICK1;
 下轨:IF(NP>FP,IF(UTL<=RH,UTL,DRAWNULL),IF(UTL>=RL,UTL,DRAWNULL)),COLORWHITE,LINETHICK1;
 
-'''
-def longsklearn(code='999999', ptype='f'):
+''' 
+def get_max_change_n_day(df,n):
+    act_price = df['closePrice'] * df['accumAdjFactor']
+    return (pd.rolling_max(act_price,n) / pd.rolling_min(act_price,n))-1
+    # http://pandas.pydata.org/pandas-docs/stable/computation.html
+    
+def longsklearn(code='999999', ptype='f',dtype='d',start=None,end=None):
     # code='999999'
-    dtype = 'w'
-    # start = '2012-09-01'
-    start = None
+    # dtype = 'w'
+    start = '2014-09-01'
+    # start = None
     # end='2015-12-23'
-    end = None
+    # end = None
     df = tdd.get_tdx_Exp_day_to_df(code, ptype, start, end).sort_index(ascending=True)
     if not dtype == 'd':
         df = tdd.get_tdx_stock_period_to_type(df, dtype).sort_index(ascending=True)
@@ -333,16 +339,20 @@ def longsklearn(code='999999', ptype='f'):
     ax = fig.add_subplot(111)
     plt.grid(True)
     ax.plot(closep, linewidth=1)
-    ax.plot(uP, uV, linewidth=1)
-    ax.plot(uP, uV, 'ko')
-    ax.plot(bP, bV, linewidth=1)
-    ax.plot(bP, bV, 'bo')
-    # ax.plot(sP, sV, linewidth=1)
-    # ax.plot(sP, sV, 'yo')
-    ax.plot(sidx, sV, linewidth=1)
-    ax.plot(sidx, sV, 'ro')
-    ax.plot(didx, dV, linewidth=1)
-    ax.plot(didx, dV, 'co')
+    # ax.plot(uP, uV, linewidth=1)
+    # ax.plot(uP, uV, 'ko')
+    # ax.plot(bP, bV, linewidth=1)
+    # ax.plot(bP, bV, 'bo')
+#    # ax.plot(sP, sV, linewidth=1)
+#    # ax.plot(sP, sV, 'yo')
+    # ax.plot(sidx, sV, linewidth=1)
+    # ax.plot(sidx, sV, 'ro')
+    # ax.plot(didx, dV, linewidth=1)
+    # ax.plot(didx, dV, 'co')
+    ax.plot(pd.rolling_min(df.close,20),'ro')
+    ax.plot(pd.rolling_max(df.close,20),'ro')
+    print pd.rolling_min(df.close,20)[:1],pd.rolling_min(df.close,20)[-1:]
+    print pd.rolling_max(df.close,20)[:1],pd.rolling_max(df.close,20)[-1:]
     # ax.plot(idx, d, 'ko')
     # ax.plot(xt, estV, '-r', linewidth=5)
     # ax.plot(xt, yt, '-g', linewidth=5)

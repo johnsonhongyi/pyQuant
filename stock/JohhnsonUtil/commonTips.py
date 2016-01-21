@@ -41,11 +41,33 @@ def day8_to_day10(start):
             return start
     return None
 
-def get_today():
+def get_today(sep='-'):
     TODAY = datetime.date.today()
-    today = TODAY.strftime('%Y-%m-%d')
+    fstr="%Y"+sep+"%m"+sep+"%d"
+    today = TODAY.strftime(fstr)
     return today
 
+def last_tddate(days=0):
+    today = datetime.datetime.today().date()
+    today=int(today.strftime("%w"))
+    if today == 0:
+        return day_last_week(-2-days)
+    else:
+        return day_last_week(-1-days)
+
+def day_last_week(days=-7):
+    lasty = datetime.datetime.today().date() + datetime.timedelta(days)
+    return str(lasty)
+
+def is_holiday(date):
+    if isinstance(date, str):
+        date = datetime.datetime.strptime(date, '%Y-%m-%d')
+    today=int(date.strftime("%w"))
+    if today > 0 and today < 6 and date not in holiday:
+        return False
+    else:
+        return True
+        
 def get_today_duration(datastr):
     today = datetime.date.today()
     last_day = datetime.datetime.strptime(datastr,'%Y-%m-%d').date()
@@ -380,3 +402,4 @@ def get_stock_tdx_period_to_type(stock_data,type='w'):
 if __name__ == '__main__':
     print get_run_path()
     print get_work_time_ratio()
+    print last_tddate()

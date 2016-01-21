@@ -28,7 +28,7 @@ def get_dfcfw_fund_flow(url):
         log.info("Fund_f NO Url:%s"%url)
     return dd
 
-def get_dfcfw_fund_HGT(url):
+def get_dfcfw_fund_HGT(url=ct.DFCFW_FUND_FLOW_HGT):
     data = cct.get_url_data_R(url)
     # vollist=re.findall('{data:(\d+)',code)
     vol_l=re.findall('\"([\d\D]+?)\"',data)
@@ -49,7 +49,7 @@ def get_dfcfw_fund_HGT(url):
         log.info("Fund_f NO Url:%s"%url)
     return dd
 
-def get_dfcfw_fund_SHSZ(url):
+def get_dfcfw_fund_SHSZ(url=ct.DFCFW_ZS_SHSZ):
     data = cct.get_url_data_R(url)
     # vollist=re.findall('{data:(\d+)',code)
     vol_l=re.findall('\"([\d\D]+?)\"',data)
@@ -91,7 +91,36 @@ def get_dfcfw_fund_SHSZ(url):
     else:
         log.info("Fund_f NO Url:%s"%url)
     return dd
-
+    
+def get_dfcfw_rzrq_SHSZ(url=ct.DFCFW_RZRQ_SHSZ):
+    data={}
+    # http://data.eastmoney.com/rzrq/total.html  web
+    def get_tzrq(url,today):
+        url=url%today
+        data = cct.get_url_data_R(url)
+        # vollist=re.findall('{data:(\d+)',code)
+        vol_l=re.findall('\"([\d\D]+?)\"',data)
+        # print vol_l
+        dd={}
+        # ['2016-01-20,1,581973101059,25779016479,1710066593,583683167652',]
+        # print vol_l
+        # print len(vol_l)
+        if len(vol_l)==3:
+            data=vol_l[0].split(',')
+            data2=vol_l[1].split(',')
+            dataall=vol_l[2].split(',')
+            dd['sh']=round(float(data[5])/100000000,1)
+            dd['sz']=round(float(data2[5])/100000000,1)
+            dd['all']=round(float(dataall[5])/100000000,1)
+        return dd
+    today=cct.last_tddate().replace('-','/')
+    data=get_tzrq(url,today)
+    data2=get_tzrq(url,cct.last_tddate(1).replace('-','/'))
+    data['diff']=data['all']-data2['all']
+    if len(data)==0:
+        log.info("Fund_f NO Url:%s"%url)
+    return data
+    
 def get_zs_VolRatio():
     list=['000001','399001']
     # list=['000001','399001','399006','399005']
@@ -212,6 +241,9 @@ if __name__ == "__main__":
     # # for x in pp.keys():
     # #     print pp[x]
     #
+    
+    df=get_dfcfw_rzrq_SHSZ()
+    print df
     
     get_lhb_dd()
     
