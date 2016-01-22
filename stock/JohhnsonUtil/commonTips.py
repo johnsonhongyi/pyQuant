@@ -41,6 +41,11 @@ def day8_to_day10(start):
             return start
     return None
 
+def get_time_to_date(times,format='%H:%M'):
+    #time.gmtime(times) 世界时间
+    # time.localtime(times) 本地时间
+    return time.strftime(format,time.localtime(times))
+    
 def get_today(sep='-'):
     TODAY = datetime.date.today()
     fstr="%Y"+sep+"%m"+sep+"%d"

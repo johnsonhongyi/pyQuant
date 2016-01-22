@@ -5,7 +5,6 @@ from matplotlib.pyplot import show
 # from research_api import *
 from sklearn.linear_model import LinearRegression
 import sys
-
 sys.path.append("..")
 from JohhnsonUtil import LoggerFactory as LoggerFactory
 
@@ -50,7 +49,7 @@ def LIS(X):
 # h = get_price(asset, start_date, end_date, frequency='1d', fields=['open','close','high', 'low'])
 def longsklearn(code='999999'):
     # code='999999'
-    df = tdd.get_tdx_Exp_day_to_df(code, 'f').sort_index(ascending=True)
+    df = tdd.get_tdx_append_now_df(code, 'f').sort_index(ascending=True)
     # print df[:1]
     h = df.loc[:, ['open', 'close', 'high', 'low']]
     highp = h['high'].values

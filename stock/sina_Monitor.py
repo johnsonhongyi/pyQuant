@@ -263,7 +263,7 @@ if __name__ == "__main__":
                     top_all = top_all.loc[:,
                               ['name', 'percent', 'diff', 'counts', 'volume', 'trade', 'prev_p', 'ratio']]
 
-                print "G:%s" % len(top_all)
+                print "G:%s dt:%s" % (len(top_all),cct.get_time_to_date(time_s))
                 top_all = top_all.sort_values(by=['diff', 'counts', 'volume', 'ratio'], ascending=[0, 0, 0, 1])
                 # top_all=top_all.sort_values(by=['percent','diff','counts','ratio'],ascending=[0,0,1,1])
 

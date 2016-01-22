@@ -260,14 +260,14 @@ def get_max_change_n_day(df,n):
 def longsklearn(code='999999', ptype='f',dtype='d',start=None,end=None):
     # code='999999'
     # dtype = 'w'
-    start = '2014-09-01'
+    # start = '2014-09-01'
     # start = None
     # end='2015-12-23'
     # end = None
-    df = tdd.get_tdx_Exp_day_to_df(code, ptype, start, end).sort_index(ascending=True)
-    if not dtype == 'd':
-        df = tdd.get_tdx_stock_period_to_type(df, dtype).sort_index(ascending=True)
-
+    df = tdd.get_tdx_append_now_df(code, ptype, start, end).sort_index(ascending=True)
+    # if not dtype == 'd':
+        # df = tdd.get_tdx_stock_period_to_type(df, dtype).sort_index(ascending=True)
+    dw = tdd.get_tdx_stock_period_to_type(df, dtype).sort_index(ascending=True)
     # print df[:1]
     h = df.loc[:, ['open', 'close', 'high', 'low']]
     highp = h['high'].values
@@ -299,17 +299,17 @@ def longsklearn(code='999999', ptype='f',dtype='d',start=None,end=None):
             uV.append(highp[i])
             uP.append(i)
     print highp
-    print "uV:%s" % uV
-    print "uP:%s" % uP
-    print "bV:%s" % bV
-    print "bP:%s" % bP
+    print "uV:%s" % uV[:1]
+    print "uP:%s" % uP[:1]
+    print "bV:%s" % bV[:1]
+    print "bP:%s" % bP[:1]
 
     sV, sP = LIS(uV)
     dV, dP = LIS(bV)
-    print "sV:%s" % sV
-    print "sP:%s" % sP
-    print "dV:%s" % dV
-    print "dP:%s" % dP
+    print "sV:%s" % sV[:1]
+    print "sP:%s" % sP[:1]
+    print "dV:%s" % dV[:1]
+    print "dP:%s" % dP[:1]
     sidx = []
     didx = []
     for i in range(len(sP)):
@@ -319,8 +319,8 @@ def longsklearn(code='999999', ptype='f',dtype='d',start=None,end=None):
         # idx.append(bP[p[i]])
         didx.append(bP[dP[i]])
 
-    print "sidx:%s"%sidx
-    print "didx:%s"%didx
+    print "sidx:%s"%sidx[:1]
+    print "didx:%s"%didx[:1]
 
     # plt.plot(closep)
     # plt.plot(idx,d,'ko')
@@ -338,7 +338,7 @@ def longsklearn(code='999999', ptype='f',dtype='d',start=None,end=None):
     # fig=plt.fig(figsize=(14,8))
     ax = fig.add_subplot(111)
     plt.grid(True)
-    print h.index[:5], h['close']
+    # print h.index[:5], h['close']
     ax = h['close'].plot()
     # ax.plot(pd.datetime(h.index),h['close'], linewidth=1)
     # ax.plot(uP, uV, linewidth=1)
@@ -351,10 +351,18 @@ def longsklearn(code='999999', ptype='f',dtype='d',start=None,end=None):
     # ax.plot(sidx, sV, 'ro')
     # ax.plot(didx, dV, linewidth=1)
     # ax.plot(didx, dV, 'co')
-    ax.plot(pd.rolling_min(df.close, 20), 'bo')
-    ax.plot(pd.rolling_max(df.close, 20), 'co')
-    ax.plot(pd.expanding_max(df.close, 20), 'ro')
-    ax.plot(pd.expanding_min(df.close, 20), 'go')
+    df['mean']=map(lambda h,l:(h+l)/2,df.high.values,df.low.values)
+    print df['mean'][:1]
+    # d=df.mean
+    dw=dw.set_index('date')
+    # print dw[:2]
+    # ax.plot(df.index,df['mean'],'g',linewidth=1)
+    ax.plot(df.index,pd.rolling_mean(df['mean'], 60), 'g',linewidth=1)
+    ax.plot(dw.index,pd.rolling_mean(dw.close, 5), 'r',linewidth=1)
+    ax.plot(dw.index,pd.rolling_min(dw.close, 5), 'bo')
+    ax.plot(dw.index,pd.rolling_max(dw.close, 5), 'yo')
+    ax.plot(dw.index,pd.expanding_max(dw.close, 5), 'ro')
+    ax.plot(dw.index,pd.expanding_min(dw.close, 5), 'go')
     # print pd.rolling_min(df.close,20)[:1],pd.rolling_min(df.close,20)[-1:]
     # print pd.rolling_min(df.close,20)
     # print pd.rolling_max(df.close,20)[:1],pd.rolling_max(df.close,20)[-1:]
@@ -380,4 +388,8 @@ def longsklearn(code='999999', ptype='f',dtype='d',start=None,end=None):
 
 
 if __name__ == "__main__":
-    longsklearn('601919')
+    # start = '2014-09-01'
+    start = None
+    end = None
+    # end='2003-12-23'
+    longsklearn('601608',dtype='m',start=start,end=end)

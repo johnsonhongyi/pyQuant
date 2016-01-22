@@ -177,7 +177,7 @@ def get_sina_Market_json(market='sh', showtime=True, num='1000', retry_count=3, 
         #     df = df.append(newdf, ignore_index=True)
         # print len(df.index)
         if showtime: print (
-        "Market-df:%s %s time: %s" % (format((time.time() - start_t), '.1f'), len(df), cct.get_now_time())),
+        "Market-df:%s %s" % (format((time.time() - start_t), '.1f'), len(df))),
         # print type(df)
         return df
     else:

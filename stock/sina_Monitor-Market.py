@@ -258,8 +258,8 @@ if __name__ == "__main__":
                         # if cct.get_now_time_int() < 930:
                             # top_all.loc[symbol, 'buy'] = top_now.loc[symbol, 'buy']
                         # else:
+
                                 if not count_n == count_a:
-                                    # log.info("n_buy-a_buy:%s" % (count_n - count_a))
                                     top_now.loc[symbol, 'diff'] = round(
                                         ((float(count_n) - float(count_a)) / float(count_a) * 100), 1)
                                     if status_change and 'counts' in top_now.columns.values:
@@ -272,9 +272,11 @@ if __name__ == "__main__":
                                         top_all.loc[symbol, 'diff':'low'] = top_now.loc[symbol, 'diff':'low']
                                 elif 'counts' in top_now.columns.values:
                                     # log.info("n_buy==a_buy:update Counts")
-                                    top_all.loc[symbol, 'diff':'counts'] = top_now.loc[symbol, 'diff':'counts']
+                                    top_all.loc[symbol, 'diff':'prev_p'] = top_now.loc[symbol, 'diff':'prev_p']
                                 else:
                                     # log.info("n_buy==a_buy:no counts update low")
+                                    top_now.loc[symbol, 'diff'] = round(
+                                        ((float(top_now.loc[symbol, 'buy']) - float(top_all.loc[symbol, 'lastp'])) / float(top_all.loc[symbol, 'lastp']) * 100), 1)
                                     top_all.loc[symbol, 'diff':'low'] = top_now.loc[symbol, 'diff':'low']
 
                                     # top_all.loc[symbol]=top_now.loc[symbol]?
@@ -352,7 +354,7 @@ if __name__ == "__main__":
                 print ("A:%s N:%s K:%s %s G:%s" % (
                     df_count, now_count, len(top_all[top_all['buy'] > 0]),
                     len(top_now[top_now['volume'] <= 0]), len(top_dif))),
-                print "Rt:%0.3f" % (float(time.time() - time_Rt))
+                print "Rt:%0.1f dT:%s" % (float(time.time() - time_Rt),cct.get_time_to_date(time_s))
                 if 'counts' in top_dif.columns.values:
                     top_dif = top_dif.sort_values(by=['diff', 'volume', 'percent', 'counts', 'ratio'],
                                                   ascending=[0, 0, 0, 1, 1])

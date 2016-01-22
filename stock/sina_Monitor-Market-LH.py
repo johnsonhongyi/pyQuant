@@ -252,7 +252,7 @@ if __name__ == "__main__":
                     # log.debug('dif3 low<>0 :%s' % len(top_dif))
                     top_dif = top_dif[top_dif.open > 0]
                     top_dif = top_dif[top_dif.open >= top_dif.low * 0.995]
-                    top_dif = top_dif[top_dif.buy >= top_dif.lhigh]
+                    top_dif = top_dif[top_dif.buy >= top_dif.lhigh* 0.995]
                     log.debug('dif4 open>low0.99:%s' % len(top_dif))
                     log.debug('dif4-2:%s' % top_dif[:1])
 
@@ -293,7 +293,8 @@ if __name__ == "__main__":
                 print ("A:%s N:%s K:%s %s G:%s" % (
                     df_count, now_count, len(top_all[top_all['buy'] > 0]),
                     len(top_now[top_now['volume'] <= 0]), len(top_dif))),
-                print "Rt:%0.3f" % (float(time.time() - time_Rt))
+                # print "Rt:%0.3f" % (float(time.time() - time_Rt))
+                print "Rt:%0.1f dT:%s" % (float(time.time() - time_Rt),cct.get_time_to_date(time_s))               
                 if 'counts' in top_dif.columns.values:
                     top_dif = top_dif.sort_values(by=['diff', 'percent', 'volume', 'counts', 'ratio'],
                                                   ascending=[0, 0, 0, 1, 0])
