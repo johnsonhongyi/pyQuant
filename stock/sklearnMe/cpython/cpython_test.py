@@ -29,4 +29,3 @@ df = ts.get_hist_data('601198')
 print df.close.values
 abc = cy_rolling_dd_custom_mv.cy_rolling_dd_custom_mv(df.close.values, 5)
 print np.array(abc)
-# print abc
