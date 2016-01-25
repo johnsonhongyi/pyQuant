@@ -115,8 +115,13 @@ def get_dfcfw_rzrq_SHSZ(url=ct.DFCFW_RZRQ_SHSZ):
         return dd
     today=cct.last_tddate().replace('-','/')
     data=get_tzrq(url,today)
-    data2=get_tzrq(url,cct.last_tddate(1).replace('-','/'))
-    data['diff']=data['all']-data2['all']
+    yestoday=cct.last_tddate(1).replace('-','/')
+    # print today,yestoday
+    data2=get_tzrq(url,yestoday)
+    if len(data2)>0:
+        data['diff']=round(data['all']-data2['all'],2)
+    else:
+        data['diff']='error'
     if len(data)==0:
         log.info("Fund_f NO Url:%s"%url)
     return data
