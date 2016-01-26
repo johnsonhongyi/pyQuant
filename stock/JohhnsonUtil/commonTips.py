@@ -52,19 +52,42 @@ def get_today(sep='-'):
     today = TODAY.strftime(fstr)
     return today
 
+    
+# from dateutil import rrule
+
+# def workdays(start, end, holidays=0, days_off=None):
+    # start=datetime.datetime.strptime(start,'%Y-%m-%d')
+    # end=datetime.datetime.strptime(end,'%Y-%m-%d')
+    # if days_off is None:
+        # days_off = 0, 6
+    # workdays = [x for x in range(7) if x not in days_off]
+    # print workdays
+    # days = rrule.rrule(rrule.DAILY, start, until=end, byweekday=workdays)
+    # return days
+    return days.count() - holidays
+    
+    
 def last_tddate(days=0):
-    today = datetime.datetime.today()
-    # day_n=(today - datetime.timedelta(days)).date()
+    today = datetime.datetime.today().date() + datetime.timedelta(-1)
     day_n=int(today.strftime("%w"))
+    # print today,day_n
     if day_n == 0:
-        # print day_last_week(-2-days)
-        return day_last_week(-2-days)
+        lasd=datetime.datetime.today().date() + datetime.timedelta(-2)
     elif day_n == 1:
-        # print day_last_week(-3-days)
-        return day_last_week(-3-days)
+        lasd=datetime.datetime.today().date() + datetime.timedelta(-3)
+    elif day_n == 6:
+        lasd=datetime.datetime.today().date() + datetime.timedelta(-1)
     else:
-        # print day_last_week(-1-days)
-        return day_last_week(-1-days)
+        lasd=today
+    oday = lasd - datetime.timedelta(days)
+    day_n=int(oday.strftime("%w"))
+    if day_n == 0:
+        # print day_last_week(-2)
+        return str(datetime.datetime.today().date() + datetime.timedelta(-2))
+    elif day_n == 6:
+        return str(datetime.datetime.today().date() + datetime.timedelta(-1))
+    else:
+        return str(oday)
 
 # def is_holiday(date):
 #     if isinstance(date, str):
@@ -422,4 +445,5 @@ def get_stock_tdx_period_to_type(stock_data,type='w'):
 if __name__ == '__main__':
     # print get_run_path()
     # print get_work_time_ratio()
-    print last_tddate()
+    print last_tddate(0)
+    # print workdays('2010-01-01','2010-05-01')
