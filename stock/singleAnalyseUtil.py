@@ -277,16 +277,16 @@ def get_hot_countNew(changepercent,rzrq):
         print (
             "%s topT: %s top>%s: %s " % (
                 f_print(4, market), f_print(3, len(topTen)), changepercent, f_print(4, len(top)))),
-        url = ct.DFCFW_FUND_FLOW_URL % ct.SINA_Market_KEY_TO_DFCFW[market]
-        log.debug("ffurl:%s" % url)
+        # url = ct.DFCFW_FUND_FLOW_URL % ct.SINA_Market_KEY_TO_DFCFW[market]
+        # log.debug("ffurl:%s" % url)
         print (u"crashT:%s crash<-%s:%s" % (f_print(4, len(crashTen)), changepercent, f_print(4, len(crash)))),
-        ff = ffu.get_dfcfw_fund_flow(url)
+        ff = ffu.get_dfcfw_fund_flow(market)
         if len(ff) > 0:
             zlr = float(ff['zlr'])
             zzb = float(ff['zzb'])
             # zt=str(ff['time'])
-            print (u"流入: %s亿 比: %s%%" % (f_print(4, zlr), f_print(4, zzb)))
-
+            print (u"流入: %s亿 比: %s%%" % (f_print(4, zlr), f_print(4, zzb))),
+            print (u"%s %s %s"%( f_print(2,'!' if ff['open'] > ff['lastp'] else '?'),f_print(4,ff['close']),f_print(4,'!!' if ff['close'] > ff['lastp'] else '??')))
         allTop = allTop.append(df, ignore_index=True)
 
     df = allTop

@@ -12,7 +12,13 @@ log = LoggerFactory.getLogger("FundFlow")
 import traceback
 from bs4 import BeautifulSoup
 
-def get_dfcfw_fund_flow(url):
+def get_dfcfw_fund_flow(market):
+    if market.startswith('http'):
+        single=True
+        url=market
+    else:
+        single=False
+        url = ct.DFCFW_FUND_FLOW_URL % ct.SINA_Market_KEY_TO_DFCFW[market]
     data = cct.get_url_data_R(url)
     # vollist=re.findall('{data:(\d+)',code)
     vol_l=re.findall('\"([\d\D]+?)\"',data)
@@ -26,6 +32,21 @@ def get_dfcfw_fund_flow(url):
         dd['time']=vol_l[1]
     else:
         log.info("Fund_f NO Url:%s"%url)
+    if not single:
+        url = ct.SINA_JSON_API_URL % ct.INDEX_LIST[market]
+        data = cct.get_url_data_R(url)
+        vol_l=re.findall('\"([\d\D]+?)\"',data)
+        if len(vol_l)==1:
+            data=vol_l[0].split(',')
+            dd['open']=round(float(data[1]),2)
+            dd['lastp']=round(float(data[2]),2)
+            dd['close']=round(float(data[3]),2)
+            dd['high']=round(float(data[4]),2)
+            dd['low']=round(float(data[5]),2)
+            dd['vol']=round(float(data[8])/100000,1)
+            dd['amount']=round(float(data[9])/100000000,1)
+        # 1592652100,32691894461
+        # 215722046, 207426675004
     return dd
 
 def get_dfcfw_fund_HGT(url=ct.DFCFW_FUND_FLOW_HGT):
@@ -247,10 +268,12 @@ if __name__ == "__main__":
     # #     print pp[x]
     #
     
-    df=get_dfcfw_rzrq_SHSZ()
-    print df
+    dd =get_dfcfw_fund_flow('cyb')
+    print dd
+    # df=get_dfcfw_rzrq_SHSZ()
+    # print df
     
-    get_lhb_dd()
+    # get_lhb_dd()
     
     # pp=get_dfcfw_fund_SHSZ(ct.DFCFW_ZS_SHSZ)
     # print pp
