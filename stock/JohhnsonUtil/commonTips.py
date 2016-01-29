@@ -27,6 +27,11 @@ def set_console(width=80,height=15,color=3):
     # os.system('color %s'%color)
     pass
 
+# @property
+def get_delay_time():
+    delay_time=7200
+    return delay_time
+    
 def get_cpu_count():
     return cpu_count()
 

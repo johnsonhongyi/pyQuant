@@ -176,7 +176,8 @@ if __name__ == "__main__":
     success = 0
     top_all = pd.DataFrame()
     time_s = time.time()
-    delay_time = 3600
+    # delay_time = 7200
+    delay_time = cct.get_delay_time()
     base_path = tdd.get_tdx_dir()
     block_path = tdd.get_tdx_dir_blocknew() + '064.blk'
     while 1:

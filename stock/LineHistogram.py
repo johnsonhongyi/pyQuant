@@ -378,6 +378,7 @@ if __name__ == "__main__":
                     sys.exit()
                 elif len(num_input) == 6:
                     code = args.code
+                    # print code, args.ptype, args.dtype, start, end
                     get_linear_model_histogram(code, args.ptype, args.dtype, start, end)
                     num_input = ''
 
