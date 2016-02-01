@@ -1,12 +1,23 @@
 # -*- coding:utf-8 -*-
-import tushare as tss
-# import pandas as pd
-##import pandas.io.pytables
-# code='601608'
-# df=ts.get_hist_data('601608')
-# store=pd.HDFStore('store.h5',format='table')
-# store['df']=df
-# print store
+import tushare as ts
+import pandas as pd
+import tables
+#import pandas.io.pytables
+code='601608'
+df=ts.get_hist_data('601608')
+# store=pd.HDFStore('store.h5',mode='w',format='table', complevel=9, complib='blosc')
+df.index=df.index.astype('datetime64')
+# store[code]=df
+df.to_hdf('store.h5','sz'+code,mode='w',format='table', complevel=9, complib='blosc',data_columns=df.columns)
+# store=pd.HDFStore('store.h5',mode='r',format='table')
+
+h5f = tables.open_file('store.h5')
+# dd=h5f.select('sz'+code)
+print dd[:1]
+
+
+import sys
+sys.exit(0)
 
 import tables
 import tstables
@@ -22,7 +33,7 @@ class prices(tables.IsDescription):
     close = tables.Float64Col(pos=3)
 
 code='601608'    
-f = tables.open_file('eurusd.h5','w')
+f = tables.open_file('eurusd.h5','w', complevel=9, complib='blosc')
 
 # This creates the time series, which is just a group called 'EURUSD' in the root of the HDF5 file.
 ts = f.create_ts('/',code,prices)
