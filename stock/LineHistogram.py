@@ -111,6 +111,23 @@ def get_linear_model_histogram(code, ptype='f', dtype='d', start=None, end=None)
     asset = asset.dropna()
     dates = asset.index
 
+    if not code.startswith('999') or not code.startswith('399'):
+        if code[:1] in ['5', '6','9']:
+            code2='999999'
+        elif code[:1] in ['3']:
+            code2='399006'
+        else:
+            code2='399001'
+        df1 = tdd.get_tdx_append_now_df(code2, ptype, start, end).sort_index(ascending=True)
+        if not dtype == 'd':
+            df1 = tdd.get_tdx_stock_period_to_type(df1, dtype).sort_index(ascending=True)
+        asset1 = df1.loc[asset.index,'close']
+        startv=asset1[:1]
+        # asset_v=asset[:1]
+        # print startv,asset_v
+        asset1=asset1.apply(lambda x:round( x/asset1[:1],2))
+        # print asset1[:4]
+    
     # 画出价格随时间变化的图像
     # _, ax = plt.subplots()
     # fig = plt.figure()
@@ -123,7 +140,9 @@ def get_linear_model_histogram(code, ptype='f', dtype='d', start=None, end=None)
     # fig.set_size_inches(18.5, 10.5)
     # fig=plt.fig(figsize=(14,8))
     ax1 = fig.add_subplot(321)
+    # asset=asset.apply(lambda x:round( x/asset[:1],2))
     ax1.plot(asset)
+    # ax1.plot(asset1,'-r', linewidth=2)
     ticks = ax1.get_xticks()
     ax1.set_xticklabels([dates[i] for i in ticks[:-1]])  # Label x-axis with dates
 
@@ -175,7 +194,9 @@ def get_linear_model_histogram(code, ptype='f', dtype='d', start=None, end=None)
         Y = X * b + a - c
         plt.plot(X, Y, 'r', alpha=0.9);
         c = c + d
+    # asset=asset.apply(lambda x:round(x/asset[:1],2))
     ax2.plot(asset)
+    # ax2.plot(asset1,'-r', linewidth=2)
     plt.xlabel('Date', fontsize=14)
     plt.ylabel('Price', fontsize=14)
     plt.grid(True)
@@ -185,25 +206,37 @@ def get_linear_model_histogram(code, ptype='f', dtype='d', start=None, end=None)
 
     # 将Y-Y_hat股价偏离中枢线的距离单画出一张图显示，对其边界线之间的区域进行均分，大于0的区间为高估，小于0的区间为低估，0为价值中枢线。
     ax3 = fig.add_subplot(324)
-    distance = (asset.values.T - Y_hat)
-    # distance = (asset.values.T-Y_hat)[0]
-    ax3.plot(distance)
-    ticks = ax3.get_xticks()
-    ax3.set_xticklabels([dates[i] for i in ticks[:-1]])
-    n = 5
-    d = (-c_high + c_low) / n
-    c = c_high
-    while c <= c_low:
-        Y = X * b + a - c
-        plt.plot(X, Y - Y_hat, 'r', alpha=0.9);
-        c = c + d
-    plt.xlabel('Date', fontsize=14)
-    plt.ylabel('Price-center price', fontsize=14)
-    plt.grid(True)
-
+    # distance = (asset.values.T - Y_hat)
+    distance = (asset.values.T-Y_hat)[0]
+    if code.startswith('999') or code.startswith('399'):
+        ax3.plot(asset)
+        plt.plot(distance)
+        ticks = ax3.get_xticks()
+        ax3.set_xticklabels([dates[i] for i in ticks[:-1]])
+        n = 5
+        d = (-c_high + c_low) / n
+        c = c_high
+        while c <= c_low:
+            Y = X * b + a - c
+            plt.plot(X, Y - Y_hat, 'r', alpha=0.9);
+            c = c + d
+        ax3.plot(asset)
+        plt.xlabel('Date', fontsize=14)
+        plt.ylabel('Price-center price', fontsize=14)
+        plt.grid(True)
+    else:
+        as3=asset.apply(lambda x:round(x/asset[:1],2))
+        ax3.plot(as3)
+        ax3.plot(asset1,'-r', linewidth=2)
+        plt.grid(True)
+        zp3 = zoompan.ZoomPan()
+        figZoom = zp3.zoom_factory(ax3, base_scale=scale)
+        figPan = zp3.pan_factory(ax3)
     # plt.title(code, fontsize=14)
     # plt.legend([code])
 
+    
+    
     # 统计出每个区域内各股价的频数，得到直方图，为了更精细的显示各个区域的频数，这里将整个边界区间分成100份。
 
     ax4 = fig.add_subplot(325)
@@ -297,7 +330,6 @@ def get_linear_model_histogram(code, ptype='f', dtype='d', start=None, end=None)
 def parseArgmain():
     # from ConfigParser import ConfigParser
     # import shlex
-
 
     import argparse
     # parser = argparse.ArgumentParser()

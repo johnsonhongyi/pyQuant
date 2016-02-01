@@ -286,7 +286,7 @@ def get_hot_countNew(changepercent,rzrq):
             zzb = float(ff['zzb'])
             # zt=str(ff['time'])
             print (u"流入: %s亿 比: %s%%" % (f_print(4, zlr), f_print(4, zzb))),
-            print (u"%s %s %s"%( f_print(2,'!' if ff['open'] > ff['lastp'] else '?'),f_print(4,ff['close']),f_print(4,'!!' if ff['close'] > ff['lastp'] else '??')))
+            print (u"%s %s%s"%( f_print(4,ff['close']),f_print(1,'!' if ff['open'] > ff['lastp'] else '?'),f_print(2,'!!' if ff['close'] > ff['lastp'] else '??')))
         allTop = allTop.append(df, ignore_index=True)
 
     df = allTop

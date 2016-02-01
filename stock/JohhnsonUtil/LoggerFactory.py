@@ -4,16 +4,28 @@ Created on 2015-3-11
 @author: Casey
 '''
 import logging
-import sys
-sys.path.append("..")
-import commonTips as cct
+import sys,os
+# sys.path.append("..")
+# import commonTips as cct
 
 # from logbook import StderrHandler
+
+def get_run_path():
+    path = os.getcwd()
+    alist = path.split('stock')
+    if len(alist) > 0:
+        path = alist[0]
+        # os_sep=get_os_path_sep()
+        path = path + 'stock' + os.path.sep
+    else:
+        print "error"
+        raise TypeError('log path error.')
+    return path
 
 '''
 传入名称
 '''
-log_path = cct.get_run_path() + 'stock.log'
+log_path = get_run_path() + 'stock.log'
 
 CRITICAL = 50
 FATAL = CRITICAL
@@ -30,8 +42,8 @@ NOTSET = 0
 
 def getLogger(name):
     # now = time.strftime('%Y-%m-%d %H:%M:%S')
-    # path_sep = cct.get_os_path_sep()
-    log_path = cct.get_run_path() + 'stock.log'
+    # path_sep = get_os_path_sep()
+    log_path = get_run_path() + 'stock.log'
     logging.basicConfig(
         # level    =eval('logging.%s'%(level_s)),
         # format   = now +":" + name + ' LINE %(lineno)-4d  %(levelname)-8s %(message)s',
@@ -85,9 +97,9 @@ class JohnsonLoger(logging.Logger):
 
     def __init__(self, name):
         # now = time.strftime('%Y-%m-%d %H:%M:%S')
-        # path_sep = cct.get_os_path_sep()
+        # path_sep = get_os_path_sep()
         self.name=name
-        log_path = cct.get_run_path() + 'stock.log'
+        log_path = get_run_path() + 'stock.log'
         logging.basicConfig(
             # level    =eval('logging.%s'%(level_s)),
             # level=DEBUG,
@@ -139,5 +151,6 @@ class JohnsonLoger(logging.Logger):
 #     logging.getLogger('').addHandler(console)
 
 if __name__ == '__main__':
-    getLogger("www").debug("www")
-    # log=JohnsonLoger("www").setDebugLevel(DEBUG)
+    # getLogger("www").debug("www")
+    # log=JohnsonLoger("www").setLevel(DEBUG)
+    pass

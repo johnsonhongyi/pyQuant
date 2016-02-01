@@ -300,6 +300,7 @@ if __name__ == "__main__":
                             print ".",
                         else:
                             top_all = pd.DataFrame()
+                            time_s = time.time()
                             print "."
                             break
                 else:
@@ -311,6 +312,8 @@ if __name__ == "__main__":
                         print ".",
                         time.sleep(60)
                     else:
+                        top_all = pd.DataFrame()
+                        time_s = time.time()
                         break
             else:
                 # break

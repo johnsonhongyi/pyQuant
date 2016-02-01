@@ -11,8 +11,10 @@ import trollius as asyncio
 from trollius.coroutines import From
 import johnson_cons as ct
 import pandas as pd
-# log = log.getLogger('commonTipss')
-
+import LoggerFactory as Log
+log = Log.getLogger('commonTipss')
+# log = LoggerFactory.getLogger("FundFlow")
+# log.setLevel(Log.DEBUG)
 
 try:
     from urllib.request import urlopen, Request
@@ -75,17 +77,22 @@ def get_today(sep='-'):
 def last_tddate(days=0):
     today = datetime.datetime.today().date() + datetime.timedelta(-1)
     day_n=int(today.strftime("%w"))
-    # print today,day_n
+    log.debug(today,day_n)
     if day_n == 0:
-        lasd=datetime.datetime.today().date() + datetime.timedelta(-2)
+        lasd=today + datetime.timedelta(-2)
+        log.debug("0:%s"%lasd)
     elif day_n == 1:
-        lasd=datetime.datetime.today().date() + datetime.timedelta(-3)
+        lasd=today + datetime.timedelta(-3)
+        log.debug("1:%s"%lasd)
     elif day_n == 6:
-        lasd=datetime.datetime.today().date() + datetime.timedelta(-1)
+        lasd=today + datetime.timedelta(-1)
+        log.debug("6:%s"%lasd)
     else:
         lasd=today
+        log.debug("1-5:%s"%lasd)
     oday = lasd - datetime.timedelta(days)
     day_n=int(oday.strftime("%w"))
+    # print oday,day_n
     if day_n == 0:
         # print day_last_week(-2)
         return str(datetime.datetime.today().date() + datetime.timedelta(-2))
@@ -451,4 +458,5 @@ if __name__ == '__main__':
     # print get_run_path()
     # print get_work_time_ratio()
     print last_tddate(0)
+    print last_tddate(1)
     # print workdays('2010-01-01','2010-05-01')

@@ -137,9 +137,10 @@ def get_dfcfw_rzrq_SHSZ(url=ct.DFCFW_RZRQ_SHSZ):
     today=cct.last_tddate().replace('-','/')
     data=get_tzrq(url,today)
     yestoday=cct.last_tddate(1).replace('-','/')
-    # print today,yestoday
+    log.debug(today,yestoday)
     data2=get_tzrq(url,yestoday)
     if len(data2)>0:
+        # print data2
         data['diff']=round(data['all']-data2['all'],2)
     else:
         data['diff']='error'
@@ -270,8 +271,8 @@ if __name__ == "__main__":
     
     dd =get_dfcfw_fund_flow('cyb')
     print dd
-    # df=get_dfcfw_rzrq_SHSZ()
-    # print df
+    df=get_dfcfw_rzrq_SHSZ()
+    print df
     
     # get_lhb_dd()
     
