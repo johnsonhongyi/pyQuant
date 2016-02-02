@@ -1,24 +1,34 @@
 # -*- coding:utf-8 -*-
 import tushare as ts
+# import sys
+# sys.path.append("..")
+# from JohhnsonUtil import commonTips as cct
+
 import pandas as pd
 import tables
 #import pandas.io.pytables
 code='601608'
-df=ts.get_hist_data('601608')
-# store=pd.HDFStore('store.h5',mode='w',format='table', complevel=9, complib='blosc')
-df.index=df.index.astype('datetime64')
+# df=ts.get_hist_data('601608')
+df= ts.get_today_ticks('601608')
+# .sort_index(ascending=True).dropna()
+print df[:1]
+store=pd.HDFStore('store.h5',mode='w',format='table', complevel=9, complib='blosc')
+# df.index=df.index.astype('datetime64')
 # store[code]=df
-df.to_hdf('store.h5','sz'+code,mode='w',format='table', complevel=9, complib='blosc',data_columns=df.columns)
+# df.to_hdf('store.h5','sz'+code,mode='w',format='table',complevel=9, complib='blosc',data_columns=df.columns)
 # store=pd.HDFStore('store.h5',mode='r',format='table')
 
-h5f = tables.open_file('store.h5')
-# dd=h5f.select('sz'+code)
-print dd[:1]
+store.put('sz'+code,df)
+# h5f = pd.HDFStore('store.h5',mode='r')
+dd=store.select('sz'+code)
+print dd[:5]
 
 
 import sys
 sys.exit(0)
 
+
+'''
 import tables
 import tstables
 import pandas.io.data as web
@@ -28,28 +38,36 @@ from datetime import *
 # in the first position (pos=0) and have the type Int64.
 class prices(tables.IsDescription):
     timestamp = tables.Int64Col(pos=0)
-    open = tables.Float64Col(pos=1)
-    high = tables.Float64Col(pos=2)
-    close = tables.Float64Col(pos=3)
+    price = tables.Float64Col(pos=1)
+    # open = tables.Float64Col(pos=1)
+    # high = tables.Float64Col(pos=2)
+    # close = tables.Float64Col(pos=3)
 
 code='601608'    
-f = tables.open_file('eurusd.h5','w', complevel=9, complib='blosc')
+f = tables.open_file('tstable.h5','w', complevel=9, complib='blosc')
 
 # This creates the time series, which is just a group called 'EURUSD' in the root of the HDF5 file.
-ts = f.create_ts('/',code,prices)
+tst = f.create_ts('/',code,prices)
 
-start = datetime(2010,1,1)
-end = datetime(2014,5,2)
+# start = datetime(2010,1,1)
+# end = datetime(2014,5,2)
 
 # euro = web.DataReader("DEXUSEU", "fred", start, end)
-euro = tss.get_hist_data(code).loc[:,['open','high','close']].sort_index(ascending=True).dropna()
-euro.index=euro.index.astype('datetime64')
-print euro[:1]
-ts.append(euro)
+# euro = ts.get_hist_data(code).loc[:,['open','high','close']].sort_index(ascending=True).dropna()
+# df = ts.get_hist_data(code).loc[:,['open']].sort_index(ascending=True).dropna()
+# print df[:1]
+df = ts.get_today_ticks('601608').loc[:,['time','price']]
+today=cct.get_today()
+df['time']=df['time'].apply(lambda x:today+'-'+str(x))
+df=df.set_index('time').sort_index(ascending=True).dropna()
+print df[:1]
+df.index=df.index.astype('datetime64')
+tst.append(df)
 f.flush() 
 
 # Now, read in a month of data
-read_start_dt = datetime(2014,1,1)
-read_end_dt = datetime(2014,1,31)
+# read_start_dt = datetime(2014,1,1)
+# read_end_dt = datetime(2014,1,31)
 
-jan = ts.read_range(read_start_dt,read_end_dt)
+# jan = ts.read_range(read_start_dt,read_end_dt)
+'''

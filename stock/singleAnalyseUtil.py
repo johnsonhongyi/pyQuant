@@ -85,13 +85,13 @@ def get_multiday_ave_compare(code, dayl='10'):
         ep = dtick['amount'].sum() / dtick['volume'].sum()
         p_now = dtick['price'].values[0] * 100
         if p_now > ave and ep > ave:
-            print ("GOLD:%s ep:%s UP:%s!!! A:%s %s !!!" % (code, ep, p_now, ave, get_now_time()))
+            print ("GOLD:%s ep:%s UP:%s!!! A:%s %s !!!" % (code, ep, p_now, ave, cct.get_now_time()))
         elif p_now > ave and ep < ave:
-            print ("gold:%s ep:%s UP:%s! A:%s %s !" % (code, ep, p_now, ave, get_now_time()))
+            print ("gold:%s ep:%s UP:%s! A:%s %s !" % (code, ep, p_now, ave, cct.get_now_time()))
         elif p_now < ave and ep > ave:
-            print ("down:%s ep:%s Dow:%s? A:%s %s ?" % (code, ep, p_now, ave, get_now_time()))
+            print ("down:%s ep:%s Dow:%s? A:%s %s ?" % (code, ep, p_now, ave, cct.get_now_time()))
         else:
-            print ("DOWN:%s ep:%s now:%s??? A:%s %s ???" % (code, ep, p_now, ave, get_now_time()))
+            print ("DOWN:%s ep:%s now:%s??? A:%s %s ???" % (code, ep, p_now, ave, cct.get_now_time()))
     return ave
 
 
@@ -354,7 +354,7 @@ def get_hot_loop(timedelay, percent=3):
 def get_code_search_loop(num_input, code='', timed=60, dayl='10', ave=None):
     # if not status:
     #
-    if get_work_time():
+    if cct.get_work_time():
         if code == num_input:
             get_today_tick_ave(code, ave)
         else:
@@ -380,7 +380,7 @@ if __name__ == '__main__':
 
     code = ''
     ave = None
-    days = '20'
+    days = '10'
     success = 0
     rzrq=ffu.get_dfcfw_rzrq_SHSZ()
     while 1:
@@ -405,7 +405,7 @@ if __name__ == '__main__':
                     else:
                         ave = get_code_search_loop(num_input, code, dayl=days, ave=ave)
                     code = num_input
-
+                    
             int_time = cct.get_now_time_int()
             if cct.get_work_time():
                 if int_time < 1000:
@@ -444,6 +444,11 @@ if __name__ == '__main__':
                     num_input = ''
                     ave = None
                     code = ''
+                elif len(st)==6:
+                    status = True
+                    num_input=st
+                    ave = None
+                    code = ''
                 else:
                     sys.exit(0)
         except (KeyboardInterrupt) as e:
@@ -456,6 +461,11 @@ if __name__ == '__main__':
             elif st == 'g' or st == 'go':
                 status = True
                 num_input = ''
+                ave = None
+                code = ''
+            elif len(st)==6:
+                status = True
+                num_input=st
                 ave = None
                 code = ''
             else:

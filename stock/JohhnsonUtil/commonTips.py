@@ -13,7 +13,6 @@ import johnson_cons as ct
 import pandas as pd
 import LoggerFactory as Log
 log = Log.getLogger('commonTipss')
-# log = LoggerFactory.getLogger("FundFlow")
 # log.setLevel(Log.DEBUG)
 
 try:
@@ -75,21 +74,23 @@ def get_today(sep='-'):
     
     
 def last_tddate(days=0):
-    today = datetime.datetime.today().date() + datetime.timedelta(-1)
+    today = datetime.datetime.today().date()  + datetime.timedelta(-1)
     day_n=int(today.strftime("%w"))
-    log.debug(today,day_n)
+    log.debug("today:%s day_n:%s"%(today,day_n))
     if day_n == 0:
         lasd=today + datetime.timedelta(-2)
         log.debug("0:%s"%lasd)
-    elif day_n == 1:
-        lasd=today + datetime.timedelta(-3)
-        log.debug("1:%s"%lasd)
     elif day_n == 6:
         lasd=today + datetime.timedelta(-1)
         log.debug("6:%s"%lasd)
+    elif day_n == 1 and not days==0:
+        lasd=today + datetime.timedelta(-2)
+        log.debug("1:%s"%lasd)
     else:
         lasd=today
         log.debug("1-5:%s"%lasd)
+    # if days==0:
+        # return str(lasd)
     oday = lasd - datetime.timedelta(days)
     day_n=int(oday.strftime("%w"))
     # print oday,day_n
@@ -137,7 +138,7 @@ def get_now_time_int():
 def get_work_time():
     now_t = str(get_now_time()).replace(':', '')
     now_t = int(now_t)
-    if (now_t > 1131 and now_t < 1300) or now_t < 916 or now_t > 1502:
+    if (now_t > 1130 and now_t < 1300) or now_t < 915 or now_t > 1500:
         # return False
         return False
     else:
@@ -147,7 +148,7 @@ def get_work_time():
 def get_work_duration():
     int_time = get_now_time_int()
     # now_t = int(now_t)
-    if (int_time > 830 and int_time <916) or (int_time > 1130 and int_time <1300 ):
+    if (int_time > 830 and int_time <915) or (int_time > 1130 and int_time <1300 ):
         # return False
         return True
     else:
@@ -169,7 +170,7 @@ def get_work_time_ratio():
     d1 = datetime.datetime.now()
     now_t = int(datetime.datetime.now().strftime("%H%M"))
     # d2 = datetime.datetime.strptime('201510111011','%Y%M%d%H%M')
-    if now_t>930 and now_t < 1131:
+    if now_t>930 and now_t < 1130:
         d2 = datetime.datetime.strptime(ymd + hm1, '%Y:%m:%d:%H:%M')
         ds = float((d1 - d2).seconds)
         ratio_t = round(ds / all_work_time, 3)
