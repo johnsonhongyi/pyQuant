@@ -182,6 +182,7 @@ if __name__ == "__main__":
         try:
             df = rl.get_sina_Market_json('cyb')
             top_now = rl.get_market_price_sina_dd_realTime(df, vol, type)
+            # print top_now.loc['300208','name']
             df_count = len(df)
             now_count = len(top_now)
             del df
@@ -304,7 +305,6 @@ if __name__ == "__main__":
                     top_dif = top_dif.sort_values(by=['diff', 'percent', 'ratio'], ascending=[0, 0, 1])
 
                 # top_all=top_all.sort_values(by=['percent','diff','counts','ratio'],ascending=[0,0,1,1])
-                # print rl.format_for_print(top_dif[:10])
                 print rl.format_for_print(top_dif[:10])
                 # print top_all.loc['000025',:]
                 # print "staus",status

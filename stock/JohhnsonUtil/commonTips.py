@@ -193,6 +193,7 @@ def get_url_data_R(url):
     req = Request(url, headers=headers)
     fp = urlopen(req, timeout=5)
     data = fp.read()
+    # print data.encoding
     fp.close()
     return data
 
@@ -203,9 +204,11 @@ def get_url_data(url):
                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
                'Connection': 'keep-alive'}
     data = requests.get(url, headers=headers,timeout=10)
+    # print data.text
     # fp = urlopen(req, timeout=5)
     # data = fp.read()
     # fp.close()
+    # print data.encoding
     return data.text
 
 def get_div_list(ls, n):

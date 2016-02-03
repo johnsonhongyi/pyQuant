@@ -256,7 +256,8 @@ class PrettyTable(object):
            return self.__unicode__()
     else:
         def __str__(self):
-           return self.__unicode__().encode(self.encoding)
+            # print type(self.__unicode__())
+            return self.__unicode__().encode(self.encoding)
 
     def __unicode__(self):
         return self.get_string()

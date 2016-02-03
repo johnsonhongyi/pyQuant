@@ -1,4 +1,4 @@
-# -*- coding:utf-8 -*-
+# -*- coding:utf8 -*-
 """
 交易数据接口 
 Created on 2014/07/31
@@ -69,7 +69,9 @@ def _parsing_Market_price_json(url):
     # url="http://vip.stock.finance.sina.com.cn/quotes_service/api/json_v2.php/Market_Center.getHQNodeData?page=1&num=50&sort=changepercent&asc=0&node=sh_a&symbol="
     # request = Request(ct.SINA_DAY_PRICE_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'],
     #                              ct.PAGES['jv'], pageNum))
-    text = cct.get_url_data(url)
+    # url='http://vip.stock.finance.sina.com.cn/quotes_service/api/json_v2.php/Market_Center.getHQNodeData?page=1&num=20&sort=changepercent&asc=0&node=cyb&symbol='
+    text = cct.get_url_data_R(url)
+    # text = cct.get_url_data(url)
     if text == 'null':
         return None
     reg = re.compile(r'\,(.*?)\:')
@@ -83,7 +85,7 @@ def _parsing_Market_price_json(url):
         jstr = json.dumps(text)
     else:
         # jstr = json.dumps(text, encoding='GBK')
-        jstr = json.dumps(text)
+        jstr = json.dumps(text,encoding='GBK')
     js = json.loads(jstr)
     # df = pd.DataFrame(pd.read_json(js, dtype={'code':object}),columns=ct.MARKET_COLUMNS)
     # log.debug("Market json:%s"%js[:1])
@@ -93,7 +95,8 @@ def _parsing_Market_price_json(url):
     # df = df.drop('symbol', axis=1)
     df = df.ix[df.volume >= 0]
     # print type(df)
-    # print df[:1],len(df.index)
+    # print df[-2:-1],len(df.index)
+    # print df.loc['300208',['name']]
     return df
 
 
@@ -147,6 +150,7 @@ def get_sina_Market_json(market='sh', showtime=True, num='1000', retry_count=3, 
         # print url_list
     else:
         url_list=_get_sina_Market_url(ct.SINA_Market_KEY[market], num=num)
+        # print url_list
     log.debug("Market_jsonURL: %s" % url_list[0])
     # print url_list
     # print "url:",url_list
@@ -156,7 +160,6 @@ def get_sina_Market_json(market='sh', showtime=True, num='1000', retry_count=3, 
 
     # results = cct.to_mp_run(_parsing_Market_price_json, url_list)
     results = cct.to_asyncio_run(url_list, _parsing_Market_price_json)
-
     if len(results)>0:
         df = df.append(results, ignore_index=True)
         # df['volume']= df['volume'].apply(lambda x:x/100)
@@ -596,8 +599,11 @@ def get_market_price_sina_dd_realTime(dp='',vol='0',type='3'):
 
 
 if __name__ == '__main__':
+    import sys
     # df = get_sina_all_json_dd('0', '3')
-    # df=get_sina_Market_json('all')
+    df=get_sina_Market_json('cyb')
+    # _parsing_Market_price_json('cyb')
+    sys.exit(0)
     dd = get_sina_all_json_dd('0', '4')
     print ""
     print dd[:2]
@@ -619,7 +625,7 @@ if __name__ == '__main__':
     # print "ra:",sl.get_work_time_ratio()
     # dd = get_sina_tick_js_LastPrice(['002399','002399','601919','601198'])
     # print(type(dd))
-    import sys
+
 
     sys.exit(0)
     # up= df[df['trade']>df['settlement']]

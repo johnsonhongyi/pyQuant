@@ -186,6 +186,7 @@ if __name__ == "__main__":
             # df = sina_data.Sina().all
             df = rl.get_sina_Market_json('all')
             top_now = rl.get_market_price_sina_dd_realTime(df, vol, type)
+            # print top_now.loc['300208','name']
             # top_now.to_hdf("testhdf5", 'marketDD', format='table', complevel=9)
             df_count = len(df)
             now_count = len(top_now)

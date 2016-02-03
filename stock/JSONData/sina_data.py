@@ -14,9 +14,11 @@ from JohhnsonUtil import johnson_cons as ct
 from JohhnsonUtil import commonTips as cct
 from JohhnsonUtil import LoggerFactory
 import trollius as asyncio
+# from urllib2 import Request,urlopen
 from trollius.coroutines import From
 import tdx_data_Day as tdd
 log = LoggerFactory.getLogger('Sina_data')
+# log.setLevel(LoggerFactory.DEBUG)
 
 class StockCode:
     def __init__(self):
@@ -107,15 +109,28 @@ class Sina:
             num_end = self.max_num * (range_start + 1)
             request_list = ','.join(self.stock_with_exchange_list[num_start:num_end])
             self.stock_list.append(request_list)
+        log.debug('all:%s'%len(self.stock_list))
         return self.get_stock_data()
-
+        
+    # def get_url_data_R(url):
+    #     # headers = {'User-Agent':'Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.6) Gecko/20091201 Firefox/3.5.6'}
+    #     headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.2; rv:16.0) Gecko/20100101 Firefox/16.0',
+    #                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+    #                'Connection': 'keep-alive'}
+    #     req = Request(url, headers=headers)
+    #     fp = urlopen(req, timeout=5)
+    #     data = fp.read()
+    #     fp.close()
+    #     return data
+        
     @asyncio.coroutine
     def get_stocks_by_range(self, index):
 
         loop = asyncio.get_event_loop()
-        response = yield From(loop.run_in_executor(None, requests.get, (self.sina_stock_api + self.stock_list[index])))
+        # response = yield From(loop.run_in_executor(None,self.get_url_data_R, (self.sina_stock_api + self.stock_list[index])))
+        response = yield From(loop.run_in_executor(None,requests.get, (self.sina_stock_api + self.stock_list[index])))
         # response = yield (requests.get(self.sina_stock_api + self.stock_list[index]))
-        # print response.text
+        log.debug("res_encoding:%s"%response.encoding)
         self.stock_data.append(response.text)
         # Return(self.stock_data.append(response.text))
 
@@ -123,13 +138,14 @@ class Sina:
         threads = []
         for index in range(self.request_num):
             threads.append(self.get_stocks_by_range(index))
-            # log.debug("url:%s"%self.sina_stock_api + self.stock_list[index])
+            log.debug("url:%s  len:%s"%(self.sina_stock_api ,len(self.stock_list[index])))
         try:
             loop = asyncio.get_event_loop()
         except RuntimeError:
             loop = asyncio.new_event_loop()
             asyncio.set_event_loop(loop)
         loop.run_until_complete(asyncio.wait(threads))
+        log.debug('get_stock_data_loop')
         return self.format_response_data()
 
     # def get_stock_data(self):
@@ -154,11 +170,13 @@ class Sina:
         self.dataframe=self.format_response_data()
         # self.get_tdx_dd()
         return self.dataframe
+        
     def get_tdx_dd(self):
         df=tdd.get_tdx_all_day_LastDF(self.stock_codes)
         # print df
     def format_response_data(self):
         stocks_detail = ''.join(self.stock_data)
+        # print stocks_detail
         result = self.grep_stock_detail.finditer(stocks_detail)
         # stock_dict = dict()
         list_s = []
@@ -223,9 +241,10 @@ class Sina:
 if __name__ == "__main__":
     times = time.time()
     sina = Sina()
-    code='601198'
-    df = sina.get_stock_list_data(['601198','002399','601608'])
-    print df
+    df= sina.all
+    # code='601198'
+    # df = sina.get_stock_list_data(['601198','002399','601608'])
+    print df[:1]
     # list=['000001','399001','399006','399005']
     # df=sina.get_stock_list_data(list)
     # print time.time() - times
