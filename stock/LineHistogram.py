@@ -412,7 +412,7 @@ if __name__ == "__main__":
                     code = args.code
                     # print code, args.ptype, args.dtype, start, end
                     get_linear_model_histogram(code, args.ptype, args.dtype, start, end)
-                    num_input = ''
+                    num_input = ''	
 
                     #         else:
                     #             get_linear_model_histogram(code,args.dtype,args.start)
@@ -450,7 +450,13 @@ if __name__ == "__main__":
             st = raw_input("status:[go(g),clear(c),quit(q,e)]:")
             if st == 'q' or st == 'e':
                 sys.exit(0)
-
-        except (IOError, EOFError) as e:
+            else:
+            	num_input=''
+        except (IOError, EOFError, Exception) as e:
             print "Error", e
+            # st = raw_input("status:[go(g),clear(c),quit(q,e)]:")
+            # if st == 'q' or st == 'e':
+            #     sys.exit(0)
+            # else:
+            num_input=''
             # traceback.print_exc()
