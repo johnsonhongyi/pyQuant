@@ -1,6 +1,7 @@
 # -*- encoding: utf-8 -*-
 import datetime
-import os,sys
+import os
+import sys
 import platform
 import re
 import time
@@ -21,78 +22,86 @@ except ImportError:
     from urllib2 import urlopen, Request
 import requests
 
-def set_console(width=80,height=15,color=3):
+
+def set_console(width=80, height=15, color=3):
     # mode con cp select=936
     # os.system("mode con: cols=%s lines=%s"%(width,height))
-    os.system('title=%s'%sys.argv[0])
+    os.system('title=%s' % sys.argv[0])
     # os.system('color %s'%color)
     pass
 
 # @property
+
+
 def get_delay_time():
-    delay_time=7200
+    delay_time = 7200
     return delay_time
-    
+
+
 def get_cpu_count():
     return cpu_count()
+
 
 def get_os_path_sep():
     return os.path.sep
 
+
 def day8_to_day10(start):
     if start:
-        start=str(start)
-        if len(start)==8:
-            start=start[:4]+'-'+start[4:6]+'-'+start[6:]
+        start = str(start)
+        if len(start) == 8:
+            start = start[:4] + '-' + start[4:6] + '-' + start[6:]
             return start
     return None
 
-def get_time_to_date(times,format='%H:%M'):
-    #time.gmtime(times) 世界时间
+
+def get_time_to_date(times, format='%H:%M'):
+    # time.gmtime(times) 世界时间
     # time.localtime(times) 本地时间
-    return time.strftime(format,time.localtime(times))
-    
+    return time.strftime(format, time.localtime(times))
+
+
 def get_today(sep='-'):
     TODAY = datetime.date.today()
-    fstr="%Y"+sep+"%m"+sep+"%d"
+    fstr = "%Y" + sep + "%m" + sep + "%d"
     today = TODAY.strftime(fstr)
     return today
 
-    
+
 # from dateutil import rrule
 
 # def workdays(start, end, holidays=0, days_off=None):
     # start=datetime.datetime.strptime(start,'%Y-%m-%d')
     # end=datetime.datetime.strptime(end,'%Y-%m-%d')
     # if days_off is None:
-        # days_off = 0, 6
+    # days_off = 0, 6
     # workdays = [x for x in range(7) if x not in days_off]
     # print workdays
     # days = rrule.rrule(rrule.DAILY, start, until=end, byweekday=workdays)
     # return days
     return days.count() - holidays
-    
-    
+
+
 def last_tddate(days=0):
-    today = datetime.datetime.today().date()  + datetime.timedelta(-1)
-    day_n=int(today.strftime("%w"))
-    log.debug("today:%s day_n:%s"%(today,day_n))
+    today = datetime.datetime.today().date() + datetime.timedelta(-1)
+    day_n = int(today.strftime("%w"))
+    log.debug("today:%s day_n:%s" % (today, day_n))
     if day_n == 0:
-        lasd=today + datetime.timedelta(-2)
-        log.debug("0:%s"%lasd)
+        lasd = today + datetime.timedelta(-2)
+        log.debug("0:%s" % lasd)
     elif day_n == 6:
-        lasd=today + datetime.timedelta(-1)
-        log.debug("6:%s"%lasd)
-    elif day_n == 1 and not days==0:
-        lasd=today + datetime.timedelta(-2)
-        log.debug("1:%s"%lasd)
+        lasd = today + datetime.timedelta(-1)
+        log.debug("6:%s" % lasd)
+    elif day_n == 1 and not days == 0:
+        lasd = today + datetime.timedelta(-2)
+        log.debug("1:%s" % lasd)
     else:
-        lasd=today
-        log.debug("1-5:%s"%lasd)
+        lasd = today
+        log.debug("1-5:%s" % lasd)
     # if days==0:
         # return str(lasd)
     oday = lasd - datetime.timedelta(days)
-    day_n=int(oday.strftime("%w"))
+    day_n = int(oday.strftime("%w"))
     # print oday,day_n
     if day_n == 0:
         # print day_last_week(-2)
@@ -110,26 +119,30 @@ def last_tddate(days=0):
 #         return False
 #     else:
 #         return True
-        
+
+
 def day_last_week(days=-7):
     lasty = datetime.datetime.today().date() + datetime.timedelta(days)
     return str(lasty)
 
+
 def is_holiday(date):
     if isinstance(date, str):
         date = datetime.datetime.strptime(date, '%Y-%m-%d')
-    today=int(date.strftime("%w"))
+    today = int(date.strftime("%w"))
     if today > 0 and today < 6 and date not in holiday:
         return False
     else:
         return True
-        
+
+
 def get_today_duration(datastr):
     today = datetime.date.today()
-    last_day = datetime.datetime.strptime(datastr,'%Y-%m-%d').date()
-    duration_day=(today-last_day).days
+    last_day = datetime.datetime.strptime(datastr, '%Y-%m-%d').date()
+    duration_day = (today - last_day).days
     return int(duration_day)
-    
+
+
 def get_now_time_int():
     now_t = datetime.datetime.now().strftime("%H%M")
     return int(now_t)
@@ -148,11 +161,12 @@ def get_work_time():
 def get_work_duration():
     int_time = get_now_time_int()
     # now_t = int(now_t)
-    if (int_time > 830 and int_time <915) or (int_time > 1130 and int_time <1300 ):
+    if (int_time > 830 and int_time < 915) or (int_time > 1130 and int_time < 1300):
         # return False
         return True
     else:
         return False
+
 
 def get_now_time():
     # now = time.time()
@@ -160,6 +174,7 @@ def get_now_time():
     # d_time=time.strftime("%Y-%m-%d %H:%M:%S",now)
     d_time = time.strftime("%H:%M", now)
     return d_time
+
 
 def get_work_time_ratio():
     now = time.localtime()
@@ -170,20 +185,21 @@ def get_work_time_ratio():
     d1 = datetime.datetime.now()
     now_t = int(datetime.datetime.now().strftime("%H%M"))
     # d2 = datetime.datetime.strptime('201510111011','%Y%M%d%H%M')
-    if now_t>930 and now_t < 1130:
+    if now_t > 930 and now_t < 1130:
         d2 = datetime.datetime.strptime(ymd + hm1, '%Y:%m:%d:%H:%M')
         ds = float((d1 - d2).seconds)
         ratio_t = round(ds / all_work_time, 3)
 
     elif now_t > 1130 and now_t < 1300:
         ratio_t = 0.5
-    elif now_t >1500 or now_t <930:
+    elif now_t > 1500 or now_t < 930:
         ratio_t = 1.0
     else:
         d2 = datetime.datetime.strptime(ymd + hm2, '%Y:%m:%d:%H:%M')
         ds = float((d1 - d2).seconds)
-        ratio_t = round((ds+7200) / all_work_time, 3)
+        ratio_t = round((ds + 7200) / all_work_time, 3)
     return ratio_t
+
 
 def get_url_data_R(url):
     # headers = {'User-Agent':'Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.6) Gecko/20091201 Firefox/3.5.6'}
@@ -203,7 +219,7 @@ def get_url_data(url):
     headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.2; rv:16.0) Gecko/20100101 Firefox/16.0',
                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
                'Connection': 'keep-alive'}
-    data = requests.get(url, headers=headers,timeout=10)
+    data = requests.get(url, headers=headers, timeout=10)
     # print data.text
     # fp = urlopen(req, timeout=5)
     # data = fp.read()
@@ -211,8 +227,10 @@ def get_url_data(url):
     # print data.encoding
     return data.text
 
+
 def get_div_list(ls, n):
-    # if isinstance(codeList, list) or isinstance(codeList, set) or isinstance(codeList, tuple) or isinstance(codeList, pd.Series):
+    # if isinstance(codeList, list) or isinstance(codeList, set) or
+    # isinstance(codeList, tuple) or isinstance(codeList, pd.Series):
 
     if not isinstance(ls, list) or not isinstance(n, int):
         return []
@@ -292,7 +310,7 @@ def to_mp_run(cmd, urllist):
     return results
 
 
-def to_mp_run_async(cmd, urllist,*args):
+def to_mp_run_async(cmd, urllist, *args):
     # n_t=time.time()
     # print "mp_async:%s" % len(urllist),
     pool = ThreadPool(cpu_count())
@@ -310,7 +328,7 @@ def to_mp_run_async(cmd, urllist,*args):
         # result = pool.apply_async(cmd, (code, arg))
         # arg=(code)+','+(args)
         # print arg
-        result = pool.apply_async(cmd,(code,)+args).get()
+        result = pool.apply_async(cmd, (code,) + args).get()
         results.append(result)
     pool.close()
     pool.join()
@@ -319,9 +337,11 @@ def to_mp_run_async(cmd, urllist,*args):
     # print "time:MP", (time.time() - n_t)
     return results
 
+
 def f_print(lens, datastr):
     data = ('{0:%s}' % (lens)).format(str(datastr))
     return data
+
 
 def _write_to_csv(df, filename, indexCode='code'):
     TODAY = datetime.date.today()
@@ -330,9 +350,11 @@ def _write_to_csv(df, filename, indexCode='code'):
     #     sys.setdefaultencoding( "gbk" )
     df = df.drop_duplicates(indexCode)
     df = df.set_index(indexCode)
-    df.to_csv(CURRENTDAY + '-' + filename + '.csv', encoding='gbk', index=False)  # 选择保存
-    print ("write csv")
+    df.to_csv(CURRENTDAY + '-' + filename + '.csv',
+              encoding='gbk', index=False)  # 选择保存
+    print("write csv")
     # df.to_csv(filename, encoding='gbk', index=False)
+
 
 def code_to_tdxblk(code):
     """
@@ -346,6 +368,7 @@ def code_to_tdxblk(code):
         else:
             return '1%s' % code if code[:1] in ['5', '6'] else '0%s' % code
 
+
 def code_to_symbol(code):
     """
         生成symbol代码标志
@@ -356,7 +379,7 @@ def code_to_symbol(code):
         if len(code) != 6:
             return ''
         else:
-            return 'sh%s' % code if code[:1] in ['5', '6','9'] else 'sz%s' % code
+            return 'sh%s' % code if code[:1] in ['5', '6', '9'] else 'sz%s' % code
 
 
 def symbol_to_code(symbol):
@@ -384,12 +407,19 @@ def code_to_tdx_blk(code):
         else:
             return '1%s' % code if code[:1] in ['5', '6'] else '0%s' % code
 
+
 def write_to_blocknew(p_name, data, append=True):
     if append:
         fout = open(p_name, 'ab+')
         flist = fout.readlines()
     else:
         fout = open(p_name, 'wb')
+        index_list = ['1999999', '27#HSI', '0159915', '47#IFL0']
+        # index_list.reverse()
+        for i in index_list:
+            raw = (i) + '\r\n'
+            fout.write(raw)
+            
     # x=0
     for i in data:
         # print type(i)
@@ -411,8 +441,9 @@ def write_to_blocknew(p_name, data, append=True):
             fout.write(raw)
 
             # raw = pack('IfffffII', t, i[2], i[3], i[4], i[5], i[6], i[7], i[8])
-    ## end for
+    # end for
     fout.close()
+
 
 def get_sys_platform():
     return platform.platform()
@@ -434,29 +465,34 @@ def get_run_path():
         raise TypeError('log path error.')
     return path
 
-def get_stock_tdx_period_to_type(stock_data,type='w'):
-    period_type= type
-    #转换周最后一日变量
+
+def get_stock_tdx_period_to_type(stock_data, type='w'):
+    period_type = type
+    # 转换周最后一日变量
     stock_data.index = pd.to_datetime(stock_data.index)
-    period_stock_data = stock_data.resample(period_type,how='last')
-    #周数据的每日change连续相乘
+    period_stock_data = stock_data.resample(period_type, how='last')
+    # 周数据的每日change连续相乘
     # period_stock_data['percent']=stock_data['percent'].resample(period_type,how=lambda x:(x+1.0).prod()-1.0)
-    #周数据open等于第一日
-    period_stock_data['open']=stock_data['open'].resample(period_type,how='first')
-    #周high等于Max high
-    period_stock_data['high']=stock_data['high'].resample(period_type,how='max')
-    period_stock_data['low']=stock_data['low'].resample(period_type,how='min')
-    #volume等于所有数据和
-    period_stock_data['amount']=stock_data['amount'].resample(period_type,how='sum')
-    period_stock_data['vol']=stock_data['vol'].resample(period_type,how='sum')
-    #计算周线turnover,【traded_market_value】 流通市值【market_value】 总市值【turnover】 换手率，成交量/流通股本
+    # 周数据open等于第一日
+    period_stock_data['open'] = stock_data[
+        'open'].resample(period_type, how='first')
+    # 周high等于Max high
+    period_stock_data['high'] = stock_data[
+        'high'].resample(period_type, how='max')
+    period_stock_data['low'] = stock_data[
+        'low'].resample(period_type, how='min')
+    # volume等于所有数据和
+    period_stock_data['amount'] = stock_data[
+        'amount'].resample(period_type, how='sum')
+    period_stock_data['vol'] = stock_data[
+        'vol'].resample(period_type, how='sum')
+    # 计算周线turnover,【traded_market_value】 流通市值【market_value】 总市值【turnover】 换手率，成交量/流通股本
     # period_stock_data['turnover']=period_stock_data['vol']/(period_stock_data['traded_market_value'])/period_stock_data['close']
-    #去除无交易纪录
-    period_stock_data=period_stock_data[period_stock_data['code'].notnull()]
+    # 去除无交易纪录
+    period_stock_data = period_stock_data[period_stock_data['code'].notnull()]
     period_stock_data.reset_index(inplace=True)
     return period_stock_data
 
-    
 
 if __name__ == '__main__':
     # print get_run_path()
