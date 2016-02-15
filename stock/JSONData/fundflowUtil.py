@@ -8,7 +8,7 @@ import JohhnsonUtil.johnson_cons as ct
 import JohhnsonUtil.LoggerFactory as LoggerFactory
 import tdx_data_Day as tdd
 log = LoggerFactory.getLogger("FundFlow")
-# log.setLevel(LoggerFactory.DEBUG)
+# log.setLevel(LoggerFactory.INFO)
 import traceback
 from bs4 import BeautifulSoup
 
@@ -134,11 +134,30 @@ def get_dfcfw_rzrq_SHSZ(url=ct.DFCFW_RZRQ_SHSZ):
             dd['sz']=round(float(data2[5])/100000000,1)
             dd['all']=round(float(dataall[5])/100000000,1)
         return dd
-    today=cct.last_tddate().replace('-','/')
-    data=get_tzrq(url,today)
-    yestoday=cct.last_tddate(1).replace('-','/')
-    log.debug(today,yestoday)
-    data2=get_tzrq(url,yestoday)
+    def get_days_data(days=0):
+        rzrq_status=1
+        # data=''
+        da=0
+        while rzrq_status:
+            for x in range(0,20):
+                yestoday=cct.last_tddate(x).replace('-','/')
+                data2=get_tzrq(url,yestoday)
+                if len(data2)>0:
+                    if da >=days:
+                        break
+                    da+=1
+                else:
+                    log.info("%s:%s"%(yestoday,data2))
+            rzrq_status=0
+        log.info("%s:%s"%(yestoday,data2))
+        return data2    
+        
+    # today=cct.last_tddate().replace('-','/')
+    # data=get_tzrq(url,today)
+    data=get_days_data()
+    # log.debug(today)
+    data2=get_days_data(1)    
+    log.info("data:%s,data2:%s",data,data2)
     if len(data2)>0:
         # print data2
         data['diff']=round(data['all']-data2['all'],2)
@@ -269,8 +288,8 @@ if __name__ == "__main__":
     # #     print pp[x]
     #
     
-    dd =get_dfcfw_fund_flow('cyb')
-    print dd
+    # dd =get_dfcfw_fund_flow('cyb')
+    # print dd
     df=get_dfcfw_rzrq_SHSZ()
     print df
     
