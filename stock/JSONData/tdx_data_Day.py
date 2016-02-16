@@ -23,6 +23,7 @@ import tushare as ts
 # log=logbook.Logger('TDX_day')
 log = LoggerFactory.getLogger('TDX_Day')
 # log.setLevel(LoggerFactory.DEBUG)
+# log.setLevel(LoggerFactory.INFO)
 
 path_sep = os.path.sep
 
@@ -247,6 +248,27 @@ def get_tdx_day_to_df_dict(code):
 
 
 def get_tdx_day_to_df(code):
+    """
+        获取个股历史交易记录
+    Parameters
+    ------
+      code:string
+                  股票代码 e.g. 600848
+      start:string
+                  开始日期 format：YYYY-MM-DD 为空时取到API所提供的最早日期数据
+      end:string
+                  结束日期 format：YYYY-MM-DD 为空时取到最近一个交易日数据
+      ktype：string
+                  数据类型，D=日k线 W=周 M=月 5=5分钟 15=15分钟 30=30分钟 60=60分钟，默认为D
+      retry_count : int, 默认 3
+                 如遇网络等问题重复执行的次数 
+      pause : int, 默认 0
+                重复请求数据过程中暂停的秒数，防止请求间隔时间太短出现的问题
+    return
+    -------
+      DataFrame
+          属性:日期 ，开盘价， 最高价， 收盘价， 最低价， 成交量， 价格变动 ，涨跌幅，5日均价，10日均价，20日均价，5日均量，10日均量，20日均量，换手率
+    """
     # time_s=time.time()
     # print code
     code_u = cct.code_to_symbol(code)
@@ -292,7 +314,8 @@ def get_tdx_day_to_df(code):
     return df
 
 
-def get_tdx_day_to_df_last(code,dayl='1',type=0):
+
+def get_tdx_day_to_df_last(code,dayl=1,type=0,dt=None):
     # dayl=int(dayl)
     # type=int(type)
     # print "t:",dayl,"type",type
@@ -313,7 +336,8 @@ def get_tdx_day_to_df_last(code,dayl='1',type=0):
     ofile = file(file_path, 'rb')
     b = 0
     e = 32
-    if dayl == 1:
+    if dayl == 1 and  dt == None :
+        log.debug ("%s"%(dayl == 1 and  dt == None))
         fileSize = os.path.getsize(file_path)
         if fileSize < 32: print "why", code
         ofile.seek(-e, 2)
@@ -332,21 +356,70 @@ def get_tdx_day_to_df_last(code,dayl='1',type=0):
             {'code': code, 'date': tdate, 'open': topen, 'high': thigh, 'low': tlow, 'close': tclose, 'amount': amount,
              'vol': tvol})
         return dt_list
+    elif dayl == 1 and dt != None:
+        log.debug ("dt:%s"%(dt))
+        dt_list = []
+        dt=cct.day8_to_day10(dt)
+        fileSize = os.path.getsize(file_path)
+        if fileSize < 32: print "why", code
+        b = fileSize
+        ofile.seek(-fileSize, 2)
+        no = int(fileSize / e)
+        # print no,b,day_cout,fileSize
+        buf = ofile.read()
+        ofile.close()
+        # print repr(buf)
+        # df=pd.DataFrame()
+        for i in xrange(no):
+            a = unpack('IIIIIfII', buf[-e:b])
+            tdate = str(a[0])[:4] + '-' + str(a[0])[4:6] + '-' + str(a[0])[6:8]
+            topen = float(a[1] / 100.0)
+            thigh = float(a[2] / 100.0)
+            tlow = float(a[3] / 100.0)
+            tclose = float(a[4] / 100.0)
+            amount = float(a[5] / 10.0)
+            tvol = int(a[6])  # int
+            # tpre = int(a[7])  # back
+            dt_list.append({'code': code, 'date': tdate, 'open': topen, 'high': thigh, 'low': tlow, 'close': tclose,
+                            'amount': amount, 'vol': tvol})
+            # print series
+            # dSeries.append(series)
+            # dSeries.append(Series({'code':code,'date':tdate,'open':topen,'high':thigh,'low':tlow,'close':tclose,'amount':amount,'vol':tvol,'pre':tpre}))
+            b = b - 32
+            e = e + 32
+            if tdate < dt:
+                break
+        df = pd.DataFrame(dt_list, columns=ct.TDX_Day_columns)
+        df = df.set_index('date')
+        dd = df[df.index <=dt]
+        if len(dd) > 0:
+            dd=dd[:1]
+            dt=dd.index.values[0]
+            dd = dd.T[dt]
+            dd['date']=dt
+        else:
+            log.debug("no < dt:NULL")
+            dd = Series(
+                {'code': code, 'date': cct.get_today(), 'open': 0, 'high': 0, 'low': 0, 'close': 0, 'amount': 0,
+                 'vol': 0})
+        return dd
     else:
         dt_list = []
         fileSize = os.path.getsize(file_path)
-        day_cout = abs(e * dayl)
+        # print fileSize
+        day_cout = abs(e * int(dayl))
         # print day_cout
         if day_cout > fileSize:
             b = fileSize
             ofile.seek(-fileSize, 2)
             no = int(fileSize / e)
         else:
-            no = dayl
+            no = int(dayl)
             b = day_cout
             ofile.seek(-day_cout, 2)
         # print no,b,day_cout,fileSize
         buf = ofile.read()
+        ofile.close()
         # print repr(buf)
         # df=pd.DataFrame()
         for i in xrange(no):
@@ -368,7 +441,6 @@ def get_tdx_day_to_df_last(code,dayl='1',type=0):
             e = e + 32
         df = pd.DataFrame(dt_list, columns=ct.TDX_Day_columns)
         df = df.set_index('date')
-
         return df
 
 
@@ -376,14 +448,15 @@ def get_tdx_day_to_df_last(code,dayl='1',type=0):
 # usage 使用说明
 #
 #############################################################
-def get_tdx_all_day_LastDF(codeList,type=0):
+def get_tdx_all_day_LastDF(codeList,type=0,dt=None):
     time_t = time.time()
     # df = rl.get_sina_Market_json(market)
     # code_list = np.array(df.code)
     # if type==0:
     #     results = cct.to_mp_run(get_tdx_day_to_df_last, codeList)
     # else:
-    results = cct.to_mp_run_async(get_tdx_day_to_df_last, codeList,1,type)
+    results = cct.to_mp_run_async(get_tdx_day_to_df_last, codeList,1,type,dt)
+    # print results
     df = pd.DataFrame(results, columns=ct.TDX_Day_columns)
     df = df.set_index('code')
     df.loc[:, 'open':] = df.loc[:, 'open':].astype(float)
@@ -479,16 +552,23 @@ if __name__ == '__main__':
     # get_tdx_append_now_df('999999')
     # sys.exit(0)
     time_s=time.time()
-    df = get_tdx_Exp_day_to_df('999999')
+    # df = get_tdx_Exp_day_to_df('999999')
+    # df = get_tdx_day_to_df_last('999999',dt=20160215)
+    # df = get_tdx_day_to_df_last('999999')
+    # print len(df),df
+    tdxdata = get_tdx_all_day_LastDF(['999999','601998'],dt=20160118)
+    # tdxdata = get_tdx_all_day_LastDF(['999999','601998'])
+    print tdxdata
     print "t:",time.time()-time_s
-    print len(df),df[:1]
     # df.sort_index(ascending=True,inplace=True)
     # df.index=df.index.apply(lambda x:datetime.time)
-    df.index = pd.to_datetime(df.index)
-    dd = get_tdx_stock_period_to_type(df)
-    print "t:",time.time()-time_s
-    print len(dd)
-    print dd[-1:]
+    
+    # df.index = pd.to_datetime(df.index)
+    # dd = get_tdx_stock_period_to_type(df)
+    # print "t:",time.time()-time_s
+    # print len(dd)
+    # print dd[-1:]
+    
     # df= get_tdx_all_StockList_DF(list,1,1)
     # print df[:6]
 

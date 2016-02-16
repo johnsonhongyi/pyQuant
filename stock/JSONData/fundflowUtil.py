@@ -143,9 +143,12 @@ def get_dfcfw_rzrq_SHSZ(url=ct.DFCFW_RZRQ_SHSZ):
                 yestoday=cct.last_tddate(x).replace('-','/')
                 data2=get_tzrq(url,yestoday)
                 if len(data2)>0:
-                    if da >=days:
+                    if da ==days and days==0:
+                        break
+                    elif da > days:
                         break
                     da+=1
+                    # print da
                 else:
                     log.info("%s:%s"%(yestoday,data2))
             rzrq_status=0

@@ -330,7 +330,6 @@ def get_linear_model_histogram(code, ptype='f', dtype='d', start=None, end=None)
 def parseArgmain():
     # from ConfigParser import ConfigParser
     # import shlex
-
     import argparse
     # parser = argparse.ArgumentParser()
     # parser.add_argument('-s', '--start', type=int, dest='start',
