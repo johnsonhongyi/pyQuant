@@ -437,12 +437,12 @@ if __name__ == "__main__":
                     st = raw_input('input date[20150612]:')
                     parser = parseArgmain()
                     args = parser.parse_args(st.split())
-                    duration_date=args.dt
-                    print duration_date
-                    # top_all = pd.DataFrame()
-                    # status = False
-                    status = True
-                    lastpTDX_DF=''
+                    if args.dt != None and len(args.dt)==8:
+                        duration_date=args.dt
+                        top_all = pd.DataFrame()
+                        status = False
+                        lastpTDX_DF=''
+                    # print ("reload new Duration:%s"%duration_date)
                     
                 elif st == 'w' or st == 'a':
                     codew = (top_dif.index).tolist()
@@ -481,12 +481,12 @@ if __name__ == "__main__":
                 st = raw_input('input date 20150612')
                 parser = parseArgmain()
                 args = parser.parse_args(st.split())
-                duration_date=args.dt
-                print duration_date
-                # top_all = pd.DataFrame()
-                # status = False
-                status = True
-                lastpTDX_DF=''
+                if args.dt != None and len(args.dt)==8:
+                    duration_date=args.dt
+                    top_all = pd.DataFrame()
+                    status = False
+                    lastpTDX_DF=''
+                # print ("reload new Duration:%s"%duration_date)
                 
             elif st == 'w' or st == 'a':
                 codew = (top_dif.index).tolist()
