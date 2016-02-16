@@ -3,13 +3,13 @@
 from __future__ import division
 
 import os
+import sys
 import time
 from struct import *
 
 import numpy as np
 import pandas as pd
 from pandas import Series
-import sys
 sys.path.append("..")
 from JSONData import realdatajson as rl
 from JohhnsonUtil import LoggerFactory
@@ -463,6 +463,8 @@ def get_tdx_all_day_LastDF(codeList,type=0,dt=None):
     # df.vol = df.vol.apply(lambda x: x / 100)
     log.info("get_to_mp:%s" % (len(df)))
     log.info("TDXTime:%s" % (time.time() - time_t))
+    if dt != None:
+        print ("TDX:%0.2f" % (time.time() - time_t)),
     return df
 
 def get_tdx_all_StockList_DF(code_list, dayl=1,type=0):

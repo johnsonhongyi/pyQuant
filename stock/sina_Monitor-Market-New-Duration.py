@@ -7,16 +7,17 @@ import sys
 import time
 import traceback
 import urllib2
+
 import pandas as pd
 from bs4 import BeautifulSoup
 from pandas import DataFrame
+
 import JohhnsonUtil.johnson_cons as ct
 import singleAnalyseUtil as sl
 from JSONData import realdatajson as rl
-from JSONData import sina_data
 from JSONData import tdx_data_Day as tdd
-from JohhnsonUtil import commonTips as cct
 from JohhnsonUtil import LoggerFactory as LoggerFactory
+from JohhnsonUtil import commonTips as cct
 
 
 # from logbook import Logger,StreamHandler,SyslogHandler
@@ -220,7 +221,7 @@ if __name__ == "__main__":
             top_now = rl.get_market_price_sina_dd_realTime(df, vol, type)
             # print top_now.loc['300208','name']
             # top_now.to_hdf("testhdf5", 'marketDD', format='table', complevel=9)
-            df_count = len(df)
+            # df_count = len(df)
             now_count = len(top_now)
             del df
             gc.collect()
@@ -363,8 +364,8 @@ if __name__ == "__main__":
                 # df['volume']= df['volume'].apply(lambda x:x/100)
 
 
-                print ("A:%s N:%s K:%s %s G:%s" % (
-                    df_count, now_count, len(top_all[top_all['buy'] > 0]),
+                print ("N:%s K:%s %s G:%s" % (
+                    now_count, len(top_all[top_all['buy'] > 0]),
                     len(top_now[top_now['volume'] <= 0]), len(top_dif))),
                 # print "Rt:%0.3f" % (float(time.time() - time_Rt))
                 print "Rt:%0.1f dT:%s" % (float(time.time() - time_Rt),cct.get_time_to_date(time_s))
