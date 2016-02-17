@@ -1,5 +1,6 @@
 #-*- encoding: utf-8 -*-
-
+import traceback  
+import sys  
 
 def consumer():
     n=0
@@ -21,5 +22,24 @@ def produce(c):
         print ('确认还剩: %d'%n)
     c.close()
 
-c = consumer()
-produce(c)
+# c = consumer()
+# produce(c)
+while 1:
+    try:
+        status=True
+        input=raw_input("input:")
+        if input=='q':
+            sys.exit(0)
+    except (KeyboardInterrupt) as e:
+                # print "key"
+                print "KeyboardInterrupt:", e
+                if not status:
+                    input2=raw_input("input:")
+                    if input2=='q':
+                        sys.exit(0)
+    except:
+        print "except"
+        traceback.print_exc()
+        info=sys.exc_info()  
+        print info[0],":",info[1]  
+        sys.exit(0)

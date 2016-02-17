@@ -313,9 +313,30 @@ def get_tdx_day_to_df(code):
     # print "time:",(time.time()-time_s)*1000
     return df
 
-
-
-def get_tdx_day_to_df_last(code,dayl=1,type=0,dt=None):
+def get_duration_price_date(code,ptype='low',dt=None,dl=34,df=''):
+    if len(df) == 0:
+        df=get_tdx_day_to_df(code).sort_index(ascending=False)
+        log.info("code:%s"%(df[:1].index))
+        # print "df",len(df)
+    if dt != None:
+        dz=df[df.index >= dt]
+        if len(dz)==0:
+            # print code,df[:1].index.values[0]
+            return df[:1].index.values[0]
+    else:
+        if len(df) > int(dl):
+            dz=df[:int(dl)]
+        else:
+            dz=df
+    if ptype=='high':
+        lowp=dz.close.max()
+    else:
+        lowp=dz.close.min()
+    lowdate=dz[dz.close==lowp].index.values[0]
+    log.info("date:%s %s:%s"%(lowdate,ptype,lowp))
+    return lowdate
+    
+def get_tdx_day_to_df_last(code,dayl=1,type=0,dt=None,ptype='low'):
     # dayl=int(dayl)
     # type=int(type)
     # print "t:",dayl,"type",type
@@ -357,9 +378,10 @@ def get_tdx_day_to_df_last(code,dayl=1,type=0,dt=None):
              'vol': tvol})
         return dt_list
     elif dayl == 1 and dt != None:
-        log.debug ("dt:%s"%(dt))
+        log.info ("dt:%s"%(dt))
         dt_list = []
-        dt=cct.day8_to_day10(dt)
+        if len(dt) == 8:
+            dt=cct.day8_to_day10(dt)
         fileSize = os.path.getsize(file_path)
         if fileSize < 32: print "why", code
         b = fileSize
@@ -391,6 +413,8 @@ def get_tdx_day_to_df_last(code,dayl=1,type=0,dt=None):
                 break
         df = pd.DataFrame(dt_list, columns=ct.TDX_Day_columns)
         df = df.set_index('date')
+        dt=get_duration_price_date(code,ptype=ptype,dt=dt,df=df)
+        log.info('last_dt:%s'%dt)
         dd = df[df.index <=dt]
         if len(dd) > 0:
             dd=dd[:1]
@@ -444,6 +468,7 @@ def get_tdx_day_to_df_last(code,dayl=1,type=0,dt=None):
         return df
 
 
+
 #############################################################
 # usage 使用说明
 #
@@ -455,6 +480,9 @@ def get_tdx_all_day_LastDF(codeList,type=0,dt=None):
     # if type==0:
     #     results = cct.to_mp_run(get_tdx_day_to_df_last, codeList)
     # else:
+    if len(str(dt)) != 8:
+        dt=get_duration_price_date('999999',dl=dt)
+        log.info("LastDF:%s"%dt)
     results = cct.to_mp_run_async(get_tdx_day_to_df_last, codeList,1,type,dt)
     # print results
     df = pd.DataFrame(results, columns=ct.TDX_Day_columns)
@@ -555,12 +583,16 @@ if __name__ == '__main__':
     # sys.exit(0)
     time_s=time.time()
     # df = get_tdx_Exp_day_to_df('999999')
-    # df = get_tdx_day_to_df_last('999999',dt=20160215)
+    # df = get_tdx_day_to_df_last('601998',dt=20160215)
     # df = get_tdx_day_to_df_last('999999')
     # print len(df),df
-    tdxdata = get_tdx_all_day_LastDF(['999999','601998'],dt=20160118)
+    tdxdata = get_tdx_all_day_LastDF(['999999','601998'],dt=2000)
     # tdxdata = get_tdx_all_day_LastDF(['999999','601998'])
     print tdxdata
+    
+    # dt=get_duration_price_date('999999')
+    # print dt
+    
     print "t:",time.time()-time_s
     # df.sort_index(ascending=True,inplace=True)
     # df.index=df.index.apply(lambda x:datetime.time)

@@ -14,4 +14,6 @@ start python sina_Monitor-Market-New.py
 ping -n 5 localhost > nul
 start python sina_Monitor-Market-LH.py
 ping -n 5 localhost > nul
+start python sina_Monitor-Market-Duration.py
+ping -n 5 localhost > nul 
 rem start python LineHistogram.py

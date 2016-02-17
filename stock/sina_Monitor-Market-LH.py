@@ -284,6 +284,7 @@ if __name__ == "__main__":
         except (KeyboardInterrupt) as e:
             # print "key"
             print "KeyboardInterrupt:", e
+            traceback.print_exc()
             # time.sleep(1)
             # if success > 3:
             #     raw_input("Except")
@@ -316,7 +317,6 @@ if __name__ == "__main__":
                 sys.exit(0)
         except (IOError, EOFError, Exception) as e:
             print "Error", e
-
             traceback.print_exc()
             # raw_input("Except")
 

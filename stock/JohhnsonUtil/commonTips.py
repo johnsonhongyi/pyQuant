@@ -52,7 +52,7 @@ def day8_to_day10(start):
         if len(start) == 8:
             start = start[:4] + '-' + start[4:6] + '-' + start[6:]
             return start
-    return None
+    return start
 
 
 def get_time_to_date(times, format='%H:%M'):
@@ -368,7 +368,16 @@ def code_to_tdxblk(code):
         else:
             return '1%s' % code if code[:1] in ['5', '6'] else '0%s' % code
 
-
+def code_to_index(code):
+    if not code.startswith('999') or not code.startswith('399'):
+        if code[:1] in ['5', '6','9']:
+            code2='999999'
+        elif code[:1] in ['3']:
+            code2='399006'
+        else:
+            code2='399001'
+    return code2
+    
 def code_to_symbol(code):
     """
         生成symbol代码标志

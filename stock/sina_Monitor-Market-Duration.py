@@ -209,10 +209,10 @@ if __name__ == "__main__":
     delay_time = cct.get_delay_time()
     First = True
     base_path = tdd.get_tdx_dir()
-    block_path = tdd.get_tdx_dir_blocknew() + '062.blk'
+    block_path = tdd.get_tdx_dir_blocknew() + '061.blk'
     status_change = False
     lastpTDX_DF=''
-    duration_date='20160118'
+    duration_date=120
     # all_diffpath = tdd.get_tdx_dir_blocknew() + '062.blk'
     while 1:
         try:
@@ -271,16 +271,13 @@ if __name__ == "__main__":
                             top_all['counts'] = 0
                             top_all['prev_p'] = 0
                     for symbol in top_now.index:
+                        top_all.loc[symbol, 'buy'] = top_now.loc[symbol, 'buy']
+                        # '''
                         # code = rl._symbol_to_code(symbol)
                         if symbol in top_all.index and top_all.loc[symbol, 'buy'] <> 0:
-                            # if top_all.loc[symbol,'diff'] == 0:
-                            # print "code:",symbol
                             count_n = top_now.loc[symbol, 'buy']
                             count_a = top_all.loc[symbol, 'buy']
-                            # print count_a,count_n
-                            # print count_n,count_a
                             if cct.get_now_time_int() < 930:
-                                # if not count_n == count_a:
                                 top_all.loc[symbol, 'buy'] = top_now.loc[symbol, 'buy']
                             else:
                                 if not count_n == count_a:
@@ -297,20 +294,25 @@ if __name__ == "__main__":
                                     top_now.loc[symbol, 'diff'] = round(
                                         ((float(top_now.loc[symbol, 'buy']) - float(top_all.loc[symbol, 'lastp'])) / float(top_all.loc[symbol, 'lastp']) * 100), 1)
                                     top_all.loc[symbol, 'diff':'low'] = top_now.loc[symbol, 'diff':'low']
-
+                        # '''
                 # top_all=top_all.sort_values(by=['diff','percent','counts'],ascending=[0,0,1])
                 # top_all=top_all.sort_values(by=['diff','ratio','percent','counts'],ascending=[0,1,0,1])
-
                 # top_all = top_all[top_all.open>=top_all.low*0.99]
                 # top_all = top_all[top_all.buy >= top_all.open*0.99]
                 # top_all = top_all[top_all.trade >= top_all.low*0.99]
                 # top_all = top_all[top_all.trade >= top_all.high*0.99]
                 # top_all = top_all[top_all.buy >= top_all.lastp]
                 # top_all = top_all[top_all.percent >= 0]
-                if cct.get_now_time_int() < 930 or cct.get_now_time_int() > 1505 or (cct.get_now_time_int() > 1125 and cct.get_now_time_int() < 1505):
-                    top_all['diff'] = (
+                
+                # if cct.get_now_time_int() < 930 or cct.get_now_time_int() > 1505 or (cct.get_now_time_int() > 1125 and cct.get_now_time_int() < 1505):
+                    # top_all['diff'] = (
+                        # map(lambda x, y: round((x - y) / y * 100, 1), top_all['buy'].values, top_all['lastp'].values))
+                # if  cct.get_now_time_int() > 930 and cct.get_now_time_int() < 1505:
+                    # top_all['diffA'] = (
+                        # map(lambda x, y: round((x - y) / y * 100, 1), top_all['buy'].values, top_all['lastp'].values))
+                top_all['diff'] = (
                         map(lambda x, y: round((x - y) / y * 100, 1), top_all['buy'].values, top_all['lastp'].values))
-
+                        
                 top_dif = top_all
                 log.info('dif1:%s' % len(top_dif))
                 log.info(top_dif[:1])
@@ -354,7 +356,6 @@ if __name__ == "__main__":
                     # top_dif = top_all
 
                 log.debug('dif6 vol:%s' % (top_dif[:1].volume))
-
                 log.debug('dif6 vol>lvol:%s' % len(top_dif))
 
                 # top_dif = top_dif[top_dif.buy >= top_dif.open*0.99]
@@ -378,9 +379,11 @@ if __name__ == "__main__":
 
                 # top_all=top_all.sort_values(by=['percent','diff','counts','ratio'],ascending=[0,0,1,1])
                 # print rl.format_for_print(top_dif[:10])
-                print rl.format_for_print(top_dif[:10])
-                if cct.get_now_time_int() < 930 or cct.get_now_time_int() > 1505 or (cct.get_now_time_int() > 1125 and cct.get_now_time_int() < 1505):
-                    print rl.format_for_print(top_dif[-10:])
+                top_dd= pd.concat([top_dif[:10],top_dif[-5:]],axis=0)
+                top_dd= top_dd.loc[:,['name','buy','diff','volume','percent','ratio','counts','lastp','date']]
+                print rl.format_for_print(top_dd)
+                # if cct.get_now_time_int() < 930 or cct.get_now_time_int() > 1505 or (cct.get_now_time_int() > 1125 and cct.get_now_time_int() < 1505):
+                    # print rl.format_for_print(top_dif[-10:])
                 # print top_all.loc['000025',:]
                 # print "staus",status
 
@@ -418,8 +421,7 @@ if __name__ == "__main__":
                         print "."
                         break
             else:
-                # break
-                # time.sleep(5)
+                '''
                 st = raw_input("status:[go(g),clear(c),date(dt),quit(q,e),W(w),Wa(a)]:")
                 if len(st) == 0:
                     status = False
@@ -435,7 +437,7 @@ if __name__ == "__main__":
                     status = False
                     
                 elif st.startswith('d') or st.startswith('dt'):
-                    st = raw_input('input date[20150612]:')
+                    st = raw_input('Low[20150612]:')
                     parser = parseArgmain()
                     args = parser.parse_args(st.split())
                     if args.dt != None and len(args.dt)==8:
@@ -458,6 +460,8 @@ if __name__ == "__main__":
                     # time.sleep(2)
                 else:
                     sys.exit(0)
+                '''
+                raise KeyboardInterrupt("StopTime.")
         except (KeyboardInterrupt) as e:
             # print "key"
             print "KeyboardInterrupt:", e
@@ -479,10 +483,10 @@ if __name__ == "__main__":
                 top_all = pd.DataFrame()
                 status = False
             elif st.startswith('d') or st.startswith('dt'):
-                st = raw_input('input date 20150612')
+                st = raw_input('LowD[20150612]:')
                 parser = parseArgmain()
                 args = parser.parse_args(st.split())
-                if args.dt != None and len(args.dt)==8:
+                if args.dt != None and len(args.dt)>0:
                     duration_date=args.dt
                     top_all = pd.DataFrame()
                     status = False
@@ -490,12 +494,12 @@ if __name__ == "__main__":
                 # print ("reload new Duration:%s"%duration_date)
                 
             elif st == 'w' or st == 'a':
-                codew = (top_dif.index).tolist()
+                codew = (top_dd.index).tolist()
                 if st == 'a':
-                    cct.write_to_blocknew(block_path, codew[:10])
+                    cct.write_to_blocknew(block_path, codew)
                     # sl.write_to_blocknew(all_diffpath, codew)
                 else:
-                    cct.write_to_blocknew(block_path, codew[:10], False)
+                    cct.write_to_blocknew(block_path, codew, False)
                     # sl.write_to_blocknew(all_diffpath, codew, False)
                 print "wri ok:%s" % block_path
 
