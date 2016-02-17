@@ -3,13 +3,13 @@
 from __future__ import division
 
 import os
+import sys
 import time
 from struct import *
 
 import numpy as np
 import pandas as pd
 from pandas import Series
-
 sys.path.append("..")
 from JSONData import realdatajson as rl
 from JohhnsonUtil import LoggerFactory
