@@ -155,6 +155,7 @@ def get_sina_all_dd(vol='0', type='0', retry_count=3, pause=0.001):
             return df
         raise IOError(ct.NETWORK_URL_ERROR_MSG)
 
+
 def parseArgmain():
     # from ConfigParser import ConfigParser
     # import shlex
@@ -171,7 +172,7 @@ def parseArgmain():
     # print args.square**2
     parser = argparse.ArgumentParser()
     parser.add_argument('dt', type=str, nargs='?', help='20150612')
-    
+
     # parser.add_argument('dt', nargs='?', type=str, help='20150612')
     # parser.add_argument('dt', nargs='?', type=str, help='20150612')
     # parser.add_argument('-dt', action="store", dest="dtype", type=str, nargs='?',help='20150612')
@@ -179,13 +180,14 @@ def parseArgmain():
     # parser.add_argument('e', nargs='?',action="store", dest="end", type=str, help='end')
     # parser.add_argument('end', nargs='?', type=str, help='20160101')
     # parser.add_argument('-d', action="store", dest="dtype", type=str, nargs='?', choices=['d', 'w', 'm'], default='d',
-                        # help='DateType')
+    # help='DateType')
     # parser.add_argument('-p', action="store", dest="ptype", type=str, choices=['f', 'b'], default='f',
-                        # help='Price Forward or back')
+    # help='Price Forward or back')
     # parser.add_argument('-help',type=str,help='Price Forward or back')
     # args = parser.parse_args()
     # args=parser.parse_args(input)
     return parser
+
 
 if __name__ == "__main__":
     # parsehtml(downloadpage(url_s))
@@ -211,8 +213,8 @@ if __name__ == "__main__":
     base_path = tdd.get_tdx_dir()
     block_path = tdd.get_tdx_dir_blocknew() + '061.blk'
     status_change = False
-    lastpTDX_DF=''
-    duration_date=120
+    lastpTDX_DF = ''
+    duration_date = 120
     # all_diffpath = tdd.get_tdx_dir_blocknew() + '062.blk'
     while 1:
         try:
@@ -245,6 +247,7 @@ if __name__ == "__main__":
                     codelist = top_all.index.tolist()
                     log.info('toTDXlist:%s' % len(codelist))
                     tdxdata = tdd.get_tdx_all_day_LastDF(codelist,dt=duration_date)
+                    # tdxdata = tdd.get_tdx_exp_all_LastDF(codelist, dt=duration_date)
                     log.debug("TdxLastP: %s %s" % (len(tdxdata), tdxdata.columns.values))
                     tdxdata.rename(columns={'low': 'llow'}, inplace=True)
                     tdxdata.rename(columns={'high': 'lhigh'}, inplace=True)
@@ -253,18 +256,18 @@ if __name__ == "__main__":
                     tdxdata = tdxdata.loc[:, ['llow', 'lhigh', 'lastp', 'lvol', 'date']]
                     log.debug("TDX Col:%s" % tdxdata.columns.values)
                     top_all = top_all.merge(tdxdata, left_index=True, right_index=True, how='left')
-                    lastpTDX_DF=tdxdata
+                    lastpTDX_DF = tdxdata
                     log.info('Top-merge_now:%s' % (top_all[:1]))
                     top_all = top_all[top_all['llow'] > 0]
-                    
 
-                elif    len(top_all) == 0 and len(lastpTDX_DF) > 0:
+
+                elif len(top_all) == 0 and len(lastpTDX_DF) > 0:
                     top_all = top_now
                     top_all = top_all.merge(lastpTDX_DF, left_index=True, right_index=True, how='left')
                     # lastpTDX_DF=tdxdata
                     log.info('Top-merge_now:%s' % (top_all[:1]))
                     top_all = top_all[top_all['llow'] > 0]
-                    
+
                 else:
                     if 'counts' in top_now.columns.values:
                         if not 'counts' in top_all.columns.values:
@@ -292,27 +295,29 @@ if __name__ == "__main__":
                                     top_all.loc[symbol, 'diff':'prev_p'] = top_now.loc[symbol, 'diff':'prev_p']
                                 else:
                                     top_now.loc[symbol, 'diff'] = round(
-                                        ((float(top_now.loc[symbol, 'buy']) - float(top_all.loc[symbol, 'lastp'])) / float(top_all.loc[symbol, 'lastp']) * 100), 1)
+                                        ((float(top_now.loc[symbol, 'buy']) - float(
+                                            top_all.loc[symbol, 'lastp'])) / float(top_all.loc[symbol, 'lastp']) * 100),
+                                        1)
                                     top_all.loc[symbol, 'diff':'low'] = top_now.loc[symbol, 'diff':'low']
-                        # '''
-                # top_all=top_all.sort_values(by=['diff','percent','counts'],ascending=[0,0,1])
-                # top_all=top_all.sort_values(by=['diff','ratio','percent','counts'],ascending=[0,1,0,1])
-                # top_all = top_all[top_all.open>=top_all.low*0.99]
-                # top_all = top_all[top_all.buy >= top_all.open*0.99]
-                # top_all = top_all[top_all.trade >= top_all.low*0.99]
-                # top_all = top_all[top_all.trade >= top_all.high*0.99]
-                # top_all = top_all[top_all.buy >= top_all.lastp]
-                # top_all = top_all[top_all.percent >= 0]
-                
-                # if cct.get_now_time_int() < 930 or cct.get_now_time_int() > 1505 or (cct.get_now_time_int() > 1125 and cct.get_now_time_int() < 1505):
-                    # top_all['diff'] = (
-                        # map(lambda x, y: round((x - y) / y * 100, 1), top_all['buy'].values, top_all['lastp'].values))
-                # if  cct.get_now_time_int() > 930 and cct.get_now_time_int() < 1505:
-                    # top_all['diffA'] = (
-                        # map(lambda x, y: round((x - y) / y * 100, 1), top_all['buy'].values, top_all['lastp'].values))
+                                    # '''
+                                    # top_all=top_all.sort_values(by=['diff','percent','counts'],ascending=[0,0,1])
+                                    # top_all=top_all.sort_values(by=['diff','ratio','percent','counts'],ascending=[0,1,0,1])
+                                    # top_all = top_all[top_all.open>=top_all.low*0.99]
+                                    # top_all = top_all[top_all.buy >= top_all.open*0.99]
+                                    # top_all = top_all[top_all.trade >= top_all.low*0.99]
+                                    # top_all = top_all[top_all.trade >= top_all.high*0.99]
+                                    # top_all = top_all[top_all.buy >= top_all.lastp]
+                                    # top_all = top_all[top_all.percent >= 0]
+
+                                    # if cct.get_now_time_int() < 930 or cct.get_now_time_int() > 1505 or (cct.get_now_time_int() > 1125 and cct.get_now_time_int() < 1505):
+                                    # top_all['diff'] = (
+                                    # map(lambda x, y: round((x - y) / y * 100, 1), top_all['buy'].values, top_all['lastp'].values))
+                                    # if  cct.get_now_time_int() > 930 and cct.get_now_time_int() < 1505:
+                                    # top_all['diffA'] = (
+                                    # map(lambda x, y: round((x - y) / y * 100, 1), top_all['buy'].values, top_all['lastp'].values))
                 top_all['diff'] = (
-                        map(lambda x, y: round((x - y) / y * 100, 1), top_all['buy'].values, top_all['lastp'].values))
-                        
+                    map(lambda x, y: round((x - y) / y * 100, 1), top_all['buy'].values, top_all['lastp'].values))
+
                 top_dif = top_all
                 log.info('dif1:%s' % len(top_dif))
                 log.info(top_dif[:1])
@@ -369,7 +374,7 @@ if __name__ == "__main__":
                     now_count, len(top_all[top_all['buy'] > 0]),
                     len(top_now[top_now['volume'] <= 0]), len(top_dif))),
                 # print "Rt:%0.3f" % (float(time.time() - time_Rt))
-                print "Rt:%0.1f dT:%s" % (float(time.time() - time_Rt),cct.get_time_to_date(time_s))
+                print "Rt:%0.1f dT:%s" % (float(time.time() - time_Rt), cct.get_time_to_date(time_s))
                 if 'counts' in top_dif.columns.values:
                     top_dif = top_dif.sort_values(by=['diff', 'volume', 'percent', 'counts', 'ratio'],
                                                   ascending=[0, 0, 0, 1, 1])
@@ -379,11 +384,11 @@ if __name__ == "__main__":
 
                 # top_all=top_all.sort_values(by=['percent','diff','counts','ratio'],ascending=[0,0,1,1])
                 # print rl.format_for_print(top_dif[:10])
-                top_dd= pd.concat([top_dif[:10],top_dif[-5:]],axis=0)
-                top_dd= top_dd.loc[:,['name','buy','diff','volume','percent','ratio','counts','lastp','date']]
+                top_dd = pd.concat([top_dif[:10], top_dif[-5:]], axis=0)
+                top_dd = top_dd.loc[:, ['name', 'buy', 'diff', 'volume', 'percent', 'ratio', 'counts', 'lastp', 'date']]
                 print rl.format_for_print(top_dd)
                 # if cct.get_now_time_int() < 930 or cct.get_now_time_int() > 1505 or (cct.get_now_time_int() > 1125 and cct.get_now_time_int() < 1505):
-                    # print rl.format_for_print(top_dif[-10:])
+                # print rl.format_for_print(top_dif[-10:])
                 # print top_all.loc['000025',:]
                 # print "staus",status
 
@@ -469,7 +474,7 @@ if __name__ == "__main__":
             # if success > 3:
             #     raw_input("Except")
             #     sys.exit(0)
-            st = raw_input("status:[go(g),clear(c),date(dt),quit(q,e),W(w),Wa(a)]:")
+            st = raw_input("status:[go(g),clear(c),d [20150101],quit(q,e),W(w),Wa(a)]:")
             if len(st) == 0:
                 status = False
             elif st == 'g' or st == 'go':
@@ -483,16 +488,18 @@ if __name__ == "__main__":
                 top_all = pd.DataFrame()
                 status = False
             elif st.startswith('d') or st.startswith('dt'):
-                st = raw_input('LowD[20150612]:')
-                parser = parseArgmain()
-                args = parser.parse_args(st.split())
-                if args.dt != None and len(args.dt)>0:
-                    duration_date=args.dt
+                # st = raw_input('LowD[20150612]:')
+                # parser = parseArgmain()
+                # args = parser.parse_args(st.split())
+                # if args.dt != None and len(args.dt) > 0:
+                dt = st.split()[1]
+                if len(dt) > 0:
+                    duration_date = dt
                     top_all = pd.DataFrame()
                     status = False
-                    lastpTDX_DF=''
-                # print ("reload new Duration:%s"%duration_date)
-                
+                    lastpTDX_DF = ''
+                    # print ("reload new Duration:%s"%duration_date)
+
             elif st == 'w' or st == 'a':
                 codew = (top_dd.index).tolist()
                 if st == 'a':

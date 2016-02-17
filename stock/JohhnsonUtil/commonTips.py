@@ -1,18 +1,20 @@
 # -*- encoding: utf-8 -*-
 import datetime
 import os
-import sys
 import platform
 import re
+import sys
 import time
 from compiler.ast import flatten
 from multiprocessing.pool import ThreadPool, cpu_count
 
+import pandas as pd
 import trollius as asyncio
 from trollius.coroutines import From
-import johnson_cons as ct
-import pandas as pd
+
 import LoggerFactory as Log
+import johnson_cons as ct
+
 log = Log.getLogger('commonTipss')
 # log.setLevel(Log.DEBUG)
 
@@ -135,6 +137,19 @@ def is_holiday(date):
     else:
         return True
 
+
+def testdf(df):
+    if df is not None and len(df) > 0:
+        pass
+    else:
+        pass
+
+
+def testdf2(df):
+    if df is not None and not df.empty > 0:
+        pass
+    else:
+        pass
 
 def get_today_duration(datastr):
     today = datetime.date.today()
