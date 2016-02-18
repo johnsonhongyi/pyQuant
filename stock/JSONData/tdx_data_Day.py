@@ -572,7 +572,7 @@ def get_tdx_all_day_LastDF(codeList, type=0, dt=None,ptype='low'):
     if dt is not None and len(str(dt)) != 8:
         dt = get_duration_price_date('999999', dt=dt,ptype=ptype)
         log.info("LastDF:%s" % dt)
-        print dt
+        # print dt
     results = cct.to_mp_run_async(get_tdx_day_to_df_last, codeList, 1, type, dt,ptype)
     # print results
     df = pd.DataFrame(results, columns=ct.TDX_Day_columns)
@@ -596,7 +596,7 @@ def get_tdx_exp_all_LastDF(codeList, dt=None,ptype='low'):
     if len(str(dt)) != 8:
         dt = get_duration_price_date('999999',ptype=ptype,dt=dt)
         log.info("LastDF:%s" % dt)
-        print dt
+        # print dt
     results = cct.to_mp_run_async(get_tdx_exp_low_or_high_price, codeList, dt,ptype)
     # print results
     df = pd.DataFrame(results, columns=ct.TDX_Day_columns)
