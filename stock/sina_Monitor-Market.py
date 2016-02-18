@@ -360,7 +360,7 @@ if __name__ == "__main__":
                     top_dif = top_dif.sort_values(by=['diff', 'volume', 'percent', 'counts', 'ratio'],
                                                   ascending=[0, 0, 0, 1, 1])
                 else:
-                    print "Good Morning!!!"
+                    # print "Good Morning!!!"
                     top_dif = top_dif.sort_values(by=['diff', 'percent', 'ratio'], ascending=[0, 0, 1])
 
                 # top_all=top_all.sort_values(by=['percent','diff','counts','ratio'],ascending=[0,0,1,1])

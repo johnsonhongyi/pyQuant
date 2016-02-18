@@ -48,6 +48,7 @@ def getLogger(name):
         # level    =eval('logging.%s'%(level_s)),
         # format   = now +":" + name + ' LINE %(lineno)-4d  %(levelname)-8s %(message)s',
         # level=logging.DEBUG,
+        # level=logging.INFO,
         format="[%(asctime)s] %(name)s:%(levelname)s: %(message)s",
         datefmt='%m-%d %H:%M',
         filename=log_path,

@@ -205,7 +205,7 @@ def get_linear_model_histogram(code, ptype='f', dtype='d', start=None, end=None)
     # plt.legend([code])
 
     # 将Y-Y_hat股价偏离中枢线的距离单画出一张图显示，对其边界线之间的区域进行均分，大于0的区间为高估，小于0的区间为低估，0为价值中枢线。
-    ax3 = fig.add_subplot(324)
+    ax3 = fig.add_subplot(322)
     # distance = (asset.values.T - Y_hat)
     distance = (asset.values.T-Y_hat)[0]
     if code.startswith('999') or code.startswith('399'):
@@ -285,7 +285,7 @@ def get_linear_model_histogram(code, ptype='f', dtype='d', start=None, end=None)
     plt.legend([code, asset.iat[-1]])
     plt.grid(True)
 
-    ax6 = fig.add_subplot(322)
+    ax6 = fig.add_subplot(324)
     h = df.loc[:, ['open', 'close', 'high', 'low']]
     highp = h['high'].values
     lowp = h['low'].values

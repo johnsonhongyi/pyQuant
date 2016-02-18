@@ -19,8 +19,8 @@ from JohhnsonUtil import commonTips as cct
 from JohhnsonUtil import LoggerFactory as LoggerFactory
 
 
-# from logbook import Logger,StreamHandler,SyslogHandler
 # from logbook import StderrHandler
+# from logbook import Logger,StreamHandler,SyslogHandler
 
 
 def downloadpage(url):
@@ -308,7 +308,6 @@ if __name__ == "__main__":
 
                 top_dif = top_all
                 log.info('dif1:%s' % len(top_dif))
-                log.info(top_dif[:1])
                 top_dif = top_dif[top_dif.buy > top_dif.lastp]
                 top_dif = top_dif[top_dif.buy > top_dif.lhigh]
                 log.debug('dif2:%s' % len(top_dif))
@@ -368,7 +367,7 @@ if __name__ == "__main__":
                     top_dif = top_dif.sort_values(by=['diff', 'volume', 'percent', 'counts', 'ratio'],
                                                   ascending=[0, 0, 0, 1, 1])
                 else:
-                    print "Good Morning!!!"
+                    # print "Good Morning!!!"
                     top_dif = top_dif.sort_values(by=['diff', 'percent', 'ratio'], ascending=[0, 0, 1])
 
                 # top_all=top_all.sort_values(by=['percent','diff','counts','ratio'],ascending=[0,0,1,1])

@@ -196,7 +196,7 @@ if __name__ == "__main__":
     # log.setLevel(LoggerFactory.DEBUG)
 
     # handler=StderrHandler(format_string='{record.channel}: {record.message) [{record.extra[cwd]}]')
-    # log.level=log.debug
+    log.level=log.debug
     # error_handler = SyslogHandler('Sina-M-Log', level='ERROR')
 
     cct.set_console(160, 15)
@@ -207,23 +207,22 @@ if __name__ == "__main__":
     success = 0
     top_all = pd.DataFrame()
     time_s = time.time()
-    # delay_time = 3600
-    delay_time = cct.get_delay_time()
+    delay_time = 720000
+    # delay_time = cct.get_delay_time()
     First = True
     base_path = tdd.get_tdx_dir()
     block_path = tdd.get_tdx_dir_blocknew() + '061.blk'
     status_change = False
     lastpTDX_DF = ''
-    duration_date = 120
+    duration_date = 60
+    ptype='low'
     # all_diffpath = tdd.get_tdx_dir_blocknew() + '062.blk'
     while 1:
         try:
             # df = sina_data.Sina().all
             df = rl.get_sina_Market_json('all')
             top_now = rl.get_market_price_sina_dd_realTime(df, vol, type)
-            # print top_now.loc['300208','name']
             # top_now.to_hdf("testhdf5", 'marketDD', format='table', complevel=9)
-            # df_count = len(df)
             now_count = len(top_now)
             del df
             gc.collect()
@@ -246,8 +245,8 @@ if __name__ == "__main__":
                     top_all = top_now
                     codelist = top_all.index.tolist()
                     log.info('toTDXlist:%s' % len(codelist))
-                    tdxdata = tdd.get_tdx_all_day_LastDF(codelist,dt=duration_date)
-                    # tdxdata = tdd.get_tdx_exp_all_LastDF(codelist, dt=duration_date)
+                    tdxdata = tdd.get_tdx_all_day_LastDF(codelist,dt=duration_date,ptype=ptype)
+                    # tdxdata = tdd.get_tdx_exp_all_LastDF(codelist, dt=duration_date,ptype=ptype)
                     log.debug("TdxLastP: %s %s" % (len(tdxdata), tdxdata.columns.values))
                     tdxdata.rename(columns={'low': 'llow'}, inplace=True)
                     tdxdata.rename(columns={'high': 'lhigh'}, inplace=True)
@@ -275,7 +274,7 @@ if __name__ == "__main__":
                             top_all['prev_p'] = 0
                     for symbol in top_now.index:
                         top_all.loc[symbol, 'buy'] = top_now.loc[symbol, 'buy']
-                        # '''
+                        '''
                         # code = rl._symbol_to_code(symbol)
                         if symbol in top_all.index and top_all.loc[symbol, 'buy'] <> 0:
                             count_n = top_now.loc[symbol, 'buy']
@@ -299,7 +298,7 @@ if __name__ == "__main__":
                                             top_all.loc[symbol, 'lastp'])) / float(top_all.loc[symbol, 'lastp']) * 100),
                                         1)
                                     top_all.loc[symbol, 'diff':'low'] = top_now.loc[symbol, 'diff':'low']
-                                    # '''
+
                                     # top_all=top_all.sort_values(by=['diff','percent','counts'],ascending=[0,0,1])
                                     # top_all=top_all.sort_values(by=['diff','ratio','percent','counts'],ascending=[0,1,0,1])
                                     # top_all = top_all[top_all.open>=top_all.low*0.99]
@@ -315,6 +314,7 @@ if __name__ == "__main__":
                                     # if  cct.get_now_time_int() > 930 and cct.get_now_time_int() < 1505:
                                     # top_all['diffA'] = (
                                     # map(lambda x, y: round((x - y) / y * 100, 1), top_all['buy'].values, top_all['lastp'].values))
+                            '''
                 top_all['diff'] = (
                     map(lambda x, y: round((x - y) / y * 100, 1), top_all['buy'].values, top_all['lastp'].values))
 
@@ -376,10 +376,10 @@ if __name__ == "__main__":
                 # print "Rt:%0.3f" % (float(time.time() - time_Rt))
                 print "Rt:%0.1f dT:%s" % (float(time.time() - time_Rt), cct.get_time_to_date(time_s))
                 if 'counts' in top_dif.columns.values:
-                    top_dif = top_dif.sort_values(by=['diff', 'volume', 'percent', 'counts', 'ratio'],
+                    top_dif = top_dif.sort_values(by=['diff','percent','volume', 'counts','ratio'],
                                                   ascending=[0, 0, 0, 1, 1])
                 else:
-                    print "Good Morning!!!"
+                    # print "Good Morning!!!"
                     top_dif = top_dif.sort_values(by=['diff', 'percent', 'ratio'], ascending=[0, 0, 1])
 
                 # top_all=top_all.sort_values(by=['percent','diff','counts','ratio'],ascending=[0,0,1,1])
@@ -407,21 +407,21 @@ if __name__ == "__main__":
             int_time = cct.get_now_time_int()
             if cct.get_work_time():
                 if int_time < 925:
-                    time.sleep(30)
+                    time.sleep(180)
                 elif int_time < 930:
                     time.sleep((930 - int_time) * 60)
-                    top_all = pd.DataFrame()
+                    # top_all = pd.DataFrame()
                     time_s = time.time()
                 else:
-                    time.sleep(60)
+                    time.sleep(180)
             elif cct.get_work_duration():
                 while 1:
-                    time.sleep(60)
+                    time.sleep(180)
                     if cct.get_work_duration():
                         print ".",
-                        time.sleep(60)
+                        time.sleep(180)
                     else:
-                        top_all = pd.DataFrame()
+                        # top_all = pd.DataFrame()
                         time_s = time.time()
                         print "."
                         break
@@ -466,6 +466,7 @@ if __name__ == "__main__":
                 else:
                     sys.exit(0)
                 '''
+                sys.exit(0)
                 raise KeyboardInterrupt("StopTime.")
         except (KeyboardInterrupt) as e:
             # print "key"
@@ -474,7 +475,7 @@ if __name__ == "__main__":
             # if success > 3:
             #     raw_input("Except")
             #     sys.exit(0)
-            st = raw_input("status:[go(g),clear(c),d [20150101],quit(q,e),W(w),Wa(a)]:")
+            st = raw_input("status:[go(g),clear(c),[d 20150101 low|high],quit(q,e),W(w),Wa(a)]:")
             if len(st) == 0:
                 status = False
             elif st == 'g' or st == 'go':
@@ -492,8 +493,15 @@ if __name__ == "__main__":
                 # parser = parseArgmain()
                 # args = parser.parse_args(st.split())
                 # if args.dt != None and len(args.dt) > 0:
-                dt = st.split()[1]
-                if len(dt) > 0:
+                dl = st.split()
+                if len(dl)==2:
+                    dt=dl[1]
+                elif len(dl) == 3:
+                    dt=dl[1]
+                    ptype=dl[2]
+                else:
+                    dt=''
+                if len(str(dt)) > 0:
                     duration_date = dt
                     top_all = pd.DataFrame()
                     status = False
