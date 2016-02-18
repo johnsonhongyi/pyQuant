@@ -463,10 +463,10 @@ def get_tdx_day_to_df_last(code, dayl=1, type=0, dt=None, ptype='low'):
     elif dayl == 1 and dt is not None:
         log.info("dt:%s" % (dt))
         dt_list = []
-        if len(str(dt)) == 8:
-            dt = cct.day8_to_day10(dt)
-        else:
-            dt=get_duration_price_date(code, ptype=ptype, dt=dt)
+        # if len(str(dt)) == 8:
+            # dt = cct.day8_to_day10(dt)
+        # else:
+            # dt=get_duration_price_date(code, ptype=ptype, dt=dt)
             # print ("dt:%s"%dt)
         fileSize = os.path.getsize(file_path)
         if fileSize < 32: print "why", code
