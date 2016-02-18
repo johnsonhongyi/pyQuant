@@ -245,8 +245,8 @@ if __name__ == "__main__":
                     top_all = top_now
                     codelist = top_all.index.tolist()
                     log.info('toTDXlist:%s' % len(codelist))
-                    tdxdata = tdd.get_tdx_all_day_LastDF(codelist,dt=duration_date,ptype=ptype)
-                    # tdxdata = tdd.get_tdx_exp_all_LastDF(codelist, dt=duration_date,ptype=ptype)
+                    # tdxdata = tdd.get_tdx_all_day_LastDF(codelist,dt=duration_date,ptype=ptype)
+                    tdxdata = tdd.get_tdx_exp_all_LastDF(codelist, dt=duration_date, ptype=ptype)
                     log.debug("TdxLastP: %s %s" % (len(tdxdata), tdxdata.columns.values))
                     tdxdata.rename(columns={'low': 'llow'}, inplace=True)
                     tdxdata.rename(columns={'high': 'lhigh'}, inplace=True)
@@ -466,7 +466,7 @@ if __name__ == "__main__":
                 else:
                     sys.exit(0)
                 '''
-                sys.exit(0)
+                # sys.exit(0)
                 raise KeyboardInterrupt("StopTime.")
         except (KeyboardInterrupt) as e:
             # print "key"
