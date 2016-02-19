@@ -214,7 +214,7 @@ if __name__ == "__main__":
     block_path = tdd.get_tdx_dir_blocknew() + '061.blk'
     status_change = False
     lastpTDX_DF = ''
-    duration_date = 20160128
+    duration_date = 20160101
     ptype='low'
     # all_diffpath = tdd.get_tdx_dir_blocknew() + '062.blk'
     while 1:

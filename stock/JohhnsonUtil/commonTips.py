@@ -36,7 +36,7 @@ def set_console(width=80, height=15, color=3):
 
 
 def get_delay_time():
-    delay_time = 7200
+    delay_time = 8000
     return delay_time
 
 
