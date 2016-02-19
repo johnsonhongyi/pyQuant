@@ -132,7 +132,7 @@ if __name__ == "__main__":
                             top_all['counts'] = 0
                             top_all['prev_p'] = 0
                     for symbol in top_now.index:
-                        if symbol in top_all.index and top_all.loc[symbol, 'buy'] != 0:
+                        if symbol in top_all.index and top_now.loc[symbol, 'buy'] != 0:
                             # if top_all.loc[symbol,'diff'] == 0:
                             if status_change and 'counts' in top_now.columns.values:
                                 # top_now.loc[symbol,'lastp']=top_all.loc[symbol,'lastp']
@@ -267,6 +267,7 @@ if __name__ == "__main__":
                             kind = sl.get_multiday_ave_compare_silent(code)
                 elif st == 'clear' or st == 'c':
                     top_all = pd.DataFrame()
+                    time_s = time.time()
                     status = False
                 elif st == 'w' or st == 'a':
                     codew = (top_dif.index).tolist()

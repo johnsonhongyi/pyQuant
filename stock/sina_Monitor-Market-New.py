@@ -159,7 +159,7 @@ if __name__ == "__main__":
     # parsehtml(downloadpage(url_s))
     # StreamHandler(sys.stdout).push_application()
     log = LoggerFactory.getLogger('SinaMarketNew')
-    # log.setLevel(LoggerFactory.DEBUG)
+    log.setLevel(LoggerFactory.DEBUG)
 
     # handler=StderrHandler(format_string='{record.channel}: {record.message) [{record.extra[cwd]}]')
     # log.level=log.debug
@@ -250,7 +250,7 @@ if __name__ == "__main__":
                             top_all['prev_p'] = 0
                     for symbol in top_now.index:
                         # code = rl._symbol_to_code(symbol)
-                        if symbol in top_all.index and top_all.loc[symbol, 'buy'] <> 0:
+                        if symbol in top_all.index and top_now.loc[symbol, 'buy'] <> 0:
                             # if top_all.loc[symbol,'diff'] == 0:
                             # print "code:",symbol
                             count_n = top_now.loc[symbol, 'buy']
@@ -424,6 +424,7 @@ if __name__ == "__main__":
                             kind = sl.get_multiday_ave_compare_silent(code)
                 elif st == 'clear' or st == 'c':
                     top_all = pd.DataFrame()
+                    time_s = time.time()
                     status = False
                 elif st == 'w' or st == 'a':
                     codew = (top_dif.index).tolist()

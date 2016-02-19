@@ -214,7 +214,7 @@ if __name__ == "__main__":
     block_path = tdd.get_tdx_dir_blocknew() + '061.blk'
     status_change = False
     lastpTDX_DF = ''
-    duration_date = 60
+    duration_date = 20160128
     ptype='low'
     # all_diffpath = tdd.get_tdx_dir_blocknew() + '062.blk'
     while 1:
@@ -273,7 +273,15 @@ if __name__ == "__main__":
                             top_all['counts'] = 0
                             top_all['prev_p'] = 0
                     for symbol in top_now.index:
-                        top_all.loc[symbol, 'buy'] = top_now.loc[symbol, 'buy']
+                        if 'counts' in top_now.columns.values:
+                            top_all.loc[symbol, 'buy':'prev_p'] = top_now.loc[symbol, 'buy':'prev_p']
+                        else:
+                            # top_now.loc[symbol, 'diff'] = round(
+                                # ((float(top_now.loc[symbol, 'buy']) - float(
+                                    # top_all.loc[symbol, 'lastp'])) / float(top_all.loc[symbol, 'lastp']) * 100),
+                                # 1)
+                            top_all.loc[symbol, 'buy':'low'] = top_now.loc[symbol, 'buy':'low']
+                        # top_all.loc[symbol, 'buy'] = top_now.loc[symbol, 'buy']
                         '''
                         # code = rl._symbol_to_code(symbol)
                         if symbol in top_all.index and top_all.loc[symbol, 'buy'] <> 0:
@@ -315,10 +323,15 @@ if __name__ == "__main__":
                                     # top_all['diffA'] = (
                                     # map(lambda x, y: round((x - y) / y * 100, 1), top_all['buy'].values, top_all['lastp'].values))
                             '''
+                top_all=top_all[top_all.buy > 0]
+                
                 top_all['diff'] = (
                     map(lambda x, y: round((x - y) / y * 100, 1), top_all['buy'].values, top_all['lastp'].values))
 
                 top_dif = top_all
+                # top_temp = top_dif.sort_values(by=['diff'], ascending=[0])
+                # top_temp = top_dif[-5:]
+                
                 log.info('dif1:%s' % len(top_dif))
                 log.info(top_dif[:1])
                 top_dif = top_dif[top_dif.buy > top_dif.lastp]
@@ -384,8 +397,9 @@ if __name__ == "__main__":
 
                 # top_all=top_all.sort_values(by=['percent','diff','counts','ratio'],ascending=[0,0,1,1])
                 # print rl.format_for_print(top_dif[:10])
-                top_dd = pd.concat([top_dif[:10], top_dif[-5:]], axis=0)
-                top_dd = top_dd.loc[:, ['name', 'buy', 'diff', 'volume', 'percent', 'ratio', 'counts', 'lastp', 'date']]
+                # top_dd = pd.concat([top_dif[:5],top_temp[:3],top_dif[-3:],top_temp[-3:]], axis=0)
+                top_dd = pd.concat([top_dif[:10],top_dif[-5:]], axis=0)
+                top_dd = top_dd.loc[:, ['name', 'buy', 'diff', 'volume', 'percent', 'ratio', 'counts','high','lastp', 'date']]
                 print rl.format_for_print(top_dd)
                 # if cct.get_now_time_int() < 930 or cct.get_now_time_int() > 1505 or (cct.get_now_time_int() > 1125 and cct.get_now_time_int() < 1505):
                 # print rl.format_for_print(top_dif[-10:])
@@ -487,6 +501,7 @@ if __name__ == "__main__":
                         kind = sl.get_multiday_ave_compare_silent(code)
             elif st == 'clear' or st == 'c':
                 top_all = pd.DataFrame()
+                time_s = time.time()
                 status = False
             elif st.startswith('d') or st.startswith('dt'):
                 # st = raw_input('LowD[20150612]:')
@@ -504,6 +519,7 @@ if __name__ == "__main__":
                 if len(str(dt)) > 0:
                     duration_date = dt
                     top_all = pd.DataFrame()
+                    time_s = time.time()
                     status = False
                     lastpTDX_DF = ''
                     # print ("reload new Duration:%s"%duration_date)
