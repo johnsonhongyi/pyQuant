@@ -7,6 +7,7 @@ import sys
 import time
 import traceback
 import urllib2
+
 import pandas as pd
 from bs4 import BeautifulSoup
 from pandas import DataFrame
@@ -182,6 +183,7 @@ if __name__ == "__main__":
         try:
             df = rl.get_sina_Market_json('all')
             top_now = rl.get_market_price_sina_dd_realTime(df, vol, type)
+            # print top_now.loc['601900',:]
             df_count = len(df)
             now_count = len(top_now)
             del df
@@ -204,6 +206,7 @@ if __name__ == "__main__":
                 # if len(top_now) > 10 or len(top_now[:10][top_now[:10]['buy'] > 0]) > 3:
                 # if len(top_now) > 10 and not top_now[:1].buy.values == 0:
                 #     top_now=top_now[top_now['percent']>=0]
+                time_Rt = time.time()
                 if len(top_all) == 0:
                     top_all = top_now
                     # top_all['llow'] = 0
@@ -212,6 +215,7 @@ if __name__ == "__main__":
                     codelist = top_all.index.tolist()
                     log.info('toTDXlist:%s' % len(codelist))
                     tdxdata = tdd.get_tdx_all_day_LastDF(codelist)
+                    # tdxdata = tdd.get_tdx_exp_all_LastDF(codelist)
                     log.debug("TdxLastP: %s %s" % (len(tdxdata), tdxdata.columns.values))
                     tdxdata.rename(columns={'low': 'llow'}, inplace=True)
                     tdxdata.rename(columns={'high': 'lhigh'}, inplace=True)
@@ -225,6 +229,7 @@ if __name__ == "__main__":
                     top_all = top_all.merge(tdxdata, left_index=True, right_index=True, how='left')
                     log.info('Top-merge_now:%s' % (top_all[:1]))
                     top_all = top_all[top_all['llow'] > 0]
+                    time_Rt = time.time()
 
                     # if len(top_all[:5][top_all[:5]['volume'] > 0]) > 3:
                     #
@@ -433,7 +438,7 @@ if __name__ == "__main__":
                     sys.exit(0)
         except (KeyboardInterrupt) as e:
             # print "key"
-            print "KeyboardInterrupt:", e
+            # print "KeyboardInterrupt:", e
             # time.sleep(1)
             # if success > 3:
             #     raw_input("Except")

@@ -32,7 +32,11 @@ def set_console(width=80, height=15, color=3):
     # os.system('color %s'%color)
     pass
 
-# @property
+
+def timeit_time(cmd, num=5):
+    import timeit
+    time_it = timeit.timeit(lambda: cmd, number=num)
+    print ("timeit:%s" % time_it)
 
 
 def get_delay_time():
@@ -69,10 +73,9 @@ def get_today(sep='-'):
     today = TODAY.strftime(fstr)
     return today
 
+    # from dateutil import rrule
 
-# from dateutil import rrule
-
-# def workdays(start, end, holidays=0, days_off=None):
+    # def workdays(start, end, holidays=0, days_off=None):
     # start=datetime.datetime.strptime(start,'%Y-%m-%d')
     # end=datetime.datetime.strptime(end,'%Y-%m-%d')
     # if days_off is None:
@@ -100,7 +103,7 @@ def last_tddate(days=0):
     else:
         lasd = today
         log.debug("1-5:%s" % lasd)
-    # if days==0:
+        # if days==0:
         # return str(lasd)
     oday = lasd - datetime.timedelta(days)
     day_n = int(oday.strftime("%w"))
@@ -112,6 +115,7 @@ def last_tddate(days=0):
         return str(datetime.datetime.today().date() + datetime.timedelta(-1))
     else:
         return str(oday)
+
 
 # def is_holiday(date):
 #     if isinstance(date, str):
@@ -150,6 +154,7 @@ def testdf2(df):
         pass
     else:
         pass
+
 
 def get_today_duration(datastr):
     today = datetime.date.today()
@@ -357,8 +362,9 @@ def f_print(lens, datastr):
     data = ('{0:%s}' % (lens)).format(str(datastr))
     return data
 
-def read_last_lines(filename, lines = 1):
-    #print the last line(s) of a text file
+
+def read_last_lines(filename, lines=1):
+    # print the last line(s) of a text file
     """
     Argument filename is the name of the file to print.
     Argument lines is the number of lines to print from last.
@@ -369,28 +375,29 @@ def read_last_lines(filename, lines = 1):
     start = 0
     fsock = file(filename, 'rU')
     try:
-        #seek to end
+        # seek to end
         fsock.seek(0, 2)
-        #get seek position
+        # get seek position
         curpos = fsock.tell()
         # print curpos
-        while(curpos > 0): #while not BOF
-            #seek ahead block_size+the length of last read block
+        while (curpos > 0):  # while not BOF
+            # seek ahead block_size+the length of last read block
             curpos -= (block_size + len(block));
             if curpos < 0: curpos = 0
             fsock.seek(curpos)
-            #read to end
+            # read to end
             block = fsock.read()
             nl_count = block.count('\n')
-            #if read enough(more)
+            # if read enough(more)
             if nl_count >= lines: break
-        #get the exact start position
-        for n in range(nl_count-lines+1):
-            start = block.find('\n', start)+1
-    finally:       
+        # get the exact start position
+        for n in range(nl_count - lines + 1):
+            start = block.find('\n', start) + 1
+    finally:
         fsock.close()
     return block[start:]
-    
+
+
 def _write_to_csv(df, filename, indexCode='code'):
     TODAY = datetime.date.today()
     CURRENTDAY = TODAY.strftime('%Y-%m-%d')
@@ -416,16 +423,18 @@ def code_to_tdxblk(code):
         else:
             return '1%s' % code if code[:1] in ['5', '6'] else '0%s' % code
 
+
 def code_to_index(code):
     if not code.startswith('999') or not code.startswith('399'):
-        if code[:1] in ['5', '6','9']:
-            code2='999999'
+        if code[:1] in ['5', '6', '9']:
+            code2 = '999999'
         elif code[:1] in ['3']:
-            code2='399006'
+            code2 = '399006'
         else:
-            code2='399001'
+            code2 = '399001'
     return code2
-    
+
+
 def code_to_symbol(code):
     """
         生成symbol代码标志
@@ -476,7 +485,7 @@ def write_to_blocknew(p_name, data, append=True):
         for i in index_list:
             raw = (i) + '\r\n'
             fout.write(raw)
-            
+
     # x=0
     for i in data:
         # print type(i)

@@ -3,12 +3,13 @@
 from __future__ import division
 
 import os
+import sys
 import time
 from struct import *
+
 import numpy as np
 import pandas as pd
 from pandas import Series
-import sys
 sys.path.append("..")
 from JSONData import realdatajson as rl
 from JohhnsonUtil import LoggerFactory
@@ -104,7 +105,7 @@ def get_tdx_Exp_day_to_df(code, type='f', start=None, end=None, dt=None, dl=None
         log.error("file_path:not exists")
         return ds
     # ofile = open(file_path, 'rb')
-    if dt is None:
+    if dt is None and dl is None:
         ofile = open(file_path, 'rb')
         buf = ofile.readlines()
         ofile.close()
@@ -143,6 +144,45 @@ def get_tdx_Exp_day_to_df(code, type='f', start=None, end=None, dt=None, dl=None
         elif start is not None:
             df = df[df.date >= start]
         df = df.set_index('date')
+        return df
+    elif int(dl) == 1:
+        # fileSize = os.path.getsize(file_path)
+        # if fileSize < 60 * newstockdayl:
+        #     return Series()
+        data = cct.read_last_lines(file_path, int(dl) + 2)
+        data_l = data.split('\n')
+        dt_list = Series()
+        data_l.reverse()
+        for line in data_l:
+            a = line.split(',')
+            # 01/15/2016,27.57,28.15,26.30,26.97,714833.15,1946604544.000
+            # da=a[0].split('/')
+            if len(a) > 5:
+                tdate = a[0]
+                # tdate = str(a[0])[:4] + '-' + str(a[0])[4:6] + '-' + str(a[0])[6:8]
+                # tdate=dt.strftime('%Y-%m-%d')
+                topen = float(a[1])
+                thigh = float(a[2])
+                tlow = float(a[3])
+                tclose = float(a[4])
+                # tvol = round(float(a[5]) / 10, 2)
+                tvol = float(a[5])
+                amount = round(float(a[6].replace('\r\n', '')), 1)  # int
+                # tpre = int(a[7])  # back
+                if int(amount) == 0:
+                    continue
+                dt_list = Series(
+                    {'code': code, 'date': tdate, 'open': topen, 'high': thigh, 'low': tlow, 'close': tclose,
+                     'amount': amount,
+                     'vol': tvol})
+            else:
+                continue
+                # if dt is not None and tdate < dt:
+                #     break
+        # df = pd.DataFrame(dt_list, columns=ct.TDX_Day_columns)
+        # df = df.set_index('date')
+        return dt_list
+
     else:
         fileSize = os.path.getsize(file_path)
         if fileSize < 60 * newstockdayl:
@@ -186,7 +226,7 @@ def get_tdx_Exp_day_to_df(code, type='f', start=None, end=None, dt=None, dl=None
         #     df = df[df.date >= start]
         df = df.set_index('date')
         # print "time:",(time.time()-time_s)*1000
-    return df
+        return df
 
 
 INDEX_LIST = {'sh': 'sh000001', 'sz': 'sz399001', 'hs300': 'sz399300',
@@ -418,49 +458,49 @@ def get_tdx_exp_low_or_high_price(code, dt=None, ptype='low', dl=None):
     :return:Series or df
     '''
     # dt = cct.day8_to_day10(dt)
-    df = get_tdx_Exp_day_to_df(code, dt=dt, dl=dl).sort_index(ascending=False)
-    # if df is not None and df.empty:
-    #     dd = Series(
-    #         {'code': code, 'date': cct.get_today(), 'open': 0, 'high': 0, 'low': 0, 'close': 0, 'amount': 0,
-    #          'vol': 0})
-    #     return dd
-    if df is not None and not df.empty:
-        if len(str(dt)) == 10:
-            dz = df[df.index >= dt]
-            if dz.empty:
-                dd = Series(
-                    {'code': code, 'date': cct.get_today(), 'open': 0, 'high': 0, 'low': 0, 'close': 0, 'amount': 0,
-                     'vol': 0})
-                return dd
-        else:
-            if len(df) > int(dt):
-                dz = df[:int(dt)]
+    if dt is not None and dl is not None:
+        df = get_tdx_Exp_day_to_df(code, dt=dt, dl=dl).sort_index(ascending=False)
+        if df is not None and not df.empty:
+            if len(str(dt)) == 10:
+                dz = df[df.index >= dt]
+                if dz.empty:
+                    dd = Series(
+                        {'code': code, 'date': cct.get_today(), 'open': 0, 'high': 0, 'low': 0, 'close': 0, 'amount': 0,
+                         'vol': 0})
+                    return dd
             else:
-                dz = df
+                if len(df) > int(dt):
+                    dz = df[:int(dt)]
+                else:
+                    dz = df
 
-        if ptype == 'high':
-            lowp = dz.close.max()
-            lowdate = dz[dz.close == lowp].index.values[0]
-            log.debug("high:%s"%lowdate)
+            if ptype == 'high':
+                lowp = dz.close.max()
+                lowdate = dz[dz.close == lowp].index.values[0]
+                log.debug("high:%s" % lowdate)
+            else:
+                lowp = dz.close.min()
+                lowdate = dz[dz.close == lowp].index.values[0]
+                log.debug("low:%s" % lowdate)
+            log.debug("date:%s %s:%s" % (lowdate, ptype, lowp))
+            # log.debug("date:%s %s:%s" % (dt, ptype, lowp))
+            dd = df[df.index == lowdate]
+            if len(dd) > 0:
+                dd = dd[:1]
+                dt = dd.index.values[0]
+                dd = dd.T[dt]
+                dd['date'] = dt
         else:
-            lowp = dz.close.min()
-            lowdate = dz[dz.close == lowp].index.values[0]
-            log.debug("low:%s"%lowdate)
-        log.debug("date:%s %s:%s" % (lowdate, ptype, lowp))
-        # log.debug("date:%s %s:%s" % (dt, ptype, lowp))
-        dd = df[df.index == lowdate]
-        if len(dd) > 0:
-            dd = dd[:1]
-            dt = dd.index.values[0]
-            dd = dd.T[dt]
-            dd['date'] = dt
+            log.warning("code:%s no < dt:NULL" % (code))
+            dd = Series()
+            # dd = Series(
+            #     {'code': code, 'date': cct.get_today(), 'open': 0, 'high': 0, 'low': 0, 'close': 0, 'amount': 0,
+            #      'vol': 0})
+        return dd
     else:
-        log.warning("code:%s no < dt:NULL"%(code))
-        dd = Series()
-        # dd = Series(
-        #     {'code': code, 'date': cct.get_today(), 'open': 0, 'high': 0, 'low': 0, 'close': 0, 'amount': 0,
-        #      'vol': 0})
-    return dd
+        dd = get_tdx_Exp_day_to_df(code, dl=1)
+
+        return dd
 
 
 def get_tdx_day_to_df_last(code, dayl=1, type=0, dt=None, ptype='low'):
@@ -648,8 +688,8 @@ def get_tdx_all_day_LastDF(codeList, type=0, dt=None,ptype='low'):
     # df.vol = df.vol.apply(lambda x: x / 100)
     log.info("get_to_mp:%s" % (len(df)))
     log.info("TDXTime:%s" % (time.time() - time_t))
-    if dt != None:
-        print ("TDX:%0.2f" % (time.time() - time_t)),
+    # if dt != None:
+    print ("TDX:%0.2f" % (time.time() - time_t)),
     return df
 
 
@@ -680,7 +720,8 @@ def get_tdx_exp_all_LastDF(codeList, dt=None,ptype='low'):
             # results.append(get_tdx_exp_low_or_high_price(code, dt, ptype, dl))
         
     else:
-        results = cct.to_mp_run_async(get_tdx_exp_low_or_high_price, codeList)
+        # results = cct.to_mp_run_async(get_tdx_exp_low_or_high_price,codeList)
+        results = cct.to_mp_run_async(get_tdx_Exp_day_to_df, codeList, 'f', None, None, None, 1)
 
     # print results
     df = pd.DataFrame(results, columns=ct.TDX_Day_columns)
@@ -689,8 +730,8 @@ def get_tdx_exp_all_LastDF(codeList, dt=None,ptype='low'):
     # df.vol = df.vol.apply(lambda x: x / 100)
     log.info("get_to_mp:%s" % (len(df)))
     log.info("TDXTime:%s" % (time.time() - time_t))
-    if dt != None:
-        print ("TDXE:%0.2f" % (time.time() - time_t)),
+    # if dt != None:
+    print ("TDXE:%0.2f" % (time.time() - time_t)),
     return df
 
 
@@ -828,12 +869,14 @@ if __name__ == '__main__':
     # df = get_tdx_Exp_day_to_df('999999')
 
     # df = get_tdx_exp_all_LastDF( ['999999', '603377','603377'], dt=30,ptype='high')
+    df = get_tdx_exp_all_LastDF(['999999', '603377', '603377'])
+    print df
     # tdxdata = get_tdx_all_day_LastDF(['999999', '603377','603377'], dt=30,ptype='high')
     # print get_tdx_Exp_day_to_df('999999').sort_index(ascending=False)[:1]
 
     # tdxdata = get_tdx_exp_all_LastDF(['999999', '601998', '300499'], dt=20120101, ptype='high')
 
-    main_test()
+    # main_test()
     sys.exit()
     
     # df = get_tdx_day_to_df_last('999999', dt=30,ptype='high')

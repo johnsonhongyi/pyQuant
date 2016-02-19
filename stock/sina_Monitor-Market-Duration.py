@@ -196,7 +196,7 @@ if __name__ == "__main__":
     # log.setLevel(LoggerFactory.DEBUG)
 
     # handler=StderrHandler(format_string='{record.channel}: {record.message) [{record.extra[cwd]}]')
-    log.level=log.debug
+    log.level = log.debug
     # error_handler = SyslogHandler('Sina-M-Log', level='ERROR')
 
     cct.set_console(160, 15)
@@ -215,20 +215,21 @@ if __name__ == "__main__":
     status_change = False
     lastpTDX_DF = ''
     duration_date = 20160101
-    ptype='low'
+    ptype = 'low'
     # all_diffpath = tdd.get_tdx_dir_blocknew() + '062.blk'
     while 1:
         try:
             # df = sina_data.Sina().all
             df = rl.get_sina_Market_json('all')
             top_now = rl.get_market_price_sina_dd_realTime(df, vol, type)
+            top_dif = top_now
             # top_now.to_hdf("testhdf5", 'marketDD', format='table', complevel=9)
             now_count = len(top_now)
             del df
             gc.collect()
             radio_t = cct.get_work_time_ratio()
-            time_Rt = time.time()
             # top_now = top_now[top_now.buy > 0]
+            time_Rt = time.time()
             time_d = time.time()
             if time_d - time_s > delay_time:
                 status_change = True
@@ -241,6 +242,7 @@ if __name__ == "__main__":
                 # if len(top_now) > 10 and len(top_now[:20][top_now[:20]['buy'] > 0]) > 3:
                 # if len(top_now) > 10 and not top_now[:1].buy.values == 0:
                 #     top_now=top_now[top_now['percent']>=0]
+                time_Rt = time.time()
                 if len(top_all) == 0 and len(lastpTDX_DF) == 0:
                     top_all = top_now
                     codelist = top_all.index.tolist()
@@ -258,6 +260,7 @@ if __name__ == "__main__":
                     lastpTDX_DF = tdxdata
                     log.info('Top-merge_now:%s' % (top_all[:1]))
                     top_all = top_all[top_all['llow'] > 0]
+                    time_Rt = time.time()
 
 
                 elif len(top_all) == 0 and len(lastpTDX_DF) > 0:
@@ -277,9 +280,9 @@ if __name__ == "__main__":
                             top_all.loc[symbol, 'buy':'prev_p'] = top_now.loc[symbol, 'buy':'prev_p']
                         else:
                             # top_now.loc[symbol, 'diff'] = round(
-                                # ((float(top_now.loc[symbol, 'buy']) - float(
-                                    # top_all.loc[symbol, 'lastp'])) / float(top_all.loc[symbol, 'lastp']) * 100),
-                                # 1)
+                            # ((float(top_now.loc[symbol, 'buy']) - float(
+                            # top_all.loc[symbol, 'lastp'])) / float(top_all.loc[symbol, 'lastp']) * 100),
+                            # 1)
                             top_all.loc[symbol, 'buy':'low'] = top_now.loc[symbol, 'buy':'low']
                         # top_all.loc[symbol, 'buy'] = top_now.loc[symbol, 'buy']
                         '''
@@ -323,49 +326,45 @@ if __name__ == "__main__":
                                     # top_all['diffA'] = (
                                     # map(lambda x, y: round((x - y) / y * 100, 1), top_all['buy'].values, top_all['lastp'].values))
                             '''
-                top_all=top_all[top_all.buy > 0]
-                
+                top_all = top_all[top_all.buy > 0]
+
                 top_all['diff'] = (
                     map(lambda x, y: round((x - y) / y * 100, 1), top_all['buy'].values, top_all['lastp'].values))
 
                 top_dif = top_all
                 # top_temp = top_dif.sort_values(by=['diff'], ascending=[0])
                 # top_temp = top_dif[-5:]
-                
+
                 log.info('dif1:%s' % len(top_dif))
                 log.info(top_dif[:1])
-                top_dif = top_dif[top_dif.buy > top_dif.lastp]
-                top_dif = top_dif[top_dif.buy > top_dif.lhigh]
-                log.debug('dif2:%s' % len(top_dif))
-                # log.debug('dif2:%s' % top_dif[:1])
-                # log
+                # top_dif = top_dif[top_dif.buy > top_dif.lastp]
+                # top_dif = top_dif[top_dif.buy > top_dif.lhigh]
+                # log.debug('dif2:%s' % len(top_dif))
 
-                # if top_dif[:1].llow.values <> 0:
                 if len(top_dif[:5][top_dif[:5]['low'] > 0]) > 3:
-                    log.debug('diff2-0-low>0')
-                    top_dif = top_dif[top_dif.low >= top_dif.llow]
-                    log.debug('diff2-1:%s' % len(top_dif))
-
-                    top_dif = top_dif[top_dif.low >= top_dif.lastp]
-                    log.debug('dif3 low<>0 :%s' % len(top_dif))
-
-                    top_dif = top_dif[top_dif.open >= top_dif.lastp]
-
-                    log.debug('dif4 open>lastp:%s' % len(top_dif))
-                    log.debug('dif4-2:%s' % top_dif[:1])
-
-                    top_dif = top_dif[top_dif.low >= top_dif.lhigh]
-
-                    log.debug("dif5-0-low>lhigh>0:%s" % len(top_dif))
-
-                    top_dif = top_dif[top_dif.percent >= 0]
-                    log.debug("dif5-percent>0:%s" % len(top_dif))
-
+                    # log.debug('diff2-0-low>0')
+                    # top_dif = top_dif[top_dif.low >= top_dif.llow]
+                    # log.debug('diff2-1:%s' % len(top_dif))
+                    #
+                    # top_dif = top_dif[top_dif.low >= top_dif.lastp]
+                    # log.debug('dif3 low<>0 :%s' % len(top_dif))
+                    #
+                    # top_dif = top_dif[top_dif.open >= top_dif.lastp]
+                    #
+                    # log.debug('dif4 open>lastp:%s' % len(top_dif))
+                    # log.debug('dif4-2:%s' % top_dif[:1])
+                    #
+                    # top_dif = top_dif[top_dif.low >= top_dif.lhigh]
+                    #
+                    # log.debug("dif5-0-low>lhigh>0:%s" % len(top_dif))
+                    #
                     # top_dif = top_dif[top_dif.percent >= 0]
+                    # log.debug("dif5-percent>0:%s" % len(top_dif))
+
                     # if len(top_dif[:5][top_dif[:5]['volume'] > 0]) > 3:
-                    log.debug("Second:vol/vol/:%s" % radio_t)
+                    # log.debug("Second:vol/vol/:%s" % radio_t)
                     # top_dif['volume'] = top_dif['volume'].apply(lambda x: round(x / radio_t, 1))
-                    log.debug("top_diff:vol")
+                    # log.debug("top_diff:vol")
                     top_dif['volume'] = (
                         map(lambda x, y: round(x / y / radio_t, 1), top_dif['volume'].values, top_dif['lvol'].values))
                     # top_dif = top_dif[top_dif.volume > 1]
@@ -379,27 +378,33 @@ if __name__ == "__main__":
                 # top_dif = top_dif[top_dif.buy >= top_dif.open*0.99]
                 # log.debug('dif5 buy>open:%s'%len(top_dif))
                 # top_dif = top_dif[top_dif.trade >= top_dif.buy]
-
                 # df['volume']= df['volume'].apply(lambda x:x/100)
 
-
+                goldstock = len(top_dif[top_dif.buy >= top_dif.high * 0.99])
+                # goldstock=len(top_dif[top_dif.buy >(top_dif.high-top_dif.low)/2])
                 print ("N:%s K:%s %s G:%s" % (
                     now_count, len(top_all[top_all['buy'] > 0]),
-                    len(top_now[top_now['volume'] <= 0]), len(top_dif))),
-                # print "Rt:%0.3f" % (float(time.time() - time_Rt))
+                    len(top_now[top_now['volume'] <= 0]), goldstock)),
                 print "Rt:%0.1f dT:%s" % (float(time.time() - time_Rt), cct.get_time_to_date(time_s))
-                if 'counts' in top_dif.columns.values:
-                    top_dif = top_dif.sort_values(by=['diff','percent','volume', 'counts','ratio'],
-                                                  ascending=[0, 0, 0, 1, 1])
+                if ptype == 'low':
+                    if 'counts' in top_dif.columns.values:
+                        top_dif = top_dif.sort_values(by=['diff', 'percent', 'volume', 'counts', 'ratio'],
+                                                      ascending=[0, 0, 0, 1, 1])
+                    else:
+                        top_dif = top_dif.sort_values(by=['diff', 'percent', 'ratio'], ascending=[0, 0, 1])
                 else:
-                    # print "Good Morning!!!"
-                    top_dif = top_dif.sort_values(by=['diff', 'percent', 'ratio'], ascending=[0, 0, 1])
+                    if 'counts' in top_dif.columns.values:
+                        top_dif = top_dif.sort_values(by=['diff', 'percent', 'volume', 'counts', 'ratio'],
+                                                      ascending=[1, 0, 0, 1, 1])
+                    else:
+                        top_dif = top_dif.sort_values(by=['diff', 'percent', 'ratio'], ascending=[1, 0, 1])
 
                 # top_all=top_all.sort_values(by=['percent','diff','counts','ratio'],ascending=[0,0,1,1])
                 # print rl.format_for_print(top_dif[:10])
                 # top_dd = pd.concat([top_dif[:5],top_temp[:3],top_dif[-3:],top_temp[-3:]], axis=0)
-                top_dd = pd.concat([top_dif[:10],top_dif[-5:]], axis=0)
-                top_dd = top_dd.loc[:, ['name', 'buy', 'diff', 'volume', 'percent', 'ratio', 'counts','high','lastp', 'date']]
+                top_dd = pd.concat([top_dif[:10], top_dif[-5:]], axis=0)
+                top_dd = top_dd.loc[:,
+                         ['name', 'buy', 'diff', 'volume', 'percent', 'ratio', 'counts', 'high', 'lastp', 'date']]
                 print rl.format_for_print(top_dd)
                 # if cct.get_now_time_int() < 930 or cct.get_now_time_int() > 1505 or (cct.get_now_time_int() > 1125 and cct.get_now_time_int() < 1505):
                 # print rl.format_for_print(top_dif[-10:])
@@ -481,10 +486,10 @@ if __name__ == "__main__":
                     sys.exit(0)
                 '''
                 # sys.exit(0)
-                raise KeyboardInterrupt("StopTime.")
+                raise KeyboardInterrupt("StopTime")
         except (KeyboardInterrupt) as e:
             # print "key"
-            print "KeyboardInterrupt:", e
+            # print "KeyboardInterrupt:", e
             # time.sleep(1)
             # if success > 3:
             #     raw_input("Except")
@@ -509,13 +514,13 @@ if __name__ == "__main__":
                 # args = parser.parse_args(st.split())
                 # if args.dt != None and len(args.dt) > 0:
                 dl = st.split()
-                if len(dl)==2:
-                    dt=dl[1]
+                if len(dl) == 2:
+                    dt = dl[1]
                 elif len(dl) == 3:
-                    dt=dl[1]
-                    ptype=dl[2]
+                    dt = dl[1]
+                    ptype = dl[2]
                 else:
-                    dt=''
+                    dt = ''
                 if len(str(dt)) > 0:
                     duration_date = dt
                     top_all = pd.DataFrame()
