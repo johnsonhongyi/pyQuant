@@ -7,6 +7,7 @@ import sys
 import time
 import traceback
 import urllib2
+
 import pandas as pd
 from bs4 import BeautifulSoup
 # from pandas import DataFrame
@@ -59,7 +60,10 @@ if __name__ == "__main__":
     # log=LoggerFactory.JohnsonLoger('SinaMarket').setLevel(LoggerFactory.DEBUG)
     # log.setLevel(LoggerFactory.DEBUG)
 
-    cct.set_console(130, 15)
+    if cct.isMac():
+        cct.set_console(165, 16)
+    else:
+        cct.set_console(130, 15)
     status = False
     vol = '0'
     type = '2'

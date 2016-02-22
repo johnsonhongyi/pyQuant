@@ -3,6 +3,7 @@ import datetime
 import sys
 import time
 import types
+
 import pandas as pd
 import tushare as ts
 # print sys.path
@@ -285,6 +286,9 @@ def get_hot_countNew(changepercent,rzrq):
             zlr = float(ff['zlr'])
             zzb = float(ff['zzb'])
             # zt=str(ff['time'])
+            # modfprint=lambda x:f_print(4,x) if x>0 else "-%s"%(f_print(4,str(x).replace('-','')))
+            # print modfprint(zlr)
+            # print (u"流入: %s亿 比: %s%%" % (modfprint(zlr), modfprint(zzb))),
             print (u"流入: %s亿 比: %s%%" % (f_print(4, zlr), f_print(4, zzb))),
             print (u"%s %s%s"%( f_print(4,ff['close']),f_print(1,'!' if ff['open'] > ff['lastp'] else '?'),f_print(2,'!!' if ff['close'] > ff['lastp'] else '??')))
         allTop = allTop.append(df, ignore_index=True)
@@ -366,7 +370,10 @@ def get_code_search_loop(num_input, code='', timed=60, dayl='10', ave=None):
 if __name__ == '__main__':
     # get_multiday_ave_compare('601198')
     # print len(sys.argv)
-    cct.set_console(100, 15)
+    if cct.isMac():
+        cct.set_console(90, 16)
+    else:
+        cct.set_console(100, 15)
 
     if len(sys.argv) == 2:
         status = True

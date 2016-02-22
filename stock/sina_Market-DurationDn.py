@@ -6,18 +6,15 @@ import re
 import sys
 import time
 import traceback
-import urllib2
 
 import pandas as pd
-from bs4 import BeautifulSoup
-from pandas import DataFrame
 
-import JohhnsonUtil.johnson_cons as ct
 import singleAnalyseUtil as sl
 from JSONData import realdatajson as rl
 from JSONData import tdx_data_Day as tdd
 from JohhnsonUtil import LoggerFactory as LoggerFactory
 from JohhnsonUtil import commonTips as cct
+
 
 # from logbook import Logger,StreamHandler,SyslogHandler
 # from logbook import StderrHandler
@@ -64,7 +61,10 @@ if __name__ == "__main__":
     # log.level = log.debug
     # error_handler = SyslogHandler('Sina-M-Log', level='ERROR')
 
-    cct.set_console(160, 15)
+    if cct.isMac():
+        cct.set_console(105, 21)
+    else:
+        cct.set_console(80, 30)
     status = False
     vol = '0'
     type = '2'

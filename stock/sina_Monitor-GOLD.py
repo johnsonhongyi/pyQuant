@@ -21,7 +21,6 @@ import singleAnalyseUtil as sl
 from JSONData import realdatajson as rl
 from JSONData import tdx_data_Day as tdd
 from JohhnsonUtil import LoggerFactory as LoggerFactory
-import gc
 
 log = LoggerFactory.getLogger('SinaMonitor-Gold')
 
@@ -81,7 +80,10 @@ def get_sina_url(vol='0', type='0', pageCount='100'):
 
 if __name__ == "__main__":
 
-    cct.set_console()
+    if cct.isMac():
+        cct.set_console(90, 16)
+    else:
+        cct.set_console()
     # log.setLevel(LoggerFactory.DEBUG)
     status = False
     vol = '0'

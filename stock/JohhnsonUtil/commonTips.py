@@ -25,10 +25,39 @@ except ImportError:
 import requests
 
 
-def set_console(width=80, height=15, color=3):
+# def get_os_system():
+#     os_sys = get_sys_system()
+#     os_platform = get_sys_platform()
+#     if os_sys.find('Darwin') == 0:
+#         log.info("Mac:%s" % os_platform)
+#         return 'mac'
+
+#     elif os_sys.find('Win') == 0:
+#         log.info("Windows:%s" % os_sys)
+#         if os_platform.find('XP'):
+#             return 'win'
+#     else:
+#         return 'other'
+
+def isMac():
+    if get_sys_system().find('Darwin') == 0:
+        return True
+    else:
+        return False
+
+
+def set_console(width=80, height=15, color=3, cmdname=None):
     # mode con cp select=936
     # os.system("mode con: cols=%s lines=%s"%(width,height))
-    os.system('title=%s' % sys.argv[0])
+    # print os.path.splitext(sys.argv[0])
+    filename = (os.path.basename(sys.argv[0]))
+    if isMac():
+        # os.system('printf "\033]0;%s\007"'%(filename))
+        os.system('printf "\e[8;%s;%st"' % (height, width))
+        os.system('printf "\033]0;%s\007"' % (filename))
+    else:
+        os.system('title=%s' % sys.argv[0])
+    # printf "\033]0;My Window title\007”
     # os.system('color %s'%color)
     pass
 
@@ -565,4 +594,7 @@ if __name__ == '__main__':
     # print get_work_time_ratio()
     print last_tddate(0)
     print last_tddate(1)
+    print get_os_system()
+    set_console()
+    # print System.IO.Path
     # print workdays('2010-01-01','2010-05-01')

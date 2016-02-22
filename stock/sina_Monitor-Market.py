@@ -165,7 +165,10 @@ if __name__ == "__main__":
     # log.setLevel(LoggerFactory.DEBUG)
 
 
-    cct.set_console(130, 15)
+    if cct.isMac():
+        cct.set_console(165, 16)
+    else:
+        cct.set_console(130, 15)
     status = False
     vol = '0'
     type = '2'

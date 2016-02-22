@@ -13,20 +13,22 @@ status_dict = {u"中性盘": "normal", u"买盘": "up", u"卖盘": "down"}
 url_real_sina = "http://finance.sina.com.cn/realstock/"
 url_real_sina_top = "http://vip.stock.finance.sina.com.cn/mkt/#stock_sh_up"
 url_real_east = "http://quote.eastmoney.com/sz000004.html"
+import gc
 import re
 import sys
 import time
 import urllib2
+
 import pandas as pd
 from bs4 import BeautifulSoup
 from pandas import DataFrame
-import JohhnsonUtil.johnson_cons as ct
+
 import JohhnsonUtil.commonTips as cct
-from JSONData import realdatajson as rl
+import JohhnsonUtil.johnson_cons as ct
 import singleAnalyseUtil as sl
+from JSONData import realdatajson as rl
 from JSONData import tdx_data_Day as tdd
 from JohhnsonUtil import LoggerFactory as LoggerFactory
-import gc
 
 
 def downloadpage(url):
@@ -168,7 +170,10 @@ if __name__ == "__main__":
     log = LoggerFactory.getLogger('SinaMarket')
     # log.setLevel(LoggerFactory.DEBUG)
 
-    cct.set_console()
+    if cct.isMac():
+        cct.set_console(90, 16)
+    else:
+        cct.set_console()
     status = False
     vol = '0'
     type = '2'
