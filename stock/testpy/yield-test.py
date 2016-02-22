@@ -24,22 +24,26 @@ def produce(c):
 
 # c = consumer()
 # produce(c)
-while 1:
-    try:
-        status=True
-        input=raw_input("input:")
-        if input=='q':
+def main():
+    while 1:
+        try:
+            status=True
+            input=raw_input("input:")
+            if input=='q':
+                sys.exit(0)
+        except (KeyboardInterrupt) as e:
+                    # print "key"
+                    print "KeyboardInterrupt:", e
+                    if not status:
+                        input2=raw_input("input:")
+                        if input2=='q':
+                            sys.exit(0)
+        except:
+            print "except"
+            traceback.print_exc()
+            info=sys.exc_info()  
+            print info[0],":",info[1]  
             sys.exit(0)
-    except (KeyboardInterrupt) as e:
-                # print "key"
-                print "KeyboardInterrupt:", e
-                if not status:
-                    input2=raw_input("input:")
-                    if input2=='q':
-                        sys.exit(0)
-    except:
-        print "except"
-        traceback.print_exc()
-        info=sys.exc_info()  
-        print info[0],":",info[1]  
-        sys.exit(0)
+
+# while 1:
+    # print eval(raw_input('DEBUG>>>'))

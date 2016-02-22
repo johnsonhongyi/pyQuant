@@ -211,11 +211,12 @@ if __name__ == "__main__":
     # delay_time = cct.get_delay_time()
     First = True
     base_path = tdd.get_tdx_dir()
-    block_path = tdd.get_tdx_dir_blocknew() + '061.blk'
+    block_path = tdd.get_tdx_dir_blocknew() + '064.blk'
     status_change = False
     lastpTDX_DF = ''
-    duration_date = 20160101
-    ptype = 'low'
+    duration_date = 20151201
+    ptype = 'high'
+    filter='y'
     # all_diffpath = tdd.get_tdx_dir_blocknew() + '062.blk'
     while 1:
         try:
@@ -248,6 +249,7 @@ if __name__ == "__main__":
                     codelist = top_all.index.tolist()
                     log.info('toTDXlist:%s' % len(codelist))
                     # tdxdata = tdd.get_tdx_all_day_LastDF(codelist,dt=duration_date,ptype=ptype)
+                    # duration_date=tdd.get_duration_price_date('999999', dt=duration_date,ptype=ptype)
                     tdxdata = tdd.get_tdx_exp_all_LastDF(codelist, dt=duration_date, ptype=ptype)
                     log.debug("TdxLastP: %s %s" % (len(tdxdata), tdxdata.columns.values))
                     tdxdata.rename(columns={'low': 'llow'}, inplace=True)
@@ -326,12 +328,21 @@ if __name__ == "__main__":
                                     # top_all['diffA'] = (
                                     # map(lambda x, y: round((x - y) / y * 100, 1), top_all['buy'].values, top_all['lastp'].values))
                             '''
-                top_all = top_all[top_all.buy > 0]
+                # top_all = top_all[top_all.buy > 0]
 
-                top_all['diff'] = (
-                    map(lambda x, y: round((x - y) / y * 100, 1), top_all['buy'].values, top_all['lastp'].values))
-
+                if cct.get_now_time_int() < 930:
+                    top_all['diff'] = (
+                        map(lambda x, y: round((x - y) / y * 100, 1), top_all['buy'].values, top_all['lastp'].values))
+                else:
+                    top_all['diff'] = (
+                        map(lambda x, y: round((x - y) / y * 100, 1), top_all['trade'].values, top_all['lastp'].values))
+                
                 top_dif = top_all
+                # top_dif = top_dif[top_dif.buy > 0]
+                top_dif = top_dif[top_dif.lvol > 0]
+                if filter == 'y':
+                    top_dif = top_dif[top_dif.date > cct.day8_to_day10(duration_date)]
+                
                 # top_temp = top_dif.sort_values(by=['diff'], ascending=[0])
                 # top_temp = top_dif[-5:]
 
@@ -365,13 +376,15 @@ if __name__ == "__main__":
                     # log.debug("Second:vol/vol/:%s" % radio_t)
                     # top_dif['volume'] = top_dif['volume'].apply(lambda x: round(x / radio_t, 1))
                     # log.debug("top_diff:vol")
+                    top_dif=top_dif[top_dif.low > 0]
                     top_dif['volume'] = (
-                        map(lambda x, y: round(x / y / radio_t, 1), top_dif['volume'].values, top_dif['lvol'].values))
+                        map(lambda x, y: round(x / y / radio_t, 1), top_dif.volume.values, top_dif.lvol.values))
                     # top_dif = top_dif[top_dif.volume > 1]
                 if len(top_dif) == 0:
                     print "No G,DataFrame is Empty!!!!!!"
                     # top_dif = top_all
-
+                else:
+                    top_dif=top_dif[top_dif.lvol > 100000]
                 log.debug('dif6 vol:%s' % (top_dif[:1].volume))
                 log.debug('dif6 vol>lvol:%s' % len(top_dif))
 
@@ -403,8 +416,12 @@ if __name__ == "__main__":
                 # print rl.format_for_print(top_dif[:10])
                 # top_dd = pd.concat([top_dif[:5],top_temp[:3],top_dif[-3:],top_temp[-3:]], axis=0)
                 top_dd = pd.concat([top_dif[:10], top_dif[-5:]], axis=0)
-                top_dd = top_dd.loc[:,
-                         ['name', 'buy', 'diff', 'volume', 'percent', 'ratio', 'counts', 'high', 'lastp', 'date']]
+                if cct.get_now_time_int() < 930:
+                    top_dd = top_dd.loc[:,
+                             ['name', 'buy', 'diff', 'volume', 'percent', 'ratio', 'counts', 'high', 'lastp', 'date']]
+                else:
+                    top_dd = top_dd.loc[:,
+                         ['name', 'trade', 'diff', 'volume', 'percent', 'ratio', 'counts', 'high', 'lastp', 'date']]
                 print rl.format_for_print(top_dd)
                 # if cct.get_now_time_int() < 930 or cct.get_now_time_int() > 1505 or (cct.get_now_time_int() > 1125 and cct.get_now_time_int() < 1505):
                 # print rl.format_for_print(top_dif[-10:])
@@ -518,11 +535,28 @@ if __name__ == "__main__":
                     dt = dl[1]
                 elif len(dl) == 3:
                     dt = dl[1]
+                    p_t = dl[2]
+                    if p_t == 'l':
+                        ptype = 'low'
+                    elif p_t == 'h':
+                        ptype = 'high'
+                    elif p_t == 'y':
+                        filter = 'y'
+                    elif p_t == 'n':
+                        filter = 'n'
+                    else:
+                        print ("arg error:%s"%p_t)
+                elif len(dl) == 4:
+                    dt = dl[1]
                     ptype = dl[2]
+                    filter = dl[3]
                 else:
                     dt = ''
                 if len(str(dt)) > 0:
-                    duration_date = dt
+                    if len(str(dt)) < 8:
+                        duration_date=tdd.get_duration_price_date('999999', dl=dt,ptype=ptype)
+                    else:
+                        duration_date = dt
                     top_all = pd.DataFrame()
                     time_s = time.time()
                     status = False

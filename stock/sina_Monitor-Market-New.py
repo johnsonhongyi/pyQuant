@@ -159,7 +159,7 @@ if __name__ == "__main__":
     # parsehtml(downloadpage(url_s))
     # StreamHandler(sys.stdout).push_application()
     log = LoggerFactory.getLogger('SinaMarketNew')
-    log.setLevel(LoggerFactory.DEBUG)
+    # log.setLevel(LoggerFactory.DEBUG)
 
     # handler=StderrHandler(format_string='{record.channel}: {record.message) [{record.extra[cwd]}]')
     # log.level=log.debug
@@ -257,9 +257,20 @@ if __name__ == "__main__":
                             count_a = top_all.loc[symbol, 'buy']
                             # print count_a,count_n
                             # print count_n,count_a
-                            if cct.get_now_time_int() < 930:
+                            
+                            if count_a == 0 and count_n == 0:
+                                continue
+                            elif count_a == 0 and count_n !=0:
+                                top_all.loc[symbol, 'buy'] = top_now.loc[symbol, 'buy']
+                                count_a = count_n
+                            else:
+                                pass
+                            
+                            
+                            if cct.get_now_time_int() < 930 and count_a != count_n:
                                 # if not count_n == count_a:
                                 top_all.loc[symbol, 'buy'] = top_now.loc[symbol, 'buy']
+                                
                             else:
                                 if not count_n == count_a:
                                     # log.info("n_buy-a_buy:%s" % (count_n - count_a))
@@ -412,33 +423,7 @@ if __name__ == "__main__":
             else:
                 # break
                 # time.sleep(5)
-                st = raw_input("status:[go(g),clear(c),quit(q,e),W(w),Wa(a)]:")
-                if len(st) == 0:
-                    status = False
-                elif st == 'g' or st == 'go':
-                    status = True
-                    for code in top_dif[:10].index:
-                        code = re.findall('(\d+)', code)
-                        if len(code) > 0:
-                            code = code[0]
-                            kind = sl.get_multiday_ave_compare_silent(code)
-                elif st == 'clear' or st == 'c':
-                    top_all = pd.DataFrame()
-                    time_s = time.time()
-                    status = False
-                elif st == 'w' or st == 'a':
-                    codew = (top_dif.index).tolist()
-                    if st == 'a':
-                        cct.write_to_blocknew(block_path, codew[:10])
-                        # sl.write_to_blocknew(all_diffpath, codew)
-                    else:
-                        cct.write_to_blocknew(block_path, codew[:10], False)
-                        # sl.write_to_blocknew(all_diffpath, codew, False)
-                    print "wri ok:%s" % block_path
-
-                    # time.sleep(2)
-                else:
-                    sys.exit(0)
+                raise KeyboardInterrupt("StopTime")
         except (KeyboardInterrupt) as e:
             # print "key"
             print "KeyboardInterrupt:", e
@@ -449,6 +434,14 @@ if __name__ == "__main__":
             st = raw_input("status:[go(g),clear(c),quit(q,e),W(w),Wa(a)]:")
             if len(st) == 0:
                 status = False
+            elif st == 'r':
+                end = True
+                while end:
+                    cmd=(raw_input('DEBUG[top_dif,top_dd,e|q]:'))
+                    if cmd =='e' or cmd=='q' or len(cmd)==0:
+                        break
+                    else:
+                        print eval(cmd)
             elif st == 'g' or st == 'go':
                 status = True
                 for code in top_dif[:10].index:

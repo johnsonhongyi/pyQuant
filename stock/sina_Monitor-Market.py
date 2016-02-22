@@ -258,13 +258,20 @@ if __name__ == "__main__":
                             # print "code:",symbol
                             count_n = top_now.loc[symbol, 'buy']
                             count_a = top_all.loc[symbol, 'buy']
+                            
+                            if count_a == 0 and count_n == 0:
+                                continue
+                            elif count_a == 0 and count_n !=0:
+                                top_all.loc[symbol, 'buy'] = top_now.loc[symbol, 'buy']
+                                count_a = count_n
+                            else:
+                                pass
                             # print count_a,count_n
                             # print count_n,count_a
                             # 
                     # if cct.get_now_time_int() < 930:
                         # top_all.loc[symbol, 'buy'] = top_now.loc[symbol, 'buy']
                     # else:
-
                             if not count_n == count_a:
                                 top_now.loc[symbol, 'diff'] = round(
                                     ((float(count_n) - float(count_a)) / float(count_a) * 100), 1)
@@ -409,33 +416,7 @@ if __name__ == "__main__":
                         print "."
                         break
             else:
-                st = raw_input("status:[go(g),clear(c),quit(q,e),W(w),Wa(a)]:")
-                if len(st) == 0:
-                    status = False
-                elif st == 'g' or st == 'go':
-                    status = True
-                    for code in top_dif[:10].index:
-                        code = re.findall('(\d+)', code)
-                        if len(code) > 0:
-                            code = code[0]
-                            kind = sl.get_multiday_ave_compare_silent(code)
-                elif st == 'clear' or st == 'c':
-                    top_all = pd.DataFrame()
-                    time_s = time.time()
-                    status = False
-                elif st == 'w' or st == 'a':
-                    codew = (top_dif.index).tolist()
-                    if st == 'a':
-                        cct.write_to_blocknew(block_path, codew[:10])
-                        # cct.write_to_blocknew(all_diffpath, codew)
-                    else:
-                        cct.write_to_blocknew(block_path, codew[:10], False)
-                        # cct.write_to_blocknew(all_diffpath, codew, False)
-                    print "wri ok:%s" % block_path
-
-                    # time.sleep(2)
-                else:
-                    sys.exit(0)
+                raise KeyboardInterrupt("StopTime")
         except (KeyboardInterrupt) as e:
             # print "key"
             # print "KeyboardInterrupt:", e
@@ -446,6 +427,14 @@ if __name__ == "__main__":
             st = raw_input("status:[go(g),clear(c),quit(q,e),W(w),Wa(a)]:")
             if len(st) == 0:
                 status = False
+            elif st == 'r':
+                end = True
+                while end:
+                    cmd=(raw_input('DEBUG[top_dif,top_dd,e|q]:'))
+                    if cmd =='e' or cmd=='q' or len(cmd)==0:
+                        break
+                    else:
+                        print eval(cmd)                
             elif st == 'g' or st == 'go':
                 status = True
                 for code in top_dif[:10].index:
