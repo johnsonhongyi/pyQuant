@@ -63,7 +63,7 @@ if __name__ == "__main__":
     if cct.isMac():
         cct.set_console(105, 21)
     else:
-        cct.set_console(80, 30)
+        cct.set_console(106, 21)
     status = False
     vol = '0'
     type = '2'
@@ -147,21 +147,21 @@ if __name__ == "__main__":
                 # top_all = top_all[top_all.buy > 0]
 
                 top_dif = top_all
-                if cct.get_now_time_int() < 930:
+                if cct.get_now_time_int() < 935:
                     top_dif['diff'] = (
                         map(lambda x, y: round((x - y) / y * 100, 1), top_dif['buy'].values, top_dif['lastp'].values))
+                    top_dif = top_dif[top_dif.buy > 0]
                 else:
                     top_dif['diff'] = (
                         map(lambda x, y: round((x - y) / y * 100, 1), top_dif['trade'].values, top_dif['lastp'].values))
                 # print top_dif.loc['600610',:]
-                # top_dif = top_dif[top_dif.buy > 0]
-                    top_dif = top_dif[top_dif.lvol > 0]
                     top_dif=top_dif[top_dif.low > 0]
+                    top_dif = top_dif[top_dif.trade > 0]
                     # top_dif.loc['600610','volume':'lvol']
-                    top_dif['volume'] = (
-                        map(lambda x, y: round(x / y / radio_t, 1), top_dif.volume.values, top_dif.lvol.values))
-                    top_dif = top_dif[top_dif.volume < 100]
-
+                top_dif=top_dif[top_dif.lvol > 100000]
+                top_dif['volume'] = (
+                    map(lambda x, y: round(x / y / radio_t, 1), top_dif.volume.values, top_dif.lvol.values))
+                # top_dif = top_dif[top_dif.volume < 100]
                 if filter == 'y':
                     top_dif = top_dif[top_dif.date > cct.day8_to_day10(duration_date)]
 
@@ -175,9 +175,6 @@ if __name__ == "__main__":
                     # top_dif = top_dif[top_dif.volume > 1]
                 if len(top_dif) == 0:
                     print "No G,DataFrame is Empty!!!!!!"
-                    # top_dif = top_all
-                else:
-                    top_dif=top_dif[top_dif.lvol > 100000]
                 log.debug('dif6 vol:%s' % (top_dif[:1].volume))
                 log.debug('dif6 vol>lvol:%s' % len(top_dif))
 
@@ -209,7 +206,7 @@ if __name__ == "__main__":
                 # print rl.format_for_print(top_dif[:10])
                 # top_dd = pd.concat([top_dif[:5],top_temp[:3],top_dif[-3:],top_temp[-3:]], axis=0)
                 top_dd = pd.concat([top_dif[:10], top_dif[-5:]], axis=0)
-                if cct.get_now_time_int() < 930:
+                if cct.get_now_time_int() < 935:
                     top_dd = top_dd.loc[:,
                              ['name', 'buy', 'diff', 'volume', 'percent', 'ratio', 'counts', 'high', 'lastp', 'date']]
                 else:
@@ -236,19 +233,19 @@ if __name__ == "__main__":
             int_time = cct.get_now_time_int()
             if cct.get_work_time():
                 if int_time < 925:
-                    time.sleep(180)
+                    time.sleep(120)
                 elif int_time < 930:
                     time.sleep((930 - int_time) * 60)
                     # top_all = pd.DataFrame()
                     time_s = time.time()
                 else:
-                    time.sleep(180)
+                    time.sleep(120)
             elif cct.get_work_duration():
                 while 1:
-                    time.sleep(180)
+                    time.sleep(120)
                     if cct.get_work_duration():
                         print ".",
-                        time.sleep(180)
+                        time.sleep(120)
                     else:
                         # top_all = pd.DataFrame()
                         time_s = time.time()

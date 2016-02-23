@@ -173,7 +173,7 @@ if __name__ == "__main__":
     if cct.isMac():
         cct.set_console(90, 16)
     else:
-        cct.set_console()
+        cct.set_console(82,16)
     status = False
     vol = '0'
     type = '2'
