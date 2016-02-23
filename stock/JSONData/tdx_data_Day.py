@@ -911,7 +911,7 @@ if __name__ == '__main__':
     # df = get_tdx_Exp_day_to_df('999999')
     print get_duration_price_date('999999',dl=100,ptype='high')
     # df = get_tdx_exp_all_LastDF( ['999999', '603377','603377'], dt=30,ptype='high')
-    df = get_tdx_exp_all_LastDF(['600610', '603377', '601998'],dt=100)
+    df = get_tdx_exp_all_LastDF(['600610', '603377', '601998','002504'],dt=20160101)
     print df
     # tdxdata = get_tdx_all_day_LastDF(['999999', '603377','603377'], dt=30,ptype='high')
     # print get_tdx_Exp_day_to_df('999999').sort_index(ascending=False)[:1]

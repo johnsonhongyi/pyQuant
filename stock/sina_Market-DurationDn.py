@@ -199,6 +199,7 @@ if __name__ == "__main__":
                     else:
                         top_dif = top_dif.sort_values(by=['diff', 'percent', 'ratio'], ascending=[0, 0, 1])
                 else:
+                    top_dif['diff']=top_dif['diff'].apply(lambda x:x*2 if x < 0 else x )
                     if 'counts' in top_dif.columns.values:
                         top_dif = top_dif.sort_values(by=['diff', 'percent', 'volume', 'counts', 'ratio'],
                                                       ascending=[1, 0, 0, 1, 1])

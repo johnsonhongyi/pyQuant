@@ -143,9 +143,8 @@ if __name__ == "__main__":
                             # top_all.loc[symbol, 'lastp'])) / float(top_all.loc[symbol, 'lastp']) * 100),
                             # 1)
                             top_all.loc[symbol, 'buy':'low'] = top_now.loc[symbol, 'buy':'low']
-                        # top_all.loc[symbol, 'buy'] = top_now.loc[symbol, 'buy']
+                            # top_all.loc[symbol, 'buy'] = top_now.loc[symbol, 'buy']
                 # top_all = top_all[top_all.buy > 0]
-
                 top_dif = top_all
                 if cct.get_now_time_int() < 935:
                     top_dif['diff'] = (
@@ -154,14 +153,16 @@ if __name__ == "__main__":
                 else:
                     top_dif['diff'] = (
                         map(lambda x, y: round((x - y) / y * 100, 1), top_dif['trade'].values, top_dif['lastp'].values))
-                # print top_dif.loc['600610',:]
+                    # print top_dif.loc['600610',:]
                     top_dif=top_dif[top_dif.low > 0]
                     top_dif = top_dif[top_dif.trade > 0]
                     # top_dif.loc['600610','volume':'lvol']
-                top_dif=top_dif[top_dif.lvol > 100000]
+
+                top_dif=top_dif[top_dif.lvol > 50000]
                 top_dif['volume'] = (
                     map(lambda x, y: round(x / y / radio_t, 1), top_dif.volume.values, top_dif.lvol.values))
                 # top_dif = top_dif[top_dif.volume < 100]
+                # print top_dif.loc['002504',:]
                 if filter == 'y':
                     top_dif = top_dif[top_dif.date > cct.day8_to_day10(duration_date)]
 
@@ -172,7 +173,7 @@ if __name__ == "__main__":
                 # log.debug('dif2:%s' % len(top_dif))
                 # top_dif['volume'] = top_dif['volume'].apply(lambda x: round(x / radio_t, 1))
                 # log.debug("top_diff:vol")
-                    # top_dif = top_dif[top_dif.volume > 1]
+                # top_dif = top_dif[top_dif.volume > 1]
                 if len(top_dif) == 0:
                     print "No G,DataFrame is Empty!!!!!!"
                 log.debug('dif6 vol:%s' % (top_dif[:1].volume))
@@ -196,6 +197,7 @@ if __name__ == "__main__":
                     else:
                         top_dif = top_dif.sort_values(by=['diff', 'percent', 'ratio'], ascending=[0, 0, 1])
                 else:
+                    top_dif['diff']=top_dif['diff'].apply(lambda x:x*2 if x > 0 else x )
                     if 'counts' in top_dif.columns.values:
                         top_dif = top_dif.sort_values(by=['diff', 'percent', 'volume', 'counts', 'ratio'],
                                                       ascending=[1, 0, 0, 1, 1])
@@ -211,7 +213,7 @@ if __name__ == "__main__":
                              ['name', 'buy', 'diff', 'volume', 'percent', 'ratio', 'counts', 'high', 'lastp', 'date']]
                 else:
                     top_dd = top_dd.loc[:,
-                         ['name', 'trade', 'diff', 'volume', 'percent', 'ratio', 'counts', 'high', 'lastp', 'date']]
+                             ['name', 'trade', 'diff', 'volume', 'percent', 'ratio', 'counts', 'high', 'lastp', 'date']]
                 print rl.format_for_print(top_dd)
                 # if cct.get_now_time_int() < 930 or cct.get_now_time_int() > 1505 or (cct.get_now_time_int() > 1125 and cct.get_now_time_int() < 1505):
                 # print rl.format_for_print(top_dif[-10:])
