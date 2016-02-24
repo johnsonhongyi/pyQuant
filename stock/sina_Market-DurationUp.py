@@ -146,7 +146,7 @@ if __name__ == "__main__":
                             # top_all.loc[symbol, 'buy'] = top_now.loc[symbol, 'buy']
                 # top_all = top_all[top_all.buy > 0]
                 top_dif = top_all
-                if cct.get_now_time_int() < 935:
+                if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935:
                     top_dif['diff'] = (
                         map(lambda x, y: round((x - y) / y * 100, 1), top_dif['buy'].values, top_dif['lastp'].values))
                     top_dif = top_dif[top_dif.buy > 0]
@@ -154,8 +154,12 @@ if __name__ == "__main__":
                     top_dif['diff'] = (
                         map(lambda x, y: round((x - y) / y * 100, 1), top_dif['trade'].values, top_dif['lastp'].values))
                     # print top_dif.loc['600610',:]
-                    top_dif=top_dif[top_dif.low > 0]
+                    log.debug("top_dif:%s"%(len(top_dif)))
                     top_dif = top_dif[top_dif.trade > 0]
+                    log.debug("top_dif.trade > 0:%s"%(len(top_dif)))
+                    if  cct.get_now_time_int() > 935:
+                        top_dif=top_dif[top_dif.low > 0]
+                        log.debug("top_dif.low > 0:%s"%(len(top_dif)))
                     # top_dif.loc['600610','volume':'lvol']
 
                 top_dif=top_dif[top_dif.lvol > 50000]
@@ -166,7 +170,7 @@ if __name__ == "__main__":
                 if filter == 'y':
                     top_dif = top_dif[top_dif.date > cct.day8_to_day10(duration_date)]
 
-                log.info('dif1:%s' % len(top_dif))
+                log.info('dif1-filter:%s' % len(top_dif))
                 log.info(top_dif[:1])
                 # top_dif = top_dif[top_dif.buy > top_dif.lastp]
                 # top_dif = top_dif[top_dif.buy > top_dif.lhigh]
@@ -208,7 +212,7 @@ if __name__ == "__main__":
                 # print rl.format_for_print(top_dif[:10])
                 # top_dd = pd.concat([top_dif[:5],top_temp[:3],top_dif[-3:],top_temp[-3:]], axis=0)
                 top_dd = pd.concat([top_dif[:10], top_dif[-5:]], axis=0)
-                if cct.get_now_time_int() < 935:
+                if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935 :
                     top_dd = top_dd.loc[:,
                              ['name', 'buy', 'diff', 'volume', 'percent', 'ratio', 'counts', 'high', 'lastp', 'date']]
                 else:

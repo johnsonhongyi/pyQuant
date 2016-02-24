@@ -1,7 +1,8 @@
 # -*- coding:utf-8 -*-
-# å¯¼å…¥éœ€è¦ç”¨åˆ°çš„åº“
+# µ¼ÈëÐèÒªÓÃµ½µÄ¿â
 # %matplotlib inline
-import sys
+import os,sys
+sys.path.append("..")
 import numpy as np
 import pandas as pd
 import statsmodels.api as sm
@@ -12,12 +13,12 @@ from JohhnsonUtil import LoggerFactory as LoggerFactory
 from JohhnsonUtil import commonTips as cct
 from JohhnsonUtil import zoompan
 
-log = LoggerFactory.getLogger('Linehistogram')
-# log.setLevel(LoggerFactory.DEBUG)
+log = LoggerFactory.getLogger(os.path.basename(sys.argv[0]))
+log.setLevel(LoggerFactory.DEBUG)
 from JSONData import tdx_data_Day as tdd
 
 
-# å–å¾—è‚¡ç¥¨çš„ä»·æ ¼
+# È¡µÃ¹ÉÆ±µÄ¼Û¸ñ
 # start = '2015-09-05'
 # end = '2016-01-04'
 # start = '2015-06-05'
@@ -57,42 +58,53 @@ def LIS(X):
     return S[::-1], pos[::-1]
 
 
-def get_linear_model_status(code, ptype='f', dtype='d',type='l', start=None, end=None):
+def get_linear_model_status(code, ptype='f', dtype='d',type='m',start=None, end=None):
     df = tdd.get_tdx_append_now_df(code, ptype, start, end).sort_index(ascending=True)
     if not dtype == 'd':
         df = tdd.get_tdx_stock_period_to_type(df, dtype).sort_index(ascending=True)
     # df = tdd.get_tdx_Exp_day_to_df(code, 'f').sort_index(ascending=True)
-    asset = df['close']
-    log.info("df:%s" % asset[:1])
-    asset = asset.dropna()
-    X = np.arange(len(asset))
-    x = sm.add_constant(X)
-    model = regression.linear_model.OLS(asset, x).fit()
-    a = model.params[0]
-    b = model.params[1]
-    log.info("X:%s a:%s b:%s" % (len(asset), a, b))
-    Y_hat = X * b + a
-    if Y_hat[-1] > Y_hat[1]:
-        log.debug("u:%s" % Y_hat[-1])
-        log.debug("price:" % asset.iat[-1])
-        if type.upper() == 'M':
-            diff = asset.iat[-1] - Y_hat[-1]
-            if diff > 0:
-                return True, len(asset), diff
-            else:
-                return False, len(asset), diff
-        elif type.upper() == 'L':
-            i = (asset.values.T - Y_hat).argmin()
-            c_low = X[i] * b + a - asset.values[i]
-            Y_hatlow = X * b + a - c_low
-            diff = asset.iat[-1] - Y_hatlow[-1]
-            if asset.iat[-1] - Y_hatlow[-1] > 0:
-                return True, len(asset), diff
-            else:
-                return False, len(asset), diff
-    else:
-        log.debug("d:%s" % Y_hat[1])
-        return False, 0, 0
+    def get_linear_model_ratio(asset):
+        log.info("asset:%s" % asset[-1:])
+        duration=asset[-1:].index.values[0]
+        log.debug("duration:%s"%duration)
+        log.debug("duration:%s"%cct.get_today_duration(duration))
+        # log.debug("duration:%s"%cct.get_duration_date(duration))
+        asset = asset.dropna()
+        X = np.arange(len(asset))
+        x = sm.add_constant(X)
+        model = regression.linear_model.OLS(asset, x).fit()
+        a = model.params[0]
+        b = model.params[1]
+        log.info("X:%s a:%s b:%s" % (len(asset), a, b))
+        # log.info("X:%s x:%s" % (X,x))
+        Y_hat = X * b + a
+        log.info("Y_hat:%s " % (Y_hat))
+        log.info("asset:%s " % (asset.values))
+        if Y_hat[-1] > Y_hat[1]:
+            log.debug("u:%s" % Y_hat[-1])
+            log.debug("price:%s" % asset.iat[-1])
+            log.debug("u:%s" % Y_hat[1])
+            log.debug("price:%s" % asset.iat[1])
+            if type.upper() == 'M':
+                diff = asset.iat[-1] - Y_hat[-1]
+                if diff > 0:
+                    return True, len(asset), diff
+                else:
+                    return False, len(asset), diff
+            elif type.upper() == 'L':
+                i = (asset.values.T - Y_hat).argmin()
+                c_low = X[i] * b + a - asset.values[i]
+                Y_hatlow = X * b + a - c_low
+                diff = asset.iat[-1] - Y_hatlow[-1]
+                if asset.iat[-1] - Y_hatlow[-1] > 0:
+                    return True, len(asset), diff
+                else:
+                    return False, len(asset), diff
+        else:
+            log.debug("d:%s" % Y_hat[1])
+            return False, 0, 0
+    get_linear_model_ratio(df['low'])
+    get_linear_model_ratio(df['high'])
     return False, 0, 0
 
 
@@ -128,7 +140,7 @@ def get_linear_model_histogram(code, ptype='f', dtype='d', start=None, end=None)
         asset1=asset1.apply(lambda x:round( x/asset1[:1],2))
         # print asset1[:4]
     
-    # ç”»å‡ºä»·æ ¼éšæ—¶é—´å˜åŒ–çš„å›¾åƒ
+    # »­³ö¼Û¸ñËæÊ±¼ä±ä»¯µÄÍ¼Ïñ
     # _, ax = plt.subplots()
     # fig = plt.figure()
     fig = plt.figure(figsize=(16, 10))
@@ -146,7 +158,7 @@ def get_linear_model_histogram(code, ptype='f', dtype='d', start=None, end=None)
     ticks = ax1.get_xticks()
     ax1.set_xticklabels([dates[i] for i in ticks[:-1]])  # Label x-axis with dates
 
-    # æ‹Ÿåˆ
+    # ÄâºÏ
     X = np.arange(len(asset))
     x = sm.add_constant(X)
     model = regression.linear_model.OLS(asset, x).fit()
@@ -156,13 +168,13 @@ def get_linear_model_histogram(code, ptype='f', dtype='d', start=None, end=None)
     log.info("X:%s a:%s b:%s" % (len(asset), a, b))
     Y_hat = X * b + a
 
-    # çœŸå®žå€¼-æ‹Ÿåˆå€¼ï¼Œå·®å€¼æœ€å¤§æœ€å°ä½œä¸ºä»·å€¼æ³¢åŠ¨åŒºé—´
-    # å‘ä¸‹å¹³ç§»
+    # ÕæÊµÖµ-ÄâºÏÖµ£¬²îÖµ×î´ó×îÐ¡×÷Îª¼ÛÖµ²¨¶¯Çø¼ä
+    # ÏòÏÂÆ½ÒÆ
     i = (asset.values.T - Y_hat).argmin()
     c_low = X[i] * b + a - asset.values[i]
     Y_hatlow = X * b + a - c_low
 
-    # å‘ä¸Šå¹³ç§»
+    # ÏòÉÏÆ½ÒÆ
     i = (asset.values.T - Y_hat).argmax()
     c_high = X[i] * b + a - asset.values[i]
     Y_hathigh = X * b + a - c_high
@@ -204,7 +216,7 @@ def get_linear_model_histogram(code, ptype='f', dtype='d', start=None, end=None)
     # plt.title(code, fontsize=14)
     # plt.legend([code])
 
-    # å°†Y-Y_hatè‚¡ä»·åç¦»ä¸­æž¢çº¿çš„è·ç¦»å•ç”»å‡ºä¸€å¼ å›¾æ˜¾ç¤ºï¼Œå¯¹å…¶è¾¹ç•Œçº¿ä¹‹é—´çš„åŒºåŸŸè¿›è¡Œå‡åˆ†ï¼Œå¤§äºŽ0çš„åŒºé—´ä¸ºé«˜ä¼°ï¼Œå°äºŽ0çš„åŒºé—´ä¸ºä½Žä¼°ï¼Œ0ä¸ºä»·å€¼ä¸­æž¢çº¿ã€‚
+    # ½«Y-Y_hat¹É¼ÛÆ«ÀëÖÐÊàÏßµÄ¾àÀëµ¥»­³öÒ»ÕÅÍ¼ÏÔÊ¾£¬¶ÔÆä±ß½çÏßÖ®¼äµÄÇøÓò½øÐÐ¾ù·Ö£¬´óÓÚ0µÄÇø¼äÎª¸ß¹À£¬Ð¡ÓÚ0µÄÇø¼äÎªµÍ¹À£¬0Îª¼ÛÖµÖÐÊàÏß¡£
     ax3 = fig.add_subplot(322)
     # distance = (asset.values.T - Y_hat)
     distance = (asset.values.T-Y_hat)[0]
@@ -237,7 +249,7 @@ def get_linear_model_histogram(code, ptype='f', dtype='d', start=None, end=None)
 
     
     
-    # ç»Ÿè®¡å‡ºæ¯ä¸ªåŒºåŸŸå†…å„è‚¡ä»·çš„é¢‘æ•°ï¼Œå¾—åˆ°ç›´æ–¹å›¾ï¼Œä¸ºäº†æ›´ç²¾ç»†çš„æ˜¾ç¤ºå„ä¸ªåŒºåŸŸçš„é¢‘æ•°ï¼Œè¿™é‡Œå°†æ•´ä¸ªè¾¹ç•ŒåŒºé—´åˆ†æˆ100ä»½ã€‚
+    # Í³¼Æ³öÃ¿¸öÇøÓòÄÚ¸÷¹É¼ÛµÄÆµÊý£¬µÃµ½Ö±·½Í¼£¬ÎªÁË¸ü¾«Ï¸µÄÏÔÊ¾¸÷¸öÇøÓòµÄÆµÊý£¬ÕâÀï½«Õû¸ö±ß½çÇø¼ä·Ö³É100·Ý¡£
 
     ax4 = fig.add_subplot(325)
     log.info("assert:len:%s %s" % (len(asset.values.T - Y_hat), (asset.values.T - Y_hat)[0]))
@@ -328,134 +340,19 @@ def get_linear_model_histogram(code, ptype='f', dtype='d', start=None, end=None)
 
 
 def parseArgmain():
-    # from ConfigParser import ConfigParser
-    # import shlex
     import argparse
-    # parser = argparse.ArgumentParser()
-    # parser.add_argument('-s', '--start', type=int, dest='start',
-    # help='Start date', required=True)
-    # parser.add_argument('-e', '--end', type=int, dest='end',
-    # help='End date', required=True)
-    # parser.add_argument('-v', '--verbose', action='store_true', dest='verbose',
-    # help='Enable debug info')
-    # parser.add_argument('foo', type=int, choices=xrange(5, 10))
-    # args = parser.parse_args()
-    # print args.square**2
     parser = argparse.ArgumentParser()
-    # parser = argparse.ArgumentParser(description='LinearRegression Show')
     parser.add_argument('code', type=str, nargs='?', help='999999')
     parser.add_argument('start', nargs='?', type=str, help='20150612')
-    # parser.add_argument('e', nargs='?',action="store", dest="end", type=str, help='end')
     parser.add_argument('end', nargs='?', type=str, help='20160101')
     parser.add_argument('-d', action="store", dest="dtype", type=str, nargs='?', choices=['d', 'w', 'm'], default='d',
                         help='DateType')
     parser.add_argument('-p', action="store", dest="ptype", type=str, choices=['f', 'b'], default='f',
                         help='Price Forward or back')
-    # parser.add_argument('-help',type=str,help='Price Forward or back')
-    # args = parser.parse_args()
-    # args=parser.parse_args(input)
     return parser
-    # def getArgs():
-    # parse=argparse.ArgumentParser()
-    # parse.add_argument('-u',type=str)
-    # parse.add_argument('-d',type=str)
-    # parse.add_argument('-o',type=str)
-    # args=parse.parse_args()
-    # return vars(args)
-    # if args.verbose:
-    # logger.setLevel(logging.DEBUG)
-    # else:
-    # logger.setLevel(logging.ERROR)
 
 
 if __name__ == "__main__":
-    # status=get_linear_model_status('601198')
-    # print status
-    # get_tdx_and_now_data('002399')
-    # sys.exit(0)
+    st=get_linear_model_status('999999',start='2016-02-18')
+    # cct.set_console(100, 15)
 
-    # args=main(raw_input('input').split())
-    # print (args.d)
-    # sys.exit()
-
-    cct.set_console(100, 15)
-    num_input = ''
-    if len(sys.argv) == 2:
-        num_input = sys.argv[1]
-    elif (len(sys.argv) > 2):
-        print ("argv error")
-        sys.exit(0)
-
-    # else:
-    #     print ("please input code:")
-    #     sys.exit(0)
-    # num_input = '601608'
-    # num_input=raw_input("Please input code:")
-    parser = parseArgmain()
-    parser.print_help()
-    while 1:
-        try:
-            if not len(num_input) == 6:
-                num_input = raw_input("please input code:")
-                if len(num_input) > 0:
-                    args = parser.parse_args(num_input.split())
-                    num_input = args.code
-                    # print args.code,args.ptype,args.dtype,
-                    start = cct.day8_to_day10(args.start)
-                    end = cct.day8_to_day10(args.end)
-                    # print start,end
-                if num_input == 'ex' or num_input == 'qu' \
-                        or num_input == 'q' or num_input == "e":
-                    sys.exit()
-                elif len(num_input) == 6:
-                    code = args.code
-                    # print code, args.ptype, args.dtype, start, end
-                    get_linear_model_histogram(code, args.ptype, args.dtype, start, end)
-                    num_input = ''	
-
-                    #         else:
-                    #             get_linear_model_histogram(code,args.dtype,args.start)
-                    #     elif args.end:
-                    #         get_linear_model_histogram(code,args.dtype,end=args.end)
-                    #     else:
-                    #         get_linear_model_histogram(code,args.dtype)
-                    # num_input = ''
-                    # elif len(num_input) == 6:
-                    # get_linear_model_histogram(num_input)
-                    # elif len(num_input) == 8:
-                    # data=num_input.split(' ')
-                    # if len(data)>2:
-                    # code=data[0]
-                    # type=data[1]
-                    # if type in ['d','w','m']:
-                    # get_linear_model_histogram(code,type)
-                    # num_input = ''
-                    # elif len(num_input) > 8:
-                    # data=num_input.split(' ')
-                    # if len(data)==3:
-                    # code=data[0]
-                    # type=data[1]
-                    # start=data[2]
-                    # if type in ['d','w','m']:
-                    # get_linear_model_histogram(code,type)
-                    # num_input = ''
-                    # else:
-                    # get_linear_model_histogram(code)
-                    # else:
-                    # get_linear_model_histogram(num_input)
-                    # num_input = ''
-        except (KeyboardInterrupt) as e:
-            print "KeyboardInterrupt:", e
-            st = raw_input("status:[go(g),clear(c),quit(q,e)]:")
-            if st == 'q' or st == 'e':
-                sys.exit(0)
-            else:
-            	num_input=''
-        except (IOError, EOFError, Exception) as e:
-            print "Error", e
-            # st = raw_input("status:[go(g),clear(c),quit(q,e)]:")
-            # if st == 'q' or st == 'e':
-            #     sys.exit(0)
-            # else:
-            num_input=''
-            # traceback.print_exc()

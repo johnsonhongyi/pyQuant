@@ -25,7 +25,7 @@ log = LoggerFactory.getLogger('TDX_Day')
 # log.setLevel(LoggerFactory.DEBUG)
 # log.setLevel(LoggerFactory.INFO)
 # log.setLevel(LoggerFactory.WARNING)
-log.setLevel(LoggerFactory.ERROR)
+# log.setLevel(LoggerFactory.ERROR)
 
 path_sep = os.path.sep
 newstockdayl = 50
@@ -250,6 +250,7 @@ def get_tdx_append_now_df(code, type='f', start=None, end=None):
     if len(df) > 0:
         tdx_last_day = df.index[-1]
         duration = cct.get_today_duration(tdx_last_day)
+        log.debug("duration:%s"%duration)
     else:
         tdx_last_day = None
         duration = 1
@@ -417,6 +418,67 @@ def get_tdx_day_to_df(code):
     # print "time:",(time.time()-time_s)*1000
     return df
 
+def get_duration_date(code, ptype='low', dt=None, df='',dl=None):
+    if len(df) == 0:
+        df = get_tdx_day_to_df(code).sort_index(ascending=False)
+        log.debug("code:%s" % (df[:1].index))
+    if dt != None:
+        if len(str(dt)) == 10:
+            dz = df[df.index >= dt]
+            if dl is not None:
+                if len(dz) < int(dl) - changedays:
+                    if len(df) > int(dl):
+                        dz = df[:int(dl)]
+                    else:
+                        dz = df
+                else:
+                    if len(df) > int(dl):
+                        dz = df[:int(dl)]
+                    else:
+                        dz = df                
+        elif len(str(dt)) == 8:
+            dt=cct.day8_to_day10(dt)
+            dz = df[df.index >= dt]
+            if dl is not None:
+                if len(dz) < int(dl) - changedays:
+                    if len(df) > int(dl):
+                        dz = df[:int(dl)]
+                    else:
+                        dz = df
+                else:
+                    if len(df) > int(dl):
+                        dz = df[:int(dl)]
+                    else:
+                        dz = df       
+        else:
+            if len(df) > int(dt):
+                dz = df[:int(dt)]
+            else:
+                dz = df
+    elif dl is not None:
+        if len(df) > int(dl):
+            dz = df[:int(dl)]
+        else:
+            dz = df
+        return dz[-1:].index.values[0]
+    if ptype == 'high':
+        lowp = dz.high.max()
+        lowdate = dz[dz.high == lowp].index.values[0]
+        log.debug("high:%s"%lowdate)
+    else:
+        lowp = dz.low.min()
+        lowdate = dz[dz.low == lowp].index.values[0]
+        log.debug("low:%s"%lowdate)
+    # if ptype == 'high':
+    #     lowp = dz.close.max()
+    #     lowdate = dz[dz.close == lowp].index.values[0]
+    #     log.debug("high:%s"%lowdate)
+    # else:
+    #     lowp = dz.close.min()
+    #     lowdate = dz[dz.close == lowp].index.values[0]
+    #     log.debug("low:%s"%lowdate)
+    log.debug("date:%s %s:%s" % (lowdate, ptype, lowp))
+    return lowdate
 
 def get_duration_price_date(code, ptype='low', dt=None, df='',dl=None):
     if len(df) == 0:
@@ -905,8 +967,9 @@ if __name__ == '__main__':
     # list=['000001','399001','399006','399005']
     # df = get_tdx_all_day_LastDF(list,type=1)
     # print df
-    # get_tdx_append_now_df('999999')
-    # sys.exit(0)
+    df= get_tdx_append_now_df('999999')
+    print df[-2:]
+    sys.exit(0)
     time_s = time.time()
     # df = get_tdx_Exp_day_to_df('999999')
     print get_duration_price_date('999999',dl=100,ptype='high')
