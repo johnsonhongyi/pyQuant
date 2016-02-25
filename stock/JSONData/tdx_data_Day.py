@@ -417,6 +417,22 @@ def get_tdx_day_to_df(code):
     df = df.set_index('date')
     # print "time:",(time.time()-time_s)*1000
     return df
+def get_duration_Index_date(code='999999',dt=None):
+    if dt is not None:
+        if len(str(dt)) < 8:
+            dl = int(dt)+changedays
+            df = get_tdx_day_to_df(code).sort_index(ascending=False)
+            dt = get_duration_price_date(code, dt=dt,ptype=ptype,df=df)
+            dt = df[df.index <= dt].index.values[changedays]
+            log.info("LastDF:%s,%s" % (dt,dl))
+        else:
+            if len(str(dt)) == 8: dt = cct.day8_to_day10(dt)
+            df = get_tdx_day_to_df(code).sort_index(ascending=False)
+            dl = len(get_tdx_Exp_day_to_df(code, start=dt)) + changedays
+            dt = df[df.index <= dt].index.values[changedays]
+            log.info("LastDF:%s,%s" % (dt,dl))
+        return dt,dl
+    return None,None
 
 def get_duration_date(code, ptype='low', dt=None, df='',dl=None):
     if len(df) == 0:
@@ -480,7 +496,7 @@ def get_duration_date(code, ptype='low', dt=None, df='',dl=None):
     log.debug("date:%s %s:%s" % (lowdate, ptype, lowp))
     return lowdate
 
-def get_duration_price_date(code, ptype='low', dt=None, df='',dl=None):
+def get_duration_price_date(code, ptype='low', dt=None, df='',dl=None,vtype=None):
     if len(df) == 0:
         df = get_tdx_day_to_df(code).sort_index(ascending=False)
         log.debug("code:%s" % (df[:1].index))
@@ -967,6 +983,9 @@ if __name__ == '__main__':
     # list=['000001','399001','399006','399005']
     # df = get_tdx_all_day_LastDF(list,type=1)
     # print df
+    index_d,dl=get_duration_Index_date(dt='20160101')
+    print index_d
+    get_duration_price_date('000935',ptype='low',dt=index_d)
     df= get_tdx_append_now_df('999999')
     print df[-2:]
     sys.exit(0)

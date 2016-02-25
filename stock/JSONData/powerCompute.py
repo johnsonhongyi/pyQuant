@@ -58,7 +58,7 @@ def LIS(X):
     return S[::-1], pos[::-1]
 
 
-def get_linear_model_status(code, ptype='f', dtype='d',type='m',start=None, end=None):
+def get_linear_model_status(code, ptype='f', dtype='d',type='m',start=None, end=None,days=1):
     df = tdd.get_tdx_append_now_df(code, ptype, start, end).sort_index(ascending=True)
     if not dtype == 'd':
         df = tdd.get_tdx_stock_period_to_type(df, dtype).sort_index(ascending=True)
@@ -76,12 +76,16 @@ def get_linear_model_status(code, ptype='f', dtype='d',type='m',start=None, end=
         a = model.params[0]
         b = model.params[1]
         log.info("X:%s a:%s b:%s" % (len(asset), a, b))
-        # log.info("X:%s x:%s" % (X,x))
+        Y=np.append(X,X[-1]+int(days))
+        log.info("X:%s" % (X[-1]))
+        # print ("X:%s" % (X[-1]))
         Y_hat = X * b + a
-        log.info("Y_hat:%s " % (Y_hat))
-        log.info("asset:%s " % (asset.values))
+        # Y_hat_t = Y * b + a
+        # log.info("Y_hat:%s " % (Y_hat))
+        # log.info("asset:%s " % (asset.values))
+        
         if Y_hat[-1] > Y_hat[1]:
-            log.debug("u:%s" % Y_hat[-1])
+            log.debug("u-Y_hat[-1]:%s" % (Y_hat[-1]))
             log.debug("price:%s" % asset.iat[-1])
             log.debug("u:%s" % Y_hat[1])
             log.debug("price:%s" % asset.iat[1])
@@ -353,6 +357,7 @@ def parseArgmain():
 
 
 if __name__ == "__main__":
-    st=get_linear_model_status('999999',start='2016-02-18')
+    st=get_linear_model_status('999999',start='2016-01-28')
+    st=get_linear_model_status('999999',start='2016-01-28',type='l')
     # cct.set_console(100, 15)
 

@@ -56,7 +56,8 @@ def set_console(width=80, height=15, color=3, cmdname=None):
         os.system('printf "\e[8;%s;%st"' % (height, width))
         os.system('printf "\033]0;%s\007"' % (filename))
     else:
-        os.system('title=%s' % sys.argv[0])
+        # os.system('title=%s' % sys.argv[0])
+        os.system('title=%s' % filename)
     # printf "\033]0;My Window title\007”
     # os.system('color %s'%color)
     pass

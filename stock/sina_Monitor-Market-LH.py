@@ -149,7 +149,7 @@ if __name__ == "__main__":
                                     symbol, 'buy':'low']
 
                 top_dif = top_all
-
+                top_dif=top_dif[top_dif.lvol > 50000]
                 # if top_dif[:1].llow.values <> 0:
                 if len(top_dif[:5][top_dif[:5]['low'] > 0]) > 3:
                     log.debug('diff2-0-low>0')
