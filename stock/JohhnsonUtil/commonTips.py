@@ -388,9 +388,13 @@ def to_mp_run_async(cmd, urllist, *args):
     return results
 
 
-def f_print(lens, datastr):
+def f_print(lens, datastr,type=None):
     data = ('{0:%s}' % (lens)).format(str(datastr))
-    return data
+    if type is not None:
+        if type == 'f':
+            return float(data)
+    else:
+        return data
 
 
 def read_last_lines(filename, lines=1):

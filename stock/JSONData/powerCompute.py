@@ -14,7 +14,7 @@ from JohhnsonUtil import commonTips as cct
 from JohhnsonUtil import zoompan
 
 log = LoggerFactory.getLogger(os.path.basename(sys.argv[0]))
-log.setLevel(LoggerFactory.DEBUG)
+# log.setLevel(LoggerFactory.DEBUG)
 from JSONData import tdx_data_Day as tdd
 
 
@@ -58,8 +58,18 @@ def LIS(X):
     return S[::-1], pos[::-1]
 
 
-def get_linear_model_status(code, ptype='f', dtype='d',type='m',start=None, end=None,days=1):
+def get_linear_model_status(code, ptype='f', dtype='d',type='m',start=None, end=None,days=1,filter='n'):
+    if start is not None and filter=='y':
+        if code not in ['999999','399006','399001']:
+            index_d,dl=tdd.get_duration_Index_date(dt=start)
+            log.debug("index_d:%s dl:%s"%(str(index_d),dl))
+        else:
+            index_d=cct.day8_to_day10(start)
+            log.debug("index_d:%s"%(index_d))
+        start=tdd.get_duration_price_date(code,ptype='low',dt=index_d)
+        log.debug("start: %s"%(start))
     df = tdd.get_tdx_append_now_df(code, ptype, start, end).sort_index(ascending=True)
+    print ("Code:%s startdate:%s"%(code,start))
     if not dtype == 'd':
         df = tdd.get_tdx_stock_period_to_type(df, dtype).sort_index(ascending=True)
     # df = tdd.get_tdx_Exp_day_to_df(code, 'f').sort_index(ascending=True)
@@ -77,7 +87,7 @@ def get_linear_model_status(code, ptype='f', dtype='d',type='m',start=None, end=
         b = model.params[1]
         log.info("X:%s a:%s b:%s" % (len(asset), a, b))
         Y=np.append(X,X[-1]+int(days))
-        log.info("X:%s" % (X[-1]))
+        log.info("X:%s Y:%s" % (X[-1],Y[-1]))
         # print ("X:%s" % (X[-1]))
         Y_hat = X * b + a
         # Y_hat_t = Y * b + a
@@ -90,25 +100,46 @@ def get_linear_model_status(code, ptype='f', dtype='d',type='m',start=None, end=
             log.debug("u:%s" % Y_hat[1])
             log.debug("price:%s" % asset.iat[1])
             if type.upper() == 'M':
-                diff = asset.iat[-1] - Y_hat[-1]
-                if diff > 0:
-                    return True, len(asset), diff
-                else:
-                    return False, len(asset), diff
+                Y_Future = Y * b + a 
+                log.info("ratio: %0.1f Y_Mid: %0.1f"%(b,Y_Future[-1]))
+                # diff = asset.iat[-1] - Y_hat[-1]
+                # if diff > 0:
+                    # return True, len(asset), diff
+                # else:
+                    # return False, len(asset), diff
             elif type.upper() == 'L':
                 i = (asset.values.T - Y_hat).argmin()
                 c_low = X[i] * b + a - asset.values[i]
                 Y_hatlow = X * b + a - c_low
-                diff = asset.iat[-1] - Y_hatlow[-1]
-                if asset.iat[-1] - Y_hatlow[-1] > 0:
-                    return True, len(asset), diff
-                else:
-                    return False, len(asset), diff
+                Y_Future = Y * b + a - c_low
+                log.info("ratio: %0.1f Y_low: %0.1f"%(b,Y_Future[-1]))
+                # diff = asset.iat[-1] - Y_hatlow[-1]
+                # if asset.iat[-1] - Y_hatlow[-1] > 0:
+                    # return True, len(asset), diff
+                # else:
+                    # return False, len(asset), diff
+            elif type.upper() == 'H':
+                i = (asset.values.T - Y_hat).argmax()
+                c_high = X[i] * b + a - asset.values[i]
+                # Y_hathigh = X * b + a - c_high
+                Y_Future = Y * b + a - c_high
+                log.info("ratio: %0.1f Y_High: %0.1f"%(b,Y_Future[-1]))
+            diff = asset[-1] - Y_Future[-1]
+            if diff > 0:
+                print ("UP !!%s Y_Future: %0.1f ratio:%0.1f"%(type.upper(),Y_Future[-1],b))
+            else:
+                print ("Down %s Y_Future: %0.1f ratio:%0.1f"%(type.upper(),Y_Future[-1],b))
         else:
-            log.debug("d:%s" % Y_hat[1])
+            log.debug("down !!! d:%s" % Y_hat[1])
+            print("down !!! d:%s" % Y_hat[1])
             return False, 0, 0
-    get_linear_model_ratio(df['low'])
+    print "high:",
     get_linear_model_ratio(df['high'])
+    print "low:",
+    get_linear_model_ratio(df['low'])
+    print "mid:",
+    get_linear_model_ratio(df['close'])
+
     return False, 0, 0
 
 
@@ -357,7 +388,11 @@ def parseArgmain():
 
 
 if __name__ == "__main__":
-    st=get_linear_model_status('999999',start='2016-01-28')
-    st=get_linear_model_status('999999',start='2016-01-28',type='l')
+    print "M:"
+    st=get_linear_model_status('300006',start='2016-01-28',filter='y')
+    print "L"
+    st=get_linear_model_status('300006',start='2016-01-28',type='l',filter='y')
+    print "H"
+    st=get_linear_model_status('300006',start='2016-01-28',type='h',filter='y')
     # cct.set_console(100, 15)
 
