@@ -2,14 +2,16 @@
 # 导入需要用到的库
 # %matplotlib inline
 import sys
+import time
+from multiprocessing import Process
+
 import numpy as np
 import pandas as pd
 import statsmodels.api as sm
-import multiprocessing
-import time
-from pylab import plt, show
+from pylab import plt
 from sklearn.linear_model import LinearRegression
 from statsmodels import regression
+
 from JohhnsonUtil import LoggerFactory as LoggerFactory
 from JohhnsonUtil import commonTips as cct
 from JohhnsonUtil import zoompan
@@ -327,7 +329,7 @@ def get_linear_model_histogram(code, ptype='f', dtype='d', start=None, end=None,
     zp2 = zoompan.ZoomPan()
     figZoom = zp2.zoom_factory(ax6, base_scale=scale)
     figPan = zp2.pan_factory(ax6)
-    show()
+    plt.show()
 
 def get_linear_model_histogramDouble(code, ptype='f', dtype='d', start=None, end=None,vtype='close',filter='n'):
     # 399001','cyb':'zs399006','zxb':'zs399005
@@ -339,6 +341,7 @@ def get_linear_model_histogramDouble(code, ptype='f', dtype='d', start=None, end
     # vtype='close'
     # if vtype == 'close' or vtype==''
         # ptype=
+
     if start is not None and filter=='y':
         if code not in ['999999','399006','399001']:
             index_d,dl=tdd.get_duration_Index_date(dt=start)
@@ -348,14 +351,17 @@ def get_linear_model_histogramDouble(code, ptype='f', dtype='d', start=None, end
             log.debug("index_d:%s"%(index_d))
         start=tdd.get_duration_price_date(code,ptype='low',dt=index_d)
         log.debug("start:%s"%(start))
+    log.debug("start:%s" % (start))
+
     df = tdd.get_tdx_append_now_df(code, ptype, start, end).sort_index(ascending=True)
+    log.debug("df:%s" % (len(df)))
+
     if not dtype == 'd':
         df = tdd.get_tdx_stock_period_to_type(df, dtype).sort_index(ascending=True)
     asset = df[vtype]
     log.info("df:%s" % asset[:1])
     asset = asset.dropna()
     dates = asset.index
-
     if not code.startswith('999') or not code.startswith('399'):
         if code[:1] in ['5', '6','9']:
             code2='999999'
@@ -372,7 +378,6 @@ def get_linear_model_histogramDouble(code, ptype='f', dtype='d', start=None, end
         # print startv,asset_v
         asset1=asset1.apply(lambda x:round( x/asset1[:1],2))
         # print asset1[:4]
-    
     # 画出价格随时间变化的图像
     # _, ax = plt.subplots()
     # fig = plt.figure()
@@ -569,7 +574,7 @@ def get_linear_model_histogramDouble(code, ptype='f', dtype='d', start=None, end
     zp2 = zoompan.ZoomPan()
     figZoom = zp2.zoom_factory(ax6, base_scale=scale)
     figPan = zp2.pan_factory(ax6)
-    show()
+    plt.show()
 def parseArgmain():
     # from ConfigParser import ConfigParser
     # import shlex
@@ -659,12 +664,21 @@ if __name__ == "__main__":
                     code = args.code
                     # print code, args.ptype, args.dtype, start, end
                     # get_linear_model_histogram(code, args.ptype, args.dtype, start, end,args.vtype)
-                    p=multiprocessing.Process(target=get_linear_model_histogramDouble,args=(code, args.ptype, args.dtype, start, end,args.vtype,args.filter,))
+                    # queue = Queue()
+                    p = Process(target=get_linear_model_histogramDouble,
+                                args=(code, args.ptype, args.dtype, start, end, args.vtype, args.filter,))
+                    # multiprocessing.Process(target=get_linear_model_histogramDouble,args=(code, args.ptype, args.dtype, start, end,args.vtype,args.filter))
                     p.daemon = True
                     p.start()
-                    # p.join()
+                    p.join()
+
+                    # import threading
+                    # t = threading.Thread(name='tmp',target=get_linear_model_histogramDouble,args=(code, args.ptype, args.dtype, start, end,args.vtype,args.filter,))
+                    # t.setDaemon(True)
+                    # t.start()
+
                     time.sleep(5)
-                    num_input = ''	
+                    num_input = ''
 
                     #         else:
                     #             get_linear_model_histogram(code,args.dtype,args.start)

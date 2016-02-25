@@ -1,8 +1,6 @@
+import errno
 import os
 import subprocess
-import errno
-import time
-import sys
 
 PIPE = subprocess.PIPE
 
@@ -165,9 +163,6 @@ def send_all(p, data):
 #!/usr/bin/env python
 #-*- coding:utf-8 -*-
 
-import threading
-import time
-
 def log(func):
     def wrapper(*args, **kwargs):
         def log_task(user):
@@ -195,24 +190,80 @@ def login():
 # -*- coding: utf-8 -*-
 """ python non blocking input
 """
-__author__ = 'Zagfai'
-__version__=  '2013-09-13'
+# __author__ = 'Zagfai'
+# __version__=  '2013-09-13'
+#
+# import sys
+# import select
+# from time import sleep
+# import termios
+# import tty
+#
+# old_settings = termios.tcgetattr(sys.stdin)
+# tty.setcbreak(sys.stdin.fileno())
+# while True:
+#     sleep(.001)
+#     if select.select([sys.stdin], [], [], 0) == ([sys.stdin], [], []):
+#         c = sys.stdin.read(1)
+#         if c == '\x1b': break
+#         sys.stdout.write(c)
+#         sys.stdout.flush()
+# termios.tcsetattr(sys.stdin, termios.TCSADRAIN, old_settings)
 
-import sys
-import select
-from time import sleep
-import termios
-import tty
+# print raw_input('123:')
+from multiprocessing import Pool
 
-old_settings = termios.tcgetattr(sys.stdin)
-tty.setcbreak(sys.stdin.fileno())
-while True:
-    sleep(.001)
-    if select.select([sys.stdin], [], [], 0) == ([sys.stdin], [], []):
-        c = sys.stdin.read(1)
-        if c == '\x1b': break
-        sys.stdout.write(c)
-        sys.stdout.flush()
-termios.tcsetattr(sys.stdin, termios.TCSADRAIN, old_settings)
 
-print raw_input('123:')    
+def f(x):
+    return x * x
+
+
+if __name__ == '__main__':
+    pool = Pool(processes=4)  # start 4 worker processes
+    print(pool.map(f, range(10)))  # prints "[0, 1, 4,..., 81]"
+    pool.terminate()
+
+from multiprocessing import Pool
+import contextlib
+
+
+def f(x):
+    return x * x
+
+
+if __name__ == '__main__':
+    with contextlib.closing(Pool(processes=4)) as pool:
+        print(pool.map(f, range(10)))
+
+from multiprocessing import Process, Queue
+
+
+def my_function(q, x):
+    print "a"
+    q.put(x + 100)
+
+
+if __name__ == '__main__':
+    queue = Queue()
+    p = Process(target=my_function, args=(queue, 1))
+    p.start()
+    p.join()  # this blocks until the process terminates
+    result = queue.get()
+    print result
+
+import time
+
+
+def blocker():
+    while True:
+        print "Oh, sorry, am I in the way?"
+        time.sleep(1)
+
+
+import threading
+
+t = threading.Thread(name='child procs', target=blocker)
+t.start()
+
+# Prove that we passed through the blocking call
+print "No, that's okay"

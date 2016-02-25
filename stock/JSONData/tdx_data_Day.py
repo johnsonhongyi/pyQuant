@@ -1,14 +1,15 @@
 # -*- encoding: utf-8 -*-
 # !/usr/bin/python
 from __future__ import division
+
 import os
-import sys
 import time
 from struct import *
 
 import numpy as np
 import pandas as pd
 from pandas import Series
+
 sys.path.append("..")
 from JSONData import realdatajson as rl
 from JohhnsonUtil import LoggerFactory
@@ -267,7 +268,10 @@ def get_tdx_append_now_df(code, type='f', start=None, end=None):
 
     log.debug("duration:%s" % duration)
     if duration >= 1:
+        log.debug("code:%s start:%s  end:%s" % (code, tdx_last_day, today))
         ds = ts.get_hist_data(code, start=tdx_last_day, end=today)
+        log.debug("ds:%s start:%s  end:%s" % (len(ds), tdx_last_day, today))
+
         if ds is not None and len(ds) > 1:
             ds = ds[:len(ds) - 1]
             ds['code'] = code
@@ -298,6 +302,8 @@ def get_tdx_append_now_df(code, type='f', start=None, end=None):
             log.debug("df[-3:]:%s" % (df[-3:]))
             df['name'] = dm.loc[code, 'name']
         log.debug("df:%s" % df[-3:])
+    else:
+        log.debug("duration <1")
     return df
 
 
