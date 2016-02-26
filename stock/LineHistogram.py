@@ -329,7 +329,7 @@ def get_linear_model_histogram(code, ptype='f', dtype='d', start=None, end=None,
     figPan = zp2.pan_factory(ax6)
     show()
 
-def get_linear_model_histogramDouble(code, ptype='f', dtype='d', start=None, end=None,vtype='close',filter='n'):
+def get_linear_model_histogramDouble(code,ptype='f',dtype='d', start=None, end=None,vtype='close',filter='n', df=None):
     # 399001','cyb':'zs399006','zxb':'zs399005
     # code = '999999'
     # code = '601608'
@@ -348,7 +348,9 @@ def get_linear_model_histogramDouble(code, ptype='f', dtype='d', start=None, end
             log.debug("index_d:%s"%(index_d))
         start=tdd.get_duration_price_date(code,ptype='low',dt=index_d)
         log.debug("start:%s"%(start))
-    df = tdd.get_tdx_append_now_df(code, ptype, start, end).sort_index(ascending=True)
+    if df is None:
+        # df = tdd.get_tdx_append_now_df(code, ptype, start, end).sort_index(ascending=True)
+        df = tdd.get_tdx_append_now_df_api(code, ptype, start, end).sort_index(ascending=True)
     if not dtype == 'd':
         df = tdd.get_tdx_stock_period_to_type(df, dtype).sort_index(ascending=True)
     asset = df[vtype]
@@ -663,7 +665,7 @@ if __name__ == "__main__":
                     p.daemon = True
                     p.start()
                     # p.join()
-                    time.sleep(5)
+                    time.sleep(6)
                     num_input = ''	
 
                     #         else:
