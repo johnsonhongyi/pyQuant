@@ -1,14 +1,15 @@
 # -*- encoding: utf-8 -*-
 # !/usr/bin/python
 from __future__ import division
+
 import os
-import sys
 import time
 from struct import *
 
 import numpy as np
 import pandas as pd
 from pandas import Series
+
 sys.path.append("..")
 from JSONData import realdatajson as rl
 from JohhnsonUtil import LoggerFactory
@@ -244,9 +245,9 @@ def get_tdx_append_now_df_api(code, type='f', start=None, end=None):
     df = get_tdx_Exp_day_to_df(code, type, start, end).sort_index(ascending=True)
     # print df[:1]
     if not end == None:
-        if not end == df.index[-1]:
+        if end < df.index[-1]:
             print(end, df.index[-1])
-        return df
+            return df
     today = cct.get_today()
     if len(df) > 0:
         tdx_last_day = df.index[-1]
@@ -268,13 +269,31 @@ def get_tdx_append_now_df_api(code, type='f', start=None, end=None):
 
     log.debug("duration:%s" % duration)
     if duration >= 1:
-        ds = ts.get_hist_data(code, start=tdx_last_day, end=today)
+        try:
+            ds = ts.get_hist_data(code, start=tdx_last_day, end=today)
+            # ds = ts.get_h_data('000001', start=tdx_last_day, end=today,index=index_status)
+            # df.index = pd.to_datetime(df.index)
+        except (IOError, EOFError, Exception) as e:
+            print "Error duration", e
+            if index_status:
+                code_t = INDEX_LIST[code][2:]
+            ds = ts.get_h_data(code_t, start=tdx_last_day, end=today, index=index_status)
+            df.index = pd.to_datetime(df.index)
         if ds is not None and len(ds) > 1:
             ds = ds[:len(ds) - 1]
-            ds['code'] = code
-            ds['vol'] = 0
-            ds = ds.loc[:, ['code', 'open', 'high', 'low', 'close', 'vol', 'volume']]
-            ds.rename(columns={'volume': 'amount'}, inplace=True)
+            if index_status:
+                code_t = INDEX_LIST[code][2:]
+                if code == 'sh':
+                    code = '999999'
+                else:
+                    code = code_t
+                ds['code'] = code
+            else:
+                ds['code'] = code
+            # ds['vol'] = 0
+            ds = ds.loc[:, ['code', 'open', 'high', 'low', 'close', 'volume', 'amount']]
+            # ds.rename(columns={'volume': 'amount'}, inplace=True)
+            ds.rename(columns={'volume': 'vol'}, inplace=True)
             ds.sort_index(ascending=True, inplace=True)
             log.debug("ds:%s" % ds[:1])
             df = df.append(ds)
@@ -285,22 +304,23 @@ def get_tdx_append_now_df_api(code, type='f', start=None, end=None):
             if index_status:
                 code = INDEX_LIST[code]
             dm = sina_data.Sina().get_stock_code_data(code).set_index('code')
-            # dm=dm.drop_duplicates()
-            log.debug("dm:%s" % dm[-1:])
-            dm.rename(columns={'volume': 'amount', 'turnover': 'vol'}, inplace=True)
-            # c_name=dm.loc[code,['name']]
-            dm_code = dm.loc[code, ['open', 'high', 'low', 'close', 'amount']]
-            log.debug("dm_code:%s" % dm_code['amount'])
-            dm_code['amount'] = round(float(dm_code['amount']) / 100, 2)
-            dm_code['code'] = code
-            dm_code['vol'] = 0
-            # dm_code['date']=today
-            dm_code.name = today
-            df = df.append(dm_code)
-            # df['name']=c_name
-            # log.debug("c_name:%s"%(c_name))
-            log.debug("df[-3:]:%s" % (df[-2:]))
-            df['name'] = dm.loc[code, 'name']
+            if dm is not None and not dm.empty:
+                # dm=dm.drop_duplicates()
+                log.debug("dm:%s" % dm[-1:])
+                dm.rename(columns={'volume': 'amount', 'turnover': 'vol'}, inplace=True)
+                # c_name=dm.loc[code,['name']]
+                dm_code = dm.loc[:, ['open', 'high', 'low', 'close', 'amount']]
+                log.debug("dm_code:%s" % dm_code['amount'])
+                dm_code['amount'] = round(float(dm_code['amount']) / 100, 2)
+                dm_code['code'] = code
+                dm_code['vol'] = 0
+                # dm_code['date']=today
+                dm_code.name = today
+                df = df.append(dm_code)
+                # df['name']=c_name
+                # log.debug("c_name:%s"%(c_name))
+                log.debug("df[-3:]:%s" % (df[-2:]))
+                # df['name'] = dm.loc[code, 'name']
         log.debug("df:%s" % df[-2:])
     return df
               
@@ -1054,11 +1074,14 @@ if __name__ == '__main__':
     index_d,dl=get_duration_Index_date(dt='20160101')
     print index_d
     get_duration_price_date('000935',ptype='low',dt=index_d)
-    df= get_tdx_append_now_df('601998').sort_index(ascending=True)
+    df= get_tdx_append_now_df('99999').sort_index(ascending=True)
     print df[-2:]
     '''
-    df= get_tdx_append_now_df_api('300380')
-    print df[-2:]
+    df = get_tdx_append_now_df_api('999999')
+    # df= get_tdx_append_now_df_api('999999',start='2016-02-01',end='2016-02-27')
+    print df[-1:]
+    print df[df.index == '2015-02-27']
+    # print df[-2:]
     sys.exit(0)
     time_s = time.time()
     # df = get_tdx_Exp_day_to_df('999999')
