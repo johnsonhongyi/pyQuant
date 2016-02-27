@@ -441,7 +441,7 @@ if __name__ == "__main__":
                 elif len(num_input) == 6:
                     code = args.code
                     # print code, args.ptype, args.dtype, start, end
-                    get_linear_model_histogramDouble(code, args.ptype, args.dtype, start, end, args.vtype)
+                    get_linear_model_histogramDouble(code, args.ptype, args.dtype, start, end, args.vtype, args.filter)
                     # p=multiprocessing.Process(target=get_linear_model_histogramDouble,args=(code, args.ptype, args.dtype, start, end,args.vtype,args.filter,))
                     # p.daemon = True
                     # p.start()
@@ -455,7 +455,7 @@ if __name__ == "__main__":
                     start = cct.day8_to_day10(args.start)
                     end = cct.day8_to_day10(args.end)
                     # get_linear_model_histogramDouble(code,args.dtype,args.start)
-                    get_linear_model_histogramDouble(code, args.ptype, args.dtype, start, end, args.vtype)
+                    get_linear_model_histogramDouble(code, args.ptype, args.dtype, start, end, args.vtype, args.filter)
 
                 sys.exit(0)
 
