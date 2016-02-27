@@ -80,6 +80,7 @@ if __name__ == "__main__":
     duration_date = 20160101
     ptype = 'low'
     filter='y'
+    percent_status='n'
     # all_diffpath = tdd.get_tdx_dir_blocknew() + '062.blk'
     while 1:
         try:
@@ -160,6 +161,7 @@ if __name__ == "__main__":
                     if  cct.get_now_time_int() > 935:
                         top_dif=top_dif[top_dif.low > 0]
                         log.debug("top_dif.low > 0:%s"%(len(top_dif)))
+
                     # top_dif.loc['600610','volume':'lvol']
 
                 top_dif=top_dif[top_dif.lvol > 50000]
@@ -169,7 +171,6 @@ if __name__ == "__main__":
                 # print top_dif.loc['002504',:]
                 if filter == 'y':
                     top_dif = top_dif[top_dif.date > cct.day8_to_day10(duration_date)]
-
                 log.info('dif1-filter:%s' % len(top_dif))
                 log.info(top_dif[:1])
                 # top_dif = top_dif[top_dif.buy > top_dif.lastp]
@@ -211,7 +212,12 @@ if __name__ == "__main__":
                 # top_all=top_all.sort_values(by=['percent','diff','counts','ratio'],ascending=[0,0,1,1])
                 # print rl.format_for_print(top_dif[:10])
                 # top_dd = pd.concat([top_dif[:5],top_temp[:3],top_dif[-3:],top_temp[-3:]], axis=0)
-                top_dd = pd.concat([top_dif[:10], top_dif[-5:]], axis=0)
+                if percent_status == 'y' and cct.get_now_time_int() > 935 and ptype == 'low' :
+                    top_temp=top_dif[top_dif.percent > 0]
+                # elif percent_status == 'y' and cct.get_now_time_int() > 935 and ptype == 'high' :
+                else:
+                    top_temp=top_dif[:10]
+                top_dd = pd.concat([top_temp, top_dif[-5:]], axis=0)
                 if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935 :
                     top_dd = top_dd.loc[:,
                              ['name', 'buy', 'diff', 'volume', 'percent', 'ratio', 'counts', 'high', 'lastp', 'date']]
@@ -260,7 +266,7 @@ if __name__ == "__main__":
             else:
                 raise KeyboardInterrupt("StopTime")
         except (KeyboardInterrupt) as e:
-            st = raw_input("status:[go(g),clear(c),[d 20150101 low|high],quit(q,e),W(w),Wa(a)]:")
+            st = raw_input("status:[go(g),clear(c),[d 20150101 [l|h]|[y|n|pn|py],quit(q,e),W(w),Wa(a)]:")
             if len(st) == 0:
                 status = False
             elif st == 'r':
@@ -298,12 +304,21 @@ if __name__ == "__main__":
                         filter = 'y'
                     elif p_t == 'n':
                         filter = 'n'
+                    elif p_t == 'py':
+                        percent_status = 'y'
+                    elif p_t == 'pn':
+                        percent_status = 'n'
                     else:
                         print ("arg error:%s"%p_t)
                 elif len(dl) == 4:
                     dt = dl[1]
                     ptype = dl[2]
-                    filter = dl[3]                  
+                    if ptype == 'l':
+                        ptype = 'low'
+                    elif ptype == 'h':
+                        ptype = 'high'
+                    filter = dl[3]
+                    percent_status = dl[3]
                 else:
                     dt = ''
                 if len(str(dt)) > 0:

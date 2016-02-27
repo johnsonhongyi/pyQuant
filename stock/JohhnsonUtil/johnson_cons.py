@@ -118,13 +118,24 @@ JSON_Market_Center_CountURL="http://vip.stock.finance.sina.com.cn/quotes_service
 # http://vip.stock.finance.sina.com.cn/quotes_service/api/json_v2.php/Market_Center.getHQNodeData?num=80&sort=changepercent&asc=0&node=hs_a&symbol=&_s_r_a=page&page=1
 SINA_Market_KEY={'sh':'sh_a','sz':'sz_a','cyb':'cyb'}
 SINA_Market_COLUMNS = ['code', 'name', 'trade', 'buy', 'percent', 'open', 'high', 'low', 'volume', 'ticktime', 'ratio']
-SINA_Total_Columns_Clean = ['code', 'name', 'trade', 'buy', 'percent', 'open', 'close', 'high', 'low', 'volume',
-                            'ratio']
+# SINA_Total_Columns_Clean = ['code', 'name', 'trade', 'buy','bid1','bid1_volume','ask1',
+                      # 'ask1_volume', 'percent', 'open', 'close', 'high', 'low', 'volume',
+                            # 'ratio']
+                           
+# SINA_Total_Columns = ['code', 'name', 'open', 'close', 'trade', 'high', 'low', 'buy', 'sell', 'volume',
+                      # 'turnover', 'bid1_volume', 'bid1', 'bid2_volume', 'bid2', 'bid3_volume',
+                      # 'bid3', 'bid4_volume', 'bid4', 'bid5_volume', 'bid5', 'ask1_volume',
+                      # 'ask1', 'ask2_volume', 'ask2', 'ask3_volume', 'ask3', 'ask4_volume',
+                      # 'ask4', 'ask5_volume', 'ask5']
+
+SINA_Total_Columns_Clean = ['code', 'name', 'buy','sell','b1','b1_v','a1',
+                      'a1_v', 'open', 'close', 'high', 'low', 'volume',
+                            'turnover']                           
 SINA_Total_Columns = ['code', 'name', 'open', 'close', 'trade', 'high', 'low', 'buy', 'sell', 'volume',
-                      'turnover', 'bid1_volume', 'bid1', 'bid2_volume', 'bid2', 'bid3_volume',
-                      'bid3', 'bid4_volume', 'bid4', 'bid5_volume', 'bid5', 'ask1_volume',
-                      'ask1', 'ask2_volume', 'ask2', 'ask3_volume', 'ask3', 'ask4_volume',
-                      'ask4', 'ask5_volume', 'ask5']
+                      'turnover', 'b1_v', 'b1', 'b2_v', 'b2', 'b3_v',
+                      'b3', 'b4_v', 'b4', 'b5_v', 'b5', 'a1_v',
+                      'a1', 'a2_v', 'a2', 'a3_v', 'a3', 'a4_v',
+                      'a4', 'a5_v', 'a5']
 
 SINA_DD_Clean_Count_Columns = ['name', 'percent', 'diff', 'counts', 'trade', 'high', 'open', 'low', 'ratio', 'volume',
                                'prev_price']

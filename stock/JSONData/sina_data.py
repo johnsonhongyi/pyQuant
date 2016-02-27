@@ -157,6 +157,20 @@ class Sina:
     #
     #     return self.format_response_data()
 
+    def get_stock_code_data(self,code):
+        self.stock_codes = code
+        # self.stock_with_exchange_list = list(
+        #     map(lambda stock_code: ('sh%s' if stock_code.startswith(('5', '6', '9')) else 'sz%s') % stock_code,
+        #         ulist))
+        self.stock_codes = map(lambda stock_code: ('sh%s' if stock_code.startswith(('5', '6', '9')) else 'sz%s') % stock_code,code.split())
+        self.url = self.sina_stock_api + ','.join(self.stock_codes)
+        log.info("stock_list:%s"%self.url)
+        response = requests.get(self.url)
+        self.stock_data.append(response.text)
+        self.dataframe=self.format_response_data()
+        # self.get_tdx_dd()
+        return self.dataframe    
+    
     def get_stock_list_data(self,ulist):
         self.stock_codes = ulist
         # self.stock_with_exchange_list = list(
@@ -199,26 +213,27 @@ class Sina:
                  'sell': float(stock[8]),
                  'volume': int(stock[9]),
                  'turnover': float(stock[10]),
-                 'bid1_volume': int(stock[11]),
-                 'bid1': float(stock[12]),
-                 'bid2_volume': int(stock[13]),
-                 'bid2': float(stock[14]),
-                 'bid3_volume': int(stock[15]),
-                 'bid3': float(stock[16]),
-                 'bid4_volume': int(stock[17]),
-                 'bid4': float(stock[18]),
-                 'bid5_volume': int(stock[19]),
-                 'bid5': float(stock[20]),
-                 'ask1_volume': int(stock[21]),
-                 'ask1': float(stock[22]),
-                 'ask2_volume': int(stock[23]),
-                 'ask2': float(stock[24]),
-                 'ask3_volume': int(stock[25]),
-                 'ask3': float(stock[26]),
-                 'ask4_volume': int(stock[27]),
-                 'ask4': float(stock[28]),
-                 'ask5_volume': int(stock[29]),
-                 'ask5': float(stock[30])})
+                 # 'amount': float(stock[10]),
+                 'b1_v': int(stock[11]),
+                 'b1': float(stock[12]),
+                 'b2_v': int(stock[13]),
+                 'b2': float(stock[14]),
+                 'b3_v': int(stock[15]),
+                 'b3': float(stock[16]),
+                 'b4_v': int(stock[17]),
+                 'b4': float(stock[18]),
+                 'b5_v': int(stock[19]),
+                 'b5': float(stock[20]),
+                 'a1_v': int(stock[21]),
+                 'a1': float(stock[22]),
+                 'a2_v': int(stock[23]),
+                 'a2': float(stock[24]),
+                 'a3_v': int(stock[25]),
+                 'a3': float(stock[26]),
+                 'a4_v': int(stock[27]),
+                 'a4': float(stock[28]),
+                 'a5_v': int(stock[29]),
+                 'a5': float(stock[30])})
 
         # df = pd.DataFrame.from_dict(stock_dict,columns=ct.SINA_Total_Columns)
         df = pd.DataFrame(list_s, columns=ct.SINA_Total_Columns)
@@ -226,8 +241,8 @@ class Sina:
         df = df.loc[:, ct.SINA_Total_Columns_Clean]
         df = df.fillna(0)
         df=df.sort_values(by='code',ascending=0)
-        print ("Market-df:%s %s time: %s" % (
-        format((time.time() - self.start_t), '.3f'), len(df), cct.get_now_time()))
+        # print ("Market-df:%s %s time: %s" % (
+        # format((time.time() - self.start_t), '.3f'), len(df), cct.get_now_time()))
         return df
         # df = pd.DataFrame.from_dict(stock_dict, orient='columns',
         #                             columns=['name', 'open', 'close', 'now', 'high', 'low', 'buy', 'sell', 'turnover',
@@ -241,9 +256,10 @@ class Sina:
 if __name__ == "__main__":
     times = time.time()
     sina = Sina()
-    df= sina.all
+    # df= sina.all
     # code='601198'
-    # df = sina.get_stock_list_data(['601198','002399','601608'])
+    # df = sina.get_stock_list_data(['300380'])
+    df = sina.get_stock_code_data('300380').set_index('code')
     print df[:1]
     # list=['000001','399001','399006','399005']
     # df=sina.get_stock_list_data(list)

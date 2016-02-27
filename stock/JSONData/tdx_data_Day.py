@@ -1,15 +1,14 @@
 # -*- encoding: utf-8 -*-
 # !/usr/bin/python
 from __future__ import division
-
 import os
+import sys
 import time
 from struct import *
 
 import numpy as np
 import pandas as pd
 from pandas import Series
-
 sys.path.append("..")
 from JSONData import realdatajson as rl
 from JohhnsonUtil import LoggerFactory
@@ -237,7 +236,74 @@ def get_tdx_Exp_day_to_df(code, type='f', start=None, end=None, dt=None, dl=None
 INDEX_LIST = {'sh': 'sh000001', 'sz': 'sz399001', 'hs300': 'sz399300',
               'sz50': 'sh000016', 'zxb': 'sz399005', 'cyb': 'sz399006'}
 
+# def get_sina_api_code_now(code):
+def get_tdx_append_now_df_api(code, type='f', start=None, end=None):
+    import sina_data
+    # start=cct.day8_to_day10(start)
+    # end=cct.day8_to_day10(end)
+    df = get_tdx_Exp_day_to_df(code, type, start, end).sort_index(ascending=True)
+    # print df[:1]
+    if not end == None:
+        if not end == df.index[-1]:
+            print(end, df.index[-1])
+        return df
+    today = cct.get_today()
+    if len(df) > 0:
+        tdx_last_day = df.index[-1]
+        duration = cct.get_today_duration(tdx_last_day)
+        log.debug("duration:%s"%duration)
+    else:
+        tdx_last_day = None
+        duration = 1
+    log.debug("tdx_last_day:%s" % tdx_last_day)
+    index_status = False
+    if code == '999999':
+        code = 'sh'
+        index_status = True
+    elif code.startswith('399'):
+        index_status = True
+        for k in INDEX_LIST.keys():
+            if INDEX_LIST[k].find(code) > 0:
+                code = k
 
+    log.debug("duration:%s" % duration)
+    if duration >= 1:
+        ds = ts.get_hist_data(code, start=tdx_last_day, end=today)
+        if ds is not None and len(ds) > 1:
+            ds = ds[:len(ds) - 1]
+            ds['code'] = code
+            ds['vol'] = 0
+            ds = ds.loc[:, ['code', 'open', 'high', 'low', 'close', 'vol', 'volume']]
+            ds.rename(columns={'volume': 'amount'}, inplace=True)
+            ds.sort_index(ascending=True, inplace=True)
+            log.debug("ds:%s" % ds[:1])
+            df = df.append(ds)
+            # pd.concat([df,ds],axis=0, join='outer')
+            # result=pd.concat([df,ds])
+        if cct.get_work_time():
+            # dm = rl.get_sina_Market_json('all').set_index('code')
+            if index_status:
+                code = INDEX_LIST[code]
+            dm = sina_data.Sina().get_stock_code_data(code).set_index('code')
+            # dm=dm.drop_duplicates()
+            log.debug("dm:%s" % dm[-1:])
+            dm.rename(columns={'volume': 'amount', 'turnover': 'vol'}, inplace=True)
+            # c_name=dm.loc[code,['name']]
+            dm_code = dm.loc[code, ['open', 'high', 'low', 'close', 'amount']]
+            log.debug("dm_code:%s" % dm_code['amount'])
+            dm_code['amount'] = round(float(dm_code['amount']) / 100, 2)
+            dm_code['code'] = code
+            dm_code['vol'] = 0
+            # dm_code['date']=today
+            dm_code.name = today
+            df = df.append(dm_code)
+            # df['name']=c_name
+            # log.debug("c_name:%s"%(c_name))
+            log.debug("df[-3:]:%s" % (df[-2:]))
+            df['name'] = dm.loc[code, 'name']
+        log.debug("df:%s" % df[-2:])
+    return df
+              
 def get_tdx_append_now_df(code, type='f', start=None, end=None):
     # start=cct.day8_to_day10(start)
     # end=cct.day8_to_day10(end)
@@ -268,10 +334,7 @@ def get_tdx_append_now_df(code, type='f', start=None, end=None):
 
     log.debug("duration:%s" % duration)
     if duration >= 1:
-        log.debug("code:%s start:%s  end:%s" % (code, tdx_last_day, today))
         ds = ts.get_hist_data(code, start=tdx_last_day, end=today)
-        log.debug("ds:%s start:%s  end:%s" % (len(ds), tdx_last_day, today))
-
         if ds is not None and len(ds) > 1:
             ds = ds[:len(ds) - 1]
             ds['code'] = code
@@ -284,7 +347,7 @@ def get_tdx_append_now_df(code, type='f', start=None, end=None):
             # pd.concat([df,ds],axis=0, join='outer')
             # result=pd.concat([df,ds])
         if cct.get_work_time() and not index_status:
-            dm = rl.get_sina_Market_json('all').set_index('code')
+            dm = rl.get_sina_Market_json('all',showtime=False).set_index('code')
             # dm=dm.drop_duplicates()
             log.debug("dm:%s" % dm[-1:])
             dm.rename(columns={'volume': 'amount', 'trade': 'close'}, inplace=True)
@@ -299,11 +362,9 @@ def get_tdx_append_now_df(code, type='f', start=None, end=None):
             df = df.append(dm_code)
             # df['name']=c_name
             # log.debug("c_name:%s"%(c_name))
-            log.debug("df[-3:]:%s" % (df[-3:]))
+            log.debug("df[-3:]:%s" % (df[-2:]))
             df['name'] = dm.loc[code, 'name']
-        log.debug("df:%s" % df[-3:])
-    else:
-        log.debug("duration <1")
+        log.debug("df:%s" % df[-2:])
     return df
 
 
@@ -989,10 +1050,14 @@ if __name__ == '__main__':
     # list=['000001','399001','399006','399005']
     # df = get_tdx_all_day_LastDF(list,type=1)
     # print df
+    '''
     index_d,dl=get_duration_Index_date(dt='20160101')
     print index_d
     get_duration_price_date('000935',ptype='low',dt=index_d)
-    df= get_tdx_append_now_df('999999')
+    df= get_tdx_append_now_df('601998').sort_index(ascending=True)
+    print df[-2:]
+    '''
+    df= get_tdx_append_now_df_api('300380')
     print df[-2:]
     sys.exit(0)
     time_s = time.time()
