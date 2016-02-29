@@ -6,7 +6,7 @@ import sys
 import numpy as np
 import pandas as pd
 import statsmodels.api as sm
-from pylab import plt
+from pylab import plt,mpl
 from sklearn.linear_model import LinearRegression
 from statsmodels import regression
 
@@ -18,7 +18,12 @@ log = LoggerFactory.getLogger('Linehistogram')
 # log.setLevel(LoggerFactory.DEBUG)
 from JSONData import tdx_data_Day as tdd
 
-
+if cct.isMac():
+    mpl.rcParams['font.sans-serif'] = ['STHeiti']
+    mpl.rcParams['axes.unicode_minus'] = False
+else:
+    mpl.rcParams['font.sans-serif'] = ['SimHei']
+    mpl.rcParams['axes.unicode_minus'] = False
 # 取得股票的价格
 # start = '2015-09-05'
 # end = '2016-01-04'
@@ -128,7 +133,8 @@ def get_linear_model_histogramDouble(code, ptype='f', dtype='d', start=None, end
     asset = asset.dropna()
     dates = asset.index
 
-    if not code.startswith('999') or not code.startswith('399'):
+    if not code.startswith('999') and not code.startswith('399'):
+        # print "code:",code
         if code[:1] in ['5', '6', '9']:
             code2 = '999999'
         elif code[:2] in ['30']:
@@ -145,8 +151,23 @@ def get_linear_model_histogramDouble(code, ptype='f', dtype='d', start=None, end
         # asset_v=asset[:1]
         # print startv,asset_v
         asset1 = asset1.apply(lambda x: round(x / asset1[:1], 2))
-        # print asset1[:4]
-
+    else:
+        if code.startswith('399001'):
+            code2 = '999999'
+        elif code.startswith('399006'):
+            code2 = '399005'
+        else:
+            code2 = '399001'
+        df1 = tdd.get_tdx_append_now_df_api(code2, ptype, start, end).sort_index(ascending=True)
+        # print df1[:1]
+        # df1 = tdd.get_tdx_append_now_df(code2, ptype, start, end).sort_index(ascending=True)
+        if not dtype == 'd':
+            df1 = tdd.get_tdx_stock_period_to_type(df1, dtype).sort_index(ascending=True)
+        if len(asset) < len(df1):
+            asset1 = df1.loc[asset.index, vtype]
+            startv = asset1[:1]
+            asset1 = asset1.apply(lambda x: round(x / asset1[:1], 2))
+        
     # 画出价格随时间变化的图像
     # _, ax = plt.subplots()
     # fig = plt.figure()
@@ -234,7 +255,8 @@ def get_linear_model_histogramDouble(code, ptype='f', dtype='d', start=None, end
     ax3 = fig.add_subplot(322)
     # distance = (asset.values.T - Y_hat)
     distance = (asset.values.T - Y_hat)[0]
-    if code.startswith('999') or code.startswith('399'):
+    # if code.startswith('999') or code.startswith('399'):
+    if len(asset) > len(df1):
         ax3.plot(asset)
         plt.plot(distance)
         ticks = ax3.get_xticks()
@@ -247,7 +269,7 @@ def get_linear_model_histogramDouble(code, ptype='f', dtype='d', start=None, end
             plt.plot(X, Y - Y_hat, 'r', alpha=0.9);
             c = c + d
         ax3.plot(asset)
-        # plt.xlabel('Date', fontsize=12)
+        ## plt.xlabel('Date', fontsize=12)
         plt.ylabel('Price-center price', fontsize=14)
         plt.grid(True)
     else:
@@ -259,7 +281,10 @@ def get_linear_model_histogramDouble(code, ptype='f', dtype='d', start=None, end
         figZoom = zp3.zoom_factory(ax3, base_scale=scale)
         figPan = zp3.pan_factory(ax3)
     # plt.title(code, fontsize=14)
-    # plt.legend([code])
+    if 'name' in df.columns:
+        plt.legend([df.name[-1],df1.name[-1]], loc=0)
+    else:
+        plt.legend([code,code2], loc=0)
 
 
 

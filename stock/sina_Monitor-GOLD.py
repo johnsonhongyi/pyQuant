@@ -172,12 +172,12 @@ if __name__ == "__main__":
                     top_all['volume'] = (
                         map(lambda x, y: round(x / y / radio_t, 1), top_all['volume'].values, top_all['lvol'].values))
 
-                    top_all = top_all[top_all.prev_p >= top_all.lhigh]
+                    # top_all = top_all[top_all.prev_p >= top_all.lhigh]
                     top_all = top_all.loc[:,
                               ['name', 'percent', 'diff', 'counts', 'volume', 'trade', 'prev_p', 'ratio']]
 
                 print "G:%s dt:%s " % (len(top_all),cct.get_time_to_date(time_s))                
-                top_all = top_all.sort_values(by=['diff', 'counts', 'volume', 'ratio'], ascending=[0, 0, 0, 1])
+                top_all = top_all.sort_values(by=[ 'counts', 'diff','volume', 'ratio'], ascending=[0, 0, 0, 1])
                 # top_all=top_all.sort_values(by=['diff','percent','counts','ratio'],ascending=[0,0,1,1])
 
                 # top_all=top_all.sort_values(by=['diff','counts'],ascending=[0,0])

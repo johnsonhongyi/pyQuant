@@ -57,7 +57,7 @@ def LIS(X):
 
 
 def get_linear_model_status(code, ptype='f', df=None, dtype='d', type='m', start=None, end=None, days=1, filter='n'):
-    if start is not None and filter=='y':
+    if start is not None and end is None and filter=='y':
         if code not in ['999999','399006','399001']:
             index_d,dl=tdd.get_duration_Index_date(dt=start)
             log.debug("index_d:%s dl:%s"%(str(index_d),dl))
@@ -68,12 +68,13 @@ def get_linear_model_status(code, ptype='f', df=None, dtype='d', type='m', start
         log.debug("start: %s"%(start))
     if df is None:
         # df = tdd.get_tdx_append_now_df(code,ptype, start, end).sort_index(ascending=True)
+        print start,end
         df = tdd.get_tdx_append_now_df_api(code, ptype, start, end).sort_index(ascending=True)
-    log.info("Code:%s start:%s end:%s"%(code,start,df[-1:].index.values[0]))
+    log.info("Code:%s start:%s df-s:%s  end:%s"%(code,start,df[:1].index.values[0],df[-1:].index.values[0]))
     if not dtype == 'd':
         df = tdd.get_tdx_stock_period_to_type(df, dtype).sort_index(ascending=True)
     # df = tdd.get_tdx_Exp_day_to_df(code, 'f').sort_index(ascending=True)
-    def get_linear_model_ratio(asset):
+    def get_linear_model_ratio(asset,type='M'):
         log.info("asset:%s" % asset[-1:])
         duration=asset[-1:].index.values[0]
         log.debug("duration:%s"%duration)
@@ -95,6 +96,7 @@ def get_linear_model_status(code, ptype='f', df=None, dtype='d', type='m', start
         # log.info("asset:%s " % (asset.values))
         ratio = b/a*100
         operation=0
+        log.debug("line_now:%s src:%s"%(Y_hat[-1],Y_hat[1]))
         if Y_hat[-1] > Y_hat[1]:
             log.debug("u-Y_hat[-1]:%0.1f" % (Y_hat[-1]))
             log.debug("price:%0.1f" % asset.iat[-1])
@@ -103,7 +105,7 @@ def get_linear_model_status(code, ptype='f', df=None, dtype='d', type='m', start
             if type.upper() == 'M':
                 Y_Future = Y * b + a 
                 # ratio = b/a*100
-                log.info("ratio: %0.1f %0.1f Y_Mid: %0.1f"%(b,ratio,Y_Future[-1]))
+                log.info("Type:M ratio: %0.1f %0.1f Y_Mid: %0.1f"%(b,ratio,Y_Future[-1]))
                 # diff = asset.iat[-1] - Y_hat[-1]
                 # if diff > 0:
                     # return True, len(asset), diff
@@ -114,7 +116,7 @@ def get_linear_model_status(code, ptype='f', df=None, dtype='d', type='m', start
                 c_low = X[i] * b + a - asset.values[i]
                 # Y_hatlow = X * b + a - c_low
                 Y_Future = Y * b + a - c_low
-                log.info("b: %0.1f ratio:%0.1f Y_Mid: %0.1f"%(b,ratio,Y_Future[-1]))
+                log.info("Type:L b: %0.1f ratio:%0.1f Y_Mid: %0.1f"%(b,ratio,Y_Future[-1]))
                 # diff = asset.iat[-1] - Y_hatlow[-1]
                 # if asset.iat[-1] - Y_hatlow[-1] > 0:
                     # return True, len(asset), diff
@@ -125,32 +127,37 @@ def get_linear_model_status(code, ptype='f', df=None, dtype='d', type='m', start
                 c_high = X[i] * b + a - asset.values[i]
                 # Y_hathigh = X * b + a - c_high
                 Y_Future = Y * b + a - c_high
-                log.info("ratio: %0.1f %0.1f Y_Mid: %0.1f"%(b,ratio,Y_Future[-1]))
+                log.info("Type:H ratio: %0.1f %0.1f Y_Mid: %0.1f"%(b,ratio,Y_Future[-1]))
             diff = asset[-1] - Y_Future[-1]
-            # print ("as:%s Y:%s"%(asset[-1] ,Y_Future[-1]))
+            print ("as:%s Y:%s"%(asset[-1] ,Y_Future[-1]))
             if diff > 0:
                 operation +=1
-                log.info("UP !!%s Y_Future: %0.1f b:%0.1f ratio:%0.1f "%(type.upper(),Y_Future[-1],b,ratio))
+                log.info("Type: %s UP !!! Y_Future: %0.1f b:%0.1f ratio:%0.1f "%(type.upper(),Y_Future[-1],b,ratio))
             else:
-                log.info("Down %s Y_Future: %0.1f b:%0.1f ratio:%0.1f"%(type.upper(),Y_Future[-1],b,ratio))
+                # operation -=1
+                log.info("Type: %s Down Y_Future: %0.1f b:%0.1f ratio:%0.1f"%(type.upper(),Y_Future[-1],b,ratio))
             return operation,ratio
         else:
-            log.debug("down !!! d:%s" % Y_hat[1])
-            print("down !!! d:%s" % Y_hat[1])
-            return 0, 0
+            log.debug("Line down !!! d:%s" % Y_hat[1])
+            print("Line down !!! d:%s nowp:%s" % (round(Y_hat[1],2),asset[-1:].values[0]))
+            return -100, round(ratio,4)
     # print "high:",
     operationcount=0
     ratio_l=[]
-    for co in ['high','close','low']:
+    # for co in ['high','close','low']:
+    for co in ['high']:
         # for co in ['high','close','low']:
-        op,ratio=get_linear_model_ratio(df[co])
-        ratio_l.append(round(ratio,2))
-        operationcount +=op
+        for dt in ['H','M','L']:
+            op,ratio=get_linear_model_ratio(df[co],dt)
+            ratio_l.append(round(ratio,4))
+            operationcount +=op
     log.info("op:%s min:%s ratio_l:%s"%(operationcount,min(ratio_l),ratio_l))
-    return operationcount,ratio.min()
+    return operationcount,min(ratio_l)
 
 
 def parseArgmain():
+    # from ConfigParser import ConfigParser
+    # import shlex
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument('code', type=str, nargs='?', help='999999')
@@ -160,6 +167,10 @@ def parseArgmain():
                         help='DateType')
     parser.add_argument('-p', action="store", dest="ptype", type=str, choices=['f', 'b'], default='f',
                         help='Price Forward or back')
+    parser.add_argument('-v', action="store", dest="vtype", type=str, choices=['high', 'low', 'close'], default='close',
+                        help='type')
+    parser.add_argument('-f', action="store", dest="filter", type=str, choices=['y', 'n'], default='n',
+                        help='find duration low')
     return parser
 
 def maintest(code,start=None,type='m',filter='y'):
@@ -168,12 +179,28 @@ def maintest(code,start=None,type='m',filter='y'):
     strip_tx = timeit.timeit(lambda : get_linear_model_status(code, start=start,type=type,filter=filter), number=run)
     print("ex Read:", strip_tx)
 if __name__ == "__main__":
-
-    print "H"
+    parser = parseArgmain()
+    while 1:
+        try:    
+            log.setLevel(LoggerFactory.INFO)
+            # log.setLevel(LoggerFactory.DEBUG)
+            code = raw_input("code:")
+            args = parser.parse_args(code.split())
+            if len(args.code) == 6:
+             # ptype='f', df=None, dtype='d', type='m', start=None, end=None, days=1, filter='n'):
+                print args.end
+                op,ra=get_linear_model_status(args.code, dtype=args.dtype, start=cct.day8_to_day10(args.start), end=cct.day8_to_day10(args.end), filter=args.filter)
+                print "code:%s op:%s ra:%s"%(code,op,ra)
+            elif code=='q':
+                sys.exit(0)
+        except (IOError, EOFError, Exception) as e:
+            print "Error", e
+            # sys.exit(0)
     # log.setLevel(LoggerFactory.DEBUG)
     log.setLevel(LoggerFactory.INFO)
+    
     # st=get_linear_model_status('300380',start='2016-01-28',type='h',filter='y')
-    st = get_linear_model_status('000025')
+    st = get_linear_model_status('300380')
     # st=get_linear_model_status('300380',start='2016-01-28',filter='y')
     # maintest('002189',start='2016-01-28',type='h',filter='y')
     print "M:"

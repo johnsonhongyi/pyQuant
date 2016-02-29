@@ -4,10 +4,10 @@ REM E:
 cd stock
 start python singleAnalyseUtil.py
 ping -n 15 localhost > nul
-start python sina_Monitor.py 
+REM start python sina_Monitor.py 
+REM ping -n 15 localhost > nul
+start python sina_Monitor-GOLD.py
 ping -n 15 localhost > nul
-rem start python sina_Monitor-GOLD.py
-rem ping -n 15 localhost > nul
 start python sina_Monitor-Market.py
 ping -n 15 localhost > nul
 start python sina_Monitor-Market-New.py
