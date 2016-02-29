@@ -82,6 +82,7 @@ class Sina:
         self.max_num = 850
         self.start_t = time.time()
         self.dataframe=pd.DataFrame()
+        self.index_status=False
 
     def load_stock_codes(self):
         with open(self.stock_code_path) as f:
@@ -101,7 +102,6 @@ class Sina:
         self.stock_with_exchange_list = list(
             map(lambda stock_code: ('sh%s' if stock_code.startswith(('5', '6', '9')) else 'sz%s') % stock_code,
                 self.stock_codes))
-
         self.stock_list = []
         self.request_num = len(self.stock_with_exchange_list) // self.max_num
         for range_start in range(self.request_num):
@@ -157,12 +157,16 @@ class Sina:
     #
     #     return self.format_response_data()
 
-    def get_stock_code_data(self,code):
+    def get_stock_code_data(self,code,index=False):
         self.stock_codes = code
         # self.stock_with_exchange_list = list(
         #     map(lambda stock_code: ('sh%s' if stock_code.startswith(('5', '6', '9')) else 'sz%s') % stock_code,
         #         ulist))
-        self.stock_codes = map(lambda stock_code: ('sh%s' if stock_code.startswith(('5', '6', '9')) else 'sz%s') % stock_code,code.split())
+        if index:
+            self.index_status = index
+            self.stock_codes = map(lambda stock_code: ('sh%s' if stock_code.startswith(('0')) else 'sz%s') % stock_code,code.split())
+        else:
+            self.stock_codes = map(lambda stock_code: ('sh%s' if stock_code.startswith(('5', '6', '9')) else 'sz%s') % stock_code,code.split())
         self.url = self.sina_stock_api + ','.join(self.stock_codes)
         log.info("stock_list:%s"%self.url)
         response = requests.get(self.url)
@@ -237,6 +241,11 @@ class Sina:
 
         # df = pd.DataFrame.from_dict(stock_dict,columns=ct.SINA_Total_Columns)
         df = pd.DataFrame(list_s, columns=ct.SINA_Total_Columns)
+        # if self.index_status and cct.get_work_time():
+        # if self.index_status:
+        if cct.get_work_time() or (cct.get_work_time_int() > 915 and cct.get_work_time_int() < 1500) :
+            df = df.drop('close', axis=1)
+            df.rename(columns={'now': 'close'}, inplace=True)
         df = df.drop_duplicates('code')
         df = df.loc[:, ct.SINA_Total_Columns_Clean]
         df = df.fillna(0)
@@ -259,7 +268,7 @@ if __name__ == "__main__":
     # df= sina.all
     # code='601198'
     # df = sina.get_stock_list_data(['300380'])
-    df = sina.get_stock_code_data('300380').set_index('code')
+    df = sina.get_stock_code_data('000001',index=True).set_index('code')
     print df[:1]
     # list=['000001','399001','399006','399005']
     # df=sina.get_stock_list_data(list)

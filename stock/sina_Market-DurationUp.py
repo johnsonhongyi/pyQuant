@@ -14,7 +14,7 @@ from JSONData import realdatajson as rl
 from JSONData import tdx_data_Day as tdd
 from JohhnsonUtil import LoggerFactory as LoggerFactory
 from JohhnsonUtil import commonTips as cct
-
+import JohhnsonUtil.johnson_cons as ct
 
 # from logbook import Logger,StreamHandler,SyslogHandler
 # from logbook import StderrHandler
@@ -164,7 +164,6 @@ if __name__ == "__main__":
 
                     # top_dif.loc['600610','volume':'lvol']
 
-                top_dif=top_dif[top_dif.lvol > 50000]
                 top_dif['volume'] = (
                     map(lambda x, y: round(x / y / radio_t, 1), top_dif.volume.values, top_dif.lvol.values))
                 # top_dif = top_dif[top_dif.volume < 100]
@@ -196,6 +195,7 @@ if __name__ == "__main__":
                     len(top_now[top_now['volume'] <= 0]), goldstock)),
                 print "Rt:%0.1f dT:%s" % (float(time.time() - time_Rt), cct.get_time_to_date(time_s))
                 if ptype == 'low':
+                    top_dif=top_dif[top_dif.lvol > ct.LvolumeSize/100]
                     if 'counts' in top_dif.columns.values:
                         top_dif = top_dif.sort_values(by=['diff', 'percent', 'volume', 'counts', 'ratio'],
                                                       ascending=[0, 0, 0, 1, 1])
@@ -215,9 +215,13 @@ if __name__ == "__main__":
                 if percent_status == 'y' and cct.get_now_time_int() > 935 and ptype == 'low' :
                     top_temp=top_dif[top_dif.percent > 0]
                 # elif percent_status == 'y' and cct.get_now_time_int() > 935 and ptype == 'high' :
-                else:
+                elif ptype == 'low':
                     top_temp=top_dif[:10]
-                top_dd = pd.concat([top_temp, top_dif[-5:]], axis=0)
+                    top_end = top_dif[-5:]
+                else:
+                    top_temp=top_dif[:5]
+                    top_end = top_dif[-10:]
+                top_dd = pd.concat([top_temp,top_end], axis=0)
                 if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935 :
                     top_dd = top_dd.loc[:,
                              ['name', 'buy', 'diff', 'volume', 'percent', 'ratio', 'counts', 'high', 'lastp', 'date']]

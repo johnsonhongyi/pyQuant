@@ -17,7 +17,7 @@ from JohhnsonUtil import LoggerFactory
 from JohhnsonUtil import commonTips as cct
 from JohhnsonUtil import johnson_cons as ct
 import tushare as ts
-
+import sina_data
 # import datetime
 # import logbook
 
@@ -240,7 +240,7 @@ INDEX_LIST = {'sh': 'sh000001', 'sz': 'sz399001', 'hs300': 'sz399300',
 
 # def get_sina_api_code_now(code):
 def get_tdx_append_now_df_api(code, type='f', start=None, end=None):
-    import sina_data
+
     # start=cct.day8_to_day10(start)
     # end=cct.day8_to_day10(end)
     df = get_tdx_Exp_day_to_df(code, type, start, end).sort_index(ascending=True)
@@ -270,20 +270,19 @@ def get_tdx_append_now_df_api(code, type='f', start=None, end=None):
 
     log.debug("duration:%s" % duration)
     if duration >= 1:
+        if index_status:
+            code_t = INDEX_LIST[code][2:]
         try:
             ds = ts.get_hist_data(code, start=tdx_last_day, end=today)
             # ds = ts.get_h_data('000001', start=tdx_last_day, end=today,index=index_status)
             # df.index = pd.to_datetime(df.index)
         except (IOError, EOFError, Exception) as e:
             print "Error duration", e
-            if index_status:
-                code_t = INDEX_LIST[code][2:]
             ds = ts.get_h_data(code_t, start=tdx_last_day, end=today, index=index_status)
             df.index = pd.to_datetime(df.index)
         if ds is not None and len(ds) > 1:
             ds = ds[:len(ds) - 1]
             if index_status:
-                code_t = INDEX_LIST[code][2:]
                 if code == 'sh':
                     code = '999999'
                 else:
@@ -300,29 +299,42 @@ def get_tdx_append_now_df_api(code, type='f', start=None, end=None):
             df = df.append(ds)
             # pd.concat([df,ds],axis=0, join='outer')
             # result=pd.concat([df,ds])
-        if cct.get_work_time():
+        
+        if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 1500:
+            log.debug("get_work_time:work")
             # dm = rl.get_sina_Market_json('all').set_index('code')
             if index_status:
-                code = INDEX_LIST[code]
-            dm = sina_data.Sina().get_stock_code_data(code).set_index('code')
+                log.debug("code:%s code_t:%s"%(code,code_t))
+                # if len(code) < 6:
+                    # code = INDEX_LIST[code]
+                # log.debug("code:%s"%(code))
+                dm = sina_data.Sina().get_stock_code_data(code_t,index=index_status)
+                dm.code = code
+                dm = dm.set_index('code')
+                # print dm
+            else:
+                dm = sina_data.Sina().get_stock_code_data(code,index=index_status).set_index('code')
+            log.debug("dm:%s now:%s"%(len(dm),dm))
             if dm is not None and not dm.empty:
                 # dm=dm.drop_duplicates()
-                log.debug("dm:%s" % dm[-1:])
+                # log.debug("not None dm:%s" % dm[-1:])
                 dm.rename(columns={'volume': 'amount', 'turnover': 'vol'}, inplace=True)
-                # c_name=dm.loc[code,['name']]
-                dm_code = dm.loc[:, ['open', 'high', 'low', 'close', 'amount']]
-                log.debug("dm_code:%s" % dm_code['amount'])
+                c_name=dm.loc[code,['name']].values[0]
+                dm_code = (dm.loc[:, ['open', 'high', 'low', 'close', 'amount','vol']])
+                log.debug("dm_code:%s" % dm_code)
                 dm_code['amount'] = round(float(dm_code['amount']) / 100, 2)
                 dm_code['code'] = code
-                dm_code['vol'] = 0
-                # dm_code['date']=today
-                dm_code.name = today
+                # dm_code['vol'] = 0
+                dm_code['date']=today
+                dm_code = dm_code.set_index('date')
+                # dm_code.name = today
+                log.debug("dm_code_index:%s"%(dm_code))
                 df = df.append(dm_code)
-                # df['name']=c_name
-                # log.debug("c_name:%s"%(c_name))
-                log.debug("df[-3:]:%s" % (df[-2:]))
+                df['name']=c_name
+                log.debug("c_name:%s df.name:%s"%(c_name,df.name[-1]))
+                # log.debug("df[-3:]:%s" % (df[-2:]))
                 # df['name'] = dm.loc[code, 'name']
-        log.debug("df:%s" % df[-2:])
+        log.debug("df:%s" % df[-3:])
     return df
               
 def get_tdx_append_now_df(code, type='f', start=None, end=None):
@@ -1078,10 +1090,12 @@ if __name__ == '__main__':
     df= get_tdx_append_now_df('99999').sort_index(ascending=True)
     print df[-2:]
     '''
-    df = get_tdx_append_now_df_api('999999')
+    # print sina_data.Sina().get_stock_code_data('300006').set_index('code')
+    # df = get_tdx_append_now_df_api('999999',start='2015-12-24')
+    df = get_tdx_append_now_df_api('300006',start='2015-12-24')
     # df= get_tdx_append_now_df_api('999999',start='2016-02-01',end='2016-02-27')
     print df[-1:]
-    print df[df.index == '2015-02-27']
+    # print df[df.index == '2015-02-27']
     # print df[-2:]
     sys.exit(0)
     time_s = time.time()

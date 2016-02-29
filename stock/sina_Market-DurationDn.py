@@ -14,7 +14,7 @@ from JSONData import realdatajson as rl
 from JSONData import tdx_data_Day as tdd
 from JohhnsonUtil import LoggerFactory as LoggerFactory
 from JohhnsonUtil import commonTips as cct
-
+import JohhnsonUtil.johnson_cons as ct
 
 # from logbook import Logger,StreamHandler,SyslogHandler
 # from logbook import StderrHandler
@@ -60,11 +60,10 @@ if __name__ == "__main__":
     # handler=StderrHandler(format_string='{record.channel}: {record.message) [{record.extra[cwd]}]')
     # log.level = log.debug
     # error_handler = SyslogHandler('Sina-M-Log', level='ERROR')
-
     if cct.isMac():
         cct.set_console(105, 21)
     else:
-        cct.set_console(105, 21)
+        cct.set_console(106, 21)
     status = False
     vol = '0'
     type = '2'
@@ -78,9 +77,10 @@ if __name__ == "__main__":
     block_path = tdd.get_tdx_dir_blocknew() + '061.blk'
     status_change = False
     lastpTDX_DF = ''
-    duration_date = 20151224
+    duration_date = 20151220
     ptype = 'high'
     filter='y'
+    percent_status='n'
     # all_diffpath = tdd.get_tdx_dir_blocknew() + '062.blk'
     while 1:
         try:
@@ -144,38 +144,40 @@ if __name__ == "__main__":
                             # top_all.loc[symbol, 'lastp'])) / float(top_all.loc[symbol, 'lastp']) * 100),
                             # 1)
                             top_all.loc[symbol, 'buy':'low'] = top_now.loc[symbol, 'buy':'low']
-                        # top_all.loc[symbol, 'buy'] = top_now.loc[symbol, 'buy']
+                            # top_all.loc[symbol, 'buy'] = top_now.loc[symbol, 'buy']
                 # top_all = top_all[top_all.buy > 0]
-
                 top_dif = top_all
-                if cct.get_now_time_int() < 935:
+                if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935:
                     top_dif['diff'] = (
                         map(lambda x, y: round((x - y) / y * 100, 1), top_dif['buy'].values, top_dif['lastp'].values))
                     top_dif = top_dif[top_dif.buy > 0]
                 else:
                     top_dif['diff'] = (
                         map(lambda x, y: round((x - y) / y * 100, 1), top_dif['trade'].values, top_dif['lastp'].values))
-                # print top_dif.loc['600610',:]
-                    top_dif=top_dif[top_dif.low > 0]
+                    # print top_dif.loc['600610',:]
+                    log.debug("top_dif:%s"%(len(top_dif)))
                     top_dif = top_dif[top_dif.trade > 0]
+                    log.debug("top_dif.trade > 0:%s"%(len(top_dif)))
+                    if  cct.get_now_time_int() > 935:
+                        top_dif=top_dif[top_dif.low > 0]
+                        log.debug("top_dif.low > 0:%s"%(len(top_dif)))
+
                     # top_dif.loc['600610','volume':'lvol']
-                   
-                top_dif=top_dif[top_dif.lvol > 100000]
+                
                 top_dif['volume'] = (
                     map(lambda x, y: round(x / y / radio_t, 1), top_dif.volume.values, top_dif.lvol.values))
-
                 # top_dif = top_dif[top_dif.volume < 100]
+                # print top_dif.loc['002504',:]
                 if filter == 'y':
                     top_dif = top_dif[top_dif.date > cct.day8_to_day10(duration_date)]
-
-                log.info('dif1:%s' % len(top_dif))
+                log.info('dif1-filter:%s' % len(top_dif))
                 log.info(top_dif[:1])
                 # top_dif = top_dif[top_dif.buy > top_dif.lastp]
                 # top_dif = top_dif[top_dif.buy > top_dif.lhigh]
                 # log.debug('dif2:%s' % len(top_dif))
                 # top_dif['volume'] = top_dif['volume'].apply(lambda x: round(x / radio_t, 1))
                 # log.debug("top_diff:vol")
-                    # top_dif = top_dif[top_dif.volume > 1]
+                # top_dif = top_dif[top_dif.volume > 1]
                 if len(top_dif) == 0:
                     print "No G,DataFrame is Empty!!!!!!"
                 log.debug('dif6 vol:%s' % (top_dif[:1].volume))
@@ -193,12 +195,15 @@ if __name__ == "__main__":
                     len(top_now[top_now['volume'] <= 0]), goldstock)),
                 print "Rt:%0.1f dT:%s" % (float(time.time() - time_Rt), cct.get_time_to_date(time_s))
                 if ptype == 'low':
+                    # print "low"
+                    top_dif=top_dif[top_dif.lvol > ct.LvolumeSize/100]
                     if 'counts' in top_dif.columns.values:
                         top_dif = top_dif.sort_values(by=['diff', 'percent', 'volume', 'counts', 'ratio'],
                                                       ascending=[0, 0, 0, 1, 1])
                     else:
                         top_dif = top_dif.sort_values(by=['diff', 'percent', 'ratio'], ascending=[0, 0, 1])
                 else:
+                    # print "high"
                     top_dif['diff']=top_dif['diff'].apply(lambda x:x*2 if x < 0 else x )
                     if 'counts' in top_dif.columns.values:
                         top_dif = top_dif.sort_values(by=['diff', 'percent', 'volume', 'counts', 'ratio'],
@@ -209,13 +214,22 @@ if __name__ == "__main__":
                 # top_all=top_all.sort_values(by=['percent','diff','counts','ratio'],ascending=[0,0,1,1])
                 # print rl.format_for_print(top_dif[:10])
                 # top_dd = pd.concat([top_dif[:5],top_temp[:3],top_dif[-3:],top_temp[-3:]], axis=0)
-                top_dd = pd.concat([top_dif[:10], top_dif[-5:]], axis=0)
-                if cct.get_now_time_int() < 930:
+                if percent_status == 'y' and cct.get_now_time_int() > 935 and ptype == 'low' :
+                    top_temp=top_dif[top_dif.percent > 0]
+                # elif percent_status == 'y' and cct.get_now_time_int() > 935 and ptype == 'high' :
+                elif ptype == 'low':
+                    top_temp=top_dif[:10]
+                    top_end = top_dif[-5:]
+                else:
+                    top_temp=top_dif[:5]
+                    top_end = top_dif[-10:]
+                top_dd = pd.concat([top_temp,top_end], axis=0)
+                if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935 :
                     top_dd = top_dd.loc[:,
                              ['name', 'buy', 'diff', 'volume', 'percent', 'ratio', 'counts', 'high', 'lastp', 'date']]
                 else:
                     top_dd = top_dd.loc[:,
-                         ['name', 'trade', 'diff', 'volume', 'percent', 'ratio', 'counts', 'high', 'lastp', 'date']]
+                             ['name', 'trade', 'diff', 'volume', 'percent', 'ratio', 'counts', 'high', 'lastp', 'date']]
                 print rl.format_for_print(top_dd)
                 # if cct.get_now_time_int() < 930 or cct.get_now_time_int() > 1505 or (cct.get_now_time_int() > 1125 and cct.get_now_time_int() < 1505):
                 # print rl.format_for_print(top_dif[-10:])
@@ -258,7 +272,7 @@ if __name__ == "__main__":
             else:
                 raise KeyboardInterrupt("StopTime")
         except (KeyboardInterrupt) as e:
-            st = raw_input("status:[go(g),clear(c),[d 20150101 low|high],quit(q,e),W(w),Wa(a)]:")
+            st = raw_input("status:[go(g),clear(c),[d 20150101 [l|h]|[y|n|pn|py],quit(q,e),W(w),Wa(a)]:")
             if len(st) == 0:
                 status = False
             elif st == 'r':
@@ -296,12 +310,21 @@ if __name__ == "__main__":
                         filter = 'y'
                     elif p_t == 'n':
                         filter = 'n'
+                    elif p_t == 'py':
+                        percent_status = 'y'
+                    elif p_t == 'pn':
+                        percent_status = 'n'
                     else:
                         print ("arg error:%s"%p_t)
                 elif len(dl) == 4:
                     dt = dl[1]
                     ptype = dl[2]
-                    filter = dl[3]                  
+                    if ptype == 'l':
+                        ptype = 'low'
+                    elif ptype == 'h':
+                        ptype = 'high'
+                    filter = dl[3]
+                    percent_status = dl[3]
                 else:
                     dt = ''
                 if len(str(dt)) > 0:

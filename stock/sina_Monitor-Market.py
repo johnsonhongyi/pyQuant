@@ -322,7 +322,7 @@ if __name__ == "__main__":
 
                 top_dif = top_all
                 log.info('dif1:%s' % len(top_dif))
-                top_dif=top_dif[top_dif.lvol > 50000]
+                top_dif=top_dif[top_dif.lvol > ct.LvolumeSize]
                 log.info(top_dif[:1])
                 top_dif = top_dif[top_dif.buy > top_dif.lastp]
                 log.debug('dif2:%s' % len(top_dif))

@@ -15,6 +15,7 @@ REAL_INDEX_LABELS=['sh_a','sz_a','cyb']
 INDEX_LIST = {'sh': 'sh000001', 'sz': 'sz399001', 'hs300': 'sz399300',
               'sz50': 'sh000016', 'zxb': 'sz399005', 'cyb': 'sz399006'}
 DD_VOL_List={'0':'40000','1':'100000','2':'100000','3':'200000','4':'1000000'}
+LvolumeSize= 2000000
 DD_TYPE_List={'0':'5','1':'10','2':'20','3':'50','4':'100'}
 P_TYPE = {'http': 'http://', 'ftp': 'ftp://'}
 PAGE_NUM = [38, 60, 80, 100]
@@ -122,7 +123,7 @@ SINA_Market_COLUMNS = ['code', 'name', 'trade', 'buy', 'percent', 'open', 'high'
                       # 'ask1_volume', 'percent', 'open', 'close', 'high', 'low', 'volume',
                             # 'ratio']
                            
-# SINA_Total_Columns = ['code', 'name', 'open', 'close', 'trade', 'high', 'low', 'buy', 'sell', 'volume',
+# SINA_Total_Columns = ['code', 'name', 'open','now','close', 'trade', 'high', 'low', 'buy', 'sell', 'volume',
                       # 'turnover', 'bid1_volume', 'bid1', 'bid2_volume', 'bid2', 'bid3_volume',
                       # 'bid3', 'bid4_volume', 'bid4', 'bid5_volume', 'bid5', 'ask1_volume',
                       # 'ask1', 'ask2_volume', 'ask2', 'ask3_volume', 'ask3', 'ask4_volume',
@@ -131,7 +132,7 @@ SINA_Market_COLUMNS = ['code', 'name', 'trade', 'buy', 'percent', 'open', 'high'
 SINA_Total_Columns_Clean = ['code', 'name', 'buy','sell','b1','b1_v','a1',
                       'a1_v', 'open', 'close', 'high', 'low', 'volume',
                             'turnover']                           
-SINA_Total_Columns = ['code', 'name', 'open', 'close', 'trade', 'high', 'low', 'buy', 'sell', 'volume',
+SINA_Total_Columns = ['code', 'name', 'open', 'close','now', 'trade', 'high', 'low', 'buy', 'sell', 'volume',
                       'turnover', 'b1_v', 'b1', 'b2_v', 'b2', 'b3_v',
                       'b3', 'b4_v', 'b4', 'b5_v', 'b5', 'a1_v',
                       'a1', 'a2_v', 'a2', 'a3_v', 'a3', 'a4_v',

@@ -131,7 +131,8 @@ def get_linear_model_histogramDouble(code, ptype='f', dtype='d', start=None, end
     if not code.startswith('999') or not code.startswith('399'):
         if code[:1] in ['5', '6', '9']:
             code2 = '999999'
-        elif code[:1] in ['3']:
+        elif code[:2] in ['30']:
+            # print "cyb"
             code2 = '399006'
         else:
             code2 = '399001'
