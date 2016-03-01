@@ -12,6 +12,7 @@ import pandas as pd
 import singleAnalyseUtil as sl
 from JSONData import realdatajson as rl
 from JSONData import tdx_data_Day as tdd
+from JSONData import powerCompute as pct
 from JohhnsonUtil import LoggerFactory as LoggerFactory
 from JohhnsonUtil import commonTips as cct
 import JohhnsonUtil.johnson_cons as ct
@@ -146,7 +147,7 @@ if __name__ == "__main__":
                             top_all.loc[symbol, 'buy':'low'] = top_now.loc[symbol, 'buy':'low']
                             # top_all.loc[symbol, 'buy'] = top_now.loc[symbol, 'buy']
                 # top_all = top_all[top_all.buy > 0]
-                top_dif = top_all
+                top_dif = top_all.copy()
                 if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935:
                     top_dif['diff'] = (
                         map(lambda x, y: round((x - y) / y * 100, 1), top_dif['buy'].values, top_dif['lastp'].values))
@@ -218,18 +219,22 @@ if __name__ == "__main__":
                     top_temp=top_dif[top_dif.percent > 0]
                 # elif percent_status == 'y' and cct.get_now_time_int() > 935 and ptype == 'high' :
                 elif ptype == 'low':
-                    top_temp=top_dif[:10]
-                    top_end = top_dif[-5:]
+                    top_temp = top_dif[:10].copy()
+                    top_end = top_dif[-5:].copy()
                 else:
-                    top_temp=top_dif[:5]
-                    top_end = top_dif[-10:]
+                    top_temp = top_dif[:5].copy()
+                    top_end = top_dif[-10:].copy()
+                top_temp = pct.powerCompute_df(top_temp)
+                top_end = pct.powerCompute_df(top_end)
+
+
                 top_dd = pd.concat([top_temp,top_end], axis=0)
                 if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935 :
                     top_dd = top_dd.loc[:,
-                             ['name', 'buy', 'diff', 'volume', 'percent', 'ratio', 'counts', 'high', 'lastp', 'date']]
+                             ['name', 'buy', 'diff', 'op', 'ra', 'volume', 'percent', 'ratio', 'counts', 'high', 'lastp', 'date']]
                 else:
                     top_dd = top_dd.loc[:,
-                             ['name', 'trade', 'diff', 'volume', 'percent', 'ratio', 'counts', 'high', 'lastp', 'date']]
+                             ['name', 'trade', 'diff', 'op', 'ra', 'volume', 'percent', 'ratio', 'counts', 'high', 'lastp', 'date']]
                 print rl.format_for_print(top_dd)
                 # if cct.get_now_time_int() < 930 or cct.get_now_time_int() > 1505 or (cct.get_now_time_int() > 1125 and cct.get_now_time_int() < 1505):
                 # print rl.format_for_print(top_dif[-10:])

@@ -611,7 +611,7 @@ def get_duration_date(code, ptype='low', dt=None, df='',dl=None):
     log.debug("date:%s %s:%s" % (lowdate, ptype, lowp))
     return lowdate
 
-def get_duration_price_date(code, ptype='low', dt=None, df='',dl=None,vtype=None):
+def get_duration_price_date(code, ptype='low', dt=None, df='',dl=None,vtype=None,filter=False):
     if len(df) == 0:
         df = get_tdx_day_to_df(code).sort_index(ascending=False)
         log.debug("code:%s" % (df[:1].index))
@@ -653,7 +653,8 @@ def get_duration_price_date(code, ptype='low', dt=None, df='',dl=None,vtype=None
             dz = df[:int(dl)]
         else:
             dz = df
-        return dz[-1:].index.values[0]
+        if not filter: 
+            return dz[-1:].index.values[0]
     if ptype == 'high':
         lowp = dz.high.max()
         lowdate = dz[dz.high == lowp].index.values[0]

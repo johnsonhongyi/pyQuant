@@ -1,5 +1,4 @@
 # -*- coding:utf-8 -*-
-# ������Ҫ�õ��Ŀ�
 # %matplotlib inline
 import os
 import sys
@@ -56,21 +55,29 @@ def LIS(X):
     return S[::-1], pos[::-1]
 
 
-def get_linear_model_status(code, ptype='f', df=None, dtype='d', type='m', start=None, end=None, days=1, filter='n'):
+def get_linear_model_status(code, ptype='f', df=None, dtype='d', type='m', start=None, end=None, days=1, filter='n',dl=None):
     if start is not None and end is None and filter=='y':
-        if code not in ['999999','399006','399001']:
-            index_d,dl=tdd.get_duration_Index_date(dt=start)
-            log.debug("index_d:%s dl:%s"%(str(index_d),dl))
-        else:
-            index_d=cct.day8_to_day10(start)
-            log.debug("index_d:%s"%(index_d))
-        start=tdd.get_duration_price_date(code,ptype='low',dt=index_d)
+        # if code not in ['999999','399006','399001']:
+            # index_d,dl=tdd.get_duration_Index_date(dt=start)
+            # log.debug("index_d:%s dl:%s"%(str(index_d),dl))
+        # else:
+            # index_d=cct.day8_to_day10(start)
+            # log.debug("index_d:%s"%(index_d))
+        index_d = cct.day8_to_day10(start)
+        start = tdd.get_duration_price_date(code,ptype='low',dt=start)
         log.debug("start: %s"%(start))
+    
+    if dl is not None:
+        start = tdd.get_duration_price_date(code,ptype='low',dl=dl,filter=True)
+        
     if df is None:
         # df = tdd.get_tdx_append_now_df(code,ptype, start, end).sort_index(ascending=True)
-        print start,end
+        # print start,end
         df = tdd.get_tdx_append_now_df_api(code, ptype, start, end).sort_index(ascending=True)
-    log.info("Code:%s start:%s df-s:%s  end:%s"%(code,start,df[:1].index.values[0],df[-1:].index.values[0]))
+        if start is not None and filter=='y':
+            print df.index.values[0],index_d
+            if df.index.values[0] < index_d:
+                df = df[df.index > index_d]
     if not dtype == 'd':
         df = tdd.get_tdx_stock_period_to_type(df, dtype).sort_index(ascending=True)
     # df = tdd.get_tdx_Exp_day_to_df(code, 'f').sort_index(ascending=True)
@@ -129,7 +136,7 @@ def get_linear_model_status(code, ptype='f', df=None, dtype='d', type='m', start
                 Y_Future = Y * b + a - c_high
                 log.info("Type:H ratio: %0.1f %0.1f Y_Mid: %0.1f"%(b,ratio,Y_Future[-1]))
             diff = asset[-1] - Y_Future[-1]
-            print ("as:%s Y:%s"%(asset[-1] ,Y_Future[-1]))
+            log.info("as:%s Y:%s"%(asset[-1] ,Y_Future[-1]))
             if diff > 0:
                 operation +=1
                 log.info("Type: %s UP !!! Y_Future: %0.1f b:%0.1f ratio:%0.1f "%(type.upper(),Y_Future[-1],b,ratio))
@@ -139,21 +146,40 @@ def get_linear_model_status(code, ptype='f', df=None, dtype='d', type='m', start
             return operation,ratio
         else:
             log.debug("Line down !!! d:%s" % Y_hat[1])
-            print("Line down !!! d:%s nowp:%s" % (round(Y_hat[1],2),asset[-1:].values[0]))
-            return -100, round(ratio,4)
+            # print("Line down !!! d:%s nowp:%s" % (round(Y_hat[1],2),asset[-1:].values[0]))
+            return -1, round(ratio,2)
     # print "high:",
     operationcount=0
     ratio_l=[]
     # for co in ['high','close','low']:
-    for co in ['high']:
+    for co in ['high','close','low']:
         # for co in ['high','close','low']:
         for dt in ['H','M','L']:
             op,ratio=get_linear_model_ratio(df[co],dt)
-            ratio_l.append(round(ratio,4))
+            ratio_l.append(round(ratio,2))
             operationcount +=op
     log.info("op:%s min:%s ratio_l:%s"%(operationcount,min(ratio_l),ratio_l))
-    return operationcount,min(ratio_l)
+    # print ("Code:%s start:%s df-s:%s  end:%s"%(code,start,df[:1].index.values[0],df[-1:].index.values[0]))
+    # log.info("Code:%s start:%s df-s:%s  end:%s"%(code,start,df[:1].index.values[0],df[-1:].index.values[0]))
+    return operationcount,min(ratio_l),df[:1].index.values[0]
 
+def powerCompute_df(df,dtype='d',end=None,dl=None):
+    code_l = df.index.tolist()
+    # dtype=dtype
+    # df['op']
+    for code in code_l:
+        if dl is None:
+            start=df.loc[code,'date']
+            start=cct.day8_to_day10(start)
+        else:
+            start = None
+        # end=cct.day8_to_day10(end)
+        op,ra,st=get_linear_model_status(code, dtype=dtype, start=cct.day8_to_day10(start), end=cct.day8_to_day10(end),dl=dl)
+        df.loc[code,'op']=op
+        df.loc[code,'ra']=ra
+        if dl is not None:
+            df.loc[code,'ldate'] = st
+    return df
 
 def parseArgmain():
     # from ConfigParser import ConfigParser
@@ -182,17 +208,19 @@ if __name__ == "__main__":
     parser = parseArgmain()
     while 1:
         try:    
-            log.setLevel(LoggerFactory.INFO)
+            # log.setLevel(LoggerFactory.INFO)
             # log.setLevel(LoggerFactory.DEBUG)
             code = raw_input("code:")
             args = parser.parse_args(code.split())
             if len(args.code) == 6:
              # ptype='f', df=None, dtype='d', type='m', start=None, end=None, days=1, filter='n'):
-                print args.end
-                op,ra=get_linear_model_status(args.code, dtype=args.dtype, start=cct.day8_to_day10(args.start), end=cct.day8_to_day10(args.end), filter=args.filter)
-                print "code:%s op:%s ra:%s"%(code,op,ra)
+                # print args.end
+                op,ra,st=get_linear_model_status(args.code, dtype=args.dtype, start=cct.day8_to_day10(args.start), end=cct.day8_to_day10(args.end), filter=args.filter)
+                print "code:%s op:%s ra:%s  start:%s"%(code,op,ra,st)
             elif code=='q':
                 sys.exit(0)
+            else:
+                print "code error"
         except (IOError, EOFError, Exception) as e:
             print "Error", e
             # sys.exit(0)

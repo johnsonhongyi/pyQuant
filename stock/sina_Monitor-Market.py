@@ -17,6 +17,7 @@ from pandas import DataFrame
 import JohhnsonUtil.johnson_cons as ct
 from JSONData import realdatajson as rl
 from JSONData import tdx_data_Day as tdd
+from JSONData import powerCompute as pct
 from JohhnsonUtil import LoggerFactory
 from JohhnsonUtil import commonTips as cct
 import singleAnalyseUtil as sl
@@ -380,8 +381,20 @@ if __name__ == "__main__":
                     top_dif = top_dif.sort_values(by=['diff', 'percent', 'ratio'], ascending=[0, 0, 1])
 
                 # top_all=top_all.sort_values(by=['percent','diff','counts','ratio'],ascending=[0,0,1,1])
+
+                top_temp = top_dif[:50].copy()
+                top_temp = pct.powerCompute_df(top_temp,dl='30')
+                if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935:
+                    top_temp = top_temp.loc[:,
+                             ['name', 'buy', 'diff', 'op', 'ra','volume', 'percent', 'ratio', 'counts',
+                              'ldate', 'date']]
+                else:
+                    top_temp = top_temp.loc[:,
+                             ['name', 'trade', 'diff', 'op', 'ra', 'volume', 'percent', 'ratio', 'counts',
+                              'ldate','date']]
+                print rl.format_for_print(top_temp[:10])                
+                
                 # print rl.format_for_print(top_dif[:10])
-                print rl.format_for_print(top_dif[:10])
                 # print top_all.loc['000025',:]
                 # print "staus",status
 

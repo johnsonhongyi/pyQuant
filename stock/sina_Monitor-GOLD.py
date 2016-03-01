@@ -20,6 +20,7 @@ import JohhnsonUtil.commonTips as cct
 import singleAnalyseUtil as sl
 from JSONData import realdatajson as rl
 from JSONData import tdx_data_Day as tdd
+from JSONData import powerCompute as pct
 from JohhnsonUtil import LoggerFactory as LoggerFactory
 
 log = LoggerFactory.getLogger('SinaMonitor-Gold')
@@ -190,7 +191,20 @@ if __name__ == "__main__":
                 # print tbl.tabulate(top_all,headers='keys', tablefmt='orgtbl')
                 # print rl.format_for_print(top_all)
                 # print top_all[:10]
-                print rl.format_for_print(top_all[:10])
+                
+                top_temp = top_all[:50].copy()
+                top_temp = pct.powerCompute_df(top_temp,dl='30')
+                if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935:
+                    top_temp = top_temp.loc[:,
+                             ['name', 'buy', 'diff', 'op', 'ra','volume', 'percent', 'ratio', 'counts',
+                              'ldate']
+                else:
+                    top_temp = top_temp.loc[:,
+                             ['name', 'trade', 'diff', 'op', 'ra', 'volume', 'percent', 'ratio', 'counts',
+                              'ldate']
+                print rl.format_for_print(top_temp[:10]) 
+                
+                # print rl.format_for_print(top_all[:10])
                 if status:
                     for code in top_all[:10].index:
                         code = re.findall('(\d+)', code)
