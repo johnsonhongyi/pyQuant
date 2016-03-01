@@ -197,11 +197,11 @@ if __name__ == "__main__":
                 if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935:
                     top_temp = top_temp.loc[:,
                              ['name', 'buy', 'diff', 'op', 'ra','volume', 'percent', 'ratio', 'counts',
-                              'ldate']
+                              'ldate']]
                 else:
                     top_temp = top_temp.loc[:,
                              ['name', 'trade', 'diff', 'op', 'ra', 'volume', 'percent', 'ratio', 'counts',
-                              'ldate']
+                              'ldate']]
                 print rl.format_for_print(top_temp[:10]) 
                 
                 # print rl.format_for_print(top_all[:10])
