@@ -33,8 +33,7 @@ path_sep = os.path.sep
 newstockdayl = 50
 changedays=5
 
-
-win7root = r'E:\DOC\Parallels\WinTools\zd_pazq'
+win7root = r'D:\Program Files\gfzq'
 macroot = r'/Users/Johnson/Documents/Johnson/WinTools/zd_pazq'
 xproot = r'E:\DOC\Parallels\WinTools\zd_pazq'
 
