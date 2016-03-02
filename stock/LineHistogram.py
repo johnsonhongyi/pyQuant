@@ -15,7 +15,7 @@ from JohhnsonUtil import commonTips as cct
 from JohhnsonUtil import zoompan
 
 log = LoggerFactory.getLogger('Linehistogram')
-log.setLevel(LoggerFactory.DEBUG)
+# log.setLevel(LoggerFactory.DEBUG)
 from JSONData import tdx_data_Day as tdd
 
 if cct.isMac():
@@ -174,7 +174,6 @@ def get_linear_model_histogramDouble(code, ptype='f', dtype='d', start=None, end
             asset1 = df1[vtype]
             asset1 = asset1.apply(lambda x: round(x / asset1[:1], 2))
 
-            
     # 画出价格随时间变化的图像
     # _, ax = plt.subplots()
     # fig = plt.figure()

@@ -21,7 +21,7 @@ from JSONData import powerCompute as pct
 from JohhnsonUtil import LoggerFactory
 from JohhnsonUtil import commonTips as cct
 import singleAnalyseUtil as sl
-
+import LineHistogram as lhg
 
 # from logbook import Logger,StreamHandler,SyslogHandler
 # from logbook import StderrHandler
@@ -472,7 +472,20 @@ if __name__ == "__main__":
                     # cct.write_to_blocknew(all_diffpath, codew, False)
                 print "wri ok:%s" % block_path
 
-                # time.sleep(2)
+            elif st.startswith('sh'):
+                code = st.split()[1]
+                # lhg.get_linear_model_histogramDouble(code, args.ptype, args.dtype, start, end, args.vtype, args.filter)
+                lhg.get_linear_model_histogramDouble(code, start=top_temp.loc[code, 'ldate'], vtype='close', filter='y')
+                # raise KeyboardInterrupt()
+                while 1:
+                    st = raw_input("code:")
+                    if len(str(st)) == 6:
+                        lhg.get_linear_model_histogramDouble(code, start=top_temp.loc[code, 'ldate'], vtype='close',
+                                                             filter='y')
+                    elif st == 'q':
+                        break
+                    else:
+                        pass
             else:
                 sys.exit(0)
         except (IOError, EOFError, Exception) as e:

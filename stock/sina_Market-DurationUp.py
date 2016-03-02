@@ -6,14 +6,17 @@ import re
 import sys
 import time
 import traceback
+
 import pandas as pd
+
+import JohhnsonUtil.johnson_cons as ct
+import LineHistogram as lhg
 import singleAnalyseUtil as sl
+from JSONData import powerCompute as pct
 from JSONData import realdatajson as rl
 from JSONData import tdx_data_Day as tdd
-from JSONData import powerCompute as pct
 from JohhnsonUtil import LoggerFactory as LoggerFactory
 from JohhnsonUtil import commonTips as cct
-import JohhnsonUtil.johnson_cons as ct
 
 
 # from logbook import Logger,StreamHandler,SyslogHandler
@@ -250,7 +253,7 @@ if __name__ == "__main__":
             else:
                 raise KeyboardInterrupt("StopTime")
         except (KeyboardInterrupt) as e:
-            st = raw_input("status:[go(g),clear(c),[d 20150101 [l|h]|[y|n|pn|py],quit(q,e),W(w),Wa(a)]:")
+            st = raw_input("status:[go(g),clear(c),[d 20150101 [l|h]|[y|n|pn|py],quit(q),W(a),sh]:")
             if len(st) == 0:
                 status = False
             elif st == 'r':
@@ -323,8 +326,20 @@ if __name__ == "__main__":
                     cct.write_to_blocknew(block_path, codew, False)
                     # sl.write_to_blocknew(all_diffpath, codew, False)
                 print "wri ok:%s" % block_path
-
-                # time.sleep(2)
+            elif st.startswith('sh'):
+                code = st.split()[1]
+                # lhg.get_linear_model_histogramDouble(code, args.ptype, args.dtype, start, end, args.vtype, args.filter)
+                lhg.get_linear_model_histogramDouble(code, start=top_temp.loc[code, 'date'], vtype='close',
+                                                     filter=filter)
+                while 1:
+                    st = raw_input("code:")
+                    if len(str(st)) == 6:
+                        lhg.get_linear_model_histogramDouble(code, start=top_temp.loc[code, 'ldate'], vtype='close',
+                                                             filter='y')
+                    elif st == 'q':
+                        break
+                    else:
+                        pass
             else:
                 sys.exit(0)
         except (IOError, EOFError, Exception) as e:
