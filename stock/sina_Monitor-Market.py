@@ -480,6 +480,7 @@ if __name__ == "__main__":
                 while 1:
                     st = raw_input("code:")
                     if len(str(st)) == 6:
+                        code = st
                         lhg.get_linear_model_histogramDouble(code, start=top_temp.loc[code, 'ldate'], vtype='close',
                                                              filter='y')
                     elif st == 'q':
