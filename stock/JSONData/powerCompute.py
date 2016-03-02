@@ -12,21 +12,22 @@ log = LoggerFactory.getLogger(os.path.basename(sys.argv[0]))
 # log.setLevel(LoggerFactory.DEBUG)
 from JSONData import tdx_data_Day as tdd
 
-def set_ctrl_handler():
-    import win32api,thread
-    # def doSaneThing(sig, func=None):
-        # '''忽略所有KeyCtrl'''
-        # return True
-    # win32api.SetConsoleCtrlHandler(doSaneThing, 1)
-    def handler(dwCtrlType, hook_sigint=thread.interrupt_main):
-        # print ("ctrl:%s"%(dwCtrlType))
-        if dwCtrlType == 0: # CTRL_C_EVENT
-            hook_sigint()
-            # raise KeyboardInterrupt("CTRL-C!")
-            return 1 # don't chain to the next handler
-        return 0 # chain to the next handler
-    win32api.SetConsoleCtrlHandler(handler, 1)
-set_ctrl_handler()
+
+# def set_ctrl_handler():
+#     import win32api,thread
+#     # def doSaneThing(sig, func=None):
+#         # '''忽略所有KeyCtrl'''
+#         # return True
+#     # win32api.SetConsoleCtrlHandler(doSaneThing, 1)
+#     def handler(dwCtrlType, hook_sigint=thread.interrupt_main):
+#         # print ("ctrl:%s"%(dwCtrlType))
+#         if dwCtrlType == 0: # CTRL_C_EVENT
+#             hook_sigint()
+#             # raise KeyboardInterrupt("CTRL-C!")
+#             return 1 # don't chain to the next handler
+#         return 0 # chain to the next handler
+#     win32api.SetConsoleCtrlHandler(handler, 1)
+# set_ctrl_handler()
 
 
 

@@ -522,7 +522,9 @@ def get_tdx_day_to_df(code):
     df = df.set_index('date')
     # print "time:",(time.time()-time_s)*1000
     return df
-def get_duration_Index_date(code='999999',dt=None):
+
+
+def get_duration_Index_date(code='999999', dt=None, ptype='low'):
     if dt is not None:
         if len(str(dt)) < 8:
             dl = int(dt)+changedays

@@ -15,7 +15,7 @@ from JohhnsonUtil import commonTips as cct
 from JohhnsonUtil import zoompan
 
 log = LoggerFactory.getLogger('Linehistogram')
-# log.setLevel(LoggerFactory.DEBUG)
+log.setLevel(LoggerFactory.DEBUG)
 from JSONData import tdx_data_Day as tdd
 
 if cct.isMac():
@@ -167,7 +167,14 @@ def get_linear_model_histogramDouble(code, ptype='f', dtype='d', start=None, end
             asset1 = df1.loc[asset.index, vtype]
             startv = asset1[:1]
             asset1 = asset1.apply(lambda x: round(x / asset1[:1], 2))
-        
+        else:
+            asset = df.loc[df1.index, vtype]
+            asset = asset.dropna()
+            dates = asset.index
+            asset1 = df1[vtype]
+            asset1 = asset1.apply(lambda x: round(x / asset1[:1], 2))
+
+            
     # 画出价格随时间变化的图像
     # _, ax = plt.subplots()
     # fig = plt.figure()
@@ -467,7 +474,7 @@ if __name__ == "__main__":
                 elif len(num_input) == 6:
                     code = args.code
                     # print code, args.ptype, args.dtype, start, end
-                    get_linear_model_histogramDouble(code, args.ptype, args.dtype, start, end, args.vtype)
+                    get_linear_model_histogramDouble(code, args.ptype, args.dtype, start, end, args.vtype, args.filter)
                     # p=multiprocessing.Process(target=get_linear_model_histogramDouble,args=(code, args.ptype, args.dtype, start, end,args.vtype,args.filter,))
                     # p.daemon = True
                     # p.start()
