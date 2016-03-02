@@ -33,41 +33,38 @@ path_sep = os.path.sep
 newstockdayl = 50
 changedays=5
 
+
+win7root = r'E:\DOC\Parallels\WinTools\zd_pazq'
+macroot = r'/Users/Johnson/Documents/Johnson/WinTools/zd_pazq'
+xproot = r'E:\DOC\Parallels\WinTools\zd_pazq'
+
 def get_tdx_dir():
     os_sys = cct.get_sys_system()
     os_platform = cct.get_sys_platform()
     if os_sys.find('Darwin') == 0:
         log.info("DarwinFind:%s" % os_sys)
-        basedir = r'/Users/Johnson/Documents/Johnson/WinTools/zd_pazq'.replace('/', path_sep).replace('\\',
-                                                                                                      path_sep)  # 如果你的安装路径不同,请改这里
+        basedir = macroot.replace('/', path_sep).replace('\\',path_sep)
         log.info("Mac:%s" % os_platform)
 
     elif os_sys.find('Win') == 0:
         log.info("Windows:%s" % os_sys)
         if os_platform.find('XP'):
             log.info("XP:%s" % os_platform)
-            basedir = r'E:\DOC\Parallels\WinTools\zd_pazq'.replace('/', path_sep).replace('\\',
-                                                                                          path_sep)  # 如果你的安装路径不同,请改这里
+            basedir = xproot.replace('/', path_sep).replace('\\',path_sep)  # 如果你的安装路径不同,请改这里
         else:
             log.info("Win7O:" % os_platform)
-            basedir = r'E:\DOC\Parallels\WinTools\zd_pazq'.replace('/', path_sep).replace('\\',
-                                                                                          path_sep)  # 如果你的安装路径不同,请改这里
+            basedir = win7root.replace('/', path_sep).replace('\\',path_sep)  # 如果你的安装路径不同,请改这里
     return basedir
-
 
 def get_tdx_dir_blocknew():
     blocknew_path = get_tdx_dir() + r'/T0002/blocknew/'.replace('/', path_sep).replace('\\', path_sep)
     return blocknew_path
 
-
 basedir = get_tdx_dir()
-# path_sep = os.path.sep
-# exp_dir = get_tdx_dir() + r'/T0002/export/'
-blocknew = r'/Users/Johnson/Documents/Johnson/WinTools/zd_pazq/T0002/blocknew'
+blocknew = get_tdx_dir_blocknew()
+# blocknew = r'/Users/Johnson/Documents/Johnson/WinTools/zd_pazq/T0002/blocknew'
 # blocknew = 'Z:\Documents\Johnson\WinTools\zd_pazq\T0002\blocknew'
-# exp_dir    = basedir + r'\T0002\export_back'
 lc5_dir_sh = basedir + r'\Vipdoc\sh\fzline'
-# lc5_dir_sh =  r'D:\2965\ydzqwsjy\Vipdoc\sh\fzline'
 lc5_dir_sz = basedir + r'\Vipdoc\sz\fzline'
 lc5_dir = basedir + r'\Vipdoc\%s\fzline'
 day_dir = basedir + r'\Vipdoc\%s\lday/'
@@ -75,12 +72,6 @@ day_dir_sh = basedir + r'\Vipdoc\sh\lday/'
 day_dir_sz = basedir + r'/Vipdoc/sz/lday/'
 exp_path = basedir + "/T0002/export/".replace('/', path_sep).replace('\\', path_sep)
 day_path = {'sh': day_dir_sh, 'sz': day_dir_sz}
-
-
-# stkdict = {}  # 存储股票ID和上海市、深圳市的对照
-
-# code_u = 'sz002399'
-
 
 # http://www.douban.com/note/504811026/
 def get_tdx_Exp_day_to_df(code, type='f', start=None, end=None, dt=None, dl=None):
@@ -611,7 +602,7 @@ def get_duration_date(code, ptype='low', dt=None, df='',dl=None):
     log.debug("date:%s %s:%s" % (lowdate, ptype, lowp))
     return lowdate
 
-def get_duration_price_date(code, ptype='low', dt=None, df='',dl=None,vtype=None,filter=False):
+def get_duration_price_date(code, ptype='low', dt=None, df='',dl=None,vtype=None,filter=True):
     if len(df) == 0:
         df = get_tdx_day_to_df(code).sort_index(ascending=False)
         log.debug("code:%s" % (df[:1].index))
@@ -654,7 +645,7 @@ def get_duration_price_date(code, ptype='low', dt=None, df='',dl=None,vtype=None
         else:
             dz = df
         if not filter: 
-            return dz[-1:].index.values[0]
+            index_d = dz[-1:].index.values[0]
     if ptype == 'high':
         lowp = dz.high.max()
         lowdate = dz[dz.high == lowp].index.values[0]
@@ -672,7 +663,10 @@ def get_duration_price_date(code, ptype='low', dt=None, df='',dl=None,vtype=None
     #     lowdate = dz[dz.close == lowp].index.values[0]
     #     log.debug("low:%s"%lowdate)
     log.debug("date:%s %s:%s" % (lowdate, ptype, lowp))
-    return lowdate
+    if filter:
+        return lowdate
+    else:
+        return lowdate,index_d
 
 
 def get_tdx_exp_low_or_high_price(code, dt=None, ptype='low', dl=None):

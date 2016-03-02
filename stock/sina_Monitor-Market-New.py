@@ -261,11 +261,11 @@ if __name__ == "__main__":
                 top_temp = pct.powerCompute_df(top_temp,dl='30')
                 if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935:
                     top_temp = top_temp.loc[:,
-                             ['name', 'buy', 'diff', 'op', 'ra','volume', 'percent', 'ratio', 'counts',
+                             ['name', 'buy', 'diff', 'op', 'ra', 'percent','volume', 'ratio', 'counts',
                               'ldate', 'date']]
                 else:
                     top_temp = top_temp.loc[:,
-                             ['name', 'trade', 'diff', 'op', 'ra', 'volume', 'percent', 'ratio', 'counts',
+                             ['name', 'trade', 'diff', 'op', 'ra', 'percent', 'volume', 'ratio', 'counts',
                               'ldate','date']]
                 print rl.format_for_print(top_temp[:10])
                 # print rl.format_for_print(top_dif[:10])

@@ -1,20 +1,42 @@
 # -*- coding:utf-8 -*-
-# %matplotlib inline
 import os
 import sys
-
 sys.path.append("..")
+
 import numpy as np
 import statsmodels.api as sm
 from statsmodels import regression
 from JohhnsonUtil import LoggerFactory as LoggerFactory
 from JohhnsonUtil import commonTips as cct
-
 log = LoggerFactory.getLogger(os.path.basename(sys.argv[0]))
 # log.setLevel(LoggerFactory.DEBUG)
 from JSONData import tdx_data_Day as tdd
 
+def set_ctrl_handler():
+    import win32api,thread
+    # def doSaneThing(sig, func=None):
+        # '''忽略所有KeyCtrl'''
+        # return True
+    # win32api.SetConsoleCtrlHandler(doSaneThing, 1)
+    def handler(dwCtrlType, hook_sigint=thread.interrupt_main):
+        # print ("ctrl:%s"%(dwCtrlType))
+        if dwCtrlType == 0: # CTRL_C_EVENT
+            hook_sigint()
+            # raise KeyboardInterrupt("CTRL-C!")
+            return 1 # don't chain to the next handler
+        return 0 # chain to the next handler
+    win32api.SetConsoleCtrlHandler(handler, 1)
+set_ctrl_handler()
 
+
+
+# import signal
+# def signal_handler(sig, frame):
+#     print('Received signal {signal}'.format(signal=sig))
+#
+# signal.signal(signal.SIGINT, signal_handler)
+# print('Press the stop button.')
+# signal.pause()
 # ȡ�ù�Ʊ�ļ۸�
 # start = '2015-09-05'
 # end = '2016-01-04'
@@ -68,14 +90,16 @@ def get_linear_model_status(code, ptype='f', df=None, dtype='d', type='m', start
         log.debug("start: %s"%(start))
     
     if dl is not None:
-        start = tdd.get_duration_price_date(code,ptype='low',dl=dl,filter=True)
+        start,index_d = tdd.get_duration_price_date(code,ptype='low',dl=dl,filter=False)
+        # start = tdd.get_duration_price_date(code,ptype='low',dl=dl)
+        # filter = 'y'
         
     if df is None:
         # df = tdd.get_tdx_append_now_df(code,ptype, start, end).sort_index(ascending=True)
         # print start,end
         df = tdd.get_tdx_append_now_df_api(code, ptype, start, end).sort_index(ascending=True)
-        if start is not None and filter=='y':
-            print df.index.values[0],index_d
+        if (start is not None or dl is not None) and filter=='y':
+            # print df.index.values[0],index_d
             if df.index.values[0] < index_d:
                 df = df[df.index > index_d]
     if not dtype == 'd':
@@ -110,7 +134,8 @@ def get_linear_model_status(code, ptype='f', df=None, dtype='d', type='m', start
             log.debug("u:%0.1f" % Y_hat[1])
             log.debug("price:%0.1f" % asset.iat[1])
             if type.upper() == 'M':
-                Y_Future = Y * b + a 
+                Y_Future = X * b +a
+                # Y_Future = Y * b + a 
                 # ratio = b/a*100
                 log.info("Type:M ratio: %0.1f %0.1f Y_Mid: %0.1f"%(b,ratio,Y_Future[-1]))
                 # diff = asset.iat[-1] - Y_hat[-1]
@@ -121,8 +146,8 @@ def get_linear_model_status(code, ptype='f', df=None, dtype='d', type='m', start
             elif type.upper() == 'L':
                 i = (asset.values.T - Y_hat).argmin()
                 c_low = X[i] * b + a - asset.values[i]
-                # Y_hatlow = X * b + a - c_low
-                Y_Future = Y * b + a - c_low
+                Y_Future = X * b + a - c_low
+                # Y_Future = Y * b + a - c_low
                 log.info("Type:L b: %0.1f ratio:%0.1f Y_Mid: %0.1f"%(b,ratio,Y_Future[-1]))
                 # diff = asset.iat[-1] - Y_hatlow[-1]
                 # if asset.iat[-1] - Y_hatlow[-1] > 0:
@@ -133,8 +158,10 @@ def get_linear_model_status(code, ptype='f', df=None, dtype='d', type='m', start
                 i = (asset.values.T - Y_hat).argmax()
                 c_high = X[i] * b + a - asset.values[i]
                 # Y_hathigh = X * b + a - c_high
-                Y_Future = Y * b + a - c_high
+                Y_Future = X * b + a - c_high
+                # Y_Future = Y * b + a - c_high
                 log.info("Type:H ratio: %0.1f %0.1f Y_Mid: %0.1f"%(b,ratio,Y_Future[-1]))
+            # diff = asset[-1] - Y_Future[-1]
             diff = asset[-1] - Y_Future[-1]
             log.info("as:%s Y:%s"%(asset[-1] ,Y_Future[-1]))
             if diff > 0:
@@ -148,22 +175,27 @@ def get_linear_model_status(code, ptype='f', df=None, dtype='d', type='m', start
             log.debug("Line down !!! d:%s" % Y_hat[1])
             # print("Line down !!! d:%s nowp:%s" % (round(Y_hat[1],2),asset[-1:].values[0]))
             return -1, round(ratio,2)
-    # print "high:",
-    operationcount=0
-    ratio_l=[]
-    # for co in ['high','close','low']:
-    for co in ['high','close','low']:
-        # for co in ['high','close','low']:
-        for dt in ['H','M','L']:
-            op,ratio=get_linear_model_ratio(df[co],dt)
-            ratio_l.append(round(ratio,2))
-            operationcount +=op
-    log.info("op:%s min:%s ratio_l:%s"%(operationcount,min(ratio_l),ratio_l))
-    # print ("Code:%s start:%s df-s:%s  end:%s"%(code,start,df[:1].index.values[0],df[-1:].index.values[0]))
-    # log.info("Code:%s start:%s df-s:%s  end:%s"%(code,start,df[:1].index.values[0],df[-1:].index.values[0]))
-    return operationcount,min(ratio_l),df[:1].index.values[0]
+    if len(df) > 1:
+        operationcount=0
+        ratio_l=[]
+        for co in ['high','close','low']:
+            for dt in ['H','M','L']:
+                op,ratio=get_linear_model_ratio(df[co],dt)
+                ratio_l.append(round(ratio,2))
+                operationcount +=op
+        log.info("op:%s min:%s ratio_l:%s"%(operationcount,min(ratio_l),ratio_l))
+        # print ("Code:%s start:%s df-s:%s  end:%s"%(code,start,df[:1].index.values[0],df[-1:].index.values[0]))
+        # log.info("Code:%s start:%s df-s:%s  end:%s"%(code,start,df[:1].index.values[0],df[-1:].index.values[0]))
+        return operationcount,min(ratio_l),df[:1].index.values[0]
+    elif len(df) == 1:
+        log.error("code: is :%s"%(code,len(df)))
+        return -9,0,df.index.values[0]
+    else:
+        log.error("code: Low :%s"%(code,len(df)))
+        return -9,-9,cct.get_today()
+        
 
-def powerCompute_df(df,dtype='d',end=None,dl=None):
+def powerCompute_df(df,dtype='d',end=None,dl=None,filter='y'):
     code_l = df.index.tolist()
     # dtype=dtype
     # df['op']
@@ -174,7 +206,7 @@ def powerCompute_df(df,dtype='d',end=None,dl=None):
         else:
             start = None
         # end=cct.day8_to_day10(end)
-        op,ra,st=get_linear_model_status(code, dtype=dtype, start=cct.day8_to_day10(start), end=cct.day8_to_day10(end),dl=dl)
+        op,ra,st=get_linear_model_status(code, dtype=dtype, start=cct.day8_to_day10(start), end=cct.day8_to_day10(end),dl=dl,filter=filter)
         df.loc[code,'op']=op
         df.loc[code,'ra']=ra
         if dl is not None:
@@ -212,7 +244,7 @@ if __name__ == "__main__":
             # log.setLevel(LoggerFactory.DEBUG)
             code = raw_input("code:")
             args = parser.parse_args(code.split())
-            if len(args.code) == 6:
+            if len(str(args.code)) == 6:
              # ptype='f', df=None, dtype='d', type='m', start=None, end=None, days=1, filter='n'):
                 # print args.end
                 op,ra,st=get_linear_model_status(args.code, dtype=args.dtype, start=cct.day8_to_day10(args.start), end=cct.day8_to_day10(args.end), filter=args.filter)
@@ -221,6 +253,9 @@ if __name__ == "__main__":
                 sys.exit(0)
             else:
                 print "code error"
+        except (KeyboardInterrupt) as e:
+            # print "key"
+            print "KeyboardInterrupt:", e
         except (IOError, EOFError, Exception) as e:
             print "Error", e
             # sys.exit(0)

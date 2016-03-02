@@ -30,7 +30,7 @@ from JSONData import realdatajson as rl
 from JSONData import tdx_data_Day as tdd
 from JSONData import powerCompute as pct
 from JohhnsonUtil import LoggerFactory as LoggerFactory
-
+# cct.set_ctrl_handler()
 if __name__ == "__main__":
     # parsehtml(downloadpage(url_s))
 
@@ -153,11 +153,11 @@ if __name__ == "__main__":
                 top_temp = pct.powerCompute_df(top_temp,dl='30')
                 if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935:
                     top_temp = top_temp.loc[:,
-                             ['name', 'buy', 'diff', 'op', 'ra','volume', 'percent', 'ratio', 'counts',
+                             ['name', 'buy', 'diff', 'op', 'ra', 'percent','volume', 'ratio', 'counts',
                               'ldate']]
                 else:
                     top_temp = top_temp.loc[:,
-                             ['name', 'trade', 'diff', 'op', 'ra', 'volume', 'percent', 'ratio', 'counts',
+                             ['name', 'trade', 'diff', 'op', 'ra', 'percent', 'volume', 'ratio', 'counts',
                               'ldate']]
                 print rl.format_for_print(top_temp[:10])
                 

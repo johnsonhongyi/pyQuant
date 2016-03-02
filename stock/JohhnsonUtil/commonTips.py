@@ -44,7 +44,21 @@ def isMac():
         return True
     else:
         return False
-
+def set_ctrl_handler():
+    # os.environ['FOR_DISABLE_CONSOLE_CTRL_HANDLER'] = '1'
+    import win32api,thread
+    # def doSaneThing(sig, func=None):
+        # '''忽略所有KeyCtrl'''
+        # return True
+    # win32api.SetConsoleCtrlHandler(doSaneThing, 1)
+    def handler(dwCtrlType, hook_sigint=thread.interrupt_main):
+        print ("ctrl:%s"%(dwCtrlType))
+        if dwCtrlType == 0: # CTRL_C_EVENT
+            # hook_sigint()
+            # raise KeyboardInterrupt("CTRL-C!")
+            return 1 # don't chain to the next handler
+        return 0 # chain to the next handler
+    win32api.SetConsoleCtrlHandler(handler, 1)        
 
 def set_console(width=80, height=15, color=3, cmdname=None):
     # mode con cp select=936
@@ -60,7 +74,7 @@ def set_console(width=80, height=15, color=3, cmdname=None):
         os.system('title=%s' % filename)
     # printf "\033]0;My Window title\007”
     # os.system('color %s'%color)
-    pass
+    # set_ctrl_handler()
 
 
 def timeit_time(cmd, num=5):
