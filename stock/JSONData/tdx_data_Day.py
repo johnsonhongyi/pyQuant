@@ -47,7 +47,7 @@ def get_tdx_dir():
 
     elif os_sys.find('Win') == 0:
         log.info("Windows:%s" % os_sys)
-        if os_platform.find('XP'):
+        if os_platform.find('XP') == 0:
             log.info("XP:%s" % os_platform)
             basedir = xproot.replace('/', path_sep).replace('\\',path_sep)  # 如果你的安装路径不同,请改这里
         else:
