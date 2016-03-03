@@ -331,14 +331,14 @@ if __name__ == "__main__":
                 print "wri ok:%s" % block_path
             elif st.startswith('sh'):
                 code = st.split()[1]
-                # lhg.get_linear_model_histogramDouble(code, args.ptype, args.dtype, start, end, args.vtype, args.filter)
-                lhg.get_linear_model_histogramDouble(code, start=top_temp.loc[code, 'date'], vtype='close',
+                # lhg.get_linear_model_histogram(code, args.ptype, args.dtype, start, end, args.vtype, args.filter)
+                lhg.get_linear_model_histogram(code, start=top_temp.loc[code, 'date'], vtype='close',
                                                      filter=filter)
                 while 1:
                     st = raw_input("code:")
                     if len(str(st)) == 6:
                         code = st
-                        lhg.get_linear_model_histogramDouble(code, start=top_temp.loc[code, 'ldate'], vtype='close',
+                        lhg.get_linear_model_histogram(code, start=top_temp.loc[code, 'ldate'], vtype='close',
                                                              filter=filter)
                     elif st == 'q':
                         break
