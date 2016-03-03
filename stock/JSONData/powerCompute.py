@@ -28,8 +28,6 @@ if not cct.isMac():
             return 0  # chain to the next handler
 
         win32api.SetConsoleCtrlHandler(handler, 1)
-
-
     set_ctrl_handler()
 
 
@@ -242,6 +240,7 @@ def maintest(code,start=None,type='m',filter='y'):
     print("ex Read:", strip_tx)
 if __name__ == "__main__":
     parser = parseArgmain()
+    import time
     while 1:
         try:    
             # log.setLevel(LoggerFactory.INFO)
@@ -253,6 +252,10 @@ if __name__ == "__main__":
                 # print args.end
                 op,ra,st=get_linear_model_status(args.code, dtype=args.dtype, start=cct.day8_to_day10(args.start), end=cct.day8_to_day10(args.end), filter=args.filter)
                 print "code:%s op:%s ra:%s  start:%s"%(code,op,ra,st)
+                cct.sleep(0.1)
+                # ts=time.time()
+                # time.sleep(5)
+                # print "%0.5f"%(time.time()-ts)
             elif code=='q':
                 sys.exit(0)
             else:

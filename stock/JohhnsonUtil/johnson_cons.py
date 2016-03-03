@@ -15,7 +15,7 @@ REAL_INDEX_LABELS=['sh_a','sz_a','cyb']
 INDEX_LIST = {'sh': 'sh000001', 'sz': 'sz399001', 'hs300': 'sz399300',
               'sz50': 'sh000016', 'zxb': 'sz399005', 'cyb': 'sz399006'}
 DD_VOL_List={'0':'40000','1':'100000','2':'100000','3':'200000','4':'1000000'}
-LvolumeSize= 2000000
+LvolumeSize= 1250000
 DD_TYPE_List={'0':'5','1':'10','2':'20','3':'50','4':'100'}
 P_TYPE = {'http': 'http://', 'ftp': 'ftp://'}
 PAGE_NUM = [38, 60, 80, 100]

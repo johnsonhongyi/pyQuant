@@ -78,7 +78,7 @@ if __name__ == "__main__":
     block_path = tdd.get_tdx_dir_blocknew() + '061.blk'
     status_change = False
     lastpTDX_DF = ''
-    duration_date = 20151220
+    duration_date = 20151224
     ptype = 'high'
     filter='y'
     percent_status='n'
@@ -170,7 +170,7 @@ if __name__ == "__main__":
                 # top_dif = top_dif[top_dif.volume < 100]
                 # print top_dif.loc['002504',:]
                 if filter == 'y':
-                    top_dif = top_dif[top_dif.date > cct.day8_to_day10(duration_date)]
+                    top_dif = top_dif[top_dif.date >= cct.day8_to_day10(duration_date)]
                 log.info('dif1-filter:%s' % len(top_dif))
                 log.info(top_dif[:1])
                 # top_dif = top_dif[top_dif.buy > top_dif.lastp]
@@ -197,7 +197,7 @@ if __name__ == "__main__":
                 print "Rt:%0.1f dT:%s" % (float(time.time() - time_Rt), cct.get_time_to_date(time_s))
                 if ptype == 'low':
                     # print "low"
-                    top_dif=top_dif[top_dif.lvol > ct.LvolumeSize/100]
+                    top_dif=top_dif[top_dif.lvol > ct.LvolumeSize]
                     if 'counts' in top_dif.columns.values:
                         top_dif = top_dif.sort_values(by=['diff', 'percent', 'volume', 'counts', 'ratio'],
                                                       ascending=[0, 0, 0, 1, 1])
@@ -256,19 +256,19 @@ if __name__ == "__main__":
             int_time = cct.get_now_time_int()
             if cct.get_work_time():
                 if int_time < 925:
-                    time.sleep(120)
+                    cct.sleep(120)
                 elif int_time < 930:
-                    time.sleep((930 - int_time) * 60)
+                    cct.sleep((930 - int_time) * 60)
                     # top_all = pd.DataFrame()
                     time_s = time.time()
                 else:
-                    time.sleep(120)
+                    cct.sleep(120)
             elif cct.get_work_duration():
                 while 1:
-                    time.sleep(120)
+                    cct.sleep(120)
                     if cct.get_work_duration():
                         print ".",
-                        time.sleep(120)
+                        cct.sleep(120)
                     else:
                         # top_all = pd.DataFrame()
                         time_s = time.time()
@@ -351,7 +351,7 @@ if __name__ == "__main__":
                     # sl.write_to_blocknew(all_diffpath, codew, False)
                 print "wri ok:%s" % block_path
 
-                # time.sleep(2)
+                # cct.sleep(2)
             else:
                 sys.exit(0)
         except (IOError, EOFError, Exception) as e:

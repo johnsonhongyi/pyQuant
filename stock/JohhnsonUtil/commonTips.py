@@ -87,7 +87,13 @@ def get_delay_time():
     delay_time = 8000
     return delay_time
 
-
+def sleep(timet):
+    times=time.time()
+    for _ in range(int(timet)*2): 
+        if int(time.time()-times) >= int(timet):
+            break
+        time.sleep(0.5)
+    # print time.time()-times
 def get_cpu_count():
     return cpu_count()
 
@@ -131,10 +137,12 @@ def get_today(sep='-'):
     return days.count() - holidays
 
 
-def last_tddate(days=0):
-    today = datetime.datetime.today().date() + datetime.timedelta(-1)
+def last_tddate(days=1):
+    today = datetime.datetime.today().date() + datetime.timedelta(-days)
     day_n = int(today.strftime("%w"))
     log.debug("today:%s day_n:%s" % (today, day_n))
+    return str(today)
+    '''
     if day_n == 0:
         lasd = today + datetime.timedelta(-2)
         log.debug("0:%s" % lasd)
@@ -159,7 +167,7 @@ def last_tddate(days=0):
         return str(datetime.datetime.today().date() + datetime.timedelta(-1))
     else:
         return str(oday)
-
+    '''
 
 # def is_holiday(date):
 #     if isinstance(date, str):

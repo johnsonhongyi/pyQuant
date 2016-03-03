@@ -9,6 +9,7 @@ import JohhnsonUtil.LoggerFactory as LoggerFactory
 import tdx_data_Day as tdd
 log = LoggerFactory.getLogger("FundFlow")
 # log.setLevel(LoggerFactory.INFO)
+# log.setLevel(LoggerFactory.DEBUG)
 import traceback
 from bs4 import BeautifulSoup
 
@@ -134,20 +135,21 @@ def get_dfcfw_rzrq_SHSZ(url=ct.DFCFW_RZRQ_SHSZ):
             dd['sz']=round(float(data2[5])/100000000,1)
             dd['all']=round(float(dataall[5])/100000000,1)
         return dd
-    def get_days_data(days=0):
+    def get_days_data(days=1):
         rzrq_status=1
         # data=''
         da=0
         while rzrq_status:
-            for x in range(0,20):
+            for x in range(days,20):
                 yestoday=cct.last_tddate(x).replace('-','/')
-                data2=get_tzrq(url,yestoday)
+                data2=get_tzrq(url,yestoday)   
+                log.info("yestoday:%s data:%s"%(yestoday,data2))
                 if len(data2)>0:
-                    if da ==days and days==0:
-                        break
-                    elif da > days:
-                        break
-                    da+=1
+                    # if da ==days and days==0:
+                    break
+                    # elif da > days:
+                        # break
+                # else:    da+=1
                     # print da
                 else:
                     log.info("%s:%s"%(yestoday,data2))
@@ -157,9 +159,9 @@ def get_dfcfw_rzrq_SHSZ(url=ct.DFCFW_RZRQ_SHSZ):
         
     # today=cct.last_tddate().replace('-','/')
     # data=get_tzrq(url,today)
-    data=get_days_data()
+    data=get_days_data(1)
     # log.debug(today)
-    data2=get_days_data(1)    
+    data2=get_days_data(2)    
     log.info("data:%s,data2:%s",data,data2)
     if len(data2)>0:
         # print data2

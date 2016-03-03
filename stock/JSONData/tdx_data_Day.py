@@ -33,7 +33,9 @@ path_sep = os.path.sep
 newstockdayl = 50
 changedays=5
 
-win7root = r'D:\Program Files\gfzq'
+win7rootAsus = r'D:\Program Files\gfzq'
+win7rootXunji = r'E:\DOC\Parallels\WinTools\zd_pazq'
+win7rootList = [win7rootAsus,win7rootXunji]
 macroot = r'/Users/Johnson/Documents/Johnson/WinTools/zd_pazq'
 xproot = r'E:\DOC\Parallels\WinTools\zd_pazq'
 
@@ -52,7 +54,12 @@ def get_tdx_dir():
             basedir = xproot.replace('/', path_sep).replace('\\',path_sep)  # 如果你的安装路径不同,请改这里
         else:
             log.info("Win7O:%s" % os_platform)
-            basedir = win7root.replace('/', path_sep).replace('\\',path_sep)  # 如果你的安装路径不同,请改这里
+            for root in win7rootList:
+                basedir = root.replace('/', path_sep).replace('\\',path_sep)  # 如果你的安装路径不同,请改这里
+                if os.path.exists(basedir):
+                    break
+    if not os.path.exists(basedir):
+        log.error("basedir not exists")
     return basedir
 
 def get_tdx_dir_blocknew():
@@ -727,7 +734,6 @@ def get_tdx_exp_low_or_high_price(code, dt=None, ptype='low', dl=None):
         return dd
     else:
         dd = get_tdx_Exp_day_to_df(code, dl=1)
-
         return dd
 
 
@@ -924,15 +930,15 @@ def get_tdx_all_day_LastDF(codeList, type=0, dt=None,ptype='low'):
     return df
 
 
-def get_tdx_exp_all_LastDF(codeList, dt=None,ptype='low'):
+def get_tdx_exp_all_LastDF(codeList, dt=None,ptype='low',filter='n'):
     time_t = time.time()
     # df = rl.get_sina_Market_json(market)
     # code_list = np.array(df.code)
     # if type==0:
     #     results = cct.to_mp_run(get_tdx_day_to_df_last, codeList)
     # else:
-    if dt is not None:
-        if len(str(dt)) < 8:
+    if dt is not None and filter == 'n':
+        if len(str(dt)) < 8 :
             dl = int(dt)+changedays
             df = get_tdx_day_to_df('999999').sort_index(ascending=False)
             dt = get_duration_price_date('999999', dt=dt,ptype=ptype,df=df)
@@ -949,7 +955,20 @@ def get_tdx_exp_all_LastDF(codeList, dt=None,ptype='low'):
         # results=[]
         # for code in codeList:
             # results.append(get_tdx_exp_low_or_high_price(code, dt, ptype, dl))
-        
+    elif dt is not None:
+        if len(str(dt)) < 8 :
+            dl = int(dt)
+            df = get_tdx_day_to_df('999999').sort_index(ascending=False)
+            dt = get_duration_price_date('999999', dt=dt,ptype=ptype,df=df)
+            dt = df[df.index <= dt].index.values[0]
+            log.info("LastDF:%s,%s" % (dt,dl))
+        else:
+            if len(str(dt)) == 8: dt = cct.day8_to_day10(dt)
+            # df = get_tdx_day_to_df('999999').sort_index(ascending=False)
+            dl = len(ts.get_hist_data('sh', start=dt))
+            log.info("LastDF:%s,%s" % (dt,dl))
+        results = cct.to_mp_run_async(get_tdx_exp_low_or_high_price, codeList, dt, ptype, dl)
+    
     else:
         # results = cct.to_mp_run_async(get_tdx_exp_low_or_high_price,codeList)
         results = cct.to_mp_run_async(get_tdx_Exp_day_to_df, codeList, 'f', None, None, None, 1)

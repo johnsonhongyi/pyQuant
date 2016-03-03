@@ -9,7 +9,7 @@ import traceback
 import urllib2
 
 import pandas as pd
-from bs4 import BeautifulSoup
+# from bs4 import BeautifulSoup
 # from pandas import DataFrame
 # import sys
 # print sys.path
@@ -222,7 +222,7 @@ if __name__ == "__main__":
 
                 # top_all=top_all.sort_values(by=['percent','diff','counts','ratio'],ascending=[0,0,1,1])
                 
-                top_temp = top_dif[:50].copy()
+                top_temp = top_dif[:10].copy()
                 top_temp = pct.powerCompute_df(top_temp,dl='30')
                 if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935:
                     top_temp = top_temp.loc[:,
@@ -254,19 +254,19 @@ if __name__ == "__main__":
             int_time = cct.get_now_time_int()
             if cct.get_work_time():
                 if int_time < 925:
-                    time.sleep(30)
+                    cct.sleep(30)
                 elif int_time < 930:
-                    time.sleep((930 - int_time) * 60)
+                    cct.sleep((930 - int_time) * 60)
                     top_all = pd.DataFrame()
                     time_s = time.time()
                 else:
-                    time.sleep(60)
+                    cct.sleep(60)
             elif cct.get_work_duration():
                 while 1:
-                    time.sleep(60)
+                    cct.sleep(60)
                     if cct.get_work_duration():
                         print ".",
-                        time.sleep(60)
+                        cct.sleep(60)
                     else:
                         top_all = pd.DataFrame()
                         time_s = time.time()
@@ -278,7 +278,7 @@ if __name__ == "__main__":
             # print "key"
             print "KeyboardInterrupt:", e
             # traceback.print_exc()
-            # time.sleep(1)
+            # cct.sleep(1)
             # if success > 3:
             #     raw_input("Except")
             #     sys.exit(0)
@@ -313,7 +313,7 @@ if __name__ == "__main__":
                     # cct.write_to_blocknew(all_diffpath, codew, False)
                 print "wri ok:%s" % block_path
 
-                # time.sleep(2)
+                # cct.sleep(2)
             else:
                 sys.exit(0)
         except (IOError, EOFError, Exception) as e:

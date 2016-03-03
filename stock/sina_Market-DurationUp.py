@@ -54,8 +54,8 @@ if __name__ == "__main__":
     base_path = tdd.get_tdx_dir()
     block_path = tdd.get_tdx_dir_blocknew() + '061.blk'
     status_change = False
-    lastpTDX_DF = ''
-    duration_date = 20160101
+    lastpTDX_DF = pd.DataFrame()
+    duration_date = 20160225
     ptype = 'low'
     filter = 'y'
     percent_status = 'n'
@@ -88,7 +88,8 @@ if __name__ == "__main__":
                     codelist = top_all.index.tolist()
                     log.info('toTDXlist:%s' % len(codelist))
                     # tdxdata = tdd.get_tdx_all_day_LastDF(codelist,dt=duration_date,ptype=ptype)
-                    tdxdata = tdd.get_tdx_exp_all_LastDF(codelist, dt=duration_date, ptype=ptype)
+                    # print "duration_date:%s ptype=%s filter:%s"%(duration_date, ptype,filter)
+                    tdxdata = tdd.get_tdx_exp_all_LastDF(codelist, dt=duration_date, ptype=ptype,filter=filter)
                     log.debug("TdxLastP: %s %s" % (len(tdxdata), tdxdata.columns.values))
                     tdxdata.rename(columns={'low': 'llow'}, inplace=True)
                     tdxdata.rename(columns={'high': 'lhigh'}, inplace=True)
@@ -141,14 +142,15 @@ if __name__ == "__main__":
                         log.debug("top_dif.low > 0:%s" % (len(top_dif)))
 
                         # top_dif.loc['600610','volume':'lvol']
-
                 top_dif['volume'] = (
                     map(lambda x, y: round(x / y / radio_t, 1), top_dif.volume.values, top_dif.lvol.values))
                 # top_dif = top_dif[top_dif.volume < 100]
                 # print top_dif.loc['002504',:]
+                # print top_dif.loc['600533',:]
                 if filter == 'y':
-                    top_dif = top_dif[top_dif.date > cct.day8_to_day10(duration_date)]
+                    top_dif = top_dif[top_dif.date >= cct.day8_to_day10(duration_date)]
                 log.info('dif1-filter:%s' % len(top_dif))
+                # print top_dif.loc['600533',:]
                 log.info(top_dif[:1])
                 # top_dif = top_dif[top_dif.buy > top_dif.lastp]
                 # top_dif = top_dif[top_dif.buy > top_dif.lhigh]
@@ -173,7 +175,8 @@ if __name__ == "__main__":
                     len(top_now[top_now['volume'] <= 0]), goldstock)),
                 print "Rt:%0.1f dT:%s" % (float(time.time() - time_Rt), cct.get_time_to_date(time_s))
                 if ptype == 'low':
-                    top_dif = top_dif[top_dif.lvol > ct.LvolumeSize / 100]
+                    top_dif = top_dif[top_dif.lvol > ct.LvolumeSize ]
+                    # top_dif = top_dif[top_dif.lvol > 12000]
                     if 'counts' in top_dif.columns.values:
                         top_dif = top_dif.sort_values(by=['diff', 'percent', 'volume', 'counts', 'ratio'],
                                                       ascending=[0, 0, 0, 1, 1])
@@ -205,11 +208,11 @@ if __name__ == "__main__":
                 top_dd = pd.concat([top_temp, top_end], axis=0)
                 if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935:
                     top_dd = top_dd.loc[:,
-                             ['name', 'buy', 'diff', 'op', 'ra','percent', 'volume' , 'ratio', 'counts', 'high',
+                             ['name', 'buy', 'diff', 'op', 'ra','percent','volume' , 'ratio', 'counts', 'high',
                               'lastp', 'date']]
                 else:
                     top_dd = top_dd.loc[:,
-                             ['name', 'trade', 'diff', 'op', 'ra', 'percent', 'volume', 'ratio', 'counts', 'high',
+                             ['name', 'trade', 'diff', 'op', 'ra', 'percent','volume', 'ratio', 'counts', 'high',
                               'lastp', 'date']]
                 print rl.format_for_print(top_dd)
                 # if cct.get_now_time_int() < 930 or cct.get_now_time_int() > 1505 or (cct.get_now_time_int() > 1125 and cct.get_now_time_int() < 1505):
@@ -232,19 +235,19 @@ if __name__ == "__main__":
             int_time = cct.get_now_time_int()
             if cct.get_work_time():
                 if int_time < 925:
-                    time.sleep(120)
+                    cct.sleep(120)
                 elif int_time < 930:
-                    time.sleep((930 - int_time) * 60)
+                    cct.sleep((930 - int_time) * 60)
                     # top_all = pd.DataFrame()
                     time_s = time.time()
                 else:
-                    time.sleep(120)
+                    cct.sleep(120)
             elif cct.get_work_duration():
                 while 1:
-                    time.sleep(120)
+                    cct.sleep(120)
                     if cct.get_work_duration():
                         print ".",
-                        time.sleep(120)
+                        cct.sleep(120)
                     else:
                         # top_all = pd.DataFrame()
                         time_s = time.time()
@@ -316,7 +319,7 @@ if __name__ == "__main__":
                     top_all = pd.DataFrame()
                     time_s = time.time()
                     status = False
-                    lastpTDX_DF = ''
+                    lastpTDX_DF = pd.DataFrame()
             elif st == 'w' or st == 'a':
                 codew = (top_dd.index).tolist()
                 if st == 'a':
@@ -336,7 +339,7 @@ if __name__ == "__main__":
                     if len(str(st)) == 6:
                         code = st
                         lhg.get_linear_model_histogramDouble(code, start=top_temp.loc[code, 'ldate'], vtype='close',
-                                                             filter='y')
+                                                             filter=filter)
                     elif st == 'q':
                         break
                     else:
