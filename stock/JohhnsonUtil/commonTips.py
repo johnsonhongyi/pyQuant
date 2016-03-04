@@ -7,13 +7,13 @@ import sys
 import time
 from compiler.ast import flatten
 from multiprocessing.pool import ThreadPool, cpu_count
-
 import pandas as pd
 import trollius as asyncio
 from trollius.coroutines import From
 
 import LoggerFactory as Log
 import johnson_cons as ct
+import argparse
 
 log = Log.getLogger('commonTipss')
 # log.setLevel(Log.DEBUG)
@@ -615,6 +615,71 @@ def get_stock_tdx_period_to_type(stock_data, type='w'):
     period_stock_data.reset_index(inplace=True)
     return period_stock_data
 
+def MoniterArgmain():
+
+    parser = argparse.ArgumentParser()
+    # parser = argparse.ArgumentParser(description='LinearRegression Show')
+    parser.add_argument('code', type=str, nargs='?', help='999999')
+    parser.add_argument('start', nargs='?', type=str, help='20150612')
+    # parser.add_argument('e', nargs='?',action="store", dest="end", type=str, help='end')
+    parser.add_argument('end', nargs='?', type=str, help='20160101')
+    parser.add_argument('-d', action="store", dest="dtype", type=str, nargs='?', choices=['d', 'w', 'm'], default='d',
+                        help='DateType')
+    parser.add_argument('-p', action="store", dest="ptype", type=str, choices=['f', 'b'], default='f',
+                        help='Price Forward or back')
+    # parser.add_argument('-v', action="store", dest="vtype", type=str, choices=['high', 'low','open','close'], default='close',
+    parser.add_argument('-v', action="store", dest="vtype", type=str, choices=['high', 'low', 'close'], default='close',
+                        help='type')
+    parser.add_argument('-f', action="store", dest="filter", type=str, choices=['y', 'n'], default='n',
+                        help='find duration low')
+    return parser        
+    
+def LineArgmain():
+    # from ConfigParser import ConfigParser
+    # import shlex
+    # parser = argparse.ArgumentParser()
+    # parser.add_argument('-s', '--start', type=int, dest='start',
+    # help='Start date', required=True)
+    # parser.add_argument('-e', '--end', type=int, dest='end',
+    # help='End date', required=True)
+    # parser.add_argument('-v', '--verbose', action='store_true', dest='verbose',
+    # help='Enable debug info')
+    # parser.add_argument('foo', type=int, choices=xrange(5, 10))
+    # args = parser.parse_args()
+    # print args.square**2
+    parser = argparse.ArgumentParser()
+    # parser = argparse.ArgumentParser(description='LinearRegression Show')
+    parser.add_argument('code', type=str, nargs='?', help='999999')
+    parser.add_argument('start', nargs='?', type=str, help='20150612')
+    # parser.add_argument('e', nargs='?',action="store", dest="end", type=str, help='end')
+    parser.add_argument('end', nargs='?', type=str, help='20160101')
+    parser.add_argument('-d', action="store", dest="dtype", type=str, nargs='?', choices=['d', 'w', 'm'], default='d',
+                        help='DateType')
+    parser.add_argument('-p', action="store", dest="ptype", type=str, choices=['f', 'b'], default='f',
+                        help='Price Forward or back')
+    # parser.add_argument('-v', action="store", dest="vtype", type=str, choices=['high', 'low','open','close'], default='close',
+    parser.add_argument('-v', action="store", dest="vtype", type=str, choices=['high', 'low', 'close'], default='close',
+                        help='type')
+    parser.add_argument('-f', action="store", dest="filter", type=str, choices=['y', 'n'], default='y',
+                        help='find duration low')
+    # parser.add_argument('-help',type=str,help='Price Forward or back')
+    # args = parser.parse_args()
+    # args=parser.parse_args(input)
+    # parser = parseArgmain()
+    # args = parser.parse_args(num_input.split())
+
+    # def getArgs():
+    # parse=argparse.ArgumentParser()
+    # parse.add_argument('-u',type=str)
+    # parse.add_argument('-d',type=str)
+    # parse.add_argument('-o',type=str)
+    # args=parse.parse_args()
+    # return vars(args)
+    # if args.verbose:
+    # logger.setLevel(logging.DEBUG)
+    # else:
+    # logger.setLevel(logging.ERROR)
+    return parser    
 
 if __name__ == '__main__':
     # print get_run_path()

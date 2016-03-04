@@ -23,11 +23,11 @@ from JohhnsonUtil import commonTips as cct
 # from logbook import StderrHandler
 
 
-def parseArgmain():
-    import argparse
-    parser = argparse.ArgumentParser()
-    parser.add_argument('dt', type=str, nargs='?', help='20150612')
-    return parser
+# def parseArgmain():
+    # import argparse
+    # parser = argparse.ArgumentParser()
+    # parser.add_argument('dt', type=str, nargs='?', help='20150612')
+    # return parser
 
 
 if __name__ == "__main__":
@@ -60,6 +60,7 @@ if __name__ == "__main__":
     filter = 'y'
     percent_status = 'n'
     # all_diffpath = tdd.get_tdx_dir_blocknew() + '062.blk'
+    parser=cct.MoniterArgmain()
     while 1:
         try:
             # df = sina_data.Sina().all
@@ -330,17 +331,15 @@ if __name__ == "__main__":
                     # sl.write_to_blocknew(all_diffpath, codew, False)
                 print "wri ok:%s" % block_path
             elif st.startswith('sh'):
-                code = st.split()[1]
-                # lhg.get_linear_model_histogram(code, args.ptype, args.dtype, start, end, args.vtype, args.filter)
-                lhg.get_linear_model_histogram(code, start=top_temp.loc[code, 'date'], vtype='close',
-                                                     filter=filter)
                 while 1:
-                    st = raw_input("code:")
-                    if len(str(st)) == 6:
-                        code = st
-                        lhg.get_linear_model_histogram(code, start=top_temp.loc[code, 'ldate'], vtype='close',
-                                                             filter=filter)
-                    elif st == 'q':
+                    input = raw_input("code:")
+                    if len(input) >= 6:
+                        args = parser.parse_args(input.split())
+                        if len(str(args.code)) == 6:
+                            if args.code in top_temp.index.values:
+                                lhg.get_linear_model_histogram(args.code, start=top_temp.loc[args.code, 'date'], vtype=args.vtype,
+                                                             filter=args.filter)
+                    elif input.startswith('q'):
                         break
                     else:
                         pass

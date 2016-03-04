@@ -390,7 +390,7 @@ if __name__ == "__main__":
                               'ldate', 'date']]
                 else:
                     top_temp = top_temp.loc[:,
-                             ['name', 'trade', 'diff', 'op', 'ra', 'percent', 'volume', 'ratio', 'counts',
+                             ['name', 'buy', 'diff', 'op', 'ra', 'percent', 'volume', 'ratio', 'counts',
                               'ldate','date']]
                 print rl.format_for_print(top_temp[:10])                
                 

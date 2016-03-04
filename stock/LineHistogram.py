@@ -466,7 +466,7 @@ def get_linear_model_histogram(code, ptype='f', dtype='d', start=None, end=None,
     # 画出价格随时间变化的图像
     # _, ax = plt.subplots()
     # fig = plt.figure()
-    fig = plt.figure(figsize=(16, 10))
+    fig = plt.figure(figsize=(16, 5))
     # fig = plt.figure(figsize=(16, 10), dpi=72)
     # fig.autofmt_xdate() #(no fact)
 
@@ -475,7 +475,7 @@ def get_linear_model_histogram(code, ptype='f', dtype='d', start=None, end=None,
     # set (gca,'Position',[0,0,512,512])
     # fig.set_size_inches(18.5, 10.5)
     # fig=plt.fig(figsize=(14,8))
-    ax1 = fig.add_subplot(211)
+    ax1 = fig.add_subplot(121)
     # asset=asset.apply(lambda x:round( x/asset[:1],2))
     ax1.plot(asset)
     # ax1.plot(asset1,'-r', linewidth=2)
@@ -526,7 +526,7 @@ def get_linear_model_histogram(code, ptype='f', dtype='d', start=None, end=None,
 
     
         # 将Y-Y_hat股价偏离中枢线的距离单画出一张图显示，对其边界线之间的区域进行均分，大于0的区间为高估，小于0的区间为低估，0为价值中枢线。
-    ax3 = fig.add_subplot(212)
+    ax3 = fig.add_subplot(122)
     # distance = (asset.values.T - Y_hat)
     distance = (asset.values.T - Y_hat)[0]
     # if code.startswith('999') or code.startswith('399'):
@@ -595,7 +595,9 @@ def parseArgmain():
     # parser.add_argument('-help',type=str,help='Price Forward or back')
     # args = parser.parse_args()
     # args=parser.parse_args(input)
-    return parser
+    # parser = parseArgmain()
+    # args = parser.parse_args(num_input.split())
+
     # def getArgs():
     # parse=argparse.ArgumentParser()
     # parse.add_argument('-u',type=str)
@@ -607,6 +609,8 @@ def parseArgmain():
     # logger.setLevel(logging.DEBUG)
     # else:
     # logger.setLevel(logging.ERROR)
+    return parser
+    
 
 
 if __name__ == "__main__":

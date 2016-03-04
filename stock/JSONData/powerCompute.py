@@ -190,7 +190,7 @@ def get_linear_model_status(code, ptype='f', df=None, dtype='d', type='m', start
         # log.info("Code:%s start:%s df-s:%s  end:%s"%(code,start,df[:1].index.values[0],df[-1:].index.values[0]))
         return operationcount,min(ratio_l),df[:1].index.values[0]
     elif len(df) == 1:
-        log.error("code: is :%s"%(code,len(df)))
+        log.error("code:%s"%(code))
         return -9,0,df.index.values[0]
     else:
         log.error("code: Low :%s"%(code,len(df)))
