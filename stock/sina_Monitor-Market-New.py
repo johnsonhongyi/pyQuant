@@ -36,9 +36,9 @@ if __name__ == "__main__":
     # error_handler = SyslogHandler('Sina-M-Log', level='ERROR')
 
     if cct.isMac():
-        cct.set_console(165, 16)
+        cct.set_console(100, 16)
     else:
-        cct.set_console(160, 15)
+        cct.set_console(100, 15)
     status = False
     vol = '0'
     type = '2'

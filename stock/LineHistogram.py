@@ -624,8 +624,10 @@ if __name__ == "__main__":
     # args=main(raw_input('input').split())
     # print (args.d)
     # sys.exit()
-
-    cct.set_console(100, 15)
+    if cct.isMac():
+        cct.set_console(80, 16)
+    else:
+        cct.set_console(80, 16)
     num_input = ''
     parser = parseArgmain()
     if len(sys.argv) == 2:

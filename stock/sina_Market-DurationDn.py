@@ -62,7 +62,7 @@ if __name__ == "__main__":
     # log.level = log.debug
     # error_handler = SyslogHandler('Sina-M-Log', level='ERROR')
     if cct.isMac():
-        cct.set_console(105, 21)
+        cct.set_console(121, 21)
     else:
         cct.set_console(106, 21)
     status = False
