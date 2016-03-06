@@ -1,5 +1,4 @@
 # -*- coding:utf-8 -*-
-import os
 import sys
 sys.path.append("..")
 
@@ -8,7 +7,8 @@ import statsmodels.api as sm
 from statsmodels import regression
 from JohhnsonUtil import LoggerFactory as LoggerFactory
 from JohhnsonUtil import commonTips as cct
-log = LoggerFactory.getLogger(os.path.basename(sys.argv[0]))
+
+log = LoggerFactory.getLogger("PowerCompute")
 # log.setLevel(LoggerFactory.DEBUG)
 from JSONData import tdx_data_Day as tdd
 
@@ -190,7 +190,7 @@ def get_linear_model_status(code, ptype='f', df=None, dtype='d', type='m', start
         # log.info("Code:%s start:%s df-s:%s  end:%s"%(code,start,df[:1].index.values[0],df[-1:].index.values[0]))
         return operationcount,min(ratio_l),df[:1].index.values[0]
     elif len(df) == 1:
-        log.error("code:%s"%(code))
+        # log.error("powerCompute code:%s"%(code))
         return -9,0,df.index.values[0]
     else:
         log.error("code: Low :%s"%(code,len(df)))
@@ -240,7 +240,6 @@ def maintest(code,start=None,type='m',filter='y'):
     print("ex Read:", strip_tx)
 if __name__ == "__main__":
     parser = parseArgmain()
-    import time
     while 1:
         try:    
             # log.setLevel(LoggerFactory.INFO)

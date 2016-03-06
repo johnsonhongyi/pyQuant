@@ -10,6 +10,7 @@ import traceback
 import pandas as pd
 
 import JohhnsonUtil.johnson_cons as ct
+import LineHistogram as lhg
 import singleAnalyseUtil as sl
 from JSONData import powerCompute as pct
 from JSONData import realdatajson as rl
@@ -17,41 +18,15 @@ from JSONData import tdx_data_Day as tdd
 from JohhnsonUtil import LoggerFactory as LoggerFactory
 from JohhnsonUtil import commonTips as cct
 
-
 # from logbook import Logger,StreamHandler,SyslogHandler
 # from logbook import StderrHandler
 
-def parseArgmain():
-    # from ConfigParser import ConfigParser
-    # import shlex
-    import argparse
-    # parser = argparse.ArgumentParser()
-    # parser.add_argument('-s', '--start', type=int, dest='start',
-    # help='Start date', required=True)
-    # parser.add_argument('-e', '--end', type=int, dest='end',
-    # help='End date', required=True)
-    # parser.add_argument('-v', '--verbose', action='store_true', dest='verbose',
-    # help='Enable debug info')
-    # parser.add_argument('foo', type=int, choices=xrange(5, 10))
-    # args = parser.parse_args()
-    # print args.square**2
-    parser = argparse.ArgumentParser()
-    parser.add_argument('dt', type=str, nargs='?', help='20150612')
 
-    # parser.add_argument('dt', nargs='?', type=str, help='20150612')
-    # parser.add_argument('dt', nargs='?', type=str, help='20150612')
-    # parser.add_argument('-dt', action="store", dest="dtype", type=str, nargs='?',help='20150612')
-    # parser.add_argument('dt', action="store", dest="dt", type=str, nargs='?',help='20150612')
-    # parser.add_argument('e', nargs='?',action="store", dest="end", type=str, help='end')
-    # parser.add_argument('end', nargs='?', type=str, help='20160101')
-    # parser.add_argument('-d', action="store", dest="dtype", type=str, nargs='?', choices=['d', 'w', 'm'], default='d',
-    # help='DateType')
-    # parser.add_argument('-p', action="store", dest="ptype", type=str, choices=['f', 'b'], default='f',
-    # help='Price Forward or back')
-    # parser.add_argument('-help',type=str,help='Price Forward or back')
-    # args = parser.parse_args()
-    # args=parser.parse_args(input)
-    return parser
+# def parseArgmain():
+# import argparse
+    # parser = argparse.ArgumentParser()
+# parser.add_argument('dt', type=str, nargs='?', help='20150612')
+# return parser
 
 
 if __name__ == "__main__":
@@ -78,12 +53,13 @@ if __name__ == "__main__":
     base_path = tdd.get_tdx_dir()
     block_path = tdd.get_tdx_dir_blocknew() + '061.blk'
     status_change = False
-    lastpTDX_DF = ''
+    lastpTDX_DF = pd.DataFrame()
     duration_date = 20151224
     ptype = 'high'
-    filter='y'
-    percent_status='n'
+    filter = 'y'
+    percent_status = 'n'
     # all_diffpath = tdd.get_tdx_dir_blocknew() + '062.blk'
+    parser = cct.MoniterArgmain()
     while 1:
         try:
             # df = sina_data.Sina().all
@@ -112,7 +88,8 @@ if __name__ == "__main__":
                     codelist = top_all.index.tolist()
                     log.info('toTDXlist:%s' % len(codelist))
                     # tdxdata = tdd.get_tdx_all_day_LastDF(codelist,dt=duration_date,ptype=ptype)
-                    tdxdata = tdd.get_tdx_exp_all_LastDF(codelist, dt=duration_date, ptype=ptype)
+                    # print "duration_date:%s ptype=%s filter:%s"%(duration_date, ptype,filter)
+                    tdxdata = tdd.get_tdx_exp_all_LastDF(codelist, dt=duration_date, ptype=ptype, filter=filter)
                     log.debug("TdxLastP: %s %s" % (len(tdxdata), tdxdata.columns.values))
                     tdxdata.rename(columns={'low': 'llow'}, inplace=True)
                     tdxdata.rename(columns={'high': 'lhigh'}, inplace=True)
@@ -151,24 +128,24 @@ if __name__ == "__main__":
                 top_dif = top_all.copy()
                 top_dif['buy'] = (
                 map(lambda x, y: y if int(x) == 0 else x, top_dif['buy'].values, top_dif['trade'].values))
+                # if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935:
                 top_dif['diff'] = (
-                        map(lambda x, y: round((x - y) / y * 100, 1), top_dif['buy'].values, top_dif['lastp'].values))
-                # top_dif = top_dif[top_dif.buy > 0]
-                    # print top_dif.loc['600610',:]
-                log.debug("top_dif.trade > 0:%s" % (len(top_dif)))
+                    map(lambda x, y: round((x - y) / y * 100, 1), top_dif['buy'].values, top_dif['lastp'].values))
+                # print top_dif.loc['600610',:]
+                # top_dif = top_dif[top_dif.trade > 0]
                 if cct.get_now_time_int() > 935:
                     top_dif = top_dif[top_dif.low > 0]
                     log.debug("top_dif.low > 0:%s" % (len(top_dif)))
-
                     # top_dif.loc['600610','volume':'lvol']
-                
                 top_dif['volume'] = (
                     map(lambda x, y: round(x / y / radio_t, 1), top_dif.volume.values, top_dif.lvol.values))
                 # top_dif = top_dif[top_dif.volume < 100]
                 # print top_dif.loc['002504',:]
+                # print top_dif.loc['600533',:]
                 if filter == 'y':
                     top_dif = top_dif[top_dif.date >= cct.day8_to_day10(duration_date)]
                 log.info('dif1-filter:%s' % len(top_dif))
+                # print top_dif.loc['600533',:]
                 log.info(top_dif[:1])
                 # top_dif = top_dif[top_dif.buy > top_dif.lastp]
                 # top_dif = top_dif[top_dif.buy > top_dif.lhigh]
@@ -187,21 +164,21 @@ if __name__ == "__main__":
                 # df['volume']= df['volume'].apply(lambda x:x/100)
 
                 goldstock = len(top_dif[top_dif.buy >= top_dif.high * 0.99])
-                # goldstock=len(top_dif[top_dif.buy >(top_dif.high-top_dif.low)/2])
+                ## goldstock=len(top_dif[top_dif.buy >(top_dif.high-top_dif.low)/2])
                 print ("N:%s K:%s %s G:%s" % (
                     now_count, len(top_all[top_all['buy'] > 0]),
                     len(top_now[top_now['volume'] <= 0]), goldstock)),
                 print "Rt:%0.1f dT:%s" % (float(time.time() - time_Rt), cct.get_time_to_date(time_s))
                 if ptype == 'low':
-                    # print "low"
-                    top_dif=top_dif[top_dif.lvol > ct.LvolumeSize]
+                    top_dif = top_dif[top_dif.lvol > ct.LvolumeSize]
+                    # top_dif = top_dif[top_dif.lvol > 12000]
                     if 'counts' in top_dif.columns.values:
                         top_dif = top_dif.sort_values(by=['diff', 'percent', 'volume', 'counts', 'ratio'],
                                                       ascending=[0, 0, 0, 1, 1])
                     else:
                         top_dif = top_dif.sort_values(by=['diff', 'percent', 'ratio'], ascending=[0, 0, 1])
                 else:
-                    # print "high"
+                    # top_dif['diff'] = top_dif['diff'].apply(lambda x: x * 2 if x > 0 else x)
                     top_dif['diff']=top_dif['diff'].apply(lambda x:x*2 if x < 0 else x )
                     if 'counts' in top_dif.columns.values:
                         top_dif = top_dif.sort_values(by=['diff', 'percent', 'volume', 'counts', 'ratio'],
@@ -212,8 +189,9 @@ if __name__ == "__main__":
                 # top_all=top_all.sort_values(by=['percent','diff','counts','ratio'],ascending=[0,0,1,1])
                 # print rl.format_for_print(top_dif[:10])
                 # top_dd = pd.concat([top_dif[:5],top_temp[:3],top_dif[-3:],top_temp[-3:]], axis=0)
-                if percent_status == 'y' and cct.get_now_time_int() > 935 and ptype == 'low' :
-                    top_temp=top_dif[top_dif.percent > 0]
+                if percent_status == 'y' and (
+                                cct.get_now_time_int() > 935 or cct.get_now_time_int() < 900) and ptype == 'low':
+                    top_temp = top_dif[top_dif.percent > 0]
                 # elif percent_status == 'y' and cct.get_now_time_int() > 935 and ptype == 'high' :
                 elif ptype == 'low':
                     top_temp = top_dif[:10].copy()
@@ -223,15 +201,15 @@ if __name__ == "__main__":
                     top_end = top_dif[-10:].copy()
                 top_temp = pct.powerCompute_df(top_temp)
                 top_end = pct.powerCompute_df(top_end)
-
-
-                top_dd = pd.concat([top_temp,top_end], axis=0)
-                if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935 :
+                top_dd = pd.concat([top_temp, top_end], axis=0)
+                if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935:
                     top_dd = top_dd.loc[:,
-                             ['name', 'buy', 'diff', 'op', 'ra', 'percent', 'volume', 'ratio', 'counts', 'high', 'lastp', 'date']]
+                             ['name', 'buy', 'diff', 'op', 'ra', 'percent', 'volume', 'ratio', 'counts', 'high',
+                              'lastp', 'date']]
                 else:
                     top_dd = top_dd.loc[:,
-                             ['name', 'trade', 'diff', 'op', 'ra', 'percent', 'volume', 'ratio', 'counts', 'high', 'lastp', 'date']]
+                             ['name', 'trade', 'diff', 'op', 'ra', 'percent', 'volume', 'ratio', 'counts', 'high',
+                              'lastp', 'date']]
                 print rl.format_for_print(top_dd)
                 # if cct.get_now_time_int() < 930 or cct.get_now_time_int() > 1505 or (cct.get_now_time_int() > 1125 and cct.get_now_time_int() < 1505):
                 # print rl.format_for_print(top_dif[-10:])
@@ -274,18 +252,18 @@ if __name__ == "__main__":
             else:
                 raise KeyboardInterrupt("StopTime")
         except (KeyboardInterrupt) as e:
-            st = raw_input("status:[go(g),clear(c),[d 20150101 [l|h]|[y|n|pn|py],quit(q,e),W(w),Wa(a)]:")
+            st = raw_input("status:[go(g),clear(c),[d 20150101 [l|h]|[y|n|pn|py],quit(q),W(a),sh]:")
             if len(st) == 0:
                 status = False
             elif st == 'r':
                 end = True
                 while end:
-                    cmd=(raw_input('DEBUG[top_dif,top_now,e|q]:'))
-                    if cmd =='e' or cmd=='q' or len(cmd)==0:
+                    cmd = (raw_input('DEBUG[top_dif,top_now,e|q]:'))
+                    if cmd == 'e' or cmd == 'q' or len(cmd) == 0:
                         break
                     else:
                         print eval(cmd)
-                # raise KeyboardInterrupt("StopTime")
+                        # raise KeyboardInterrupt("StopTime")
             elif st == 'g' or st == 'go':
                 status = True
                 for code in top_dif[:10].index:
@@ -317,7 +295,7 @@ if __name__ == "__main__":
                     elif p_t == 'pn':
                         percent_status = 'n'
                     else:
-                        print ("arg error:%s"%p_t)
+                        print ("arg error:%s" % p_t)
                 elif len(dl) == 4:
                     dt = dl[1]
                     ptype = dl[2]
@@ -331,13 +309,13 @@ if __name__ == "__main__":
                     dt = ''
                 if len(str(dt)) > 0:
                     if len(str(dt)) < 8:
-                        duration_date=tdd.get_duration_price_date('999999', dl=dt,ptype=ptype)
+                        duration_date = tdd.get_duration_price_date('999999', dl=dt, ptype=ptype)
                     else:
                         duration_date = dt
                     top_all = pd.DataFrame()
                     time_s = time.time()
                     status = False
-                    lastpTDX_DF = ''
+                    lastpTDX_DF = pd.DataFrame()
             elif st == 'w' or st == 'a':
                 codew = (top_dd.index).tolist()
                 if st == 'a':
@@ -347,14 +325,27 @@ if __name__ == "__main__":
                     cct.write_to_blocknew(block_path, codew, False)
                     # sl.write_to_blocknew(all_diffpath, codew, False)
                 print "wri ok:%s" % block_path
-
-                # cct.sleep(2)
+            elif st.startswith('sh'):
+                while 1:
+                    input = raw_input("code:")
+                    if len(input) >= 6:
+                        args = parser.parse_args(input.split())
+                        if len(str(args.code)) == 6:
+                            # print args.code
+                            if args.code in top_temp.index.values:
+                                lhg.get_linear_model_histogram(args.code, start=top_temp.loc[args.code, 'date'],
+                                                               end=args.end, vtype=args.vtype,
+                                                               filter=args.filter)
+                    elif input.startswith('q'):
+                        break
+                    else:
+                        pass
             else:
                 sys.exit(0)
         except (IOError, EOFError, Exception) as e:
             print "Error", e
             traceback.print_exc()
-          
+
 '''
 {symbol:"sz000001",code:"000001",name:"平安银行",trade:"0.00",pricechange:"0.000",changepercent:"0.000",buy:"12.36",sell:"12.36",settlement:"12.34",open:"0.00",high:"0.00",low:"0",volume:0,amount:0,ticktime:"09:17:55",per:7.133,pb:1.124,mktcap:17656906.355526,nmc:14566203.350486,turnoverratio:0},
 {symbol:"sz000002",code:"000002",name:"万  科Ａ",trade:"0.00",pricechange:"0.000",changepercent:"0.000",buy:"0.00",sell:"0.00",settlement:"24.43",open:"0.00",high:"0.00",low:"0",volume:0,amount:0,ticktime:"09:17:55",per:17.084,pb:3.035,mktcap:26996432.575,nmc:23746405.928119,turnoverratio:0},

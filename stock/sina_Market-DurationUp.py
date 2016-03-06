@@ -330,6 +330,7 @@ if __name__ == "__main__":
                     if len(input) >= 6:
                         args = parser.parse_args(input.split())
                         if len(str(args.code)) == 6:
+                            # print args.code
                             if args.code in top_temp.index.values:
                                 lhg.get_linear_model_histogram(args.code, start=top_temp.loc[args.code, 'date'],
                                                                end=args.end, vtype=args.vtype,
