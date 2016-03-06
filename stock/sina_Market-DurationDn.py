@@ -9,13 +9,14 @@ import traceback
 
 import pandas as pd
 
+import JohhnsonUtil.johnson_cons as ct
 import singleAnalyseUtil as sl
+from JSONData import powerCompute as pct
 from JSONData import realdatajson as rl
 from JSONData import tdx_data_Day as tdd
-from JSONData import powerCompute as pct
 from JohhnsonUtil import LoggerFactory as LoggerFactory
 from JohhnsonUtil import commonTips as cct
-import JohhnsonUtil.johnson_cons as ct
+
 
 # from logbook import Logger,StreamHandler,SyslogHandler
 # from logbook import StderrHandler
@@ -148,20 +149,16 @@ if __name__ == "__main__":
                             # top_all.loc[symbol, 'buy'] = top_now.loc[symbol, 'buy']
                 # top_all = top_all[top_all.buy > 0]
                 top_dif = top_all.copy()
-                if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935:
-                    top_dif['diff'] = (
+                top_dif['buy'] = (
+                map(lambda x, y: y if int(x) == 0 else x, top_dif['buy'].values, top_dif['trade'].values))
+                top_dif['diff'] = (
                         map(lambda x, y: round((x - y) / y * 100, 1), top_dif['buy'].values, top_dif['lastp'].values))
-                    top_dif = top_dif[top_dif.buy > 0]
-                else:
-                    top_dif['diff'] = (
-                        map(lambda x, y: round((x - y) / y * 100, 1), top_dif['trade'].values, top_dif['lastp'].values))
+                # top_dif = top_dif[top_dif.buy > 0]
                     # print top_dif.loc['600610',:]
-                    log.debug("top_dif:%s"%(len(top_dif)))
-                    top_dif = top_dif[top_dif.trade > 0]
-                    log.debug("top_dif.trade > 0:%s"%(len(top_dif)))
-                    if  cct.get_now_time_int() > 935:
-                        top_dif=top_dif[top_dif.low > 0]
-                        log.debug("top_dif.low > 0:%s"%(len(top_dif)))
+                log.debug("top_dif.trade > 0:%s" % (len(top_dif)))
+                if cct.get_now_time_int() > 935:
+                    top_dif = top_dif[top_dif.low > 0]
+                    log.debug("top_dif.low > 0:%s" % (len(top_dif)))
 
                     # top_dif.loc['600610','volume':'lvol']
                 

@@ -18,7 +18,6 @@ from JSONData import tdx_data_Day as tdd
 from JohhnsonUtil import LoggerFactory as LoggerFactory
 from JohhnsonUtil import commonTips as cct
 
-
 # from logbook import Logger,StreamHandler,SyslogHandler
 # from logbook import StderrHandler
 
@@ -127,21 +126,16 @@ if __name__ == "__main__":
                             # top_all.loc[symbol, 'buy'] = top_now.loc[symbol, 'buy']
                 # top_all = top_all[top_all.buy > 0]
                 top_dif = top_all.copy()
-                if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935:
-                    top_dif['diff'] = (
-                        map(lambda x, y: round((x - y) / y * 100, 1), top_dif['buy'].values, top_dif['lastp'].values))
-                    top_dif = top_dif[top_dif.buy > 0]
-                else:
-                    top_dif['diff'] = (
-                        map(lambda x, y: round((x - y) / y * 100, 1), top_dif['trade'].values, top_dif['lastp'].values))
-                    # print top_dif.loc['600610',:]
-                    log.debug("top_dif:%s" % (len(top_dif)))
-                    top_dif = top_dif[top_dif.trade > 0]
-                    log.debug("top_dif.trade > 0:%s" % (len(top_dif)))
-                    if cct.get_now_time_int() > 935:
-                        top_dif = top_dif[top_dif.low > 0]
-                        log.debug("top_dif.low > 0:%s" % (len(top_dif)))
-
+                top_dif['buy'] = (
+                map(lambda x, y: y if int(x) == 0 else x, top_dif['buy'].values, top_dif['trade'].values))
+                # if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935:
+                top_dif['diff'] = (
+                    map(lambda x, y: round((x - y) / y * 100, 1), top_dif['buy'].values, top_dif['lastp'].values))
+                # print top_dif.loc['600610',:]
+                # top_dif = top_dif[top_dif.trade > 0]
+                if cct.get_now_time_int() > 935:
+                    top_dif = top_dif[top_dif.low > 0]
+                    log.debug("top_dif.low > 0:%s" % (len(top_dif)))
                         # top_dif.loc['600610','volume':'lvol']
                 top_dif['volume'] = (
                     map(lambda x, y: round(x / y / radio_t, 1), top_dif.volume.values, top_dif.lvol.values))
@@ -176,7 +170,7 @@ if __name__ == "__main__":
                     len(top_now[top_now['volume'] <= 0]), goldstock)),
                 print "Rt:%0.1f dT:%s" % (float(time.time() - time_Rt), cct.get_time_to_date(time_s))
                 if ptype == 'low':
-                    top_dif = top_dif[top_dif.lvol > ct.LvolumeSize ]
+                    top_dif = top_dif[top_dif.lvol > ct.LvolumeSize]
                     # top_dif = top_dif[top_dif.lvol > 12000]
                     if 'counts' in top_dif.columns.values:
                         top_dif = top_dif.sort_values(by=['diff', 'percent', 'volume', 'counts', 'ratio'],
@@ -337,8 +331,9 @@ if __name__ == "__main__":
                         args = parser.parse_args(input.split())
                         if len(str(args.code)) == 6:
                             if args.code in top_temp.index.values:
-                                lhg.get_linear_model_histogram(args.code, start=top_temp.loc[args.code, 'date'], vtype=args.vtype,
-                                                             filter=args.filter)
+                                lhg.get_linear_model_histogram(args.code, start=top_temp.loc[args.code, 'date'],
+                                                               end=args.end, vtype=args.vtype,
+                                                               filter=args.filter)
                     elif input.startswith('q'):
                         break
                     else:
