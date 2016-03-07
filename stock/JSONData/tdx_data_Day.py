@@ -255,11 +255,10 @@ def get_tdx_append_now_df_api(code, type='f', start=None, end=None):
             
     if len(df) > 0:
         tdx_last_day = df.index[-1]
-        duration = cct.get_today_duration(tdx_last_day)
-        log.debug("duration:%s"%duration)
     else:
-        tdx_last_day = None
-        duration = 1
+        tdx_last_day = start
+    duration = cct.get_today_duration(tdx_last_day)
+    log.debug("duration:%s"%duration)
     log.debug("tdx_last_day:%s" % tdx_last_day)
     index_status = False
     if code == '999999':
@@ -283,8 +282,12 @@ def get_tdx_append_now_df_api(code, type='f', start=None, end=None):
             print "Error duration", e
             ds = ts.get_h_data(code_t, start=tdx_last_day, end=today, index=index_status)
             df.index = pd.to_datetime(df.index)
+        if len(df) > 0:
+            lends = len(ds)
+        else:
+            lends = len(ds) + 1
         if ds is not None and len(ds) > 1:
-            ds = ds[:len(ds) - 1]
+            ds = ds[:lends - 1]
             if index_status:
                 if code == 'sh':
                     code = '999999'
@@ -345,8 +348,9 @@ def get_tdx_append_now_df_api(code, type='f', start=None, end=None):
             if dm is not None and not dm.empty:
                 c_name=dm.loc[code,['name']].values[0]
                 df['name']=c_name
-                log.debug("c_name:%s df.name:%s"%(c_name,df.name[-1]))
+                log.debug("c_name:%s df.name:%s"%(c_name,df.name[-1:]))
         log.debug("df:%s" % df[-3:])
+        # print df
     return df
               
 def get_tdx_append_now_df(code, type='f', start=None, end=None):
@@ -611,6 +615,10 @@ def get_duration_date(code, ptype='low', dt=None, df='',dl=None):
     return lowdate
 
 def get_duration_price_date(code, ptype='low', dt=None, df='',dl=None,vtype=None,filter=True):
+    # if code == "600760":
+        # log.setLevel(LoggerFactory.DEBUG)
+    # else:
+        # log.setLevel(LoggerFactory.ERROR)
     if len(df) == 0:
         df = get_tdx_day_to_df(code).sort_index(ascending=False)
         log.debug("code:%s" % (df[:1].index))
@@ -1134,11 +1142,11 @@ if __name__ == '__main__':
     print df[-2:]
     '''
     # print sina_data.Sina().get_stock_code_data('300006').set_index('code')
-    df = get_tdx_exp_low_or_high_price('600000', dt='20160304')
+    # df = get_tdx_exp_low_or_high_price('600000', dt='20160304')
     # df,inx = get_duration_price_date('600000',dt='20160301',filter=False)
-    # df = get_tdx_append_now_df_api('600000',start='2015-01-24',end='2016-01-01')
+    df = get_tdx_append_now_df_api('600760',start='2016-03-04')
     # df= get_tdx_append_now_df_api('999999',start='2016-02-01',end='2016-02-27')
-    print df
+    print "a:%s"%df
     # print df[df.index == '2015-02-27']
     # print df[-2:]
     time_s = time.time()

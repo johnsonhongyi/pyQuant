@@ -139,6 +139,7 @@ def get_dfcfw_rzrq_SHSZ(url=ct.DFCFW_RZRQ_SHSZ):
         rzrq_status=1
         # data=''
         da=0
+        i=0
         while rzrq_status:
             for x in range(days,20):
                 yestoday=cct.last_tddate(x).replace('-','/')
@@ -146,7 +147,9 @@ def get_dfcfw_rzrq_SHSZ(url=ct.DFCFW_RZRQ_SHSZ):
                 log.info("yestoday:%s data:%s"%(yestoday,data2))
                 if len(data2)>0:
                     # if da ==days and days==0:
-                    break
+                    i +=1
+                    if i >= days:
+                        break
                     # elif da > days:
                         # break
                 # else:    da+=1
@@ -166,6 +169,8 @@ def get_dfcfw_rzrq_SHSZ(url=ct.DFCFW_RZRQ_SHSZ):
     if len(data2)>0:
         # print data2
         data['diff']=round(data['all']-data2['all'],2)
+        data['shrz']=round(data['sh']-data2['sh'],2)
+        data['szrz']=round(data['sz']-data2['sz'],2)
     else:
         data['diff']='error'
     if len(data)==0:

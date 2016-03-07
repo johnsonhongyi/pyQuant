@@ -178,7 +178,8 @@ if __name__ == "__main__":
                     else:
                         top_dif = top_dif.sort_values(by=['diff', 'percent', 'ratio'], ascending=[0, 0, 1])
                 else:
-                    top_dif['diff'] = top_dif['diff'].apply(lambda x: x * 2 if x > 0 else x)
+                    # top_dif['diff'] = top_dif['diff'].apply(lambda x: x * 2 if x > 0 else x)
+                    top_dif['diff']=top_dif['diff'].apply(lambda x:x*2 if x < 0 else x )
                     if 'counts' in top_dif.columns.values:
                         top_dif = top_dif.sort_values(by=['diff', 'percent', 'volume', 'counts', 'ratio'],
                                                       ascending=[1, 0, 0, 1, 1])
@@ -204,11 +205,11 @@ if __name__ == "__main__":
                 if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935:
                     top_dd = top_dd.loc[:,
                              ['name', 'buy', 'diff', 'op', 'ra','percent','volume' , 'ratio', 'counts', 'high',
-                              'lastp', 'date']]
+                              'lastp','ldate', 'date']]
                 else:
                     top_dd = top_dd.loc[:,
                              ['name', 'trade', 'diff', 'op', 'ra', 'percent','volume', 'ratio', 'counts', 'high',
-                              'lastp', 'date']]
+                              'lastp','ldate', 'date']]
                 print rl.format_for_print(top_dd)
                 # if cct.get_now_time_int() < 930 or cct.get_now_time_int() > 1505 or (cct.get_now_time_int() > 1125 and cct.get_now_time_int() < 1505):
                 # print rl.format_for_print(top_dif[-10:])

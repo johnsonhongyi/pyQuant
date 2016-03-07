@@ -565,7 +565,7 @@ def write_to_blocknew(p_name, data, append=True):
             # raw = pack('IfffffII', t, i[2], i[3], i[4], i[5], i[6], i[7], i[8])
     # end for
     fout.close()
-
+    # print "wri ok:%s" % p_name
 
 def get_sys_platform():
     return platform.platform()

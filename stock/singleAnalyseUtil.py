@@ -325,8 +325,10 @@ def get_hot_countNew(changepercent,rzrq):
         print ("Hgt: %s Ggt: %s" % (hgt['hgt'], hgt['ggt']))    
     
     if len(rzrq) > 0:
-        print (u"\t\t\t\t\t    Sh: %s sz:  %s All: %s diff: %s亿" % (
-            f_print(5, rzrq['sh']), f_print(5, rzrq['sz']), f_print(4, rzrq['all']), f_print(5, rzrq['diff']))) 
+        shpcent= round((rzrq['shrz']/rzrq['sh'] * 100),1)
+        szpcent= round((rzrq['szrz']/rzrq['sz'] * 100),1)
+        print (u"\tSh: %s rz:%s :%s%% sz: %s rz:%s :%s%% All: %s diff: %s亿" % (
+            f_print(5, rzrq['sh']),f_print(4, rzrq['shrz']),shpcent, f_print(5, rzrq['sz']),f_print(4, rzrq['szrz']),szpcent,f_print(4, rzrq['all']), f_print(5, rzrq['diff']))) 
     
 
         

@@ -44,7 +44,7 @@ if __name__ == "__main__":
     status = False
     vol = '0'
     type = '2'
-    cut_num = 20000
+    cut_num = 1000000
     success = 0
     top_all = pd.DataFrame()
     time_s = time.time()
@@ -257,7 +257,7 @@ if __name__ == "__main__":
                 else:
                     cct.write_to_blocknew(block_path, codew, False)
                     # cct.write_to_blocknew(all_diffpath,codew,False)
-                print "wri ok"
+                print "wri ok:%s" % block_path
                 # cct.sleep(5)
             else:
                 sys.exit(0)

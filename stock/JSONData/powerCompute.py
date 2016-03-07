@@ -80,6 +80,11 @@ def LIS(X):
 
 
 def get_linear_model_status(code, ptype='f', df=None, dtype='d', type='m', start=None, end=None, days=1, filter='n',dl=None):
+    # log.setLevel(LoggerFactory.DEBUG)
+    # if code == "600760":
+        # log.setLevel(LoggerFactory.DEBUG)
+    # else:
+        # log.setLevel(LoggerFactory.ERROR)
     if start is not None and end is None and filter=='y':
         # if code not in ['999999','399006','399001']:
             # index_d,dl=tdd.get_duration_Index_date(dt=start)
@@ -89,7 +94,7 @@ def get_linear_model_status(code, ptype='f', df=None, dtype='d', type='m', start
             # log.debug("index_d:%s"%(index_d))
         index_d = cct.day8_to_day10(start)
         start = tdd.get_duration_price_date(code,ptype='low',dt=start)
-        log.debug("start: %s"%(start))
+        log.debug("start: %s  index_d:%s"%(start,index_d))
     
     if dl is not None:
         start,index_d = tdd.get_duration_price_date(code,ptype='low',dl=dl,filter=False)
@@ -98,9 +103,9 @@ def get_linear_model_status(code, ptype='f', df=None, dtype='d', type='m', start
         
     if df is None:
         # df = tdd.get_tdx_append_now_df(code,ptype, start, end).sort_index(ascending=True)
-        # print start,end
         df = tdd.get_tdx_append_now_df_api(code, ptype, start, end).sort_index(ascending=True)
-        if (start is not None or dl is not None) and filter=='y':
+        # if (start is not None or dl is not None) and filter=='y':
+        if dl is None and start is not None  and filter=='y':
             # print df.index.values[0],index_d
             if df.index.values[0] < index_d:
                 df = df[df.index > index_d]
@@ -120,21 +125,25 @@ def get_linear_model_status(code, ptype='f', df=None, dtype='d', type='m', start
         a = model.params[0]
         b = model.params[1]
         log.info("X:%s a:%0.1f b:%0.1f" % (len(asset), a, b))
-        Y=np.append(X,X[-1]+int(days))
+        # if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 1500:
+        Y = np.append(X,X[-1]+int(days))
+        # else:
+            # Y = X
         log.debug("X:%s Y:%s" % (X[-1],Y[-1]))
         # print ("X:%s" % (X[-1]))
         Y_hat = X * b + a
+        log.debug("Y_hat:%s"%Y_hat)
         # Y_hat_t = Y * b + a
         # log.info("Y_hat:%s " % (Y_hat))
         # log.info("asset:%s " % (asset.values))
         ratio = b/a*100
         operation=0
-        log.debug("line_now:%s src:%s"%(Y_hat[-1],Y_hat[1]))
-        if Y_hat[-1] > Y_hat[1]:
+        log.debug("line_now:%s src:%s"%(Y_hat[-1],Y_hat[0]))
+        if Y_hat[-1] > Y_hat[0]:
             log.debug("u-Y_hat[-1]:%0.1f" % (Y_hat[-1]))
             log.debug("price:%0.1f" % asset.iat[-1])
-            log.debug("u:%0.1f" % Y_hat[1])
-            log.debug("price:%0.1f" % asset.iat[1])
+            log.debug("u:%0.1f" % Y_hat[0])
+            log.debug("price:%0.1f" % asset.iat[0])
             if type.upper() == 'M':
                 Y_Future = X * b +a
                 # Y_Future = Y * b + a 
@@ -164,6 +173,7 @@ def get_linear_model_status(code, ptype='f', df=None, dtype='d', type='m', start
                 # Y_Future = Y * b + a - c_high
                 log.info("Type:H ratio: %0.1f %0.1f Y_Mid: %0.1f"%(b,ratio,Y_Future[-1]))
             # diff = asset[-1] - Y_Future[-1]
+            # log.debug("asset:%s Y_Future:%s"%(asset[-1],Y_Future[-1]))
             diff = asset[-1] - Y_Future[-1]
             log.info("as:%s Y:%s"%(asset[-1] ,Y_Future[-1]))
             if diff > 0:
@@ -174,7 +184,7 @@ def get_linear_model_status(code, ptype='f', df=None, dtype='d', type='m', start
                 log.info("Type: %s Down Y_Future: %0.1f b:%0.1f ratio:%0.1f"%(type.upper(),Y_Future[-1],b,ratio))
             return operation,ratio
         else:
-            log.debug("Line down !!! d:%s" % Y_hat[1])
+            log.debug("Line down !!! d:%s" % Y_hat[0])
             # print("Line down !!! d:%s nowp:%s" % (round(Y_hat[1],2),asset[-1:].values[0]))
             return -1, round(ratio,2)
     if len(df) > 1:
@@ -193,7 +203,7 @@ def get_linear_model_status(code, ptype='f', df=None, dtype='d', type='m', start
         # log.error("powerCompute code:%s"%(code))
         return -9,0,df.index.values[0]
     else:
-        log.error("code: Low :%s"%(code,len(df)))
+        log.error("code:%s Low :%s"%(code,len(df)))
         return -9,-9,cct.get_today()
         
 
@@ -207,12 +217,14 @@ def powerCompute_df(df,dtype='d',end=None,dl=None,filter='y'):
             start=cct.day8_to_day10(start)
         else:
             start = None
+                
         # end=cct.day8_to_day10(end)
         op,ra,st=get_linear_model_status(code, dtype=dtype, start=cct.day8_to_day10(start), end=cct.day8_to_day10(end),dl=dl,filter=filter)
         df.loc[code,'op']=op
         df.loc[code,'ra']=ra
-        if dl is not None:
-            df.loc[code,'ldate'] = st
+        # if dl is not None:
+            # df.loc[code,'ldate'] = st
+        df.loc[code,'ldate'] = st
     return df
 
 def parseArgmain():
@@ -231,6 +243,8 @@ def parseArgmain():
                         help='type')
     parser.add_argument('-f', action="store", dest="filter", type=str, choices=['y', 'n'], default='n',
                         help='find duration low')
+    parser.add_argument('-l', action="store", dest="dl", type=str, default=None,
+                        help='days')
     return parser
 
 def maintest(code,start=None,type='m',filter='y'):
@@ -249,7 +263,8 @@ if __name__ == "__main__":
             if len(str(args.code)) == 6:
              # ptype='f', df=None, dtype='d', type='m', start=None, end=None, days=1, filter='n'):
                 # print args.end
-                op,ra,st=get_linear_model_status(args.code, dtype=args.dtype, start=cct.day8_to_day10(args.start), end=cct.day8_to_day10(args.end), filter=args.filter)
+          
+                op,ra,st=get_linear_model_status(args.code, dtype=args.dtype, start=cct.day8_to_day10(args.start), end=cct.day8_to_day10(args.end), filter=args.filter,dl=args.dl)
                 print "code:%s op:%s ra:%s  start:%s"%(code,op,ra,st)
                 cct.sleep(0.1)
                 # ts=time.time()
