@@ -138,25 +138,32 @@ def get_today(sep='-'):
 
 
 def last_tddate(days=1):
-    today = datetime.datetime.today().date() + datetime.timedelta(-days)
-    day_n = int(today.strftime("%w"))
-    log.debug("today:%s day_n:%s" % (today, day_n))
-    return str(today)
-    '''
-    if day_n == 0:
-        lasd = today + datetime.timedelta(-2)
-        log.debug("0:%s" % lasd)
-    elif day_n == 6:
-        lasd = today + datetime.timedelta(-1)
-        log.debug("6:%s" % lasd)
-    elif day_n == 1 and not days == 0:
-        lasd = today + datetime.timedelta(-2)
-        log.debug("1:%s" % lasd)
-    else:
-        lasd = today
-        log.debug("1-5:%s" % lasd)
+    # today = datetime.datetime.today().date() + datetime.timedelta(-days)
+    today = datetime.datetime.today().date()
+    log.debug("today:%s " % (today))
+    # return str(today)
+    def get_work_day(today):
+        day_n = int(today.strftime("%w"))
+        if day_n == 0:
+            lastd = today + datetime.timedelta(-2)
+            log.debug("0:%s" % lastd)
+        elif day_n == 1 :
+            lastd = today + datetime.timedelta(-3)
+            log.debug("1:%s" % lastd)
+        else:
+            lastd = today + datetime.timedelta(-1)
+            log.debug("2-6:%s" % lastd)
+        return lastd
         # if days==0:
         # return str(lasd)
+    lastday=today
+    for x in range(days):
+        # print x
+        lastday = get_work_day(today)
+        today = lastday
+    return str(lastday)
+    
+    '''
     oday = lasd - datetime.timedelta(days)
     day_n = int(oday.strftime("%w"))
     # print oday,day_n
@@ -684,9 +691,10 @@ def LineArgmain():
 if __name__ == '__main__':
     # print get_run_path()
     # print get_work_time_ratio()
-    print last_tddate(0)
-    print last_tddate(1)
-    print get_os_system()
+    for x in range(1,30,1):
+        print last_tddate(x)
+        # print last_tddate(2)
+    # print get_os_system()
     set_console()
     # print System.IO.Path
     # print workdays('2010-01-01','2010-05-01')

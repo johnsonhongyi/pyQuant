@@ -179,6 +179,7 @@ if __name__ == "__main__":
                         top_dif = top_dif.sort_values(by=['diff', 'percent', 'ratio'], ascending=[0, 0, 1])
                 else:
                     # top_dif['diff'] = top_dif['diff'].apply(lambda x: x * 2 if x > 0 else x)
+                    top_dif = top_dif[top_dif.lvol > ct.LvolumeSize]
                     top_dif['diff']=top_dif['diff'].apply(lambda x:x*2 if x < 0 else x )
                     if 'counts' in top_dif.columns.values:
                         top_dif = top_dif.sort_values(by=['diff', 'percent', 'volume', 'counts', 'ratio'],
@@ -199,8 +200,8 @@ if __name__ == "__main__":
                 else:
                     top_temp = top_dif[:5].copy()
                     top_end = top_dif[-10:].copy()
-                top_temp = pct.powerCompute_df(top_temp)
-                top_end = pct.powerCompute_df(top_end)
+                top_temp = pct.powerCompute_df(top_temp,dl=30)
+                top_end = pct.powerCompute_df(top_end,dl=30)
                 top_dd = pd.concat([top_temp, top_end], axis=0)
                 if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935:
                     top_dd = top_dd.loc[:,

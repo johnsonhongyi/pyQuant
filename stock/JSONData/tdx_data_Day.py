@@ -1144,7 +1144,7 @@ if __name__ == '__main__':
     # print sina_data.Sina().get_stock_code_data('300006').set_index('code')
     # df = get_tdx_exp_low_or_high_price('600000', dt='20160304')
     # df,inx = get_duration_price_date('600000',dt='20160301',filter=False)
-    df = get_tdx_append_now_df_api('600760',start='2016-03-04')
+    df = get_tdx_append_now_df_api('300502',start='2016-03-03')
     # df= get_tdx_append_now_df_api('999999',start='2016-02-01',end='2016-02-27')
     print "a:%s"%df
     # print df[df.index == '2015-02-27']

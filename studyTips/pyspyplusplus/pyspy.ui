@@ -1,0 +1,81 @@
+<ui version="4.0" >
+ <class>SpyDialog</class>
+ <widget class="QDialog" name="SpyDialog" >
+  <property name="enabled" >
+   <bool>true</bool>
+  </property>
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>400</width>
+    <height>292</height>
+   </rect>
+  </property>
+  <property name="sizePolicy" >
+   <sizepolicy vsizetype="Preferred" hsizetype="Preferred" >
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="minimumSize" >
+   <size>
+    <width>400</width>
+    <height>292</height>
+   </size>
+  </property>
+  <property name="maximumSize" >
+   <size>
+    <width>400</width>
+    <height>292</height>
+   </size>
+  </property>
+  <property name="windowTitle" >
+   <string>PySpy++</string>
+  </property>
+  <property name="windowIcon" >
+   <iconset resource="pyspy.qrc" >
+    <normaloff>:/res/finderf.bmp</normaloff>:/res/finderf.bmp</iconset>
+  </property>
+  <property name="modal" >
+   <bool>false</bool>
+  </property>
+  <widget class="QTextEdit" name="textEditInformation" >
+   <property name="geometry" >
+    <rect>
+     <x>30</x>
+     <y>70</y>
+     <width>341</width>
+     <height>161</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label" >
+   <property name="geometry" >
+    <rect>
+     <x>290</x>
+     <y>250</y>
+     <width>91</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text" >
+    <string>&lt;!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
+p, li { white-space: pre-wrap; }
+&lt;/style>&lt;/head>&lt;body style=" font-family:'宋体'; font-size:9pt; font-weight:400; font-style:normal;">
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">By &lt;a href="http://www.cnblogs.com/coderzh">&lt;span style=" font-size:12pt; text-decoration: underline; color:#0000ff;">CoderZh&lt;/span>&lt;/a>&lt;/p>&lt;/body>&lt;/html></string>
+   </property>
+   <property name="textFormat" >
+    <enum>Qt::RichText</enum>
+   </property>
+   <property name="openExternalLinks" >
+    <bool>true</bool>
+   </property>
+  </widget>
+ </widget>
+ <resources>
+  <include location="pyspy.qrc" />
+ </resources>
+ <connections/>
+</ui>

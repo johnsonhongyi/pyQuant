@@ -147,9 +147,9 @@ def get_dfcfw_rzrq_SHSZ(url=ct.DFCFW_RZRQ_SHSZ):
                 log.info("yestoday:%s data:%s"%(yestoday,data2))
                 if len(data2)>0:
                     # if da ==days and days==0:
-                    i +=1
-                    if i >= days:
-                        break
+                    # i +=1
+                    # if i >= days:
+                    break
                     # elif da > days:
                         # break
                 # else:    da+=1

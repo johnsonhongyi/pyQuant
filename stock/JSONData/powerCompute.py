@@ -105,8 +105,9 @@ def get_linear_model_status(code, ptype='f', df=None, dtype='d', type='m', start
         # df = tdd.get_tdx_append_now_df(code,ptype, start, end).sort_index(ascending=True)
         df = tdd.get_tdx_append_now_df_api(code, ptype, start, end).sort_index(ascending=True)
         # if (start is not None or dl is not None) and filter=='y':
-        if dl is None and start is not None  and filter=='y':
+        if len(df) >2 and dl is None and start is not None  and filter=='y':
             # print df.index.values[0],index_d
+            # print "df:%s code:%s"%(len(df),code)
             if df.index.values[0] < index_d:
                 df = df[df.index > index_d]
     if not dtype == 'd':
