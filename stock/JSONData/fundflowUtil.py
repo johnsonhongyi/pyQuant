@@ -103,8 +103,8 @@ def get_dfcfw_fund_SHSZ(url=ct.DFCFW_ZS_SHSZ):
             if isinstance(dd['svol'],str) and dd['svol'].find('-')==0:
                 log.info("svol:%s"%dd['svol'])
             else:
-                dd['svol']="%s->%s"%((dd['svol'],round(dd['svol']/(df.loc['999999','amount']/10000000)/radio_t,1)))
-                dd['zvol']="%s->%s"%((dd['zvol'],round(dd['zvol']/(df.loc['399001','amount']/10000000)/radio_t,1)))
+                dd['svol']="%s-%s"%((dd['svol'],round(dd['svol']/(df.loc['999999','amount']/10000000)/radio_t,1)))
+                dd['zvol']="%s-%s"%((dd['zvol'],round(dd['zvol']/(df.loc['399001','amount']/10000000)/radio_t,1)))
         # dd['zzb']=data[1]
         # dd['sjlr']=data[2]
         # dd['sjzb']=data[3]

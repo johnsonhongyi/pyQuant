@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 # !/usr/bin/env python
 
-import gc
+import gc,os
 import re
 import sys
 import time
@@ -37,10 +37,12 @@ if __name__ == "__main__":
     # handler=StderrHandler(format_string='{record.channel}: {record.message) [{record.extra[cwd]}]')
     # log.level = log.debug
     # error_handler = SyslogHandler('Sina-M-Log', level='ERROR')
-    if cct.isMac():
-        cct.set_console(121, 21)
-    else:
-        cct.set_console(106, 21)
+    
+    def set_duration_console(duration_date):
+        if cct.isMac():
+            cct.set_console(121, 21)
+        else:
+            cct.set_console(121, 21,title=str(duration_date))
     status = False
     vol = '0'
     type = '2'
@@ -55,6 +57,7 @@ if __name__ == "__main__":
     status_change = False
     lastpTDX_DF = pd.DataFrame()
     duration_date = 20160225
+    set_duration_console(duration_date)
     ptype = 'low'
     filter = 'y'
     percent_status = 'n'
@@ -169,6 +172,7 @@ if __name__ == "__main__":
                     now_count, len(top_all[top_all['buy'] > 0]),
                     len(top_now[top_now['volume'] <= 0]), goldstock)),
                 print "Rt:%0.1f dT:%s" % (float(time.time() - time_Rt), cct.get_time_to_date(time_s))
+                cct.set_console(title=[duration_date,'dT:%s'%cct.get_time_to_date(time_s),'G:%s'%goldstock])
                 if ptype == 'low':
                     top_dif = top_dif[top_dif.lvol > ct.LvolumeSize]
                     # top_dif = top_dif[top_dif.lvol > 12000]
@@ -313,12 +317,17 @@ if __name__ == "__main__":
                         duration_date = tdd.get_duration_price_date('999999', dl=dt, ptype=ptype)
                     else:
                         duration_date = dt
+                    set_duration_console(duration_date)
                     top_all = pd.DataFrame()
                     time_s = time.time()
                     status = False
                     lastpTDX_DF = pd.DataFrame()
             elif st == 'w' or st == 'a':
-                codew = (top_dd.index).tolist()
+                if ptype == 'low':
+                    codew = (top_dd[:10].index).tolist()
+                else:
+                    codew = (top_dd[-10:].index).tolist()
+                
                 if st == 'a':
                     cct.write_to_blocknew(block_path, codew)
                     # sl.write_to_blocknew(all_diffpath, codew)

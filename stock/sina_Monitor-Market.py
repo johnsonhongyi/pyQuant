@@ -167,7 +167,7 @@ if __name__ == "__main__":
 
 
     if cct.isMac():
-        cct.set_console(98, 16)
+        cct.set_console(100, 16)
     else:
         cct.set_console(100, 16)
     status = False
@@ -373,6 +373,7 @@ if __name__ == "__main__":
                     df_count, now_count, len(top_all[top_all['buy'] > 0]),
                     len(top_now[top_now['volume'] <= 0]), len(top_dif))),
                 print "Rt:%0.1f dT:%s" % (float(time.time() - time_Rt),cct.get_time_to_date(time_s))
+                cct.set_console(title=['dT:%s'%cct.get_time_to_date(time_s),'G:%s'%len(top_dif)])   
                 if 'counts' in top_dif.columns.values:
                     top_dif = top_dif.sort_values(by=['diff', 'volume', 'percent', 'counts', 'ratio'],
                                                   ascending=[0, 0, 0, 1, 1])

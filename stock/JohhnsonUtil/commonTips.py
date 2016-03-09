@@ -60,11 +60,20 @@ def set_ctrl_handler():
         return 0 # chain to the next handler
     win32api.SetConsoleCtrlHandler(handler, 1)        
 
-def set_console(width=80, height=15, color=3, cmdname=None):
+def set_console(width=80, height=15, color=3, title=None):
     # mode con cp select=936
     # os.system("mode con: cols=%s lines=%s"%(width,height))
     # print os.path.splitext(sys.argv[0])
-    filename = (os.path.basename(sys.argv[0]))
+    if title is None:
+        filename = (os.path.basename(sys.argv[0]))
+    elif isinstance(title, list):
+        filename = (os.path.basename(sys.argv[0]))
+        for cname in title:
+            # print cname
+            filename = filename + ' ' + str(cname)
+            # print filename
+    else:
+        filename = (os.path.basename(sys.argv[0])) + ' ' + title
     if isMac():
         # os.system('printf "\033]0;%s\007"'%(filename))
         os.system('printf "\e[8;%s;%st"' % (height, width))
@@ -74,8 +83,7 @@ def set_console(width=80, height=15, color=3, cmdname=None):
         os.system('title=%s' % filename)
     # printf "\033]0;My Window title\007”
     # os.system('color %s'%color)
-    # set_ctrl_handler()
-
+    # set_ctrl_handler()  
 
 def timeit_time(cmd, num=5):
     import timeit
@@ -543,7 +551,7 @@ def write_to_blocknew(p_name, data, append=True):
         flist = fout.readlines()
     else:
         fout = open(p_name, 'wb')
-        index_list = ['1999999', '27#HSI', '0159915', '47#IFL0']
+        index_list = ['1999999', '27#HSI', '47#IFL0', '0159915']
         # index_list.reverse()
         for i in index_list:
             raw = (i) + '\r\n'
@@ -691,10 +699,12 @@ def LineArgmain():
 if __name__ == '__main__':
     # print get_run_path()
     # print get_work_time_ratio()
-    for x in range(1,30,1):
+    for x in range(1,2,1):
         print last_tddate(x)
         # print last_tddate(2)
     # print get_os_system()
     set_console()
+    set_console(title=['G','dT'])
+    raw_input("a")
     # print System.IO.Path
     # print workdays('2010-01-01','2010-05-01')

@@ -211,6 +211,7 @@ if __name__ == "__main__":
                 print "Rt:%0.1f dT:%s" % (
                     float(time.time() - time_Rt),
                     cct.get_time_to_date(time_s))
+                cct.set_console(title=['dT:%s'%cct.get_time_to_date(time_s),'G:%s'%len(top_dif)])                     
                 if 'counts' in top_dif.columns.values:
                     top_dif = top_dif.sort_values(
                         by=['diff', 'percent', 'volume', 'counts', 'ratio'],

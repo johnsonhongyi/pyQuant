@@ -29,6 +29,7 @@ except ImportError:
     from urllib2 import urlopen, Request
 
 log=LoggerFactory.getLogger('Realdata')
+# log.setLevel(LoggerFactory.INFO)
 # log=LoggerFactory.JohnsonLoger('Realdata')
 
 
@@ -186,7 +187,56 @@ def get_sina_Market_json(market='sh', showtime=True, num='1000', retry_count=3, 
     else:
         if showtime:print ("no data Market-df:%s" % (format((time.time() - start_t), '.2f')))
         return []
-
+from configobj import ConfigObj
+import os
+# http://www.cnblogs.com/qq78292959/archive/2013/07/25/3213939.html
+def getconfigBigCount(count=None):
+    conf_ini = "count.ini"
+    # print os.chdir(os.path.dirname(sys.argv[0]))
+    # print (os.path.dirname(sys.argv[0]))
+    # log.setLevel(LoggerFactory.INFO)
+    if os.path.exists(conf_ini):
+        log.info("file ok:%s"%conf_ini)
+        config = ConfigObj(conf_ini,encoding='UTF8')
+        if config['BigCount']['type2'] > 0:
+            big_last= int(config['BigCount']['type2'])
+            if count is None:
+                big_now = int(sina_json_Big_Count())
+            else:
+                big_now = int(count)
+            ratio_t=cct.get_work_time_ratio()
+            bigRt=round( big_now / big_last / ratio_t, 1)
+            if not cct.get_work_duration() and big_now > 0 and big_last != big_now :
+                log.info("big_now update:%s last:%s"%(big_now,big_last))
+                config['BigCount']['type2'] = big_now
+                rt=float(config['BigCount']['ratio'])
+                # if  rt != bigRt:
+                log.info("bigRt:%s"%bigRt)
+                config['BigCount']['ratio'] = bigRt
+                config.write()
+            else:
+                log.info("not work:%s ra:%s"%(big_now,bigRt))
+                return [big_now,bigRt]
+    else:
+        config = ConfigObj(conf_ini,encoding='UTF8')
+        config['BigCount'] = {}
+        config['BigCount']['type2'] = sina_json_Big_Count()
+        config['BigCount']['ratio'] = 0
+        config.write()
+    cl=[config['BigCount']['type2'],config['BigCount']['ratio']]
+    return cl
+        
+def sina_json_Big_Count(vol='0', type='2', num='10000'):
+    url = ct.JSON_DD_CountURL % (ct.DD_VOL_List[vol], type)
+    log.info("Big_Count_url:%s"%url)
+    data = cct.get_url_data(url)
+    count = re.findall('(\d+)', data, re.S)
+    log.debug("Big_Count_count:%s"%count)
+    if len(count) > 0:
+        count = count[0]
+    else:
+        count = 0
+    return count
 
 def _get_sina_json_dd_url(vol='0', type='3', num='10000', count=None):
     urllist = []
@@ -201,7 +251,8 @@ def _get_sina_json_dd_url(vol='0', type='3', num='10000', count=None):
         # print count
         if len(count) > 0:
             count = count[0]
-            print ("Big:%s"%(count)),
+            bigcount=getconfigBigCount(count)
+            print ("Big:%s V:%s "%(bigcount[0],bigcount[1])),
             if int(count) >= int(num):
                 page_count = int(math.ceil(int(count) / int(num)))
                 for page in range(1, page_count + 1):
@@ -601,7 +652,9 @@ def get_market_price_sina_dd_realTime(dp='',vol='0',type='3'):
 if __name__ == '__main__':
     import sys
     # df = get_sina_all_json_dd('0', '3')
-    df=get_sina_Market_json('cyb')
+    # df=get_sina_Market_json('cyb')
+    print sina_json_Big_Count()
+    print getconfigBigCount()
     # _parsing_Market_price_json('cyb')
     sys.exit(0)
     dd = get_sina_all_json_dd('0', '4')
