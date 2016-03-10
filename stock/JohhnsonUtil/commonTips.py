@@ -238,7 +238,7 @@ def get_now_time_int():
 def get_work_time():
     now_t = str(get_now_time()).replace(':', '')
     now_t = int(now_t)
-    if (now_t > 1130 and now_t < 1300) or now_t < 915 or now_t > 1500:
+    if (now_t > 1130 and now_t < 1300) or now_t < 915 or now_t > 1502:
         # return False
         return False
     else:
@@ -249,6 +249,7 @@ def get_work_duration():
     int_time = get_now_time_int()
     # now_t = int(now_t)
     if (int_time > 830 and int_time < 915) or (int_time > 1130 and int_time < 1300):
+    # if (int_time > 830 and int_time < 915) or (int_time > 1130 and int_time < 1300) or (int_time > 1500 and int_time < 1510):
         # return False
         return True
     else:

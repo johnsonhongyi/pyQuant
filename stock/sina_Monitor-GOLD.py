@@ -193,8 +193,8 @@ if __name__ == "__main__":
                 # print rl.format_for_print(top_all)
                 # print top_all[:10]
                 
-                top_temp = top_all[:50].copy()
-                top_temp = pct.powerCompute_df(top_temp,dl='30')
+                top_temp = top_all[:30].copy()
+                top_temp = pct.powerCompute_df(top_temp,dl='30')            
                 if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935:
                     top_temp = top_temp.loc[:,
                              ['name', 'buy', 'diff', 'op', 'ra', 'percent','volume', 'ratio', 'counts',

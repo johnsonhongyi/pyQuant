@@ -102,6 +102,9 @@ def get_linear_model_status(code, ptype='f', df=None, dtype='d', type='m', start
         # filter = 'y'
         
     if df is None:
+        if start is not None and len(start)>8 and int(start[:4]) > 2500:
+           log.warn("code:%s ERROR:%s"%(code,start))
+           start = '2016-01-01'
         # df = tdd.get_tdx_append_now_df(code,ptype, start, end).sort_index(ascending=True)
         df = tdd.get_tdx_append_now_df_api(code, ptype, start, end).sort_index(ascending=True)
         # if (start is not None or dl is not None) and filter=='y':
@@ -220,7 +223,9 @@ def powerCompute_df(df,dtype='d',end=None,dl=None,filter='y'):
             start = None
                 
         # end=cct.day8_to_day10(end)
-        op,ra,st=get_linear_model_status(code, dtype=dtype, start=cct.day8_to_day10(start), end=cct.day8_to_day10(end),dl=dl,filter=filter)
+        start = cct.day8_to_day10(start)
+        end = cct.day8_to_day10(end)
+        op,ra,st=get_linear_model_status(code, dtype=dtype, start=start, end=end,dl=dl,filter=filter)
         df.loc[code,'op']=op
         df.loc[code,'ra']=ra
         # if dl is not None:

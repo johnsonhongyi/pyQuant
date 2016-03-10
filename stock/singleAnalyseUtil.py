@@ -330,7 +330,7 @@ def get_hot_countNew(changepercent,rzrq):
         print (u"\tSh: %s rz:%s :%s%% sz: %s rz:%s :%s%% All: %s diff: %s亿" % (
             f_print(5, rzrq['sh']),f_print(4, rzrq['shrz']),shpcent, f_print(5, rzrq['sz']),f_print(4, rzrq['szrz']),szpcent,f_print(4, rzrq['all']), f_print(5, rzrq['diff']))) 
     bigcount=rd.getconfigBigCount()
-    cct.set_console(title=['B:%s V:%s'%(bigcount[0],bigcount[1]),'To:%s'%len(topTen),'D:%s'%len(crash),'Sh: %s '%ff['scent'],'Vr:%s%% '%ff['svol'],'MR: %s%%'%zzb])
+    cct.set_console(title=['B:%s V:%s'%(bigcount[0],bigcount[1]),'To:%s'%len(topTen),'D:%s'%len(crash),'Sh: %s '%ff['scent'],'Vr:%s%% '%ff['svol'],'MR: %s'%zzb])
     return allTop
 
 
