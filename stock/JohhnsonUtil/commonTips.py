@@ -1,4 +1,5 @@
 # -*- encoding: utf-8 -*-
+import argparse
 import datetime
 import os
 import platform
@@ -7,13 +8,13 @@ import sys
 import time
 from compiler.ast import flatten
 from multiprocessing.pool import ThreadPool, cpu_count
+
 import pandas as pd
 import trollius as asyncio
 from trollius.coroutines import From
 
 import LoggerFactory as Log
 import johnson_cons as ct
-import argparse
 
 log = Log.getLogger('commonTipss')
 # log.setLevel(Log.DEBUG)
@@ -44,6 +45,8 @@ def isMac():
         return True
     else:
         return False
+
+
 def set_ctrl_handler():
     # os.environ['FOR_DISABLE_CONSOLE_CTRL_HANDLER'] = '1'
     import win32api,thread

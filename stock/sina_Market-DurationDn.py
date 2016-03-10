@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 # !/usr/bin/env python
 
-import gc,os
+import gc
 import re
 import sys
 import time
@@ -37,12 +37,12 @@ if __name__ == "__main__":
     # handler=StderrHandler(format_string='{record.channel}: {record.message) [{record.extra[cwd]}]')
     # log.level = log.debug
     # error_handler = SyslogHandler('Sina-M-Log', level='ERROR')
-    
+    width, height = 121, 21
     def set_duration_console(duration_date):
         if cct.isMac():
-            cct.set_console(121, 21)
+            cct.set_console(width, height)
         else:
-            cct.set_console(106, 21,title=str(duration_date))
+            cct.set_console(width, height, title=str(duration_date))
     status = False
     vol = '0'
     type = '2'
@@ -172,7 +172,8 @@ if __name__ == "__main__":
                     now_count, len(top_all[top_all['buy'] > 0]),
                     len(top_now[top_now['volume'] <= 0]), goldstock)),
                 print "Rt:%0.1f dT:%s" % (float(time.time() - time_Rt), cct.get_time_to_date(time_s))
-                cct.set_console(title=[duration_date,'dT:%s'%cct.get_time_to_date(time_s),'G:%s'%goldstock])
+                cct.set_console(width, height,
+                                title=[duration_date, 'dT:%s' % cct.get_time_to_date(time_s), 'G:%s' % goldstock])
                 if ptype == 'low':
                     top_dif = top_dif[top_dif.lvol > ct.LvolumeSize]
                     # top_dif = top_dif[top_dif.lvol > 12000]
