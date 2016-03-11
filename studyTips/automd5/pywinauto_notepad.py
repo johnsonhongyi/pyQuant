@@ -11,10 +11,11 @@ logger = logging.getLogger('pywinauto')
 # logger.level = logging.WARNING # or higher
 logger.level = logging.DEBUG # or higher
 # pywinauto.Timings.window_find_timeout = 10
-timings.Timings.window_find_timeout = 0.2
+timings.Timings.window_find_timeout = 0.1
 
 App = application.Application()
-app = App.start('notepad.exe')
+# app = App.Connect(class_name='Notepad')
+# app = App.start('notepad.exe')
 
 # app.notepad.TypeKeys("%FX")
 # time.sleep(.5)

@@ -56,7 +56,7 @@ if __name__ == "__main__":
     block_path = tdd.get_tdx_dir_blocknew() + '061.blk'
     status_change = False
     lastpTDX_DF = pd.DataFrame()
-    duration_date = 20151224
+    duration_date = 20160229
     set_duration_console(duration_date)
     ptype = 'high'
     filter = 'y'
@@ -132,6 +132,7 @@ if __name__ == "__main__":
                 top_dif['buy'] = (
                 map(lambda x, y: y if int(x) == 0 else x, top_dif['buy'].values, top_dif['trade'].values))
                 # if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935:
+                top_dif = top_dif[top_dif.buy > 0]
                 top_dif['diff'] = (
                     map(lambda x, y: round((x - y) / y * 100, 1), top_dif['buy'].values, top_dif['lastp'].values))
                 # print top_dif.loc['600610',:]

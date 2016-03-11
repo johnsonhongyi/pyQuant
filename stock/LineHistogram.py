@@ -13,6 +13,7 @@ from statsmodels import regression
 from JohhnsonUtil import LoggerFactory as LoggerFactory
 from JohhnsonUtil import commonTips as cct
 from JohhnsonUtil import zoompan
+from JSONData import powerCompute as pct
 
 log = LoggerFactory.getLogger('Linehistogram')
 # log.setLevel(LoggerFactory.DEBUG)
@@ -146,11 +147,24 @@ def get_linear_model_histogramDouble(code, ptype='f', dtype='d', start=None, end
         # df1 = tdd.get_tdx_append_now_df(code2, ptype, start, end).sort_index(ascending=True)
         if not dtype == 'd':
             df1 = tdd.get_tdx_stock_period_to_type(df1, dtype).sort_index(ascending=True)
-        asset1 = df1.loc[asset.index, vtype]
-        startv = asset1[:1]
-        # asset_v=asset[:1]
-        # print startv,asset_v
-        asset1 = asset1.apply(lambda x: round(x / asset1[:1], 2))
+        # if len(asset) < len(df1):
+            # asset1 = df1.loc[asset.index, vtype]
+        # else:
+            # asset1 = df1.loc[asset.index, vtype]
+        # startv = asset1[:1]
+        # asset1 = asset1.apply(lambda x: round(x / asset1[:1], 2))
+        if asset[:1].index[0] > df1[:1].index[0]:
+            asset1 = df1.loc[asset.index, vtype]
+            startv = asset1[:1]
+            asset1 = asset1.apply(lambda x: round(x / asset1[:1], 2))
+        else:
+            asset = df.loc[df1.index, vtype]
+            asset = asset.dropna()
+            dates = asset.index
+            asset1 = df1[vtype]
+            asset1 = asset1.apply(lambda x: round(x / asset1[:1], 2))
+    
+    
     else:
         if code.startswith('399001'):
             code2 = '999999'
@@ -258,6 +272,8 @@ def get_linear_model_histogramDouble(code, ptype='f', dtype='d', start=None, end
         plt.ylabel('Price-center price', fontsize=14)
         plt.grid(True)
     else:
+        ticks = ax3.get_xticks()
+        ax3.set_xticklabels([dates[i] for i in (np.append(ticks[:-1], len(asset) - 1))], rotation=15)
         as3 = asset.apply(lambda x: round(x / asset[:1], 2))
         ax3.plot(as3)
         ax3.plot(asset1, '-r', linewidth=2)
@@ -656,6 +672,8 @@ if __name__ == "__main__":
                     code = args.code
                     # print code, args.ptype, args.dtype, start, end
                     get_linear_model_histogramDouble(code, args.ptype, args.dtype, start, end, args.vtype, args.filter)
+                    op,ra,st = pct.get_linear_model_status(code, dtype=args.dtype, start=start, end=end, filter=args.filter)
+                    print "code:%s op:%s ra:%s  start:%s"%(code,op,ra,st)
                     # p=multiprocessing.Process(target=get_linear_model_histogramDouble,args=(code, args.ptype, args.dtype, start, end,args.vtype,args.filter,))
                     # p.daemon = True
                     # p.start()
@@ -670,7 +688,9 @@ if __name__ == "__main__":
                     end = cct.day8_to_day10(args.end)
                     # get_linear_model_histogramDouble(code,args.dtype,args.start)
                     get_linear_model_histogramDouble(code, args.ptype, args.dtype, start, end, args.vtype)
-
+                    op,ra,st = pct.get_linear_model_status(code, dtype=args.dtype, start=start, end=end, filter=args.filter)
+                    print "code:%s op:%s ra:%s  start:%s"%(code,op,ra,st)
+                    # get_linear_model_status(code, dtype=args.dtype, start=start, end=end, filter=args.filter,dl=args.dl)
                 sys.exit(0)
 
         except (KeyboardInterrupt) as e:
