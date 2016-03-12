@@ -6,11 +6,9 @@ import re
 import sys
 import time
 import traceback
-import urllib2
 
 import pandas as pd
 # from bs4 import BeautifulSoup
-from pandas import DataFrame
 
 import JohhnsonUtil.johnson_cons as ct
 import singleAnalyseUtil as sl
@@ -49,8 +47,10 @@ if __name__ == "__main__":
     # delay_time = 3600
     delay_time = cct.get_delay_time()
     First = True
-    base_path = tdd.get_tdx_dir()
-    block_path = tdd.get_tdx_dir_blocknew() + '062.blk'
+    # base_path = tdd.get_tdx_dir()
+    # block_path = tdd.get_tdx_dir_blocknew() + '062.blk'
+    blkname = '069.blk'
+    block_path = tdd.get_tdx_dir_blocknew() + blkname
     status_change = False
 
     # all_diffpath = tdd.get_tdx_dir_blocknew() + '062.blk'
@@ -248,7 +248,8 @@ if __name__ == "__main__":
                     len(top_now[top_now['volume'] <= 0]), len(top_dif))),
                 # print "Rt:%0.3f" % (float(time.time() - time_Rt))
                 print "Rt:%0.1f dT:%s" % (float(time.time() - time_Rt),cct.get_time_to_date(time_s))
-                cct.set_console(title=['dT:%s'%cct.get_time_to_date(time_s),'G:%s'%len(top_dif)])   
+                cct.set_console(
+                    title=['dT:%s' % cct.get_time_to_date(time_s), 'G:%s' % len(top_dif), 'zxg: %s' % (blkname)])
                 if 'counts' in top_dif.columns.values:
                     top_dif = top_dif.sort_values(by=['diff', 'volume', 'percent', 'counts', 'ratio'],
                                                   ascending=[0, 0, 0, 1, 1])

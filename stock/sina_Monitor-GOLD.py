@@ -95,8 +95,10 @@ if __name__ == "__main__":
     time_s = time.time()
     # delay_time = 3600
     delay_time = cct.get_delay_time()
-    base_path = tdd.get_tdx_dir()
-    block_path = tdd.get_tdx_dir_blocknew() + '065.blk'
+    # base_path = tdd.get_tdx_dir()
+    # block_path = tdd.get_tdx_dir_blocknew() + '065.blk'
+    blkname = '065.blk'
+    block_path = tdd.get_tdx_dir_blocknew() + blkname
     # all_diffpath = tdd.get_tdx_dir_blocknew() + '062.blk'
 
     while 1:
@@ -178,7 +180,8 @@ if __name__ == "__main__":
                               ['name', 'percent', 'diff', 'counts', 'volume', 'trade', 'prev_p', 'ratio']]
 
                 print "G:%s dt:%s " % (len(top_all),cct.get_time_to_date(time_s))
-                cct.set_console(title=['dT:%s'%cct.get_time_to_date(time_s),'G:%s'%len(top_all)])                
+                cct.set_console(
+                    title=['dT:%s' % cct.get_time_to_date(time_s), 'G:%s' % len(top_all), 'zxg: %s' % (blkname)])
                 top_all = top_all.sort_values(by=[ 'counts', 'diff','volume', 'ratio'], ascending=[0, 0, 0, 1])
                 # top_all=top_all.sort_values(by=['diff','percent','counts','ratio'],ascending=[0,0,1,1])
 

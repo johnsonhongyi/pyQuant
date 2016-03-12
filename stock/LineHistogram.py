@@ -10,10 +10,10 @@ from pylab import plt,mpl
 from sklearn.linear_model import LinearRegression
 from statsmodels import regression
 
+from JSONData import powerCompute as pct
 from JohhnsonUtil import LoggerFactory as LoggerFactory
 from JohhnsonUtil import commonTips as cct
 from JohhnsonUtil import zoompan
-from JSONData import powerCompute as pct
 
 log = LoggerFactory.getLogger('Linehistogram')
 # log.setLevel(LoggerFactory.DEBUG)
@@ -153,18 +153,19 @@ def get_linear_model_histogramDouble(code, ptype='f', dtype='d', start=None, end
             # asset1 = df1.loc[asset.index, vtype]
         # startv = asset1[:1]
         # asset1 = asset1.apply(lambda x: round(x / asset1[:1], 2))
+        # print asset[:1].index[0] , df1[:1].index[0]
         if asset[:1].index[0] > df1[:1].index[0]:
             asset1 = df1.loc[asset.index, vtype]
             startv = asset1[:1]
             asset1 = asset1.apply(lambda x: round(x / asset1[:1], 2))
         else:
-            asset = df.loc[df1.index, vtype]
+            df = df[df.index >= df1.index[0]]
+            asset = df[vtype]
             asset = asset.dropna()
             dates = asset.index
-            asset1 = df1[vtype]
+            asset1 = df1.loc[df.index, vtype]
             asset1 = asset1.apply(lambda x: round(x / asset1[:1], 2))
-    
-    
+
     else:
         if code.startswith('399001'):
             code2 = '999999'
@@ -182,11 +183,14 @@ def get_linear_model_histogramDouble(code, ptype='f', dtype='d', start=None, end
             startv = asset1[:1]
             asset1 = asset1.apply(lambda x: round(x / asset1[:1], 2))
         else:
-            asset = df.loc[df1.index, vtype]
+
+            df = df[df.index >= df1.index[0]]
+            asset = df[vtype]
             asset = asset.dropna()
             dates = asset.index
-            asset1 = df1[vtype]
+            asset1 = df1.loc[df.index, vtype]
             asset1 = asset1.apply(lambda x: round(x / asset1[:1], 2))
+    # print len(df),len(asset),len(df1),len(asset1)
 
     # 画出价格随时间变化的图像
     # _, ax = plt.subplots()
@@ -272,11 +276,11 @@ def get_linear_model_histogramDouble(code, ptype='f', dtype='d', start=None, end
         plt.ylabel('Price-center price', fontsize=14)
         plt.grid(True)
     else:
-        ticks = ax3.get_xticks()
-        ax3.set_xticklabels([dates[i] for i in (np.append(ticks[:-1], len(asset) - 1))], rotation=15)
         as3 = asset.apply(lambda x: round(x / asset[:1], 2))
         ax3.plot(as3)
+        ticks = ax3.get_xticks()
         ax3.plot(asset1, '-r', linewidth=2)
+        ax3.set_xticklabels([dates[i] for i in (np.append(ticks[:-1], len(asset) - 1))], rotation=15)
         plt.grid(True)
         zp3 = zoompan.ZoomPan()
         figZoom = zp3.zoom_factory(ax3, base_scale=scale)

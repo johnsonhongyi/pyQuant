@@ -75,8 +75,10 @@ if __name__ == "__main__":
     # delay_time = 3600
     delay_time = cct.get_delay_time()
     First = True
-    base_path = tdd.get_tdx_dir()
-    block_path = tdd.get_tdx_dir_blocknew() + '067.blk'
+    # base_path = tdd.get_tdx_dir()
+    # block_path = tdd.get_tdx_dir_blocknew() + '067.blk'
+    blkname = '067.blk'
+    block_path = tdd.get_tdx_dir_blocknew() + blkname
     # all_diffpath = tdd.get_tdx_dir_blocknew() + '062.blk'
     while 1:
         try:
@@ -211,7 +213,8 @@ if __name__ == "__main__":
                 print "Rt:%0.1f dT:%s" % (
                     float(time.time() - time_Rt),
                     cct.get_time_to_date(time_s))
-                cct.set_console(title=['dT:%s'%cct.get_time_to_date(time_s),'G:%s'%len(top_dif)])                     
+                cct.set_console(
+                    title=['dT:%s' % cct.get_time_to_date(time_s), 'G:%s' % len(top_dif), 'zxg: %s' % (blkname)])
                 if 'counts' in top_dif.columns.values:
                     top_dif = top_dif.sort_values(
                         by=['diff', 'percent', 'volume', 'counts', 'ratio'],

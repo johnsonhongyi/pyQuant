@@ -53,8 +53,8 @@ if __name__ == "__main__":
     delay_time = 720000
     # delay_time = cct.get_delay_time()
     First = True
-    base_path = tdd.get_tdx_dir()
-    block_path = tdd.get_tdx_dir_blocknew() + '061.blk'
+    blkname = '061.blk'
+    block_path = tdd.get_tdx_dir_blocknew() + blkname
     status_change = False
     lastpTDX_DF = pd.DataFrame()
     duration_date = 20160225
@@ -175,7 +175,8 @@ if __name__ == "__main__":
                     len(top_now[top_now['volume'] <= 0]), goldstock)),
                 print "Rt:%0.1f dT:%s" % (float(time.time() - time_Rt), cct.get_time_to_date(time_s))
                 cct.set_console(width, height,
-                                title=[duration_date, 'dT:%s' % cct.get_time_to_date(time_s), 'G:%s' % goldstock])
+                                title=[duration_date, 'dT:%s' % cct.get_time_to_date(time_s), 'G:%s' % goldstock,
+                                       'zxg: %s' % (blkname)])
                 if ptype == 'low':
                     top_dif = top_dif[top_dif.lvol > ct.LvolumeSize]
                     # top_dif = top_dif[top_dif.lvol > 12000]
@@ -200,15 +201,23 @@ if __name__ == "__main__":
                 if percent_status == 'y' and (
                         cct.get_now_time_int() > 935 or cct.get_now_time_int() < 900) and ptype == 'low':
                     top_temp = top_dif[top_dif.percent > 0]
+                    top_temp = top_dif[:10].copy()
+                    top_end = top_dif[-5:].copy()
+                    top_temp = pct.powerCompute_df(top_temp)
+                    top_end = pct.powerCompute_df(top_end)
+
                 # elif percent_status == 'y' and cct.get_now_time_int() > 935 and ptype == 'high' :
                 elif ptype == 'low':
                     top_temp = top_dif[:10].copy()
                     top_end = top_dif[-5:].copy()
+                    top_temp = pct.powerCompute_df(top_temp)
+                    top_end = pct.powerCompute_df(top_end)
                 else:
                     top_temp = top_dif[:5].copy()
                     top_end = top_dif[-10:].copy()
-                top_temp = pct.powerCompute_df(top_temp)
-                top_end = pct.powerCompute_df(top_end)
+                    top_temp = pct.powerCompute_df(top_temp, dl=30)
+                    top_end = pct.powerCompute_df(top_end, dl=30)
+
                 top_dd = pd.concat([top_temp, top_end], axis=0)
                 if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935:
                     top_dd = top_dd.loc[:,

@@ -17,14 +17,13 @@ import gc
 import re
 import sys
 import time
-import urllib2
 
 import pandas as pd
 # from bs4 import BeautifulSoup
-from pandas import DataFrame
+# from pandas import DataFrame
 
 import JohhnsonUtil.commonTips as cct
-import JohhnsonUtil.johnson_cons as ct
+# import JohhnsonUtil.johnson_cons as ct
 import singleAnalyseUtil as sl
 from JSONData import realdatajson as rl
 from JSONData import tdx_data_Day as tdd
@@ -50,8 +49,10 @@ if __name__ == "__main__":
     time_s = time.time()
     # delay_time = 7200
     delay_time = cct.get_delay_time()
-    base_path = tdd.get_tdx_dir()
-    block_path = tdd.get_tdx_dir_blocknew() + '064.blk'
+    # base_path = tdd.get_tdx_dir()
+    # block_path = tdd.get_tdx_dir_blocknew() + '064.blk'
+    blkname = '064.blk'
+    block_path = tdd.get_tdx_dir_blocknew() + blkname
     while 1:
         try:
             df = rl.get_sina_all_json_dd(vol, type)
@@ -141,7 +142,7 @@ if __name__ == "__main__":
                 # top_all=top_all.sort_values(by=['percent','diff','counts','ratio'],ascending=[0,0,1,1])
 
 
-                cct.set_console(title='G:%s'%len(top_all))
+                cct.set_console(title=['G:%s' % len(top_all), 'zxg: %s' % (blkname)])
                 # print top_all
                 # print pt.PrettyTable([''] + list(top_all.columns))
                 # print tbl.tabulate(top_all,headers='keys', tablefmt='psql')
