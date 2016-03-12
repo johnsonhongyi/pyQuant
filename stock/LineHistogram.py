@@ -64,9 +64,12 @@ def LIS(X):
         k = P[k]
     return S[::-1], pos[::-1]
 
-
 def get_linear_model_status(code, ptype='f', dtype='d', type='l', start=None, end=None):
-    df = tdd.get_tdx_append_now_df(code, ptype, start, end).sort_index(ascending=True)
+    # df = tdd.get_tdx_append_now_df(code, ptype, start, end).sort_index(ascending=True)
+    df = tdd.get_tdx_append_now_df_api(code, ptype, start, end).sort_index(ascending=True)
+    # print start,end,df.index.values[:1],df.index.values[-1:]
+    if len(df) < 2:
+        return False, 0, 0
     if not dtype == 'd':
         df = tdd.get_tdx_stock_period_to_type(df, dtype).sort_index(ascending=True)
     # df = tdd.get_tdx_Exp_day_to_df(code, 'f').sort_index(ascending=True)
@@ -102,7 +105,6 @@ def get_linear_model_status(code, ptype='f', dtype='d', type='l', start=None, en
         log.debug("d:%s" % Y_hat[1])
         return False, 0, 0
     return False, 0, 0
-
 
 def get_linear_model_histogramDouble(code, ptype='f', dtype='d', start=None, end=None, vtype='close', filter='n',
                                      df=None):
@@ -180,7 +182,6 @@ def get_linear_model_histogramDouble(code, ptype='f', dtype='d', start=None, end
             df1 = tdd.get_tdx_stock_period_to_type(df1, dtype).sort_index(ascending=True)
         if len(asset) < len(df1):
             asset1 = df1.loc[asset.index, vtype]
-            startv = asset1[:1]
             asset1 = asset1.apply(lambda x: round(x / asset1[:1], 2))
         else:
 
@@ -287,7 +288,7 @@ def get_linear_model_histogramDouble(code, ptype='f', dtype='d', start=None, end
         figPan = zp3.pan_factory(ax3)
     # plt.title(code, fontsize=14)
     if 'name' in df.columns:
-        plt.legend([df.name[-1],df1.name[-1]], loc=0)
+        plt.legend([df.name.values[-1:][0], df1.name.values[-1:][0]], loc=0)
     else:
         plt.legend([code,code2], loc=0)
     
@@ -544,7 +545,6 @@ def get_linear_model_histogram(code, ptype='f', dtype='d', start=None, end=None,
     figZoom = zp.zoom_factory(ax1, base_scale=scale)
     figPan = zp.pan_factory(ax1)
 
-    
         # 将Y-Y_hat股价偏离中枢线的距离单画出一张图显示，对其边界线之间的区域进行均分，大于0的区间为高估，小于0的区间为低估，0为价值中枢线。
     ax3 = fig.add_subplot(122)
     # distance = (asset.values.T - Y_hat)
@@ -676,7 +676,7 @@ if __name__ == "__main__":
                     code = args.code
                     # print code, args.ptype, args.dtype, start, end
                     get_linear_model_histogramDouble(code, args.ptype, args.dtype, start, end, args.vtype, args.filter)
-                    op,ra,st = pct.get_linear_model_status(code, dtype=args.dtype, start=start, end=end, filter=args.filter)
+                    op, ra, st = pct.get_linear_model_status(code, start=start, end=end, filter=args.filter)
                     print "code:%s op:%s ra:%s  start:%s"%(code,op,ra,st)
                     # p=multiprocessing.Process(target=get_linear_model_histogramDouble,args=(code, args.ptype, args.dtype, start, end,args.vtype,args.filter,))
                     # p.daemon = True
@@ -692,7 +692,7 @@ if __name__ == "__main__":
                     end = cct.day8_to_day10(args.end)
                     # get_linear_model_histogramDouble(code,args.dtype,args.start)
                     get_linear_model_histogramDouble(code, args.ptype, args.dtype, start, end, args.vtype)
-                    op,ra,st = pct.get_linear_model_status(code, dtype=args.dtype, start=start, end=end, filter=args.filter)
+                    op, ra, st = pct.get_linear_model_status(code, start=start, end=end, filter=args.filter)
                     print "code:%s op:%s ra:%s  start:%s"%(code,op,ra,st)
                     # get_linear_model_status(code, dtype=args.dtype, start=start, end=end, filter=args.filter,dl=args.dl)
                 sys.exit(0)

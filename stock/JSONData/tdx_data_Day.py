@@ -1142,6 +1142,7 @@ if __name__ == '__main__':
     df= get_tdx_append_now_df('99999').sort_index(ascending=True)
     print df[-2:]
     '''
+    '''
     # print sina_data.Sina().get_stock_code_data('300006').set_index('code')
     # df = get_tdx_exp_low_or_high_price('600000', dt='20160304')
     # df,inx = get_duration_price_date('600000',dt='20160301',filter=False)
@@ -1150,11 +1151,12 @@ if __name__ == '__main__':
     print "a:%s"%df
     # print df[df.index == '2015-02-27']
     # print df[-2:]
+    '''
     time_s = time.time()
-    # df = get_tdx_Exp_day_to_df('999999')
+    df = get_tdx_Exp_day_to_df('999999')
     # print get_duration_price_date('999999',dl=100,ptype='high')
     # df = get_tdx_exp_all_LastDF( ['999999', '603377','603377'], dt=30,ptype='high')
-    df = get_tdx_exp_all_LastDF(['600000', '603377', '601998', '002504'], dt=20160304, ptype='low', filter='y')
+    # df = get_tdx_exp_all_LastDF(['600000', '603377', '601998', '002504'], dt=20160304, ptype='low', filter='y')
     print df
     sys.exit(0)
     # tdxdata = get_tdx_all_day_LastDF(['999999', '603377','603377'], dt=30,ptype='high')
