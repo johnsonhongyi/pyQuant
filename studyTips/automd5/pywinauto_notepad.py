@@ -2,11 +2,13 @@
 #coding=gbk
  
 # http://my.oschina.net/yangyanxing/blog/167042
-import time,sys
-from pywinauto import application,timings
-from pywinauto import win32defines
+
+# ex2:
+# http://stackoverflow.com/questions/32184398/sort-application-windows-side-by-side-in-alphabetical-order/32236936#32236936
 
 import logging
+
+from pywinauto import application,timings
 logger = logging.getLogger('pywinauto')
 # logger.level = logging.WARNING # or higher
 logger.level = logging.DEBUG # or higher
@@ -14,6 +16,17 @@ logger.level = logging.DEBUG # or higher
 timings.Timings.window_find_timeout = 0.1
 
 App = application.Application()
+
+
+# pywinauto.findwindows.find_windows(class_name=None,class_name_re=None, parent=None, process=None, title=None, title_re=None, top_level_only=True, visible_only=True, enabled_only=False, best_match=None, handle=None, ctrl_index=None, predicate_func=None, active_only=False, control_id=None)
+def find_wait_pro():
+    a_check = lambda: \
+    pywinauto.findwindows.find_windows(title=u' Please select a batch file to run:', class_name='#32770')[0]
+    try:
+        w_handle = pywinauto.timings.WaitUntilPasses(timeout=10, retry_interval=1, a_check)
+    except:
+        print('Something went wrong')
+
 # app = App.Connect(class_name='Notepad')
 # app = App.start('notepad.exe')
 
