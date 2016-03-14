@@ -170,12 +170,17 @@ def get_linear_model_histogramDouble(code, ptype='f', dtype='d', start=None, end
 
     else:
         if code.startswith('399001'):
-            code2 = '999999'
+            code2 = '399006'
         elif code.startswith('399006'):
             code2 = '399005'
         else:
-            code2 = '399001'
-        df1 = tdd.get_tdx_append_now_df_api(code2, ptype, start, end).sort_index(ascending=True)
+            code2 = '399006'
+        if code2 == '399006':
+            df1 = tdd.get_tdx_append_now_df_api(code2, ptype, start, end).sort_index(ascending=True)
+            if len(df1) < int(len(df)/4) :
+                code2 = '399001'
+                df1 = tdd.get_tdx_append_now_df_api(code2, ptype, start, end).sort_index(ascending=True)
+                
         # print df1[:1]
         # df1 = tdd.get_tdx_append_now_df(code2, ptype, start, end).sort_index(ascending=True)
         if not dtype == 'd':
@@ -192,7 +197,15 @@ def get_linear_model_histogramDouble(code, ptype='f', dtype='d', start=None, end
             asset1 = df1.loc[df.index, vtype]
             asset1 = asset1.apply(lambda x: round(x / asset1[:1], 2))
     # print len(df),len(asset),len(df1),len(asset1)
-
+    
+    if end is not None:
+        # print asset[-1:]
+        asset = asset[:-1]
+        dates = asset.index
+        asset1 = asset1[:-1]
+        asset1 = asset1.apply(lambda x: round(x / asset1[:1], 2))
+    
+    
     # 画出价格随时间变化的图像
     # _, ax = plt.subplots()
     # fig = plt.figure()
@@ -424,6 +437,7 @@ def get_linear_model_histogram(code, ptype='f', dtype='d', start=None, end=None,
     # vtype='close'
     # if vtype == 'close' or vtype==''
     # ptype=
+    
     if start is not None and filter == 'y':
         if code not in ['999999', '399006', '399001']:
             index_d, dl = tdd.get_duration_Index_date(dt=start)
@@ -456,11 +470,25 @@ def get_linear_model_histogram(code, ptype='f', dtype='d', start=None, end=None,
         # df1 = tdd.get_tdx_append_now_df(code2, ptype, start, end).sort_index(ascending=True)
         if not dtype == 'd':
             df1 = tdd.get_tdx_stock_period_to_type(df1, dtype).sort_index(ascending=True)
-        asset1 = df1.loc[asset.index, vtype]
-        startv = asset1[:1]
-        # asset_v=asset[:1]
-        # print startv,asset_v
-        asset1 = asset1.apply(lambda x: round(x / asset1[:1], 2))
+        # if len(asset) < len(df1):
+            # asset1 = df1.loc[asset.index, vtype]
+        # else:
+            # asset1 = df1.loc[asset.index, vtype]
+        # startv = asset1[:1]
+        # asset1 = asset1.apply(lambda x: round(x / asset1[:1], 2))
+        # print asset[:1].index[0] , df1[:1].index[0]
+        if asset[:1].index[0] > df1[:1].index[0]:
+            asset1 = df1.loc[asset.index, vtype]
+            startv = asset1[:1]
+            asset1 = asset1.apply(lambda x: round(x / asset1[:1], 2))
+        else:
+            df = df[df.index >= df1.index[0]]
+            asset = df[vtype]
+            asset = asset.dropna()
+            dates = asset.index
+            asset1 = df1.loc[df.index, vtype]
+            asset1 = asset1.apply(lambda x: round(x / asset1[:1], 2))
+
     else:
         if code.startswith('399001'):
             code2 = '999999'
@@ -475,15 +503,26 @@ def get_linear_model_histogram(code, ptype='f', dtype='d', start=None, end=None,
             df1 = tdd.get_tdx_stock_period_to_type(df1, dtype).sort_index(ascending=True)
         if len(asset) < len(df1):
             asset1 = df1.loc[asset.index, vtype]
-            startv = asset1[:1]
             asset1 = asset1.apply(lambda x: round(x / asset1[:1], 2))
         else:
-            asset = df.loc[df1.index, vtype]
+
+            df = df[df.index >= df1.index[0]]
+            asset = df[vtype]
             asset = asset.dropna()
             dates = asset.index
-            asset1 = df1[vtype]
+            asset1 = df1.loc[df.index, vtype]
             asset1 = asset1.apply(lambda x: round(x / asset1[:1], 2))
-
+    # print len(df),len(asset),len(df1),len(asset1)
+    
+    if end is not None:
+        # print asset[-1:]
+        asset = asset[:-1]
+        dates = asset.index
+        asset1 = asset1[:-1]
+        asset1 = asset1.apply(lambda x: round(x / asset1[:1], 2))
+    
+    
+    
     # 画出价格随时间变化的图像
     # _, ax = plt.subplots()
     # fig = plt.figure()

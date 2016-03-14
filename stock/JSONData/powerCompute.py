@@ -399,9 +399,9 @@ if __name__ == "__main__":
             if len(str(args.code)) == 6:
              # ptype='f', df=None, dtype='d', type='m', start=None, end=None, days=1, filter='n'):
                 # print args.end
-             op, ra, st = get_linear_model_status(args.code, dtype=args.dtype, start=cct.day8_to_day10(
-                 args.start), end=cct.day8_to_day10(args.end), filter=args.filter, dl=args.dl)
-             print "code:%s op:%s ra:%s  start:%s" % (code, op, ra, st)
+                op, ra, st = get_linear_model_status(args.code, dtype=args.dtype, start=cct.day8_to_day10(
+                     args.start), end=cct.day8_to_day10(args.end), filter=args.filter, dl=args.dl)
+                print "code:%s op:%s ra:%s  start:%s" % (code, op, ra, st)
                 cct.sleep(0.1)
                 # ts=time.time()
                 # time.sleep(5)

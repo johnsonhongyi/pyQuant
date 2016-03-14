@@ -143,6 +143,12 @@ def get_tdx_Exp_day_to_df(code, type='f', start=None, end=None, dt=None, dl=None
         elif start is not None:
             df = df[df.date >= start]
         df = df.set_index('date')
+        df = df.sort_index(ascending=True)
+        df['ma5d'] = pd.rolling_mean(df.close,5)
+        df['ma10d'] = pd.rolling_mean(df.close,10)
+        df['ma20d'] = pd.rolling_mean(df.close,20)
+        df['ma60d'] = pd.rolling_mean(df.close,60)
+        df = df.sort_index(ascending=False)
         return df
     elif int(dl) == 1:
         # fileSize = os.path.getsize(file_path)
@@ -228,7 +234,12 @@ def get_tdx_Exp_day_to_df(code, type='f', start=None, end=None, dt=None, dl=None
         # elif start is not None:
         #     df = df[df.date >= start]
         df = df.set_index('date')
-        # print "time:",(time.time()-time_s)*1000
+        df = df.sort_index(ascending=True)
+        df['ma5d'] = pd.rolling_mean(df.close,5)
+        df['ma10d'] = pd.rolling_mean(df.close,10)
+        df['ma20d'] = pd.rolling_mean(df.close,20)
+        df['ma60d'] = pd.rolling_mean(df.close,60)
+        df = df.sort_index(ascending=False)
         return df
 
 
@@ -246,6 +257,8 @@ def get_tdx_append_now_df_api(code, type='f', start=None, end=None):
     today = cct.get_today()
     if end is not None:
         # print end,df.index[-1]
+        if len(df)==0:
+            return df
         if end < df.index[-1]:
             print(end, df.index[-1])
             return df

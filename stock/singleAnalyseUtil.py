@@ -304,6 +304,7 @@ def get_hot_countNew(changepercent,rzrq):
             f_print(4, count), f_print(3, len(topTen)), changepercent, f_print(4, len(top)))),
     print (u"crashT:%s crash<-%s:%s" % (f_print(3, len(crashTen)), changepercent, f_print(4, len(crash)))),
     ff = ffu.get_dfcfw_fund_flow(ct.DFCFW_FUND_FLOW_ALL)
+    zzb = 0
     if len(ff) > 0:
         zlr = float(ff['zlr'])
         zzb = float(ff['zzb'])
@@ -330,7 +331,7 @@ def get_hot_countNew(changepercent,rzrq):
         print (u"\tSh: %s rz:%s :%s%% sz: %s rz:%s :%s%% All: %s diff: %s亿" % (
             f_print(5, rzrq['sh']),f_print(4, rzrq['shrz']),shpcent, f_print(5, rzrq['sz']),f_print(4, rzrq['szrz']),szpcent,f_print(4, rzrq['all']), f_print(5, rzrq['diff']))) 
     bigcount=rd.getconfigBigCount()
-    cct.set_console(title=['B:%s V:%s'%(bigcount[0],bigcount[1]),'To:%s'%len(topTen),'D:%s'%len(crash),'Sh: %s '%ff['scent'],'Vr:%s%% '%ff['svol'],'MR: %s'%zzb])
+    cct.set_console(title=['B:%s V:%s'%(bigcount[0],bigcount[1]),'To:%s'%len(topTen),'D:%s'%len(crash),'Sh: %s '%ff['scent'] if len(ff) >0 else 0,'Vr:%s%% '%ff['svol'] if len(ff) >0 else 0,'MR: %s'%zzb])
     return allTop
 
 
