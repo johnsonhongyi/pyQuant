@@ -201,7 +201,7 @@ def get_linear_model_status(code, ptype='f', df=None, dtype='d', type='m', start
         else:
             log.debug("Line down !!! d:%s" % Y_hat[0])
             # print("Line down !!! d:%s nowp:%s" % (round(Y_hat[1],2),asset[-1:].values[0]))
-            return -1, round(ratio, 2)
+            return -20, round(ratio, 2)
     if len(df) > 1:
         operationcount = 0
         ratio_l = []
