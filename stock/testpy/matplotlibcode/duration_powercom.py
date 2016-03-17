@@ -6,12 +6,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
 import matplotlib.dates as mdates
-from matplotlib.finance import candlestick
+from matplotlib.finance import candlestick2_ohlc
 import matplotlib
 import pylab
 matplotlib.rcParams.update({'font.size': 9})
-
-eachStock = 'EBAY','TSLA','AAPL'
+import tushare as ts
+# eachStock = 'EBAY','TSLA','AAPL'
 
 def rsiFunc(prices, n=14):
     deltas = np.diff(prices)
@@ -69,31 +69,38 @@ def graphData(stock,MA1,MA2):
     try:
         print 'Currently Pulling',stock
         print str(datetime.datetime.fromtimestamp(int(time.time())).strftime('%Y-%m-%d %H:%M:%S'))
-        urlToVisit = 'http://chartapi.finance.yahoo.com/instrument/1.0/'+stock+'/chartdata;type=quote;range=10y/csv'
+        # urlToVisit = 'http://chartapi.finance.yahoo.com/instrument/1.0/'+stock+'/chartdata;type=quote;range=10y/csv'
+        bars = ts.get_hist_data(stock,start='2016-01-01')
         stockFile =[]
-        try:
-            sourceCode = urllib2.urlopen(urlToVisit).read()
-            splitSource = sourceCode.split('\n')
-            for eachLine in splitSource:
-                splitLine = eachLine.split(',')
-                if len(splitLine)==6:
-                    if 'values' not in eachLine:
-                        stockFile.append(eachLine)
-        except Exception, e:
-            print str(e), 'failed to organize pulled data.'
+        # try:
+            # sourceCode = urllib2.urlopen(urlToVisit).read()
+            # splitSource = sourceCode.split('\n')
+            # for eachLine in splitSource:
+                # splitLine = eachLine.split(',')
+                # if len(splitLine)==6:
+                    # if 'values' not in eachLine:
+                        # stockFile.append(eachLine)
+        # except Exception, e:
+            # print str(e), 'failed to organize pulled data.'
     except Exception,e:
         print str(e), 'failed to pull pricing data'
     try:   
-        date, closep, highp, lowp, openp, volume = np.loadtxt(stockFile,delimiter=',', unpack=True,
-                                                              converters={ 0: mdates.strpdate2num('%Y%m%d')})
-        x = 0
-        y = len(date)
-        newAr = []
-        while x < y:
-            appendLine = date[x],openp[x],closep[x],highp[x],lowp[x],volume[x]
-            newAr.append(appendLine)
-            x+=1
-            
+        bars=bars.sort_index(ascending=True)
+        bars.reset_index(inplace=True)
+        # bars.plot()
+        # bars.date=bars.date.astype(datetime.datetime)
+        # bars['date']=bars['date'].apply(lambda date: mdates.date2num(date.to_pydatetime()))
+        # import pandas as pd
+        # bars['date2']=bars['date'].apply(lambda date: mdates.date2num(datetime.datetime.strptime(date,'%Y-%m-%d')))
+        # print "a:",type(bars.date[:1])
+        # bars.plot()
+        # bars['date']=bars['date'].apply(lambda date: mdates.date2num(datetime.datetime.strptime(date,'%Y-%m-%d')))
+        date=bars.date
+        openp=bars['open']
+        closep=bars['close']
+        highp=bars['high']
+        lowp=bars['low']
+        volume=bars['volume']
         Av1 = movingaverage(closep, MA1)
         Av2 = movingaverage(closep, MA2)
 
@@ -102,8 +109,12 @@ def graphData(stock,MA1,MA2):
         fig = plt.figure(facecolor='#07000d')
 
         ax1 = plt.subplot2grid((6,4), (1,0), rowspan=4, colspan=4, axisbg='#07000d')
-        candlestick(ax1, newAr[-SP:], width=.6, colorup='#53c156', colordown='#ff1717')
-
+        candlestick2_ohlc(ax1, bars['open'][-SP:],bars['close'][-SP:],bars['high'][-SP:],bars['low'][-SP:], width=.6, colorup='#53c156', colordown='#ff1717')
+        # fig = figure() 
+        # ax = fig.add_subplot(111) 
+        # candlestick2(ax,bars['open'],bars['close'],bars['high'],bars['low'],width=.5,colorup='g',colordown='r',alpha=1)
+        # ax.set_xticks(arange(0,len(bars))) 
+        # ax.set_xticklabels(bars.index,rotation=70)
         Label1 = str(MA1)+' SMA'
         Label2 = str(MA2)+' SMA'
 
@@ -200,12 +211,11 @@ def graphData(stock,MA1,MA2):
 
         plt.subplots_adjust(left=.09, bottom=.14, right=.94, top=.95, wspace=.20, hspace=0)
         plt.show()
-        fig.savefig('example.png',facecolor=fig.get_facecolor())
+        # fig.savefig('example.png',facecolor=fig.get_facecolor())
            
     except Exception,e:
         print 'main loop',str(e)
 
 # while True:
     # stock = raw_input('Stock to plot: ')
-stock='EBAY'
-graphData(stock,10,50)
+graphData('300092',10,50)

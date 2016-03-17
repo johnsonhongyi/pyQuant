@@ -322,8 +322,9 @@ if __name__ == "__main__":
                 # if cct.get_now_time_int() < 930:
                     # top_all['diff'] = (
                         # map(lambda x, y: round((x - y) / y * 100, 1), top_all['buy'].values, top_all['lastp'].values))
-
                 top_dif = top_all
+                top_dif['buy'] = (
+                    map(lambda x, y: y if int(x) == 0 else x, top_dif['buy'].values, top_dif['trade'].values))
                 log.info('dif1:%s' % len(top_dif))
                 top_dif=top_dif[top_dif.lvol > ct.LvolumeSize]
                 log.info(top_dif[:1])

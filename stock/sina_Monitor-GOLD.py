@@ -150,6 +150,8 @@ if __name__ == "__main__":
                             top_all.append(top_now.loc[symbol])
 
                 top_bak = top_all
+                # top_all['buy'] = (
+                    # map(lambda x, y: y if int(x) == 0 else x, top_all['buy'].values, top_all['trade'].values))
                 codelist = top_all.index.tolist()
                 if len(codelist) > 0:
                     log.info('toTDXlist:%s' % len(codelist))
@@ -175,7 +177,7 @@ if __name__ == "__main__":
                     top_all['volume'] = (
                         map(lambda x, y: round(x / y / radio_t, 1), top_all['volume'].values, top_all['lvol'].values))
 
-                    # top_all = top_all[top_all.prev_p >= top_all.lhigh]
+                    top_all = top_all[top_all.trade >= top_all.lastp]
                     top_all = top_all.loc[:,
                               ['name', 'percent', 'diff', 'counts', 'volume', 'trade', 'prev_p', 'ratio']]
 

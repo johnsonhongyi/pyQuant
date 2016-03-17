@@ -319,9 +319,12 @@ def get_hot_countNew(changepercent,rzrq):
     if len(ff) > 0:
         print (u"\tSh: %s Vr:  %s Sz: %s Vr: %s " % (
             f_print(4, ff['scent']), f_print(5, ff['svol']), f_print(4, ff['zcent']), f_print(5, ff['zvol']))),
+    else:
+        print (u"\tSh: \t%s Vr:  \t%s Sz: \t%s Vr: \t%s ")%(0,0,0,0),
     if len(hgt) > 0:
         print ("Hgt: %s Ggt: %s" % (hgt['hgt'], hgt['ggt']))    
-    
+    else:
+        print ("Hgt: \t%s Ggt: \t%s"%(0,0))
     if len(rzrq) > 0:
         shpcent= round((rzrq['shrz']/rzrq['sh'] * 100),1)
         szpcent= round((rzrq['szrz']/rzrq['sz'] * 100),1)

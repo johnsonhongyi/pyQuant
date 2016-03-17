@@ -152,6 +152,8 @@ if __name__ == "__main__":
                                     symbol, 'buy':'low']
 
                 top_dif = top_all
+                top_dif['buy'] = (
+                    map(lambda x, y: y if int(x) == 0 else x, top_dif['buy'].values, top_dif['trade'].values))
                 top_dif=top_dif[top_dif.lvol > ct.LvolumeSize]
                 # if top_dif[:1].llow.values <> 0:
                 if len(top_dif[:5][top_dif[:5]['low'] > 0]) > 3:

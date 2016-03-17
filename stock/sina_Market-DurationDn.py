@@ -131,7 +131,7 @@ if __name__ == "__main__":
                 # top_all = top_all[top_all.buy > 0]
                 top_dif = top_all.copy()
                 top_dif['buy'] = (
-                map(lambda x, y: y if int(x) == 0 else x, top_dif['buy'].values, top_dif['trade'].values))
+                    map(lambda x, y: y if int(x) == 0 else x, top_dif['buy'].values, top_dif['trade'].values))
                 # if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935:
                 top_dif = top_dif[top_dif.buy > 0]
                 top_dif['diff'] = (
