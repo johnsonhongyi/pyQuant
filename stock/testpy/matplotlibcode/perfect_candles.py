@@ -4,7 +4,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 import tushare as ts
 from matplotlib.dates import num2date, date2num
-from matplotlib.finance import candlestick_ohlc
+from matplotlib.lines import Line2D
+from matplotlib.patches import Rectangle
+
 
 # Create sample data for 5 days. Five columns: time, opening, close, high, low
 # jaar = 2007
@@ -27,7 +29,59 @@ from matplotlib.finance import candlestick_ohlc
 # print len(data)
 # print('Ready with building sample data')
 
-bars = ts.get_hist_data('sh', start="2015-01-01").sort_index(ascending=True)
+
+def fooCandlestick(ax, quotes, width=0.5, colorup='k', colordown='r',
+                   alpha=1.0):
+    OFFSET = width / 2.0
+    linewidth = width * 2
+    print width
+    lines = []
+    boxes = []
+    for q in quotes:
+        # t, op, cl, hi, lo = q[:5]
+        t, op, hi, lo, cl = q[:5]
+
+        box_h = max(op, cl)
+        box_l = min(op, cl)
+        height = box_h - box_l
+
+        if cl >= op:
+            color = colorup
+        else:
+            color = colordown
+
+        vline_lo = Line2D(
+            xdata=(t, t), ydata=(lo, box_l),
+            color=color,
+            linewidth=linewidth,
+            antialiased=True,
+        )
+        vline_hi = Line2D(
+            xdata=(t, t), ydata=(box_h, hi),
+            color=color,
+            linewidth=linewidth,
+            antialiased=True,
+        )
+        rect = Rectangle(
+            xy=(t - OFFSET, box_l),
+            width=width,
+            height=height,
+            facecolor=color,
+            edgecolor=color,
+        )
+        rect.set_alpha(alpha)
+        lines.append(vline_lo)
+        lines.append(vline_hi)
+        boxes.append(rect)
+        ax.add_line(vline_lo)
+        ax.add_line(vline_hi)
+        ax.add_patch(rect)
+    ax.autoscale_view()
+
+    return lines, boxes
+
+
+bars = ts.get_hist_data('cyb', start="2016-01-01").sort_index(ascending=True)
 
 date = date2num(bars.index.to_datetime().to_pydatetime())
 openp = bars['open']
@@ -82,8 +136,9 @@ new_xticks = [bars.index[d] for d in ax.get_xticks()]
 #     print "lst"
 #     new_xticks.append(lastd)
 # print new_xticks
-ax.set_xticklabels(new_xticks, rotation=30, horizontalalignment='center')
-fig.autofmt_xdate()
+ax.set_xticklabels(new_xticks, rotation=30, horizontalalignment='right')
+# fig.autofmt_xdate()
+ax.autoscale_view()
 # ax.set_xticks(data2[ndays[1], 0])
 # ax.set_xticklabels(xdays, rotation=45, horizontalalignment='right')
 
@@ -92,7 +147,8 @@ ax.set_ylabel('Quotes', size=10)
 # ax.set_ylim([min(data[:, 4]), max(data[:, 3])])
 
 # Create the candle sticks
-candlestick_ohlc(ax, data2, width=candlestickWidth, colorup='r', colordown='g')
+# candlestick_ohlc(ax, data2, width=candlestickWidth, colorup='r', colordown='g')
+fooCandlestick(ax, data2, width=candlestickWidth, colorup='r', colordown='g')
 plt.title('code' + " | " + str(bars.index[-1])[:11], fontsize=14)
 plt.legend(['code', str(bars.index[-1])[:11]], fontsize=12)
 plt.show()

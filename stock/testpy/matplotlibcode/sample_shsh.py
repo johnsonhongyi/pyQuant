@@ -1,9 +1,8 @@
 # coding:utf-8
 import matplotlib.pyplot as plt
-import matplotlib.ticker as ticker
 import numpy as np
 from matplotlib.dates import DateFormatter, WeekdayLocator, DayLocator, MONDAY, date2num
-from matplotlib.finance import candlestick_ohlc,candlestick2_ohlc
+from matplotlib.finance import candlestick2_ohlc
 
 plt.rcParams['font.sans-serif'] = ['SimHei']
 plt.rcParams['axes.unicode_minus'] = False
@@ -63,12 +62,12 @@ ax.xaxis_date()
 # ax.set_xticks(frame.index.to_datetime().to_pydatetime())
 # ax.set_xticks(range(len(frame.index)))
 # ax.set_xticklabels(frame.index, rotation=15, horizontalalignment='right')
-candlestick2_ohlc(ax,frame['open'],frame['high'],frame['low'],frame['close'],width=1,colorup='g',colordown='r',alpha=1)
+candlestick2_ohlc(ax, frame['open'], frame['high'], frame['low'], frame[
+    'close'], width=1, colorup='g', colordown='r', alpha=1)
 # candlestick_ohlc(ax,quotes,width=1,colorup='g',colordown='r',alpha=1)
 
-import matplotlib.dates as mdates
 # ax.set_xticks(range(0,len(frame.index)))
-ax.set_xticks(range(0,len(frame.index)))
+ax.set_xticks(range(0, len(frame.index)))
 # ax.set_xticklabels([mdates.num2date(quotes[index][0]).strftime('%b-%d') for index in ax.get_xticks()])
 ax.set_xticklabels([frame.index[index] for index in ax.get_xticks()])
 
