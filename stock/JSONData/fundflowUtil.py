@@ -103,8 +103,12 @@ def get_dfcfw_fund_SHSZ(url=ct.DFCFW_ZS_SHSZ):
             if isinstance(dd['svol'],str) and dd['svol'].find('-')==0:
                 log.info("svol:%s"%dd['svol'])
             else:
-                dd['svol']="%s-%s"%((dd['svol'],round(dd['svol']/(df.loc['999999','amount']/10000000)/radio_t,1)))
-                dd['zvol']="%s-%s"%((dd['zvol'],round(dd['zvol']/(df.loc['399001','amount']/10000000)/radio_t,1)))
+                svol_r=round(dd['svol']/(df.loc['999999','amount']/10000000)/radio_t,1)
+                svol_v=round(svol_r*(df.loc['999999','amount']/10000000),1)
+                zvol_r=round(dd['zvol']/(df.loc['399001','amount']/10000000)/radio_t,1)
+                zvol_v=round(svol_r*(df.loc['399001','amount']/10000000),1)
+                dd['svol']="%s-%s-%s"%((dd['svol'],svol_v,svol_r))
+                dd['zvol']="%s-%s-%s"%((dd['zvol'],zvol_v,zvol_r))
         # dd['zzb']=data[1]
         # dd['sjlr']=data[2]
         # dd['sjzb']=data[3]
@@ -300,6 +304,7 @@ if __name__ == "__main__":
     
     # dd =get_dfcfw_fund_flow('cyb')
     # print dd
+    print get_dfcfw_fund_SHSZ()
     df=get_dfcfw_rzrq_SHSZ()
     print df
     

@@ -98,7 +98,7 @@ def graphData(stock,MA1,MA2):
         Av2 = movingaverage(closep, MA2)
 
         SP = len(date[MA2-1:])
-            
+        print date    
         fig = plt.figure(facecolor='#07000d')
 
         ax1 = plt.subplot2grid((6,4), (1,0), rowspan=4, colspan=4, axisbg='#07000d')
@@ -200,7 +200,7 @@ def graphData(stock,MA1,MA2):
 
         plt.subplots_adjust(left=.09, bottom=.14, right=.94, top=.95, wspace=.20, hspace=0)
         plt.show()
-        fig.savefig('example.png',facecolor=fig.get_facecolor())
+        # fig.savefig('example.png',facecolor=fig.get_facecolor())
            
     except Exception,e:
         print 'main loop',str(e)

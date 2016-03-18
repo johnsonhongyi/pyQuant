@@ -206,6 +206,7 @@ def getconfigBigCount(count=None,write=False):
                 big_now = int(count)
             ratio_t=cct.get_work_time_ratio()
             bigRt=round( big_now / big_last / ratio_t, 1)
+            big_v=int(bigRt*int(config['BigCount']['type2']))
             # print big_now,big_last,bigRt
             int_time=cct.get_now_time_int()
             # print int_time
@@ -220,7 +221,7 @@ def getconfigBigCount(count=None,write=False):
                 config.write()
             else:
                 log.info("not work:%s ra:%s"%(big_now,bigRt))
-                return [big_now,bigRt]
+                return [big_now,bigRt,big_v]
     else:
         config = ConfigObj(conf_ini,encoding='UTF8')
         config['BigCount'] = {}

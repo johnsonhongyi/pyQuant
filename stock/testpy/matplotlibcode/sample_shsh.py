@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 import numpy as np
 from matplotlib.dates import DateFormatter, WeekdayLocator, DayLocator, MONDAY, date2num
-from matplotlib.finance import candlestick_ohlc
+from matplotlib.finance import candlestick_ohlc,candlestick2_ohlc
 
 plt.rcParams['font.sans-serif'] = ['SimHei']
 plt.rcParams['axes.unicode_minus'] = False
@@ -55,17 +55,32 @@ fig.subplots_adjust(bottom=0.2)
 # ax.xaxis.set_minor_formatter(dayFormatter)
 
 # plot_day_summary(ax, quotes, ticksize=3)
-candlestick_ohlc(ax, quotes, width=0.6, colorup='r', colordown='g')
+# candlestick_ohlc(ax, quotes, width=0.6, colorup='r', colordown='g')
 
+# fig = figure()
+ax = fig.add_subplot(111)
 ax.xaxis_date()
-ax.autoscale_view()
-plt.setp(plt.gca().get_xticklabels(), rotation=45, horizontalalignment='right')
+# ax.set_xticks(frame.index.to_datetime().to_pydatetime())
+# ax.set_xticks(range(len(frame.index)))
+# ax.set_xticklabels(frame.index, rotation=15, horizontalalignment='right')
+candlestick2_ohlc(ax,frame['open'],frame['high'],frame['low'],frame['close'],width=1,colorup='g',colordown='r',alpha=1)
+# candlestick_ohlc(ax,quotes,width=1,colorup='g',colordown='r',alpha=1)
+
+import matplotlib.dates as mdates
+# ax.set_xticks(range(0,len(frame.index)))
+ax.set_xticks(range(0,len(frame.index)))
+# ax.set_xticklabels([mdates.num2date(quotes[index][0]).strftime('%b-%d') for index in ax.get_xticks()])
+ax.set_xticklabels([frame.index[index] for index in ax.get_xticks()])
+
+# ax.xaxis_date()
+# ax.autoscale_view()
+# plt.setp(plt.gca().get_xticklabels(), rotation=45, horizontalalignment='right')
 # ax.xaxis.set_major_formatter(ticker.FuncFormatter(format_date))
 fig.autofmt_xdate()
 
 # next we'll write a custom formatter
 
-
+'''
 fig, ax = plt.subplots()
 print ind
 ax.plot(ind, frame.close, 'o-')
@@ -75,7 +90,7 @@ ax.plot(ind, frame.close, 'o-')
 ax.xaxis.set_major_formatter(ticker.FuncFormatter(format_date))
 # plt.setp(plt.gca().get_xticklabels(), rotation=45, horizontalalignment='right')
 fig.autofmt_xdate()
-
+'''
 ax.grid(True)
 plt.title(u'中国石化 600028')
 plt.show()

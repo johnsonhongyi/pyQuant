@@ -317,7 +317,7 @@ def get_hot_countNew(changepercent,rzrq):
     #         f_print(4, ff['zup']),
     #         f_print(5, ff['zvol']))),
     if len(ff) > 0:
-        print (u"\tSh: %s Vr:  %s Sz: %s Vr: %s " % (
+        print (u"\tSh: %s Vr:%s Sz: %s Vr:%s " % (
             f_print(4, ff['scent']), f_print(5, ff['svol']), f_print(4, ff['zcent']), f_print(5, ff['zvol']))),
     else:
         print (u"\tSh: \t%s Vr:  \t%s Sz: \t%s Vr: \t%s ")%(0,0,0,0),
@@ -331,7 +331,7 @@ def get_hot_countNew(changepercent,rzrq):
         print (u"\tSh: %s rz:%s :%s%% sz: %s rz:%s :%s%% All: %s diff: %s亿" % (
             f_print(5, rzrq['sh']),f_print(4, rzrq['shrz']),shpcent, f_print(5, rzrq['sz']),f_print(4, rzrq['szrz']),szpcent,f_print(4, rzrq['all']), f_print(5, rzrq['diff']))) 
     bigcount=rd.getconfigBigCount()
-    cct.set_console(title=['B:%s V:%s'%(bigcount[0],bigcount[1]),'ZL: %s'%(zlr if len(ff) >0 else 0),'To:%s'%len(topTen),'D:%s'%len(crash),'Sh: %s '%ff['scent'] if len(ff) >0 else 0,'Vr:%s%% '%ff['svol'] if len(ff) >0 else 0,'MR: %s'%zzb,'ZL: %s'%(zlr if len(ff) >0 else 0)])
+    cct.set_console(title=['B:%s-%s V:%s'%(bigcount[0],bigcount[2],bigcount[1]),'ZL: %s'%(zlr if len(ff) >0 else 0),'To:%s'%len(topTen),'D:%s'%len(crash),'Sh: %s '%ff['scent'] if len(ff) >0 else 0,'Vr:%s%% '%ff['svol'] if len(ff) >0 else 0,'MR: %s'%zzb,'ZL: %s'%(zlr if len(ff) >0 else 0)])
     return allTop
 
 

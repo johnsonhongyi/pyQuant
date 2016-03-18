@@ -3,7 +3,7 @@ import matplotlib
 import matplotlib.finance as mpf
 import matplotlib.pyplot as plt
 import numpy as np
-# from matplotlib.finance import candlestick2
+from matplotlib.finance import candlestick2_ohlc
 # from matplotlib.finance import volume_overlay3
 # from matplotlib.dates import num2date
 # from matplotlib.dates import date2num
@@ -25,7 +25,7 @@ def plot_candlestick(frame, ylabel='BTC/USD', candle_width=1.0, freq='D'):
     @param candle_width: width of the candles in days.
     @param freq: frequency of the plotted x labels.
     """
-    frame.dropna()
+    # frame.dropna()
     candlesticks = zip(
         date2num(frame.index.to_datetime().to_pydatetime()),
         frame['open'],
@@ -35,38 +35,56 @@ def plot_candlestick(frame, ylabel='BTC/USD', candle_width=1.0, freq='D'):
         frame['volume'])
 
     # Figure
-    ax0 = plt.subplot2grid((3, 1), (0, 0), rowspan=2)
-    ax1 = plt.subplot2grid((3, 1), (2, 0), rowspan=1, sharex=ax0)
+    ax = plt.subplot2grid((3, 1), (0, 0), rowspan=2)
+    ax1 = plt.subplot2grid((3, 1), (2, 0), rowspan=1, sharex=ax)
+    
+    # ax = fig.add_subplot(111)
+    # ax.xaxis_date()
+    # ax.set_xticks(frame.index.to_datetime().to_pydatetime())
+    # ax.set_xticks(range(len(frame.index)))
+    # ax.set_xticklabels(frame.index, rotation=15, horizontalalignment='right')
+    candlestick2_ohlc(ax,frame['open'],frame['high'],frame['low'],frame['close'],width=1,colorup='g',colordown='r',alpha=1)
+    import matplotlib.dates as mdates
+    # ax.set_xticks(range(0,len(frame.index)))
+    ax.set_xticks(range(0,len(frame.index)))
+    ax.set_xticklabels([frame.index[index] for index in ax.get_xticks()])
+    # ax.set_xticklabels([mdates.num2date(quotes[index][0]).strftime('%b-%d') for index in ax.get_xticks()])
+
     # ax1.xaxis.set_major_locator(mondays)
     # ax1.xaxis.set_minor_locator(alldays)
-    # ax0.xaxis.set_major_formatter(weekFormatter)
+    # ax.xaxis.set_major_formatter(weekFormatter)
     plt.subplots_adjust(bottom=0.15)
-    plt.setp(ax0.get_xticklabels(), visible=True)
-    # plt.setp(ax0.get_xticklabels(), visible=False)
-    ax0.grid(True)
-    ax0.set_ylabel(ylabel, size=20)
+    plt.setp(ax.get_xticklabels(), visible=True)
+    # plt.setp(ax.get_xticklabels(), visible=False)
+    ax.grid(True)
+    ax.set_ylabel(ylabel, size=20)
     # Candlestick
-    # mpf.plot_day_summary(ax0, candlesticks, ticksize=1)
-    mpf.candlestick(ax0, candlesticks,
-                    width=1 * candle_width,
-                    colorup='g', colordown='r')
-    ax0.xaxis_date()
-    ax0.autoscale_view()
-    # candlestick2(ax0, frame['open'], frame['close'], frame['high'], frame['low'], width=.5, col‌​orup='g', colordown='r', alpha=1)
+    # mpf.plot_day_summary(ax, candlesticks, ticksize=1)
+    # mpf.candlestick(ax, candlesticks,
+                    # width=1 * candle_width,
+                    # colorup='g', colordown='r')
+    # ax.xaxis_date()
+    # ax.autoscale_view()
+    # candlestick2(ax, frame['open'], frame['close'], frame['high'], frame['low'], width=.5, col‌​orup='g', colordown='r', alpha=1)
     # Get data from candlesticks for a bar plot
-    dates = np.asarray([x[0] for x in candlesticks])
+    dates = np.asarray(frame.index)
+    print dates
     volume = np.asarray([x[5] for x in candlesticks])
+    # print volume
     # Make bar plots and color differently depending on up/down for the day
     pos = frame['open'] - frame['close'] < 0
     neg = frame['open'] - frame['close'] > 0
+    print pos,neg
+    print dates[pos]
     ax1.grid(True)
-    ax1.bar(dates[pos], volume[pos], color='g',
-            width=candle_width, align='center')
-    ax1.bar(dates[neg], volume[neg], color='r',
-            width=candle_width, align='center')
+    # ax1.bar(dates[pos], volume[pos], color='g',
+            # width=candle_width, align='center')
+    # ax1.bar(dates[neg], volume[neg], color='r',
+            # width=candle_width, align='center')
     # Scale the x-axis tight
-    ax1.set_xlim(min(dates), max(dates))
-    ax1.set_ylabel('VOLUME', size=20)
+    # ax1.set_xlim(min(dates), max(dates))
+    # ax1.set_ylabel('VOLUME', size=20)
+    
     # Format the x-ticks with a human-readable date.
     # if freq != 'D':
 
@@ -83,13 +101,13 @@ def plot_candlestick(frame, ylabel='BTC/USD', candle_width=1.0, freq='D'):
     # print xt
     # print ticks
     # xt_labels = [num2date(d).strftime('%Y-%m-%d\n%H:%M:%S') for d in xt]
-    xt_labels = [num2date(d).strftime('%Y%m%d') for d in ticks]
-    ax1.set_xticklabels(xt_labels, rotation=15, horizontalalignment='right')
+    # xt_labels = [num2date(d).strftime('%Y%m%d') for d in ticks]
+    # ax1.set_xticklabels(xt_labels, rotation=15, horizontalalignment='right')
     # Plot
     # plt.ion()
     # plt.hold(True)
     plt.show()
-    return (ax0, ax1)
+    return (ax, ax1)
 
 
 r = ts.get_hist_data('sz', start='2016-01-01')
