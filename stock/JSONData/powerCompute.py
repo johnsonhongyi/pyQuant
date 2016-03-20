@@ -1,5 +1,6 @@
 # -*- coding:utf-8 -*-
 import sys
+
 sys.path.append("..")
 
 import numpy as np
@@ -36,6 +37,8 @@ if not cct.isMac():
             return 0  # chain to the next handler
 
         win32api.SetConsoleCtrlHandler(handler, 1)
+
+
     set_ctrl_handler()
 
 
@@ -208,16 +211,16 @@ def get_linear_model_status(code, df=None, dtype='d', type='m', start=None, end=
                             dl=None, countall=True):
     # log.setLevel(LoggerFactory.DEBUG)
     # if code == "600760":
-        # log.setLevel(LoggerFactory.DEBUG)
+    # log.setLevel(LoggerFactory.DEBUG)
     # else:
-        # log.setLevel(LoggerFactory.ERROR)
+    # log.setLevel(LoggerFactory.ERROR)
     if start is not None and end is None and filter == 'y':
         # if code not in ['999999','399006','399001']:
-            # index_d,dl=tdd.get_duration_Index_date(dt=start)
-            # log.debug("index_d:%s dl:%s"%(str(index_d),dl))
+        # index_d,dl=tdd.get_duration_Index_date(dt=start)
+        # log.debug("index_d:%s dl:%s"%(str(index_d),dl))
         # else:
-            # index_d=cct.day8_to_day10(start)
-            # log.debug("index_d:%s"%(index_d))
+        # index_d=cct.day8_to_day10(start)
+        # log.debug("index_d:%s"%(index_d))
         index_d = cct.day8_to_day10(start)
         start = tdd.get_duration_price_date(code, ptype='low', dt=start)
         log.debug("start: %s  index_d:%s" % (start, index_d))
@@ -244,6 +247,7 @@ def get_linear_model_status(code, df=None, dtype='d', type='m', start=None, end=
     if not dtype == 'd':
         df = tdd.get_tdx_stock_period_to_type(
             df, dtype).sort_index(ascending=True)
+
     # df = tdd.get_tdx_Exp_day_to_df(code, 'f').sort_index(ascending=True)
 
     def get_linear_model_ratio(asset, type='M'):
@@ -326,6 +330,7 @@ def get_linear_model_status(code, df=None, dtype='d', type='m', start=None, end=
             log.debug("Line down !!! d:%s" % Y_hat[0])
             # print("Line down !!! d:%s nowp:%s" % (round(Y_hat[1],2),asset[-1:].values[0]))
             return -10, round(ratio, 2)
+
     if len(df) > 1:
         operationcount = 0
         ratio_l = []
@@ -469,6 +474,7 @@ def get_linear_model_candles(code, ptype='low', dtype='d', start=None, end=None,
     figPan = zp.pan_factory(ax)
     plt.show(block=False)
 
+
 def powerCompute_df(df, dtype='d', end=None, dl=None, filter='y'):
     code_l = df.index.tolist()
     # dtype=dtype
@@ -505,7 +511,7 @@ def parseArgmain():
                         help='DateType')
     parser.add_argument('-v', action="store", dest="vtype", type=str, choices=['f', 'b'], default='f',
                         help='Price Forward or back')
-    parser.add_argument('-p', action="store", dest="ptype", type=str, choices=['high', 'low', 'close'], default='close',
+    parser.add_argument('-p', action="store", dest="ptype", type=str, choices=['high', 'low', 'close'], default='low',
                         help='price type')
     parser.add_argument('-f', action="store", dest="filter", type=str, choices=['y', 'n'], default='n',
                         help='find duration low')
@@ -513,12 +519,15 @@ def parseArgmain():
                         help='days')
     return parser
 
+
 def maintest(code, start=None, type='m', filter='y'):
     import timeit
     run = 1
     strip_tx = timeit.timeit(lambda: get_linear_model_status(
         code, start=start, type=type, filter=filter), number=run)
     print("ex Read:", strip_tx)
+
+
 if __name__ == "__main__":
     parser = parseArgmain()
     while 1:
@@ -528,16 +537,16 @@ if __name__ == "__main__":
             code = raw_input("code:")
             args = parser.parse_args(code.split())
             if len(str(args.code)) == 6:
-             # ptype='f', df=None, dtype='d', type='m', start=None, end=None, days=1, filter='n'):
+                # ptype='f', df=None, dtype='d', type='m', start=None, end=None, days=1, filter='n'):
                 # print args.end
-             # op, ra, st = get_linear_model_status(args.code, dtype=args.dtype, start=cct.day8_to_day10(
-             #      args.start), end=cct.day8_to_day10(args.end), filter=args.filter, dl=args.dl)
-             # print "code:%s op:%s ra:%s  start:%s" % (code, op, ra, st)
-             get_linear_model_candles(args.code, dtype=args.dtype, start=cct.day8_to_day10(
-                 args.start), end=cct.day8_to_day10(args.end), ptype=args.ptype, filter=args.filter)
-             op, ra, st, days = get_linear_model_status(args.code, dtype=args.dtype, start=cct.day8_to_day10(
-                     args.start), end=cct.day8_to_day10(args.end), filter=args.filter, dl=args.dl)
-             print "code:%s op:%s ra/days:%s  start:%s" % (code, op, str(ra) + '/' + str(days), st)
+                # op, ra, st = get_linear_model_status(args.code, dtype=args.dtype, start=cct.day8_to_day10(
+                #      args.start), end=cct.day8_to_day10(args.end), filter=args.filter, dl=args.dl)
+                # print "code:%s op:%s ra:%s  start:%s" % (code, op, ra, st)
+                get_linear_model_candles(args.code, dtype=args.dtype, start=cct.day8_to_day10(
+                    args.start), end=cct.day8_to_day10(args.end), ptype=args.ptype, filter=args.filter)
+                op, ra, st, days = get_linear_model_status(args.code, dtype=args.dtype, start=cct.day8_to_day10(
+                    args.start), end=cct.day8_to_day10(args.end), filter=args.filter, dl=args.dl)
+                print "code:%s op:%s ra/days:%s  start:%s" % (code, op, str(ra) + '/' + str(days), st)
                 cct.sleep(0.1)
                 # ts=time.time()
                 # time.sleep(5)
