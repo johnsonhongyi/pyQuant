@@ -247,7 +247,7 @@ INDEX_LIST = {'sh': 'sh000001', 'sz': 'sz399001', 'hs300': 'sz399300',
               'sz50': 'sh000016', 'zxb': 'sz399005', 'cyb': 'sz399006'}
 
 # def get_sina_api_code_now(code):
-def get_tdx_append_now_df_api(code, type='f', start=None, end=None):
+def get_tdx_append_now_df_api(code, start=None, end=None, type='f'):
 
     # start=cct.day8_to_day10(start)
     # end=cct.day8_to_day10(end)
@@ -612,10 +612,14 @@ def get_duration_date(code, ptype='low', dt=None, df='',dl=None):
         lowp = dz.high.max()
         lowdate = dz[dz.high == lowp].index.values[0]
         log.debug("high:%s"%lowdate)
+    elif ptype == 'close':
+        lowp = dz.close.min()
+        lowdate = dz[dz.close == lowp].index.values[0]
+        log.debug("high:%s" % lowdate)
     else:
         lowp = dz.low.min()
         lowdate = dz[dz.low == lowp].index.values[0]
-        log.debug("low:%s"%lowdate)
+        log.debug("low:%s" % lowdate)
     # if ptype == 'high':
     #     lowp = dz.close.max()
     #     lowdate = dz[dz.close == lowp].index.values[0]
@@ -685,6 +689,10 @@ def get_duration_price_date(code, ptype='low', dt=None, df='',dl=None,vtype=None
             lowp = dz.high.max()
             lowdate = dz[dz.high == lowp].index.values[0]
             log.debug("high:%s" % lowdate)
+        elif ptype == 'close':
+            lowp = dz.close.min()
+            lowdate = dz[dz.close == lowp].index.values[0]
+            log.debug("high:%s" % lowdate)
         else:
             lowp = dz.low.min()
             lowdate = dz[dz.low == lowp].index.values[0]
@@ -706,7 +714,7 @@ def get_duration_price_date(code, ptype='low', dt=None, df='',dl=None,vtype=None
         return lowdate,index_d
 
 
-def get_tdx_exp_low_or_high_price(code, dt=None, ptype='low', dl=None):
+def get_tdx_exp_low_or_high_price(code, dt=None, ptype='close', dl=None):
     '''
     :param code:999999
     :param dayl:Duration Days
@@ -747,10 +755,15 @@ def get_tdx_exp_low_or_high_price(code, dt=None, ptype='low', dl=None):
                 lowp = dz.close.max()
                 lowdate = dz[dz.close == lowp].index.values[0]
                 log.debug("high:%s" % lowdate)
-            else:
+            elif ptype == 'close':
                 lowp = dz.close.min()
                 lowdate = dz[dz.close == lowp].index.values[0]
+                log.debug("close:%s" % lowdate)
+            else:
+                lowp = dz.low.min()
+                lowdate = dz[dz.low == lowp].index.values[0]
                 log.debug("low:%s" % lowdate)
+
             log.debug("date:%s %s:%s" % (lowdate, ptype, lowp))
             # log.debug("date:%s %s:%s" % (dt, ptype, lowp))
             dd = df[df.index == lowdate]
@@ -771,7 +784,7 @@ def get_tdx_exp_low_or_high_price(code, dt=None, ptype='low', dl=None):
         return dd
 
 
-def get_tdx_day_to_df_last(code, dayl=1, type=0, dt=None, ptype='low',dl=None):
+def get_tdx_day_to_df_last(code, dayl=1, type=0, dt=None, ptype='close', dl=None):
     '''
     :param code:999999
     :param dayl:Duration Days
@@ -924,7 +937,7 @@ def get_tdx_day_to_df_last(code, dayl=1, type=0, dt=None, ptype='low',dl=None):
 # usage 使用说明
 #
 #############################################################
-def get_tdx_all_day_LastDF(codeList, type=0, dt=None,ptype='low'):
+def get_tdx_all_day_LastDF(codeList, type=0, dt=None, ptype='close'):
     time_t = time.time()
     # df = rl.get_sina_Market_json(market)
     # code_list = np.array(df.code)

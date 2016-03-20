@@ -55,8 +55,9 @@ def _write_to_csv(df, filename, indexCode='code'):
     #     sys.setdefaultencoding( "gbk" )
     df = df.drop_duplicates(indexCode)
     df = df.set_index(indexCode)
-    df.to_csv(CURRENTDAY + '-' + filename + '.csv', encoding='gbk', index=False)  # 选择保存
-    print ("write csv")
+    df.to_csv(CURRENTDAY + '-' + filename + '.csv',
+              encoding='gbk', index=False)  # 选择保存
+    print("write csv")
 
     # df.to_csv(filename, encoding='gbk', index=False)
 
@@ -80,19 +81,23 @@ def get_multiday_ave_compare(code, dayl='10'):
         if not type(td) == types.NoneType:
             ep = td['amount'].sum() / td['volume'].sum()
             ep_list.append(ep)
-            print ("D: %s P: %s" % (da[-5:], ep))
+            print("D: %s P: %s" % (da[-5:], ep))
     ave = ema.less_average(ep_list)
     if len(dtick.index) > 0:
         ep = dtick['amount'].sum() / dtick['volume'].sum()
         p_now = dtick['price'].values[0] * 100
         if p_now > ave and ep > ave:
-            print ("GOLD:%s ep:%s UP:%s!!! A:%s %s !!!" % (code, ep, p_now, ave, cct.get_now_time()))
+            print("GOLD:%s ep:%s UP:%s!!! A:%s %s !!!" %
+                  (code, ep, p_now, ave, cct.get_now_time()))
         elif p_now > ave and ep < ave:
-            print ("gold:%s ep:%s UP:%s! A:%s %s !" % (code, ep, p_now, ave, cct.get_now_time()))
+            print("gold:%s ep:%s UP:%s! A:%s %s !" %
+                  (code, ep, p_now, ave, cct.get_now_time()))
         elif p_now < ave and ep > ave:
-            print ("down:%s ep:%s Dow:%s? A:%s %s ?" % (code, ep, p_now, ave, cct.get_now_time()))
+            print("down:%s ep:%s Dow:%s? A:%s %s ?" %
+                  (code, ep, p_now, ave, cct.get_now_time()))
         else:
-            print ("DOWN:%s ep:%s now:%s??? A:%s %s ???" % (code, ep, p_now, ave, cct.get_now_time()))
+            print("DOWN:%s ep:%s now:%s??? A:%s %s ???" %
+                  (code, ep, p_now, ave, cct.get_now_time()))
     return ave
 
 
@@ -121,7 +126,8 @@ def get_multiday_ave_compare_silent(code, dayl='10'):
         ep = dtick['amount'].sum() / dtick['volume'].sum()
         p_now = dtick['price'].values[0] * 100
         if p_now > ave or ep > ave:
-            print ("GOLD:%s ep:%s UP:%s!!! A:%s %s !!!" % (code, ep, p_now, ave, get_now_time()))
+            print("GOLD:%s ep:%s UP:%s!!! A:%s %s !!!" %
+                  (code, ep, p_now, ave, get_now_time()))
             # elif p_now > ave and ep < ave:
             #     print ("gold:%s ep:%s UP:%s! A:%s %s !" % (code, ep, p_now, ave, get_now_time()))
             # elif p_now < ave and ep > ave:
@@ -129,7 +135,8 @@ def get_multiday_ave_compare_silent(code, dayl='10'):
             return True
         else:
             if p_now < ave and ep < ave:
-                print ("DOWN:%s ep:%s now:%s??? A:%s %s ???" % (code, ep, p_now, ave, get_now_time()))
+                print("DOWN:%s ep:%s now:%s??? A:%s %s ???" %
+                      (code, ep, p_now, ave, get_now_time()))
             return False
             # return ave
 
@@ -145,18 +152,24 @@ def get_yestoday_tick_status(code, ave=None):
             ep = dtick['amount'].sum() / dtick['volume'].sum()
             if not ave == None:
                 if p_now > ave and ep > ave:
-                    print ("GOLD:%s ep:%s UP:%s!!! A:%s %s !!!" % (code, ep, p_now, ave, get_now_time()))
+                    print("GOLD:%s ep:%s UP:%s!!! A:%s %s !!!" %
+                          (code, ep, p_now, ave, get_now_time()))
                 elif p_now > ave and ep < ave:
-                    print ("gold:%s ep:%s UP:%s! A:%s %s !" % (code, ep, p_now, ave, get_now_time()))
+                    print("gold:%s ep:%s UP:%s! A:%s %s !" %
+                          (code, ep, p_now, ave, get_now_time()))
                 elif p_now < ave and ep > ave:
-                    print ("down:%s ep:%s Dow:%s? A:%s %s ?" % (code, ep, p_now, ave, get_now_time()))
+                    print("down:%s ep:%s Dow:%s? A:%s %s ?" %
+                          (code, ep, p_now, ave, get_now_time()))
                 else:
-                    print ("DOWN:%s ep:%s now:%s??? A:%s %s ???" % (code, ep, p_now, ave, get_now_time()))
+                    print("DOWN:%s ep:%s now:%s??? A:%s %s ???" %
+                          (code, ep, p_now, ave, get_now_time()))
             else:
                 if ep > ave:
-                    print ("GOLD:%s ep:%s UP:%s!!! A:%s %s !!!" % (code, ep, p_now, ave, get_now_time()))
+                    print("GOLD:%s ep:%s UP:%s!!! A:%s %s !!!" %
+                          (code, ep, p_now, ave, get_now_time()))
                 else:
-                    print ("down:%s ep:%s now:%s??? A:%s %s ?" % (code, ep, p_now, ave, get_now_time()))
+                    print("down:%s ep:%s now:%s??? A:%s %s ?" %
+                          (code, ep, p_now, ave, get_now_time()))
 
         else:
             df = ts.get_realtime_quotes(code)
@@ -175,18 +188,24 @@ def get_today_tick_ave(code, ave=None):
             ep = dtick['amount'].sum() / dtick['volume'].sum()
             if not ave == None:
                 if p_now > ave and ep > ave:
-                    print ("GOLD:%s ep:%s UP:%s!!! A:%s %s !!!" % (code, ep, p_now, ave, get_now_time()))
+                    print("GOLD:%s ep:%s UP:%s!!! A:%s %s !!!" %
+                          (code, ep, p_now, ave, get_now_time()))
                 elif p_now > ave and ep < ave:
-                    print ("gold:%s ep:%s UP:%s! A:%s %s !" % (code, ep, p_now, ave, get_now_time()))
+                    print("gold:%s ep:%s UP:%s! A:%s %s !" %
+                          (code, ep, p_now, ave, get_now_time()))
                 elif p_now < ave and ep > ave:
-                    print ("down:%s ep:%s Dow:%s? A:%s %s ?" % (code, ep, p_now, ave, get_now_time()))
+                    print("down:%s ep:%s Dow:%s? A:%s %s ?" %
+                          (code, ep, p_now, ave, get_now_time()))
                 else:
-                    print ("DOWN:%s ep:%s now:%s??? A:%s %s ???" % (code, ep, p_now, ave, get_now_time()))
+                    print("DOWN:%s ep:%s now:%s??? A:%s %s ???" %
+                          (code, ep, p_now, ave, get_now_time()))
             else:
                 if ep > ave:
-                    print ("GOLD:%s ep:%s UP:%s!!! A:%s %s !!!" % (code, ep, p_now, ave, get_now_time()))
+                    print("GOLD:%s ep:%s UP:%s!!! A:%s %s !!!" %
+                          (code, ep, p_now, ave, get_now_time()))
                 else:
-                    print ("down:%s ep:%s now:%s??? A:%s %s ?" % (code, ep, p_now, ave, get_now_time()))
+                    print("down:%s ep:%s now:%s??? A:%s %s ?" %
+                          (code, ep, p_now, ave, get_now_time()))
 
         else:
             df = ts.get_realtime_quotes(code)
@@ -202,7 +221,6 @@ def f_print(lens, datastr):
     data = ('{0:%s}' % (lens)).format(str(datastr))
     return data
 
-
     allTop = pd.DataFrame()
     for market in ct.SINA_Market_KEY:
         df = rd.get_sina_Market_json(market, False)
@@ -214,7 +232,7 @@ def f_print(lens, datastr):
         crash = df[df['percent'] < -changepercent]['code']
         # top=df[ df['changepercent'] <6]
 
-        print (
+        print(
             "%s topT: %s top>%s: %s " % (
                 f_print(4, market), f_print(3, len(topTen)), changepercent, f_print(4, len(top)))),
         url = ct.DFCFW_FUND_FLOW_URL % ct.SINA_Market_KEY_TO_DFCFW[market]
@@ -224,10 +242,10 @@ def f_print(lens, datastr):
             zlr = float(ff['zlr'])
             zzb = float(ff['zzb'])
             # zt=str(ff['time'])
-            print (u"crashT:%s crash<-%s:%s 流入: %0.1f亿 比: %0.1f%%" % (
+            print(u"crashT:%s crash<-%s:%s 流入: %0.1f亿 比: %0.1f%%" % (
                 f_print(4, len(crashTen)), changepercent, f_print(4, len(crash)), zlr, zzb))
         else:
-            print (u"crashT:%s crash<-%s:%s 流入: %0.1f亿 比: %0.1f%% %s" % (
+            print(u"crashT:%s crash<-%s:%s 流入: %0.1f亿 比: %0.1f%% %s" % (
                 f_print(4, len(crashTen)), changepercent, f_print(4, len(crash))))
 
         allTop = allTop.append(df, ignore_index=True)
@@ -238,7 +256,7 @@ def f_print(lens, datastr):
     topTen = df[df['percent'] > 9.9]['code']
     crashTen = df[df['percent'] < -9.8]['code']
     crash = df[df['percent'] < -changepercent]['code']
-    print (
+    print(
         u"\t\tA:%s topT:%s top>%s:%s" % (
             f_print(4, count), f_print(3, len(topTen)), changepercent, f_print(4, len(top)))),
     ff = ffu.get_dfcfw_fund_flow(ct.DFCFW_FUND_FLOW_ALL)
@@ -246,12 +264,15 @@ def f_print(lens, datastr):
         zlr = float(ff['zlr'])
         zzb = float(ff['zzb'])
         zt = str(ff['time'])
-        print (u"crashT:%s crash<-%s:%s 流入: %0.1f亿 占比: %0.1f%% %s" % (
+        print(u"crashT:%s crash<-%s:%s 流入: %0.1f亿 占比: %0.1f%% %s" % (
             f_print(3, len(crashTen)), changepercent, f_print(4, (len(crash))), zlr, zzb, zt))
     else:
-        print (u"crashT:%s crash<-%s:%s" % (f_print(3, len(crashTen)), changepercent, f_print(4, len(crash))))
+        print(u"crashT:%s crash<-%s:%s" %
+              (f_print(3, len(crashTen)), changepercent, f_print(4, len(crash))))
     return allTop
-def get_hot_countNew(changepercent,rzrq):
+
+
+def get_hot_countNew(changepercent, rzrq):
     allTop = pd.DataFrame()
     for market in ct.SINA_Market_KEY:
         df = rd.get_sina_Market_json(market, False)
@@ -272,12 +293,13 @@ def get_hot_countNew(changepercent,rzrq):
             crash = '0'
         # top=df[ df['changepercent'] <6]
 
-        print (
+        print(
             "%s topT: %s top>%s: %s " % (
                 f_print(4, market), f_print(3, len(topTen)), changepercent, f_print(4, len(top)))),
         # url = ct.DFCFW_FUND_FLOW_URL % ct.SINA_Market_KEY_TO_DFCFW[market]
         # log.debug("ffurl:%s" % url)
-        print (u"crashT:%s crash<-%s:%s" % (f_print(4, len(crashTen)), changepercent, f_print(4, len(crash)))),
+        print(u"crashT:%s crash<-%s:%s" %
+              (f_print(4, len(crashTen)), changepercent, f_print(4, len(crash)))),
         ff = ffu.get_dfcfw_fund_flow(market)
         if len(ff) > 0:
             zlr = float(ff['zlr'])
@@ -286,8 +308,9 @@ def get_hot_countNew(changepercent,rzrq):
             # modfprint=lambda x:f_print(4,x) if x>0 else "-%s"%(f_print(4,str(x).replace('-','')))
             # print modfprint(zlr)
             # print (u"流入: %s亿 比: %s%%" % (modfprint(zlr), modfprint(zzb))),
-            print (u"流入: %s亿 比: %s%%" % (f_print(4, zlr), f_print(4, zzb))),
-            print (u"%s %s%s"%( f_print(4,ff['close']),f_print(1,'!' if ff['open'] > ff['lastp'] else '?'),f_print(2,'!!' if ff['close'] > ff['lastp'] else '??')))
+            print(u"流入: %s亿 比: %s%%" % (f_print(4, zlr), f_print(4, zzb))),
+            print(u"%s %s%s" % (f_print(4, ff['close']), f_print(1, '!' if ff['open'] > ff[
+                'lastp'] else '?'), f_print(2, '!!' if ff['close'] > ff['lastp'] else '??')))
         allTop = allTop.append(df, ignore_index=True)
 
     df = allTop
@@ -296,17 +319,19 @@ def get_hot_countNew(changepercent,rzrq):
     topTen = df[df['percent'] > 9.9]['code']
     crashTen = df[df['percent'] < -9.8]['code']
     crash = df[df['percent'] < -changepercent]['code']
-    print (
+    print(
         u" \tA:%s topT:%s top>%s:%s" % (
             f_print(4, count), f_print(3, len(topTen)), changepercent, f_print(4, len(top)))),
-    print (u"crashT:%s crash<-%s:%s" % (f_print(3, len(crashTen)), changepercent, f_print(4, len(crash)))),
+    print(u"crashT:%s crash<-%s:%s" %
+          (f_print(3, len(crashTen)), changepercent, f_print(4, len(crash)))),
     ff = ffu.get_dfcfw_fund_flow(ct.DFCFW_FUND_FLOW_ALL)
     zzb = 0
     if len(ff) > 0:
         zlr = float(ff['zlr'])
         zzb = float(ff['zzb'])
         zt = str(ff['time'])
-        print (u"流入: %s亿 占比: %s%% %s" % (f_print(4, zlr), f_print(4, zzb), f_print(4, zt)))
+        print(u"流入: %s亿 占比: %s%% %s" %
+              (f_print(4, zlr), f_print(4, zzb), f_print(4, zt)))
     ff = ffu.get_dfcfw_fund_SHSZ()
     hgt = ffu.get_dfcfw_fund_HGT()
     log.debug("shzs:%s" % ff)
@@ -317,21 +342,27 @@ def get_hot_countNew(changepercent,rzrq):
     #         f_print(4, ff['zup']),
     #         f_print(5, ff['zvol']))),
     if len(ff) > 0:
-        print (u"\tSh: %s Vr:%s Sz: %s Vr:%s " % (
+        print(u"\tSh: %s Vr:%s Sz: %s Vr:%s " % (
             f_print(4, ff['scent']), f_print(5, ff['svol']), f_print(4, ff['zcent']), f_print(5, ff['zvol']))),
     else:
-        print (u"\tSh: \t%s Vr:  \t%s Sz: \t%s Vr: \t%s ")%(0,0,0,0),
+        print(u"\tSh: \t%s Vr:  \t%s Sz: \t%s Vr: \t%s ") % (0, 0, 0, 0),
     if len(hgt) > 0:
-        print ("Hgt: %s Ggt: %s" % (hgt['hgt'], hgt['ggt']))    
+        print("Hgt: %s Ggt: %s" % (hgt['hgt'], hgt['ggt']))
     else:
-        print ("Hgt: \t%s Ggt: \t%s"%(0,0))
+        print("Hgt: \t%s Ggt: \t%s" % (0, 0))
     if len(rzrq) > 0:
-        shpcent= round((rzrq['shrz']/rzrq['sh'] * 100),1)
-        szpcent= round((rzrq['szrz']/rzrq['sz'] * 100),1)
-        print (u"\tSh: %s rz:%s :%s%% sz: %s rz:%s :%s%% All: %s diff: %s亿" % (
-            f_print(5, rzrq['sh']),f_print(4, rzrq['shrz']),shpcent, f_print(5, rzrq['sz']),f_print(4, rzrq['szrz']),szpcent,f_print(4, rzrq['all']), f_print(5, rzrq['diff']))) 
-    bigcount=rd.getconfigBigCount()
-    cct.set_console(title=['B:%s-%s V:%s'%(bigcount[0],bigcount[2],bigcount[1]),'ZL: %s'%(zlr if len(ff) >0 else 0),'To:%s'%len(topTen),'D:%s'%len(crash),'Sh: %s '%ff['scent'] if len(ff) >0 else 0,'Vr:%s%% '%ff['svol'] if len(ff) >0 else 0,'MR: %s'%zzb,'ZL: %s'%(zlr if len(ff) >0 else 0)])
+        shpcent = round((rzrq['shrz'] / rzrq['sh'] * 100), 1) if rzrq['sh'] > 0 else 0
+        szpcent = round((rzrq['szrz'] / rzrq['sz'] * 100), 1) if rzrq['sz'] > 0 else 0
+        print(u"\tSh: %s rz:%s :%s%% sz: %s rz:%s :%s%% All: %s diff: %s亿" % (
+            f_print(5, rzrq['sh']), f_print(4, rzrq['shrz']), shpcent, f_print(5, rzrq['sz']), f_print(4, rzrq['szrz']),
+            szpcent, f_print(4, rzrq['all']), f_print(5, rzrq['diff'])))
+    bigcount = rd.getconfigBigCount()
+    # print bigcount
+    cct.set_console(
+        title=['B:%s|%s V:%s' % (bigcount[0], bigcount[2], bigcount[1]), 'ZL: %s' % (zlr if len(ff) > 0 else 0),
+               'To:%s' % len(topTen), 'D:%s' % len(
+                crash), 'Sh: %s ' % ff['scent'] if len(ff) > 0 else 0, 'Vr:%s%% ' % ff['svol'] if len(ff) > 0 else 0,
+               'MR: %s' % zzb, 'ZL: %s' % (zlr if len(ff) > 0 else 0)])
     return allTop
 
 
@@ -390,13 +421,13 @@ if __name__ == '__main__':
     ave = None
     days = '10'
     success = 0
-    rzrq=ffu.get_dfcfw_rzrq_SHSZ()
+    rzrq = ffu.get_dfcfw_rzrq_SHSZ()
     while 1:
         try:
             if not status:
-                if len(rzrq)==0:
-                    rzrq=ffu.get_dfcfw_rzrq_SHSZ()
-                get_hot_countNew(3,rzrq)
+                if len(rzrq) == 0:
+                    rzrq = ffu.get_dfcfw_rzrq_SHSZ()
+                get_hot_countNew(3, rzrq)
             if status:
                 # status=True
                 if not num_input:
@@ -404,16 +435,18 @@ if __name__ == '__main__':
                     if num_input == 'ex' or num_input == 'qu' \
                             or num_input == 'q' or num_input == "e":
                         sys.exit()
-                    elif not num_input or not len(num_input) == 6:  # str.isdigit()是用来判断字符串是否纯粹由数字组成
-                        print ("Please input 6 code:or exit")
+                    # str.isdigit()是用来判断字符串是否纯粹由数字组成
+                    elif not num_input or not len(num_input) == 6:
+                        print("Please input 6 code:or exit")
                         num_input = ''
                 if num_input:
                     if ave == None:
                         ave = get_code_search_loop(num_input, code, dayl=days)
                     else:
-                        ave = get_code_search_loop(num_input, code, dayl=days, ave=ave)
+                        ave = get_code_search_loop(
+                            num_input, code, dayl=days, ave=ave)
                     code = num_input
-                    
+
             int_time = cct.get_now_time_int()
             if cct.get_work_time():
                 if int_time < 1000:
@@ -452,9 +485,9 @@ if __name__ == '__main__':
                     num_input = ''
                     ave = None
                     code = ''
-                elif len(st)==6:
+                elif len(st) == 6:
                     status = True
-                    num_input=st
+                    num_input = st
                     ave = None
                     code = ''
                 else:
@@ -471,9 +504,9 @@ if __name__ == '__main__':
                 num_input = ''
                 ave = None
                 code = ''
-            elif len(st)==6:
+            elif len(st) == 6:
                 status = True
-                num_input=st
+                num_input = st
                 ave = None
                 code = ''
             else:

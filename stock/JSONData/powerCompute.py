@@ -5,8 +5,14 @@ sys.path.append("..")
 import numpy as np
 import statsmodels.api as sm
 from statsmodels import regression
+from pylab import plt
+from matplotlib.dates import num2date, date2num
+from matplotlib.lines import Line2D
+from matplotlib.patches import Rectangle
+import datetime
 from JohhnsonUtil import LoggerFactory as LoggerFactory
 from JohhnsonUtil import commonTips as cct
+from JohhnsonUtil import zoompan
 
 log = LoggerFactory.getLogger("PowerCompute")
 # log.setLevel(LoggerFactory.DEBUG)
@@ -80,7 +86,125 @@ def LIS(X):
     return S[::-1], pos[::-1]
 
 
-def get_linear_model_status(code, ptype='f', df=None, dtype='d', type='m', start=None, end=None, days=1, filter='n',
+def Candlestick(ax, bars=None, quotes=None, width=0.5, colorup='k', colordown='r', alpha=1.0):
+    def fooCandlestick(ax, quotes, width=0.5, colorup='k', colordown='r',
+                       alpha=1.0):
+        OFFSET = width / 2.0
+        linewidth = width * 2
+        lines = []
+        boxes = []
+        for q in quotes:
+            # t, op, cl, hi, lo = q[:5]
+            t, op, hi, lo, cl = q[:5]
+
+            box_h = max(op, cl)
+            box_l = min(op, cl)
+            height = box_h - box_l
+
+            if cl >= op:
+                color = colorup
+            else:
+                color = colordown
+
+            vline_lo = Line2D(
+                xdata=(t, t), ydata=(lo, box_l),
+                color=color,
+                linewidth=linewidth,
+                antialiased=True,
+            )
+            vline_hi = Line2D(
+                xdata=(t, t), ydata=(box_h, hi),
+                color=color,
+                linewidth=linewidth,
+                antialiased=True,
+            )
+            rect = Rectangle(
+                xy=(t - OFFSET, box_l),
+                width=width,
+                height=height,
+                facecolor=color,
+                edgecolor=color,
+            )
+            rect.set_alpha(alpha)
+            lines.append(vline_lo)
+            lines.append(vline_hi)
+            boxes.append(rect)
+            ax.add_line(vline_lo)
+            ax.add_line(vline_hi)
+            ax.add_patch(rect)
+        ax.autoscale_view()
+
+        return lines, boxes
+
+    date = date2num(bars.index.to_datetime().to_pydatetime())
+    openp = bars['open']
+    closep = bars['close']
+    highp = bars['high']
+    lowp = bars['low']
+    # volume = bars['volume']
+    data = np.array([[1.0, 1.0, 1.0, 1.0, 1.0]])
+    for i in range(len(bars) - 1):
+        data = np.append(
+            data, [[date[i], openp[i], highp[i], lowp[i], closep[i], ]], axis=0)
+    data = np.delete(data, 0, 0)
+    # determine number of days and create a list of those days
+    # print np.unique(np.trunc(data[:, 0]))
+    ndays = np.unique(np.trunc(data[:, 0]), return_index=True)
+    xdays = []
+    for n in np.arange(len(ndays[0])):
+        xdays.append(datetime.date.isoformat(num2date(data[ndays[1], 0][n])))
+    # creation of new data by replacing the time array with equally spaced values.
+    # this will allow to remove the gap between the days, when plotting the data
+    data2 = np.hstack([np.arange(data[:, 0].size)[:, np.newaxis], data[:, 1:]])
+    # print data2
+    # plot the data
+    # figWidth = len(data) * width
+    # fig = plt.figure(figsize=(figWidth, 5))
+    # fig = plt.figure(figsize=(16, 10))
+    # ax = fig.add_axes([0.05, 0.1, 0.9, 0.9])
+    # customization of the axis
+
+    '''
+    #custom color
+    ax.spines['right'].set_color('none')
+    ax.spines['top'].set_color('none')
+    ax.xaxis.set_ticks_position('bottom')
+    ax.yaxis.set_ticks_position('left')
+    ax.tick_params(
+        axis='both', direction='out', width=2, length=8, labelsize=12, pad=8)
+    ax.spines['left'].set_linewidth(2)
+    ax.spines['bottom'].set_linewidth(2)
+    '''
+
+    # ax.grid(True, color='w')
+    # ax.yaxis.label.set_color("w")
+    # ax.spines['bottom'].set_color("#5998ff")
+    # ax.spines['top'].set_color("#5998ff")
+    # ax.spines['left'].set_color("#5998ff")
+    # ax.spines['right'].set_color("#5998ff")
+    # ax.tick_params(axis='y', colors='w')
+    # import matplotlib.ticker as mticker
+    # plt.gca().yaxis.set_major_locator(mticker.MaxNLocator(prune='upper'))
+    # ax.tick_params(axis='x', colors='w')
+    # plt.ylabel('Stock price and Volume')
+
+    # set the ticks of the x axis only when starting a new day
+    # (Also write the code to set a tick for every whole hour)
+    div_n = len(ax.get_xticks())
+    allc = len(bars.index)
+    # lastd = bars.index[-1]
+    if allc / div_n > 12:
+        div_n = allc / 12
+    ax.set_xticks(range(0, len(bars.index), div_n))
+    new_xticks = [bars.index[d] for d in ax.get_xticks()]
+    ax.set_xticklabels(new_xticks, rotation=30, horizontalalignment='right')
+    # fig.autofmt_xdate()
+    ax.autoscale_view()
+    # Create the candle sticks
+    fooCandlestick(ax, data2, width=width, colorup='r', colordown='g')
+
+
+def get_linear_model_status(code, df=None, dtype='d', type='m', start=None, end=None, days=1, filter='n',
                             dl=None, countall=True):
     # log.setLevel(LoggerFactory.DEBUG)
     # if code == "600760":
@@ -110,7 +234,7 @@ def get_linear_model_status(code, ptype='f', df=None, dtype='d', type='m', start
             start = '2016-01-01'
         # df = tdd.get_tdx_append_now_df(code,ptype, start, end).sort_index(ascending=True)
         df = tdd.get_tdx_append_now_df_api(
-            code, ptype, start, end).sort_index(ascending=True)
+            code, start, end).sort_index(ascending=True)
         # if (start is not None or dl is not None) and filter=='y':
         if len(df) > 2 and dl is None and start is not None and filter == 'y':
             # print df.index.values[0],index_d
@@ -220,56 +344,17 @@ def get_linear_model_status(code, ptype='f', df=None, dtype='d', type='m', start
                  (operationcount, min(ratio_l), ratio_l))
         # print ("Code:%s start:%s df-s:%s  end:%s"%(code,start,df[:1].index.values[0],df[-1:].index.values[0]))
         # log.info("Code:%s start:%s df-s:%s  end:%s"%(code,start,df[:1].index.values[0],df[-1:].index.values[0]))
-        return operationcount, min(ratio_l), df[:1].index.values[0]
+        return operationcount, min(ratio_l), df[:1].index.values[0], len(df)
     elif len(df) == 1:
         # log.error("powerCompute code:%s"%(code))
-        return -9, 0, df.index.values[0]
+        return -9, 0, df.index.values[0], len(df)
     else:
         log.error("code:%s Low :%s" % (code, len(df)))
-        return -9, -9, cct.get_today()
+        return -9, -9, cct.get_today(), len(df)
 
 
-def get_linear_model_status_old(code, ptype='f', dtype='d', type='l', start=None, end=None):
-    df = tdd.get_tdx_append_now_df(code, ptype, start, end).sort_index(ascending=True)
-    if not dtype == 'd':
-        df = tdd.get_tdx_stock_period_to_type(df, dtype).sort_index(ascending=True)
-    # df = tdd.get_tdx_Exp_day_to_df(code, 'f').sort_index(ascending=True)
-    asset = df['close']
-    log.info("df:%s" % asset[:1])
-    asset = asset.dropna()
-    X = np.arange(len(asset))
-    x = sm.add_constant(X)
-    model = regression.linear_model.OLS(asset, x).fit()
-    a = model.params[0]
-    b = model.params[1]
-    log.info("X:%s a:%s b:%s" % (len(asset), a, b))
-    Y_hat = X * b + a
-    if Y_hat[-1] > Y_hat[1]:
-        log.debug("u:%s" % Y_hat[-1])
-        log.debug("price:" % asset.iat[-1])
-        if type.upper() == 'M':
-            diff = asset.iat[-1] - Y_hat[-1]
-            if diff > 0:
-                return True, len(asset), diff
-            else:
-                return False, len(asset), diff
-        elif type.upper() == 'L':
-            i = (asset.values.T - Y_hat).argmin()
-            c_low = X[i] * b + a - asset.values[i]
-            Y_hatlow = X * b + a - c_low
-            diff = asset.iat[-1] - Y_hatlow[-1]
-            if asset.iat[-1] - Y_hatlow[-1] > 0:
-                return True, len(asset), diff
-            else:
-                return False, len(asset), diff
-    else:
-        log.debug("d:%s" % Y_hat[1])
-        return False, 0, 0
-    return False, 0, 0
-
-
-def get_linear_model_diff(code, ptype='f', dtype='d', start=None, end=None, vtype='close', filter='n',
-                          df=None):
+def get_linear_model_candles(code, ptype='low', dtype='d', start=None, end=None, filter='n',
+                             df=None):
     if start is not None and filter == 'y':
         if code not in ['999999', '399006', '399001']:
             index_d, dl = tdd.get_duration_Index_date(dt=start)
@@ -280,17 +365,18 @@ def get_linear_model_diff(code, ptype='f', dtype='d', start=None, end=None, vtyp
         start = tdd.get_duration_price_date(code, ptype='low', dt=index_d)
         log.debug("start:%s" % (start))
     if df is None:
-        # df = tdd.get_tdx_append_now_df(code, ptype, start, end).sort_index(ascending=True)
         df = tdd.get_tdx_append_now_df_api(
-            code, ptype, start, end).sort_index(ascending=True)
+            code, start=start, end=end).sort_index(ascending=True)
     if not dtype == 'd':
         df = tdd.get_tdx_stock_period_to_type(
             df, dtype).sort_index(ascending=True)
-    asset = df[vtype]
+
+    asset = df[ptype]
     log.info("df:%s" % asset[:1])
     asset = asset.dropna()
     dates = asset.index
 
+    '''
     if not code.startswith('999') and not code.startswith('399'):
         # print "code:",code
         if code[:1] in ['5', '6', '9']:
@@ -306,7 +392,7 @@ def get_linear_model_diff(code, ptype='f', dtype='d', start=None, end=None, vtyp
         if not dtype == 'd':
             df1 = tdd.get_tdx_stock_period_to_type(
                 df1, dtype).sort_index(ascending=True)
-        asset1 = df1.loc[asset.index, vtype]
+        asset1 = df1.loc[df.index, ptype]
         startv = asset1[:1]
         # asset_v=asset[:1]
         # print startv,asset_v
@@ -325,17 +411,63 @@ def get_linear_model_diff(code, ptype='f', dtype='d', start=None, end=None, vtyp
         if not dtype == 'd':
             df1 = tdd.get_tdx_stock_period_to_type(
                 df1, dtype).sort_index(ascending=True)
-        if len(asset) < len(df1):
-            asset1 = df1.loc[asset.index, vtype]
+        if len(df) < len(df1):
+            asset1 = df1.loc[df.index, ptype]
             startv = asset1[:1]
             asset1 = asset1.apply(lambda x: round(x / asset1[:1], 2))
         else:
-            asset = df.loc[df1.index, vtype]
+            df = df.loc[df1.index]
+            df = df.dropna()
+            asset = df[ptype]
             asset = asset.dropna()
             dates = asset.index
-            asset1 = df1[vtype]
+            asset1 = df1[ptype]
             asset1 = asset1.apply(lambda x: round(x / asset1[:1], 2))
+    '''
 
+    fig = plt.figure(figsize=(8, 5))
+    plt.subplots_adjust(left=0.05, bottom=0.08, right=0.95, top=0.95, wspace=0.15, hspace=0.25)
+    ax = fig.add_subplot(111)
+
+    Candlestick(ax, df)
+    # print len(df),len(asset)
+    X = np.arange(len(asset))
+    x = sm.add_constant(X)
+    model = regression.linear_model.OLS(asset, x).fit()
+    a = model.params[0]
+    b = model.params[1]
+    # log.info("a:%s b:%s" % (a, b))
+    log.info("X:%s a:%s b:%s" % (len(asset), a, b))
+    Y_hat = X * b + a
+
+    # 真实值-拟合值，差值最大最小作为价值波动区间
+    # 向下平移
+    i = (asset.values.T - Y_hat).argmin()
+    c_low = X[i] * b + a - asset.values[i]
+    Y_hatlow = X * b + a - c_low
+
+    # 向上平移
+    i = (asset.values.T - Y_hat).argmax()
+    c_high = X[i] * b + a - asset.values[i]
+    Y_hathigh = X * b + a - c_high
+    plt.plot(X, Y_hat, 'k', alpha=0.9);
+    plt.plot(X, Y_hatlow, 'r', alpha=0.9);
+    plt.plot(X, Y_hathigh, 'r', alpha=0.9);
+    # plt.xlabel('Date', fontsize=12)
+    plt.ylabel('Price', fontsize=12)
+    plt.title(code + " | " + str(dates[-1])[:11], fontsize=14)
+    plt.legend([asset.iat[-1], "day:%s" % len(asset)], fontsize=12)
+    plt.grid(True)
+
+    # plt.legend([code]);
+    # plt.legend([code, 'Value center line', 'Value interval line']);
+    # fig=plt.fig()
+    # fig.figsize = [14,8]
+    scale = 1.1
+    zp = zoompan.ZoomPan()
+    figZoom = zp.zoom_factory(ax, base_scale=scale)
+    figPan = zp.pan_factory(ax)
+    plt.show(block=False)
 
 def powerCompute_df(df, dtype='d', end=None, dl=None, filter='y'):
     code_l = df.index.tolist()
@@ -351,10 +483,10 @@ def powerCompute_df(df, dtype='d', end=None, dl=None, filter='y'):
         # end=cct.day8_to_day10(end)
         start = cct.day8_to_day10(start)
         end = cct.day8_to_day10(end)
-        op, ra, st = get_linear_model_status(
+        op, ra, st, days = get_linear_model_status(
             code, dtype=dtype, start=start, end=end, dl=dl, filter=filter)
         df.loc[code, 'op'] = op
-        df.loc[code, 'ra'] = ra
+        df.loc[code, 'ra'] = str(ra) + '/' + str(days)
         # if dl is not None:
         # df.loc[code,'ldate'] = st
         df.loc[code, 'ldate'] = st
@@ -371,16 +503,15 @@ def parseArgmain():
     parser.add_argument('end', nargs='?', type=str, help='20160101')
     parser.add_argument('-d', action="store", dest="dtype", type=str, nargs='?', choices=['d', 'w', 'm'], default='d',
                         help='DateType')
-    parser.add_argument('-p', action="store", dest="ptype", type=str, choices=['f', 'b'], default='f',
+    parser.add_argument('-v', action="store", dest="vtype", type=str, choices=['f', 'b'], default='f',
                         help='Price Forward or back')
-    parser.add_argument('-v', action="store", dest="vtype", type=str, choices=['high', 'low', 'close'], default='close',
-                        help='type')
+    parser.add_argument('-p', action="store", dest="ptype", type=str, choices=['high', 'low', 'close'], default='close',
+                        help='price type')
     parser.add_argument('-f', action="store", dest="filter", type=str, choices=['y', 'n'], default='n',
                         help='find duration low')
     parser.add_argument('-l', action="store", dest="dl", type=str, default=None,
                         help='days')
     return parser
-
 
 def maintest(code, start=None, type='m', filter='y'):
     import timeit
@@ -399,9 +530,14 @@ if __name__ == "__main__":
             if len(str(args.code)) == 6:
              # ptype='f', df=None, dtype='d', type='m', start=None, end=None, days=1, filter='n'):
                 # print args.end
-                op, ra, st = get_linear_model_status(args.code, dtype=args.dtype, start=cct.day8_to_day10(
+             # op, ra, st = get_linear_model_status(args.code, dtype=args.dtype, start=cct.day8_to_day10(
+             #      args.start), end=cct.day8_to_day10(args.end), filter=args.filter, dl=args.dl)
+             # print "code:%s op:%s ra:%s  start:%s" % (code, op, ra, st)
+             get_linear_model_candles(args.code, dtype=args.dtype, start=cct.day8_to_day10(
+                 args.start), end=cct.day8_to_day10(args.end), ptype=args.ptype, filter=args.filter)
+             op, ra, st, days = get_linear_model_status(args.code, dtype=args.dtype, start=cct.day8_to_day10(
                      args.start), end=cct.day8_to_day10(args.end), filter=args.filter, dl=args.dl)
-                print "code:%s op:%s ra:%s  start:%s" % (code, op, ra, st)
+             print "code:%s op:%s ra/days:%s  start:%s" % (code, op, str(ra) + '/' + str(days), st)
                 cct.sleep(0.1)
                 # ts=time.time()
                 # time.sleep(5)
