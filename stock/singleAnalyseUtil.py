@@ -12,6 +12,7 @@ import JSONData.fundflowUtil as ffu
 import JohhnsonUtil.johnson_cons as ct
 import JohhnsonUtil.commonTips as cct
 from JSONData import realdatajson as rd
+from JSONData import powerCompute as pct
 import JohhnsonUtil.emacount as ema
 from JohhnsonUtil import LoggerFactory
 
@@ -271,7 +272,17 @@ def f_print(lens, datastr):
               (f_print(3, len(crashTen)), changepercent, f_print(4, len(crash))))
     return allTop
 
-
+def getFibonacci(code):
+    op, ra, st, days = pct.get_linear_model_status(code, filter='y',dl=60)
+    fib=cct.getFibonacci(300,days)
+    # fib = 0
+    # for x in fibl:
+        # if days < x:
+            # fib = x
+            # break
+            
+    print "\t\t\t\t\t%s op:%s ra:%s days:%s fib:%s start:%s" % (code, op, str(ra) ,(days),fib, st)
+    
 def get_hot_countNew(changepercent, rzrq):
     allTop = pd.DataFrame()
     for market in ct.SINA_Market_KEY:
@@ -324,6 +335,7 @@ def get_hot_countNew(changepercent, rzrq):
             f_print(4, count), f_print(3, len(topTen)), changepercent, f_print(4, len(top)))),
     print(u"crashT:%s crash<-%s:%s" %
           (f_print(3, len(crashTen)), changepercent, f_print(4, len(crash)))),
+                           
     ff = ffu.get_dfcfw_fund_flow(ct.DFCFW_FUND_FLOW_ALL)
     zzb = 0
     if len(ff) > 0:
@@ -332,6 +344,7 @@ def get_hot_countNew(changepercent, rzrq):
         zt = str(ff['time'])
         print(u"流入: %s亿 占比: %s%% %s" %
               (f_print(4, zlr), f_print(4, zzb), f_print(4, zt)))
+      
     ff = ffu.get_dfcfw_fund_SHSZ()
     hgt = ffu.get_dfcfw_fund_HGT()
     log.debug("shzs:%s" % ff)
@@ -358,11 +371,14 @@ def get_hot_countNew(changepercent, rzrq):
             szpcent, f_print(4, rzrq['all']), f_print(5, rzrq['diff'])))
     bigcount = rd.getconfigBigCount()
     # print bigcount
+    getFibonacci('999999')
+    getFibonacci('399001') 
     cct.set_console(
-        title=['B:%s|%s V:%s' % (bigcount[0], bigcount[2], bigcount[1]), 'ZL: %s' % (zlr if len(ff) > 0 else 0),
+        title=['B:%s-%s V:%s' % (bigcount[0], bigcount[2], bigcount[1]), 'ZL: %s' % (zlr if len(ff) > 0 else 0),
                'To:%s' % len(topTen), 'D:%s' % len(
                 crash), 'Sh: %s ' % ff['scent'] if len(ff) > 0 else 0, 'Vr:%s%% ' % ff['svol'] if len(ff) > 0 else 0,
                'MR: %s' % zzb, 'ZL: %s' % (zlr if len(ff) > 0 else 0)])
+    
     return allTop
 
 

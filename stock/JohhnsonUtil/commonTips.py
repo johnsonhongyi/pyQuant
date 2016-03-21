@@ -608,7 +608,33 @@ def get_run_path():
         raise TypeError('log path error.')
     return path
 
+def getFibonacci(num,days=None):
+    res = [0, 1]
+    a = 0
+    b = 1
+    for i in range(0, num):
+        if i == a + b:
+            res.append(i)
+            a, b = b, a + b
+    if days is None:
+        return res
+    else:
+        fib = days
+        for x in res:
+            if days < x:
+                fib = x
+                break
+        return fib
 
+# def getFibonacciCount(num,days):
+    # fibl = getFibonacci(num)
+    # fib = days
+    # for x in fibl:
+        # if days < x:
+            # fib = x
+            # break
+    # return fib
+    
 def get_stock_tdx_period_to_type(stock_data, type='w'):
     period_type = type
     # 转换周最后一日变量

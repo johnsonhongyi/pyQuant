@@ -4,6 +4,7 @@ import sys
 sys.path.append("..")
 
 import numpy as np
+import pandas as pd
 import statsmodels.api as sm
 from statsmodels import regression
 from pylab import plt
@@ -207,8 +208,60 @@ def Candlestick(ax, bars=None, quotes=None, width=0.5, colorup='k', colordown='r
     fooCandlestick(ax, data2, width=width, colorup='r', colordown='g')
 
 
+    
+def twoLineCompute(code,df=None,start=None,ptype='low'):
+    ##ptype='low'
+    # ptype='high'
+    if df is None:
+        # df = ts.get_hist_data(code,start=start)
+        df = tdd.get_tdx_append_now_df_api(
+            code, start).sort_index(ascending=True)
+    series = df[ptype]
+    ##pd.rolling_min(df.low,window=len(series)/8).unique()
+    def get_Top(df,ptype):
+        if len(df) < 30:
+            period_type='d'
+        elif len(df) > 30 and len(df) < 120:
+            period_type='w'
+        else:
+            period_type='m'
+        df.index = pd.to_datetime(df.index)
+        if ptype == 'high':
+            dfw = df[ptype].resample(period_type, how='max')
+            # price=dfw.min()
+            # idx = dfw[dfw == price].index.values[0]
+            ##dd = dfw[dfw.index >= idx]
+        else:
+            dfw = df[ptype].resample(period_type, how='min')
+            # price=dfw.max()
+            # idx = dfw[dfw == price].index.values[0]
+            ##dd = dfw[dfw.index >= idx]
+        dd = dfw.dropna()     
+        all=len(dd)
+        mlist=[]
+        if all > 60:
+            step = 0.1
+        else:
+            step = 0.2
+        for x in np.arange(1,all,step):
+            if ptype == 'high':
+                mlist=pd.rolling_max(dd,window=all/x).unique()
+            else:
+                mlist=pd.rolling_min(dd,window=all/x).unique()
+            if len(mlist) > 2:
+                mlist=mlist[1:]
+                # ra = all / x
+                break
+        return mlist
+    #map(lambda x: x/10.0, range(5, 50, 15))
+    mlist= get_Top(df,ptype)
+    # for p in mlist:
+        # idx=df[df[ptype]==p].index.values[0]
+        # print p,str(idx)[:10]
+    return mlist
+    
 def get_linear_model_status(code, df=None, dtype='d', type='m', start=None, end=None, days=1, filter='n',
-                            dl=None, countall=True):
+                            dl=None, countall=True,ptype='low'):
     # log.setLevel(LoggerFactory.DEBUG)
     # if code == "600760":
     # log.setLevel(LoggerFactory.DEBUG)
@@ -222,12 +275,12 @@ def get_linear_model_status(code, df=None, dtype='d', type='m', start=None, end=
         # index_d=cct.day8_to_day10(start)
         # log.debug("index_d:%s"%(index_d))
         index_d = cct.day8_to_day10(start)
-        start = tdd.get_duration_price_date(code, ptype='low', dt=start)
+        start = tdd.get_duration_price_date(code, ptype=ptype, dt=start)
         log.debug("start: %s  index_d:%s" % (start, index_d))
 
     if dl is not None:
         start, index_d = tdd.get_duration_price_date(
-            code, ptype='low', dl=dl, filter=False)
+            code, ptype=ptype, dl=dl, filter=False)
         # start = tdd.get_duration_price_date(code,ptype='low',dl=dl)
         # filter = 'y'
 
@@ -367,7 +420,7 @@ def get_linear_model_candles(code, ptype='low', dtype='d', start=None, end=None,
         else:
             index_d = cct.day8_to_day10(start)
             log.debug("index_d:%s" % (index_d))
-        start = tdd.get_duration_price_date(code, ptype='low', dt=index_d)
+        start = tdd.get_duration_price_date(code, ptype=ptype, dt=index_d)
         log.debug("start:%s" % (start))
     if df is None:
         df = tdd.get_tdx_append_now_df_api(
@@ -436,34 +489,84 @@ def get_linear_model_candles(code, ptype='low', dtype='d', start=None, end=None,
 
     Candlestick(ax, df)
     # print len(df),len(asset)
-    X = np.arange(len(asset))
-    x = sm.add_constant(X)
-    model = regression.linear_model.OLS(asset, x).fit()
-    a = model.params[0]
-    b = model.params[1]
-    # log.info("a:%s b:%s" % (a, b))
-    log.info("X:%s a:%s b:%s" % (len(asset), a, b))
-    Y_hat = X * b + a
+    def setRegLinearPlt(asset,xaxis=None):
+        X = np.arange(len(asset))
+        if xaxis is not None:
+            X = X + xaxis
+        x = sm.add_constant(X)
+        model = regression.linear_model.OLS(asset, x).fit()
+        a = model.params[0]
+        b = model.params[1]
+        # log.info("a:%s b:%s" % (a, b))
+        log.info("X:%s a:%s b:%s" % (len(asset), a, b))
+        Y_hat = X * b + a
 
-    # 真实值-拟合值，差值最大最小作为价值波动区间
-    # 向下平移
-    i = (asset.values.T - Y_hat).argmin()
-    c_low = X[i] * b + a - asset.values[i]
-    Y_hatlow = X * b + a - c_low
+        # 真实值-拟合值，差值最大最小作为价值波动区间
+        # 向下平移
+        i = (asset.values.T - Y_hat).argmin()
+        c_low = X[i] * b + a - asset.values[i]
+        Y_hatlow = X * b + a - c_low
 
-    # 向上平移
-    i = (asset.values.T - Y_hat).argmax()
-    c_high = X[i] * b + a - asset.values[i]
-    Y_hathigh = X * b + a - c_high
-    plt.plot(X, Y_hat, 'k', alpha=0.9);
-    plt.plot(X, Y_hatlow, 'r', alpha=0.9);
-    plt.plot(X, Y_hathigh, 'r', alpha=0.9);
-    # plt.xlabel('Date', fontsize=12)
+        # 向上平移
+        i = (asset.values.T - Y_hat).argmax()
+        c_high = X[i] * b + a - asset.values[i]
+        Y_hathigh = X * b + a - c_high
+        plt.plot(X, Y_hat, 'k', alpha=0.9);
+        plt.plot(X, Y_hatlow, 'r', alpha=0.9);
+        plt.plot(X, Y_hathigh, 'r', alpha=0.9);
+
+        
+    def setBollPlt(code,df,ptype='low'):
+        dt = tdd.get_duration_price_date(code, ptype=ptype, dt=start,df=df)
+        assetL = df[df.index >= dt][ptype]
+        # if ptype == 'high':
+            # xaxisInit = len(df[df.index > dt])
+        # else:
+            # xaxisInit = len(df[df.index < dt])
+        xaxisInit = len(df[df.index < dt])
+        setRegLinearPlt(assetL,xaxis=xaxisInit)
+        op, ra, st, days = get_linear_model_status(code,df=df[df.index >= dt],start=dt)
+        print "%s op:%s ra:%s days:%s  start:%s" % (code, op, str(ra),str(days), st)
+        
+    setRegLinearPlt(asset)
+    if filter =='n':
+        setBollPlt(code,df,'low')
+        setBollPlt(code,df,'high')
+    # eval("df.%s"%ptype).ewm(span=20).mean().plot(style='k')    
+    eval("df.%s"%'close').plot(style='k') 
+    pd.rolling_mean(df.high,window=10).plot(style='b')    
     plt.ylabel('Price', fontsize=12)
     plt.title(code + " | " + str(dates[-1])[:11], fontsize=14)
-    plt.legend([asset.iat[-1], "day:%s" % len(asset)], fontsize=12)
+    fib=cct.getFibonacci(len(asset)*5,len(asset))
+    plt.legend([asset.iat[-1], "day:%s" % len(asset),"fib:%s"%(fib)], fontsize=12)
     plt.grid(True)
+    if filter =='n':
+        dt = tdd.get_duration_price_date(code, ptype=ptype, dt=start,df=df)
+        mlist=twoLineCompute(code,start=dt,ptype='low')
+        if len(mlist) > 1:
+            sx=mlist[0]
+            se=mlist[-1]
+            if sx < se:
+                print "Gold Line"
 
+            else:
+                print "Down Line"
+                
+            count = len(df) - 1
+            X = np.arange(len(df))
+            sx_id=df[df[ptype]== sx].index.values[0][:10]
+            idx = len(df[df.index <= sx_id])
+            sx_X = X[idx-1]
+            
+            se_id=df[df[ptype]== se].index.values[0][:10]
+            # print sx_id,se_id
+            ide = len(df[df.index <= se_id])
+            sx_e = X[ide-1]  
+            print X,ax.get_xticks()
+            print sx_X,sx, sx_e,se
+            ax.plot([sx_X,sx], [sx_e,se])
+        else:
+            print "Mlist:%s"%(mlist)
     # plt.legend([code]);
     # plt.legend([code, 'Value center line', 'Value interval line']);
     # fig=plt.fig()
@@ -498,7 +601,9 @@ def powerCompute_df(df, dtype='d', end=None, dl=None, filter='y'):
         df.loc[code, 'ldate'] = st
     return df
 
-
+def computeRolling_min(series):
+    pd.rolling_min(df.low,window=len(series)/8).unique()
+    
 def parseArgmain():
     # from ConfigParser import ConfigParser
     # import shlex

@@ -95,7 +95,6 @@ def get_dfcfw_fund_SHSZ(url=ct.DFCFW_ZS_SHSZ):
             dd['zvol'] = data2[3]
             # print data[3],data2[3]
         dd['scent'] = data[5]
-        print dd['scent']
         dd['sup'] = data[6].split('|')[0]
         dd['zcent'] = data2[5]
         dd['zup'] = data2[7].split('|')[0]

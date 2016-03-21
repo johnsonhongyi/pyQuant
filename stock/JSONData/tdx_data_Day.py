@@ -1157,7 +1157,10 @@ def main_test():
 if __name__ == '__main__':
     import sys
     import timeit
-    print get_duration_price_date('002024',dl=30)
+    print get_duration_price_date('999999',dl=30)
+    print get_duration_price_date('999999',ptype='high',dt='2015-01-01')
+    print get_duration_price_date('999999',ptype='low',dt='2015-01-01')
+    sys.exit(0)
     # list=['000001','399001','399006','399005']
     # df = get_tdx_all_day_LastDF(list,type=1)
     # print df
