@@ -54,21 +54,18 @@ def perfectCandles():
                 xdata=(t, t), ydata=(lo, box_l),
                 color=color,
                 linewidth=linewidth,
-                antialiased=True,
-            )
+                antialiased=True, )
             vline_hi = Line2D(
                 xdata=(t, t), ydata=(box_h, hi),
                 color=color,
                 linewidth=linewidth,
-                antialiased=True,
-            )
+                antialiased=True, )
             rect = Rectangle(
                 xy=(t - OFFSET, box_l),
                 width=width,
                 height=height,
                 facecolor=color,
-                edgecolor=color,
-            )
+                edgecolor=color, )
             rect.set_alpha(alpha)
             lines.append(vline_lo)
             lines.append(vline_hi)
@@ -177,21 +174,18 @@ def Candlestick(ax, bars=None, quotes=None, width=0.5, colorup='k', colordown='r
                 xdata=(t, t), ydata=(lo, box_l),
                 color=color,
                 linewidth=linewidth,
-                antialiased=True,
-            )
+                antialiased=True, )
             vline_hi = Line2D(
                 xdata=(t, t), ydata=(box_h, hi),
                 color=color,
                 linewidth=linewidth,
-                antialiased=True,
-            )
+                antialiased=True, )
             rect = Rectangle(
                 xy=(t - OFFSET, box_l),
                 width=width,
                 height=height,
                 facecolor=color,
-                edgecolor=color,
-            )
+                edgecolor=color, )
             rect.set_alpha(alpha)
             lines.append(vline_lo)
             lines.append(vline_hi)

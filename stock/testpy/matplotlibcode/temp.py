@@ -27,6 +27,12 @@ from matplotlib.finance import candlestick_ohlc
 # print len(data)
 # print('Ready with building sample data')
 
+# ax = plt.subplot(1,1,1)
+# p1, = ax.plot([1,3], label="line 1")
+# p2, = ax.plot([3,2,1], label="line 2")
+# p3, = ax.plot([2,3,1], label="line 3")
+
+
 bars = ts.get_hist_data('sh', start="2015-01-01").sort_index(ascending=True)
 
 date = date2num(bars.index.to_datetime().to_pydatetime())
@@ -90,9 +96,12 @@ fig.autofmt_xdate()
 ax.set_ylabel('Quotes', size=10)
 # Set limits to the high and low of the data set
 # ax.set_ylim([min(data[:, 4]), max(data[:, 3])])
-
+# p1,=ax.plot([5,3000], [8,4000],'k',label="line 1")
 # Create the candle sticks
 candlestick_ohlc(ax, data2, width=candlestickWidth, colorup='r', colordown='g')
 plt.title('code' + " | " + str(bars.index[-1])[:11], fontsize=14)
 plt.legend(['code', str(bars.index[-1])[:11]], fontsize=12)
+# ax = plt.subplot(1,1,1)
+
+
 plt.show()

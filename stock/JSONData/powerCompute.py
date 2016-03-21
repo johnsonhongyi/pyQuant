@@ -14,7 +14,6 @@ from matplotlib.patches import Rectangle
 import datetime
 from JohhnsonUtil import LoggerFactory as LoggerFactory
 from JohhnsonUtil import commonTips as cct
-from JohhnsonUtil import zoompan
 
 log = LoggerFactory.getLogger("PowerCompute")
 # log.setLevel(LoggerFactory.DEBUG)
@@ -114,21 +113,18 @@ def Candlestick(ax, bars=None, quotes=None, width=0.5, colorup='k', colordown='r
                 xdata=(t, t), ydata=(lo, box_l),
                 color=color,
                 linewidth=linewidth,
-                antialiased=True,
-            )
+                antialiased=True, )
             vline_hi = Line2D(
                 xdata=(t, t), ydata=(box_h, hi),
                 color=color,
                 linewidth=linewidth,
-                antialiased=True,
-            )
+                antialiased=True, )
             rect = Rectangle(
                 xy=(t - OFFSET, box_l),
                 width=width,
                 height=height,
                 facecolor=color,
-                edgecolor=color,
-            )
+                edgecolor=color, )
             rect.set_alpha(alpha)
             lines.append(vline_lo)
             lines.append(vline_hi)
@@ -158,7 +154,8 @@ def Candlestick(ax, bars=None, quotes=None, width=0.5, colorup='k', colordown='r
     for n in np.arange(len(ndays[0])):
         xdays.append(datetime.date.isoformat(num2date(data[ndays[1], 0][n])))
     # creation of new data by replacing the time array with equally spaced values.
-    # this will allow to remove the gap between the days, when plotting the data
+    # this will allow to remove the gap between the days, when plotting the
+    # data
     data2 = np.hstack([np.arange(data[:, 0].size)[:, np.newaxis], data[:, 1:]])
     # print data2
     # plot the data
@@ -167,7 +164,7 @@ def Candlestick(ax, bars=None, quotes=None, width=0.5, colorup='k', colordown='r
     # fig = plt.figure(figsize=(16, 10))
     # ax = fig.add_axes([0.05, 0.1, 0.9, 0.9])
     # customization of the axis
-
+    # 
     '''
     #custom color
     ax.spines['right'].set_color('none')
@@ -201,30 +198,33 @@ def Candlestick(ax, bars=None, quotes=None, width=0.5, colorup='k', colordown='r
         div_n = allc / 12
     ax.set_xticks(range(0, len(bars.index), div_n))
     new_xticks = [bars.index[d] for d in ax.get_xticks()]
-    ax.set_xticklabels(new_xticks, rotation=30, horizontalalignment='right')
+    ax.set_xticklabels(new_xticks, rotation=30, ha='right')
+    # ax.set_xticklabels(new_xticks, rotation=30, horizontalalignment='right')
+
     # fig.autofmt_xdate()
-    ax.autoscale_view()
+    # ax.autoscale_view()
     # Create the candle sticks
     fooCandlestick(ax, data2, width=width, colorup='r', colordown='g')
 
 
-    
-def twoLineCompute(code,df=None,start=None,ptype='low'):
-    ##ptype='low'
+def twoLineCompute(code, df=None, start=None, ptype='low'):
+    # ptype='low'
     # ptype='high'
     if df is None:
         # df = ts.get_hist_data(code,start=start)
         df = tdd.get_tdx_append_now_df_api(
             code, start).sort_index(ascending=True)
     series = df[ptype]
-    ##pd.rolling_min(df.low,window=len(series)/8).unique()
-    def get_Top(df,ptype):
+
+    # pd.rolling_min(df.low,window=len(series)/8).unique()
+
+    def get_Top(df, ptype):
         if len(df) < 30:
-            period_type='d'
+            period_type = 'd'
         elif len(df) > 30 and len(df) < 120:
-            period_type='w'
+            period_type = 'w'
         else:
-            period_type='m'
+            period_type = 'm'
         df.index = pd.to_datetime(df.index)
         if ptype == 'high':
             dfw = df[ptype].resample(period_type, how='max')
@@ -236,32 +236,34 @@ def twoLineCompute(code,df=None,start=None,ptype='low'):
             # price=dfw.max()
             # idx = dfw[dfw == price].index.values[0]
             ##dd = dfw[dfw.index >= idx]
-        dd = dfw.dropna()     
-        all=len(dd)
-        mlist=[]
+        dd = dfw.dropna()
+        all = len(dd)
+        mlist = []
         if all > 60:
             step = 0.1
         else:
             step = 0.2
-        for x in np.arange(1,all,step):
+        for x in np.arange(1, all, step):
             if ptype == 'high':
-                mlist=pd.rolling_max(dd,window=all/x).unique()
+                mlist = pd.rolling_max(dd, window=all / x).unique()
             else:
-                mlist=pd.rolling_min(dd,window=all/x).unique()
+                mlist = pd.rolling_min(dd, window=all / x).unique()
             if len(mlist) > 2:
-                mlist=mlist[1:]
+                mlist = mlist[1:]
                 # ra = all / x
                 break
         return mlist
-    #map(lambda x: x/10.0, range(5, 50, 15))
-    mlist= get_Top(df,ptype)
+
+    # map(lambda x: x/10.0, range(5, 50, 15))
+    mlist = get_Top(df, ptype)
     # for p in mlist:
-        # idx=df[df[ptype]==p].index.values[0]
-        # print p,str(idx)[:10]
+    # idx=df[df[ptype]==p].index.values[0]
+    # print p,str(idx)[:10]
     return mlist
-    
+
+
 def get_linear_model_status(code, df=None, dtype='d', type='m', start=None, end=None, days=1, filter='n',
-                            dl=None, countall=True,ptype='low'):
+                            dl=None, countall=True, ptype='low'):
     # log.setLevel(LoggerFactory.DEBUG)
     # if code == "600760":
     # log.setLevel(LoggerFactory.DEBUG)
@@ -484,12 +486,15 @@ def get_linear_model_candles(code, ptype='low', dtype='d', start=None, end=None,
     '''
 
     fig = plt.figure(figsize=(8, 5))
-    plt.subplots_adjust(left=0.05, bottom=0.08, right=0.95, top=0.95, wspace=0.15, hspace=0.25)
+    plt.subplots_adjust(left=0.05, bottom=0.08, right=0.95,
+                        top=0.95, wspace=0.15, hspace=0.25)
     ax = fig.add_subplot(111)
 
     Candlestick(ax, df)
+
     # print len(df),len(asset)
-    def setRegLinearPlt(asset,xaxis=None):
+
+    def setRegLinearPlt(asset, xaxis=None):
         X = np.arange(len(asset))
         if xaxis is not None:
             X = X + xaxis
@@ -511,70 +516,94 @@ def get_linear_model_candles(code, ptype='low', dtype='d', start=None, end=None,
         i = (asset.values.T - Y_hat).argmax()
         c_high = X[i] * b + a - asset.values[i]
         Y_hathigh = X * b + a - c_high
-        plt.plot(X, Y_hat, 'k', alpha=0.9);
-        plt.plot(X, Y_hatlow, 'r', alpha=0.9);
-        plt.plot(X, Y_hathigh, 'r', alpha=0.9);
+        plt.plot(X, Y_hat, 'k', alpha=0.9)
+        plt.plot(X, Y_hatlow, 'r', alpha=0.9)
+        plt.plot(X, Y_hathigh, 'r', alpha=0.9)
 
-        
-    def setBollPlt(code,df,ptype='low'):
-        dt = tdd.get_duration_price_date(code, ptype=ptype, dt=start,df=df)
+    def setBollPlt(code, df, ptype='low'):
+        dt = tdd.get_duration_price_date(code, ptype=ptype, dt=start, df=df)
         assetL = df[df.index >= dt][ptype]
         # if ptype == 'high':
-            # xaxisInit = len(df[df.index > dt])
+        # xaxisInit = len(df[df.index > dt])
         # else:
-            # xaxisInit = len(df[df.index < dt])
+        # xaxisInit = len(df[df.index < dt])
         xaxisInit = len(df[df.index < dt])
-        setRegLinearPlt(assetL,xaxis=xaxisInit)
-        op, ra, st, days = get_linear_model_status(code,df=df[df.index >= dt],start=dt)
-        print "%s op:%s ra:%s days:%s  start:%s" % (code, op, str(ra),str(days), st)
-        
+        setRegLinearPlt(assetL, xaxis=xaxisInit)
+        op, ra, st, days = get_linear_model_status(
+            code, df=df[df.index >= dt], start=dt)
+        print "%s op:%s ra:%s days:%s  start:%s" % (code, op, str(ra), str(days), st)
+
     setRegLinearPlt(asset)
-    if filter =='n':
-        setBollPlt(code,df,'low')
-        setBollPlt(code,df,'high')
-    # eval("df.%s"%ptype).ewm(span=20).mean().plot(style='k')    
-    eval("df.%s"%'close').plot(style='k') 
-    pd.rolling_mean(df.high,window=10).plot(style='b')    
+    if filter == 'n':
+        setBollPlt(code, df, 'low')
+        setBollPlt(code, df, 'high')
+    # eval("df.%s"%ptype).ewm(span=20).mean().plot(style='k')
+    eval("df.%s" % 'close').plot(style='k')
+    pd.rolling_mean(df.high, window=10).plot(style='b')
     plt.ylabel('Price', fontsize=12)
     plt.title(code + " | " + str(dates[-1])[:11], fontsize=14)
-    fib=cct.getFibonacci(len(asset)*5,len(asset))
-    plt.legend([asset.iat[-1], "day:%s" % len(asset),"fib:%s"%(fib)], fontsize=12)
+    fib = cct.getFibonacci(len(asset) * 5, len(asset))
+    plt.legend([asset.iat[-1], "day:%s" %
+                len(asset), "fib:%s" % (fib)], fontsize=12)
     plt.grid(True)
-    if filter =='n':
-        dt = tdd.get_duration_price_date(code, ptype=ptype, dt=start,df=df)
-        mlist=twoLineCompute(code,start=dt,ptype='low')
-        if len(mlist) > 1:
-            sx=mlist[0]
-            se=mlist[-1]
-            if sx < se:
-                print "Gold Line"
+    if filter == 'n':
+
+        for type in ['high', 'low']:
+            dt = tdd.get_duration_price_date(code, ptype=type, dt=start, df=df)
+            mlist = twoLineCompute(code, start=dt, ptype=type)
+            if len(mlist) > 1:
+                sa = mlist[0]
+                sb = mlist[-1]
+                X = np.arange(len(df))
+                aid = df[df[type] == sa].index.values[0][:10]
+                ida = len(df[df.index <= aid])
+                aX = X[ida - 1]
+
+                bid = df[df[type] == sb].index.values[0][:10]
+                idb = len(df[df.index <= bid])
+                bX = X[idb - 1]
+                if sa < sb:
+                    print "Gold Line"
+                    Xa = X[ida - 1:]
+                    # sb=(bX - aX)*b + sa
+                    b = (sb - sa) / (bX - aX)
+                    Yhat = Xa * b + sa
+
+                else:
+                    print "Down Line"
+                    # Xa=X[ida:idb - 1]
+                    Xa = X[ida:]
+                    Xb = Xa - ida
+                    # sb=(bX - aX)*b+sa 
+                    b = (sb - sa) / (bX - aX)
+                    Ylist = Xb * b + sa
+                    Yhat = []
+                    st = sb * 0.618
+                    for v in Ylist:
+                        if v >= st:
+                            Yhat.append(v)
+                        else:
+                            break
+                    Xa = Xa[:len(Yhat)]
+                print aX, sa, bX, sb
+                # print Yhat
+                # Yhat = X*b+a
+                # ax.plot([aX,bX],[sa,sb],'k--')
+                ax.plot(Xa, Yhat, 'k--')
 
             else:
-                print "Down Line"
-                
-            count = len(df) - 1
-            X = np.arange(len(df))
-            sx_id=df[df[ptype]== sx].index.values[0][:10]
-            idx = len(df[df.index <= sx_id])
-            sx_X = X[idx-1]
-            
-            se_id=df[df[ptype]== se].index.values[0][:10]
-            # print sx_id,se_id
-            ide = len(df[df.index <= se_id])
-            sx_e = X[ide-1]  
-            print X,ax.get_xticks()
-            print sx_X,sx, sx_e,se
-            ax.plot([sx_X,sx], [sx_e,se])
-        else:
-            print "Mlist:%s"%(mlist)
+                print "Mlist:%s" % (mlist)
+
     # plt.legend([code]);
     # plt.legend([code, 'Value center line', 'Value interval line']);
     # fig=plt.fig()
     # fig.figsize = [14,8]
-    scale = 1.1
-    zp = zoompan.ZoomPan()
-    figZoom = zp.zoom_factory(ax, base_scale=scale)
-    figPan = zp.pan_factory(ax)
+    # scale = 1.1
+    # zp = zoompan.ZoomPan()
+    # figZoom = zp.zoom_factory(ax, base_scale=scale)
+    # figPan = zp.pan_factory(ax)
+    plt.xticks(rotation=30, ha='right')
+    # plt.setp( axs[1].xaxis.get_majorticklabels(), rotation=70 )
     plt.show(block=False)
 
 
@@ -601,9 +630,11 @@ def powerCompute_df(df, dtype='d', end=None, dl=None, filter='y'):
         df.loc[code, 'ldate'] = st
     return df
 
+
 def computeRolling_min(series):
-    pd.rolling_min(df.low,window=len(series)/8).unique()
-    
+    pd.rolling_min(df.low, window=len(series) / 8).unique()
+
+
 def parseArgmain():
     # from ConfigParser import ConfigParser
     # import shlex
