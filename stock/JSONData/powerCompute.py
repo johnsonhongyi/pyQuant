@@ -16,7 +16,7 @@ from JohhnsonUtil import LoggerFactory as LoggerFactory
 from JohhnsonUtil import commonTips as cct
 
 log = LoggerFactory.getLogger("PowerCompute")
-# log.setLevel(LoggerFactory.DEBUG)
+# log.setLevel(LoggerFactory.INFO)
 from JSONData import tdx_data_Day as tdd
 
 if not cct.isMac():
@@ -207,15 +207,16 @@ def Candlestick(ax, bars=None, quotes=None, width=0.5, colorup='k', colordown='r
     fooCandlestick(ax, data2, width=width, colorup='r', colordown='g')
 
 
-def twoLineCompute(code, df=None, start=None, ptype='low'):
+def twoLineCompute(code, df=None, start=None,end=None, ptype='low'):
     # ptype='low'
     # ptype='high'
     if df is None:
         # df = ts.get_hist_data(code,start=start)
         df = tdd.get_tdx_append_now_df_api(
-            code, start).sort_index(ascending=True)
+            code, start,end).sort_index(ascending=True)
+    else:
+        df = df[df.index >=start]
     series = df[ptype]
-
     # pd.rolling_min(df.low,window=len(series)/8).unique()
 
     def get_Top(df, ptype):
@@ -223,8 +224,12 @@ def twoLineCompute(code, df=None, start=None, ptype='low'):
             period_type = 'd'
         elif len(df) > 30 and len(df) < 120:
             period_type = 'w'
+        elif int(len(df))/20 > 20:
+            total = int(len(df)/20 / 20)
+            period_type = '%sm'%total if total > 0 else 1
         else:
             period_type = 'm'
+        log.info("period:%s"%period_type)
         df.index = pd.to_datetime(df.index)
         if ptype == 'high':
             dfw = df[ptype].resample(period_type, how='max')
@@ -238,6 +243,7 @@ def twoLineCompute(code, df=None, start=None, ptype='low'):
             ##dd = dfw[dfw.index >= idx]
         dd = dfw.dropna()
         all = len(dd)
+        log.info("all:%s"%(all))
         mlist = []
         if all > 60:
             step = 0.1
@@ -294,6 +300,7 @@ def get_linear_model_status(code, df=None, dtype='d', type='m', start=None, end=
         df = tdd.get_tdx_append_now_df_api(
             code, start, end).sort_index(ascending=True)
         # if (start is not None or dl is not None) and filter=='y':
+        start=df.index.values[0]
         if len(df) > 2 and dl is None and start is not None and filter == 'y':
             # print df.index.values[0],index_d
             # print "df:%s code:%s"%(len(df),code)
@@ -306,18 +313,16 @@ def get_linear_model_status(code, df=None, dtype='d', type='m', start=None, end=
     # df = tdd.get_tdx_Exp_day_to_df(code, 'f').sort_index(ascending=True)
 
     def get_linear_model_ratio(asset, type='M'):
-        log.info("asset:%s" % asset[-1:])
         duration = asset[-1:].index.values[0]
         log.debug("duration:%s" % duration)
         log.debug("duration:%s" % cct.get_today_duration(duration))
-        # log.debug("duration:%s"%cct.get_duration_date(duration))
         asset = asset.dropna()
         X = np.arange(len(asset))
         x = sm.add_constant(X)
         model = regression.linear_model.OLS(asset, x).fit()
         a = model.params[0]
         b = model.params[1]
-        log.info("X:%s a:%0.1f b:%0.1f" % (len(asset), a, b))
+        log.debug("X:%s a:%0.1f b:%0.1f" % (len(asset), a, b))
         # if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 1500:
         Y = np.append(X, X[-1] + int(days))
         # else:
@@ -333,16 +338,16 @@ def get_linear_model_status(code, df=None, dtype='d', type='m', start=None, end=
         operation = 0
         log.debug("line_now:%s src:%s" % (Y_hat[-1], Y_hat[0]))
         if Y_hat[-1] > Y_hat[0]:
-            log.debug("u-Y_hat[-1]:%0.1f" % (Y_hat[-1]))
-            log.debug("price:%0.1f" % asset.iat[-1])
-            log.debug("u:%0.1f" % Y_hat[0])
-            log.debug("price:%0.1f" % asset.iat[0])
+            # log.debug("u-Y_hat[-1]:%0.1f" % (Y_hat[-1]))
+            # log.debug("price:%0.1f" % asset.iat[-1])
+            # log.debug("u:%0.1f" % Y_hat[0])
+            # log.debug("price:%0.1f" % asset.iat[0])
             if type.upper() == 'M':
                 Y_Future = X * b + a
                 # Y_Future = Y * b + a
                 # ratio = b/a*100
-                log.info("Type:M ratio: %0.1f %0.1f Y_Mid: %0.1f" %
-                         (b, ratio, Y_Future[-1]))
+                # log.info("Type:M ratio: %0.1f %0.1f Y_Mid: %0.1f" %
+                         # (b, ratio, Y_Future[-1]))
                 # diff = asset.iat[-1] - Y_hat[-1]
                 # if diff > 0:
                 # return True, len(asset), diff
@@ -353,8 +358,8 @@ def get_linear_model_status(code, df=None, dtype='d', type='m', start=None, end=
                 c_low = X[i] * b + a - asset.values[i]
                 Y_Future = X * b + a - c_low
                 # Y_Future = Y * b + a - c_low
-                log.info("Type:L b: %0.1f ratio:%0.1f Y_Mid: %0.1f" %
-                         (b, ratio, Y_Future[-1]))
+                # log.info("Type:L b: %0.1f ratio:%0.1f Y_Mid: %0.1f" %
+                         # (b, ratio, Y_Future[-1]))
                 # diff = asset.iat[-1] - Y_hatlow[-1]
                 # if asset.iat[-1] - Y_hatlow[-1] > 0:
                 # return True, len(asset), diff
@@ -366,25 +371,66 @@ def get_linear_model_status(code, df=None, dtype='d', type='m', start=None, end=
                 # Y_hathigh = X * b + a - c_high
                 Y_Future = X * b + a - c_high
                 # Y_Future = Y * b + a - c_high
-                log.info("Type:H ratio: %0.1f %0.1f Y_Mid: %0.1f" %
-                         (b, ratio, Y_Future[-1]))
+                # log.info("Type:H ratio: %0.1f %0.1f Y_Mid: %0.1f" %
+                         # (b, ratio, Y_Future[-1]))
             # diff = asset[-1] - Y_Future[-1]
             # log.debug("asset:%s Y_Future:%s"%(asset[-1],Y_Future[-1]))
             diff = asset[-1] - Y_Future[-1]
-            log.info("as:%s Y:%s" % (asset[-1], Y_Future[-1]))
+            # log.info("as:%s Y:%s" % (asset[-1], Y_Future[-1]))
             if diff > 0:
                 operation += 1
-                log.info("Type: %s UP !!! Y_Future: %0.1f b:%0.1f ratio:%0.1f " % (
-                    type.upper(), Y_Future[-1], b, ratio))
-            else:
+                # log.info("Type: %s UP !!! Y_Future: %0.1f b:%0.1f ratio:%0.1f " % (
+                    # type.upper(), Y_Future[-1], b, ratio))
+            # else:
                 # operation -=1
-                log.info("Type: %s Down Y_Future: %0.1f b:%0.1f ratio:%0.1f" % (
-                    type.upper(), Y_Future[-1], b, ratio))
+                # log.info("Type: %s Down Y_Future: %0.1f b:%0.1f ratio:%0.1f" % (
+                    # type.upper(), Y_Future[-1], b, ratio))
             return operation, ratio
         else:
+            # log.debug("u-Y_hat[-1]:%0.1f" % (Y_hat[-1]))
+            # log.debug("price:%0.1f" % asset.iat[-1])
+            # log.debug("u:%0.1f" % Y_hat[0])
+            # log.debug("price:%0.1f" % asset.iat[0])
+            if type.upper() == 'M':
+                Y_Future = X * b + a
+                # Y_Future = Y * b + a
+                # ratio = b/a*100
+                # log.info("Type:M ratio: %0.1f %0.1f Y_Mid: %0.1f" %
+                         # (b, ratio, Y_Future[-1]))
+            elif type.upper() == 'L':
+                i = (asset.values.T - Y_hat).argmin()
+                c_low = X[i] * b + a - asset.values[i]
+                Y_Future = X * b + a - c_low
+                # Y_Future = Y * b + a - c_low
+                # log.info("Type:L b: %0.1f ratio:%0.1f Y_Mid: %0.1f" %
+                         # (b, ratio, Y_Future[-1]))
+                # diff = asset.iat[-1] - Y_hatlow[-1]
+                # if asset.iat[-1] - Y_hatlow[-1] > 0:
+                # return True, len(asset), diff
+                # else:
+                # return False, len(asset), diff
+            elif type.upper() == 'H':
+                i = (asset.values.T - Y_hat).argmax()
+                c_high = X[i] * b + a - asset.values[i]
+                # Y_hathigh = X * b + a - c_high
+                Y_Future = X * b + a - c_high
+                # Y_Future = Y * b + a - c_high
+                # log.info("Type:H ratio: %0.1f %0.1f Y_Mid: %0.1f" %
+                         # (b, ratio, Y_Future[-1]))
+            diff = asset[-1] - Y_Future[-1]
+            # log.info("as:%s Y:%s" % (asset[-1], Y_Future[-1]))
+            if diff > 0:
+                operation += 1
+                # log.info("Type: %s UP !!! Y_Future: %0.1f b:%0.1f ratio:%0.1f " % (
+                    # type.upper(), Y_Future[-1], b, ratio))
+            else:
+                operation -=1
+                # log.info("Type: %s Down Y_Future: %0.1f b:%0.1f ratio:%0.1f" % (
+                    # type.upper(), Y_Future[-1], b, ratio))
+            return operation, ratio
             log.debug("Line down !!! d:%s" % Y_hat[0])
             # print("Line down !!! d:%s nowp:%s" % (round(Y_hat[1],2),asset[-1:].values[0]))
-            return -10, round(ratio, 2)
+            # return -3, round(ratio, 2)
 
     if len(df) > 1:
         operationcount = 0
@@ -400,10 +446,8 @@ def get_linear_model_status(code, df=None, dtype='d', type='m', start=None, end=
             ratio_l.append(round(ratio, 2))
             operationcount += op
 
-        log.info("op:%s min:%s ratio_l:%s" %
-                 (operationcount, min(ratio_l), ratio_l))
-        # print ("Code:%s start:%s df-s:%s  end:%s"%(code,start,df[:1].index.values[0],df[-1:].index.values[0]))
-        # log.info("Code:%s start:%s df-s:%s  end:%s"%(code,start,df[:1].index.values[0],df[-1:].index.values[0]))
+        # log.info("op:%s min:%s ratio_l:%s" %
+                 # (operationcount, min(ratio_l), ratio_l))
         return operationcount, min(ratio_l), df[:1].index.values[0], len(df)
     elif len(df) == 1:
         # log.error("powerCompute code:%s"%(code))
@@ -427,12 +471,13 @@ def get_linear_model_candles(code, ptype='low', dtype='d', start=None, end=None,
     if df is None:
         df = tdd.get_tdx_append_now_df_api(
             code, start=start, end=end).sort_index(ascending=True)
+        start=df.index.values[0]
     if not dtype == 'd':
         df = tdd.get_tdx_stock_period_to_type(
             df, dtype).sort_index(ascending=True)
 
     asset = df[ptype]
-    log.info("df:%s" % asset[:1])
+    # log.info("df:%s" % asset[:1])
     asset = asset.dropna()
     dates = asset.index
 
@@ -494,7 +539,7 @@ def get_linear_model_candles(code, ptype='low', dtype='d', start=None, end=None,
 
     # print len(df),len(asset)
 
-    def setRegLinearPlt(asset, xaxis=None):
+    def setRegLinearPlt(asset, xaxis=None,status=None):
         X = np.arange(len(asset))
         if xaxis is not None:
             X = X + xaxis
@@ -503,7 +548,7 @@ def get_linear_model_candles(code, ptype='low', dtype='d', start=None, end=None,
         a = model.params[0]
         b = model.params[1]
         # log.info("a:%s b:%s" % (a, b))
-        log.info("X:%s a:%s b:%s" % (len(asset), a, b))
+        # log.info("X:%s a:%s b:%s" % (len(asset), a, b))
         Y_hat = X * b + a
 
         # 真实值-拟合值，差值最大最小作为价值波动区间
@@ -516,27 +561,46 @@ def get_linear_model_candles(code, ptype='low', dtype='d', start=None, end=None,
         i = (asset.values.T - Y_hat).argmax()
         c_high = X[i] * b + a - asset.values[i]
         Y_hathigh = X * b + a - c_high
+        status_n = Y_hat[-1] > Y_hat[0]
+        if status is not None:
+            if status_n and  status:
+                return status_n
+            elif not status_n and not status:
+                return status_n
         plt.plot(X, Y_hat, 'k', alpha=0.9)
         plt.plot(X, Y_hatlow, 'r', alpha=0.9)
         plt.plot(X, Y_hathigh, 'r', alpha=0.9)
-
-    def setBollPlt(code, df, ptype='low'):
-        dt = tdd.get_duration_price_date(code, ptype=ptype, dt=start, df=df)
+        return status_n
+        
+    def setBollPlt(code, df, ptype='low',start=None,status=None):
+        if start is None:
+            dt = tdd.get_duration_price_date(code, ptype=ptype, dl=60, df=df)
+        else:
+            dt = tdd.get_duration_price_date(code, ptype=ptype, dt=start, df=df)    
         assetL = df[df.index >= dt][ptype]
+        if len(assetL) == 1:
+            mlist = twoLineCompute(code,df=df,start=start, ptype=ptype)
+            sp = mlist[0]
+            idx = df[df[ptype] == sp ].index.values[-1]
+            print "New %s !!! start:%s"%(ptype,idx)
+            assetL = df[df.index >= idx][ptype]
+            dt = idx
+            # return False
         # if ptype == 'high':
         # xaxisInit = len(df[df.index > dt])
         # else:
         # xaxisInit = len(df[df.index < dt])
         xaxisInit = len(df[df.index < dt])
-        setRegLinearPlt(assetL, xaxis=xaxisInit)
+        setRegLinearPlt(assetL, xaxis=xaxisInit,status=status)
         op, ra, st, days = get_linear_model_status(
             code, df=df[df.index >= dt], start=dt)
         print "%s op:%s ra:%s days:%s  start:%s" % (code, op, str(ra), str(days), st)
 
-    setRegLinearPlt(asset)
+    status=setRegLinearPlt(asset)
     if filter == 'n':
-        setBollPlt(code, df, 'low')
-        setBollPlt(code, df, 'high')
+        setBollPlt(code, df, 'low',start,status=status)
+        setBollPlt(code, df, 'high',start,status=status)
+        # pass
     # eval("df.%s"%ptype).ewm(span=20).mean().plot(style='k')
     eval("df.%s" % 'close').plot(style='k')
     pd.rolling_mean(df.high, window=10).plot(style='b')
@@ -544,35 +608,38 @@ def get_linear_model_candles(code, ptype='low', dtype='d', start=None, end=None,
     plt.title(code + " | " + str(dates[-1])[:11], fontsize=14)
     fib = cct.getFibonacci(len(asset) * 5, len(asset))
     plt.legend([asset.iat[-1], "day:%s" %
-                len(asset), "fib:%s" % (fib)], fontsize=12)
+                len(asset), "fib:%s" % (fib)], fontsize=12,loc=8)
     plt.grid(True)
     if filter == 'n':
 
         for type in ['high', 'low']:
             dt = tdd.get_duration_price_date(code, ptype=type, dt=start, df=df)
-            mlist = twoLineCompute(code, start=dt, ptype=type)
+            mlist = twoLineCompute(code,df=df,start=dt, ptype=type)
             if len(mlist) > 1:
+                log.info("mlist:%s"%mlist)
                 sa = mlist[0]
                 sb = mlist[-1]
                 X = np.arange(len(df))
-                aid = df[df[type] == sa].index.values[0][:10]
+                aid = df[df[type] == sa].index.values[-1][:10]
                 ida = len(df[df.index <= aid])
                 aX = X[ida - 1]
 
-                bid = df[df[type] == sb].index.values[0][:10]
+                bid = df[df[type] == sb].index.values[-1][:10]
+                # print df[df[type] == sb].index.values
                 idb = len(df[df.index <= bid])
                 bX = X[idb - 1]
                 if sa < sb:
-                    print "Gold Line"
+                    # print "Gold Line"
                     Xa = X[ida - 1:]
+                    Xb = Xa - ida
                     # sb=(bX - aX)*b + sa
                     b = (sb - sa) / (bX - aX)
-                    Yhat = Xa * b + sa
+                    Yhat = Xb * b + sa
 
                 else:
-                    print "Down Line"
+                    # print "Down Line"
                     # Xa=X[ida:idb - 1]
-                    Xa = X[ida:]
+                    Xa = X[ida - 1:]
                     Xb = Xa - ida
                     # sb=(bX - aX)*b+sa 
                     b = (sb - sa) / (bX - aX)
@@ -585,7 +652,8 @@ def get_linear_model_candles(code, ptype='low', dtype='d', start=None, end=None,
                         else:
                             break
                     Xa = Xa[:len(Yhat)]
-                print aX, sa, bX, sb
+                log.info("aX:%s sa:%s bx:%s sb:%s"%(aX, sa, bX, sb))
+                log.info("Xa:%s Yhat"%(Xa[:1]))
                 # print Yhat
                 # Yhat = X*b+a
                 # ax.plot([aX,bX],[sa,sb],'k--')
@@ -666,6 +734,7 @@ def maintest(code, start=None, type='m', filter='y'):
 
 if __name__ == "__main__":
     parser = parseArgmain()
+    parser.print_help()
     while 1:
         try:
             # log.setLevel(LoggerFactory.INFO)
@@ -689,6 +758,8 @@ if __name__ == "__main__":
                 # print "%0.5f"%(time.time()-ts)
             elif code == 'q':
                 sys.exit(0)
+            elif code == 'h' or code == 'help':
+                parser.print_help()
             else:
                 print "code error"
         except (KeyboardInterrupt) as e:

@@ -832,6 +832,8 @@ if __name__ == "__main__":
                 if num_input == 'ex' or num_input == 'qu' \
                         or num_input == 'q' or num_input == "e":
                     sys.exit(0)
+                elif num_input == 'h' or num_input == 'help':
+                    parser.print_help()
                 elif len(num_input) == 6:
                     code = args.code
                     # print code, args.ptype, args.dtype, start, end

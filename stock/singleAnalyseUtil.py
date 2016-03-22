@@ -219,71 +219,26 @@ def get_today_tick_ave(code, ave=None):
 
 
 def f_print(lens, datastr):
-    data = ('{0:%s}' % (lens)).format(str(datastr))
+    # if lens < len(str(datastr)):
+        # log.warn("str:%s f_print:%s %s"%(datastr,lens,len(str(datastr))))
+    lenf = '{0:>%s}' % (lens)
+    data = lenf.format(datastr)
     return data
 
-    allTop = pd.DataFrame()
-    for market in ct.SINA_Market_KEY:
-        df = rd.get_sina_Market_json(market, False)
-        # count=len(df.index)
-        # print df[:1]
-        top = df[df['percent'] > changepercent]['code']
-        topTen = df[df['percent'] > 9.9]['code']
-        crashTen = df[df['percent'] < -9.8]['code']
-        crash = df[df['percent'] < -changepercent]['code']
-        # top=df[ df['changepercent'] <6]
-
-        print(
-            "%s topT: %s top>%s: %s " % (
-                f_print(4, market), f_print(3, len(topTen)), changepercent, f_print(4, len(top)))),
-        url = ct.DFCFW_FUND_FLOW_URL % ct.SINA_Market_KEY_TO_DFCFW[market]
-        log.debug("ffurl:%s" % url)
-        ff = ffu.get_dfcfw_fund_flow(url)
-        if len(ff) > 0:
-            zlr = float(ff['zlr'])
-            zzb = float(ff['zzb'])
-            # zt=str(ff['time'])
-            print(u"crashT:%s crash<-%s:%s 流入: %0.1f亿 比: %0.1f%%" % (
-                f_print(4, len(crashTen)), changepercent, f_print(4, len(crash)), zlr, zzb))
-        else:
-            print(u"crashT:%s crash<-%s:%s 流入: %0.1f亿 比: %0.1f%% %s" % (
-                f_print(4, len(crashTen)), changepercent, f_print(4, len(crash))))
-
-        allTop = allTop.append(df, ignore_index=True)
-
-    df = allTop
-    count = len(df.index)
-    top = df[df['percent'] > changepercent]['code']
-    topTen = df[df['percent'] > 9.9]['code']
-    crashTen = df[df['percent'] < -9.8]['code']
-    crash = df[df['percent'] < -changepercent]['code']
-    print(
-        u"\t\tA:%s topT:%s top>%s:%s" % (
-            f_print(4, count), f_print(3, len(topTen)), changepercent, f_print(4, len(top)))),
-    ff = ffu.get_dfcfw_fund_flow(ct.DFCFW_FUND_FLOW_ALL)
-    if len(ff) > 0:
-        zlr = float(ff['zlr'])
-        zzb = float(ff['zzb'])
-        zt = str(ff['time'])
-        print(u"crashT:%s crash<-%s:%s 流入: %0.1f亿 占比: %0.1f%% %s" % (
-            f_print(3, len(crashTen)), changepercent, f_print(4, (len(crash))), zlr, zzb, zt))
+def getFibonacci(code,dl=60,start=None):
+    fibl=[]
+    if not isinstance(code,list):
+        codes = [code]
     else:
-        print(u"crashT:%s crash<-%s:%s" %
-              (f_print(3, len(crashTen)), changepercent, f_print(4, len(crash))))
-    return allTop
-
-def getFibonacci(code):
-    op, ra, st, days = pct.get_linear_model_status(code, filter='y',dl=60)
-    fib=cct.getFibonacci(300,days)
-    # fib = 0
-    # for x in fibl:
-        # if days < x:
-            # fib = x
-            # break
-            
-    print "\t\t\t\t\t%s op:%s ra:%s days:%s fib:%s start:%s" % (code, op, str(ra) ,(days),fib, st)
-    
-def get_hot_countNew(changepercent, rzrq):
+        codes = code
+    for code in codes:
+        for ptype in ['low','high']:
+            op, ra, st, days = pct.get_linear_model_status(code, filter='y',dl=dl,ptype=ptype)
+            fib=cct.getFibonacci(300,days)            
+            # print "%s op:%s ra:%s days:%s fib:%s %s" % (code, op, ra,days,fib, st)
+            fibl.append([code, op, ra,days,fib,st])
+    return fibl
+def get_hot_countNew(changepercent, rzrq,fibl=None):
     allTop = pd.DataFrame()
     for market in ct.SINA_Market_KEY:
         df = rd.get_sina_Market_json(market, False)
@@ -371,8 +326,17 @@ def get_hot_countNew(changepercent, rzrq):
             szpcent, f_print(4, rzrq['all']), f_print(5, rzrq['diff'])))
     bigcount = rd.getconfigBigCount()
     # print bigcount
-    getFibonacci('999999')
-    getFibonacci('399001') 
+    if fibl is not None:
+        int=0
+        for f in fibl:
+            code, op, ra,days,fib, st = f[0],f[1],f[2],f[3],f[4],f[5]
+            int +=1
+            if int%2 != 0:
+                print "\t%s op:%s ra:%s days:%s fib:%s %s" % (code, f_print(3,op),f_print(5,ra),f_print(2,days),f_print(3,fib), st),
+            else:
+                print "%s op:%s ra:%s days:%s fib:%s" % (st,f_print(3,op), f_print(5,ra),f_print(2,days),f_print(3,fib))
+                
+            
     cct.set_console(
         title=['B:%s-%s V:%s' % (bigcount[0], bigcount[2], bigcount[1]), 'ZL: %s' % (zlr if len(ff) > 0 else 0),
                'To:%s' % len(topTen), 'D:%s' % len(
@@ -438,12 +402,16 @@ if __name__ == '__main__':
     days = '10'
     success = 0
     rzrq = ffu.get_dfcfw_rzrq_SHSZ()
+    dl=30
+    fibl = getFibonacci(['999999','399001','399006'],dl=dl) 
     while 1:
         try:
             if not status:
                 if len(rzrq) == 0:
                     rzrq = ffu.get_dfcfw_rzrq_SHSZ()
-                get_hot_countNew(3, rzrq)
+                if len(fibl) == 0:
+                    fibl = getFibonacci(['999999','399001'],dl=dl) 
+                get_hot_countNew(3, rzrq,fibl)
             if status:
                 # status=True
                 if not num_input:
