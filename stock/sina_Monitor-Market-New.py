@@ -80,6 +80,8 @@ if __name__ == "__main__":
                 # if len(top_now) > 10 and len(top_now[:20][top_now[:20]['buy'] > 0]) > 3:
                 # if len(top_now) > 10 and not top_now[:1].buy.values == 0:
                 #     top_now=top_now[top_now['percent']>=0]
+                top_now['buy'] = (
+                    map(lambda x, y: y if int(x) == 0 else x, top_now['buy'].values, top_now['trade'].values))
                 if len(top_all) == 0:
                     top_all = top_now
                     # top_all['llow'] = 0
@@ -192,8 +194,6 @@ if __name__ == "__main__":
                         map(lambda x, y: round((x - y) / y * 100, 1), top_all['buy'].values, top_all['lastp'].values))
 
                 top_dif = top_all
-                top_dif['buy'] = (
-                    map(lambda x, y: y if int(x) == 0 else x, top_dif['buy'].values, top_dif['trade'].values))
                 log.info('dif1:%s' % len(top_dif))
                 top_dif=top_dif[top_dif.lvol > ct.LvolumeSize]
                 top_dif = top_dif[top_dif.buy > top_dif.lastp]

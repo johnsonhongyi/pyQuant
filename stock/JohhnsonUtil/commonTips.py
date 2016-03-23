@@ -46,7 +46,6 @@ def isMac():
     else:
         return False
 
-
 def set_ctrl_handler():
     # os.environ['FOR_DISABLE_CONSOLE_CTRL_HANDLER'] = '1'
     import win32api,thread
@@ -621,7 +620,7 @@ def getFibonacci(num,days=None):
     else:
         fib = days
         for x in res:
-            if days < x:
+            if days <= x:
                 fib = x
                 break
         return fib

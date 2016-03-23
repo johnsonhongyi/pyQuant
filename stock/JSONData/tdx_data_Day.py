@@ -255,25 +255,16 @@ def get_tdx_append_now_df_api(code, start=None, end=None, type='f'):
     df = get_tdx_Exp_day_to_df(code, type, start, end).sort_index(ascending=True)
     # print df.index.values[:1],df.index.values[-1:]
     today = cct.get_today()
-    if end is not None:
-        # print end,df.index[-1]
-        if len(df)==0:
-            return df
-        if end < df.index[-1]:
-            print(end, df.index[-1])
-            return df
-        else:
-            today = end
-            # return df
             
     if len(df) > 0:
         tdx_last_day = df.index[-1]
     else:
-        tdx_last_day = start
+        tdx_last_day = start            
     duration = cct.get_today_duration(tdx_last_day)
     log.debug("duration:%s"%duration)
     log.debug("tdx_last_day:%s" % tdx_last_day)
     index_status = False
+    code_t=None
     if code == '999999':
         code = 'sh'
         index_status = True
@@ -282,8 +273,18 @@ def get_tdx_append_now_df_api(code, start=None, end=None, type='f'):
         for k in INDEX_LIST.keys():
             if INDEX_LIST[k].find(code) > 0:
                 code = k
-
     log.debug("duration:%s" % duration)
+    if end is not None:
+        # print end,df.index[-1]
+        if len(df)==0:
+            return df
+        if end <= df.index[-1]:
+            # print(end, df.index[-1])
+            # return df
+            duration = 0
+        else:
+            today = end
+
     if duration >= 1:
         if index_status:
             code_t = INDEX_LIST[code][2:]
@@ -318,50 +319,57 @@ def get_tdx_append_now_df_api(code, start=None, end=None, type='f'):
             df = df.append(ds)
             # pd.concat([df,ds],axis=0, join='outer')
             # result=pd.concat([df,ds])
-        
-        if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 1500:
+
+        if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 1530:
             log.debug("get_work_time:work")
-            # dm = rl.get_sina_Market_json('all').set_index('code')
-            if index_status:
-                log.debug("code:%s code_t:%s"%(code,code_t))
-                dm = sina_data.Sina().get_stock_code_data(code_t,index=index_status)
-                dm.code = code
-                dm = dm.set_index('code')
-            else:
-                dm = sina_data.Sina().get_stock_code_data(code,index=index_status).set_index('code')
-            log.debug("dm:%s now:%s"%(len(dm),dm))
-            if dm is not None and not dm.empty:
-                # dm=dm.drop_duplicates()
-                # log.debug("not None dm:%s" % dm[-1:])
-                dm.rename(columns={'volume': 'amount', 'turnover': 'vol'}, inplace=True)
-                c_name=dm.loc[code,['name']].values[0]
-                dm_code = (dm.loc[:, ['open', 'high', 'low', 'close', 'amount','vol']])
-                log.debug("dm_code:%s" % dm_code)
-                dm_code['amount'] = round(float(dm_code['amount']) / 100, 2)
-                dm_code['code'] = code
-                # dm_code['vol'] = 0
-                dm_code['date']=today
-                dm_code = dm_code.set_index('date')
-                # dm_code.name = today
-                log.debug("dm_code_index:%s"%(dm_code))
-                df = df.append(dm_code)
-                df['name']=c_name
-                log.debug("c_name:%s df.name:%s"%(c_name,df.name[-1]))
-                # log.debug("df[-3:]:%s" % (df[-2:]))
-                # df['name'] = dm.loc[code, 'name']
+            if end is None:     
+                # dm = rl.get_sina_Market_json('all').set_index('code')
+                if index_status:
+                    log.debug("code:%s code_t:%s"%(code,code_t))
+                    dm = sina_data.Sina().get_stock_code_data(code_t,index=index_status)
+                    dm.code = code
+                    dm = dm.set_index('code')
+                else:
+                    dm = sina_data.Sina().get_stock_code_data(code,index=index_status).set_index('code')
+                log.debug("dm:%s now:%s"%(len(dm),dm))
+                if dm is not None and not dm.empty:
+                    # dm=dm.drop_duplicates()
+                    # log.debug("not None dm:%s" % dm[-1:])
+                    dm.rename(columns={'volume': 'amount', 'turnover': 'vol'}, inplace=True)
+                    c_name=dm.loc[code,['name']].values[0]
+                    dm_code = (dm.loc[:, ['open', 'high', 'low', 'close', 'amount','vol']])
+                    log.debug("dm_code:%s" % dm_code)
+                    dm_code['amount'] = round(float(dm_code['amount']) / 100, 2)
+                    dm_code['code'] = code
+                    # dm_code['vol'] = 0
+                    dm_code['date']=today
+                    dm_code = dm_code.set_index('date')
+                    # dm_code.name = today
+                    # log.debug("dm_code_index:%s"%(dm_code))
+                    log.debug("df.open:%s dm.open%s"%(df.open[-1],round(dm.open[-1],2)))
+                    
+                    if df.open[-1] != round(dm.open[-1],2):
+                        df = df.append(dm_code)
+                    df['name']=c_name
+                    log.debug("c_name:%s df.name:%s"%(c_name,df.name[-1]))
+                    # log.debug("df[-3:]:%s" % (df[-2:]))
+                    # df['name'] = dm.loc[code, 'name']
+                    
+    if not 'name' in df.columns:
+        if index_status:
+            if code_t is None:
+                code_t = INDEX_LIST[code][2:]
+            log.debug("code:%s code_t:%s"%(code,code_t))
+            dm = sina_data.Sina().get_stock_code_data(code_t,index=index_status)
+            dm.code = code
+            dm = dm.set_index('code')
         else:
-            if index_status:
-                log.debug("code:%s code_t:%s"%(code,code_t))
-                dm = sina_data.Sina().get_stock_code_data(code_t,index=index_status)
-                dm.code = code
-                dm = dm.set_index('code')
-            else:
-                dm = sina_data.Sina().get_stock_code_data(code,index=index_status).set_index('code')
-            log.debug("dm:%s now:%s"%(len(dm),dm))
-            if dm is not None and not dm.empty:
-                c_name=dm.loc[code,['name']].values[0]
-                df['name']=c_name
-                log.debug("c_name:%s df.name:%s"%(c_name,df.name[-1:]))
+            dm = sina_data.Sina().get_stock_code_data(code,index=index_status).set_index('code')
+        log.debug("dm:%s now:%s"%(len(dm),dm))
+        if dm is not None and not dm.empty:
+            c_name=dm.loc[code,['name']].values[0]
+            df['name']=c_name
+            log.debug("c_name:%s df.name:%s"%(c_name,df.name[-1:]))
         log.debug("df:%s" % df[-3:])
         # print df
     return df
@@ -1157,6 +1165,7 @@ def main_test():
 if __name__ == '__main__':
     import sys
     import timeit
+    print sina_data.Sina().get_stock_code_data('300006').set_index('code')
     print get_duration_price_date('999999',dl=30)
     print get_duration_price_date('999999',ptype='high',dt='2015-01-01')
     print get_duration_price_date('999999',ptype='low',dt='2015-01-01')
@@ -1172,7 +1181,6 @@ if __name__ == '__main__':
     print df[-2:]
     '''
     '''
-    # print sina_data.Sina().get_stock_code_data('300006').set_index('code')
     # df = get_tdx_exp_low_or_high_price('600000', dt='20160304')
     # df,inx = get_duration_price_date('600000',dt='20160301',filter=False)
     df = get_tdx_append_now_df_api('300502',start='2016-03-03')

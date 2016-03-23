@@ -7,14 +7,14 @@ import numpy as np
 import pandas as pd
 import statsmodels.api as sm
 from statsmodels import regression
-from pylab import plt
+from pylab import plt, mpl
 from matplotlib.dates import num2date, date2num
 from matplotlib.lines import Line2D
 from matplotlib.patches import Rectangle
 import datetime
 from JohhnsonUtil import LoggerFactory as LoggerFactory
 from JohhnsonUtil import commonTips as cct
-
+from JohhnsonUtil import zoompan
 log = LoggerFactory.getLogger("PowerCompute")
 # log.setLevel(LoggerFactory.INFO)
 from JSONData import tdx_data_Day as tdd
@@ -41,7 +41,13 @@ if not cct.isMac():
 
     set_ctrl_handler()
 
-
+if cct.isMac():
+    mpl.rcParams['font.sans-serif'] = ['STHeiti']
+    mpl.rcParams['axes.unicode_minus'] = False
+else:
+    mpl.rcParams['font.sans-serif'] = ['SimHei']
+    mpl.rcParams['axes.unicode_minus'] = False
+    
 # import signal
 # def signal_handler(sig, frame):
 #     print('Received signal {signal}'.format(signal=sig))
@@ -135,15 +141,15 @@ def Candlestick(ax, bars=None, quotes=None, width=0.5, colorup='k', colordown='r
         ax.autoscale_view()
 
         return lines, boxes
-
     date = date2num(bars.index.to_datetime().to_pydatetime())
     openp = bars['open']
     closep = bars['close']
     highp = bars['high']
     lowp = bars['low']
     # volume = bars['volume']
+    # data = np.array([[1.0, 1.0, 1.0, 1.0, 1.0]])
     data = np.array([[1.0, 1.0, 1.0, 1.0, 1.0]])
-    for i in range(len(bars) - 1):
+    for i in range(len(bars)):
         data = np.append(
             data, [[date[i], openp[i], highp[i], lowp[i], closep[i], ]], axis=0)
     data = np.delete(data, 0, 0)
@@ -157,6 +163,7 @@ def Candlestick(ax, bars=None, quotes=None, width=0.5, colorup='k', colordown='r
     # this will allow to remove the gap between the days, when plotting the
     # data
     data2 = np.hstack([np.arange(data[:, 0].size)[:, np.newaxis], data[:, 1:]])
+    # print len(bars),len(date),len(data),len(data2)
     # print data2
     # plot the data
     # figWidth = len(data) * width
@@ -202,8 +209,8 @@ def Candlestick(ax, bars=None, quotes=None, width=0.5, colorup='k', colordown='r
     # ax.set_xticklabels(new_xticks, rotation=30, horizontalalignment='right')
 
     # fig.autofmt_xdate()
-    # ax.autoscale_view()
-    # Create the candle sticks
+    ax.autoscale_view()
+    # Create the candle sticks    
     fooCandlestick(ax, data2, width=width, colorup='r', colordown='g')
 
 
@@ -289,8 +296,11 @@ def get_linear_model_status(code, df=None, dtype='d', type='m', start=None, end=
     if dl is not None:
         start, index_d = tdd.get_duration_price_date(
             code, ptype=ptype, dl=dl, filter=False)
+        # start = tdd.get_duration_date(
+            # code, ptype=ptype, dl=dl)
         # start = tdd.get_duration_price_date(code,ptype='low',dl=dl)
         # filter = 'y'
+        # print start,ptype
 
     if df is None:
         if start is not None and len(start) > 8 and int(start[:4]) > 2500:
@@ -300,7 +310,9 @@ def get_linear_model_status(code, df=None, dtype='d', type='m', start=None, end=
         df = tdd.get_tdx_append_now_df_api(
             code, start, end).sort_index(ascending=True)
         # if (start is not None or dl is not None) and filter=='y':
-        start=df.index.values[0]
+        # print "code:",start
+        if start is None:
+            start=df.index.values[0]
         if len(df) > 2 and dl is None and start is not None and filter == 'y':
             # print df.index.values[0],index_d
             # print "df:%s code:%s"%(len(df),code)
@@ -534,7 +546,6 @@ def get_linear_model_candles(code, ptype='low', dtype='d', start=None, end=None,
     plt.subplots_adjust(left=0.05, bottom=0.08, right=0.95,
                         top=0.95, wspace=0.15, hspace=0.25)
     ax = fig.add_subplot(111)
-
     Candlestick(ax, df)
 
     # print len(df),len(asset)
@@ -570,6 +581,28 @@ def get_linear_model_candles(code, ptype='low', dtype='d', start=None, end=None,
         plt.plot(X, Y_hat, 'k', alpha=0.9)
         plt.plot(X, Y_hatlow, 'r', alpha=0.9)
         plt.plot(X, Y_hathigh, 'r', alpha=0.9)
+        # print 'hat:%0.2f'%(Y_hat[-1])
+        if status_n:
+            directionX = 0.8
+            directionY = 0.9
+            directColor = 'r'
+        else:
+            directionX = 0.8
+            directionY = 0.1
+            # directColor = 'cyan' m 
+            directColor = 'g'
+        plt.annotate('Hat:%0.2f'%(Y_hat[-1]),(X[-1],Y_hat[-1]),
+            # xytext=(0.8, 0.9),
+            xytext=(directionX, directionY),
+            textcoords='axes fraction',
+            # arrowprops=dict(facecolor='white', shrink=0.05),
+            # xytext=(directionX,directionY),
+            # textcoords='offset points',
+            # arrowprops=dict(arrowstyle="->"),
+            arrowprops=dict(facecolor=directColor, shrink=0.02),
+            fontsize=14, color = directColor,
+            horizontalalignment='right', verticalalignment='bottom')
+        
         return status_n
         
     def setBollPlt(code, df, ptype='low',start=None,status=None):
@@ -591,6 +624,7 @@ def get_linear_model_candles(code, ptype='low', dtype='d', start=None, end=None,
         # else:
         # xaxisInit = len(df[df.index < dt])
         xaxisInit = len(df[df.index < dt])
+        # print assertL[-1],assert[0]
         setRegLinearPlt(assetL, xaxis=xaxisInit,status=status)
         op, ra, st, days = get_linear_model_status(
             code, df=df[df.index >= dt], start=dt)
@@ -603,35 +637,43 @@ def get_linear_model_candles(code, ptype='low', dtype='d', start=None, end=None,
         # pass
     # eval("df.%s"%ptype).ewm(span=20).mean().plot(style='k')
     eval("df.%s" % 'close').plot(style='k')
-    pd.rolling_mean(df.high, window=10).plot(style='b')
+    roll_mean = pd.rolling_mean(df.high, window=10)
+    plt.plot(roll_mean,'b')
+    # print roll_mean[-1]
+    # plt.legend(["MA:10"+str(roll_mean[-1]], fontsize=12,loc=2)
+    
     plt.ylabel('Price', fontsize=12)
-    plt.title(code + " | " + str(dates[-1])[:11], fontsize=14)
+    if 'name' in df.columns:
+        plt.title(df.name.values[-1:][0]+ " " + code + " | " + str(dates[-1])[:11]+" | "+"MA:%0.2f"%(roll_mean[-1]), fontsize=12)
+    else:
+        plt.title(code + " | " + str(dates[-1])[:11]+" | "+"MA:%0.2f"%(roll_mean[-1]), fontsize=12)
+    # plt.title(code + " | " + str(dates[-1])[:11], fontsize=14)
     fib = cct.getFibonacci(len(asset) * 5, len(asset))
-    plt.legend([asset.iat[-1], "day:%s" %
+    plt.legend(["%0.2f"%(asset.iat[-1]), "day:%s" %
                 len(asset), "fib:%s" % (fib)], fontsize=12,loc=8)
     plt.grid(True)
-    if filter == 'n':
+    if filter:
 
         for type in ['high', 'low']:
             dt = tdd.get_duration_price_date(code, ptype=type, dt=start, df=df)
             mlist = twoLineCompute(code,df=df,start=dt, ptype=type)
             if len(mlist) > 1:
                 log.info("mlist:%s"%mlist)
-                sa = mlist[0]
-                sb = mlist[-1]
+                sa = round(mlist[0],2)
+                sb = round(mlist[-1],2)
                 X = np.arange(len(df))
                 aid = df[df[type] == sa].index.values[-1][:10]
                 ida = len(df[df.index <= aid])
-                aX = X[ida - 1]
+                aX = X[ida-1]
 
                 bid = df[df[type] == sb].index.values[-1][:10]
                 # print df[df[type] == sb].index.values
                 idb = len(df[df.index <= bid])
-                bX = X[idb - 1]
+                bX = X[idb-1]
                 if sa < sb:
                     # print "Gold Line"
                     Xa = X[ida - 1:]
-                    Xb = Xa - ida
+                    Xb = Xa - Xa[0]
                     # sb=(bX - aX)*b + sa
                     b = (sb - sa) / (bX - aX)
                     Yhat = Xb * b + sa
@@ -639,8 +681,8 @@ def get_linear_model_candles(code, ptype='low', dtype='d', start=None, end=None,
                 else:
                     # print "Down Line"
                     # Xa=X[ida:idb - 1]
-                    Xa = X[ida - 1:]
-                    Xb = Xa - ida
+                    Xa = X[ida - 1 :]
+                    Xb = Xa - Xa[0]
                     # sb=(bX - aX)*b+sa 
                     b = (sb - sa) / (bX - aX)
                     Ylist = Xb * b + sa
@@ -654,9 +696,8 @@ def get_linear_model_candles(code, ptype='low', dtype='d', start=None, end=None,
                     Xa = Xa[:len(Yhat)]
                 log.info("aX:%s sa:%s bx:%s sb:%s"%(aX, sa, bX, sb))
                 log.info("Xa:%s Yhat"%(Xa[:1]))
-                # print Yhat
-                # Yhat = X*b+a
                 # ax.plot([aX,bX],[sa,sb],'k--')
+                # print Yhat[0],Yhat[-1],sa,sb,Xa[0],ida,Xb[0]
                 ax.plot(Xa, Yhat, 'k--')
 
             else:
@@ -667,9 +708,9 @@ def get_linear_model_candles(code, ptype='low', dtype='d', start=None, end=None,
     # fig=plt.fig()
     # fig.figsize = [14,8]
     # scale = 1.1
-    # zp = zoompan.ZoomPan()
-    # figZoom = zp.zoom_factory(ax, base_scale=scale)
-    # figPan = zp.pan_factory(ax)
+    zp = zoompan.ZoomPan()
+    figZoom = zp.zoom_factory(ax, base_scale=1.1)
+    figPan = zp.pan_factory(ax)
     plt.xticks(rotation=30, ha='right')
     # plt.setp( axs[1].xaxis.get_majorticklabels(), rotation=70 )
     plt.show(block=False)
@@ -733,6 +774,9 @@ def maintest(code, start=None, type='m', filter='y'):
 
 
 if __name__ == "__main__":
+    # print get_linear_model_status('399001', filter='y',dl=30,ptype='low')
+    # print get_linear_model_status('399001', filter='y',dl=30,ptype='high')
+    # sys.exit()
     parser = parseArgmain()
     parser.print_help()
     while 1:
@@ -749,9 +793,9 @@ if __name__ == "__main__":
                 # print "code:%s op:%s ra:%s  start:%s" % (code, op, ra, st)
                 get_linear_model_candles(args.code, dtype=args.dtype, start=cct.day8_to_day10(
                     args.start), end=cct.day8_to_day10(args.end), ptype=args.ptype, filter=args.filter)
-                op, ra, st, days = get_linear_model_status(args.code, dtype=args.dtype, start=cct.day8_to_day10(
-                    args.start), end=cct.day8_to_day10(args.end), filter=args.filter, dl=args.dl)
-                print "code:%s op:%s ra/days:%s  start:%s" % (code, op, str(ra) + '/' + str(days), st)
+                # op, ra, st, days = get_linear_model_status(args.code, dtype=args.dtype, start=cct.day8_to_day10(
+                    # args.start), end=cct.day8_to_day10(args.end), filter=args.filter, dl=args.dl)
+                # print "code:%s op:%s ra/days:%s  start:%s" % (code, op, str(ra) + '/' + str(days), st)
                 cct.sleep(0.1)
                 # ts=time.time()
                 # time.sleep(5)
