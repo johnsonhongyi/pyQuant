@@ -599,7 +599,7 @@ def get_linear_model_candles(code, ptype='low', dtype='d', start=None, end=None,
             # xytext=(directionX,directionY),
             # textcoords='offset points',
             # arrowprops=dict(arrowstyle="->"),
-            arrowprops=dict(facecolor=directColor, shrink=0.02),
+            arrowprops=dict(facecolor=directColor, shrink=0.02,headwidth=5,width=1),
             fontsize=14, color = directColor,
             horizontalalignment='right', verticalalignment='bottom')
         
