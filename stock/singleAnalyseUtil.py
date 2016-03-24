@@ -30,6 +30,8 @@ except ImportError:
 #     today = TODAY.strftime('%Y-%m-%d')
 #     return today
 
+global fibcount
+fibcount = 0
 
 def time_sleep(timemin):
     time1 = time.time()
@@ -238,7 +240,25 @@ def getFibonacci(code,dl=60,start=None):
             # print "%s op:%s ra:%s days:%s fib:%s %s" % (code, op, ra,days,fib, st)
             fibl.append([code, op, ra,days,fib,st])
     return fibl
-def get_hot_countNew(changepercent, rzrq,fibl=None):
+def get_hot_countNew(changepercent, rzrq,fibl=None,fibc=10):
+    global fibcount
+    if fibcount == 0 or fibcount >= fibc:
+        if fibcount >= fibc:
+            fibcount = 1
+        else:
+            fibcount += 1 
+        if fibl is not None:
+            int=0
+            for f in fibl:
+                code, op, ra,days,fib, st = f[0],f[1],f[2],f[3],f[4],f[5]
+                int +=1
+                if int%2 != 0:
+                    print "%s op:%s ra:%s days:%s fib:%s %s" % (code, f_print(3,op),f_print(5,ra),f_print(2,days),f_print(3,fib), st),
+                else:
+                    print "%s op:%s ra:%s days:%s fib:%s" % (st,f_print(3,op), f_print(5,ra),f_print(2,days),f_print(3,fib))
+       
+    else:
+        fibcount += 1
     allTop = pd.DataFrame()
     for market in ct.SINA_Market_KEY:
         df = rd.get_sina_Market_json(market, False)
@@ -326,16 +346,7 @@ def get_hot_countNew(changepercent, rzrq,fibl=None):
             szpcent, f_print(4, rzrq['all']), f_print(5, rzrq['diff'])))
     bigcount = rd.getconfigBigCount()
     # print bigcount
-    if fibl is not None:
-        int=0
-        for f in fibl:
-            code, op, ra,days,fib, st = f[0],f[1],f[2],f[3],f[4],f[5]
-            int +=1
-            if int%2 != 0:
-                print "\t%s op:%s ra:%s days:%s fib:%s %s" % (code, f_print(3,op),f_print(5,ra),f_print(2,days),f_print(3,fib), st),
-            else:
-                print "%s op:%s ra:%s days:%s fib:%s" % (st,f_print(3,op), f_print(5,ra),f_print(2,days),f_print(3,fib))
-                
+        
             
     cct.set_console(
         title=['B:%s-%s V:%s' % (bigcount[0], bigcount[2], bigcount[1]), 'ZL: %s' % (zlr if len(ff) > 0 else 0),
@@ -403,15 +414,16 @@ if __name__ == '__main__':
     success = 0
     rzrq = ffu.get_dfcfw_rzrq_SHSZ()
     dl=30
+    fibc = 10
     fibl = getFibonacci(['999999','399001','399006'],dl=dl) 
     while 1:
         try:
             if not status:
                 if len(rzrq) == 0:
                     rzrq = ffu.get_dfcfw_rzrq_SHSZ()
-                if len(fibl) == 0:
+                if len(fibl) == 0 or fibcount >fibc:
                     fibl = getFibonacci(['999999','399001'],dl=dl) 
-                get_hot_countNew(3, rzrq,fibl)
+                get_hot_countNew(3, rzrq,fibl,fibc)
             if status:
                 # status=True
                 if not num_input:

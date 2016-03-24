@@ -108,8 +108,9 @@ if __name__ == "__main__":
                 # if len(top_now) > 10 or len(top_now[:10][top_now[:10]['buy'] > 0]) > 3:
                 # if len(top_now) > 10 and not top_now[:1].buy.values == 0:
                 #     top_now=top_now[top_now['percent']>=0]
-                top_now['buy'] = (
-                    map(lambda x, y: y if int(x) == 0 else x, top_now['buy'].values, top_now['trade'].values))
+                if 'trade' in top_now.columns:
+                    top_now['buy'] = (
+                        map(lambda x, y: y if int(x) == 0 else x, top_now['buy'].values, top_now['trade'].values))
                 if len(top_all) == 0:
                     top_all = top_now
                     # top_all['llow'] = 0
@@ -156,15 +157,16 @@ if __name__ == "__main__":
                 top_dif = top_all       
                 top_dif=top_dif[top_dif.lvol > ct.LvolumeSize]
                 # if top_dif[:1].llow.values <> 0:
-                if len(top_dif[:5][top_dif[:5]['low'] > 0]) > 3:
-                    log.debug('diff2-0-low>0')
+                if len(top_dif[:5][top_dif[:5]['buy'] > 0]) > 3:
+                    log.debug('diff2-0-buy>0')
                     # top_dif = top_dif[top_dif.low >= top_dif.llow]
                     # log.debug('diff2-1:%s' % len(top_dif))
                     # top_dif = top_dif[top_dif.low >= top_dif.lastp]
                     # log.debug('dif3 low<>0 :%s' % len(top_dif))
-                    top_dif = top_dif[top_dif.open > 0]
-                    top_dif = top_dif[top_dif.open >= top_dif.low * 0.995]
-                    top_dif = top_dif[top_dif.buy >= top_dif.lhigh * 0.995]
+                    # top_dif = top_dif[top_dif.open > 0]
+                    top_dif = top_dif[top_dif.buy >= top_dif.lastp * 0.995]
+                    if cct.get_now_time_int() > 915:                    
+                        top_dif = top_dif[top_dif.buy >= top_dif.lhigh * 0.995]
                     log.debug('dif4 open>low0.99:%s' % len(top_dif))
                     log.debug('dif4-2:%s' % top_dif[:1])
 
@@ -230,6 +232,8 @@ if __name__ == "__main__":
                 
                 top_temp = top_dif[:10].copy()
                 top_temp = pct.powerCompute_df(top_temp,dl='30')
+                if 'op' in top_temp.columns:
+                    top_temp = top_temp.sort_values(by=['op','diff', 'percent', 'ratio'], ascending=[0,0, 0, 1])
                 if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935:
                     top_temp = top_temp.loc[:,
                              ['name', 'buy', 'diff', 'op', 'ra', 'percent','volume', 'ratio', 'counts',

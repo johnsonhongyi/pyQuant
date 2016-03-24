@@ -57,7 +57,7 @@ if __name__ == "__main__":
     block_path = tdd.get_tdx_dir_blocknew() + blkname
     status_change = False
     lastpTDX_DF = pd.DataFrame()
-    duration_date = 20160229
+    duration_date = 20160301
     set_duration_console(duration_date)
     ptype = 'high'
     filter = 'y'
@@ -213,11 +213,12 @@ if __name__ == "__main__":
                     top_temp = pct.powerCompute_df(top_temp)
                     top_end = pct.powerCompute_df(top_end)
                 else:
-                    top_temp = top_dif[:5].copy()
-                    top_end = top_dif[-10:].copy()
+                    top_end = top_dif[:5].copy()
+                    top_temp = top_dif[-10:].copy()
                     top_temp = pct.powerCompute_df(top_temp, dl=30)
                     top_end = pct.powerCompute_df(top_end, dl=30)
 
+                top_temp = top_temp.sort_values(by=['op','diff', 'percent', 'ratio'], ascending=[0,0, 0, 1])                    
                 top_dd = pd.concat([top_temp, top_end], axis=0)
                 if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935:
                     top_dd = top_dd.loc[:,
@@ -299,9 +300,9 @@ if __name__ == "__main__":
                 elif len(dl) == 3:
                     dt = dl[1]
                     p_t = dl[2]
-                    if p_t == 'l':
+                    if p_t.startswith('l'):
                         ptype = 'low'
-                    elif p_t == 'h':
+                    elif p_t.startswith('h'):
                         ptype = 'high'
                     elif p_t == 'y':
                         filter = 'y'

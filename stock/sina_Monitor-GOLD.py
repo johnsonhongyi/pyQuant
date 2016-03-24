@@ -149,7 +149,7 @@ if __name__ == "__main__":
                         else:
                             top_all.append(top_now.loc[symbol])
 
-                top_bak = top_all
+                # top_bak = top_all
                 # top_all['buy'] = (
                     # map(lambda x, y: y if int(x) == 0 else x, top_all['buy'].values, top_all['trade'].values))
                 codelist = top_all.index.tolist()
@@ -176,8 +176,8 @@ if __name__ == "__main__":
                     log.debug("top_diff:vol")
                     top_all['volume'] = (
                         map(lambda x, y: round(x / y / radio_t, 1), top_all['volume'].values, top_all['lvol'].values))
-
-                    top_all = top_all[top_all.trade >= top_all.lastp]
+                    if cct.get_now_time_int() > 930:
+                        top_all = top_all[top_all.trade >= top_all.lastp]
                     top_all = top_all.loc[:,
                               ['name', 'percent', 'diff', 'counts', 'volume', 'trade', 'prev_p', 'ratio']]
 
@@ -199,7 +199,8 @@ if __name__ == "__main__":
                 # print top_all[:10]
                 
                 top_temp = top_all[:30].copy()
-                top_temp = pct.powerCompute_df(top_temp,dl='30')            
+                top_temp = pct.powerCompute_df(top_temp,dl='30')
+                top_temp = top_temp.sort_values(by=['op','diff', 'percent', 'ratio'], ascending=[0,0, 0, 1])                
                 if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935:
                     top_temp = top_temp.loc[:,
                              ['name', 'trade', 'diff', 'op', 'ra', 'percent','volume', 'ratio', 'counts',

@@ -324,7 +324,7 @@ def get_linear_model_status(code, df=None, dtype='d', type='m', start=None, end=
 
     # df = tdd.get_tdx_Exp_day_to_df(code, 'f').sort_index(ascending=True)
 
-    def get_linear_model_ratio(asset, type='M'):
+    def get_linear_model_ratio(asset, type='M',nowP=None):
         duration = asset[-1:].index.values[0]
         log.debug("duration:%s" % duration)
         log.debug("duration:%s" % cct.get_today_duration(duration))
@@ -350,10 +350,6 @@ def get_linear_model_status(code, df=None, dtype='d', type='m', start=None, end=
         operation = 0
         log.debug("line_now:%s src:%s" % (Y_hat[-1], Y_hat[0]))
         if Y_hat[-1] > Y_hat[0]:
-            # log.debug("u-Y_hat[-1]:%0.1f" % (Y_hat[-1]))
-            # log.debug("price:%0.1f" % asset.iat[-1])
-            # log.debug("u:%0.1f" % Y_hat[0])
-            # log.debug("price:%0.1f" % asset.iat[0])
             if type.upper() == 'M':
                 Y_Future = X * b + a
                 # Y_Future = Y * b + a
@@ -385,10 +381,10 @@ def get_linear_model_status(code, df=None, dtype='d', type='m', start=None, end=
                 # Y_Future = Y * b + a - c_high
                 # log.info("Type:H ratio: %0.1f %0.1f Y_Mid: %0.1f" %
                          # (b, ratio, Y_Future[-1]))
-            # diff = asset[-1] - Y_Future[-1]
-            # log.debug("asset:%s Y_Future:%s"%(asset[-1],Y_Future[-1]))
-            diff = asset[-1] - Y_Future[-1]
-            # log.info("as:%s Y:%s" % (asset[-1], Y_Future[-1]))
+            if nowP is not None:
+                diff = nowP - Y_Future[-1]
+            else:
+                diff = asset[-1] - Y_Future[-1]
             if diff > 0:
                 operation += 1
                 # log.info("Type: %s UP !!! Y_Future: %0.1f b:%0.1f ratio:%0.1f " % (
@@ -399,10 +395,6 @@ def get_linear_model_status(code, df=None, dtype='d', type='m', start=None, end=
                     # type.upper(), Y_Future[-1], b, ratio))
             return operation, ratio
         else:
-            # log.debug("u-Y_hat[-1]:%0.1f" % (Y_hat[-1]))
-            # log.debug("price:%0.1f" % asset.iat[-1])
-            # log.debug("u:%0.1f" % Y_hat[0])
-            # log.debug("price:%0.1f" % asset.iat[0])
             if type.upper() == 'M':
                 Y_Future = X * b + a
                 # Y_Future = Y * b + a
@@ -429,7 +421,10 @@ def get_linear_model_status(code, df=None, dtype='d', type='m', start=None, end=
                 # Y_Future = Y * b + a - c_high
                 # log.info("Type:H ratio: %0.1f %0.1f Y_Mid: %0.1f" %
                          # (b, ratio, Y_Future[-1]))
-            diff = asset[-1] - Y_Future[-1]
+            if nowP is not None:
+                diff = nowP - Y_Future[-1]
+            else:
+                diff = asset[-1] - Y_Future[-1]
             # log.info("as:%s Y:%s" % (asset[-1], Y_Future[-1]))
             if diff > 0:
                 operation += 1
@@ -443,30 +438,39 @@ def get_linear_model_status(code, df=None, dtype='d', type='m', start=None, end=
             log.debug("Line down !!! d:%s" % Y_hat[0])
             # print("Line down !!! d:%s nowp:%s" % (round(Y_hat[1],2),asset[-1:].values[0]))
             # return -3, round(ratio, 2)
-
-    if len(df) > 1:
+    if len(df)>2:
+        asset = df[:-1]
+    else:
+        asset = df
+    if len(asset) > 1:
         operationcount = 0
         ratio_l = []
         if countall:
             for co in ['high', 'close', 'low']:
-                for dt in ['H', 'M', 'L']:
-                    op, ratio = get_linear_model_ratio(df[co], dt)
+                for d_type in ['H', 'M', 'L']:
+                    op, ratio = get_linear_model_ratio(asset[co] , d_type ,df[co][-1] if len(df) > 2 else None)
                     ratio_l.append(round(ratio, 2))
                     operationcount += op
         else:
-            op, ratio = get_linear_model_ratio(df['close'], type)
+            op, ratio = get_linear_model_ratio(asset['close'] , type,df['close'][-1] if len(df) > 2 else None)
             ratio_l.append(round(ratio, 2))
             operationcount += op
 
         # log.info("op:%s min:%s ratio_l:%s" %
                  # (operationcount, min(ratio_l), ratio_l))
         return operationcount, min(ratio_l), df[:1].index.values[0], len(df)
-    elif len(df) == 1:
+    elif len(asset) == 1:
         # log.error("powerCompute code:%s"%(code))
-        return -9, 0, df.index.values[0], len(df)
+        if ptype == 'high':
+            return 9, 0, df.index.values[0], len(df)
+        else:
+            return -9, 0, df.index.values[0], len(df)
     else:
         log.error("code:%s Low :%s" % (code, len(df)))
-        return -9, -9, cct.get_today(), len(df)
+        if ptype == 'high':
+            return -9, -9, cct.get_today(), len(df)
+        else:
+            return -9, -9, cct.get_today(), len(df)
 
 
 def get_linear_model_candles(code, ptype='low', dtype='d', start=None, end=None, filter='n',
@@ -613,9 +617,13 @@ def get_linear_model_candles(code, ptype='low', dtype='d', start=None, end=None,
         assetL = df[df.index >= dt][ptype]
         if len(assetL) == 1:
             mlist = twoLineCompute(code,df=df,start=start, ptype=ptype)
-            sp = mlist[0]
-            idx = df[df[ptype] == sp ].index.values[-1]
-            print "New %s !!! start:%s"%(ptype,idx)
+            if len(mlist) > 0:
+                sp = mlist[0]
+                idx = df[df[ptype] == sp ].index.values[-1]
+                print "New %s  %s !!! start:%s"%(ptype,assetL[-1],idx)
+            else:
+                idx = assertL.index[-1]
+                print "NTop %s  %s !!! start:%s"%(ptype,assetL[-1],idx)
             assetL = df[df.index >= idx][ptype]
             dt = idx
             # return False
@@ -700,8 +708,8 @@ def get_linear_model_candles(code, ptype='low', dtype='d', start=None, end=None,
                 # print Yhat[0],Yhat[-1],sa,sb,Xa[0],ida,Xb[0]
                 ax.plot(Xa, Yhat, 'k--')
 
-            else:
-                print "Mlist:%s" % (mlist)
+            # else:
+                # print "Mlist:%s" % (mlist)
 
     # plt.legend([code]);
     # plt.legend([code, 'Value center line', 'Value interval line']);

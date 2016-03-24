@@ -320,7 +320,7 @@ def get_tdx_append_now_df_api(code, start=None, end=None, type='f'):
             # pd.concat([df,ds],axis=0, join='outer')
             # result=pd.concat([df,ds])
 
-        if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 1530:
+        if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 1510:
             log.debug("get_work_time:work")
             if end is None:     
                 # dm = rl.get_sina_Market_json('all').set_index('code')

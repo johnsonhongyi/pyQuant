@@ -243,7 +243,7 @@ class Sina:
         df = pd.DataFrame(list_s, columns=ct.SINA_Total_Columns)
         # if self.index_status and cct.get_work_time():
         # if self.index_status:
-        if cct.get_work_time() or (cct.get_now_time_int() > 915 and cct.get_now_time_int() < 1500) :
+        if cct.get_work_time() or (cct.get_now_time_int() > 915 and cct.get_now_time_int() < 1510) :
             df = df.drop('close', axis=1)
             df.rename(columns={'now': 'close'}, inplace=True)
         df = df.drop_duplicates('code')
