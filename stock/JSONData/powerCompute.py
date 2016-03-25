@@ -205,7 +205,7 @@ def Candlestick(ax, bars=None, quotes=None, width=0.5, colorup='k', colordown='r
         div_n = allc / 12
     ax.set_xticks(range(0, len(bars.index), div_n))
     new_xticks = [bars.index[d] for d in ax.get_xticks()]
-    ax.set_xticklabels(new_xticks, rotation=30, ha='right')
+    ax.set_xticklabels(new_xticks, rotation=30, horizontalalignment='right')
     # ax.set_xticklabels(new_xticks, rotation=30, horizontalalignment='right')
 
     # fig.autofmt_xdate()
@@ -562,7 +562,7 @@ def get_linear_model_candles(code, ptype='low', dtype='d', start=None, end=None,
             asset1 = asset1.apply(lambda x: round(x / asset1[:1], 2))
     '''
 
-    fig = plt.figure(figsize=(8, 5))
+    fig = plt.figure(figsize=(10, 6))
     plt.subplots_adjust(left=0.05, bottom=0.08, right=0.95,
                         top=0.95, wspace=0.15, hspace=0.25)
     ax = fig.add_subplot(111)
@@ -673,8 +673,8 @@ def get_linear_model_candles(code, ptype='low', dtype='d', start=None, end=None,
         plt.title(code + " | " + str(dates[-1])[:11]+" | "+"MA:%0.2f"%(roll_mean[-1]), fontsize=12)
     # plt.title(code + " | " + str(dates[-1])[:11], fontsize=14)
     fib = cct.getFibonacci(len(asset) * 5, len(asset))
-    plt.legend(["Hi%s"%df.high[-1],"No:%s"%df.close[-1],"Lo:%0.2f"%(asset.iat[-1]), "day:%s" %
-                len(asset), "fib:%s" % (fib)], fontsize=12,loc=8)
+    plt.legend(["Hi:%s" % df.high[-1], "No:%s" % df.close[-1], "Lo:%0.2f" % (asset.iat[-1]), "day:%s" %
+                len(asset), "fib:%s" % (fib)], fontsize=12, loc=8)
     plt.grid(True)
     if filter:
 
@@ -735,7 +735,7 @@ def get_linear_model_candles(code, ptype='low', dtype='d', start=None, end=None,
     zp = zoompan.ZoomPan()
     figZoom = zp.zoom_factory(ax, base_scale=1.1)
     figPan = zp.pan_factory(ax)
-    plt.xticks(rotation=30, ha='right')
+    plt.xticks(rotation=15, horizontalalignment='center')
     # plt.setp( axs[1].xaxis.get_majorticklabels(), rotation=70 )
     plt.show(block=False)
 
