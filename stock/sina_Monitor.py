@@ -140,7 +140,8 @@ if __name__ == "__main__":
                 print "G:%s dt:%s" % (len(top_all),cct.get_time_to_date(time_s))
                 top_all = top_all.sort_values(by=['diff', 'counts', 'volume', 'ratio'], ascending=[0, 0, 0, 1])
                 # top_all=top_all.sort_values(by=['percent','diff','counts','ratio'],ascending=[0,0,1,1])
-                if cct.get_now_time_int() > 930:
+                if cct.get_now_time_int() > 930 and 'lastp' in top_all.columns: 
+                
                     top_all = top_all[top_all.trade > top_all.lastp]
 
                 cct.set_console(title=['G:%s' % len(top_all), 'zxg: %s' % (blkname)])
@@ -153,7 +154,8 @@ if __name__ == "__main__":
                 
                 top_temp = top_all[:10].copy()
                 top_temp = pct.powerCompute_df(top_temp,dl='30')
-                top_temp = top_temp.sort_values(by=['op','diff', 'percent', 'ratio'], ascending=[0,0, 0, 1])
+                if 'op' in top_temp.columns:
+                    top_temp = top_temp.sort_values(by=['op','ra','diff', 'percent', 'ratio'], ascending=[0,0,0, 0, 1])
                 if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935:
                     top_temp = top_temp.loc[:,
                              ['name', 'trade', 'diff', 'op', 'ra', 'percent','volume', 'ratio', 'counts',
@@ -220,7 +222,7 @@ if __name__ == "__main__":
                     top_all = pd.DataFrame()
                     status = False
                 elif st == 'w' or st == 'a':
-                    codew = (top_all.index).tolist()
+                    codew = (top_temp.index).tolist()
                     if st == 'a':
                         cct.write_to_blocknew(block_path, codew[:10])
                         # cct.write_to_blocknew(all_diffpath, codew)

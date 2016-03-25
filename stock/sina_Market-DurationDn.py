@@ -130,8 +130,9 @@ if __name__ == "__main__":
                             # top_all.loc[symbol, 'buy'] = top_now.loc[symbol, 'buy']
                 # top_all = top_all[top_all.buy > 0]
                 top_dif = top_all.copy()
-                top_dif['buy'] = (
-                    map(lambda x, y: y if int(x) == 0 else x, top_dif['buy'].values, top_dif['trade'].values))
+                if 'trade' in top_dif.columns:
+                    top_dif['buy'] = (
+                        map(lambda x, y: y if int(x) == 0 else x, top_dif['buy'].values, top_dif['trade'].values))
                 # if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935:
                 top_dif = top_dif[top_dif.buy > 0]
                 top_dif['diff'] = (
@@ -217,8 +218,8 @@ if __name__ == "__main__":
                     top_temp = top_dif[-10:].copy()
                     top_temp = pct.powerCompute_df(top_temp, dl=30)
                     top_end = pct.powerCompute_df(top_end, dl=30)
-
-                top_temp = top_temp.sort_values(by=['op','diff', 'percent', 'ratio'], ascending=[0,0, 0, 1])                    
+                if 'op' in top_temp.columns:
+                    top_temp = top_temp.sort_values(by=['op','ra','diff', 'percent', 'ratio'], ascending=[0,0,0, 0, 1])                    
                 top_dd = pd.concat([top_temp, top_end], axis=0)
                 if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935:
                     top_dd = top_dd.loc[:,
@@ -235,7 +236,7 @@ if __name__ == "__main__":
                 # print "staus",status
 
                 if status:
-                    for code in top_dif[:10].index:
+                    for code in top_dd[:10].index:
                         code = re.findall('(\d+)', code)
                         if len(code) > 0:
                             code = code[0]
@@ -284,7 +285,7 @@ if __name__ == "__main__":
                         # raise KeyboardInterrupt("StopTime")
             elif st == 'g' or st == 'go':
                 status = True
-                for code in top_dif[:10].index:
+                for code in top_dd[:10].index:
                     code = re.findall('(\d+)', code)
                     if len(code) > 0:
                         code = code[0]
@@ -336,11 +337,11 @@ if __name__ == "__main__":
                     status = False
                     lastpTDX_DF = pd.DataFrame()
             elif st == 'w' or st == 'a':
-                if ptype == 'low':
-                    codew = (top_dd[:10].index).tolist()
-                else:
-                    codew = (top_dd[-10:].index).tolist()
-
+                # if ptype == 'low':
+                    # codew = (top_dd[:10].index).tolist()
+                # else:
+                    # codew = (top_dd[-10:].index).tolist()
+                codew = (top_dd[:10].index).tolist()
                 if st == 'a':
                     cct.write_to_blocknew(block_path, codew)
                     # sl.write_to_blocknew(all_diffpath, codew)

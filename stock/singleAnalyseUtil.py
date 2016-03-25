@@ -414,7 +414,7 @@ if __name__ == '__main__':
     success = 0
     rzrq = ffu.get_dfcfw_rzrq_SHSZ()
     dl=30
-    fibc = 10
+    fibc = 5
     fibl = getFibonacci(['999999','399001','399006'],dl=dl) 
     while 1:
         try:
@@ -459,6 +459,7 @@ if __name__ == '__main__':
                             print ".",
                         else:
                             print "."
+                            fibcount = 0
                             break
                 else:
                     time.sleep(60)

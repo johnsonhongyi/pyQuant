@@ -267,7 +267,7 @@ if __name__ == "__main__":
                 top_temp = top_dif[:10].copy()
                 top_temp = pct.powerCompute_df(top_temp,dl='30')
                 if 'op' in top_temp.columns:
-                    top_temp = top_temp.sort_values(by=['op','diff', 'percent', 'ratio'], ascending=[0,0, 0, 1])
+                    top_temp = top_temp.sort_values(by=['op','ra','diff', 'percent', 'ratio'], ascending=[0,0,0, 0, 1])
                 if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935:
                     top_temp = top_temp.loc[:,
                              ['name', 'buy', 'diff', 'op', 'ra', 'percent','volume', 'ratio', 'counts',
@@ -347,7 +347,7 @@ if __name__ == "__main__":
                 top_all = pd.DataFrame()
                 status = False
             elif st == 'w' or st == 'a':
-                codew = (top_dif.index).tolist()
+                codew = (top_temp.index).tolist()
                 if st == 'a':
                     cct.write_to_blocknew(block_path, codew[:10])
                     # sl.write_to_blocknew(all_diffpath, codew)

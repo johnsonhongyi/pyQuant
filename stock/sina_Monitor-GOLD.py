@@ -105,7 +105,7 @@ if __name__ == "__main__":
         try:
             df = rl.get_sina_all_json_dd(vol, type)
             top_now = rl.get_sina_dd_count_price_realTime(df)
-            # print type(top_now)
+            # print top_now
             time_d = time.time()
             if time_d - time_s > delay_time:
                 status_change = True
@@ -176,7 +176,7 @@ if __name__ == "__main__":
                     log.debug("top_diff:vol")
                     top_all['volume'] = (
                         map(lambda x, y: round(x / y / radio_t, 1), top_all['volume'].values, top_all['lvol'].values))
-                    if cct.get_now_time_int() > 930:
+                    if cct.get_now_time_int() > 930 and 'lastp' in top_all.columns:
                         top_all = top_all[top_all.trade >= top_all.lastp]
                     top_all = top_all.loc[:,
                               ['name', 'percent', 'diff', 'counts', 'volume', 'trade', 'prev_p', 'ratio']]
@@ -200,7 +200,8 @@ if __name__ == "__main__":
                 
                 top_temp = top_all[:30].copy()
                 top_temp = pct.powerCompute_df(top_temp,dl='30')
-                top_temp = top_temp.sort_values(by=['op','diff', 'percent', 'ratio'], ascending=[0,0, 0, 1])                
+                if 'op' in top_temp.columns:
+                    top_temp = top_temp.sort_values(by=['op','ra','diff', 'percent', 'ratio'], ascending=[0,0,0, 0, 1])                
                 if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935:
                     top_temp = top_temp.loc[:,
                              ['name', 'trade', 'diff', 'op', 'ra', 'percent','volume', 'ratio', 'counts',
@@ -264,7 +265,7 @@ if __name__ == "__main__":
                     top_all = pd.DataFrame()
                     status = False
                 elif st == 'w' or st == 'a':
-                    codew = (top_all.index).tolist()
+                    codew = (top_temp.index).tolist()
                     if st == 'a':
                         cct.write_to_blocknew(block_path, codew[:10])
                         # cct.write_to_blocknew(all_diffpath, codew)

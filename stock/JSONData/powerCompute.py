@@ -292,8 +292,15 @@ def get_linear_model_status(code, df=None, dtype='d', type='m', start=None, end=
         index_d = cct.day8_to_day10(start)
         start = tdd.get_duration_price_date(code, ptype=ptype, dt=start)
         log.debug("start: %s  index_d:%s" % (start, index_d))
-
-    if dl is not None:
+    elif end is not None and filter =='y':
+        df = tdd.get_tdx_append_now_df_api(code, start, end).sort_index(ascending=True)
+        index_d = cct.day8_to_day10(start)
+        start = tdd.get_duration_price_date(code, ptype=ptype, dt=start,df=df)
+        df = df[df.index >=start]
+        if len(df) > 2 and dl is None:
+            if df.index.values[0] < index_d:
+                df = df[df.index >= index_d]
+    if dl is not None:            
         start, index_d = tdd.get_duration_price_date(
             code, ptype=ptype, dl=dl, filter=False)
         # start = tdd.get_duration_date(
@@ -317,7 +324,7 @@ def get_linear_model_status(code, df=None, dtype='d', type='m', start=None, end=
             # print df.index.values[0],index_d
             # print "df:%s code:%s"%(len(df),code)
             if df.index.values[0] < index_d:
-                df = df[df.index > index_d]
+                df = df[df.index >= index_d]
     if not dtype == 'd':
         df = tdd.get_tdx_stock_period_to_type(
             df, dtype).sort_index(ascending=True)
@@ -427,7 +434,8 @@ def get_linear_model_status(code, df=None, dtype='d', type='m', start=None, end=
                 diff = asset[-1] - Y_Future[-1]
             # log.info("as:%s Y:%s" % (asset[-1], Y_Future[-1]))
             if diff > 0:
-                operation += 1
+                # operation += 1
+                pass
                 # log.info("Type: %s UP !!! Y_Future: %0.1f b:%0.1f ratio:%0.1f " % (
                     # type.upper(), Y_Future[-1], b, ratio))
             else:
@@ -446,7 +454,8 @@ def get_linear_model_status(code, df=None, dtype='d', type='m', start=None, end=
         operationcount = 0
         ratio_l = []
         if countall:
-            for co in ['high', 'close', 'low']:
+            # for co in ['high', 'close', 'low']:
+            for co in ['low','high','close']:
                 for d_type in ['H', 'M', 'L']:
                     op, ratio = get_linear_model_ratio(asset[co] , d_type ,df[co][-1] if len(df) > 2 else None)
                     ratio_l.append(round(ratio, 2))
@@ -462,19 +471,19 @@ def get_linear_model_status(code, df=None, dtype='d', type='m', start=None, end=
     elif len(asset) == 1:
         # log.error("powerCompute code:%s"%(code))
         if ptype == 'high':
-            return 9, 0, df.index.values[0], len(df)
+            return 10, 0, df.index.values[0], len(df)
         else:
-            return -9, 0, df.index.values[0], len(df)
+            return -10, 0, df.index.values[0], len(df)
     else:
-        log.error("code:%s Low :%s" % (code, len(df)))
+        # log.error("code:%s %s :%s" % (code, ptype,len(df)))
         if ptype == 'high':
-            return -9, -9, cct.get_today(), len(df)
+            return 10, 1, cct.get_today(), len(df)
         else:
-            return -9, -9, cct.get_today(), len(df)
+            return -10, -10, cct.get_today(), len(df)
 
 
 def get_linear_model_candles(code, ptype='low', dtype='d', start=None, end=None, filter='n',
-                             df=None):
+                             df=None,dl=None):
     if start is not None and filter == 'y':
         if code not in ['999999', '399006', '399001']:
             index_d, dl = tdd.get_duration_Index_date(dt=start)
@@ -484,10 +493,17 @@ def get_linear_model_candles(code, ptype='low', dtype='d', start=None, end=None,
             log.debug("index_d:%s" % (index_d))
         start = tdd.get_duration_price_date(code, ptype=ptype, dt=index_d)
         log.debug("start:%s" % (start))
+    
+    if start is None and dl is not None:
+        start = cct.last_tddate(dl)
+        # print start
+        df=tdd.get_tdx_append_now_df_api(code,start=start).sort_index(ascending=True)
+    
     if df is None:
         df = tdd.get_tdx_append_now_df_api(
             code, start=start, end=end).sort_index(ascending=True)
         start=df.index.values[0]
+        
     if not dtype == 'd':
         df = tdd.get_tdx_stock_period_to_type(
             df, dtype).sort_index(ascending=True)
@@ -635,7 +651,7 @@ def get_linear_model_candles(code, ptype='low', dtype='d', start=None, end=None,
         # print assertL[-1],assert[0]
         setRegLinearPlt(assetL, xaxis=xaxisInit,status=status)
         op, ra, st, days = get_linear_model_status(
-            code, df=df[df.index >= dt], start=dt)
+            code, df=df[df.index >= dt], start=dt,filter='y')
         print "%s op:%s ra:%s days:%s  start:%s" % (code, op, str(ra), str(days), st)
 
     status=setRegLinearPlt(asset)
@@ -657,7 +673,7 @@ def get_linear_model_candles(code, ptype='low', dtype='d', start=None, end=None,
         plt.title(code + " | " + str(dates[-1])[:11]+" | "+"MA:%0.2f"%(roll_mean[-1]), fontsize=12)
     # plt.title(code + " | " + str(dates[-1])[:11], fontsize=14)
     fib = cct.getFibonacci(len(asset) * 5, len(asset))
-    plt.legend(["%0.2f"%(asset.iat[-1]), "day:%s" %
+    plt.legend(["Hi%s"%df.high[-1],"No:%s"%df.close[-1],"Lo:%0.2f"%(asset.iat[-1]), "day:%s" %
                 len(asset), "fib:%s" % (fib)], fontsize=12,loc=8)
     plt.grid(True)
     if filter:
@@ -741,7 +757,7 @@ def powerCompute_df(df, dtype='d', end=None, dl=None, filter='y'):
         op, ra, st, days = get_linear_model_status(
             code, dtype=dtype, start=start, end=end, dl=dl, filter=filter)
         df.loc[code, 'op'] = op
-        df.loc[code, 'ra'] = str(ra) + '/' + str(days)
+        df.loc[code, 'ra'] = str(ra) + '|' + str(days)
         # if dl is not None:
         # df.loc[code,'ldate'] = st
         df.loc[code, 'ldate'] = st
@@ -770,6 +786,8 @@ def parseArgmain():
                         help='find duration low')
     parser.add_argument('-l', action="store", dest="dl", type=str, default=None,
                         help='days')
+    parser.add_argument('-m', action="store", dest="mpl", type=str, default='y',
+                        help='mpl show')                            
     return parser
 
 
@@ -794,13 +812,23 @@ if __name__ == "__main__":
             code = raw_input("code:")
             args = parser.parse_args(code.split())
             if len(str(args.code)) == 6:
+                if len(args.start) < 4:
+                    args.dl = int(args.start)
+                    args.start = None
                 # ptype='f', df=None, dtype='d', type='m', start=None, end=None, days=1, filter='n'):
                 # print args.end
                 # op, ra, st = get_linear_model_status(args.code, dtype=args.dtype, start=cct.day8_to_day10(
                 #      args.start), end=cct.day8_to_day10(args.end), filter=args.filter, dl=args.dl)
                 # print "code:%s op:%s ra:%s  start:%s" % (code, op, ra, st)
-                get_linear_model_candles(args.code, dtype=args.dtype, start=cct.day8_to_day10(
-                    args.start), end=cct.day8_to_day10(args.end), ptype=args.ptype, filter=args.filter)
+                start=cct.day8_to_day10(args.start)
+                end=cct.day8_to_day10(args.end)
+                if args.mpl == 'y':
+                    get_linear_model_candles(args.code, dtype=args.dtype, start=start, end=end, ptype=args.ptype, filter=args.filter,dl=args.dl)
+                else:
+                    args.filter = 'y'
+                    for ptype in ['low','high']:
+                        op, ra, st, days = get_linear_model_status(args.code, dtype=args.dtype, start=start, end=end, ptype=ptype, filter=args.filter,dl=args.dl)
+                        print "%s op:%s ra:%s days:%s  start:%s" % (args.code, op, str(ra), str(days), st)
                 # op, ra, st, days = get_linear_model_status(args.code, dtype=args.dtype, start=cct.day8_to_day10(
                     # args.start), end=cct.day8_to_day10(args.end), filter=args.filter, dl=args.dl)
                 # print "code:%s op:%s ra/days:%s  start:%s" % (code, op, str(ra) + '/' + str(days), st)

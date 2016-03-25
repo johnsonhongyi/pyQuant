@@ -560,14 +560,17 @@ def get_duration_Index_date(code='999999', dt=None, ptype='low'):
     if dt is not None:
         if len(str(dt)) < 8:
             dl = int(dt)+changedays
-            df = get_tdx_day_to_df(code).sort_index(ascending=False)
+            # df = get_tdx_day_to_df(code).sort_index(ascending=False)
+            df = get_tdx_append_now_df_api(code).sort_index(ascending=False)
             dt = get_duration_price_date(code, dt=dt,ptype=ptype,df=df)
             dt = df[df.index <= dt].index.values[changedays]
             log.info("LastDF:%s,%s" % (dt,dl))
         else:
             if len(str(dt)) == 8: dt = cct.day8_to_day10(dt)
-            df = get_tdx_day_to_df(code).sort_index(ascending=False)
-            dl = len(get_tdx_Exp_day_to_df(code, start=dt)) + changedays
+            # df = get_tdx_day_to_df(code).sort_index(ascending=False)
+            df = get_tdx_append_now_df_api(code,start=dt).sort_index(ascending=False)
+            # dl = len(get_tdx_Exp_day_to_df(code, start=dt)) + changedays
+            dl = len(df) + changedays
             dt = df[df.index <= dt].index.values[changedays]
             log.info("LastDF:%s,%s" % (dt,dl))
         return dt,dl
@@ -1093,7 +1096,7 @@ def get_tdx_search_day_DF(market='cyb'):
 def get_tdx_stock_period_to_type(stock_data, type='w'):
     period_type = type
     # 转换周最后一日变量
-    stock_data.index = pd.to_datetime(stock_data.index)
+    stock_data.index = pd.to_datetime(stock_data.index,format='%Y-%m-%d')
     period_stock_data = stock_data.resample(period_type, how='last')
     # 周数据的每日change连续相乘
     # period_stock_data['percent']=stock_data['percent'].resample(period_type,how=lambda x:(x+1.0).prod()-1.0)
@@ -1109,7 +1112,10 @@ def get_tdx_stock_period_to_type(stock_data, type='w'):
     # period_stock_data['turnover']=period_stock_data['vol']/(period_stock_data['traded_market_value'])/period_stock_data['close']
     # 去除无交易纪录
     period_stock_data = period_stock_data[period_stock_data['code'].notnull()]
-    period_stock_data.reset_index(inplace=True)
+    # period_stock_data.reset_index(inplace=True)
+    # period_stock_data.set_index('date',inplace=True)
+    period_stock_data.index = map(lambda x:str(x)[:10],period_stock_data.index)
+    # print period_stock_data[:1].index
     return period_stock_data
 
 
@@ -1165,10 +1171,12 @@ def main_test():
 if __name__ == '__main__':
     import sys
     import timeit
-    print sina_data.Sina().get_stock_code_data('300006').set_index('code')
-    print get_duration_price_date('999999',dl=30)
-    print get_duration_price_date('999999',ptype='high',dt='2015-01-01')
-    print get_duration_price_date('999999',ptype='low',dt='2015-01-01')
+    # print sina_data.Sina().get_stock_code_data('300006').set_index('code')
+    # print get_duration_price_date('999999',dl=30)
+    # print get_duration_price_date('999999',ptype='high',dt='2015-01-01')
+    # print get_duration_price_date('999999',ptype='low',dt='2015-01-01')
+    df = get_tdx_Exp_day_to_df('999999')
+    print get_tdx_stock_period_to_type(df)
     sys.exit(0)
     # list=['000001','399001','399006','399005']
     # df = get_tdx_all_day_LastDF(list,type=1)
@@ -1191,10 +1199,11 @@ if __name__ == '__main__':
     '''
     time_s = time.time()
     df = get_tdx_Exp_day_to_df('999999')
+    dd = get_tdx_stock_period_to_type(df)
     # print get_duration_price_date('999999',dl=100,ptype='high')
     # df = get_tdx_exp_all_LastDF( ['999999', '603377','603377'], dt=30,ptype='high')
     # df = get_tdx_exp_all_LastDF(['600000', '603377', '601998', '002504'], dt=20160304, ptype='low', filter='y')
-    print df
+    print dd
     sys.exit(0)
     # tdxdata = get_tdx_all_day_LastDF(['999999', '603377','603377'], dt=30,ptype='high')
     # print get_tdx_Exp_day_to_df('999999').sort_index(ascending=False)[:1]
