@@ -236,11 +236,11 @@ if __name__ == "__main__":
                     top_temp = top_temp.sort_values(by=['op','ra','diff', 'percent', 'ratio'], ascending=[0,0,0, 0, 1])
                 if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935:
                     top_temp = top_temp.loc[:,
-                             ['name', 'buy', 'diff', 'op', 'ra', 'percent','volume', 'ratio', 'counts',
+                             ['name', 'buy', 'diff', 'op', 'ra','fib', 'percent','volume', 'ratio', 'counts',
                               'ldate', 'date']]
                 else:
                     top_temp = top_temp.loc[:,
-                             ['name', 'buy', 'diff', 'op', 'ra', 'percent', 'volume', 'ratio', 'counts',
+                             ['name', 'buy', 'diff', 'op', 'ra','fib', 'percent', 'volume', 'ratio', 'counts',
                               'ldate','date']]
                 print rl.format_for_print(top_temp[:10]) 
                 

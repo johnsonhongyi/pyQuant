@@ -223,11 +223,11 @@ if __name__ == "__main__":
                 top_dd = pd.concat([top_temp, top_end], axis=0)
                 if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935:
                     top_dd = top_dd.loc[:,
-                             ['name', 'buy', 'diff', 'op', 'ra', 'percent', 'volume', 'ratio', 'counts', 'high',
+                             ['name', 'buy', 'diff', 'op', 'ra','fib', 'percent', 'volume', 'ratio', 'counts', 'high',
                               'lastp','ldate', 'date']]
                 else:
                     top_dd = top_dd.loc[:,
-                             ['name', 'trade', 'diff', 'op', 'ra', 'percent', 'volume', 'ratio', 'counts', 'high',
+                             ['name', 'trade', 'diff', 'op', 'ra','fib', 'percent', 'volume', 'ratio', 'counts', 'high',
                               'lastp','ldate', 'date']]
                 print rl.format_for_print(top_dd)
                 # if cct.get_now_time_int() < 930 or cct.get_now_time_int() > 1505 or (cct.get_now_time_int() > 1125 and cct.get_now_time_int() < 1505):

@@ -446,8 +446,8 @@ def get_linear_model_status(code, df=None, dtype='d', type='m', start=None, end=
             log.debug("Line down !!! d:%s" % Y_hat[0])
             # print("Line down !!! d:%s nowp:%s" % (round(Y_hat[1],2),asset[-1:].values[0]))
             # return -3, round(ratio, 2)
-    if len(df)>2:
-        asset = df[:-1]
+    if len(df)>1+days:
+        asset = df[:-days]
     else:
         asset = df
     if len(asset) > 1:
@@ -457,11 +457,11 @@ def get_linear_model_status(code, df=None, dtype='d', type='m', start=None, end=
             # for co in ['high', 'close', 'low']:
             for co in ['low','high','close']:
                 for d_type in ['H', 'M', 'L']:
-                    op, ratio = get_linear_model_ratio(asset[co] , d_type ,df[co][-1] if len(df) > 2 else None)
+                    op, ratio = get_linear_model_ratio(asset[co] , d_type ,df[co][-days] if len(df) > 1+days else None)
                     ratio_l.append(round(ratio, 2))
                     operationcount += op
         else:
-            op, ratio = get_linear_model_ratio(asset['close'] , type,df['close'][-1] if len(df) > 2 else None)
+            op, ratio = get_linear_model_ratio(asset['close'] , type,df['close'][-days] if len(df) > 1+days else None)
             ratio_l.append(round(ratio, 2))
             operationcount += op
 
@@ -754,13 +754,26 @@ def powerCompute_df(df, dtype='d', end=None, dl=None, filter='y'):
         # end=cct.day8_to_day10(end)
         start = cct.day8_to_day10(start)
         end = cct.day8_to_day10(end)
-        op, ra, st, days = get_linear_model_status(
-            code, dtype=dtype, start=start, end=end, dl=dl, filter=filter)
-        df.loc[code, 'op'] = op
-        df.loc[code, 'ra'] = str(ra) + '|' + str(days)
+        opc = 0 
+        stl = ''
+        rac = 0
+        fib = []
+        sep = '|'
+        for ptype in ['low','high']:
+            op, ra, st, days = get_linear_model_status(
+                code, dtype=dtype, start=start, end=end, dl=dl, filter=filter,ptype=ptype)
+            fib.append(str(days))
+            opc +=op
+            rac += ra
+            if ptype == 'low':
+                stl = st
         # if dl is not None:
         # df.loc[code,'ldate'] = st
-        df.loc[code, 'ldate'] = st
+        fibl= sep.join(fib)
+        df.loc[code, 'op'] = opc
+        df.loc[code, 'ra'] = rac
+        df.loc[code, 'fib'] = fibl
+        df.loc[code, 'ldate'] = stl
     return df
 
 
@@ -784,8 +797,10 @@ def parseArgmain():
                         help='price type')
     parser.add_argument('-f', action="store", dest="filter", type=str, choices=['y', 'n'], default='n',
                         help='find duration low')
-    parser.add_argument('-l', action="store", dest="dl", type=str, default=None,
-                        help='days')
+    parser.add_argument('-l', action="store", dest="dl", type=int, default=None,
+                        help='dl')
+    parser.add_argument('-dl', action="store", dest="days", type=int, default=1,
+                        help='days')                        
     parser.add_argument('-m', action="store", dest="mpl", type=str, default='y',
                         help='mpl show')                            
     return parser
@@ -827,7 +842,7 @@ if __name__ == "__main__":
                 else:
                     args.filter = 'y'
                     for ptype in ['low','high']:
-                        op, ra, st, days = get_linear_model_status(args.code, dtype=args.dtype, start=start, end=end, ptype=ptype, filter=args.filter,dl=args.dl)
+                        op, ra, st, days = get_linear_model_status(args.code, dtype=args.dtype, start=start, end=end,days=args.days, ptype=ptype, filter=args.filter,dl=args.dl)
                         print "%s op:%s ra:%s days:%s  start:%s" % (args.code, op, str(ra), str(days), st)
                 # op, ra, st, days = get_linear_model_status(args.code, dtype=args.dtype, start=cct.day8_to_day10(
                     # args.start), end=cct.day8_to_day10(args.end), filter=args.filter, dl=args.dl)

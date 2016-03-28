@@ -269,6 +269,10 @@ def get_now_time():
 
 
 def get_work_time_ratio():
+    initx=6.5
+    stepx=0.5
+    init=0
+    initAll=10
     now = time.localtime()
     ymd = time.strftime("%Y:%m:%d:", now)
     hm1 = '09:30'
@@ -277,19 +281,50 @@ def get_work_time_ratio():
     d1 = datetime.datetime.now()
     now_t = int(datetime.datetime.now().strftime("%H%M"))
     # d2 = datetime.datetime.strptime('201510111011','%Y%M%d%H%M')
-    if now_t > 930 and now_t <= 1130:
+    if now_t > 930 and now_t <= 1000:
         d2 = datetime.datetime.strptime(ymd + hm1, '%Y:%m:%d:%H:%M')
         ds = float((d1 - d2).seconds)
-        ratio_t = round(ds / all_work_time, 3)
-
+        ratio_t = round(ds / all_work_time/(initx+init*stepx)*initAll, 3)
+    elif now_t > 1000 and now_t <= 1030:
+        d2 = datetime.datetime.strptime(ymd + hm1, '%Y:%m:%d:%H:%M')
+        ds = float((d1 - d2).seconds)
+        init +=1            
+        ratio_t = round(ds / all_work_time/(initx+init*stepx)*initAll, 3)
+    elif now_t > 1030 and now_t <= 1100:
+        d2 = datetime.datetime.strptime(ymd + hm1, '%Y:%m:%d:%H:%M')
+        ds = float((d1 - d2).seconds)
+        init +=2            
+        ratio_t = round(ds / all_work_time/(initx+init*stepx)*initAll, 3)
+    elif now_t > 1100 and now_t <= 1130:
+        d2 = datetime.datetime.strptime(ymd + hm1, '%Y:%m:%d:%H:%M')
+        ds = float((d1 - d2).seconds)
+        init +=3            
+        ratio_t = round(ds / all_work_time/(initx+init*stepx)*initAll, 3)
     elif now_t > 1130 and now_t < 1300:
-        ratio_t = 0.5
+        init +=4
+        ratio_t = 0.5/(initx+init*stepx)*initAll
     elif now_t >= 1500 or now_t < 930:
         ratio_t = 1.0
+    elif now_t > 1300 and now_t <= 1330:
+        d2 = datetime.datetime.strptime(ymd + hm2, '%Y:%m:%d:%H:%M')
+        ds = float((d1 - d2).seconds)
+        init +=4            
+        ratio_t = round((ds + 7200) / all_work_time/(initx+init*stepx)*initAll, 3)
+    elif now_t > 1330 and now_t <= 1400:
+        d2 = datetime.datetime.strptime(ymd + hm2, '%Y:%m:%d:%H:%M')
+        ds = float((d1 - d2).seconds)
+        init +=5            
+        ratio_t = round((ds + 7200) / all_work_time/(initx+init*stepx)*initAll, 3)
+    elif now_t > 1400 and now_t <= 1430:
+        d2 = datetime.datetime.strptime(ymd + hm2, '%Y:%m:%d:%H:%M')
+        ds = float((d1 - d2).seconds)
+        init +=6            
+        ratio_t = round((ds + 7200) / all_work_time/(initx+init*stepx)*initAll, 3)
     else:
         d2 = datetime.datetime.strptime(ymd + hm2, '%Y:%m:%d:%H:%M')
         ds = float((d1 - d2).seconds)
         ratio_t = round((ds + 7200) / all_work_time, 3)
+        
     return ratio_t
 
 

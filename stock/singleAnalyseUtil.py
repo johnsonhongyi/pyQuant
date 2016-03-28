@@ -471,6 +471,7 @@ if __name__ == '__main__':
                         time.sleep(60)
                     else:
                         top_all = pd.DataFrame()
+                        fibcount = 0
                         break
 
             else:
