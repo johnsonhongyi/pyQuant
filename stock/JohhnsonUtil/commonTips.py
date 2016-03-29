@@ -284,21 +284,22 @@ def get_work_time_ratio():
     if now_t > 930 and now_t <= 1000:
         d2 = datetime.datetime.strptime(ymd + hm1, '%Y:%m:%d:%H:%M')
         ds = float((d1 - d2).seconds)
+        init +=1            
         ratio_t = round(ds / all_work_time/(initx+init*stepx)*initAll, 3)
     elif now_t > 1000 and now_t <= 1030:
         d2 = datetime.datetime.strptime(ymd + hm1, '%Y:%m:%d:%H:%M')
         ds = float((d1 - d2).seconds)
-        init +=1            
+        init +=2            
         ratio_t = round(ds / all_work_time/(initx+init*stepx)*initAll, 3)
     elif now_t > 1030 and now_t <= 1100:
         d2 = datetime.datetime.strptime(ymd + hm1, '%Y:%m:%d:%H:%M')
         ds = float((d1 - d2).seconds)
-        init +=2            
+        init +=3            
         ratio_t = round(ds / all_work_time/(initx+init*stepx)*initAll, 3)
     elif now_t > 1100 and now_t <= 1130:
         d2 = datetime.datetime.strptime(ymd + hm1, '%Y:%m:%d:%H:%M')
         ds = float((d1 - d2).seconds)
-        init +=3            
+        init +=4            
         ratio_t = round(ds / all_work_time/(initx+init*stepx)*initAll, 3)
     elif now_t > 1130 and now_t < 1300:
         init +=4
@@ -308,17 +309,17 @@ def get_work_time_ratio():
     elif now_t > 1300 and now_t <= 1330:
         d2 = datetime.datetime.strptime(ymd + hm2, '%Y:%m:%d:%H:%M')
         ds = float((d1 - d2).seconds)
-        init +=4            
+        init +=5            
         ratio_t = round((ds + 7200) / all_work_time/(initx+init*stepx)*initAll, 3)
     elif now_t > 1330 and now_t <= 1400:
         d2 = datetime.datetime.strptime(ymd + hm2, '%Y:%m:%d:%H:%M')
         ds = float((d1 - d2).seconds)
-        init +=5            
+        init +=6            
         ratio_t = round((ds + 7200) / all_work_time/(initx+init*stepx)*initAll, 3)
     elif now_t > 1400 and now_t <= 1430:
         d2 = datetime.datetime.strptime(ymd + hm2, '%Y:%m:%d:%H:%M')
         ds = float((d1 - d2).seconds)
-        init +=6            
+        init +=7            
         ratio_t = round((ds + 7200) / all_work_time/(initx+init*stepx)*initAll, 3)
     else:
         d2 = datetime.datetime.strptime(ymd + hm2, '%Y:%m:%d:%H:%M')

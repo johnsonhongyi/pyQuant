@@ -293,7 +293,8 @@ def get_tdx_append_now_df_api(code, start=None, end=None, type='f'):
             # ds = ts.get_h_data('000001', start=tdx_last_day, end=today,index=index_status)
             # df.index = pd.to_datetime(df.index)
         except (IOError, EOFError, Exception) as e:
-            print "Error duration", e
+            print "Error Duration:", e
+            cct.sleep(2)
             ds = ts.get_h_data(code_t, start=tdx_last_day, end=today, index=index_status)
             df.index = pd.to_datetime(df.index)
         if len(df) > 0:

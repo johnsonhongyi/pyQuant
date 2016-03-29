@@ -673,7 +673,7 @@ def get_linear_model_candles(code, ptype='low', dtype='d', start=None, end=None,
         plt.title(code + " | " + str(dates[-1])[:11]+" | "+"MA:%0.2f"%(roll_mean[-1]), fontsize=12)
     # plt.title(code + " | " + str(dates[-1])[:11], fontsize=14)
     fib = cct.getFibonacci(len(asset) * 5, len(asset))
-    plt.legend(["Hi:%s" % df.high[-1], "No:%s" % df.close[-1], "Lo:%0.2f" % (asset.iat[-1]), "day:%s" %
+    plt.legend(["Now:%s" % df.close[-1],"Hi:%s" % df.high[-1],  "Lo:%0.2f" % (asset.iat[-1]), "day:%s" %
                 len(asset), "fib:%s" % (fib)], fontsize=12, loc=8)
     plt.grid(True)
     if filter:
