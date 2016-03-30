@@ -9,7 +9,7 @@ vwanp 提供组合管理示例
 """
 
 from pyalgotrade import plotter
-from pyalgotrade.barfeed import yahoofeed
+from pyalgotrade  import barfeed,bar
 from pyalgotrade.stratanalyzer import returns,sharpe,drawdown,trades
 from datetime import datetime
 from matplotlib.pyplot import plot 
@@ -18,19 +18,99 @@ import pyalg_test
 import constant as ct
 import pandas as pd 
 import json
-import pyalg_utils,data，data_sql
-from utils import dataFramefeed
+import pyalg_utils
+# from utils import dataFramefeed
 
-def turtle_test(load_type = 'csv',dataString = 'pyalg'):
+class DataFrameBarFeed(barfeed.BaseBarFeed):
+    def __init__(self, dataframe, instrument, frequency):
+        super(DataFrameBarFeed, self).__init__(frequency)
+        self.registerInstrument(instrument)
+        self.__df = dataframe
+        self.__instrument = instrument
+        self.__next = 0
+
+    def reset(self):
+        super(DataFrameBarFeed, self).reset()
+        self.__next = 0
+
+    def peekDateTime(self):
+        return self.getCurrentDateTime()
+
+    def getCurrentDateTime(self):
+        ret = None
+        if not self.eof():
+            rowkey = self.__df.index[self.__next]
+            ret = rowkey.to_datetime()
+        return ret
+
+    def barsHaveAdjClose(self):
+        return True
+
+    def getNextBars(self):
+        ret = None
+        if not self.eof():
+            # Convert the dataframe row into a bar.BasicBar
+            rowkey = self.__df.index[self.__next]
+            row = self.__df.ix[rowkey]
+            bar_dict = {
+                self.__instrument: bar.BasicBar(
+                    rowkey.to_datetime(),
+                    row["Open".lower()],
+                    row["High".lower()],
+                    row["Low".lower()],
+                    row["Close".lower()],
+                    row["Volume".lower()],
+                    # row["Adj Close".lower()],
+                    row["Close".lower()],
+                    self.getFrequency()
+                )
+            }
+            ret = bar.Bars(bar_dict)
+            self.__next += 1
+        return ret
+
+    def eof(self):
+        return self.__next >= len(self.__df.index)
+
+    def start(self):
+        pass
+
+    def stop(self):
+        pass
+
+    def join(self):
+        pass
+
+# class MyStrategy(strategy.BacktestingStrategy):
+    # def onBars(self, bars):
+        # for instrument in bars.getInstruments():
+            # bar = bars[instrument]
+            # self.info("%s: %s %s %s %s %s %s" % (
+                # instrument,
+                # bar.getOpen(),
+                # bar.getHigh(),
+                # bar.getLow(),
+                # bar.getClose(),
+                # bar.getAdjClose(),
+                # bar.getVolume(),
+            # ))
+
+def turtle_test(load_type = 'df',dataString = 'pyalg'):
     if load_type =='csv':
         #Load the yahoo feed from the CSV file
         feed = yahoofeed.Feed()
         feed.addBarsFromCSV("orcl", "D:/data2/600687.csv")
-    elif load_type =='dataFrame':
+    elif load_type =='df':
         #从dataFrame中加载，
-        dat = pd.read_csv('d:/data/600687.csv',index_col=0,encoding='gbk')
-        feed = dataFramefeed.Feed()
-        feed.addBarsFromDataFrame("orcl", dat)
+        # dat = pd.read_csv('d:/data/600687.csv',index_col=0,encoding='gbk')
+        import tushare as ts
+        instrument='orcl'
+        df = ts.get_hist_data('000001',start='2015-01-01').sort_index(ascending=True)
+        df.index = df.index.to_datetime()
+        # feed = dataFramefeed.Feed()
+        # feed.addBarsFromDataFrame("orcl", dat)
+        feed = DataFrameBarFeed(df, instrument, barfeed.Frequency.DAY)
+        # myStrategy = MyStrategy(feed)
     elif load_type == 'sql':
         #此处也是
         dat = data_sql.get_h_data('600848')
@@ -89,4 +169,4 @@ def vwap(plot):
 
 if __name__ == '__main__':
     #vwap(True)
-    turtle_test()
+    turtle_test('df')
