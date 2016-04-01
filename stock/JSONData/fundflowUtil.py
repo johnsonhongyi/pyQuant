@@ -34,6 +34,11 @@ def get_dfcfw_fund_flow(market):
         dd['sjzb'] = round(float(data[3]), 1)
         dd['time'] = vol_l[1]
     else:
+        dd['zlr'] = 0.0
+        dd['zzb'] = 0.0
+        dd['sjlr'] = 0.0
+        dd['sjzb'] = 0.0
+        dd['time'] = 0.0
         log.info("Fund_f NO Url:%s" % url)
     if not single:
         url = ct.SINA_JSON_API_URL % ct.INDEX_LIST[market]

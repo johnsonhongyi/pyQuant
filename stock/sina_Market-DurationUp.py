@@ -58,6 +58,7 @@ if __name__ == "__main__":
     status_change = False
     lastpTDX_DF = pd.DataFrame()
     duration_date = 20160301
+    end_date = None
     set_duration_console(duration_date)
     ptype = 'low'
     filter = 'y'
@@ -93,7 +94,7 @@ if __name__ == "__main__":
                     log.info('toTDXlist:%s' % len(codelist))
                     # tdxdata = tdd.get_tdx_all_day_LastDF(codelist,dt=duration_date,ptype=ptype)
                     # print "duration_date:%s ptype=%s filter:%s"%(duration_date, ptype,filter)
-                    tdxdata = tdd.get_tdx_exp_all_LastDF(codelist, dt=duration_date, ptype=ptype,filter=filter)
+                    tdxdata = tdd.get_tdx_exp_all_LastDF(codelist, dt=duration_date, end=end_date,ptype=ptype,filter=filter)
                     log.debug("TdxLastP: %s %s" % (len(tdxdata), tdxdata.columns.values))
                     tdxdata.rename(columns={'low': 'llow'}, inplace=True)
                     tdxdata.rename(columns={'high': 'lhigh'}, inplace=True)

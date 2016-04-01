@@ -333,7 +333,7 @@ def get_tdx_append_now_df_api(code, start=None, end=None, type='f'):
                 else:
                     dm = sina_data.Sina().get_stock_code_data(code,index=index_status).set_index('code')
                 log.debug("dm:%s now:%s"%(len(dm),dm))
-                if dm is not None and not dm.empty:
+                if dm is not None and df is not None and not dm.empty  and not df.empty:
                     # dm=dm.drop_duplicates()
                     # log.debug("not None dm:%s" % dm[-1:])
                     dm.rename(columns={'volume': 'amount', 'turnover': 'vol'}, inplace=True)
@@ -726,7 +726,7 @@ def get_duration_price_date(code, ptype='low', dt=None, df='',dl=None,vtype=None
         return lowdate,index_d
 
 
-def get_tdx_exp_low_or_high_price(code, dt=None, ptype='close', dl=None):
+def get_tdx_exp_low_or_high_price(code, dt=None, ptype='close', dl=None,end=None):
     '''
     :param code:999999
     :param dayl:Duration Days
@@ -738,7 +738,7 @@ def get_tdx_exp_low_or_high_price(code, dt=None, ptype='close', dl=None):
     # dt = cct.day8_to_day10(dt)
     if dt is not None and dl is not None:
         # log.debug("dt:%s dl:%s"%(dt,dl))
-        df = get_tdx_Exp_day_to_df(code, dt=dt, dl=dl).sort_index(ascending=False)
+        df = get_tdx_Exp_day_to_df(code, dt=dt, dl=dl,end=end).sort_index(ascending=False)
         if df is not None and not df.empty:
             if len(str(dt)) == 10:
                 dz = df[df.index >= dt]
@@ -989,7 +989,7 @@ def get_tdx_all_day_LastDF(codeList, type=0, dt=None, ptype='close'):
     return df
 
 
-def get_tdx_exp_all_LastDF(codeList, dt=None,ptype='low',filter='n'):
+def get_tdx_exp_all_LastDF(codeList, dt=None,end=None,ptype='low',filter='n'):
     time_t = time.time()
     # df = rl.get_sina_Market_json(market)
     # code_list = np.array(df.code)
@@ -1009,7 +1009,7 @@ def get_tdx_exp_all_LastDF(codeList, dt=None,ptype='low',filter='n'):
             dl = len(get_tdx_Exp_day_to_df('999999', start=dt)) + changedays
             dt = df[df.index <= dt].index.values[changedays]
             log.info("LastDF:%s,%s" % (dt,dl))
-        results = cct.to_mp_run_async(get_tdx_exp_low_or_high_price, codeList, dt, ptype, dl)
+        results = cct.to_mp_run_async(get_tdx_exp_low_or_high_price, codeList, dt, ptype, dl,end)
         # results = get_tdx_exp_low_or_high_price(codeList[0], dt,ptype,dl)
         # results=[]
         # for code in codeList:
@@ -1026,7 +1026,7 @@ def get_tdx_exp_all_LastDF(codeList, dt=None,ptype='low',filter='n'):
             # df = get_tdx_day_to_df('999999').sort_index(ascending=False)
             dl = len(ts.get_hist_data('sh', start=dt))
             log.info("LastDF:%s,%s" % (dt,dl))
-        results = cct.to_mp_run_async(get_tdx_exp_low_or_high_price, codeList, dt, ptype, dl)
+        results = cct.to_mp_run_async(get_tdx_exp_low_or_high_price, codeList, dt, ptype, dl,end)
     
     else:
         # results = cct.to_mp_run_async(get_tdx_exp_low_or_high_price,codeList)
