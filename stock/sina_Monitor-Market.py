@@ -167,7 +167,7 @@ if __name__ == "__main__":
 
 
     if cct.isMac():
-        cct.set_console(100, 16)
+        cct.set_console(123, 16)
     else:
         cct.set_console(100, 16)
     status = False

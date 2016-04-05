@@ -78,7 +78,8 @@ def set_console(width=80, height=15, color=3, title=None):
         filename = (os.path.basename(sys.argv[0])) + ' ' + title
     if isMac():
         # os.system('printf "\033]0;%s\007"'%(filename))
-        os.system('printf "\e[8;%s;%st"' % (height, width))
+        if title is None:
+            os.system('printf "\e[8;%s;%st"' % (height, width))
         # printf "\033]0;%s sin ZL: 356.8 To:183 D:3 Sh: 1.73%  Vr:3282.4-3339.7-2.6%  MR: 4.3 ZL: 356.8\007"
         filename = filename.replace('%', '!')
         os.system('printf "\033]0;%s\007"' % (filename))

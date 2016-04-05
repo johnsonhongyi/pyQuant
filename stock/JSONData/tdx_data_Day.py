@@ -297,11 +297,11 @@ def get_tdx_append_now_df_api(code, start=None, end=None, type='f'):
             cct.sleep(2)
             ds = ts.get_h_data(code_t, start=tdx_last_day, end=today, index=index_status)
             df.index = pd.to_datetime(df.index)
-        if len(df) > 0:
-            lends = len(ds)
-        else:
-            lends = len(ds) + 1
         if ds is not None and len(ds) > 1:
+            if len(df) > 0:
+                lends = len(ds)
+            else:
+                lends = len(ds) + 1
             ds = ds[:lends - 1]
             if index_status:
                 if code == 'sh':

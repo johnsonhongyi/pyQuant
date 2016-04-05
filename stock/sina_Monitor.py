@@ -37,7 +37,7 @@ if __name__ == "__main__":
     # log.setLevel(LoggerFactory.DEBUG)
 
     if cct.isMac():
-        cct.set_console(100, 16)
+        cct.set_console(108, 16)
     else:
         cct.set_console(100, 16)
     status = False

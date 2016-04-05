@@ -82,7 +82,7 @@ def get_sina_url(vol='0', type='0', pageCount='100'):
 if __name__ == "__main__":
 
     if cct.isMac():
-        cct.set_console(100, 16)
+        cct.set_console(108, 16)
     else:
         cct.set_console(100, 16)
     # log.setLevel(LoggerFactory.DEBUG)
