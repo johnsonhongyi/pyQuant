@@ -446,29 +446,29 @@ if __name__ == '__main__':
             int_time = cct.get_now_time_int()
             if cct.get_work_time():
                 if int_time < 1000:
-                    time.sleep(60)
+                    cct.sleep(60)
                 else:
-                    time.sleep(120)
+                    cct.sleep(120)
             int_time = cct.get_now_time_int()
             if cct.get_work_time():
                 if int_time < 930:
                     while 1:
-                        time.sleep(60)
+                        cct.sleep(60)
                         if cct.get_now_time_int() < 931:
-                            time.sleep(60)
+                            cct.sleep(60)
                             print ".",
                         else:
                             print "."
                             fibcount = 0
                             break
                 else:
-                    time.sleep(60)
+                    cct.sleep(60)
             elif cct.get_work_duration():
                 while 1:
-                    time.sleep(60)
+                    cct.sleep(60)
                     if cct.get_work_duration():
                         print ".",
-                        time.sleep(60)
+                        cct.sleep(60)
                     else:
                         top_all = pd.DataFrame()
                         fibcount = 0
@@ -509,7 +509,7 @@ if __name__ == '__main__':
                 code = ''
             else:
                 sys.exit(0)
-                # time.sleep(0.5)
+                # cct.sleep(0.5)
                 # if success > 3:
                 #     raw_input("Except")
                 #     sys.exit(0)

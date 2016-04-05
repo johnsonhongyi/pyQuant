@@ -331,15 +331,24 @@ def get_work_time_ratio():
 
 
 def get_url_data_R(url):
+    import socket
     # headers = {'User-Agent':'Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.6) Gecko/20091201 Firefox/3.5.6'}
     headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.2; rv:16.0) Gecko/20100101 Firefox/16.0',
                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
                'Connection': 'keep-alive'}
     req = Request(url, headers=headers)
-    fp = urlopen(req, timeout=5)
-    data = fp.read()
+    try:
+        fp = urlopen(req, timeout=10)
+        data = fp.read()
+        fp.close()
+    # except (HTTPError, URLError) as error:
+        # log.error('Data of %s not retrieved because %s\nURL: %s', name, error, url)
+    except (socket.timeout,socket.error) as e:
     # print data.encoding
-    fp.close()
+        data = ''
+        log.error('socket timed out - URL %s', url)
+    else:
+        log.info('Access successful.')
     return data
 
 

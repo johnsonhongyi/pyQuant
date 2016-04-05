@@ -102,13 +102,13 @@ class VWAPMomentum(strategy.BacktestingStrategy):
                 __order = self.marketOrder(element, 100)
                 self.addInfo(__order)  #添加交易信息
                 if(self.__count<30):
-                    print "buy %s at ￥%.2f" % (element,price)
+                    print "buy %s at %.2f" % (element,price)
                 #self.info("buy %s at ￥%.2f" % (element,price))
             elif price < vwap * (1 - self.__threshold) and notional > 0:
                 __order = self.marketOrder(element, -100)  
                 self.addInfo(__order)   #添加交易信息
                 if(self.__count<30):
-                    print "sell %s at ￥%.2f" % (element,price)
+                    print "sell %s at %.2f" % (element,price)
                 #self.info("sell %s at ￥%.2f" % (element,price))
 
 class turtle(strategy.BacktestingStrategy):
@@ -150,7 +150,7 @@ class turtle(strategy.BacktestingStrategy):
         
     def onEnterOk(self, position):
         execInfo = position.getEntryOrder().getExecutionInfo()
-        self.info("BUY at ￥%.2f" % (execInfo.getPrice()))
+        self.info("BUY at $%.2f" % (execInfo.getPrice()))
         self.addInfo(position.getEntryOrder())   #在此处添加信息
         
     def onEnterCanceled(self, position):
@@ -158,7 +158,7 @@ class turtle(strategy.BacktestingStrategy):
 
     def onExitOk(self, position):
         execInfo = position.getExitOrder().getExecutionInfo()
-        self.info("SELL at ￥%.2f" % (execInfo.getPrice()))
+        self.info("SELL at $%.2f" % (execInfo.getPrice()))
         self.addInfo(position.getExitOrder())  #在此处添加信息
         self.__position = None
 
