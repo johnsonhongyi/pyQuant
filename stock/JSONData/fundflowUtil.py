@@ -139,21 +139,24 @@ def get_dfcfw_rzrq_SHSZ(url=ct.DFCFW_RZRQ_SHSZ):
 
     def get_tzrq(url, today):
         url = url % today
-        data = cct.get_url_data_R(url)
+        data = cct.get_url_data(url)
+        # data = cct.get_url_data_R(url)
         # vollist=re.findall('{data:(\d+)',code)
         vol_l = re.findall('\"([\d\D]+?)\"', data)
         # print vol_l
         dd = {}
-        # ['2016-01-20,1,581973101059,25779016479,1710066593,583683167652',]
         # print vol_l
         # print len(vol_l)
         if len(vol_l) == 3:
             data = vol_l[0].split(',')
             data2 = vol_l[1].split(',')
             dataall = vol_l[2].split(',')
-            dd['sh'] = round(float(data[5]) / 100000000, 1) if len(data[5]) > 0 else 0
-            dd['sz'] = round(float(data2[5]) / 100000000, 1) if len(data2[5]) > 0 else 0
-            dd['all'] = round(float(dataall[5]) / 100000000, 1) if len(dataall[5]) > 0 else 0
+            dd['sh'] = round(
+                float(data[5]) / 100000000, 1) if len(data[5]) > 0 else 0
+            dd['sz'] = round(
+                float(data2[5]) / 100000000, 1) if len(data2[5]) > 0 else 0
+            dd['all'] = round(
+                float(dataall[5]) / 100000000, 1) if len(dataall[5]) > 0 else 0
         return dd
 
     def get_days_data(days=1):
@@ -162,15 +165,16 @@ def get_dfcfw_rzrq_SHSZ(url=ct.DFCFW_RZRQ_SHSZ):
         da = 0
         i = 0
         while rzrq_status:
-            for x in range(days, 20):
+            for x in range(1, 20):
                 yestoday = cct.last_tddate(x).replace('-', '/')
                 data2 = get_tzrq(url, yestoday)
                 log.info("yestoday:%s data:%s" % (yestoday, data2))
                 if len(data2) > 0:
+                    i += 1
                     # if da ==days and days==0:
                     # i +=1
-                    # if i >= days:
-                    break
+                    if i >= days:
+                        break
                     # elif da > days:
                         # break
                 # else:    da+=1
@@ -178,7 +182,6 @@ def get_dfcfw_rzrq_SHSZ(url=ct.DFCFW_RZRQ_SHSZ):
                 else:
                     log.info("%s:%s" % (yestoday, data2))
             rzrq_status = 0
-        log.info("%s:%s" % (yestoday, data2))
         return data2
 
     # today=cct.last_tddate().replace('-','/')
@@ -255,8 +258,8 @@ def get_lhb_dd(retry_count=3, pause=0.001):
             # soup = BeautifulSoup(html_doc.decode('gb2312','ignore'))
             # print soup.find_all('div', id="divListTemplate")
             # for i in soup.find_all('tr',attrs={"class": "gray"."class":""}):
-            alldata = {}
-            dict_data = {}
+            # alldata = {}
+            # dict_data = {}
             # print soup.find_all('div',id='divListTemplate')
 
             row = soup.find_all('div', id='divListTemplate')
