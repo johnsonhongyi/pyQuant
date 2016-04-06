@@ -38,7 +38,7 @@ if __name__ == "__main__":
     # log.level = log.debug
     # error_handler = SyslogHandler('Sina-M-Log', level='ERROR')
 
-    width, height = 141, 21
+    width, height = 145, 21
     def set_duration_console(duration_date):
         if cct.isMac():
             cct.set_console(width, height)
@@ -57,17 +57,20 @@ if __name__ == "__main__":
     block_path = tdd.get_tdx_dir_blocknew() + blkname
     status_change = False
     lastpTDX_DF = pd.DataFrame()
-    duration_date = 20160301
-    set_duration_console(duration_date)
+    duration_date = 30
+    end_date = None
     ptype = 'high'
     filter = 'y'
+    duration_date = tdd.get_duration_price_date('999999', dl=duration_date, end=end_date, ptype=ptype)
+    set_duration_console(duration_date)
     percent_status = 'n'
     # all_diffpath = tdd.get_tdx_dir_blocknew() + '062.blk'
     parser = cct.MoniterArgmain()
+    parserDuraton = cct.DurationArgmain()
     while 1:
         try:
             # df = sina_data.Sina().all
-            df = rl.get_sina_Market_json('all')
+            df = rl.get_sina_Market_json('cyb')
             top_now = rl.get_market_price_sina_dd_realTime(df, vol, type)
             top_dif = top_now
             # top_now.to_hdf("testhdf5", 'marketDD', format='table', complevel=9)
@@ -93,7 +96,8 @@ if __name__ == "__main__":
                     log.info('toTDXlist:%s' % len(codelist))
                     # tdxdata = tdd.get_tdx_all_day_LastDF(codelist,dt=duration_date,ptype=ptype)
                     # print "duration_date:%s ptype=%s filter:%s"%(duration_date, ptype,filter)
-                    tdxdata = tdd.get_tdx_exp_all_LastDF(codelist, dt=duration_date, ptype=ptype, filter=filter)
+                    tdxdata = tdd.get_tdx_exp_all_LastDF(codelist, dt=duration_date, end=end_date, ptype=ptype,
+                                                         filter=filter)
                     log.debug("TdxLastP: %s %s" % (len(tdxdata), tdxdata.columns.values))
                     tdxdata.rename(columns={'low': 'llow'}, inplace=True)
                     tdxdata.rename(columns={'high': 'lhigh'}, inplace=True)
@@ -171,13 +175,6 @@ if __name__ == "__main__":
 
                 goldstock = len(top_dif[top_dif.buy >= top_dif.high * 0.99])
                 ## goldstock=len(top_dif[top_dif.buy >(top_dif.high-top_dif.low)/2])
-                print ("N:%s K:%s %s G:%s" % (
-                    now_count, len(top_all[top_all['buy'] > 0]),
-                    len(top_now[top_now['volume'] <= 0]), goldstock)),
-                print "Rt:%0.1f dT:%s" % (float(time.time() - time_Rt), cct.get_time_to_date(time_s))
-                cct.set_console(width, height,
-                                title=[duration_date, 'dT:%s' % cct.get_time_to_date(time_s), 'G:%s' % goldstock,
-                                       'zxg: %s' % (blkname)])
                 if ptype == 'low':
                     top_dif = top_dif[top_dif.lvol > ct.LvolumeSize]
                     # top_dif = top_dif[top_dif.lvol > 12000]
@@ -202,24 +199,37 @@ if __name__ == "__main__":
                 if percent_status == 'y' and (
                                 cct.get_now_time_int() > 935 or cct.get_now_time_int() < 900) and ptype == 'low':
                     top_temp = top_dif[top_dif.percent > 0]
-                    top_temp = top_dif[:10].copy()
+                    top_temp = top_dif[:50].copy()
                     top_end = top_dif[-5:].copy()
                     top_temp = pct.powerCompute_df(top_temp)
                     top_end = pct.powerCompute_df(top_end)
 
                 # elif percent_status == 'y' and cct.get_now_time_int() > 935 and ptype == 'high' :
                 elif ptype == 'low':
-                    top_temp = top_dif[:10].copy()
+                    top_temp = top_dif[:50].copy()
                     top_end = top_dif[-5:].copy()
                     top_temp = pct.powerCompute_df(top_temp)
                     top_end = pct.powerCompute_df(top_end)
                 else:
                     top_end = top_dif[:5].copy()
-                    top_temp = top_dif[-10:].copy()
+                    top_temp = top_dif[-50:].copy()
                     top_temp = pct.powerCompute_df(top_temp, dl=30)
                     top_end = pct.powerCompute_df(top_end, dl=30)
+
+                print ("N:%s K:%s %s G:%s" % (
+                    now_count, len(top_all[top_all['buy'] > 0]),
+                    len(top_now[top_now['volume'] <= 0]), goldstock)),
+                print "Rt:%0.1f dT:%s" % (float(time.time() - time_Rt), cct.get_time_to_date(time_s))
+                cct.set_console(width, height,
+                                title=[duration_date, 'dT:%s' % cct.get_time_to_date(time_s), 'G:%s' % goldstock,
+                                       'zxg: %s' % (blkname)])
+
                 if 'op' in top_temp.columns:
-                    top_temp = top_temp.sort_values(by=['op','ra','diff', 'percent', 'ratio'], ascending=[0,0,0, 0, 1])                    
+                    # top_temp = top_temp.sort_values(by=['diff','op','ra', 'percent', 'ratio'], ascending=[0,0,0, 0, 1])[:10]
+                    top_temp = top_temp.sort_values(by=['op', 'ra', 'diff', 'percent', 'ratio'],
+                                                    ascending=[0, 0, 0, 0, 1])[:10]
+                    # top_temp = top_temp.sort_values(by=['op','ldate','ra','diff', 'percent', 'ratio'], ascending=[0,0,0,0, 0, 1])[:10]                
+                
                 top_dd = pd.concat([top_temp, top_end], axis=0)
                 if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935:
                     top_dd = top_dd.loc[:,
@@ -295,47 +305,50 @@ if __name__ == "__main__":
                 time_s = time.time()
                 status = False
             elif st.startswith('d') or st.startswith('dt'):
-                dl = st.split()
-                if len(dl) == 2:
-                    dt = dl[1]
-                elif len(dl) == 3:
-                    dt = dl[1]
-                    p_t = dl[2]
-                    if p_t.startswith('l'):
-                        ptype = 'low'
-                    elif p_t.startswith('h'):
-                        ptype = 'high'
-                    elif p_t == 'y':
-                        filter = 'y'
-                    elif p_t == 'n':
-                        filter = 'n'
-                    elif p_t == 'py':
-                        percent_status = 'y'
-                    elif p_t == 'pn':
-                        percent_status = 'n'
-                    else:
-                        print ("arg error:%s" % p_t)
-                elif len(dl) == 4:
-                    dt = dl[1]
-                    ptype = dl[2]
-                    if ptype == 'l':
-                        ptype = 'low'
-                    elif ptype == 'h':
-                        ptype = 'high'
-                    filter = dl[3]
-                    percent_status = dl[3]
-                else:
-                    dt = ''
-                if len(str(dt)) > 0:
-                    if len(str(dt)) < 8:
-                        duration_date = tdd.get_duration_price_date('999999', dl=dt, ptype=ptype)
-                    else:
-                        duration_date = dt
+                # dl = st.split()
+                # if len(dl) == 2:
+                #     dt = dl[1]
+                # elif len(dl) == 3:
+                #     dt = dl[1]
+                #     p_t = dl[2]
+                #     if p_t.startswith('l'):
+                #         ptype = 'low'
+                #     elif p_t.startswith('h'):
+                #         ptype = 'high'
+                #     elif p_t == 'y':
+                #         filter = 'y'
+                #     elif p_t == 'n':
+                #         filter = 'n'
+                #     elif p_t == 'py':
+                #         percent_status = 'y'
+                #     elif p_t == 'pn':
+                #         percent_status = 'n'
+                #     else:
+                #         print ("arg error:%s" % p_t)
+                # elif len(dl) == 4:
+                #     dt = dl[1]
+                #     ptype = dl[2]
+                #     if ptype == 'l':
+                #         ptype = 'low'
+                #     elif ptype == 'h':
+                #         ptype = 'high'
+                #     filter = dl[3]
+                #     percent_status = dl[3]
+                # else:
+                #     dt = ''
+                args = parserDuraton.parse_args(st.split()[1:])
+                if len(str(args.start)) > 0:
+                    end_date = args.end
+                    duration_date = args.start
+                    if len(str(duration_date)) < 8:
+                        duration_date = tdd.get_duration_price_date('999999', dl=duration_date, end=end_date,
+                                                                    ptype=ptype)
                     set_duration_console(duration_date)
                     top_all = pd.DataFrame()
                     time_s = time.time()
                     status = False
                     lastpTDX_DF = pd.DataFrame()
+
             elif st == 'w' or st == 'a':
                 # if ptype == 'low':
                     # codew = (top_dd[:10].index).tolist()

@@ -210,15 +210,6 @@ if __name__ == "__main__":
 
                 # df['volume']= df['volume'].apply(lambda x:x/100)
 
-                print("A:%s N:%s K:%s %s G:%s" % (
-                    df_count, now_count, len(top_all[top_all['buy'] > 0]),
-                    len(top_now[top_now['volume'] <= 0]), len(top_dif))),
-                # print "Rt:%0.3f" % (float(time.time() - time_Rt))
-                print "Rt:%0.1f dT:%s" % (
-                    float(time.time() - time_Rt),
-                    cct.get_time_to_date(time_s))
-                cct.set_console(
-                    title=['dT:%s' % cct.get_time_to_date(time_s), 'G:%s' % len(top_dif), 'zxg: %s' % (blkname)])
                 if 'counts' in top_dif.columns.values:
                     top_dif = top_dif.sort_values(
                         by=['diff', 'percent', 'volume', 'counts', 'ratio'],
@@ -229,9 +220,19 @@ if __name__ == "__main__":
                         by=['diff', 'percent', 'ratio'], ascending=[0, 0, 1])
 
                 # top_all=top_all.sort_values(by=['percent','diff','counts','ratio'],ascending=[0,0,1,1])
-                
-                top_temp = top_dif[:10].copy()
+
+                top_temp = top_dif[:50].copy()
                 top_temp = pct.powerCompute_df(top_temp,dl='30')
+                print("A:%s N:%s K:%s %s G:%s" % (
+                    df_count, now_count, len(top_all[top_all['buy'] > 0]),
+                    len(top_now[top_now['volume'] <= 0]), len(top_dif))),
+                # print "Rt:%0.3f" % (float(time.time() - time_Rt))
+                print "Rt:%0.1f dT:%s" % (
+                    float(time.time() - time_Rt),
+                    cct.get_time_to_date(time_s))
+                cct.set_console(
+                    title=['dT:%s' % cct.get_time_to_date(time_s), 'G:%s' % len(top_dif), 'zxg: %s' % (blkname)])
+
                 if 'op' in top_temp.columns:
                     top_temp = top_temp.sort_values(by=['op','ra','diff', 'percent', 'ratio'], ascending=[0,0,0, 0, 1])
                 if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935:

@@ -598,8 +598,10 @@ def code_to_tdx_blk(code):
 
 def write_to_blocknew(p_name, data, append=True):
     if append:
-        fout = open(p_name, 'ab+')
+        # fout = open(p_name, 'ab+')
+        fout = open(p_name)
         flist = fout.readlines()
+        print "flist", flist
     else:
         fout = open(p_name, 'wb')
         index_list = ['1999999', '27#HSI', '47#IFL0', '0159915']
@@ -612,26 +614,21 @@ def write_to_blocknew(p_name, data, append=True):
     for i in data:
         # print type(i)
         if append and len(flist) > 0:
-            wstatus = True
-            for ic in flist:
-                # print code_to_tdxblk(i),ic
-                if code_to_tdxblk(i).strip() == ic.strip():
-                    wstatus = False
-            if wstatus:
-                # if x==0:
-                #     x+=1
-                #     raw='\r\n'+code_to_tdxblk(i)+'\r\n'
-                # else:
-                raw = code_to_tdxblk(i) + '\r\n'
+            # wstatus = True
+            # print "a",code_to_tdxblk(i).strip() in flist
+            # for ic in flist:
+            #     if code_to_tdxblk(i).strip() == ic.strip():
+            #         wstatus = False
+            # if wstatus:
+            raw = code_to_tdxblk(i).strip() + '\r\n'
+            if not raw in flist:
                 fout.write(raw)
         else:
             raw = code_to_tdxblk(i) + '\r\n'
             fout.write(raw)
 
             # raw = pack('IfffffII', t, i[2], i[3], i[4], i[5], i[6], i[7], i[8])
-    # end for
     fout.close()
-    # print "wri ok:%s" % p_name
 
 def get_sys_platform():
     return platform.platform()
@@ -724,7 +721,26 @@ def MoniterArgmain():
                         help='type')
     parser.add_argument('-f', action="store", dest="filter", type=str, choices=['y', 'n'], default='n',
                         help='find duration low')
-    return parser        
+    return parser
+
+
+def DurationArgmain():
+    parser = argparse.ArgumentParser()
+    # parser = argparse.ArgumentParser(description='LinearRegression Show')
+    # parser.add_argument('code', type=str, nargs='?', help='999999')
+    parser.add_argument('start', nargs='?', type=str, help='20150612')
+    # parser.add_argument('e', nargs='?',action="store", dest="end", type=str, help='end')
+    parser.add_argument('end', nargs='?', type=str, help='20160101')
+    # parser.add_argument('-d', action="store", dest="dtype", type=str, nargs='?', choices=['d', 'w', 'm'], default='d',
+    #                     help='DateType')
+    # parser.add_argument('-p', action="store", dest="ptype", type=str, choices=['f', 'b'], default='f',
+    #                     help='Price Forward or back')
+    # parser.add_argument('-v', action="store", dest="vtype", type=str, choices=['high', 'low','open','close'], default='close',
+    # parser.add_argument('-v', action="store", dest="vtype", type=str, choices=['high', 'low', 'close'], default='close',
+    # help='type')
+    parser.add_argument('-f', action="store", dest="filter", type=str, choices=['y', 'n'], default='n',
+                        help='filter low')
+    return parser  
     
 def LineArgmain():
     # from ConfigParser import ConfigParser
@@ -776,6 +792,7 @@ def LineArgmain():
 if __name__ == '__main__':
     # print get_run_path()
     # print get_work_time_ratio()
+    # print typeday8_to_day10(None)
     print get_work_time_ratio()
     for x in range(1,2,1):
         print last_tddate(x)

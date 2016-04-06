@@ -82,7 +82,7 @@ def get_sina_url(vol='0', type='0', pageCount='100'):
 if __name__ == "__main__":
 
     if cct.isMac():
-        cct.set_console(108, 16)
+        cct.set_console(111, 16)
     else:
         cct.set_console(100, 16)
     # log.setLevel(LoggerFactory.DEBUG)
@@ -106,6 +106,7 @@ if __name__ == "__main__":
             df = rl.get_sina_all_json_dd(vol, type)
             top_now = rl.get_sina_dd_count_price_realTime(df)
             # print top_now
+            time_Rt = time.time()
             time_d = time.time()
             if time_d - time_s > delay_time:
                 status_change = True
@@ -181,9 +182,6 @@ if __name__ == "__main__":
                     top_all = top_all.loc[:,
                               ['name', 'percent', 'diff', 'counts', 'volume', 'trade', 'prev_p', 'ratio']]
 
-                print "G:%s dt:%s " % (len(top_all),cct.get_time_to_date(time_s))
-                cct.set_console(
-                    title=['dT:%s' % cct.get_time_to_date(time_s), 'G:%s' % len(top_all), 'zxg: %s' % (blkname)])
                 top_all = top_all.sort_values(by=[ 'counts', 'diff','volume', 'ratio'], ascending=[0, 0, 0, 1])
                 # top_all=top_all.sort_values(by=['diff','percent','counts','ratio'],ascending=[0,0,1,1])
 
@@ -200,6 +198,11 @@ if __name__ == "__main__":
                 
                 top_temp = top_all[:30].copy()
                 top_temp = pct.powerCompute_df(top_temp,dl='30')
+                print "G:%s dt:%s " % (len(top_all),cct.get_time_to_date(time_s)),
+                print "Rt:%0.1f" % (float(time.time() - time_Rt))
+                cct.set_console(
+                    title=['dT:%s' % cct.get_time_to_date(time_s), 'G:%s' % len(top_all), 'zxg: %s' % (blkname)])
+               
                 if 'op' in top_temp.columns:
                     top_temp = top_temp.sort_values(by=['op','ra','diff', 'percent', 'ratio'], ascending=[0,0,0, 0, 1])                
                 if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935:

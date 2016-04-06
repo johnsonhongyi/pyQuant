@@ -243,7 +243,7 @@ class Sina:
         df = pd.DataFrame(list_s, columns=ct.SINA_Total_Columns)
         # if self.index_status and cct.get_work_time():
         # if self.index_status:
-        if cct.get_work_time() or (cct.get_now_time_int() > 915 and cct.get_now_time_int() < 1510) :
+        if cct.get_work_time() or (cct.get_now_time_int() > 915) :
             df = df.drop('close', axis=1)
             df.rename(columns={'now': 'close'}, inplace=True)
         df = df.drop_duplicates('code')
@@ -267,9 +267,10 @@ if __name__ == "__main__":
     sina = Sina()
     # df= sina.all
     # code='601198'
-    # df = sina.get_stock_list_data(['300380'])
-    df = sina.get_stock_code_data('000001',index=True).set_index('code')
-    print df[:1]
+    df = sina.get_stock_list_data(['300380','601998','999999']).set_index('code')
+    # df = sina.get_stock_code_data('000001',index=True).set_index('code')
+    print df
+    print df.loc['300380']
     # list=['000001','399001','399006','399005']
     # df=sina.get_stock_list_data(list)
     # print time.time() - times

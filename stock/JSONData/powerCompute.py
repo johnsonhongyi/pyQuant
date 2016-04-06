@@ -14,10 +14,10 @@ from matplotlib.patches import Rectangle
 import datetime
 from JohhnsonUtil import LoggerFactory as LoggerFactory
 from JohhnsonUtil import commonTips as cct
+from JSONData import tdx_data_Day as tdd
 from JohhnsonUtil import zoompan
 log = LoggerFactory.getLogger("PowerCompute")
 # log.setLevel(LoggerFactory.INFO)
-from JSONData import tdx_data_Day as tdd
 
 if not cct.isMac():
     def set_ctrl_handler():
@@ -47,7 +47,7 @@ if cct.isMac():
 else:
     mpl.rcParams['font.sans-serif'] = ['SimHei']
     mpl.rcParams['axes.unicode_minus'] = False
-    
+
 # import signal
 # def signal_handler(sig, frame):
 #     print('Received signal {signal}'.format(signal=sig))
@@ -171,7 +171,7 @@ def Candlestick(ax, bars=None, quotes=None, width=0.5, colorup='k', colordown='r
     # fig = plt.figure(figsize=(16, 10))
     # ax = fig.add_axes([0.05, 0.1, 0.9, 0.9])
     # customization of the axis
-    # 
+    #
     '''
     #custom color
     ax.spines['right'].set_color('none')
@@ -210,7 +210,7 @@ def Candlestick(ax, bars=None, quotes=None, width=0.5, colorup='k', colordown='r
 
     # fig.autofmt_xdate()
     ax.autoscale_view()
-    # Create the candle sticks    
+    # Create the candle sticks
     fooCandlestick(ax, data2, width=width, colorup='r', colordown='g')
 
 
@@ -300,9 +300,16 @@ def get_linear_model_status(code, df=None, dtype='d', type='m', start=None, end=
         if len(df) > 2 and dl is None:
             if df.index.values[0] < index_d:
                 df = df[df.index >= index_d]
-    if dl is not None:            
-        start, index_d = tdd.get_duration_price_date(
-            code, ptype=ptype, dl=dl, filter=False)
+    if dl is not None:
+        start, index_d = tdd.get_duration_price_date(   
+            code, ptype=ptype, dl=dl, filter=False,df=df)
+        # print start,index_d,ptype
+        if df is not None:
+            df = df[df.index >= start]
+            # if len(df) > 2 and start is not None and filter == 'y':
+            #     if df.index.values[0] < index_d:
+            #         df = df[df.index >= index_d]
+            #         print df[:1]
         # start = tdd.get_duration_date(
             # code, ptype=ptype, dl=dl)
         # start = tdd.get_duration_price_date(code,ptype='low',dl=dl)
@@ -322,9 +329,10 @@ def get_linear_model_status(code, df=None, dtype='d', type='m', start=None, end=
             start=df.index.values[0]
         if len(df) > 2 and dl is None and start is not None and filter == 'y':
             # print df.index.values[0],index_d
-            # print "df:%s code:%s"%(len(df),code)
+            # print "df:%s code:%s"%(len(df),code)`
             if df.index.values[0] < index_d:
                 df = df[df.index >= index_d]
+
     if not dtype == 'd':
         df = tdd.get_tdx_stock_period_to_type(
             df, dtype).sort_index(ascending=True)
@@ -493,17 +501,17 @@ def get_linear_model_candles(code, ptype='low', dtype='d', start=None, end=None,
             log.debug("index_d:%s" % (index_d))
         start = tdd.get_duration_price_date(code, ptype=ptype, dt=index_d)
         log.debug("start:%s" % (start))
-    
+
     if start is None and dl is not None:
         start = cct.last_tddate(dl)
         # print start
         df=tdd.get_tdx_append_now_df_api(code,start=start).sort_index(ascending=True)
-    
+
     if df is None:
         df = tdd.get_tdx_append_now_df_api(
             code, start=start, end=end).sort_index(ascending=True)
         start=df.index.values[0]
-        
+
     if not dtype == 'd':
         df = tdd.get_tdx_stock_period_to_type(
             df, dtype).sort_index(ascending=True)
@@ -609,7 +617,7 @@ def get_linear_model_candles(code, ptype='low', dtype='d', start=None, end=None,
         else:
             directionX = 0.8
             directionY = 0.1
-            # directColor = 'cyan' m 
+            # directColor = 'cyan' m
             directColor = 'g'
         plt.annotate('Hat:%0.2f'%(Y_hat[-1]),(X[-1],Y_hat[-1]),
             # xytext=(0.8, 0.9),
@@ -622,14 +630,14 @@ def get_linear_model_candles(code, ptype='low', dtype='d', start=None, end=None,
             arrowprops=dict(facecolor=directColor, shrink=0.02,headwidth=5,width=1),
             fontsize=14, color = directColor,
             horizontalalignment='right', verticalalignment='bottom')
-        
+
         return status_n
-        
+
     def setBollPlt(code, df, ptype='low',start=None,status=None):
         if start is None:
             dt = tdd.get_duration_price_date(code, ptype=ptype, dl=60, df=df)
         else:
-            dt = tdd.get_duration_price_date(code, ptype=ptype, dt=start, df=df)    
+            dt = tdd.get_duration_price_date(code, ptype=ptype, dt=start, df=df)
         assetL = df[df.index >= dt][ptype]
         if len(assetL) == 1:
             mlist = twoLineCompute(code,df=df,start=start, ptype=ptype)
@@ -665,7 +673,7 @@ def get_linear_model_candles(code, ptype='low', dtype='d', start=None, end=None,
     plt.plot(roll_mean,'b')
     # print roll_mean[-1]
     # plt.legend(["MA:10"+str(roll_mean[-1]], fontsize=12,loc=2)
-    
+
     plt.ylabel('Price', fontsize=12)
     if 'name' in df.columns:
         plt.title(df.name.values[-1:][0]+ " " + code + " | " + str(dates[-1])[:11]+" | "+"MA:%0.2f"%(roll_mean[-1]), fontsize=12)
@@ -707,7 +715,7 @@ def get_linear_model_candles(code, ptype='low', dtype='d', start=None, end=None,
                     # Xa=X[ida:idb - 1]
                     Xa = X[ida - 1 :]
                     Xb = Xa - Xa[0]
-                    # sb=(bX - aX)*b+sa 
+                    # sb=(bX - aX)*b+sa
                     b = (sb - sa) / (bX - aX)
                     Ylist = Xb * b + sa
                     Yhat = []
@@ -741,34 +749,44 @@ def get_linear_model_candles(code, ptype='low', dtype='d', start=None, end=None,
 
 
 def powerCompute_df(df, dtype='d', end=None, dl=None, filter='y'):
-    code_l = df.index.tolist()
-    # dtype=dtype
-    # df['op']
+    if isinstance(df, list):
+        code_l = df
+        statuslist=True
+    else:
+        code_l = df.index.tolist()
+        statuslist=False
+    dm = tdd.get_sina_data_df(code_l)
+    if statuslist:
+        df = dm
     for code in code_l:
-        if dl is None:
-            start = df.loc[code, 'date']
-            start = cct.day8_to_day10(start)
+        if statuslist:
+            start=None
         else:
-            start = None
+            if dl is None:
+                start = df.loc[code, 'date']
+                start = cct.day8_to_day10(start)
+                filter = 'n'
+                # print start
+            else:
+                start = None
 
-        # end=cct.day8_to_day10(end)
         start = cct.day8_to_day10(start)
         end = cct.day8_to_day10(end)
-        opc = 0 
+        dz = dm.loc[code].to_frame().T
+        tdx_df = tdd.get_tdx_power_now_df(code,start=start, end=end, type='f', df=None, dm=dz,dl=dl)
+        opc = 0
         stl = ''
         rac = 0
         fib = []
         sep = '|'
         for ptype in ['low','high']:
             op, ra, st, days = get_linear_model_status(
-                code, dtype=dtype, start=start, end=end, dl=dl, filter=filter,ptype=ptype)
+                code,df=tdx_df,dtype=dtype, start=None, end=None, dl=dl, filter=filter,ptype=ptype)
             fib.append(str(days))
             opc +=op
             rac += ra
             if ptype == 'low':
                 stl = st
-        # if dl is not None:
-        # df.loc[code,'ldate'] = st
         fibl= sep.join(fib)
         df.loc[code, 'op'] = opc
         df.loc[code, 'ra'] = rac
@@ -800,9 +818,9 @@ def parseArgmain():
     parser.add_argument('-l', action="store", dest="dl", type=int, default=None,
                         help='dl')
     parser.add_argument('-dl', action="store", dest="days", type=int, default=1,
-                        help='days')                        
+                        help='days')
     parser.add_argument('-m', action="store", dest="mpl", type=str, default='y',
-                        help='mpl show')                            
+                        help='mpl show')
     return parser
 
 
@@ -817,6 +835,7 @@ def maintest(code, start=None, type='m', filter='y'):
 if __name__ == "__main__":
     # print get_linear_model_status('399001', filter='y',dl=30,ptype='low')
     # print get_linear_model_status('399001', filter='y',dl=30,ptype='high')
+    # print powerCompute_df(['000001','601198','000503'], dtype='d',end=None, dl=30, filter='y')
     # sys.exit()
     parser = parseArgmain()
     parser.print_help()

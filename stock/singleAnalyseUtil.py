@@ -7,7 +7,6 @@ import types
 import pandas as pd
 import tushare as ts
 # print sys.path
-
 import JSONData.fundflowUtil as ffu
 import JohhnsonUtil.johnson_cons as ct
 import JohhnsonUtil.commonTips as cct
@@ -235,7 +234,7 @@ def getFibonacci(code,dl=60,start=None):
         codes = code
     for code in codes:
         for ptype in ['low','high']:
-            op, ra, st, days = pct.get_linear_model_status(code, filter='y',dl=dl,ptype=ptype)
+            op, ra, st, days = pct.get_linear_model_status(code, filter='y', dl=dl, ptype=ptype, days=2)
             fib=cct.getFibonacci(300,days)            
             # print "%s op:%s ra:%s days:%s fib:%s %s" % (code, op, ra,days,fib, st)
             fibl.append([code, op, ra,days,fib,st])

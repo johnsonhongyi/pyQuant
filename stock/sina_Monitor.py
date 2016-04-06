@@ -61,6 +61,7 @@ if __name__ == "__main__":
                 print len(df),
             top_now = rl.get_sina_dd_count_price_realTime(df)
             # print len(top_now)
+            time_Rt = time.time()
             time_d = time.time()
             if time_d - time_s > delay_time:
                 status_change = True
@@ -137,7 +138,6 @@ if __name__ == "__main__":
                     top_all = top_all.loc[:,
                               ['name', 'percent', 'diff', 'counts', 'volume', 'trade', 'prev_p', 'ratio']]
 
-                print "G:%s dt:%s" % (len(top_all),cct.get_time_to_date(time_s))
                 top_all = top_all.sort_values(by=['diff', 'counts', 'volume', 'ratio'], ascending=[0, 0, 0, 1])
                 # top_all=top_all.sort_values(by=['percent','diff','counts','ratio'],ascending=[0,0,1,1])
                 if cct.get_now_time_int() > 930 and 'lastp' in top_all.columns: 
@@ -151,9 +151,13 @@ if __name__ == "__main__":
                 # print tbl.tabulate(top_all,headers='keys', tablefmt='orgtbl')
                 # print rl.format_for_print(top_all)
                 # print top_all[:10]
-                
-                top_temp = top_all[:10].copy()
+
+                top_temp = top_all[:50].copy()
                 top_temp = pct.powerCompute_df(top_temp,dl='30')
+
+                print "G:%s dt:%s" % (len(top_all), cct.get_time_to_date(time_s)),
+                print "Rt:%0.1f" % (float(time.time() - time_Rt))
+               
                 if 'op' in top_temp.columns:
                     top_temp = top_temp.sort_values(by=['op','ra','diff', 'percent', 'ratio'], ascending=[0,0,0, 0, 1])
                 if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935:
