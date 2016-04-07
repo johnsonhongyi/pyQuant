@@ -58,10 +58,12 @@ if __name__ == "__main__":
     status_change = False
     lastpTDX_DF = pd.DataFrame()
     duration_date = 30
-    end_date = None
+    # print cct.last_tddate(2)
+    end_date = cct.last_tddate(2)
     ptype = 'high'
     filter = 'y'
-    duration_date = tdd.get_duration_price_date('999999', dl=duration_date, end=end_date, ptype=ptype)
+    dutype = 'low'
+    duration_date = tdd.get_duration_price_date('999999', dl=duration_date, end=end_date, ptype='dutype')
     set_duration_console(duration_date)
     percent_status = 'n'
     # all_diffpath = tdd.get_tdx_dir_blocknew() + '062.blk'
@@ -70,7 +72,7 @@ if __name__ == "__main__":
     while 1:
         try:
             # df = sina_data.Sina().all
-            df = rl.get_sina_Market_json('cyb')
+            df = rl.get_sina_Market_json('all')
             top_now = rl.get_market_price_sina_dd_realTime(df, vol, type)
             top_dif = top_now
             # top_now.to_hdf("testhdf5", 'marketDD', format='table', complevel=9)
@@ -342,7 +344,7 @@ if __name__ == "__main__":
                     duration_date = args.start
                     if len(str(duration_date)) < 8:
                         duration_date = tdd.get_duration_price_date('999999', dl=duration_date, end=end_date,
-                                                                    ptype=ptype)
+                                                                    ptype='dutype')
                     set_duration_console(duration_date)
                     top_all = pd.DataFrame()
                     time_s = time.time()

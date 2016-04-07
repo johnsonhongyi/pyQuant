@@ -290,22 +290,25 @@ def get_linear_model_status(code, df=None, dtype='d', type='m', start=None, end=
         # index_d=cct.day8_to_day10(start)
         # log.debug("index_d:%s"%(index_d))
         index_d = cct.day8_to_day10(start)
-        start = tdd.get_duration_price_date(code, ptype=ptype, dt=start)
+        start = tdd.get_duration_price_date(code, ptype=ptype, dt=start, df=df, power=True)
         log.debug("start: %s  index_d:%s" % (start, index_d))
     elif end is not None and filter =='y':
         df = tdd.get_tdx_append_now_df_api(code, start, end).sort_index(ascending=True)
         index_d = cct.day8_to_day10(start)
-        start = tdd.get_duration_price_date(code, ptype=ptype, dt=start,df=df)
+        start = tdd.get_duration_price_date(code, ptype=ptype, dt=start, df=df, power=True)
         df = df[df.index >=start]
         if len(df) > 2 and dl is None:
             if df.index.values[0] < index_d:
                 df = df[df.index >= index_d]
     if dl is not None:
-        start, index_d = tdd.get_duration_price_date(   
-            code, ptype=ptype, dl=dl, filter=False,df=df)
+        start, index_d = tdd.get_duration_price_date(
+            code, ptype=ptype, dl=dl, filter=False, df=df, power=True)
         # print start,index_d,ptype
-        if df is not None:
-            df = df[df.index >= start]
+    if df is not None:
+        df = df[df.index >= start]
+        if start and index_d and len(df) > 2 and filter == 'y':
+            if df.index.values[0] < index_d:
+                df = df[df.index >= index_d]
             # if len(df) > 2 and start is not None and filter == 'y':
             #     if df.index.values[0] < index_d:
             #         df = df[df.index >= index_d]
@@ -346,7 +349,7 @@ def get_linear_model_status(code, df=None, dtype='d', type='m', start=None, end=
         asset = asset.dropna()
         X = np.arange(len(asset))
         x = sm.add_constant(X)
-        model = regression.linear_model.OLS(asset, x).fit()
+        model = regression.linear_model.OLS(asset.astype(float), x).fit()
         a = model.params[0]
         b = model.params[1]
         log.debug("X:%s a:%0.1f b:%0.1f" % (len(asset), a, b))
@@ -465,11 +468,16 @@ def get_linear_model_status(code, df=None, dtype='d', type='m', start=None, end=
             # for co in ['high', 'close', 'low']:
             for co in ['low','high','close']:
                 for d_type in ['H', 'M', 'L']:
-                    op, ratio = get_linear_model_ratio(asset[co] , d_type ,df[co][-days] if len(df) > 1+days else None)
+                    assetratio = asset[co]
+                    nowpratio = df[co][-days] if len(df) > 1 + days else None
+                    # print assetratio,nowpratio
+                    op, ratio = get_linear_model_ratio(assetratio, d_type, nowpratio)
                     ratio_l.append(round(ratio, 2))
                     operationcount += op
         else:
-            op, ratio = get_linear_model_ratio(asset['close'] , type,df['close'][-days] if len(df) > 1+days else None)
+            assetratio = asset['close']
+            nowpratio = df['close'][-days] if len(df) > 1 + days else None
+            op, ratio = get_linear_model_ratio(assetratio, type, nowpratio)
             ratio_l.append(round(ratio, 2))
             operationcount += op
 
@@ -499,7 +507,7 @@ def get_linear_model_candles(code, ptype='low', dtype='d', start=None, end=None,
         else:
             index_d = cct.day8_to_day10(start)
             log.debug("index_d:%s" % (index_d))
-        start = tdd.get_duration_price_date(code, ptype=ptype, dt=index_d)
+        start = tdd.get_duration_price_date(code, ptype=ptype, dt=index_d, power=True)
         log.debug("start:%s" % (start))
 
     if start is None and dl is not None:
@@ -635,9 +643,9 @@ def get_linear_model_candles(code, ptype='low', dtype='d', start=None, end=None,
 
     def setBollPlt(code, df, ptype='low',start=None,status=None):
         if start is None:
-            dt = tdd.get_duration_price_date(code, ptype=ptype, dl=60, df=df)
+            dt = tdd.get_duration_price_date(code, ptype=ptype, dl=60, df=df, power=True)
         else:
-            dt = tdd.get_duration_price_date(code, ptype=ptype, dt=start, df=df)
+            dt = tdd.get_duration_price_date(code, ptype=ptype, dt=start, df=df, power=True)
         assetL = df[df.index >= dt][ptype]
         if len(assetL) == 1:
             mlist = twoLineCompute(code,df=df,start=start, ptype=ptype)
@@ -659,13 +667,13 @@ def get_linear_model_candles(code, ptype='low', dtype='d', start=None, end=None,
         # print assertL[-1],assert[0]
         setRegLinearPlt(assetL, xaxis=xaxisInit,status=status)
         op, ra, st, days = get_linear_model_status(
-            code, df=df[df.index >= dt], start=dt,filter='y')
+            code, df=df[df.index >= dt], start=dt, filter='y', ptype=ptype)
         print "%s op:%s ra:%s days:%s  start:%s" % (code, op, str(ra), str(days), st)
 
     status=setRegLinearPlt(asset)
-    if filter == 'n':
-        setBollPlt(code, df, 'low',start,status=status)
-        setBollPlt(code, df, 'high',start,status=status)
+    # if filter == 'n':
+    setBollPlt(code, df, 'low', start, status=status)
+    setBollPlt(code, df, 'high', start, status=status)
         # pass
     # eval("df.%s"%ptype).ewm(span=20).mean().plot(style='k')
     eval("df.%s" % 'close').plot(style='k')
@@ -687,7 +695,7 @@ def get_linear_model_candles(code, ptype='low', dtype='d', start=None, end=None,
     if filter:
 
         for type in ['high', 'low']:
-            dt = tdd.get_duration_price_date(code, ptype=type, dt=start, df=df)
+            dt = tdd.get_duration_price_date(code, ptype=type, dt=start, df=df, power=True)
             mlist = twoLineCompute(code,df=df,start=dt, ptype=type)
             if len(mlist) > 1:
                 log.info("mlist:%s"%mlist)
@@ -765,7 +773,7 @@ def powerCompute_df(df, dtype='d', end=None, dl=None, filter='y'):
             if dl is None:
                 start = df.loc[code, 'date']
                 start = cct.day8_to_day10(start)
-                filter = 'n'
+                # filter = 'y'
                 # print start
             else:
                 start = None
@@ -774,6 +782,7 @@ def powerCompute_df(df, dtype='d', end=None, dl=None, filter='y'):
         end = cct.day8_to_day10(end)
         dz = dm.loc[code].to_frame().T
         tdx_df = tdd.get_tdx_power_now_df(code,start=start, end=end, type='f', df=None, dm=dz,dl=dl)
+        # print tdx_df
         opc = 0
         stl = ''
         rac = 0
@@ -781,7 +790,7 @@ def powerCompute_df(df, dtype='d', end=None, dl=None, filter='y'):
         sep = '|'
         for ptype in ['low','high']:
             op, ra, st, days = get_linear_model_status(
-                code,df=tdx_df,dtype=dtype, start=None, end=None, dl=dl, filter=filter,ptype=ptype)
+                code, df=tdx_df, dtype=dtype, start=start, end=end, dl=dl, filter=filter, ptype=ptype)
             fib.append(str(days))
             opc +=op
             rac += ra
@@ -835,7 +844,8 @@ def maintest(code, start=None, type='m', filter='y'):
 if __name__ == "__main__":
     # print get_linear_model_status('399001', filter='y',dl=30,ptype='low')
     # print get_linear_model_status('399001', filter='y',dl=30,ptype='high')
-    # print powerCompute_df(['000001','601198','000503'], dtype='d',end=None, dl=30, filter='y')
+    # print powerCompute_df(['601198'], dtype='d',end=None, dl=30, filter='y')
+    # print powerCompute_df(['601198','002791','000503'], dtype='d',end=None, dl=30, filter='y')
     # sys.exit()
     parser = parseArgmain()
     parser.print_help()
