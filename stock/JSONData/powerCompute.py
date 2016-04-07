@@ -492,13 +492,36 @@ def get_linear_model_status(code, df=None, dtype='d', type='m', start=None, end=
     elif len(asset) == 1:
         # log.error("powerCompute code:%s"%(code))
         if ptype == 'high':
-            return 10, 0, df.index.values[0], len(df)
+            if df.close[-1] >= df.high[-1] * 0.99 and df.close[-1] >= df.open[-1]:
+                return 12, 0, df.index.values[0], len(df)
+
+            elif df.close[-1] > df.open[-1]:
+                if df.close[-1] > df.high[-1] * 0.97:
+                    if len(df) > 2 and df.close[-1] > df.close[-2]:
+                        return 10, 0, df.index.values[0], len(df)
+                    else:
+                        return 11, 0, df.index.values[0], len(df)
+                else:
+                    return 9, 0, df.index.values[0], len(df)
+            else:
+                if len(df) >= 2:
+                    if df.close[-1] > df.close[-2] * 1.01:
+                        return 9, 0, df.index.values[0], len(df)
+                    elif df.close[-1] > df.close[-2]:
+                        return 8, 0, df.index.values[0], len(df)
+                    elif df.low[-1] > df.low[-2]:
+                        return 6, 0, df.index.values[0], len(df)
+                    else:
+                        return 3, 0, df.index.values[0], len(df)
+                else:
+                    return 1, 0, df.index.values[0], len(df)
         else:
             return -10, 0, df.index.values[0], len(df)
     else:
         # log.error("code:%s %s :%s" % (code, ptype,len(df)))
         if ptype == 'high':
-            return 10, 1, cct.get_today(), len(df)
+            log.warn("df is None,start:%s index:%s" % start, index_d)
+            return 5, 1, cct.get_today(), len(df)
         else:
             return -10, -10, cct.get_today(), len(df)
 
@@ -518,7 +541,7 @@ def get_linear_model_candles(code, ptype='low', dtype='d', start=None, end=None,
     if start is None and dl is not None:
         start = cct.last_tddate(dl)
         # print start
-        df = tdd.get_tdx_append_now_df_api(code, start=start).sort_index(ascending=True)
+        df = tdd.get_tdx_append_now_df_api(code, start=start, end=end).sort_index(ascending=True)
 
     if df is None:
         df = tdd.get_tdx_append_now_df_api(
@@ -849,11 +872,11 @@ def maintest(code, start=None, type='m', filter='y'):
 
 
 if __name__ == "__main__":
-    print get_linear_model_status('399001', filter='y', dl=30, ptype='low')
-    print get_linear_model_status('399001', filter='y', dl=30, ptype='high')
+    # print get_linear_model_status('399001', filter='y', dl=30, ptype='low')
+    # print get_linear_model_status('399001', filter='y', dl=30, ptype='high')
     # print powerCompute_df(['601198'], dtype='d',end=None, dl=30, filter='y')
-    print powerCompute_df(['601198', '002791', '000503'], dtype='d', end=None, dl=30, filter='y')
-    sys.exit()
+    # print powerCompute_df(['601198', '002791', '000503'], dtype='d', end=None, dl=30, filter='y')
+    # sys.exit()
     parser = parseArgmain()
     parser.print_help()
     while 1:
