@@ -16,6 +16,7 @@ from JohhnsonUtil import LoggerFactory as LoggerFactory
 from JohhnsonUtil import commonTips as cct
 from JSONData import tdx_data_Day as tdd
 from JohhnsonUtil import zoompan
+
 log = LoggerFactory.getLogger("PowerCompute")
 # log.setLevel(LoggerFactory.INFO)
 
@@ -47,6 +48,7 @@ if cct.isMac():
 else:
     mpl.rcParams['font.sans-serif'] = ['SimHei']
     mpl.rcParams['axes.unicode_minus'] = False
+
 
 # import signal
 # def signal_handler(sig, frame):
@@ -141,6 +143,7 @@ def Candlestick(ax, bars=None, quotes=None, width=0.5, colorup='k', colordown='r
         ax.autoscale_view()
 
         return lines, boxes
+
     date = date2num(bars.index.to_datetime().to_pydatetime())
     openp = bars['open']
     closep = bars['close']
@@ -214,16 +217,17 @@ def Candlestick(ax, bars=None, quotes=None, width=0.5, colorup='k', colordown='r
     fooCandlestick(ax, data2, width=width, colorup='r', colordown='g')
 
 
-def twoLineCompute(code, df=None, start=None,end=None, ptype='low'):
+def twoLineCompute(code, df=None, start=None, end=None, ptype='low'):
     # ptype='low'
     # ptype='high'
     if df is None:
         # df = ts.get_hist_data(code,start=start)
         df = tdd.get_tdx_append_now_df_api(
-            code, start,end).sort_index(ascending=True)
+            code, start, end).sort_index(ascending=True)
     else:
-        df = df[df.index >=start]
+        df = df[df.index >= start]
     series = df[ptype]
+
     # pd.rolling_min(df.low,window=len(series)/8).unique()
 
     def get_Top(df, ptype):
@@ -231,12 +235,12 @@ def twoLineCompute(code, df=None, start=None,end=None, ptype='low'):
             period_type = 'd'
         elif len(df) > 30 and len(df) < 120:
             period_type = 'w'
-        elif int(len(df))/20 > 20:
-            total = int(len(df)/20 / 20)
-            period_type = '%sm'%total if total > 0 else 1
+        elif int(len(df)) / 20 > 20:
+            total = int(len(df) / 20 / 20)
+            period_type = '%sm' % total if total > 0 else 1
         else:
             period_type = 'm'
-        log.info("period:%s"%period_type)
+        log.info("period:%s" % period_type)
         df.index = pd.to_datetime(df.index)
         if ptype == 'high':
             dfw = df[ptype].resample(period_type, how='max')
@@ -250,7 +254,7 @@ def twoLineCompute(code, df=None, start=None,end=None, ptype='low'):
             ##dd = dfw[dfw.index >= idx]
         dd = dfw.dropna()
         all = len(dd)
-        log.info("all:%s"%(all))
+        log.info("all:%s" % (all))
         mlist = []
         if all > 60:
             step = 0.1
@@ -292,11 +296,11 @@ def get_linear_model_status(code, df=None, dtype='d', type='m', start=None, end=
         index_d = cct.day8_to_day10(start)
         start = tdd.get_duration_price_date(code, ptype=ptype, dt=start, df=df, power=True)
         log.debug("start: %s  index_d:%s" % (start, index_d))
-    elif end is not None and filter =='y':
+    elif end is not None and filter == 'y':
         df = tdd.get_tdx_append_now_df_api(code, start, end).sort_index(ascending=True)
         index_d = cct.day8_to_day10(start)
         start = tdd.get_duration_price_date(code, ptype=ptype, dt=start, df=df, power=True)
-        df = df[df.index >=start]
+        df = df[df.index >= start]
         if len(df) > 2 and dl is None:
             if df.index.values[0] < index_d:
                 df = df[df.index >= index_d]
@@ -309,15 +313,15 @@ def get_linear_model_status(code, df=None, dtype='d', type='m', start=None, end=
         if start and index_d and len(df) > 2 and filter == 'y':
             if df.index.values[0] < index_d:
                 df = df[df.index >= index_d]
-            # if len(df) > 2 and start is not None and filter == 'y':
-            #     if df.index.values[0] < index_d:
-            #         df = df[df.index >= index_d]
-            #         print df[:1]
-        # start = tdd.get_duration_date(
-            # code, ptype=ptype, dl=dl)
-        # start = tdd.get_duration_price_date(code,ptype='low',dl=dl)
-        # filter = 'y'
-        # print start,ptype
+                # if len(df) > 2 and start is not None and filter == 'y':
+                #     if df.index.values[0] < index_d:
+                #         df = df[df.index >= index_d]
+                #         print df[:1]
+                # start = tdd.get_duration_date(
+                # code, ptype=ptype, dl=dl)
+                # start = tdd.get_duration_price_date(code,ptype='low',dl=dl)
+                # filter = 'y'
+                # print start,ptype
 
     if df is None:
         if start is not None and len(start) > 8 and int(start[:4]) > 2500:
@@ -329,7 +333,7 @@ def get_linear_model_status(code, df=None, dtype='d', type='m', start=None, end=
         # if (start is not None or dl is not None) and filter=='y':
         # print "code:",start
         if start is None:
-            start=df.index.values[0]
+            start = df.index.values[0]
         if len(df) > 2 and dl is None and start is not None and filter == 'y':
             # print df.index.values[0],index_d
             # print "df:%s code:%s"%(len(df),code)`
@@ -342,7 +346,7 @@ def get_linear_model_status(code, df=None, dtype='d', type='m', start=None, end=
 
     # df = tdd.get_tdx_Exp_day_to_df(code, 'f').sort_index(ascending=True)
 
-    def get_linear_model_ratio(asset, type='M',nowP=None):
+    def get_linear_model_ratio(asset, type='M', nowP=None):
         duration = asset[-1:].index.values[0]
         log.debug("duration:%s" % duration)
         log.debug("duration:%s" % cct.get_today_duration(duration))
@@ -373,7 +377,7 @@ def get_linear_model_status(code, df=None, dtype='d', type='m', start=None, end=
                 # Y_Future = Y * b + a
                 # ratio = b/a*100
                 # log.info("Type:M ratio: %0.1f %0.1f Y_Mid: %0.1f" %
-                         # (b, ratio, Y_Future[-1]))
+                # (b, ratio, Y_Future[-1]))
                 # diff = asset.iat[-1] - Y_hat[-1]
                 # if diff > 0:
                 # return True, len(asset), diff
@@ -385,7 +389,7 @@ def get_linear_model_status(code, df=None, dtype='d', type='m', start=None, end=
                 Y_Future = X * b + a - c_low
                 # Y_Future = Y * b + a - c_low
                 # log.info("Type:L b: %0.1f ratio:%0.1f Y_Mid: %0.1f" %
-                         # (b, ratio, Y_Future[-1]))
+                # (b, ratio, Y_Future[-1]))
                 # diff = asset.iat[-1] - Y_hatlow[-1]
                 # if asset.iat[-1] - Y_hatlow[-1] > 0:
                 # return True, len(asset), diff
@@ -398,7 +402,7 @@ def get_linear_model_status(code, df=None, dtype='d', type='m', start=None, end=
                 Y_Future = X * b + a - c_high
                 # Y_Future = Y * b + a - c_high
                 # log.info("Type:H ratio: %0.1f %0.1f Y_Mid: %0.1f" %
-                         # (b, ratio, Y_Future[-1]))
+                # (b, ratio, Y_Future[-1]))
             if nowP is not None:
                 diff = nowP - Y_Future[-1]
             else:
@@ -406,11 +410,11 @@ def get_linear_model_status(code, df=None, dtype='d', type='m', start=None, end=
             if diff > 0:
                 operation += 1
                 # log.info("Type: %s UP !!! Y_Future: %0.1f b:%0.1f ratio:%0.1f " % (
-                    # type.upper(), Y_Future[-1], b, ratio))
-            # else:
+                # type.upper(), Y_Future[-1], b, ratio))
+                # else:
                 # operation -=1
                 # log.info("Type: %s Down Y_Future: %0.1f b:%0.1f ratio:%0.1f" % (
-                    # type.upper(), Y_Future[-1], b, ratio))
+                # type.upper(), Y_Future[-1], b, ratio))
             return operation, ratio
         else:
             if type.upper() == 'M':
@@ -418,14 +422,14 @@ def get_linear_model_status(code, df=None, dtype='d', type='m', start=None, end=
                 # Y_Future = Y * b + a
                 # ratio = b/a*100
                 # log.info("Type:M ratio: %0.1f %0.1f Y_Mid: %0.1f" %
-                         # (b, ratio, Y_Future[-1]))
+                # (b, ratio, Y_Future[-1]))
             elif type.upper() == 'L':
                 i = (asset.values.T - Y_hat).argmin()
                 c_low = X[i] * b + a - asset.values[i]
                 Y_Future = X * b + a - c_low
                 # Y_Future = Y * b + a - c_low
                 # log.info("Type:L b: %0.1f ratio:%0.1f Y_Mid: %0.1f" %
-                         # (b, ratio, Y_Future[-1]))
+                # (b, ratio, Y_Future[-1]))
                 # diff = asset.iat[-1] - Y_hatlow[-1]
                 # if asset.iat[-1] - Y_hatlow[-1] > 0:
                 # return True, len(asset), diff
@@ -438,7 +442,7 @@ def get_linear_model_status(code, df=None, dtype='d', type='m', start=None, end=
                 Y_Future = X * b + a - c_high
                 # Y_Future = Y * b + a - c_high
                 # log.info("Type:H ratio: %0.1f %0.1f Y_Mid: %0.1f" %
-                         # (b, ratio, Y_Future[-1]))
+                # (b, ratio, Y_Future[-1]))
             if nowP is not None:
                 diff = nowP - Y_Future[-1]
             else:
@@ -448,16 +452,17 @@ def get_linear_model_status(code, df=None, dtype='d', type='m', start=None, end=
                 # operation += 1
                 pass
                 # log.info("Type: %s UP !!! Y_Future: %0.1f b:%0.1f ratio:%0.1f " % (
-                    # type.upper(), Y_Future[-1], b, ratio))
+                # type.upper(), Y_Future[-1], b, ratio))
             else:
-                operation -=1
+                operation -= 1
                 # log.info("Type: %s Down Y_Future: %0.1f b:%0.1f ratio:%0.1f" % (
-                    # type.upper(), Y_Future[-1], b, ratio))
+                # type.upper(), Y_Future[-1], b, ratio))
             return operation, ratio
             log.debug("Line down !!! d:%s" % Y_hat[0])
             # print("Line down !!! d:%s nowp:%s" % (round(Y_hat[1],2),asset[-1:].values[0]))
             # return -3, round(ratio, 2)
-    if len(df)>1+days:
+
+    if len(df) > 1 + days:
         asset = df[:-days]
     else:
         asset = df
@@ -466,7 +471,7 @@ def get_linear_model_status(code, df=None, dtype='d', type='m', start=None, end=
         ratio_l = []
         if countall:
             # for co in ['high', 'close', 'low']:
-            for co in ['low','high','close']:
+            for co in ['low', 'high', 'close']:
                 for d_type in ['H', 'M', 'L']:
                     assetratio = asset[co]
                     nowpratio = df[co][-days] if len(df) > 1 + days else None
@@ -481,8 +486,8 @@ def get_linear_model_status(code, df=None, dtype='d', type='m', start=None, end=
             ratio_l.append(round(ratio, 2))
             operationcount += op
 
-        # log.info("op:%s min:%s ratio_l:%s" %
-                 # (operationcount, min(ratio_l), ratio_l))
+            # log.info("op:%s min:%s ratio_l:%s" %
+            # (operationcount, min(ratio_l), ratio_l))
         return operationcount, min(ratio_l), df[:1].index.values[0], len(df)
     elif len(asset) == 1:
         # log.error("powerCompute code:%s"%(code))
@@ -499,7 +504,7 @@ def get_linear_model_status(code, df=None, dtype='d', type='m', start=None, end=
 
 
 def get_linear_model_candles(code, ptype='low', dtype='d', start=None, end=None, filter='n',
-                             df=None,dl=None):
+                             df=None, dl=None):
     if start is not None and filter == 'y':
         if code not in ['999999', '399006', '399001']:
             index_d, dl = tdd.get_duration_Index_date(dt=start)
@@ -513,12 +518,12 @@ def get_linear_model_candles(code, ptype='low', dtype='d', start=None, end=None,
     if start is None and dl is not None:
         start = cct.last_tddate(dl)
         # print start
-        df=tdd.get_tdx_append_now_df_api(code,start=start).sort_index(ascending=True)
+        df = tdd.get_tdx_append_now_df_api(code, start=start).sort_index(ascending=True)
 
     if df is None:
         df = tdd.get_tdx_append_now_df_api(
             code, start=start, end=end).sort_index(ascending=True)
-        start=df.index.values[0]
+        start = df.index.values[0]
 
     if not dtype == 'd':
         df = tdd.get_tdx_stock_period_to_type(
@@ -586,7 +591,7 @@ def get_linear_model_candles(code, ptype='low', dtype='d', start=None, end=None,
 
     # print len(df),len(asset)
 
-    def setRegLinearPlt(asset, xaxis=None,status=None):
+    def setRegLinearPlt(asset, xaxis=None, status=None):
         X = np.arange(len(asset))
         if xaxis is not None:
             X = X + xaxis
@@ -610,7 +615,7 @@ def get_linear_model_candles(code, ptype='low', dtype='d', start=None, end=None,
         Y_hathigh = X * b + a - c_high
         status_n = Y_hat[-1] > Y_hat[0]
         if status is not None:
-            if status_n and  status:
+            if status_n and status:
                 return status_n
             elif not status_n and not status:
                 return status_n
@@ -627,35 +632,35 @@ def get_linear_model_candles(code, ptype='low', dtype='d', start=None, end=None,
             directionY = 0.1
             # directColor = 'cyan' m
             directColor = 'g'
-        plt.annotate('Hat:%0.2f'%(Y_hat[-1]),(X[-1],Y_hat[-1]),
-            # xytext=(0.8, 0.9),
-            xytext=(directionX, directionY),
-            textcoords='axes fraction',
-            # arrowprops=dict(facecolor='white', shrink=0.05),
-            # xytext=(directionX,directionY),
-            # textcoords='offset points',
-            # arrowprops=dict(arrowstyle="->"),
-            arrowprops=dict(facecolor=directColor, shrink=0.02,headwidth=5,width=1),
-            fontsize=14, color = directColor,
-            horizontalalignment='right', verticalalignment='bottom')
+        plt.annotate('Hat:%0.2f' % (Y_hat[-1]), (X[-1], Y_hat[-1]),
+                     # xytext=(0.8, 0.9),
+                     xytext=(directionX, directionY),
+                     textcoords='axes fraction',
+                     # arrowprops=dict(facecolor='white', shrink=0.05),
+                     # xytext=(directionX,directionY),
+                     # textcoords='offset points',
+                     # arrowprops=dict(arrowstyle="->"),
+                     arrowprops=dict(facecolor=directColor, shrink=0.02, headwidth=5, width=1),
+                     fontsize=14, color=directColor,
+                     horizontalalignment='right', verticalalignment='bottom')
 
         return status_n
 
-    def setBollPlt(code, df, ptype='low',start=None,status=None):
+    def setBollPlt(code, df, ptype='low', start=None, status=None):
         if start is None:
             dt = tdd.get_duration_price_date(code, ptype=ptype, dl=60, df=df, power=True)
         else:
             dt = tdd.get_duration_price_date(code, ptype=ptype, dt=start, df=df, power=True)
         assetL = df[df.index >= dt][ptype]
         if len(assetL) == 1:
-            mlist = twoLineCompute(code,df=df,start=start, ptype=ptype)
+            mlist = twoLineCompute(code, df=df, start=start, ptype=ptype)
             if len(mlist) > 0:
                 sp = mlist[0]
-                idx = df[df[ptype] == sp ].index.values[-1]
-                print "New %s  %s !!! start:%s"%(ptype,assetL[-1],idx)
+                idx = df[df[ptype] == sp].index.values[-1]
+                print "New %s  %s !!! start:%s" % (ptype, assetL[-1], idx)
             else:
                 idx = assertL.index[-1]
-                print "NTop %s  %s !!! start:%s"%(ptype,assetL[-1],idx)
+                print "NTop %s  %s !!! start:%s" % (ptype, assetL[-1], idx)
             assetL = df[df.index >= idx][ptype]
             dt = idx
             # return False
@@ -665,51 +670,53 @@ def get_linear_model_candles(code, ptype='low', dtype='d', start=None, end=None,
         # xaxisInit = len(df[df.index < dt])
         xaxisInit = len(df[df.index < dt])
         # print assertL[-1],assert[0]
-        setRegLinearPlt(assetL, xaxis=xaxisInit,status=status)
+        setRegLinearPlt(assetL, xaxis=xaxisInit, status=status)
         op, ra, st, days = get_linear_model_status(
             code, df=df[df.index >= dt], start=dt, filter='y', ptype=ptype)
         print "%s op:%s ra:%s days:%s  start:%s" % (code, op, str(ra), str(days), st)
 
-    status=setRegLinearPlt(asset)
+    status = setRegLinearPlt(asset)
     # if filter == 'n':
     setBollPlt(code, df, 'low', start, status=status)
     setBollPlt(code, df, 'high', start, status=status)
-        # pass
+    # pass
     # eval("df.%s"%ptype).ewm(span=20).mean().plot(style='k')
     eval("df.%s" % 'close').plot(style='k')
     roll_mean = pd.rolling_mean(df.high, window=10)
-    plt.plot(roll_mean,'b')
+    plt.plot(roll_mean, 'b')
     # print roll_mean[-1]
     # plt.legend(["MA:10"+str(roll_mean[-1]], fontsize=12,loc=2)
 
     plt.ylabel('Price', fontsize=12)
     if 'name' in df.columns:
-        plt.title(df.name.values[-1:][0]+ " " + code + " | " + str(dates[-1])[:11]+" | "+"MA:%0.2f"%(roll_mean[-1]), fontsize=12)
+        plt.title(
+            df.name.values[-1:][0] + " " + code + " | " + str(dates[-1])[:11] + " | " + "MA:%0.2f" % (roll_mean[-1]),
+            fontsize=12)
     else:
-        plt.title(code + " | " + str(dates[-1])[:11]+" | "+"MA:%0.2f"%(roll_mean[-1]), fontsize=12)
+        plt.title(code + " | " + str(dates[-1])[:11] + " | " + "MA:%0.2f" % (roll_mean[-1]), fontsize=12)
     # plt.title(code + " | " + str(dates[-1])[:11], fontsize=14)
     fib = cct.getFibonacci(len(asset) * 5, len(asset))
-    plt.legend(["Now:%s" % df.close[-1],"Hi:%s" % df.high[-1],  "Lo:%0.2f" % (asset.iat[-1]), "day:%s" %
+    plt.legend(["Now:%s" % df.close[-1], "Hi:%s" % df.high[-1], "Lo:%0.2f" % (asset.iat[-1]), "day:%s" %
                 len(asset), "fib:%s" % (fib)], fontsize=12, loc=8)
     plt.grid(True)
     if filter:
 
         for type in ['high', 'low']:
             dt = tdd.get_duration_price_date(code, ptype=type, dt=start, df=df, power=True)
-            mlist = twoLineCompute(code,df=df,start=dt, ptype=type)
+            mlist = twoLineCompute(code, df=df, start=dt, ptype=type)
             if len(mlist) > 1:
-                log.info("mlist:%s"%mlist)
-                sa = round(mlist[0],2)
-                sb = round(mlist[-1],2)
+                log.info("mlist:%s" % mlist)
+                sa = round(mlist[0], 2)
+                sb = round(mlist[-1], 2)
                 X = np.arange(len(df))
                 aid = df[df[type] == sa].index.values[-1][:10]
                 ida = len(df[df.index <= aid])
-                aX = X[ida-1]
+                aX = X[ida - 1]
 
                 bid = df[df[type] == sb].index.values[-1][:10]
                 # print df[df[type] == sb].index.values
                 idb = len(df[df.index <= bid])
-                bX = X[idb-1]
+                bX = X[idb - 1]
                 if sa < sb:
                     # print "Gold Line"
                     Xa = X[ida - 1:]
@@ -721,7 +728,7 @@ def get_linear_model_candles(code, ptype='low', dtype='d', start=None, end=None,
                 else:
                     # print "Down Line"
                     # Xa=X[ida:idb - 1]
-                    Xa = X[ida - 1 :]
+                    Xa = X[ida - 1:]
                     Xb = Xa - Xa[0]
                     # sb=(bX - aX)*b+sa
                     b = (sb - sa) / (bX - aX)
@@ -734,13 +741,13 @@ def get_linear_model_candles(code, ptype='low', dtype='d', start=None, end=None,
                         else:
                             break
                     Xa = Xa[:len(Yhat)]
-                log.info("aX:%s sa:%s bx:%s sb:%s"%(aX, sa, bX, sb))
-                log.info("Xa:%s Yhat"%(Xa[:1]))
+                log.info("aX:%s sa:%s bx:%s sb:%s" % (aX, sa, bX, sb))
+                log.info("Xa:%s Yhat" % (Xa[:1]))
                 # ax.plot([aX,bX],[sa,sb],'k--')
                 # print Yhat[0],Yhat[-1],sa,sb,Xa[0],ida,Xb[0]
                 ax.plot(Xa, Yhat, 'k--')
 
-            # else:
+                # else:
                 # print "Mlist:%s" % (mlist)
 
     # plt.legend([code]);
@@ -759,16 +766,16 @@ def get_linear_model_candles(code, ptype='low', dtype='d', start=None, end=None,
 def powerCompute_df(df, dtype='d', end=None, dl=None, filter='y'):
     if isinstance(df, list):
         code_l = df
-        statuslist=True
+        statuslist = True
     else:
         code_l = df.index.tolist()
-        statuslist=False
+        statuslist = False
     dm = tdd.get_sina_data_df(code_l)
     if statuslist:
         df = dm
     for code in code_l:
         if statuslist:
-            start=None
+            start = None
         else:
             if dl is None:
                 start = df.loc[code, 'date']
@@ -781,22 +788,22 @@ def powerCompute_df(df, dtype='d', end=None, dl=None, filter='y'):
         start = cct.day8_to_day10(start)
         end = cct.day8_to_day10(end)
         dz = dm.loc[code].to_frame().T
-        tdx_df = tdd.get_tdx_power_now_df(code,start=start, end=end, type='f', df=None, dm=dz,dl=dl)
+        tdx_df = tdd.get_tdx_power_now_df(code, start=start, end=end, type='f', df=None, dm=dz, dl=dl)
         # print tdx_df
         opc = 0
         stl = ''
         rac = 0
         fib = []
         sep = '|'
-        for ptype in ['low','high']:
+        for ptype in ['low', 'high']:
             op, ra, st, days = get_linear_model_status(
                 code, df=tdx_df, dtype=dtype, start=start, end=end, dl=dl, filter=filter, ptype=ptype)
             fib.append(str(days))
-            opc +=op
+            opc += op
             rac += ra
             if ptype == 'low':
                 stl = st
-        fibl= sep.join(fib)
+        fibl = sep.join(fib)
         df.loc[code, 'op'] = opc
         df.loc[code, 'ra'] = rac
         df.loc[code, 'fib'] = fibl
@@ -842,11 +849,11 @@ def maintest(code, start=None, type='m', filter='y'):
 
 
 if __name__ == "__main__":
-    # print get_linear_model_status('399001', filter='y',dl=30,ptype='low')
-    # print get_linear_model_status('399001', filter='y',dl=30,ptype='high')
+    print get_linear_model_status('399001', filter='y', dl=30, ptype='low')
+    print get_linear_model_status('399001', filter='y', dl=30, ptype='high')
     # print powerCompute_df(['601198'], dtype='d',end=None, dl=30, filter='y')
-    # print powerCompute_df(['601198','002791','000503'], dtype='d',end=None, dl=30, filter='y')
-    # sys.exit()
+    print powerCompute_df(['601198', '002791', '000503'], dtype='d', end=None, dl=30, filter='y')
+    sys.exit()
     parser = parseArgmain()
     parser.print_help()
     while 1:
@@ -864,17 +871,20 @@ if __name__ == "__main__":
                 # op, ra, st = get_linear_model_status(args.code, dtype=args.dtype, start=cct.day8_to_day10(
                 #      args.start), end=cct.day8_to_day10(args.end), filter=args.filter, dl=args.dl)
                 # print "code:%s op:%s ra:%s  start:%s" % (code, op, ra, st)
-                start=cct.day8_to_day10(args.start)
-                end=cct.day8_to_day10(args.end)
+                start = cct.day8_to_day10(args.start)
+                end = cct.day8_to_day10(args.end)
                 if args.mpl == 'y':
-                    get_linear_model_candles(args.code, dtype=args.dtype, start=start, end=end, ptype=args.ptype, filter=args.filter,dl=args.dl)
+                    get_linear_model_candles(args.code, dtype=args.dtype, start=start, end=end, ptype=args.ptype,
+                                             filter=args.filter, dl=args.dl)
                 else:
                     args.filter = 'y'
-                    for ptype in ['low','high']:
-                        op, ra, st, days = get_linear_model_status(args.code, dtype=args.dtype, start=start, end=end,days=args.days, ptype=ptype, filter=args.filter,dl=args.dl)
+                    for ptype in ['low', 'high']:
+                        op, ra, st, days = get_linear_model_status(args.code, dtype=args.dtype, start=start, end=end,
+                                                                   days=args.days, ptype=ptype, filter=args.filter,
+                                                                   dl=args.dl)
                         print "%s op:%s ra:%s days:%s  start:%s" % (args.code, op, str(ra), str(days), st)
-                # op, ra, st, days = get_linear_model_status(args.code, dtype=args.dtype, start=cct.day8_to_day10(
-                    # args.start), end=cct.day8_to_day10(args.end), filter=args.filter, dl=args.dl)
+                        # op, ra, st, days = get_linear_model_status(args.code, dtype=args.dtype, start=cct.day8_to_day10(
+                        # args.start), end=cct.day8_to_day10(args.end), filter=args.filter, dl=args.dl)
                 # print "code:%s op:%s ra/days:%s  start:%s" % (code, op, str(ra) + '/' + str(days), st)
                 cct.sleep(0.1)
                 # ts=time.time()
