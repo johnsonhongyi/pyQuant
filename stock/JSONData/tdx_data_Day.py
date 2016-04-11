@@ -381,6 +381,8 @@ def get_tdx_append_now_df_api(code, start=None, end=None, type='f',df=None,dm=No
     end=cct.day8_to_day10(end)
     if df is None:
         df = get_tdx_Exp_day_to_df(code, type, start, end).sort_index(ascending=True)
+    else:
+        df = df.sort_index(ascending=True)
     today = cct.get_today()
     if len(df) > 0:
         tdx_last_day = df.index[-1]
@@ -484,6 +486,8 @@ def get_tdx_append_now_df_api(code, start=None, end=None, type='f',df=None,dm=No
             #             log.debug("c_name:%s df.name:%s"%(c_name,df.name[-1]))
             #                 # log.debug("df[-3:]:%s" % (df[-2:]))
             #                 # df['name'] = dm.loc[code, 'name']
+    if cct.get_now_time_int() > 830 and cct.get_now_time_int() < 930:
+        return df
     if dm is None:
         # if dm is None and today != df.index[-1]:
         # log.warn('today != end:%s'%(df.index[-1]))
@@ -498,7 +502,7 @@ def get_tdx_append_now_df_api(code, start=None, end=None, type='f',df=None,dm=No
         else:
             dm = sina_data.Sina().get_stock_code_data(code).set_index('code')
 
-    if dm is not None and df is not None and not dm.empty and not df.empty:
+    if dm is not None and df is not None and not dm.empty:
         dm.rename(columns={'volume': 'amount', 'turnover': 'vol'}, inplace=True)
         c_name = dm.loc[code, ['name']].values[0]
         dm_code = (dm.loc[:, ['open', 'high', 'low', 'close', 'amount', 'vol']])
@@ -512,18 +516,15 @@ def get_tdx_append_now_df_api(code, start=None, end=None, type='f',df=None,dm=No
             dm_code['code'] = code_ts
         else:
             dm_code['code'] = code
-        # dm_code['vol'] = 0
         dm_code['date'] = today
         dm_code = dm_code.set_index('date')
-        log.debug("df.open:%s dm.open%s" % (df.open[-1], round(dm.open[-1], 2)))
+        # log.debug("df.open:%s dm.open%s" % (df.open[-1], round(dm.open[-1], 2)))
         # print df.close[-1],round(dm.close[-1],2)
-        if df.close[-1] != round(dm.close[-1], 2) and end is None:
-            # print (dm),(df) 
-            df = df.append(dm_code)
-            df = df.astype(float)
-            # print dm
+        if (df is not None and df.empty) or (df.close[-1] != round(dm.close[-1], 2) and end is None):
+            if dm.open[0] > 0:
+                df = df.append(dm_code)
+                df = df.astype(float)
             # df=pd.concat([df,dm],axis=0, ignore_index=True).set
-            # print df
         df['name'] = c_name
         log.debug("c_name:%s df.name:%s" % (c_name, df.name[-1]))
 
@@ -554,12 +555,14 @@ def get_tdx_power_now_df(code, start=None, end=None, type='f',df=None,dm=None,dl
         df = get_tdx_Exp_day_to_df(code, type=type, start=start, end=end, dl=dl).sort_index(ascending=True)
         if end is not None:
             return df
+    else:
+        df = df.sort_index(ascending=True)
     today = cct.get_today()
-    if dm is None and today != df.index[-1] and cct.get_now_time_int() > 915:
+    if dm is None and today != df.index[-1] and (cct.get_now_time_int() < 830 or cct.get_now_time_int() > 930):
         # log.warn('today != end:%s'%(df.index[-1]))
         dm = sina_data.Sina().get_stock_code_data(code).set_index('code')
 
-    if dm is not None and df is not None and not dm.empty  and not df.empty:
+    if dm is not None and df is not None and not dm.empty:
         dm.rename(columns={'volume': 'amount', 'turnover': 'vol'}, inplace=True)
         c_name=dm.loc[code,['name']].values[0]
         dm_code = (dm.loc[:, ['open', 'high', 'low', 'close', 'amount','vol']])
@@ -571,10 +574,12 @@ def get_tdx_power_now_df(code, start=None, end=None, type='f',df=None,dm=None,dl
         dm_code = dm_code.set_index('date')
         log.debug("df.open:%s dm.open%s"%(df.open[-1],round(dm.open[-1],2)))
         # print df.close[-1],round(dm.close[-1],2)
-        if df.close[-1] != round(dm.close[-1], 2) and end is None:
+        # if df.close[-1] != round(dm.close[-1], 2) and end is None:
+        if (df is not None and df.empty) or (df.close[-1] != round(dm.close[-1], 2) and end is None):
             # print (dm),(df) 
-            df = df.append(dm_code)
-            df = df.astype(float)
+            if dm.open[0] > 0:
+                df = df.append(dm_code)
+                df = df.astype(float)
             # print dm
             # df=pd.concat([df,dm],axis=0, ignore_index=True).set
             # print df
@@ -793,10 +798,13 @@ def get_duration_Index_date(code='999999', dt=None, ptype='low'):
         return dt,dl
     return None,None
 
-def get_duration_date(code, ptype='low', dt=None, df='',dl=None):
-    if len(df) == 0:
+
+def get_duration_date(code, ptype='low', dt=None, df=None, dl=None):
+    if df is None:
         df = get_tdx_day_to_df(code).sort_index(ascending=False)
-        log.debug("code:%s" % (df[:1].index))
+        # log.debug("code:%s" % (df[:1].index))
+    else:
+        df = df.sort_index(ascending=False)
     if dt != None:
         if len(str(dt)) == 10:
             dz = df[df.index >= dt]
@@ -835,7 +843,7 @@ def get_duration_date(code, ptype='low', dt=None, df='',dl=None):
             dz = df[:int(dl)]
         else:
             dz = df
-        return dz[-1:].index.values[0]
+        return dz.index[-1]
     if ptype == 'high':
         lowp = dz.high.max()
         lowdate = dz[dz.high == lowp].index.values[0]
@@ -869,10 +877,12 @@ def get_duration_price_date(code, ptype='low', dt=None, df=None, dl=None, end=No
     if df is None:
         # df = get_tdx_day_to_df(code).sort_index(ascending=False)
         if not power:
-            df = get_tdx_Exp_day_to_df(code, end=end).sort_index(ascending=False)
+            df = get_tdx_Exp_day_to_df(code, start=dt, end=end).sort_index(ascending=False)
         else:
-            df = get_tdx_power_now_df(code, end=end).sort_index(ascending=False)
-        log.debug("code:%s" % (df[:1].index))
+            df = get_tdx_power_now_df(code, start=dt, end=end).sort_index(ascending=False)
+    else:
+        df = df.sort_index(ascending=False)
+        # log.debug("code:%s" % (df[:1].index))
     if dt != None:
         if len(str(dt)) == 10:
             dz = df[df.index >= dt]
@@ -904,7 +914,7 @@ def get_duration_price_date(code, ptype='low', dt=None, df=None, dl=None, end=No
             else:
                 # log.error("code:%s dt:%s no data"%(code,dt))
                 if not filter:
-                    index_d = df[:1].index.values[0]
+                    index_d = df.index[0]
 
         else:
             if len(df) > int(dt):
@@ -933,7 +943,7 @@ def get_duration_price_date(code, ptype='low', dt=None, df=None, dl=None, end=No
             log.debug("low:%s" % lowdate)
         log.debug("date:%s %s:%s" % (lowdate, ptype, lowp))
     else:
-        lowdate = df[:1].index.values[0]
+        lowdate = df.index[0]
     # if ptype == 'high':
     #     lowp = dz.close.max()
     #     lowdate = dz[dz.close == lowp].index.values[0]
@@ -1402,12 +1412,16 @@ if __name__ == '__main__':
     import sys
     import timeit
     # print sina_data.Sina().get_stock_code_data('300006').set_index('code')
-    dd=rl.get_sina_Market_json('cyb').set_index('code')
-    codelist= dd.index.tolist()
-    df = get_tdx_exp_all_LastDF(codelist, dt=30,end=20160401, ptype='high', filter='y')
-    print df[:5]
+    # dd=rl.get_sina_Market_json('cyb').set_index('code')
+    # codelist= dd.index.tolist()
+    # df = get_tdx_exp_all_LastDF(codelist, dt=30,end=20160401, ptype='high', filter='y')
+    # print get_tdx_append_now_df_api('300134',start='2016-02-08')
+    tdx_df = get_tdx_power_now_df('601198', dl=200)
+    print tdx_df.index[-1]
+    print get_duration_price_date('601198', dl=200, ptype='low', filter=False, df=tdx_df)
+    print get_duration_price_date('601198', dl=200, ptype='high', filter=False, df=tdx_df)
+    # print df[:5]
     sys.exit(0)
-    print get_duration_price_date('999999',dl=30,ptype='low',filter=False)
     # print get_duration_price_date('999999',ptype='high',dt='2015-01-01')
     # print get_duration_price_date('999999',ptype='low',dt='2015-01-01')
     # df = get_tdx_Exp_day_to_df('999999')

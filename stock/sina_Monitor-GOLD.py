@@ -197,14 +197,16 @@ if __name__ == "__main__":
                 # print top_all[:10]
                 
                 top_temp = top_all[:30].copy()
-                top_temp = pct.powerCompute_df(top_temp,dl='30')
+                top_temp = pct.powerCompute_df(top_temp, dl=ct.PowerCountdl)
                 print "G:%s dt:%s " % (len(top_all),cct.get_time_to_date(time_s)),
                 print "Rt:%0.1f" % (float(time.time() - time_Rt))
                 cct.set_console(
                     title=['dT:%s' % cct.get_time_to_date(time_s), 'G:%s' % len(top_all), 'zxg: %s' % (blkname)])
                
                 if 'op' in top_temp.columns:
-                    top_temp = top_temp.sort_values(by=['op','ra','diff', 'percent', 'ratio'], ascending=[0,0,0, 0, 1])                
+                    top_temp = top_temp.sort_values(by=['diff', 'op', 'ra', 'percent', 'ratio'],
+                                                    ascending=[0, 0, 0, 0, 1])
+                    # top_temp = top_temp.sort_values(by=['op','ra','diff', 'percent', 'ratio'], ascending=[0,0,0, 0, 1])                
                 if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935:
                     top_temp = top_temp.loc[:,
                              ['name', 'trade', 'diff', 'op', 'ra','fib', 'percent','volume', 'ratio', 'counts',

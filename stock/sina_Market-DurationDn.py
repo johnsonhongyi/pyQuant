@@ -57,13 +57,14 @@ if __name__ == "__main__":
     block_path = tdd.get_tdx_dir_blocknew() + blkname
     status_change = False
     lastpTDX_DF = pd.DataFrame()
-    duration_date = 30
+    duration_date = 20
     # print cct.last_tddate(2)
     end_date = cct.last_tddate(2)
     ptype = 'high'
     filter = 'y'
     dutype = 'low'
-    duration_date = tdd.get_duration_price_date('999999', dl=duration_date, end=end_date, ptype='dutype')
+    if len(str(duration_date)) < 4:
+        duration_date = tdd.get_duration_price_date('999999', dl=duration_date, end=end_date, ptype='dutype')
     set_duration_console(duration_date)
     percent_status = 'n'
     # all_diffpath = tdd.get_tdx_dir_blocknew() + '062.blk'
@@ -201,22 +202,22 @@ if __name__ == "__main__":
                 if percent_status == 'y' and (
                                 cct.get_now_time_int() > 935 or cct.get_now_time_int() < 900) and ptype == 'low':
                     top_temp = top_dif[top_dif.percent > 0]
-                    top_temp = top_dif[:50].copy()
+                    top_temp = top_dif[:ct.PowerCount].copy()
                     top_end = top_dif[-5:].copy()
                     top_temp = pct.powerCompute_df(top_temp)
                     top_end = pct.powerCompute_df(top_end)
 
                 # elif percent_status == 'y' and cct.get_now_time_int() > 935 and ptype == 'high' :
                 elif ptype == 'low':
-                    top_temp = top_dif[:50].copy()
+                    top_temp = top_dif[:ct.PowerCount].copy()
                     top_end = top_dif[-5:].copy()
                     top_temp = pct.powerCompute_df(top_temp)
                     top_end = pct.powerCompute_df(top_end)
                 else:
                     top_end = top_dif[:5].copy()
-                    top_temp = top_dif[-50:].copy()
-                    top_temp = pct.powerCompute_df(top_temp, dl=30)
-                    top_end = pct.powerCompute_df(top_end, dl=30)
+                    top_temp = top_dif[-ct.PowerCount:].copy()
+                    top_temp = pct.powerCompute_df(top_temp, dl=ct.PowerCountdl)
+                    top_end = pct.powerCompute_df(top_end, dl=ct.PowerCountdl)
 
                 print ("N:%s K:%s %s G:%s" % (
                     now_count, len(top_all[top_all['buy'] > 0]),
@@ -227,9 +228,10 @@ if __name__ == "__main__":
                                        'zxg: %s' % (blkname)])
 
                 if 'op' in top_temp.columns:
-                    # top_temp = top_temp.sort_values(by=['diff','op','ra', 'percent', 'ratio'], ascending=[0,0,0, 0, 1])[:10]
-                    top_temp = top_temp.sort_values(by=['op', 'ra', 'diff', 'percent', 'ratio'],
+                    top_temp = top_temp.sort_values(by=['diff', 'op', 'ra', 'percent', 'ratio'],
                                                     ascending=[0, 0, 0, 0, 1])[:10]
+                    # top_temp = top_temp.sort_values(by=['op', 'ra', 'diff', 'percent', 'ratio'],
+                    #                                 ascending=[0, 0, 0, 0, 1])[:10]
                     # top_temp = top_temp.sort_values(by=['op','ldate','ra','diff', 'percent', 'ratio'], ascending=[0,0,0,0, 0, 1])[:10]                
                 
                 top_dd = pd.concat([top_temp, top_end], axis=0)
@@ -342,7 +344,7 @@ if __name__ == "__main__":
                 if len(str(args.start)) > 0:
                     end_date = args.end
                     duration_date = args.start
-                    if len(str(duration_date)) < 8:
+                    if len(str(duration_date)) < 4:
                         duration_date = tdd.get_duration_price_date('999999', dl=duration_date, end=end_date,
                                                                     ptype='dutype')
                     set_duration_console(duration_date)

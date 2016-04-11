@@ -225,6 +225,7 @@ def twoLineCompute(code, df=None, start=None, end=None, ptype='low'):
         df = tdd.get_tdx_append_now_df_api(
             code, start, end).sort_index(ascending=True)
     else:
+        df = df.sort_index(ascending=True)
         df = df[df.index >= start]
     series = df[ptype]
 
@@ -309,10 +310,12 @@ def get_linear_model_status(code, df=None, dtype='d', type='m', start=None, end=
             code, ptype=ptype, dl=dl, filter=False, df=df, power=True)
         # print start,index_d,ptype
     if df is not None:
+        df = df.sort_index(ascending=True)
         df = df[df.index >= start]
-        if start and index_d and len(df) > 2 and filter == 'y':
-            if df.index.values[0] < index_d:
-                df = df[df.index >= index_d]
+        # if start and index_d and len(df) > 2 and filter == 'y':
+        #     if df.index.values[0] < index_d:
+        #         df = df[df.index >= index_d]
+        #         
                 # if len(df) > 2 and start is not None and filter == 'y':
                 #     if df.index.values[0] < index_d:
                 #         df = df[df.index >= index_d]
@@ -335,7 +338,7 @@ def get_linear_model_status(code, df=None, dtype='d', type='m', start=None, end=
         if start is None:
             start = df.index.values[0]
         if len(df) > 2 and dl is None and start is not None and filter == 'y':
-            # print df.index.values[0],index_d
+            # print code,ptype,start,df.index.values[0],index_d
             # print "df:%s code:%s"%(len(df),code)`
             if df.index.values[0] < index_d:
                 df = df[df.index >= index_d]
@@ -520,8 +523,8 @@ def get_linear_model_status(code, df=None, dtype='d', type='m', start=None, end=
     else:
         # log.error("code:%s %s :%s" % (code, ptype,len(df)))
         if ptype == 'high':
-            log.warn("df is None,start:%s index:%s" % start, index_d)
-            return 5, 1, cct.get_today(), len(df)
+            # log.warn("df is None,start:%s index:%s" % (start, index_d))
+            return 13, 1, cct.get_today(), len(df)
         else:
             return -10, -10, cct.get_today(), len(df)
 
@@ -547,7 +550,8 @@ def get_linear_model_candles(code, ptype='low', dtype='d', start=None, end=None,
         df = tdd.get_tdx_append_now_df_api(
             code, start=start, end=end).sort_index(ascending=True)
         start = df.index.values[0]
-
+    else:
+        df = df.sort_index(ascending=True)
     if not dtype == 'd':
         df = tdd.get_tdx_stock_period_to_type(
             df, dtype).sort_index(ascending=True)
@@ -736,7 +740,7 @@ def get_linear_model_candles(code, ptype='low', dtype='d', start=None, end=None,
                 ida = len(df[df.index <= aid])
                 aX = X[ida - 1]
 
-                bid = df[df[type] == sb].index.values[-1][:10]
+                bid = df[df[type] == mlist[-1]].index.values[-1][:10]
                 # print df[df[type] == sb].index.values
                 idb = len(df[df.index <= bid])
                 bX = X[idb - 1]
@@ -872,11 +876,18 @@ def maintest(code, start=None, type='m', filter='y'):
 
 
 if __name__ == "__main__":
-    # print get_linear_model_status('399001', filter='y', dl=30, ptype='low')
-    # print get_linear_model_status('399001', filter='y', dl=30, ptype='high')
-    # print powerCompute_df(['601198'], dtype='d',end=None, dl=30, filter='y')
-    # print powerCompute_df(['601198', '002791', '000503'], dtype='d', end=None, dl=30, filter='y')
+    # print get_linear_model_status('600671', filter='y', dl=10, ptype='low')
+    # print get_linear_model_status('600671', filter='y', dl=10, ptype='high')
+    # print get_linear_model_status('600671', filter='y', start='20160329', ptype='low')
+    # print get_linear_model_status('600671', filter='y', start='20160329', ptype='high')
+    # print get_linear_model_status('300134', filter='y', dl=10, ptype='high')
+    # print powerCompute_df(['300134','002171'], dtype='d',end=None, dl=10, filter='y')
+    # # print powerCompute_df(['601198', '002791', '000503'], dtype='d', end=None, dl=30, filter='y')
     # sys.exit()
+    if cct.isMac():
+        cct.set_console(80, 19)
+    else:
+        cct.set_console(80, 19)
     parser = parseArgmain()
     parser.print_help()
     while 1:

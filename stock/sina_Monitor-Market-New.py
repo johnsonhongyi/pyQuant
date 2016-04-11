@@ -257,8 +257,8 @@ if __name__ == "__main__":
     
                 # top_all=top_all.sort_values(by=['percent','diff','counts','ratio'],ascending=[0,0,1,1])
                 # print rl.format_for_print(top_dif[:10])
-                top_temp = top_dif[:50].copy()
-                top_temp = pct.powerCompute_df(top_temp,dl='30')
+                top_temp = top_dif[:ct.PowerCount].copy()
+                top_temp = pct.powerCompute_df(top_temp, dl=ct.PowerCountdl)
                 print ("A:%s N:%s K:%s %s G:%s" % (
                     df_count, now_count, len(top_all[top_all['buy'] > 0]),
                     len(top_now[top_now['volume'] <= 0]), len(top_dif))),
@@ -268,7 +268,9 @@ if __name__ == "__main__":
                     title=['dT:%s' % cct.get_time_to_date(time_s), 'G:%s' % len(top_dif), 'zxg: %s' % (blkname)])
                
                 if 'op' in top_temp.columns:
-                    top_temp = top_temp.sort_values(by=['op','ra','diff', 'percent', 'ratio'], ascending=[0,0,0, 0, 1])
+                    top_temp = top_temp.sort_values(by=['diff', 'op', 'ra', 'percent', 'ratio'],
+                                                    ascending=[0, 0, 0, 0, 1])
+                    # top_temp = top_temp.sort_values(by=['op','ra','diff', 'percent', 'ratio'], ascending=[0,0,0, 0, 1])
                 if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935:
                     top_temp = top_temp.loc[:,
                              ['name', 'buy', 'diff', 'op', 'ra','fib', 'percent','volume', 'ratio', 'counts',

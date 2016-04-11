@@ -13,7 +13,7 @@ sleep 16
 open sina_Monitor-Market-LH.py
 sleep 16
 open sina_Market-DurationUp.py
-sleep 16
+sleep 36
 open sina_Market-DurationDn.py
 sleep 16
 cd JSONData

@@ -393,7 +393,7 @@ if __name__ == '__main__':
     # get_multiday_ave_compare('601198')
     # print len(sys.argv)
     if cct.isMac():
-        cct.set_console(108, 16)
+        cct.set_console(108, 15)
     else:
         cct.set_console(100, 15)
 
