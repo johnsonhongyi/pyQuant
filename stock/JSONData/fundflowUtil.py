@@ -12,9 +12,7 @@ log = LoggerFactory.getLogger("FundFlow")
 # log.setLevel(LoggerFactory.INFO)
 # log.setLevel(LoggerFactory.DEBUG)
 import traceback
-from bs4 import BeautifulSoup
-
-
+# from bs4 import BeautifulSoup
 def get_dfcfw_fund_flow(market):
     if market.startswith('http'):
         single = True
@@ -67,8 +65,7 @@ def get_dfcfw_fund_HGT(url=ct.DFCFW_FUND_FLOW_HGT):
     if len(vol_l) == 1:
         data = vol_l[0].split(',')
         log.info("D0:%s" % data[0])
-        log.debug("hgt:%s" % re.findall(
-            ur'([\d.]+)([\u4e00-\u9fa5]+)', data[0].decode('utf8')))
+        log.debug("hgt:%s" % re.findall(r'([\d.]+)([\u4e00-\u9fa5]+)', data[0].decode('utf8')))
         dd['ggt'] = data[0].decode('utf8')
         dd['hgt'] = data[6].decode('utf8')
         # dd['zzb']=data[1]

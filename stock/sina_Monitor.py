@@ -138,7 +138,8 @@ if __name__ == "__main__":
                     top_all = top_all.loc[:,
                               ['name', 'percent', 'diff', 'counts', 'volume', 'trade', 'prev_p', 'ratio']]
 
-                top_all = top_all.sort_values(by=['diff', 'counts', 'volume', 'ratio'], ascending=[0, 0, 0, 1])
+                top_all = top_all.sort_values(by=['counts', 'diff', 'volume', 'ratio'], ascending=[0, 0, 0, 1])
+                # top_all = top_all.sort_values(by=['diff', 'counts', 'volume', 'ratio'], ascending=[0, 0, 0, 1])
                 # top_all=top_all.sort_values(by=['percent','diff','counts','ratio'],ascending=[0,0,1,1])
                 if cct.get_now_time_int() > 930 and 'lastp' in top_all.columns: 
                 
@@ -159,7 +160,8 @@ if __name__ == "__main__":
                 print "Rt:%0.1f" % (float(time.time() - time_Rt))
                
                 if 'op' in top_temp.columns:
-                    top_temp = top_temp.sort_values(by=['diff', 'op', 'ra', 'percent', 'ratio'],
+                    # top_temp = top_temp.sort_values(by=['diff', 'op', 'ra', 'percent', 'ratio'],
+                    top_temp = top_temp.sort_values(by=['percent', 'op', 'ra','diff' , 'ratio'],
                                                     ascending=[0, 0, 0, 0, 1])
                     # top_temp = top_temp.sort_values(by=['op','ra','diff', 'percent', 'ratio'], ascending=[0,0,0, 0, 1])
                 if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935:

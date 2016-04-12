@@ -345,7 +345,7 @@ def get_hot_countNew(changepercent, rzrq,fibl=None,fibc=10):
             szpcent, f_print(4, rzrq['all']), f_print(5, rzrq['diff'])))
     bigcount = rd.getconfigBigCount()
     # print bigcount
-        
+    
             
     cct.set_console(
         title=['B:%s-%s V:%s' % (bigcount[0], bigcount[2], bigcount[1]), 'ZL: %s' % (zlr if len(ff) > 0 else 0),
@@ -393,9 +393,9 @@ if __name__ == '__main__':
     # get_multiday_ave_compare('601198')
     # print len(sys.argv)
     if cct.isMac():
-        cct.set_console(108, 15)
+        cct.set_console(108, 14)
     else:
-        cct.set_console(100, 15)
+        cct.set_console(100, 14)
 
     if len(sys.argv) == 2:
         status = True

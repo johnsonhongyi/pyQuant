@@ -100,7 +100,6 @@ if __name__ == "__main__":
     blkname = '065.blk'
     block_path = tdd.get_tdx_dir_blocknew() + blkname
     # all_diffpath = tdd.get_tdx_dir_blocknew() + '062.blk'
-
     while 1:
         try:
             df = rl.get_sina_all_json_dd(vol, type)
@@ -204,7 +203,9 @@ if __name__ == "__main__":
                     title=['dT:%s' % cct.get_time_to_date(time_s), 'G:%s' % len(top_all), 'zxg: %s' % (blkname)])
                
                 if 'op' in top_temp.columns:
-                    top_temp = top_temp.sort_values(by=['diff', 'op', 'ra', 'percent', 'ratio'],
+                    # top_temp = top_temp.sort_values(by=['diff', 'op', 'ra', 'percent', 'ratio'],
+                    top_temp = top_temp.sort_values(by=['percent', 'op', 'ra','diff' , 'ratio'],
+                    
                                                     ascending=[0, 0, 0, 0, 1])
                     # top_temp = top_temp.sort_values(by=['op','ra','diff', 'percent', 'ratio'], ascending=[0,0,0, 0, 1])                
                 if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935:
