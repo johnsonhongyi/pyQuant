@@ -34,9 +34,10 @@ positionKey = {'sina_Market-DurationDn.py': '267, 485',
                'sina_Monitor-Market-New.py': '-2, 371',
                'sina_Monitor-Market-LH.py': '440, 293',
                'sina_Monitor-Market.py': '19, 179',
-               'sina_Monitor-GOLD.py': '36, 130',
-               'sina_Monitor.py': '53, 22',
-               'singleAnalyseUtil.py': '583, 23',}
+               'sina_Monitor-GOLD.py': '43, 80',
+               'sina_Monitor.py': '85, 27',
+               'singleAnalyseUtil.py': '583, 23',
+               'powerCompute.py':'217, 521',}
 
 cmdRun = '''cd /Users/Johnson/Documents/Quant/pyQuant/stock;
 open singleAnalyseUtil.py;
@@ -84,7 +85,8 @@ def getPosition(cmd=None, position=None):
 
 def setPosition(cmd=None, position=None):
     count = doScript(scriptcount)
-    if int(count) > 1:
+    # print count
+    if int(count) > 4:
         for n in xrange(1, int(count)):
             # print n
             title = doScript(scriptname % ('get', str(object=n)))
@@ -98,11 +100,11 @@ def setPosition(cmd=None, position=None):
             # position = doScript(scriptposition % ('get', str(n)))
             # print positio
     else:
-        # print count
+        print "run Cmd"
         os.system(cmdRun)
-
         setPosition(cmd=None, position=None)
 # count = doScript(scriptcount        
 # os.system(cmdRun)
-# print getPosition('Gold')
+print getPosition('sina_Monitor.py')
+print getPosition('sina_Monitor-GOLD.py')
 setPosition(cmd=None, position=None)
