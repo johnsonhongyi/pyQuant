@@ -37,7 +37,7 @@ positionKey = {'sina_Market-DurationDn.py': '267, 485',
                'sina_Monitor-GOLD.py': '43, 80',
                'sina_Monitor.py': '85, 27',
                'singleAnalyseUtil.py': '583, 23',
-               'powerCompute.py':'217, 521',}
+               'powerCompute.py':'364, 515',}
 
 cmdRun = '''cd /Users/Johnson/Documents/Quant/pyQuant/stock;
 open singleAnalyseUtil.py;
@@ -58,6 +58,7 @@ open sina_Market-DurationDn.py;
 sleep 16;
 cd JSONData;
 open powerCompute.py;
+sleep 5;
 '''
 
 
@@ -107,4 +108,5 @@ def setPosition(cmd=None, position=None):
 # os.system(cmdRun)
 print getPosition('sina_Monitor.py')
 print getPosition('sina_Monitor-GOLD.py')
+print getPosition('powerCompute.py')
 setPosition(cmd=None, position=None)

@@ -35,11 +35,16 @@ if __name__ == "__main__":
 
     log = LoggerFactory.getLogger('SinaMarket')
     # log.setLevel(LoggerFactory.DEBUG)
-
     if cct.isMac():
-        cct.set_console(108, 16)
+        width, height = 108,16
     else:
-        cct.set_console(100, 16)
+        width, height = 100,16
+
+    cct.set_console(width, height)
+    # if cct.isMac():
+    #     cct.set_console(108, 16)
+    # else:
+    #     cct.set_console(100, 16)
     status = False
     vol = '0'
     type = '2'
@@ -145,7 +150,7 @@ if __name__ == "__main__":
                 
                     top_all = top_all[top_all.trade > top_all.lastp]
 
-                cct.set_console(title=['G:%s' % len(top_all), 'zxg: %s' % (blkname)])
+                cct.set_console(width, height,title=['G:%s' % len(top_all), 'zxg: %s' % (blkname)])
                 # print top_all
                 # print pt.PrettyTable([''] + list(top_all.columns))
                 # print tbl.tabulate(top_all,headers='keys', tablefmt='psql')
@@ -263,7 +268,7 @@ if __name__ == "__main__":
                 # base_path=r"E:\DOC\Parallels\WinTools\zd_pazq\T0002\blocknew\\"
                 # block_path=base_path+'064.blk'
                 # all_diffpath=base_path+'\065.blk'
-                codew = top_all[:10].index.tolist()
+                codew = top_temp[:10].index.tolist()
                 if st == 'a':
                     cct.write_to_blocknew(block_path, codew)
                     # cct.write_to_blocknew(all_diffpath,codew)

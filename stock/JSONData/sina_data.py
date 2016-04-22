@@ -248,6 +248,7 @@ class Sina:
             df.rename(columns={'now': 'close'}, inplace=True)
         df = df.drop_duplicates('code')
         df = df.loc[:, ct.SINA_Total_Columns_Clean]
+        # df.rename(columns={'turnover': 'amount'}, inplace=True)
         df = df.fillna(0)
         df=df.sort_values(by='code',ascending=0)
         # print ("Market-df:%s %s time: %s" % (
@@ -268,8 +269,8 @@ if __name__ == "__main__":
     # print len(sina.all)
     # df= sina.all
     # code='601198'
-    df = sina.get_stock_list_data(['300134', '601998', '999999']).set_index('code')
-    # df = sina.get_stock_code_data('000001',index=True).set_index('code')
+    # df = sina.get_stock_list_data(['300134', '601998', '999999']).set_index('code')
+    df = sina.get_stock_code_data('000001',index=True).set_index('code')
     print df
     # print df.loc['300380']
     # list=['000001','399001','399006','399005']

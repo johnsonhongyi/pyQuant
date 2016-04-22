@@ -520,7 +520,7 @@ def get_tdx_append_now_df_api(code, start=None, end=None, type='f',df=None,dm=No
         dm_code = dm_code.set_index('date')
         # log.debug("df.open:%s dm.open%s" % (df.open[-1], round(dm.open[-1], 2)))
         # print df.close[-1],round(dm.close[-1],2)
-        if (df is not None and df.empty) or (df.close[-1] != round(dm.close[-1], 2) and end is None):
+        if (df is not None and df.empty) or (df.open[-1] != round(dm.open[-1], 2) and end is None):
             if dm.open[0] > 0:
                 df = df.append(dm_code)
                 df = df.astype(float)
@@ -548,7 +548,13 @@ def get_tdx_append_now_df_api(code, start=None, end=None, type='f',df=None,dm=No
     return df
 
 def get_tdx_power_now_df(code, start=None, end=None, type='f',df=None,dm=None,dl=None):
-
+    if code == '999999' or code.startswith('399'):
+        # if dl is not None and start is None:
+            # start=get_duration_Index_date(code, dt=dl)
+        if start is None and dl is not None:
+            start=cct.last_tddate(days=dl)
+        df=get_tdx_append_now_df_api(code, start=start, end=end, type=type,df=df,dm=dm)
+        return df
     start=cct.day8_to_day10(start)
     end=cct.day8_to_day10(end)
     if df is None:
@@ -575,7 +581,7 @@ def get_tdx_power_now_df(code, start=None, end=None, type='f',df=None,dm=None,dl
         log.debug("df.open:%s dm.open%s"%(df.open[-1],round(dm.open[-1],2)))
         # print df.close[-1],round(dm.close[-1],2)
         # if df.close[-1] != round(dm.close[-1], 2) and end is None:
-        if (df is not None and df.empty) or (df.close[-1] != round(dm.close[-1], 2) and end is None):
+        if (df is not None and df.empty) or (df.open[-1] != round(dm.open[-1], 2) and end is None):
             # print (dm),(df) 
             if dm.open[0] > 0:
                 df = df.append(dm_code)
@@ -778,7 +784,7 @@ def get_tdx_day_to_df(code):
     return df
 
 
-def get_duration_Index_date(code='999999', dt=None, ptype='low'):
+def get_duration_Index_date(code='999999', dt=None, ptype='low',dl=None):
     if dt is not None:
         if len(str(dt)) < 8:
             dl = int(dt)+changedays
@@ -796,6 +802,13 @@ def get_duration_Index_date(code='999999', dt=None, ptype='low'):
             dt = df[df.index <= dt].index.values[changedays]
             log.info("LastDF:%s,%s" % (dt,dl))
         return dt,dl
+    if dl is not None:
+        df = get_tdx_append_now_df_api(code,start=dt).sort_index(ascending=False)
+        # print df[-1:]
+        # dl = len(get_tdx_Exp_day_to_df(code, start=dt)) + changedays
+        dt = df[:dl].index[-1]
+        log.info("dl to dt:%s" % (dt))
+        return dt
     return None,None
 
 
@@ -872,14 +885,14 @@ def get_duration_price_date(code, ptype='low', dt=None, df=None, dl=None, end=No
                             power=False):
     # if code == "600760":
         # log.setLevel(LoggerFactory.DEBUG)
-    # else:
+    # else:u
         # log.setLevel(LoggerFactory.ERROR)
     if df is None:
         # df = get_tdx_day_to_df(code).sort_index(ascending=False)
         if not power:
             df = get_tdx_Exp_day_to_df(code, start=dt, end=end).sort_index(ascending=False)
         else:
-            df = get_tdx_power_now_df(code, start=dt, end=end).sort_index(ascending=False)
+            df = get_tdx_append_now_df_api(code, start=dt, end=end).sort_index(ascending=False)
     else:
         df = df.sort_index(ascending=False)
         # log.debug("code:%s" % (df[:1].index))
@@ -1415,12 +1428,11 @@ if __name__ == '__main__':
     # dd=rl.get_sina_Market_json('cyb').set_index('code')
     # codelist= dd.index.tolist()
     # df = get_tdx_exp_all_LastDF(codelist, dt=30,end=20160401, ptype='high', filter='y')
-    # print get_tdx_append_now_df_api('300134',start='2016-02-08')
-    tdx_df = get_tdx_power_now_df('601198', dl=200)
-    print tdx_df.index[-1]
-    print get_duration_price_date('601198', dl=200, ptype='low', filter=False, df=tdx_df)
-    print get_duration_price_date('601198', dl=200, ptype='high', filter=False, df=tdx_df)
-    # print df[:5]
+    # print get_tdx_append_now_df_api('999999',start='2016-04-08')
+    print get_tdx_power_now_df('000001', dl=20)
+    # print tdx_df.index
+    print get_duration_price_date('399005', dl=60, ptype='low', filter=False,power=True)
+    print get_duration_price_date('999999', dl=60, ptype='high', filter=False,power=True)
     sys.exit(0)
     # print get_duration_price_date('999999',ptype='high',dt='2015-01-01')
     # print get_duration_price_date('999999',ptype='low',dt='2015-01-01')

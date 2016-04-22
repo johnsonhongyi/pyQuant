@@ -82,9 +82,11 @@ def get_sina_url(vol='0', type='0', pageCount='100'):
 if __name__ == "__main__":
 
     if cct.isMac():
-        cct.set_console(111, 16)
+        width, height = 111,16
     else:
-        cct.set_console(100, 16)
+        width, height = 100,16
+
+    cct.set_console(width, height)
     # log.setLevel(LoggerFactory.DEBUG)
     status = False
     vol = '0'
@@ -199,7 +201,7 @@ if __name__ == "__main__":
                 top_temp = pct.powerCompute_df(top_temp, dl=ct.PowerCountdl)
                 print "G:%s dt:%s " % (len(top_all),cct.get_time_to_date(time_s)),
                 print "Rt:%0.1f" % (float(time.time() - time_Rt))
-                cct.set_console(
+                cct.set_console(width, height,
                     title=['dT:%s' % cct.get_time_to_date(time_s), 'G:%s' % len(top_all), 'zxg: %s' % (blkname)])
                
                 if 'op' in top_temp.columns:
@@ -306,7 +308,7 @@ if __name__ == "__main__":
                 # base_path=r"E:\DOC\Parallels\WinTools\zd_pazq\T0002\blocknew\\"
                 # block_path=base_path+'065.blk'
                 # all_diffpath=base_path+'\062.blk'
-                codew = top_all[:10].index.tolist()
+                codew = top_temp[:10].index.tolist()
                 if st == 'a':
                     cct.write_to_blocknew(block_path, codew)
                     # cct.write_to_blocknew(all_diffpath,codew)

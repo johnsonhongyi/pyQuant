@@ -57,16 +57,15 @@ if __name__ == "__main__":
     block_path = tdd.get_tdx_dir_blocknew() + blkname
     status_change = False
     lastpTDX_DF = pd.DataFrame()
-    duration_date = 15
+    duration_date = 30
     end_date = None
     ptype = 'low'
-    dutype = 'low'
     filter = 'y'
     percent_status = 'n'
     if len(str(duration_date)) < 4:
-        duration_date = tdd.get_duration_price_date('999999', dl=duration_date, end=end_date, ptype='dutype')
+        # duration_date = tdd.get_duration_price_date('999999', dl=duration_date, end=end_date, ptype='dutype')
+        duration_date = tdd.get_duration_Index_date('999999',dl=duration_date)
     set_duration_console(duration_date)
-    print duration_date
     # all_diffpath = tdd.get_tdx_dir_blocknew() + '062.blk'
     parser=cct.MoniterArgmain()
     parserDuraton=cct.DurationArgmain()
@@ -313,8 +312,8 @@ if __name__ == "__main__":
                     end_date=args.end
                     duration_date=args.start
                     if len(str(duration_date)) < 8:
-                        duration_date = tdd.get_duration_price_date('999999', dl=duration_date, end=end_date,
-                                                                    ptype='dutype')
+                        duration_date = tdd.get_duration_Index_date('999999',dl=duration_date)
+                        # print duration_date
                     set_duration_console(duration_date)
                     top_all = pd.DataFrame()
                     time_s = time.time()

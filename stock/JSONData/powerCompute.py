@@ -261,15 +261,25 @@ def twoLineCompute(code, df=None, start=None, end=None, ptype='low'):
             step = 0.1
         else:
             step = 0.2
-        for x in np.arange(1, all, step):
+        if ptype == 'high':
+            nrange = np.arange(all, 1, -step)
+        else:
+            nrange = np.arange(1, all, step)
+
+        for x in nrange:
+        # for x in np.arange(1, all, step):
             if ptype == 'high':
                 mlist = pd.rolling_max(dd, window=all / x).unique()
             else:
                 mlist = pd.rolling_min(dd, window=all / x).unique()
             if len(mlist) > 2:
-                mlist = mlist[1:]
+                if  str(mlist[0]).strip() == ('nan'):
+                # if str(mlist[0]).find('nan') >0 :print "N"
+                    mlist = mlist[1:]
                 # ra = all / x
+                # print mlist
                 break
+        # print LIS(mlist)
         return mlist
 
     # map(lambda x: x/10.0, range(5, 50, 15))
@@ -880,7 +890,8 @@ if __name__ == "__main__":
     # print get_linear_model_status('600671', filter='y', dl=10, ptype='high')
     # print get_linear_model_status('600671', filter='y', start='20160329', ptype='low')
     # print get_linear_model_status('600671', filter='y', start='20160329', ptype='high')
-    # print get_linear_model_status('300134', filter='y', dl=10, ptype='high')
+    # print get_linear_model_status('999999', filter='y', dl=30, ptype='high')
+    # print get_linear_model_status('999999', filter='y', dl=30, ptype='low')
     # print powerCompute_df(['300134','002171'], dtype='d',end=None, dl=10, filter='y')
     # # print powerCompute_df(['601198', '002791', '000503'], dtype='d', end=None, dl=30, filter='y')
     # sys.exit()
