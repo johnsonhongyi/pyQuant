@@ -87,7 +87,7 @@ def getPosition(cmd=None, position=None):
 def setPosition(cmd=None, position=None):
     count = doScript(scriptcount)
     # print count
-    if int(count) > 4:
+    if int(count) > 2:
         for n in xrange(1, int(count)):
             # print n
             title = doScript(scriptname % ('get', str(object=n)))

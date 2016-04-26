@@ -25,8 +25,7 @@ try:
 except ImportError:
     from urllib2 import urlopen, Request
 import requests
-
-
+requests.adapters.DEFAULT_RETRIES = 5 
 # def get_os_system():
 #     os_sys = get_sys_system()
 #     os_platform = get_sys_platform()
