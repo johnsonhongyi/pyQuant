@@ -4,7 +4,7 @@
 import gc
 import re
 import sys
-import time
+import time,random
 import traceback
 
 import pandas as pd
@@ -313,6 +313,7 @@ if __name__ == "__main__":
                         print ".",
                         cct.sleep(60)
                     else:
+                        cct.sleep(random.randint(0, 30))
                         top_all = pd.DataFrame()
                         time_s = time.time()
                         print "."
@@ -364,8 +365,10 @@ if __name__ == "__main__":
                 sys.exit(0)
         except (IOError, EOFError, Exception) as e:
             print "Error", e
-
-            traceback.print_exc()
+            #traceback.print_exc()
+            sleeptime=random.randint(5, 15)
+            print "Error2sleep:%s"%(sleeptime)
+            cct.sleep(sleeptime)
             # raw_input("Except")
 
 

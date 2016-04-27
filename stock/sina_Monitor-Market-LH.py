@@ -4,7 +4,7 @@
 import gc
 import re
 import sys
-import time
+import time,random
 import traceback
 import urllib2
 
@@ -21,7 +21,6 @@ from JSONData import powerCompute as pct
 from JohhnsonUtil import LoggerFactory
 from JohhnsonUtil import commonTips as cct
 import singleAnalyseUtil as sl
-
 
 # from logbook import Logger,StreamHandler,SyslogHandler
 # from logbook import StderrHandler
@@ -281,6 +280,7 @@ if __name__ == "__main__":
                         print ".",
                         cct.sleep(60)
                     else:
+                        cct.sleep(random.randint(0, 30))
                         top_all = pd.DataFrame()
                         time_s = time.time()
                         print "."
@@ -290,7 +290,7 @@ if __name__ == "__main__":
         except (KeyboardInterrupt) as e:
             # print "key"
             print "KeyboardInterrupt:", e
-            # traceback.print_exc()
+            # #traceback.print_exc()
             # cct.sleep(1)
             # if success > 3:
             #     raw_input("Except")
@@ -330,8 +330,11 @@ if __name__ == "__main__":
             else:
                 sys.exit(0)
         except (IOError, EOFError, Exception) as e:
-            print "Error", e
-            traceback.print_exc()
+            print "Error::", e
+            #traceback.print_exc()
+            sleeptime=random.randint(5, 15)
+            print "Error2sleep:%s"%(sleeptime)
+            cct.sleep(sleeptime)
             # raw_input("Except")
 
             # sl.get_code_search_loop()

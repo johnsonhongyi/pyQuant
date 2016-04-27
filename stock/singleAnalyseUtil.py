@@ -1,7 +1,7 @@
 # -*- coding: UTF-8 -*-
 import datetime
 import sys
-import time
+import time,random
 import types
 
 import pandas as pd
@@ -421,7 +421,8 @@ if __name__ == '__main__':
                 if len(rzrq) == 0:
                     rzrq = ffu.get_dfcfw_rzrq_SHSZ()
                 if len(fibl) == 0 or fibcount >fibc:
-                    fibl = getFibonacci(['999999','399001'],dl=dl) 
+                    # print "change FibDiff"
+                    fibl = getFibonacci(['999999','399001','399006'],dl=dl) 
                 get_hot_countNew(3, rzrq,fibl,fibc)
             if status:
                 # status=True
@@ -457,6 +458,7 @@ if __name__ == '__main__':
                             cct.sleep(60)
                             print ".",
                         else:
+                            cct.sleep(random.randint(0, 30))
                             print "."
                             fibcount = 0
                             break
@@ -469,6 +471,7 @@ if __name__ == '__main__':
                         print ".",
                         cct.sleep(60)
                     else:
+                        cct.sleep(random.randint(0, 30))
                         top_all = pd.DataFrame()
                         fibcount = 0
                         break
@@ -516,6 +519,9 @@ if __name__ == '__main__':
         except (IOError, EOFError) as e:
             print "Error", e
             # traceback.print_exc()
+            sleeptime=random.randint(5, 15)
+            print "Error2sleep:%s"%(sleeptime)
+            cct.sleep(sleeptime)
             # raw_input("Except")
             # num_input=num_input
             # print "status:",status

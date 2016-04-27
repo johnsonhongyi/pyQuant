@@ -16,7 +16,7 @@ url_real_east = "http://quote.eastmoney.com/sz000004.html"
 import gc
 import re
 import sys
-import time
+import time,random
 
 import pandas as pd
 # from bs4 import BeautifulSoup
@@ -215,6 +215,7 @@ if __name__ == "__main__":
                         print ".",
                         cct.sleep(60)
                     else:
+                        cct.sleep(random.randint(0, 30))
                         top_all = pd.DataFrame()
                         time_s = time.time()
                         break
@@ -281,7 +282,9 @@ if __name__ == "__main__":
                 sys.exit(0)
         except (IOError, EOFError) as e:
             print "Error", e
-
+            sleeptime=random.randint(5, 15)
+            print "Error2sleep:%s"%(sleeptime)
+            cct.sleep(sleeptime)
             # traceback.print_exc()
             # raw_input("Except")
 
