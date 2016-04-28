@@ -196,6 +196,9 @@ def get_tdx_Exp_day_to_df(code, type='f', start=None, end=None, dt=None, dl=None
         fileSize = os.path.getsize(file_path)
         # if fileSize < 60 * newstockdayl:
             # return Series()
+        if dl is None:
+            dl = 60
+            log.error("dt:%s dl is None"%(dt))
         data = cct.read_last_lines(file_path, int(dl) + 2)
         dt_list = []
         data_l = data.split('\n')
@@ -375,12 +378,12 @@ INDEX_LIST = {'sh': 'sh000001', 'sz': 'sz399001', 'hs300': 'sz399300',
 #         # print df
 #     # return df
 
-def get_tdx_append_now_df_api(code, start=None, end=None, type='f',df=None,dm=None):
+def get_tdx_append_now_df_api(code, start=None, end=None, type='f',df=None,dm=None,dl=None):
 
     start=cct.day8_to_day10(start)
     end=cct.day8_to_day10(end)
     if df is None:
-        df = get_tdx_Exp_day_to_df(code, type, start, end).sort_index(ascending=True)
+        df = get_tdx_Exp_day_to_df(code, start=start, end=end,dl=dl).sort_index(ascending=True)
     else:
         df = df.sort_index(ascending=True)
     today = cct.get_today()
@@ -890,9 +893,9 @@ def get_duration_price_date(code, ptype='low', dt=None, df=None, dl=None, end=No
     if df is None:
         # df = get_tdx_day_to_df(code).sort_index(ascending=False)
         if not power:
-            df = get_tdx_Exp_day_to_df(code, start=dt, end=end).sort_index(ascending=False)
+            df = get_tdx_Exp_day_to_df(code, start=dt, end=end,dl=dl).sort_index(ascending=False)
         else:
-            df = get_tdx_append_now_df_api(code, start=dt, end=end).sort_index(ascending=False)
+            df = get_tdx_append_now_df_api(code, start=dt, end=end,dl=dl).sort_index(ascending=False)
     else:
         df = df.sort_index(ascending=False)
         # log.debug("code:%s" % (df[:1].index))
@@ -1429,10 +1432,11 @@ if __name__ == '__main__':
     # codelist= dd.index.tolist()
     # df = get_tdx_exp_all_LastDF(codelist, dt=30,end=20160401, ptype='high', filter='y')
     # print get_tdx_append_now_df_api('999999',start='2016-04-08')
-    print get_tdx_power_now_df('000001', dl=20)
+    # print get_tdx_power_now_df('000001', dl=20)
     # print tdx_df.index
-    print get_duration_price_date('399005', dl=60, ptype='low', filter=False,power=True)
-    print get_duration_price_date('999999', dl=60, ptype='high', filter=False,power=True)
+    print get_duration_price_date('999999', dl=30, ptype='low', filter=False,power=True)
+    print get_duration_price_date('399006', dl=30, ptype='low', filter=False,power=True)
+    # print get_duration_price_date('999999', dl=30, ptype='high', filter=False,power=True)
     sys.exit(0)
     # print get_duration_price_date('999999',ptype='high',dt='2015-01-01')
     # print get_duration_price_date('999999',ptype='low',dt='2015-01-01')

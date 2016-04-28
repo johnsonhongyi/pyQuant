@@ -305,19 +305,19 @@ def get_linear_model_status(code, df=None, dtype='d', type='m', start=None, end=
         # index_d=cct.day8_to_day10(start)
         # log.debug("index_d:%s"%(index_d))
         index_d = cct.day8_to_day10(start)
-        start = tdd.get_duration_price_date(code, ptype=ptype, dt=start, df=df, power=True)
+        start = tdd.get_duration_price_date(code, ptype=ptype, dt=start, df=df,dl=dl,power=True)
         log.debug("start: %s  index_d:%s" % (start, index_d))
     elif end is not None and filter == 'y':
-        df = tdd.get_tdx_append_now_df_api(code, start, end).sort_index(ascending=True)
+        df = tdd.get_tdx_append_now_df_api(code, start=start, end=end,dl=dl).sort_index(ascending=True)
         index_d = cct.day8_to_day10(start)
-        start = tdd.get_duration_price_date(code, ptype=ptype, dt=start, df=df, power=True)
+        start = tdd.get_duration_price_date(code, ptype=ptype, dt=start, df=df,dl=dl, power=True)
         df = df[df.index >= start]
         if len(df) > 2 and dl is None:
             if df.index.values[0] < index_d:
                 df = df[df.index >= index_d]
     if dl is not None:
         start, index_d = tdd.get_duration_price_date(
-            code, ptype=ptype, dl=dl, filter=False, df=df, power=True)
+            code, ptype=ptype, dl=dl, filter=False, df=df,power=True)
         # print start,index_d,ptype
     if df is not None:
         df = df.sort_index(ascending=True)
@@ -476,7 +476,10 @@ def get_linear_model_status(code, df=None, dtype='d', type='m', start=None, end=
             # return -3, round(ratio, 2)
 
     if len(df) > 1 + days:
-        asset = df[:-days]
+        if days != 0:
+            asset = df[:-days]
+        else:
+            asset = df
     else:
         asset = df
     if len(asset) > 1:
@@ -540,7 +543,7 @@ def get_linear_model_status(code, df=None, dtype='d', type='m', start=None, end=
 
 
 def get_linear_model_candles(code, ptype='low', dtype='d', start=None, end=None, filter='n',
-                             df=None, dl=None):
+                             df=None, dl=None,days=1):
     if start is not None and filter == 'y':
         if code not in ['999999', '399006', '399001']:
             index_d, dl = tdd.get_duration_Index_date(dt=start)
@@ -708,9 +711,8 @@ def get_linear_model_candles(code, ptype='low', dtype='d', start=None, end=None,
         xaxisInit = len(df[df.index < dt])
         # print assertL[-1],assert[0]
         setRegLinearPlt(assetL, xaxis=xaxisInit, status=status)
-        op, ra, st, days = get_linear_model_status(
-            code, df=df[df.index >= dt], start=dt, filter='y', ptype=ptype)
-        print "%s op:%s ra:%s days:%s  start:%s" % (code, op, str(ra), str(days), st)
+        op, ra, st, dss = get_linear_model_status(code, df=df[df.index >= dt], start=dt, filter='y', ptype=ptype,days=days)
+        print "%s op:%s ra:%s days:%s  start:%s" % (code, op, str(ra), str(dss), st)
 
     status = setRegLinearPlt(asset)
     # if filter == 'n':
@@ -894,6 +896,8 @@ if __name__ == "__main__":
     # print get_linear_model_status('999999', filter='y', dl=30, ptype='low')
     # print powerCompute_df(['300134','002171'], dtype='d',end=None, dl=10, filter='y')
     # # print powerCompute_df(['601198', '002791', '000503'], dtype='d', end=None, dl=30, filter='y')
+    # print get_linear_model_status('999999', filter='y', dl=34, ptype='low', days=1)
+    # print get_linear_model_status('399006', filter='y', dl=34, ptype='low', days=1)
     # sys.exit()
     if cct.isMac():
         cct.set_console(80, 19)
@@ -920,7 +924,7 @@ if __name__ == "__main__":
                 end = cct.day8_to_day10(args.end)
                 if args.mpl == 'y':
                     get_linear_model_candles(args.code, dtype=args.dtype, start=start, end=end, ptype=args.ptype,
-                                             filter=args.filter, dl=args.dl)
+                                             filter=args.filter, dl=args.dl,days=args.days)
                 else:
                     args.filter = 'y'
                     for ptype in ['low', 'high']:
