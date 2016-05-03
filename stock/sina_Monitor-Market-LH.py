@@ -196,6 +196,8 @@ if __name__ == "__main__":
                             top_dif['lastp'].values)
                     )
 
+                top_dif = top_dif[(top_dif.volume > ct.VolumeMinR) & (top_dif.volume < ct.VolumeMaxR)]
+
                 if len(top_dif) == 0:
                     print "No G,DataFrame is Empty!!!!!!"
 

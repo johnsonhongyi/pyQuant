@@ -143,6 +143,8 @@ if __name__ == "__main__":
                     top_all = top_all.loc[:,
                               ['name', 'percent', 'diff', 'counts', 'volume', 'trade', 'prev_p', 'ratio']]
 
+                top_all = top_all[(top_all.volume > ct.VolumeMinR) & (top_all.volume < ct.VolumeMaxR)]
+
                 top_all = top_all.sort_values(by=['counts', 'diff', 'volume', 'ratio'], ascending=[0, 0, 0, 1])
                 # top_all = top_all.sort_values(by=['diff', 'counts', 'volume', 'ratio'], ascending=[0, 0, 0, 1])
                 # top_all=top_all.sort_values(by=['percent','diff','counts','ratio'],ascending=[0,0,1,1])
@@ -151,12 +153,8 @@ if __name__ == "__main__":
                     top_all = top_all[top_all.trade > top_all.lastp]
 
                 cct.set_console(width, height,title=['G:%s' % len(top_all), 'zxg: %s' % (blkname)])
-                # print top_all
-                # print pt.PrettyTable([''] + list(top_all.columns))
-                # print tbl.tabulate(top_all,headers='keys', tablefmt='psql')
-                # print tbl.tabulate(top_all,headers='keys', tablefmt='orgtbl')
-                # print rl.format_for_print(top_all)
-                # print top_all[:10]
+ 
+
 
                 top_temp = top_all[:ct.PowerCount].copy()
                 top_temp = pct.powerCompute_df(top_temp, dl=ct.PowerCountdl)

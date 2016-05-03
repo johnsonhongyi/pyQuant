@@ -163,7 +163,9 @@ if __name__ == "__main__":
                 # log.debug('dif2:%s' % len(top_dif))
                 # top_dif['volume'] = top_dif['volume'].apply(lambda x: round(x / radio_t, 1))
                 # log.debug("top_diff:vol")
-                # top_dif = top_dif[top_dif.volume > 1]
+                # 
+                top_dif = top_dif[(top_dif.volume > ct.VolumeMinR) & (top_dif.volume < ct.VolumeMaxR)]
+
                 if len(top_dif) == 0:
                     print "No G,DataFrame is Empty!!!!!!"
                 log.debug('dif6 vol:%s' % (top_dif[:1].volume))
@@ -312,8 +314,8 @@ if __name__ == "__main__":
                 if len(str(args.start)) > 0:
                     end_date=args.end
                     duration_date=args.start
-                    if len(str(duration_date)) < 8:
-                        duration_date = tdd.get_duration_Index_date('999999',dl=duration_date)
+                    if len(str(duration_date)) < 4:
+                        duration_date = tdd.get_duration_Index_date('999999',dl=int(duration_date))
                         # print duration_date
                     set_duration_console(duration_date)
                     top_all = pd.DataFrame()

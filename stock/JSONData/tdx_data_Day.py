@@ -806,9 +806,11 @@ def get_duration_Index_date(code='999999', dt=None, ptype='low',dl=None):
             log.info("LastDF:%s,%s" % (dt,dl))
         return dt,dl
     if dl is not None:
+        # dl = int(dl)
         df = get_tdx_append_now_df_api(code,start=dt).sort_index(ascending=False)
-        # print df[-1:]
+        # print df
         # dl = len(get_tdx_Exp_day_to_df(code, start=dt)) + changedays
+        # print dl
         dt = df[:dl].index[-1]
         log.info("dl to dt:%s" % (dt))
         return dt
@@ -1434,6 +1436,7 @@ if __name__ == '__main__':
     # print get_tdx_append_now_df_api('999999',start='2016-04-08')
     # print get_tdx_power_now_df('000001', dl=20)
     # print tdx_df.index
+    print "index_Date:",get_duration_Index_date('999999',dl=3)
     print get_duration_price_date('999999', dl=30, ptype='low', filter=False,power=True)
     print get_duration_price_date('399006', dl=30, ptype='low', filter=False,power=True)
     # print get_duration_price_date('999999', dl=30, ptype='high', filter=False,power=True)
@@ -1470,7 +1473,6 @@ if __name__ == '__main__':
     time_s = time.time()
     # df = get_tdx_Exp_day_to_df('999999')
     # dd = get_tdx_stock_period_to_type(df)
-    # print get_duration_price_date('999999',dl=100,ptype='high')
     # df = get_tdx_exp_all_LastDF( ['999999', '603377','603377'], dt=30,ptype='high')
     df = get_tdx_exp_all_LastDF(['600000', '603377', '601998', '002504'], dt=20160329,end=None, ptype='low', filter='y')
     print df

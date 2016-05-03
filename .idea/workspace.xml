@@ -3,7 +3,8 @@
   <component name="ChangeListManager">
     <list default="true" id="f090dad1-4324-4dd7-b658-6ef3a59fd6f8" name="Default" comment="optimize powerCompute Bug restore diff top and add mac applescript">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/easyquant" afterPath="$PROJECT_DIR$/easyquant" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/stock/JohhnsonUtil/commonTips.py" afterPath="$PROJECT_DIR$/stock/JohhnsonUtil/commonTips.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/stock/count.ini" afterPath="$PROJECT_DIR$/stock/count.ini" />
     </list>
     <list id="2cfb04de-6b7a-4d7a-bd6f-729c2b84ef9c" name="Ext Workxml changelist" comment="Ext Workxml changelist" />
     <ignored path="pyQuant.iws" />

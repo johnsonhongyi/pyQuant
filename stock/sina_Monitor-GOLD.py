@@ -183,6 +183,8 @@ if __name__ == "__main__":
                     top_all = top_all.loc[:,
                               ['name', 'percent', 'diff', 'counts', 'volume', 'trade', 'prev_p', 'ratio']]
 
+                top_all = top_all[(top_all.volume > ct.VolumeMinR) & (top_all.volume < ct.VolumeMaxR)]
+
                 top_all = top_all.sort_values(by=[ 'counts', 'diff','volume', 'ratio'], ascending=[0, 0, 0, 1])
                 # top_all=top_all.sort_values(by=['diff','percent','counts','ratio'],ascending=[0,0,1,1])
 
@@ -196,8 +198,9 @@ if __name__ == "__main__":
                 # print tbl.tabulate(top_all,headers='keys', tablefmt='orgtbl')
                 # print rl.format_for_print(top_all)
                 # print top_all[:10]
-                
-                top_temp = top_all[:30].copy()
+
+
+                top_temp = top_all[:ct.PowerCount].copy()
                 top_temp = pct.powerCompute_df(top_temp, dl=ct.PowerCountdl)
                 print "G:%s dt:%s " % (len(top_all),cct.get_time_to_date(time_s)),
                 print "Rt:%0.1f" % (float(time.time() - time_Rt))

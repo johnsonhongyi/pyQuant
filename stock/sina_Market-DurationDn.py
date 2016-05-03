@@ -59,7 +59,7 @@ if __name__ == "__main__":
     lastpTDX_DF = pd.DataFrame()
     duration_date = 30
     # print cct.last_tddate(2)
-    end_date = cct.last_tddate(days=2)
+    end_date = cct.last_tddate(days=3)
     ptype = 'high'
     filter = 'y'
     if len(str(duration_date)) < 4:
@@ -166,6 +166,9 @@ if __name__ == "__main__":
                 # top_dif['volume'] = top_dif['volume'].apply(lambda x: round(x / radio_t, 1))
                 # log.debug("top_diff:vol")
                 # top_dif = top_dif[top_dif.volume > 1]
+                
+                top_dif = top_dif[(top_dif.volume > ct.VolumeMinR) & (top_dif.volume < ct.VolumeMaxR)]
+
                 if len(top_dif) == 0:
                     print "No G,DataFrame is Empty!!!!!!"
                 log.debug('dif6 vol:%s' % (top_dif[:1].volume))
@@ -344,9 +347,9 @@ if __name__ == "__main__":
                 args = parserDuraton.parse_args(st.split()[1:])
                 if len(str(args.start)) > 0:
                     end_date = args.end
-                    duration_date = args.start
+                    duration_date = args.start.strip()
                     if len(str(duration_date)) < 4:
-                        duration_date = tdd.get_duration_Index_date('999999',dl=duration_date)
+                        duration_date = tdd.get_duration_Index_date('999999',dl=int(duration_date))
                     set_duration_console(duration_date)
                     top_all = pd.DataFrame()
                     time_s = time.time()
