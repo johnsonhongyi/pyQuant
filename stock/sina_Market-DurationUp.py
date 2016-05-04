@@ -144,12 +144,12 @@ if __name__ == "__main__":
                     map(lambda x, y: round((x - y) / y * 100, 1), top_dif['buy'].values, top_dif['lastp'].values))
                 # print top_dif.loc['600610',:]
                 # top_dif = top_dif[top_dif.trade > 0]
-                if cct.get_now_time_int() > 935:
+                if cct.get_now_time_int() > 932:
                     top_dif = top_dif[top_dif.low > 0]
                     log.debug("top_dif.low > 0:%s" % (len(top_dif)))
                         # top_dif.loc['600610','volume':'lvol']
-                top_dif['volume'] = (
-                    map(lambda x, y: round(x / y / radio_t, 1), top_dif.volume.values, top_dif.lvol.values))
+                    top_dif['volume'] = (
+                        map(lambda x, y: round(x / y / radio_t, 1), top_dif.volume.values, top_dif.lvol.values))                
                 # top_dif = top_dif[top_dif.volume < 100]
                 # print top_dif.loc['002504',:]
                 # print top_dif.loc['600533',:]
@@ -164,7 +164,6 @@ if __name__ == "__main__":
                 # top_dif['volume'] = top_dif['volume'].apply(lambda x: round(x / radio_t, 1))
                 # log.debug("top_diff:vol")
                 # 
-                top_dif = top_dif[(top_dif.volume > ct.VolumeMinR) & (top_dif.volume < ct.VolumeMaxR)]
 
                 if len(top_dif) == 0:
                     print "No G,DataFrame is Empty!!!!!!"
@@ -180,6 +179,8 @@ if __name__ == "__main__":
                 ## goldstock=len(top_dif[top_dif.buy >(top_dif.high-top_dif.low)/2])
                 if ptype == 'low':
                     top_dif = top_dif[top_dif.lvol > ct.LvolumeSize]
+                    if cct.get_now_time_int() > 925 and cct.get_work_time():
+                        top_dif = top_dif[(top_dif.volume > ct.VolumeMinR) & (top_dif.volume < ct.VolumeMaxR)]
                     # top_dif = top_dif[top_dif.lvol > 12000]
                     if 'counts' in top_dif.columns.values:
                         top_dif = top_dif.sort_values(by=['diff', 'percent', 'volume', 'counts', 'ratio'],

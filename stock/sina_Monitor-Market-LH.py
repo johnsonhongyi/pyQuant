@@ -177,6 +177,7 @@ if __name__ == "__main__":
                         map(lambda x, y: round(x / y / radio_t, 1),
                             top_dif['volume'].values, top_dif['lvol'].values))
                     # top_dif = top_dif[top_dif.volume > 3]
+                    top_dif = top_dif[(top_dif.volume > ct.VolumeMinR) & (top_dif.volume < ct.VolumeMaxR)]
 
                     top_dif['diff'] = (
                         map(lambda x, y: round(
@@ -196,7 +197,6 @@ if __name__ == "__main__":
                             top_dif['lastp'].values)
                     )
 
-                top_dif = top_dif[(top_dif.volume > ct.VolumeMinR) & (top_dif.volume < ct.VolumeMaxR)]
 
                 if len(top_dif) == 0:
                     print "No G,DataFrame is Empty!!!!!!"

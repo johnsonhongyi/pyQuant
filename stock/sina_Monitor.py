@@ -142,8 +142,8 @@ if __name__ == "__main__":
                     # top_all = top_all[top_all.prev_p >= top_all.lhigh]
                     top_all = top_all.loc[:,
                               ['name', 'percent', 'diff', 'counts', 'volume', 'trade', 'prev_p', 'ratio']]
-
-                top_all = top_all[(top_all.volume > ct.VolumeMinR) & (top_all.volume < ct.VolumeMaxR)]
+                    if cct.get_now_time_int() > 932:            
+                        top_all = top_all[(top_all.volume > ct.VolumeMinR) & (top_all.volume < ct.VolumeMaxR)]
 
                 top_all = top_all.sort_values(by=['counts', 'diff', 'volume', 'ratio'], ascending=[0, 0, 0, 1])
                 # top_all = top_all.sort_values(by=['diff', 'counts', 'volume', 'ratio'], ascending=[0, 0, 0, 1])
@@ -213,6 +213,7 @@ if __name__ == "__main__":
                         print ".",
                         cct.sleep(60)
                     else:
+                        print "."
                         cct.sleep(random.randint(0, 30))
                         top_all = pd.DataFrame()
                         time_s = time.time()

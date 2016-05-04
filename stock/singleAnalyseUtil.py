@@ -471,6 +471,7 @@ if __name__ == '__main__':
                         print ".",
                         cct.sleep(60)
                     else:
+                        print "."
                         cct.sleep(random.randint(0, 30))
                         top_all = pd.DataFrame()
                         fibcount = 0

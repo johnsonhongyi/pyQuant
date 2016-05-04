@@ -358,7 +358,8 @@ if __name__ == "__main__":
                     # top_dif = top_dif[top_dif.volume > 0.5]
                 # print top_dif[-2:]
                 
-                top_dif = top_dif[(top_dif.volume > ct.VolumeMinR) & (top_dif.volume < ct.VolumeMaxR)]
+                    if cct.get_now_time_int() > 932:
+                        top_dif = top_dif[(top_dif.volume > ct.VolumeMinR) & (top_dif.volume < ct.VolumeMaxR)]
                 
                 if len(top_dif) == 0:
                     print "No G,DataFrame is Empty!!!!!!"

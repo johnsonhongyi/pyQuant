@@ -233,8 +233,9 @@ if __name__ == "__main__":
                     top_dif['volume'] = (
                         map(lambda x, y: round(x / y / radio_t, 1), top_dif['volume'].values, top_dif['lvol'].values))
                     # top_dif = top_dif[top_dif.volume > 1]
+                    if cct.get_now_time_int() > 932:
+                        top_dif = top_dif[(top_dif.volume > ct.VolumeMinR) & (top_dif.volume < ct.VolumeMaxR)]
                 
-                top_dif = top_dif[(top_dif.volume > ct.VolumeMinR) & (top_dif.volume < ct.VolumeMaxR)]
 
                 if len(top_dif) == 0:
                     print "No G,DataFrame is Empty!!!!!!"
