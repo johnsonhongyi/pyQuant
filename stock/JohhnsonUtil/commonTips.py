@@ -603,7 +603,7 @@ def code_to_tdx_blk(code):
 
 def write_to_blocknew(p_name, data, append=True):
     if append:
-        fout = open(p_name, 'ab+')
+        fout = open(p_name, 'rab')
         # fout = open(p_name)
         flist = fout.readlines()
         print "flist", flist

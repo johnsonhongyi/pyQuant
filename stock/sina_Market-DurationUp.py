@@ -57,7 +57,7 @@ if __name__ == "__main__":
     block_path = tdd.get_tdx_dir_blocknew() + blkname
     status_change = False
     lastpTDX_DF = pd.DataFrame()
-    duration_date = 30
+    duration_date = 13
     end_date = None
     ptype = 'low'
     filter = 'y'
