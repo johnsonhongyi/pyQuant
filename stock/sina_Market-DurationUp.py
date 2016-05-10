@@ -2,10 +2,10 @@
 # !/usr/bin/env python
 
 import gc
+import random
 import re
 import sys
-import time,random
-import traceback
+import time
 
 import pandas as pd
 
@@ -179,7 +179,8 @@ if __name__ == "__main__":
                 ## goldstock=len(top_dif[top_dif.buy >(top_dif.high-top_dif.low)/2])
                 if ptype == 'low':
                     top_dif = top_dif[top_dif.lvol > ct.LvolumeSize]
-                    if cct.get_now_time_int() > 925 and cct.get_work_time():
+                    if cct.get_now_time_int() > 1030 and cct.get_now_time_int() < 1400:
+                        # if cct.get_now_time_int() > 931 and cct.get_work_time():
                         top_dif = top_dif[(top_dif.volume > ct.VolumeMinR) & (top_dif.volume < ct.VolumeMaxR)]
                     # top_dif = top_dif[top_dif.lvol > 12000]
                     if 'counts' in top_dif.columns.values:

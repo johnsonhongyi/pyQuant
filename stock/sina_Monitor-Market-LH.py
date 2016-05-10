@@ -2,10 +2,10 @@
 # !/usr/bin/env python
 
 import gc
+import random
 import re
 import sys
-import time,random
-import traceback
+import time
 import urllib2
 
 import pandas as pd
@@ -177,7 +177,8 @@ if __name__ == "__main__":
                         map(lambda x, y: round(x / y / radio_t, 1),
                             top_dif['volume'].values, top_dif['lvol'].values))
                     # top_dif = top_dif[top_dif.volume > 3]
-                    top_dif = top_dif[(top_dif.volume > ct.VolumeMinR) & (top_dif.volume < ct.VolumeMaxR)]
+                    if cct.get_now_time_int() > 1030 and cct.get_now_time_int() < 1400:
+                        top_dif = top_dif[(top_dif.volume > ct.VolumeMinR) & (top_dif.volume < ct.VolumeMaxR)]
 
                     top_dif['diff'] = (
                         map(lambda x, y: round(

@@ -2,10 +2,10 @@
 # !/usr/bin/env python
 
 import gc
+import random
 import re
 import sys
-import time,random
-import traceback
+import time
 
 import pandas as pd
 # from bs4 import BeautifulSoup
@@ -233,7 +233,7 @@ if __name__ == "__main__":
                     top_dif['volume'] = (
                         map(lambda x, y: round(x / y / radio_t, 1), top_dif['volume'].values, top_dif['lvol'].values))
                     # top_dif = top_dif[top_dif.volume > 1]
-                    if cct.get_now_time_int() > 932:
+                    if cct.get_now_time_int() > 1030 and cct.get_now_time_int() < 1400:
                         top_dif = top_dif[(top_dif.volume > ct.VolumeMinR) & (top_dif.volume < ct.VolumeMaxR)]
                 
 

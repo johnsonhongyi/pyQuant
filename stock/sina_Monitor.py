@@ -14,9 +14,10 @@ url_real_sina = "http://finance.sina.com.cn/realstock/"
 url_real_sina_top = "http://vip.stock.finance.sina.com.cn/mkt/#stock_sh_up"
 url_real_east = "http://quote.eastmoney.com/sz000004.html"
 import gc
+import random
 import re
 import sys
-import time,random
+import time
 
 import pandas as pd
 # from bs4 import BeautifulSoup
@@ -142,7 +143,7 @@ if __name__ == "__main__":
                     # top_all = top_all[top_all.prev_p >= top_all.lhigh]
                     top_all = top_all.loc[:,
                               ['name', 'percent', 'diff', 'counts', 'volume', 'trade', 'prev_p', 'ratio']]
-                    if cct.get_now_time_int() > 932:            
+                    if cct.get_now_time_int() > 1030 and cct.get_now_time_int() < 1400:           
                         top_all = top_all[(top_all.volume > ct.VolumeMinR) & (top_all.volume < ct.VolumeMaxR)]
 
                 top_all = top_all.sort_values(by=['counts', 'diff', 'volume', 'ratio'], ascending=[0, 0, 0, 1])

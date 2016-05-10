@@ -292,7 +292,7 @@ def twoLineCompute(code, df=None, start=None, end=None, ptype='low'):
 
 def get_linear_model_status(code, df=None, dtype='d', type='m', start=None, end=None, days=1, filter='n',
                             dl=None, countall=True, ptype='low'):
-    # log.setLevel(LoggerFactory.DEBUG)
+
     # if code == "600760":
     # log.setLevel(LoggerFactory.DEBUG)
     # else:
@@ -306,7 +306,7 @@ def get_linear_model_status(code, df=None, dtype='d', type='m', start=None, end=
         # log.debug("index_d:%s"%(index_d))
         index_d = cct.day8_to_day10(start)
         start = tdd.get_duration_price_date(code, ptype=ptype, dt=start, df=df,dl=dl,power=True)
-        log.debug("start: %s  index_d:%s" % (start, index_d))
+        log.debug("start is not None start: %s  index_d:%s" % (start, index_d))
     elif end is not None and filter == 'y':
         df = tdd.get_tdx_append_now_df_api(code, start=start, end=end,dl=dl).sort_index(ascending=True)
         index_d = cct.day8_to_day10(start)
@@ -316,9 +316,16 @@ def get_linear_model_status(code, df=None, dtype='d', type='m', start=None, end=
             if df.index.values[0] < index_d:
                 df = df[df.index >= index_d]
     if dl is not None:
-        start, index_d = tdd.get_duration_price_date(
+        if ptype == 'low' and code == '999999':
+            log.setLevel(LoggerFactory.DEBUG)
+        else:
+            log.setLevel(LoggerFactory.ERROR)
+
+        start, index_d, df = tdd.get_duration_price_date(
             code, ptype=ptype, dl=dl, filter=False, df=df,power=True)
         # print start,index_d,ptype
+        log.debug("dl not None code:%s start: %s  index_d:%s" % (code, start, index_d))
+
     if df is not None:
         df = df.sort_index(ascending=True)
         df = df[df.index >= start]
@@ -361,29 +368,29 @@ def get_linear_model_status(code, df=None, dtype='d', type='m', start=None, end=
 
     def get_linear_model_ratio(asset, type='M', nowP=None):
         duration = asset[-1:].index.values[0]
-        log.debug("duration:%s" % duration)
-        log.debug("duration:%s" % cct.get_today_duration(duration))
+        # log.debug("duration:%s" % duration)
+        # log.debug("duration:%s" % cct.get_today_duration(duration))
         asset = asset.dropna()
         X = np.arange(len(asset))
         x = sm.add_constant(X)
         model = regression.linear_model.OLS(asset.astype(float), x).fit()
         a = model.params[0]
         b = model.params[1]
-        log.debug("X:%s a:%0.1f b:%0.1f" % (len(asset), a, b))
+        # log.debug("X:%s a:%0.1f b:%0.1f" % (len(asset), a, b))
         # if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 1500:
         Y = np.append(X, X[-1] + int(days))
         # else:
         # Y = X
-        log.debug("X:%s Y:%s" % (X[-1], Y[-1]))
+        # log.debug("X:%s Y:%s" % (X[-1], Y[-1]))
         # print ("X:%s" % (X[-1]))
         Y_hat = X * b + a
-        log.debug("Y_hat:%s" % Y_hat)
+        # log.debug("Y_hat:%s" % Y_hat[-1])
         # Y_hat_t = Y * b + a
         # log.info("Y_hat:%s " % (Y_hat))
         # log.info("asset:%s " % (asset.values))
         ratio = b / a * 100
         operation = 0
-        log.debug("line_now:%s src:%s" % (Y_hat[-1], Y_hat[0]))
+        # log.debug("line_now:%s src:%s" % (Y_hat[-1], Y_hat[0]))
         if Y_hat[-1] > Y_hat[0]:
             if type.upper() == 'M':
                 Y_Future = X * b + a
@@ -471,7 +478,7 @@ def get_linear_model_status(code, df=None, dtype='d', type='m', start=None, end=
                 # log.info("Type: %s Down Y_Future: %0.1f b:%0.1f ratio:%0.1f" % (
                 # type.upper(), Y_Future[-1], b, ratio))
             return operation, ratio
-            log.debug("Line down !!! d:%s" % Y_hat[0])
+            # log.debug("Line down !!! d:%s" % Y_hat[0])
             # print("Line down !!! d:%s nowp:%s" % (round(Y_hat[1],2),asset[-1:].values[0]))
             # return -3, round(ratio, 2)
 

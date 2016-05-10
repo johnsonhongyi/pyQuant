@@ -2,10 +2,10 @@
 # !/usr/bin/env python
 
 import gc
+import random
 import re
 import sys
-import time,random
-import traceback
+import time
 
 import pandas as pd
 
@@ -59,7 +59,7 @@ if __name__ == "__main__":
     lastpTDX_DF = pd.DataFrame()
     duration_date = 30
     # print cct.last_tddate(2)
-    end_date = cct.last_tddate(days=3)
+    end_date = cct.last_tddate(days=2)
     ptype = 'high'
     filter = 'y'
     if len(str(duration_date)) < 4:

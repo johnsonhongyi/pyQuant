@@ -8,9 +8,10 @@
 #
 # sys.setdefaultencoding('utf-8')
 
+import random
 import re
 import sys
-import time,random
+import time
 # import urllib2
 
 # from pandas import DataFrame
@@ -182,7 +183,7 @@ if __name__ == "__main__":
                         top_all = top_all[top_all.trade >= top_all.lastp]
                     top_all = top_all.loc[:,
                               ['name', 'percent', 'diff', 'counts', 'volume', 'trade', 'prev_p', 'ratio']]
-                    if cct.get_now_time_int() > 932:
+                    if cct.get_now_time_int() > 1030 and cct.get_now_time_int() < 1400:
                         top_all = top_all[(top_all.volume > ct.VolumeMinR) & (top_all.volume < ct.VolumeMaxR)]
 
                 top_all = top_all.sort_values(by=[ 'counts', 'diff','volume', 'ratio'], ascending=[0, 0, 0, 1])

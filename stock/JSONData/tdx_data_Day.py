@@ -447,7 +447,7 @@ def get_tdx_append_now_df_api(code, start=None, end=None, type='f',df=None,dm=No
             # ds.rename(columns={'volume': 'amount'}, inplace=True)
             ds.rename(columns={'volume': 'vol'}, inplace=True)
             ds.sort_index(ascending=True, inplace=True)
-            log.debug("ds:%s" % ds[:1])
+            # log.debug("ds:%s" % ds[:1])
             df = df.append(ds)
             df = df.astype(float)
             # pd.concat([df,ds],axis=0, join='outer')
@@ -490,6 +490,7 @@ def get_tdx_append_now_df_api(code, start=None, end=None, type='f',df=None,dm=No
             #                 # log.debug("df[-3:]:%s" % (df[-2:]))
             #                 # df['name'] = dm.loc[code, 'name']
     if cct.get_now_time_int() > 830 and cct.get_now_time_int() < 930:
+        log.debug("now > 830 and <930 return")
         return df
     if dm is None:
         # if dm is None and today != df.index[-1]:
@@ -892,6 +893,10 @@ def get_duration_price_date(code, ptype='low', dt=None, df=None, dl=None, end=No
         # log.setLevel(LoggerFactory.DEBUG)
     # else:u
         # log.setLevel(LoggerFactory.ERROR)
+    if ptype == 'low' and code == '999999':
+        log.setLevel(LoggerFactory.DEBUG)
+    else:
+        log.setLevel(LoggerFactory.ERROR)
     if df is None:
         # df = get_tdx_day_to_df(code).sort_index(ascending=False)
         if not power:
@@ -972,9 +977,10 @@ def get_duration_price_date(code, ptype='low', dt=None, df=None, dl=None, end=No
     #     log.debug("low:%s"%lowdate)
     if filter:
         return lowdate
-    else:
+    elif not power:
         return lowdate,index_d
-
+    else:
+        return lowdate, index_d, df
 
 def get_tdx_exp_low_or_high_price(code, dt=None, ptype='close', dl=None,end=None):
     '''

@@ -1,7 +1,8 @@
 # -*- coding: UTF-8 -*-
 import datetime
+import random
 import sys
-import time,random
+import time
 import types
 
 import pandas as pd
@@ -226,7 +227,8 @@ def f_print(lens, datastr):
     data = lenf.format(datastr)
     return data
 
-def getFibonacci(code,dl=30,start=None):
+
+def fibonacciCount(code, dl=30, start=None):
     fibl=[]
     if not isinstance(code,list):
         codes = [code]
@@ -235,7 +237,8 @@ def getFibonacci(code,dl=30,start=None):
     for code in codes:
         for ptype in ['low','high']:
             op, ra, st, days = pct.get_linear_model_status(code, filter='y', dl=dl, ptype=ptype, days=1)
-            fib=cct.getFibonacci(300,days)            
+            fib = cct.getFibonacci(300, days)
+            # log.debug('st:%s days:%s fib:%s'%(st,days,fib))
             # print "%s op:%s ra:%s days:%s fib:%s %s" % (code, op, ra,days,fib, st)
             fibl.append([code, op, ra,days,fib,st])
     return fibl
@@ -414,16 +417,18 @@ if __name__ == '__main__':
     rzrq = ffu.get_dfcfw_rzrq_SHSZ()
     dl=30
     fibc = 5
-    fibl = getFibonacci(['999999','399001','399006'],dl=dl) 
+    fibl = fibonacciCount(['999999', '399001', '399006'], dl=dl)
     while 1:
         try:
             if not status:
                 if len(rzrq) == 0:
                     rzrq = ffu.get_dfcfw_rzrq_SHSZ()
-                if len(fibl) == 0 or fibcount >fibc:
+                if len(fibl) == 0 or fibcount >= fibc:
                     # print "change FibDiff"
-                    fibl = getFibonacci(['999999','399001','399006'],dl=dl) 
+                    fibcount = 0
+                    fibl = fibonacciCount(['999999', '399001', '399006'], dl=dl)
                 get_hot_countNew(3, rzrq,fibl,fibc)
+                fibcount += 1
             if status:
                 # status=True
                 if not num_input:
