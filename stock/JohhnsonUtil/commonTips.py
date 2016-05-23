@@ -149,6 +149,14 @@ def get_today(sep='-'):
     # return days
     return days.count() - holidays
 
+def get_work_day_status():
+    today = datetime.datetime.today().date()
+    day_n = int(today.strftime("%w"))
+    if day_n >0 and day_n < 6:
+        return True
+    else:
+        return False
+    # return str(today)
 
 def last_tddate(days=1):
     # today = datetime.datetime.today().date() + datetime.timedelta(-days)
@@ -243,6 +251,8 @@ def get_now_time_int():
 def get_work_time():
     now_t = str(get_now_time()).replace(':', '')
     now_t = int(now_t)
+    if not get_work_day_status():
+        return False
     if (now_t > 1130 and now_t < 1300) or now_t < 915 or now_t > 1502:
         # return False
         return False
@@ -603,7 +613,7 @@ def code_to_tdx_blk(code):
 
 def write_to_blocknew(p_name, data, append=True):
     if append:
-        fout = open(p_name, 'rab')
+        fout = open(p_name, 'r+')
         # fout = open(p_name)
         flist = fout.readlines()
         print "flist", flist
@@ -799,6 +809,7 @@ if __name__ == '__main__':
     # print get_work_time_ratio()
     # print typeday8_to_day10(None)
     print get_work_time_ratio()
+    print get_work_day_status()
     for x in range(1, 3, 1):
         print last_tddate(x)
         # print last_tddate(2)

@@ -124,20 +124,22 @@ if __name__ == "__main__":
                     top_all = top_now
                     # dd=dd.fillna(0)
                 else:
-                    top_now = top_now[top_now.trade >= top_now.high * 0.98]
+                    # top_now = top_now[top_now.trade >= top_now.high * 0.98]
                     for symbol in top_now.index:
                         # code = rl._symbol_to_code(symbol)
                         if symbol in top_all.index:
-                            # print top_all.iloc[symbol]
-                            # print top_now[symbol]
-                            # if top_all.loc[symbol,'diff'] == 0:
-                            # print "code:",symbol
-                            count_n = top_now.loc[symbol, 'percent']
-                            count_a = top_all.loc[symbol, 'percent']
+
+                            # count_n = top_now.loc[symbol, 'percent']
+                            # count_a = top_all.loc[symbol, 'percent']
+                            # top_now.loc[symbol, 'diff'] = count_n - count_a
+                            count_n = top_now.loc[symbol, 'counts']
+                            count_a = top_all.loc[symbol, 'counts']
                             top_now.loc[symbol, 'diff'] = count_n - count_a
                             if status_change:
                                 top_all.loc[symbol] = top_now.loc[symbol]
                             else:
+                                # print top_now.loc[symbol,:]
+                                # print top_all.loc[symbol,:]
                                 top_all.loc[symbol, ['percent', 'diff']] = top_now.loc[symbol, ['percent', 'diff']]
                                 top_all.loc[symbol, 'trade':] = top_now.loc[symbol, 'trade':]
                                 # if not count_n==count_a:
@@ -179,14 +181,15 @@ if __name__ == "__main__":
                     log.debug("top_diff:vol")
                     top_all['volume'] = (
                         map(lambda x, y: round(x / y / radio_t, 1), top_all['volume'].values, top_all['lvol'].values))
-                    if cct.get_now_time_int() > 930 and 'lastp' in top_all.columns:
-                        top_all = top_all[top_all.trade >= top_all.lastp]
+                    # if cct.get_now_time_int() > 930 and 'lastp' in top_all.columns:
+                    #     top_all = top_all[top_all.trade >= top_all.lastp]
                     top_all = top_all.loc[:,
                               ['name', 'percent', 'diff', 'counts', 'volume', 'trade', 'prev_p', 'ratio']]
-                    if cct.get_now_time_int() > 1030 and cct.get_now_time_int() < 1400:
-                        top_all = top_all[(top_all.volume > ct.VolumeMinR) & (top_all.volume < ct.VolumeMaxR)]
+                    # if cct.get_now_time_int() > 1030 and cct.get_now_time_int() < 1400:
+                        # top_all = top_all[(top_all.volume > ct.VolumeMinR) & (top_all.volume < ct.VolumeMaxR)]
 
                 top_all = top_all.sort_values(by=[ 'counts', 'diff','volume', 'ratio'], ascending=[0, 0, 0, 1])
+                # top_all = top_all.sort_values(by=[ 'counts'], ascending=[0])
                 # top_all=top_all.sort_values(by=['diff','percent','counts','ratio'],ascending=[0,0,1,1])
 
                 # top_all=top_all.sort_values(by=['diff','counts'],ascending=[0,0])
@@ -208,11 +211,11 @@ if __name__ == "__main__":
                 cct.set_console(width, height,
                     title=['dT:%s' % cct.get_time_to_date(time_s), 'G:%s' % len(top_all), 'zxg: %s' % (blkname)])
                
-                if 'op' in top_temp.columns:
-                    # top_temp = top_temp.sort_values(by=['diff', 'op', 'ra', 'percent', 'ratio'],
-                    top_temp = top_temp.sort_values(by=['percent', 'op', 'ra','diff' , 'ratio'],
+                # if 'op' in top_temp.columns:
+                #     # top_temp = top_temp.sort_values(by=['diff', 'op', 'ra', 'percent', 'ratio'],
+                #     top_temp = top_temp.sort_values(by=['percent', 'op', 'ra','diff' , 'ratio'],
                     
-                                                    ascending=[0, 0, 0, 0, 1])
+                #                                     ascending=[0, 0, 0, 0, 1])
                     # top_temp = top_temp.sort_values(by=['op','ra','diff', 'percent', 'ratio'], ascending=[0,0,0, 0, 1])                
                 if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935:
                     top_temp = top_temp.loc[:,

@@ -416,7 +416,7 @@ if __name__ == '__main__':
     success = 0
     rzrq = ffu.get_dfcfw_rzrq_SHSZ()
     dl=30
-    fibc = 5
+    fibc = 3
     fibl = fibonacciCount(['999999', '399001', '399006'], dl=dl)
     while 1:
         try:

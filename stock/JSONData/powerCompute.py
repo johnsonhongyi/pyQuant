@@ -316,10 +316,10 @@ def get_linear_model_status(code, df=None, dtype='d', type='m', start=None, end=
             if df.index.values[0] < index_d:
                 df = df[df.index >= index_d]
     if dl is not None:
-        if ptype == 'low' and code == '999999':
-            log.setLevel(LoggerFactory.DEBUG)
-        else:
-            log.setLevel(LoggerFactory.ERROR)
+        # if ptype == 'low' and code == '999999':
+        #     log.setLevel(LoggerFactory.DEBUG)
+        # else:
+        #     log.setLevel(LoggerFactory.ERROR)
 
         start, index_d, df = tdd.get_duration_price_date(
             code, ptype=ptype, dl=dl, filter=False, df=df,power=True)

@@ -44,13 +44,22 @@ def get_dfcfw_fund_flow(market):
         vol_l = re.findall('\"([\d\D]+?)\"', data)
         if len(vol_l) == 1:
             data = vol_l[0].split(',')
-            dd['open'] = round(float(data[1]), 2)
-            dd['lastp'] = round(float(data[2]), 2)
-            dd['close'] = round(float(data[3]), 2)
-            dd['high'] = round(float(data[4]), 2)
-            dd['low'] = round(float(data[5]), 2)
-            dd['vol'] = round(float(data[8]) / 100000, 1)
-            dd['amount'] = round(float(data[9]) / 100000000, 1)
+            try:
+                dd['open'] = round(float(data[1]), 2)
+                dd['lastp'] = round(float(data[2]), 2)
+                dd['close'] = round(float(data[3]), 2)
+                dd['high'] = round(float(data[4]), 2)
+                dd['low'] = round(float(data[5]), 2)
+                dd['vol'] = round(float(data[8]) / 100000, 1)
+                dd['amount'] = round(float(data[9]) / 100000000, 1)
+            except Exception, e:
+                print e
+                return dd
+            else:
+                pass
+            finally:
+                pass
+
         # 1592652100,32691894461
         # 215722046, 207426675004
     return dd

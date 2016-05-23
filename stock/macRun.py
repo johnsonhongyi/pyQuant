@@ -29,7 +29,7 @@ script_set_position = '''tell application "Terminal"
 end tell
 '''
 
-positionKey = {'sina_Market-DurationDn.py': '267, 485',
+positionKey = {'sina_Market-DurationDn.py': '267, 448',
                'sina_Market-DurationUp.py': '0, 490',
                'sina_Monitor-Market-New.py': '-2, 371',
                'sina_Monitor-Market-LH.py': '440, 293',
@@ -37,15 +37,15 @@ positionKey = {'sina_Market-DurationDn.py': '267, 485',
                'sina_Monitor-GOLD.py': '43, 80',
                'sina_Monitor.py': '85, 27',
                'singleAnalyseUtil.py': '583, 23',
-               'powerCompute.py':'364, 515',}
+               'powerCompute.py':'675, 526',}
 
 cmdRun = '''cd /Users/Johnson/Documents/Quant/pyQuant/stock;
 open singleAnalyseUtil.py;
 sleep 16;
 open sina_Monitor.py;
 sleep 16;
-rem open sina_Monitor-GOLD.py;
-rem sleep 16;
+open sina_Monitor-GOLD.py;
+sleep 16;
 open sina_Monitor-Market.py;
 sleep 16;
 open sina_Monitor-Market-New.py;
@@ -107,6 +107,6 @@ def setPosition(cmd=None, position=None):
 # count = doScript(scriptcount        
 # os.system(cmdRun)
 print getPosition('sina_Monitor.py')
-print getPosition('sina_Monitor-GOLD.py')
+print getPosition('sina_Market-DurationDn.py')
 print getPosition('powerCompute.py')
 setPosition(cmd=None, position=None)
