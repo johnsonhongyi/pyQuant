@@ -37,7 +37,7 @@ positionKey = {'sina_Market-DurationDn.py': '267, 448',
                'sina_Monitor-GOLD.py': '43, 80',
                'sina_Monitor.py': '85, 27',
                'singleAnalyseUtil.py': '583, 23',
-               'powerCompute.py':'675, 526',}
+               'LinePower.py':'675, 526',}
 
 cmdRun = '''cd /Users/Johnson/Documents/Quant/pyQuant/stock;
 open singleAnalyseUtil.py;
@@ -56,8 +56,8 @@ open sina_Market-DurationUp.py;
 sleep 36;
 open sina_Market-DurationDn.py;
 sleep 16;
-cd JSONData;
-open powerCompute.py;
+rem cd JSONData;
+open LinePower.py;
 sleep 5;
 '''
 

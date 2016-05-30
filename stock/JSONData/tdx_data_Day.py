@@ -1009,6 +1009,8 @@ def get_duration_date(code, ptype='low', dt=None, df=None, dl=None):
         else:
             dz = df
         return dz.index[-1]
+    else:
+        dz=df
     if ptype == 'high':
         lowp = dz.high.max()
         lowdate = dz[dz.high == lowp].index.values[0]
@@ -1097,6 +1099,8 @@ def get_duration_price_date(code, ptype='low', dt=None, df=None, dl=None, end=No
             dz = df
         if not filter:
             index_d = dz[:1].index.values[0]
+    else:
+        dz=df
     if len(dz) > 0:
         if ptype == 'high':
             lowp = dz.high.max()

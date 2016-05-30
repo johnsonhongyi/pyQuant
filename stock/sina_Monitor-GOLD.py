@@ -129,19 +129,26 @@ if __name__ == "__main__":
                         # code = rl._symbol_to_code(symbol)
                         if symbol in top_all.index:
 
-                            # count_n = top_now.loc[symbol, 'percent']
-                            # count_a = top_all.loc[symbol, 'percent']
-                            # top_now.loc[symbol, 'diff'] = count_n - count_a
-                            count_n = top_now.loc[symbol, 'counts']
-                            count_a = top_all.loc[symbol, 'counts']
+                            count_n = top_now.loc[symbol, 'percent']
+                            count_a = top_all.loc[symbol, 'percent']
                             top_now.loc[symbol, 'diff'] = count_n - count_a
+                            # count_n = top_now.loc[symbol, 'counts']
+                            # count_a = top_all.loc[symbol, 'counts']
+                            # top_now.loc[symbol, 'diff'] = count_n - count_a
+                            # print top_now.columns
+                            # Index([u'name', u'percent', u'diff', u'counts', u'trade', u'high', u'open',
+                            #        u'low', u'ratio', u'volume', u'prev_p'],
+                            #       dtype='object')
+                            # Index([u'name', u'percent', u'diff', u'counts', u'volume', u'trade', u'prev_p',
+                            #        u'ratio'],
+                            #       dtype='object')
+                            # print top_all.columns
                             if status_change:
                                 top_all.loc[symbol] = top_now.loc[symbol]
                             else:
-                                # print top_now.loc[symbol,:]
-                                # print top_all.loc[symbol,:]
-                                top_all.loc[symbol, ['percent', 'diff']] = top_now.loc[symbol, ['percent', 'diff']]
-                                top_all.loc[symbol, 'trade':] = top_now.loc[symbol, 'trade':]
+                                # top_all.loc[symbol, ['percent', 'diff']] = top_now.loc[symbol, ['percent', 'diff']]
+                                # top_all.loc[symbol, 'trade':] = top_now.loc[symbol, 'trade':]
+                                top_all.loc[symbol, 'diff':] = top_now.loc[symbol, 'diff':]
                                 # if not count_n==count_a:
                                 # top_now.loc[symbol,'diff']=round((count_n-count_a),1)
                                 # if status_change:
@@ -219,11 +226,11 @@ if __name__ == "__main__":
                     # top_temp = top_temp.sort_values(by=['op','ra','diff', 'percent', 'ratio'], ascending=[0,0,0, 0, 1])                
                 if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935:
                     top_temp = top_temp.loc[:,
-                             ['name', 'trade', 'diff', 'op', 'ra','fib', 'percent','volume', 'ratio', 'counts',
+                             ['name', 'trade', 'diff', 'percent', 'op', 'ra','fib','volume', 'ratio', 'counts',
                               'ldate']]
                 else:
                     top_temp = top_temp.loc[:,
-                             ['name', 'trade', 'diff', 'op', 'ra','fib', 'percent', 'volume', 'ratio', 'counts',
+                             ['name', 'trade', 'diff', 'percent', 'op', 'ra','fib', 'volume', 'ratio', 'counts',
                               'ldate']]
                 print rl.format_for_print(top_temp[:10]) 
                 

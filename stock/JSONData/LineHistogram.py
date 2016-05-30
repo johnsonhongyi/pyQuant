@@ -14,7 +14,7 @@ from pylab import plt, mpl
 from sklearn.linear_model import LinearRegression
 from statsmodels import regression
 
-from JSONData import powerCompute as pct
+import powerCompute as pct
 from JohhnsonUtil import LoggerFactory as LoggerFactory
 from JohhnsonUtil import commonTips as cct
 from JohhnsonUtil import zoompan
@@ -71,51 +71,51 @@ def LIS(X):
     return S[::-1], pos[::-1]
 
 
-def get_linear_model_status(code, ptype='low', dtype='d', type='l', start=None, end=None):
-    # df = tdd.get_tdx_append_now_df(code, ptype, start, end).sort_index(ascending=True)
-    df = tdd.get_tdx_append_now_df_api(code, start, end).sort_index(ascending=True)
-    # print start,end,df.index.values[:1],df.index.values[-1:]
-    if len(df) < 2:
-        return False, 0, 0
-    if not dtype == 'd':
-        df = tdd.get_tdx_stock_period_to_type(df, dtype).sort_index(ascending=True)
-    # df = tdd.get_tdx_Exp_day_to_df(code, 'f').sort_index(ascending=True)
-    asset = df['close']
-    log.info("df:%s" % asset[:1])
-    asset = asset.dropna()
-    X = np.arange(len(asset))
-    x = sm.add_constant(X)
-    model = regression.linear_model.OLS(asset, x).fit()
-    a = model.params[0]
-    b = model.params[1]
-    log.info("X:%s a:%s b:%s" % (len(asset), a, b))
-    Y_hat = X * b + a
-    if Y_hat[-1] > Y_hat[1]:
-        log.debug("u:%s" % Y_hat[-1])
-        log.debug("price:" % asset.iat[-1])
-        if type.upper() == 'M':
-            diff = asset.iat[-1] - Y_hat[-1]
-            if diff > 0:
-                return True, len(asset), diff
-            else:
-                return False, len(asset), diff
-        elif type.upper() == 'L':
-            i = (asset.values.T - Y_hat).argmin()
-            c_low = X[i] * b + a - asset.values[i]
-            Y_hatlow = X * b + a - c_low
-            diff = asset.iat[-1] - Y_hatlow[-1]
-            if asset.iat[-1] - Y_hatlow[-1] > 0:
-                return True, len(asset), diff
-            else:
-                return False, len(asset), diff
-    else:
-        log.debug("d:%s" % Y_hat[1])
-        return False, 0, 0
-    return False, 0, 0
+# def get_linear_model_status(code, ptype='low', dtype='d', type='l', start=None, end=None):
+#     # df = tdd.get_tdx_append_now_df(code, ptype, start, end).sort_index(ascending=True)
+#     df = tdd.get_tdx_append_now_df_api(code, start, end).sort_index(ascending=True)
+#     # print start,end,df.index.values[:1],df.index.values[-1:]
+#     if len(df) < 2:
+#         return False, 0, 0
+#     if not dtype == 'd':
+#         df = tdd.get_tdx_stock_period_to_type(df, dtype).sort_index(ascending=True)
+#     # df = tdd.get_tdx_Exp_day_to_df(code, 'f').sort_index(ascending=True)
+#     asset = df['close']
+#     log.info("df:%s" % asset[:1])
+#     asset = asset.dropna()
+#     X = np.arange(len(asset))
+#     x = sm.add_constant(X)
+#     model = regression.linear_model.OLS(asset, x).fit()
+#     a = model.params[0]
+#     b = model.params[1]
+#     log.info("X:%s a:%s b:%s" % (len(asset), a, b))
+#     Y_hat = X * b + a
+#     if Y_hat[-1] > Y_hat[1]:
+#         log.debug("u:%s" % Y_hat[-1])
+#         log.debug("price:" % asset.iat[-1])
+#         if type.upper() == 'M':
+#             diff = asset.iat[-1] - Y_hat[-1]
+#             if diff > 0:
+#                 return True, len(asset), diff
+#             else:
+#                 return False, len(asset), diff
+#         elif type.upper() == 'L':
+#             i = (asset.values.T - Y_hat).argmin()
+#             c_low = X[i] * b + a - asset.values[i]
+#             Y_hatlow = X * b + a - c_low
+#             diff = asset.iat[-1] - Y_hatlow[-1]
+#             if asset.iat[-1] - Y_hatlow[-1] > 0:
+#                 return True, len(asset), diff
+#             else:
+#                 return False, len(asset), diff
+#     else:
+#         log.debug("d:%s" % Y_hat[1])
+#         return False, 0, 0
+#     return False, 0, 0
 
 
 def get_linear_model_histogramDouble(code, ptype='low', dtype='d', start=None, end=None, vtype='f', filter='n',
-                                     df=None):
+                                     df=None,dl=None):
     # 399001','cyb':'zs399006','zxb':'zs399005
     # code = '999999'
     # code = '601608'
@@ -134,6 +134,13 @@ def get_linear_model_histogramDouble(code, ptype='low', dtype='d', start=None, e
             log.debug("index_d:%s" % (index_d))
         start = tdd.get_duration_price_date(code, ptype='low', dt=index_d)
         log.debug("start:%s" % (start))
+
+    if start is None and df is None and dl is not None:
+        start = cct.last_tddate(dl)
+        # print start
+        df = tdd.get_tdx_append_now_df_api(code, start=start, end=end).sort_index(ascending=True)
+
+
     if df is None:
         # df = tdd.get_tdx_append_now_df(code, ptype, start, end).sort_index(ascending=True)
         df = tdd.get_tdx_append_now_df_api(code, start, end).sort_index(ascending=True)
@@ -429,6 +436,7 @@ def get_linear_model_histogramDouble(code, ptype='low', dtype='d', start=None, e
     plt.show(block=False)
     # print plt.get_backend()
     # plt.show()
+    return df
 
 
 def get_linear_model_histogram(code, ptype='low', dtype='d', start=None, end=None, vtype='f', filter='n',

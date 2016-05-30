@@ -561,7 +561,7 @@ def get_linear_model_candles(code, ptype='low', dtype='d', start=None, end=None,
         start = tdd.get_duration_price_date(code, ptype=ptype, dt=index_d, power=True)
         log.debug("start:%s" % (start))
 
-    if start is None and dl is not None:
+    if start is None and df is None and dl is not None:
         start = cct.last_tddate(dl)
         # print start
         df = tdd.get_tdx_append_now_df_api(code, start=start, end=end).sort_index(ascending=True)
@@ -807,6 +807,7 @@ def get_linear_model_candles(code, ptype='low', dtype='d', start=None, end=None,
     plt.xticks(rotation=15, horizontalalignment='center')
     # plt.setp( axs[1].xaxis.get_majorticklabels(), rotation=70 )
     plt.show(block=False)
+    return df
 
 
 def powerCompute_df(df, dtype='d', end=None, dl=None, filter='y'):

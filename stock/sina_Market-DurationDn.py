@@ -10,11 +10,11 @@ import time
 import pandas as pd
 
 import JohhnsonUtil.johnson_cons as ct
-import LineHistogram as lhg
 import singleAnalyseUtil as sl
 from JSONData import powerCompute as pct
 from JSONData import realdatajson as rl
 from JSONData import tdx_data_Day as tdd
+from JSONData import LineHistogram as lhg
 from JohhnsonUtil import LoggerFactory as LoggerFactory
 from JohhnsonUtil import commonTips as cct
 
@@ -57,7 +57,10 @@ if __name__ == "__main__":
     block_path = tdd.get_tdx_dir_blocknew() + blkname
     status_change = False
     lastpTDX_DF = pd.DataFrame()
-    duration_date = 30
+    dl=30
+    ptype='high'
+    op, ra, duration_date, days = pct.get_linear_model_status('999999', filter='y', dl=dl, ptype=ptype, days=1)
+    # duration_date = 30
     # print cct.last_tddate(2)
     end_date = cct.last_tddate(days=2)
     ptype = 'high'
