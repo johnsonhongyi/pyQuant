@@ -141,7 +141,7 @@ def get_dfcfw_fund_SHSZ(url=ct.DFCFW_ZS_SHSZ):
 
 def get_dfcfw_rzrq_SHSZ(url=ct.DFCFW_RZRQ_SHSZ):
     data = {}
-    # http://data.eastmoney.com/rzrq/total.html  web
+    log.info("http://data.eastmoney.com/rzrq/total.html")
 
     def get_tzrq(url, today):
         url = url % today

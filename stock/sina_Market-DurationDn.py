@@ -53,7 +53,8 @@ if __name__ == "__main__":
     delay_time = 720000
     # delay_time = cct.get_delay_time()
     First = True
-    blkname = '062.blk'
+    # blkname = '062.blk'
+    blkname = '066.blk'
     block_path = tdd.get_tdx_dir_blocknew() + blkname
     status_change = False
     lastpTDX_DF = pd.DataFrame()
@@ -62,12 +63,16 @@ if __name__ == "__main__":
     op, ra, duration_date, days = pct.get_linear_model_status('999999', filter='y', dl=dl, ptype=ptype, days=1)
     # duration_date = 30
     # print cct.last_tddate(2)
-    end_date = cct.last_tddate(days=2)
+    end_date = cct.last_tddate(days=3)
     ptype = 'high'
     filter = 'y'
     if len(str(duration_date)) < 4:
         # duration_date = tdd.get_duration_price_date('999999', dl=duration_date, end=end_date, ptype='dutype')
         duration_date = tdd.get_duration_Index_date('999999',dl=duration_date)
+        if cct.get_today_duration(duration_date) <=3:
+            duration_date = 5
+            print ("duaration: %s duration_date:%s" %(cct.get_today_duration(duration_date),duration_date))
+        log.info("duaration: %s duration_date:%s" %(cct.get_today_duration(duration_date),duration_date))
     set_duration_console(duration_date)
     percent_status = 'n'
     # all_diffpath = tdd.get_tdx_dir_blocknew() + '062.blk'
@@ -296,7 +301,7 @@ if __name__ == "__main__":
             st = raw_input("status:[go(g),clear(c),[d 20150101 [l|h]|[y|n|pn|py],quit(q),W(a),sh]:")
             if len(st) == 0:
                 status = False
-            elif st == 'r':
+            elif st.lower() == 'r':
                 end = True
                 while end:
                     cmd = (raw_input('DEBUG[top_dif,top_now,e|q]:'))
@@ -305,14 +310,14 @@ if __name__ == "__main__":
                     else:
                         print eval(cmd)
                         # raise KeyboardInterrupt("StopTime")
-            elif st == 'g' or st == 'go':
+            elif st.lower() == 'g' or st.lower() == 'go':
                 status = True
                 for code in top_dd[:10].index:
                     code = re.findall('(\d+)', code)
                     if len(code) > 0:
                         code = code[0]
                         kind = sl.get_multiday_ave_compare_silent(code)
-            elif st == 'clear' or st == 'c':
+            elif st.lower() == 'clear' or st.lower() == 'c':
                 top_all = pd.DataFrame()
                 time_s = time.time()
                 status = False
@@ -360,16 +365,17 @@ if __name__ == "__main__":
                     status = False
                     lastpTDX_DF = pd.DataFrame()
 
-            elif st == 'w' or st == 'a':
+            elif st.lower() == 'w' or st.lower() == 'a':
                 # if ptype == 'low':
                     # codew = (top_dd[:10].index).tolist()
                 # else:
                     # codew = (top_dd[-10:].index).tolist()
-                codew = (top_dd[:10].index).tolist()
-                if st == 'a':
+                if st.lower() == 'a':
+                    codew = (top_dd[:10].index).tolist()
                     cct.write_to_blocknew(block_path, codew)
                     # sl.write_to_blocknew(all_diffpath, codew)
                 else:
+                    codew = (top_dd.index).tolist()
                     cct.write_to_blocknew(block_path, codew, False)
                     # sl.write_to_blocknew(all_diffpath, codew, False)
                 print "wri ok:%s" % block_path

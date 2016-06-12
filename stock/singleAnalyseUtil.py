@@ -486,7 +486,7 @@ if __name__ == '__main__':
                 st = raw_input("status:[go(g),clear(c),quit(q,e)]:")
                 if len(st) == 0:
                     status = False
-                elif st == 'g' or st == 'go':
+                elif st.lower() == 'g' or st.lower() == 'go':
                     status = True
                     num_input = ''
                     ave = None
@@ -505,7 +505,7 @@ if __name__ == '__main__':
             st = raw_input("status:[go(g),clear(c),quit(q,e)]:")
             if len(st) == 0:
                 status = False
-            elif st == 'g' or st == 'go':
+            elif st.lower() == 'g' or st.lower() == 'go':
                 status = True
                 num_input = ''
                 ave = None

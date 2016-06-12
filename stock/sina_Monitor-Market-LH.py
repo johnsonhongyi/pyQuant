@@ -76,7 +76,8 @@ if __name__ == "__main__":
     First = True
     # base_path = tdd.get_tdx_dir()
     # block_path = tdd.get_tdx_dir_blocknew() + '067.blk'
-    blkname = '067.blk'
+    # blkname = '067.blk'
+    blkname = '066.blk'
     block_path = tdd.get_tdx_dir_blocknew() + blkname
     # all_diffpath = tdd.get_tdx_dir_blocknew() + '062.blk'
     while 1:
@@ -301,7 +302,7 @@ if __name__ == "__main__":
             st = raw_input("status:[go(g),clear(c),quit(q,e),W(w),Wa(a)]:")
             if len(st) == 0:
                 status = False
-            elif st == 'r':
+            elif st.lower() == 'r':
                 end = True
                 while end:
                     cmd=(raw_input('DEBUG[top_dif,top_dd,e|q]:'))
@@ -309,19 +310,19 @@ if __name__ == "__main__":
                         break
                     else:
                         print eval(cmd)                  
-            elif st == 'g' or st == 'go':
+            elif st.lower() == 'g' or st.lower() == 'go':
                 status = True
                 for code in top_dif[:10].index:
                     code = re.findall('(\d+)', code)
                     if len(code) > 0:
                         code = code[0]
                         kind = sl.get_multiday_ave_compare_silent(code)
-            elif st == 'clear' or st == 'c':
+            elif st.lower() == 'clear' or st.lower() == 'c':
                 top_all = pd.DataFrame()
                 status = False
-            elif st == 'w' or st == 'a':
+            elif st.lower() == 'w' or st.lower() == 'a':
                 codew = (top_temp.index).tolist()
-                if st == 'a':
+                if st.lower() == 'a':
                     cct.write_to_blocknew(block_path, codew[:10])
                     # cct.write_to_blocknew(all_diffpath, codew)
                 else:
