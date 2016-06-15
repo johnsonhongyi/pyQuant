@@ -18,6 +18,8 @@ scriptname = '''tell application "Terminal"
     %s the name of window %s
 end tell
 '''
+scriptquit = '''tell application "Python Launcher" to quit
+'''
 script_get_position = '''tell application "Terminal"
     --activate
     %s position of window %s 
@@ -41,24 +43,24 @@ positionKey = {'sina_Market-DurationDn.py': '267, 448',
 
 cmdRun = '''cd /Users/Johnson/Documents/Quant/pyQuant/stock;
 open singleAnalyseUtil.py;
-sleep 16;
+sleep 0.3;osascript -e 'tell application "Python Launcher" to quit';sleep 16;
 open sina_Monitor.py;
-sleep 16;
+sleep 0.3;osascript -e 'tell application "Python Launcher" to quit';sleep 16;
 open sina_Monitor-GOLD.py;
-sleep 16;
+sleep 0.3;osascript -e 'tell application "Python Launcher" to quit';sleep 16;
 open sina_Monitor-Market.py;
-sleep 16;
+sleep 0.3;osascript -e 'tell application "Python Launcher" to quit';sleep 16;
 open sina_Monitor-Market-New.py;
-sleep 16;
+sleep 0.3;osascript -e 'tell application "Python Launcher" to quit';sleep 16;
 open sina_Monitor-Market-LH.py;
-sleep 16;
+sleep 0.3;osascript -e 'tell application "Python Launcher" to quit';sleep 16;
 open sina_Market-DurationUp.py;
-sleep 36;
+sleep 0.3;osascript -e 'tell application "Python Launcher" to quit';sleep 16;
 open sina_Market-DurationDn.py;
-sleep 16;
+sleep 0.3;osascript -e 'tell application "Python Launcher" to quit';sleep 16;
 rem cd JSONData;
 open LinePower.py;
-sleep 5;
+sleep 0.3;osascript -e 'tell application "Python Launcher" to quit';sleep 5;
 '''
 
 
@@ -88,6 +90,7 @@ def setPosition(cmd=None, position=None):
     count = doScript(scriptcount)
     # print count
     if int(count) > 2:
+        doScript(scriptquit)
         for n in xrange(1, int(count)):
             # print n
             title = doScript(scriptname % ('get', str(object=n)))
@@ -100,6 +103,7 @@ def setPosition(cmd=None, position=None):
                     # print doScript(script_get_position % ('get', str(n)))
             # position = doScript(scriptposition % ('get', str(n)))
             # print positio
+         
     else:
         print "run Cmd"
         os.system(cmdRun)

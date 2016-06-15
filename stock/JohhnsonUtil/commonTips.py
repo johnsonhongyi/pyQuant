@@ -810,7 +810,9 @@ if __name__ == '__main__':
     # print typeday8_to_day10(None)
     print get_work_time_ratio()
     print get_work_day_status()
-    for x in range(1, 3, 1):
+    # print last_tddate(days=3)
+    for x in range(0, 4, 1):
+        print x
         print last_tddate(x)
         # print last_tddate(2)
     # print get_os_system()

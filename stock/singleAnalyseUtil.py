@@ -228,7 +228,7 @@ def f_print(lens, datastr):
     return data
 
 
-def fibonacciCount(code, dl=30, start=None):
+def fibonacciCount(code, dl=60, start=None):
     fibl=[]
     if not isinstance(code,list):
         codes = [code]
@@ -236,7 +236,11 @@ def fibonacciCount(code, dl=30, start=None):
         codes = code
     for code in codes:
         for ptype in ['low','high']:
-            op, ra, st, days = pct.get_linear_model_status(code, filter='y', dl=dl, ptype=ptype, days=1)
+            if ptype == 'low':
+                op, ra, st, days = pct.get_linear_model_status(code, filter='y', dl=int(dl/2), ptype=ptype, days=1)
+            else:
+                op, ra, st, days = pct.get_linear_model_status(code, filter='y', dl=dl, ptype=ptype, days=1)
+                
             fib = cct.getFibonacci(300, days)
             # log.debug('st:%s days:%s fib:%s'%(st,days,fib))
             # print "%s op:%s ra:%s days:%s fib:%s %s" % (code, op, ra,days,fib, st)
@@ -415,7 +419,7 @@ if __name__ == '__main__':
     days = '10'
     success = 0
     rzrq = ffu.get_dfcfw_rzrq_SHSZ()
-    dl=30
+    dl=60
     fibc = 3
     fibl = fibonacciCount(['999999', '399001', '399006'], dl=dl)
     while 1:

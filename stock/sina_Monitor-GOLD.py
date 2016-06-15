@@ -83,9 +83,9 @@ def get_sina_url(vol='0', type='0', pageCount='100'):
 if __name__ == "__main__":
 
     if cct.isMac():
-        width, height = 111,16
+        width, height = 120,16
     else:
-        width, height = 100,16
+        width, height = 120,16
 
     cct.set_console(width, height)
     # log.setLevel(LoggerFactory.DEBUG)
@@ -108,6 +108,7 @@ if __name__ == "__main__":
             df = rl.get_sina_all_json_dd(vol, type)
             top_now = rl.get_sina_dd_count_price_realTime(df)
             # print top_now
+            # print top_now.columns
             time_Rt = time.time()
             time_d = time.time()
             if time_d - time_s > delay_time:
@@ -121,8 +122,8 @@ if __name__ == "__main__":
                 # if 'percent' in top_now.columns.values:
                 #     top_now=top_now[top_now['percent']>0]
                 if len(top_all) == 0:
-                    top_all = top_now
-                    # dd=dd.fillna(0)
+                    # top_all = top_now
+                    top_all = tdd.get_append_lastp_to_df(top_now)
                 else:
                     # top_now = top_now[top_now.trade >= top_now.high * 0.98]
                     for symbol in top_now.index:
@@ -144,11 +145,16 @@ if __name__ == "__main__":
                             #       dtype='object')
                             # print top_all.columns
                             if status_change:
-                                top_all.loc[symbol] = top_now.loc[symbol]
+                                top_all.loc[symbol,['name', 'percent', 'diff', 'counts', 'trade', 'high', 'open', 'low', 'ratio', 'volume',
+                               'prev_p']] = top_now.loc[symbol,['name', 'percent', 'diff', 'counts', 'trade', 'high', 'open', 'low', 'ratio', 'volume',
+                               'prev_p']]
+                                
                             else:
                                 # top_all.loc[symbol, ['percent', 'diff']] = top_now.loc[symbol, ['percent', 'diff']]
                                 # top_all.loc[symbol, 'trade':] = top_now.loc[symbol, 'trade':]
-                                top_all.loc[symbol, 'diff':] = top_now.loc[symbol, 'diff':]
+                                top_all.loc[symbol,['diff', 'counts', 'trade', 'high', 'open', 'low', 'ratio', 'volume',
+                               'prev_p']] = top_now.loc[symbol,['diff', 'counts', 'trade', 'high', 'open', 'low', 'ratio', 'volume',
+                               'prev_p']]
                                 # if not count_n==count_a:
                                 # top_now.loc[symbol,'diff']=round((count_n-count_a),1)
                                 # if status_change:
@@ -166,32 +172,23 @@ if __name__ == "__main__":
                     # map(lambda x, y: y if int(x) == 0 else x, top_all['buy'].values, top_all['trade'].values))
                 codelist = top_all.index.tolist()
                 if len(codelist) > 0:
-                    log.info('toTDXlist:%s' % len(codelist))
-                    tdxdata = tdd.get_tdx_all_day_LastDF(codelist)
-                    log.debug("TdxLastP: %s %s" % (len(tdxdata), tdxdata.columns.values))
-                    tdxdata.rename(columns={'low': 'llow'}, inplace=True)
-                    tdxdata.rename(columns={'high': 'lhigh'}, inplace=True)
-                    tdxdata.rename(columns={'close': 'lastp'}, inplace=True)
-                    tdxdata.rename(columns={'vol': 'lvol'}, inplace=True)
-                    tdxdata = tdxdata.loc[:, ['llow', 'lhigh', 'lastp', 'lvol', 'date']]
-                    # data.drop('amount',axis=0,inplace=True)
-                    log.debug("TDX Col:%s" % tdxdata.columns.values)
-                    # df_now=top_all.merge(data,on='code',how='left')
-                    # df_now=pd.merge(top_all,data,left_index=True,right_index=True,how='left')
-                    top_all = top_all.merge(tdxdata, left_index=True, right_index=True, how='left')
-                    log.info('Top-merge_now:%s' % (top_all[:1]))
-                    top_all = top_all[top_all['llow'] > 0]
-                    log.info("df:%s" % top_all[:1])
+                    # log.info('toTDXlist:%s' % len(codelist))
+                    # top_all = tdd.get_append_lastp_to_df(top_all)
+                    # log.info("df:%s" % top_all[:1])
                     radio_t = cct.get_work_time_ratio()
                     log.debug("Second:vol/vol/:%s" % radio_t)
                     # top_dif['volume'] = top_dif['volume'].apply(lambda x: round(x / radio_t, 1))
                     log.debug("top_diff:vol")
                     top_all['volume'] = (
                         map(lambda x, y: round(x / y / radio_t, 1), top_all['volume'].values, top_all['lvol'].values))
+                    
+                    if cct.get_now_time_int() > 915:
+                        top_all = top_all[top_all.trade > top_all.lastp]
+                        top_all = top_all[top_all.trade > top_all.lhigh]
                     # if cct.get_now_time_int() > 930 and 'lastp' in top_all.columns:
                     #     top_all = top_all[top_all.trade >= top_all.lastp]
-                    top_all = top_all.loc[:,
-                              ['name', 'percent', 'diff', 'counts', 'volume', 'trade', 'prev_p', 'ratio']]
+                    # top_all = top_all.loc[:,
+                              # ['name', 'percent', 'lastp','diff', 'counts', 'volume', 'trade', 'prev_p', 'ratio']]
                     # if cct.get_now_time_int() > 1030 and cct.get_now_time_int() < 1400:
                         # top_all = top_all[(top_all.volume > ct.VolumeMinR) & (top_all.volume < ct.VolumeMaxR)]
 
@@ -217,8 +214,9 @@ if __name__ == "__main__":
                 print "Rt:%0.1f" % (float(time.time() - time_Rt))
                 cct.set_console(width, height,
                     title=['dT:%s' % cct.get_time_to_date(time_s), 'G:%s' % len(top_all), 'zxg: %s' % (blkname)])
-               
-                # if 'op' in top_temp.columns:
+                
+                if 'op' in top_temp.columns:
+                    top_temp = top_temp.sort_values(by=['ra','op','counts'],ascending=[0, 0,0])
                 #     # top_temp = top_temp.sort_values(by=['diff', 'op', 'ra', 'percent', 'ratio'],
                 #     top_temp = top_temp.sort_values(by=['percent', 'op', 'ra','diff' , 'ratio'],
                     
@@ -226,11 +224,11 @@ if __name__ == "__main__":
                     # top_temp = top_temp.sort_values(by=['op','ra','diff', 'percent', 'ratio'], ascending=[0,0,0, 0, 1])                
                 if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935:
                     top_temp = top_temp.loc[:,
-                             ['name', 'trade', 'diff', 'percent', 'op', 'ra','fib','volume', 'ratio', 'counts',
+                             ['name', 'trade', 'lastp','diff', 'percent', 'ra','op', 'fib','volume', 'ratio', 'counts',
                               'ldate']]
                 else:
                     top_temp = top_temp.loc[:,
-                             ['name', 'trade', 'diff', 'percent', 'op', 'ra','fib', 'volume', 'ratio', 'counts',
+                             ['name', 'trade', 'lastp','diff', 'percent', 'ra','op', 'fib', 'volume', 'ratio', 'counts',
                               'ldate']]
                 print rl.format_for_print(top_temp[:10]) 
                 

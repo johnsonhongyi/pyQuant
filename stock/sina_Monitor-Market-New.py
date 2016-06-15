@@ -34,9 +34,9 @@ if __name__ == "__main__":
     # error_handler = SyslogHandler('Sina-M-Log', level='ERROR')
 
     if cct.isMac():
-        cct.set_console(123, 16)
+        cct.set_console(132, 16)
     else:
-        cct.set_console(100, 15)
+        cct.set_console(132, 15)
     status = False
     vol = '0'
     type = '2'
@@ -84,26 +84,7 @@ if __name__ == "__main__":
                     top_now['buy'] = (
                         map(lambda x, y: y if int(x) == 0 else x, top_now['buy'].values, top_now['trade'].values))
                 if len(top_all) == 0:
-                    top_all = top_now
-                    # top_all['llow'] = 0
-                    # top_all['lastp'] = 0
-                    # top_all = top_all[top_all.buy > 0]
-                    codelist = top_all.index.tolist()
-                    log.info('toTDXlist:%s' % len(codelist))
-                    tdxdata = tdd.get_tdx_all_day_LastDF(codelist)
-                    log.debug("TdxLastP: %s %s" % (len(tdxdata), tdxdata.columns.values))
-                    tdxdata.rename(columns={'low': 'llow'}, inplace=True)
-                    tdxdata.rename(columns={'high': 'lhigh'}, inplace=True)
-                    tdxdata.rename(columns={'close': 'lastp'}, inplace=True)
-                    tdxdata.rename(columns={'vol': 'lvol'}, inplace=True)
-                    tdxdata = tdxdata.loc[:, ['llow', 'lhigh', 'lastp', 'lvol', 'date']]
-                    # data.drop('amount',axis=0,inplace=True)
-                    log.debug("TDX Col:%s" % tdxdata.columns.values)
-                    # df_now=top_all.merge(data,on='code',how='left')
-                    # df_now=pd.merge(top_all,data,left_index=True,right_index=True,how='left')
-                    top_all = top_all.merge(tdxdata, left_index=True, right_index=True, how='left')
-                    log.info('Top-merge_now:%s' % (top_all[:1]))
-                    top_all = top_all[top_all['llow'] > 0]
+                    top_all = tdd.get_append_lastp_to_df(top_now)
 
                     # if len(top_all[:5][top_all[:5]['volume'] > 0]) > 3:
                     #     # top_all['volume'] = top_all['volume'].apply(lambda x: round(float(x) / radio_t, 1))
@@ -272,16 +253,19 @@ if __name__ == "__main__":
                     title=['dT:%s' % cct.get_time_to_date(time_s), 'G:%s' % len(top_dif), 'zxg: %s' % (blkname)])
                
                 if 'op' in top_temp.columns:
-                    top_temp = top_temp.sort_values(by=['diff', 'op', 'ra', 'percent', 'ratio'],
-                                                    ascending=[0, 0, 0, 0, 1])
+
+                    top_temp = top_temp.sort_values(by=['ra', 'op','percent'],ascending=[0, 0,0])
+
+                    # top_temp = top_temp.sort_values(by=['diff', 'op', 'ra', 'percent', 'ratio'],
+                                                    # ascending=[0, 0, 0, 0, 1])
                     # top_temp = top_temp.sort_values(by=['op','ra','diff', 'percent', 'ratio'], ascending=[0,0,0, 0, 1])
                 if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935:
                     top_temp = top_temp.loc[:,
-                             ['name', 'buy', 'diff', 'op', 'ra','fib', 'percent','volume', 'ratio', 'counts',
+                             ['name', 'buy','lastp', 'diff', 'ra','op', 'fib', 'percent','volume', 'ratio', 'counts',
                               'ldate', 'date']]
                 else:
                     top_temp = top_temp.loc[:,
-                             ['name', 'buy', 'diff', 'op', 'ra','fib', 'percent', 'volume', 'ratio', 'counts',
+                             ['name', 'buy','lastp', 'diff', 'ra','op', 'fib', 'percent', 'volume', 'ratio', 'counts',
                               'ldate','date']]
                 print rl.format_for_print(top_temp[:10])
                 # print rl.format_for_print(top_dif[:10])

@@ -1397,6 +1397,27 @@ def get_tdx_all_day_LastDF(codeList, type=0, dt=None, ptype='close'):
         print ("TDX:%0.2f" % (time.time() - time_t)),
     return df
 
+def get_append_lastp_to_df(top_all):
+    codelist = top_all.index.tolist()
+    log.info('toTDXlist:%s' % len(codelist))
+    tdxdata = get_tdx_all_day_LastDF(codelist)
+    log.debug("TdxLastP: %s %s" %
+              (len(tdxdata), tdxdata.columns.values))
+    tdxdata.rename(columns={'low': 'llow'}, inplace=True)
+    tdxdata.rename(columns={'high': 'lhigh'}, inplace=True)
+    tdxdata.rename(columns={'close': 'lastp'}, inplace=True)
+    tdxdata.rename(columns={'vol': 'lvol'}, inplace=True)
+    tdxdata = tdxdata.loc[
+        :, ['llow', 'lhigh', 'lastp', 'lvol','ma5d', 'date']]
+    # data.drop('amount',axis=0,inplace=True)
+    log.debug("TDX Col:%s" % tdxdata.columns.values)
+    # df_now=top_all.merge(data,on='code',how='left')
+    # df_now=pd.merge(top_all,data,left_index=True,right_index=True,how='left')
+    top_all = top_all.merge(
+        tdxdata, left_index=True, right_index=True, how='left')
+    log.info('Top-merge_now:%s' % (top_all[:1]))
+    top_all = top_all[top_all['llow'] > 0]
+    return top_all
 
 def get_tdx_exp_all_LastDF(codeList, dt=None,end=None,ptype='low',filter='n'):
     time_t = time.time()
