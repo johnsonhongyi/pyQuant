@@ -148,7 +148,9 @@ if __name__ == "__main__":
                 if 'trade' in top_dif.columns:
                     top_dif['buy'] = (
                         map(lambda x, y: y if int(x) == 0 else x, top_dif['buy'].values, top_dif['trade'].values))
-                # if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935:
+                if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935:
+                    top_dif = top_dif[top_dif.buy >= top_dif.lastp * 0.995]      
+                    top_dif = top_dif[top_dif.buy >= top_dif.lhigh * 0.995]
                 top_dif = top_dif[top_dif.buy > 0]
                 top_dif['diff'] = (
                     map(lambda x, y: round((x - y) / y * 100, 1), top_dif['buy'].values, top_dif['lastp'].values))
@@ -186,7 +188,7 @@ if __name__ == "__main__":
                 # top_dif = top_dif[top_dif.trade >= top_dif.buy]
                 # df['volume']= df['volume'].apply(lambda x:x/100)
 
-                goldstock = len(top_dif[top_dif.buy >= top_dif.high * 0.99])
+                goldstock = len(top_dif[top_dif.buy >= top_dif.lhigh * 0.99])
                 ## goldstock=len(top_dif[top_dif.buy >(top_dif.high-top_dif.low)/2])
                 if ptype == 'low':
                     top_dif = top_dif[top_dif.lvol > ct.LvolumeSize]
