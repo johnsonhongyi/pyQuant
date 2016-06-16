@@ -987,7 +987,6 @@ if __name__ == "__main__":
                         op, ra, st, daysData  = get_linear_model_status(args.code, dtype=args.dtype, start=start, end=end,
                                                                    days=args.days, ptype=ptype, filter=args.filter,
                                                                    dl=args.dl)
-                        print days
                         print "%s op:%s ra:%s days:%s  start:%s" % (args.code, op, str(ra), str(daysData[0]), st)
                         # op, ra, st, daysData  = get_linear_model_status(args.code, dtype=args.dtype, start=cct.day8_to_day10(
                         # args.start), end=cct.day8_to_day10(args.end), filter=args.filter, dl=args.dl)
