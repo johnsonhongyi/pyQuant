@@ -90,8 +90,8 @@ if __name__ == "__main__":
     cct.set_console(width, height)
     # log.setLevel(LoggerFactory.DEBUG)
     status = False
-    vol = '0'
-    type = '2'
+    vol = ct.json_countVol
+    type = ct.json_countType
     top_all = pd.DataFrame()
     code_a = {}
     success = 0
@@ -188,7 +188,7 @@ if __name__ == "__main__":
                     # if cct.get_now_time_int() > 930 and 'lastp' in top_all.columns:
                     #     top_all = top_all[top_all.trade >= top_all.lastp]
                     # top_all = top_all.loc[:,
-                              # ['name', 'percent', 'lastp','diff', 'counts', 'volume', 'trade', 'prev_p', 'ratio']]
+                              # ['name', 'percent', 'ma5d','diff', 'counts', 'volume', 'trade', 'prev_p', 'ratio']]
                     # if cct.get_now_time_int() > 1030 and cct.get_now_time_int() < 1400:
                         # top_all = top_all[(top_all.volume > ct.VolumeMinR) & (top_all.volume < ct.VolumeMaxR)]
 
@@ -224,11 +224,11 @@ if __name__ == "__main__":
                     # top_temp = top_temp.sort_values(by=['op','ra','diff', 'percent', 'ratio'], ascending=[0,0,0, 0, 1])                
                 if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935:
                     top_temp = top_temp.loc[:,
-                             ['name', 'trade', 'lastp','diff', 'percent', 'ra','op', 'fib','volume', 'ratio', 'counts',
+                             ['name', 'trade', 'ma5d','diff', 'percent', 'ra','op', 'fib','volume', 'ratio', 'counts',
                               'ldate']]
                 else:
                     top_temp = top_temp.loc[:,
-                             ['name', 'trade', 'lastp','diff', 'percent', 'ra','op', 'fib', 'volume', 'ratio', 'counts',
+                             ['name', 'trade', 'ma5d','diff', 'percent', 'ra','op', 'fib', 'volume', 'ratio', 'counts',
                               'ldate']]
                 print rl.format_for_print(top_temp[:10]) 
                 

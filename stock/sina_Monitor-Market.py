@@ -171,8 +171,8 @@ if __name__ == "__main__":
     else:
         cct.set_console(132, 16)
     status = False
-    vol = '0'
-    type = '2'
+    vol = ct.json_countVol
+    type = ct.json_countType
     # cut_num=10000
     success = 0
     top_all = pd.DataFrame()
@@ -366,11 +366,11 @@ if __name__ == "__main__":
                     # top_temp = top_temp.sort_values(by=['op','ra','diff', 'percent', 'ratio'], ascending=[0,0,0, 0, 1])
                 if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935:
                     top_temp = top_temp.loc[:,
-                             ['name', 'buy','lastp', 'diff', 'ra','op', 'fib', 'percent','volume', 'ratio', 'counts',
+                             ['name', 'buy', 'ma5d','diff', 'ra','op', 'fib', 'percent','volume', 'ratio', 'counts',
                               'ldate', 'date']]
                 else:
                     top_temp = top_temp.loc[:,
-                             ['name', 'buy','lastp','diff', 'ra','op', 'fib', 'percent', 'volume', 'ratio', 'counts',
+                             ['name', 'buy','ma5d','diff', 'ra','op', 'fib', 'percent', 'volume', 'ratio', 'counts',
                               'ldate','date']]
                 print rl.format_for_print(top_temp[:10])                
                 

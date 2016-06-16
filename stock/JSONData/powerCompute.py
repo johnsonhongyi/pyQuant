@@ -511,42 +511,84 @@ def get_linear_model_status(code, df=None, dtype='d', type='m', start=None, end=
 
             # log.info("op:%s min:%s ratio_l:%s" %
             # (operationcount, min(ratio_l), ratio_l))
-        return operationcount, min(ratio_l), df[:1].index.values[0], len(df)
+            # 
+        return operationcount, min(ratio_l), df[:1].index.values[0], [len(df),df[:1]]
+
     elif len(asset) == 1:
-        # log.error("powerCompute code:%s"%(code))
+        ## log.error("powerCompute code:%s"%(code))
         if ptype == 'high':
             if df.close[-1] >= df.high[-1] * 0.99 and df.close[-1] >= df.open[-1]:
-                return 12, 0, df.index.values[0], len(df)
+                return 12, 0, df.index.values[0], [len(df),df[:1]]
 
             elif df.close[-1] > df.open[-1]:
                 if df.close[-1] > df.high[-1] * 0.97:
                     if len(df) > 2 and df.close[-1] > df.close[-2]:
-                        return 10, 0, df.index.values[0], len(df)
+                        return 10, 0, df.index.values[0], [len(df),df[:1]]
                     else:
-                        return 11, 0, df.index.values[0], len(df)
+                        return 11, 0, df.index.values[0], [len(df),df[:1]]
                 else:
-                    return 9, 0, df.index.values[0], len(df)
+                    return 9, 0, df.index.values[0], [len(df),df[:1]]
             else:
                 if len(df) >= 2:
                     if df.close[-1] > df.close[-2] * 1.01:
-                        return 9, 0, df.index.values[0], len(df)
+                        return 9, 0, df.index.values[0], [len(df),df[:1]]
                     elif df.close[-1] > df.close[-2]:
-                        return 8, 0, df.index.values[0], len(df)
+                        return 8, 0, df.index.values[0], [len(df),df[:1]]
                     elif df.low[-1] > df.low[-2]:
-                        return 6, 0, df.index.values[0], len(df)
+                        return 6, 0, df.index.values[0], [len(df),df[:1]]
                     else:
-                        return 3, 0, df.index.values[0], len(df)
+                        return 3, 0, df.index.values[0], [len(df),df[:1]]
                 else:
-                    return 1, 0, df.index.values[0], len(df)
+                    return 1, 0, df.index.values[0], [len(df),df[:1]]
         else:
-            return -10, 0, df.index.values[0], len(df)
+            return -10, 0, df.index.values[0], [len(df),df[:1]]
     else:
-        # log.error("code:%s %s :%s" % (code, ptype,len(df)))
+        ## log.error("code:%s %s :%s" % (code, ptype,len(df)))
         if ptype == 'high':
-            # log.warn("df is None,start:%s index:%s" % (start, index_d))
-            return 13, 1, cct.get_today(), len(df)
+            ## log.warn("df is None,start:%s index:%s" % (start, index_d))
+            return 13, 1, cct.get_today(), [len(df),df[:1]]
         else:
-            return -10, -10, cct.get_today(), len(df)
+            return -10, -10, cct.get_today(), [len(df),df[:1]]
+
+
+
+
+    #     return operationcount, min(ratio_l), df[:1].index.values[0], [len(df),df[:1]]
+    # elif len(asset) == 1:
+    #     ## log.error("powerCompute code:%s"%(code))
+    #     if ptype == 'high':
+    #         if df.close[-1] >= df.high[-1] * 0.99 and df.close[-1] >= df.open[-1]:
+    #             return 12, 0, df.index.values[0], [len(df),df[:1]]
+
+    #         elif df.close[-1] > df.open[-1]:
+    #             if df.close[-1] > df.high[-1] * 0.97:
+    #                 if len(df) > 2 and df.close[-1] > df.close[-2]:
+    #                     return 10, 0, df.index.values[0], [len(df),df[:1]]
+    #                 else:
+    #                     return 11, 0, df.index.values[0], [len(df),df[:1]]
+    #             else:
+    #                 return 9, 0, df.index.values[0], [len(df),df[:1]]
+    #         else:
+    #             if len(df) >= 2:
+    #                 if df.close[-1] > df.close[-2] * 1.01:
+    #                     return 9, 0, df.index.values[0], [len(df),df[:1]]
+    #                 elif df.close[-1] > df.close[-2]:
+    #                     return 8, 0, df.index.values[0], [len(df),df[:1]]
+    #                 elif df.low[-1] > df.low[-2]:
+    #                     return 6, 0, df.index.values[0], [len(df),df[:1]]
+    #                 else:
+    #                     return 3, 0, df.index.values[0], [len(df),df[:1]]
+    #             else:
+    #                 return 1, 0, df.index.values[0], [len(df),df[:1]]
+    #     else:
+    #         return -10, 0, df.index.values[0], [len(df),df[:1]]
+    # else:
+    #     ## log.error("code:%s %s :%s" % (code, ptype,len(df)))
+    #     if ptype == 'high':
+    #         ## log.warn("df is None,start:%s index:%s" % (start, index_d))
+    #         return 13, 1, cct.get_today(), [len(df),df[:1]]
+    #     else:
+    #         return -10, -10, cct.get_today(), [len(df),df[:1]]
 
 
 def get_linear_model_candles(code, ptype='low', dtype='d', start=None, end=None, filter='n',
@@ -810,7 +852,7 @@ def get_linear_model_candles(code, ptype='low', dtype='d', start=None, end=None,
     return df
 
 
-def powerCompute_df(df, dtype='d', end=None, dl=None, filter='y'):
+def powerCompute_df(df, dtype='d', end=None, dl=None, filter='y',talib=False):
     if isinstance(df, list):
         code_l = df
         statuslist = True
@@ -843,14 +885,20 @@ def powerCompute_df(df, dtype='d', end=None, dl=None, filter='y'):
         fib = []
         sep = '|'
         for ptype in ['low', 'high']:
-            op, ra, st, days = get_linear_model_status(
+            op, ra, st, daysData  = get_linear_model_status(
                 code, df=tdx_df, dtype=dtype, start=start, end=end, dl=dl, filter=filter, ptype=ptype)
-            fib.append(str(days))
+            fib.append(str(daysData[0]))
             opc += op
             rac += ra
             if ptype == 'low':
                 stl = st
         fibl = sep.join(fib)
+        # df.loc[code,'ma5'] = daysData[1].ma5d[0]
+        # print tdx_df[:1].ma5d[0],daysData[1].ma5d[0]
+        if tdx_df[:1].ma5d[0] is not None:
+            df.loc[code,'ma5d'] = round(float(tdx_df[:1].ma5d[0]),2)
+        if talib and tdx_df[:1].ma5d[0] is not None:
+            df.loc[code,'ma10d'] = round(float(tdx_df[:1].ma10d[0]),2)
         df.loc[code, 'op'] = opc
         df.loc[code, 'ra'] = rac
         df.loc[code, 'fib'] = fibl
@@ -936,13 +984,14 @@ if __name__ == "__main__":
                 else:
                     args.filter = 'y'
                     for ptype in ['low', 'high']:
-                        op, ra, st, days = get_linear_model_status(args.code, dtype=args.dtype, start=start, end=end,
+                        op, ra, st, daysData  = get_linear_model_status(args.code, dtype=args.dtype, start=start, end=end,
                                                                    days=args.days, ptype=ptype, filter=args.filter,
                                                                    dl=args.dl)
-                        print "%s op:%s ra:%s days:%s  start:%s" % (args.code, op, str(ra), str(days), st)
-                        # op, ra, st, days = get_linear_model_status(args.code, dtype=args.dtype, start=cct.day8_to_day10(
+                        print days
+                        print "%s op:%s ra:%s days:%s  start:%s" % (args.code, op, str(ra), str(daysData[0]), st)
+                        # op, ra, st, daysData  = get_linear_model_status(args.code, dtype=args.dtype, start=cct.day8_to_day10(
                         # args.start), end=cct.day8_to_day10(args.end), filter=args.filter, dl=args.dl)
-                # print "code:%s op:%s ra/days:%s  start:%s" % (code, op, str(ra) + '/' + str(days), st)
+                # print "code:%s op:%s ra/days:%s  start:%s" % (code, op, str(ra) + '/' + str(daysData[0]), st)
                 cct.sleep(0.1)
                 # ts=time.time()
                 # time.sleep(5)

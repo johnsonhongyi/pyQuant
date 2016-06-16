@@ -37,7 +37,7 @@ def get_dfcfw_fund_flow(market):
         dd['sjlr'] = 0.0
         dd['sjzb'] = 0.0
         dd['time'] = 0.0
-        log.info("Fund_f NO Url:%s" % url)
+        log.error("Fund_f NO Url:%s" % url)
     if not single:
         url = ct.SINA_JSON_API_URL % ct.INDEX_LIST[market]
         data = cct.get_url_data_R(url)

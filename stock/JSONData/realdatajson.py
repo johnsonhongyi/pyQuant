@@ -231,7 +231,7 @@ def getconfigBigCount(count=None,write=False):
     cl=[config['BigCount']['type2'],config['BigCount']['ratio']]
     return cl
         
-def sina_json_Big_Count(vol='0', type='2', num='10000'):
+def sina_json_Big_Count(vol='1', type='0', num='10000'):
     url = ct.JSON_DD_CountURL % (ct.DD_VOL_List[vol], type)
     log.info("Big_Count_url:%s"%url)
     data = cct.get_url_data(url)
@@ -243,7 +243,7 @@ def sina_json_Big_Count(vol='0', type='2', num='10000'):
         count = 0
     return count
 
-def _get_sina_json_dd_url(vol='0', type='2', num='10000', count=None):
+def _get_sina_json_dd_url(vol='0', type='0', num='10000', count=None):
     urllist = []
     if count == None:
         url = ct.JSON_DD_CountURL % (ct.DD_VOL_List[vol], type)
@@ -268,6 +268,7 @@ def _get_sina_json_dd_url(vol='0', type='2', num='10000', count=None):
                 url = ct.JSON_DD_Data_URL_Page % (count, '1', ct.DD_VOL_List[vol], type)
                 urllist.append(url)
         else:
+            log.error("url Count error:%s"%(url))
             return []
     else:
         url = ct.JSON_DD_CountURL % (ct.DD_VOL_List[vol], type)
@@ -336,7 +337,7 @@ def _parsing_sina_dd_price_json(url):
     return df
 
 
-def get_sina_all_json_dd(vol='0', type='3', num='10000', retry_count=3, pause=0.001):
+def get_sina_all_json_dd(vol='0', type='0', num='10000', retry_count=3, pause=0.001):
     start_t = time.time()
     # url="http://vip.stock.finance.sina.com.cn/quotes_service/api/json_v2.php/Market_Center.getHQNodeData?page=1&num=50&sort=changepercent&asc=0&node=sh_a&symbol="
     # SINA_REAL_PRICE_DD = '%s%s/quotes_service/api/json_v2.php/Market_Center.getHQNodeData?page=1&num=%s&sort=changepercent&asc=0&node=%s&symbol=%s'
@@ -389,7 +390,7 @@ def get_sina_all_json_dd(vol='0', type='3', num='10000', retry_count=3, pause=0.
             print ("no data  json-df: %0.2f"%((time.time() - start_t))),
             return ''
     else:
-        print ("Url null json-df: %0.2f "%((time.time() - start_t))),
+        print ("Url None json-df: %0.2f "%((time.time() - start_t))),
         return ''
 
 def _today_ticks(symbol, tdate, pageNo, retry_count, pause):
@@ -448,12 +449,14 @@ def _get_hists(symbols, start=None, end=None,
     else:
         return None
 
-def get_sina_dd_count_price_realTime(df='',mtype='all'):
+def get_sina_dd_count_price_realTime(df='',mtype='all',vol='0',type='0'):
     '''
     input df count and merge price to df
     '''
     if len(df)==0:
-        df = get_sina_all_json_dd('0','4')
+        # df = get_sina_all_json_dd('0')
+        df = get_sina_all_json_dd(vol,type)
+
     if len(df)>0:
         df['counts']=df.groupby(['code'])['code'].transform('count')
         # df=df[(df['kind'] == 'U')]
@@ -586,7 +589,7 @@ def get_market_LastPrice_sina_js(codeList):
 #     else:
 #         print "codeL not list"
 
-def get_market_price_sina_dd_realTime(dp='',vol='0',type='3'):
+def get_market_price_sina_dd_realTime(dp='',vol='0',type='0'):
     '''
     input df count and merge price to df
     '''
@@ -662,8 +665,9 @@ if __name__ == '__main__':
     # print sina_json_Big_Count()
     print getconfigBigCount(write=True)
     # _parsing_Market_price_json('cyb')
-    sys.exit(0)
-    dd = get_sina_all_json_dd('0', '4')
+    # sys.exit(0)
+    # dd = get_sina_all_json_dd('0', '4')
+    dd = get_sina_all_json_dd('0')
     print ""
     print dd[:2]
     df = get_sina_dd_count_price_realTime(dd)

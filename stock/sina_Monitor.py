@@ -47,8 +47,8 @@ if __name__ == "__main__":
     # else:
     #     cct.set_console(100, 16)
     status = False
-    vol = '0'
-    type = '2'
+    vol = ct.json_countVol
+    type = ct.json_countType
     cut_num = 1000000
     success = 0
     top_all = pd.DataFrame()
@@ -152,7 +152,7 @@ if __name__ == "__main__":
 
                     # top_all = top_all[top_all.prev_p >= top_all.lhigh]
                     # top_all = top_all.loc[:,
-                              # ['name', 'percent', 'lastp','diff', 'counts', 'volume', 'trade', 'prev_p', 'ratio']]
+                              # ['name', 'percent', 'ma5d','diff', 'counts', 'volume', 'trade', 'prev_p', 'ratio']]
                     if cct.get_now_time_int() > 1030 and cct.get_now_time_int() < 1400:           
                         top_all = top_all[(top_all.volume > ct.VolumeMinR) & (top_all.volume < ct.VolumeMaxR)]
 
@@ -169,7 +169,6 @@ if __name__ == "__main__":
 
                 top_temp = top_all[:ct.PowerCount].copy()
                 top_temp = pct.powerCompute_df(top_temp, dl=ct.PowerCountdl)
-
                 print "G:%s dt:%s" % (len(top_all), cct.get_time_to_date(time_s)),
                 print "Rt:%0.1f" % (float(time.time() - time_Rt))
                
@@ -181,11 +180,11 @@ if __name__ == "__main__":
                     # top_temp = top_temp.sort_values(by=['op','ra','diff', 'percent', 'ratio'], ascending=[0,0,0, 0, 1])
                 if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935:
                     top_temp = top_temp.loc[:,
-                             ['name', 'trade', 'lastp','diff','ra', 'op','fib','percent','volume', 'ratio', 'counts',
+                             ['name', 'trade', 'ma5d','diff','ra', 'op','fib','percent','volume', 'ratio', 'counts',
                               'ldate']]
                 else:
                     top_temp = top_temp.loc[:,
-                             ['name', 'trade','lastp', 'diff','ra', 'op','fib','percent', 'volume', 'ratio', 'counts',
+                             ['name', 'trade','ma5d', 'diff','ra', 'op','fib','percent', 'volume', 'ratio', 'counts',
                               'ldate']]
                 print rl.format_for_print(top_temp[:10])
                 

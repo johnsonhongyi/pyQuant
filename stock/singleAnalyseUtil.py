@@ -237,14 +237,14 @@ def fibonacciCount(code, dl=60, start=None):
     for code in codes:
         for ptype in ['low','high']:
             if ptype == 'low':
-                op, ra, st, days = pct.get_linear_model_status(code, filter='y', dl=int(dl/2), ptype=ptype, days=1)
+                op, ra, st, daysData = pct.get_linear_model_status(code, filter='y', dl=int(dl/2), ptype=ptype, days=1)
             else:
-                op, ra, st, days = pct.get_linear_model_status(code, filter='y', dl=dl, ptype=ptype, days=1)
+                op, ra, st, daysData = pct.get_linear_model_status(code, filter='y', dl=dl, ptype=ptype, days=1)
                 
-            fib = cct.getFibonacci(300, days)
+            fib = cct.getFibonacci(300, daysData[0])
             # log.debug('st:%s days:%s fib:%s'%(st,days,fib))
             # print "%s op:%s ra:%s days:%s fib:%s %s" % (code, op, ra,days,fib, st)
-            fibl.append([code, op, ra,days,fib,st])
+            fibl.append([code, op, ra,[daysData[0],int(daysData[1].ma5d[0])],fib,st])
     return fibl
 def get_hot_countNew(changepercent, rzrq,fibl=None,fibc=10):
     global fibcount
@@ -256,12 +256,12 @@ def get_hot_countNew(changepercent, rzrq,fibl=None,fibc=10):
         if fibl is not None:
             int=0
             for f in fibl:
-                code, op, ra,days,fib, st = f[0],f[1],f[2],f[3],f[4],f[5]
+                code, op, ra,daysData,fib, st = f[0],f[1],f[2],f[3],f[4],f[5]
                 int +=1
                 if int%2 != 0:
-                    print "%s op:%s ra:%s days:%s fib:%s %s" % (code, f_print(3,op),f_print(5,ra),f_print(2,days),f_print(3,fib), st),
+                    print "%s op:%s ra:%s d:%s ma:%s fib:%s %s" % (code, f_print(3,op),f_print(5,ra),f_print(2,daysData[0]),f_print(4,daysData[1]),f_print(3,fib), st),
                 else:
-                    print "%s op:%s ra:%s days:%s fib:%s" % (st,f_print(3,op), f_print(5,ra),f_print(2,days),f_print(3,fib))
+                    print "%s op:%s ra:%s d:%s ma:%s fib:%s" % (st,f_print(3,op), f_print(5,ra),f_print(2,daysData[0]),f_print(4,daysData[1]),f_print(3,fib))
        
     else:
         fibcount += 1
@@ -345,8 +345,8 @@ def get_hot_countNew(changepercent, rzrq,fibl=None,fibc=10):
     else:
         print("Hgt: \t%s Ggt: \t%s" % (0, 0))
     if len(rzrq) > 0:
-        shpcent = round((rzrq['shrz'] / rzrq['sh'] * 100), 1) if rzrq['sh'] > 0 else 0
-        szpcent = round((rzrq['szrz'] / rzrq['sz'] * 100), 1) if rzrq['sz'] > 0 else 0
+        shpcent = round((rzrq['shrz'] / rzrq['sh'] * 100), 1) if rzrq['sh'] > 0 else '?'
+        szpcent = round((rzrq['szrz'] / rzrq['sz'] * 100), 1) if rzrq['sz'] > 0 else '?'
         print(u"\tSh: %s rz:%s :%s%% sz: %s rz:%s :%s%% All: %s diff: %s亿" % (
             f_print(5, rzrq['sh']), f_print(4, rzrq['shrz']), shpcent, f_print(5, rzrq['sz']), f_print(4, rzrq['szrz']),
             szpcent, f_print(4, rzrq['all']), f_print(5, rzrq['diff'])))
@@ -357,8 +357,8 @@ def get_hot_countNew(changepercent, rzrq,fibl=None,fibc=10):
     cct.set_console(
         title=['B:%s-%s V:%s' % (bigcount[0], bigcount[2], bigcount[1]), 'ZL: %s' % (zlr if len(ff) > 0 else 0),
                'To:%s' % len(topTen), 'D:%s' % len(
-                crash), 'Sh: %s ' % ff['scent'] if len(ff) > 0 else 0, 'Vr:%s%% ' % ff['svol'] if len(ff) > 0 else 0,
-               'MR: %s' % zzb, 'ZL: %s' % (zlr if len(ff) > 0 else 0)])
+                crash), 'Sh: %s ' % ff['scent'] if len(ff) > 0 else '?', 'Vr:%s%% ' % ff['svol'] if len(ff) > 0 else '?',
+               'MR: %s' % zzb, 'ZL: %s' % (zlr if len(ff) > 0 else '?')])
     
     return allTop
 

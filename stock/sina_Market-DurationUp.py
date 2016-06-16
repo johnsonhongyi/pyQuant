@@ -38,15 +38,15 @@ if __name__ == "__main__":
     # log.level = log.debug
     # error_handler = SyslogHandler('Sina-M-Log', level='ERROR')
 
-    width, height = 145, 21
+    width, height = 150, 21
     def set_duration_console(duration_date):
         if cct.isMac():
             cct.set_console(width, height)
         else:
             cct.set_console(width, height, title=str(duration_date))
     status = False
-    vol = '0'
-    type = '2'
+    vol = ct.json_countVol
+    type = ct.json_countType
     success = 0
     top_all = pd.DataFrame()
     time_s = time.time()
@@ -60,7 +60,7 @@ if __name__ == "__main__":
     dl=30
     ptype='low'
     op, ra, duration_date, days = pct.get_linear_model_status('999999', filter='y', dl=dl, ptype=ptype, days=1)
-    duration_date = 5
+    duration_date = 21
     end_date = None
     ptype = 'low'
     filter = 'y'
@@ -215,20 +215,20 @@ if __name__ == "__main__":
                     top_temp = top_dif[top_dif.percent > 0]
                     top_temp = top_dif[:ct.PowerCount].copy()
                     top_end = top_dif[-5:].copy()
-                    top_temp = pct.powerCompute_df(top_temp)
-                    top_end = pct.powerCompute_df(top_end)
+                    top_temp = pct.powerCompute_df(top_temp,talib=True)
+                    top_end = pct.powerCompute_df(top_end,talib=True)
 
                 # elif percent_status == 'y' and cct.get_now_time_int() > 935 and ptype == 'high' :
                 elif ptype == 'low':
                     top_temp = top_dif[:ct.PowerCount].copy()
                     top_end = top_dif[-5:].copy()
-                    top_temp = pct.powerCompute_df(top_temp)
-                    top_end = pct.powerCompute_df(top_end)
+                    top_temp = pct.powerCompute_df(top_temp,talib=True)
+                    top_end = pct.powerCompute_df(top_end,talib=True)
                 else:
                     top_end = top_dif[:5].copy()
                     top_temp = top_dif[-ct.PowerCount:].copy()
-                    top_temp = pct.powerCompute_df(top_temp, dl=ct.PowerCountdl)
-                    top_end = pct.powerCompute_df(top_end, dl=ct.PowerCountdl)
+                    top_temp = pct.powerCompute_df(top_temp, dl=ct.PowerCountdl,talib=True)
+                    top_end = pct.powerCompute_df(top_end, dl=ct.PowerCountdl,talib=True)
 
                 print ("N:%s K:%s %s G:%s" % (
                     now_count, len(top_all[top_all['buy'] > 0]),
@@ -239,7 +239,7 @@ if __name__ == "__main__":
                                        'zxg: %s' % (blkname)])
 
                 if 'op' in top_temp.columns:
-                    top_temp = top_temp.sort_values(by=['ra', 'op','percent'],ascending=[0, 0,0])[:10]
+                    top_temp = top_temp.sort_values(by=['ra', 'op','percent'],ascending=[0, 0,0])
                     
                     # top_temp = top_temp.sort_values(by=['ra', 'op'],ascending=[0, 0])[:10]
 
@@ -250,14 +250,20 @@ if __name__ == "__main__":
                     # top_temp = top_temp.sort_values(by=['op','ra','diff', 'percent', 'ratio'], ascending=[0,0,0, 0, 1])[:10]
                     # top_temp = top_temp.sort_values(by=['op','ldate','ra','diff', 'percent', 'ratio'], ascending=[0,0,0,0, 0, 1])[:10]
                 
-                top_dd = pd.concat([top_temp, top_end], axis=0)
                 if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935:
+                    top_temp = top_temp[ (top_temp['ma5d'] > top_temp['ma10d']) & (top_temp['buy'] > top_temp['ma5d']) ][:10]
+                    # top_temp = top_temp[top_temp['ma5d'] > top_temp['ma10d']][:10]
+                    top_dd = pd.concat([top_temp, top_end], axis=0)
                     top_dd = top_dd.loc[:,
-                             ['name', 'buy', 'lastp','diff', 'ra','op', 'fib','percent','volume' , 'ratio', 'counts', 'high',
+                             ['name', 'buy', 'ma5d','ma10d','diff', 'ra','op', 'fib','percent','volume' , 'ratio', 'counts', 'high',
                               'ldate', 'date']]
                 else:
+                    top_temp = top_temp[ (top_temp['ma5d'] > top_temp['ma10d']) & (top_temp['trade'] > top_temp['ma5d']) ][:10]
+                    # top_temp = top_temp[top_temp['trade'] > top_temp['ma10d']]
+                    # top_temp = top_temp[top_temp['ma5d'] > top_temp['ma10d']][:10]
+                    top_dd = pd.concat([top_temp, top_end], axis=0)
                     top_dd = top_dd.loc[:,
-                             ['name', 'trade', 'lastp','diff', 'ra','op', 'fib', 'percent','volume', 'ratio', 'counts', 'high',
+                             ['name', 'trade', 'ma5d','ma10d','diff', 'ra','op', 'fib', 'percent','volume', 'ratio', 'counts', 'high',
                               'ldate', 'date']]
                 print rl.format_for_print(top_dd)
                 # if cct.get_now_time_int() < 930 or cct.get_now_time_int() > 1505 or (cct.get_now_time_int() > 1125 and cct.get_now_time_int() < 1505):
