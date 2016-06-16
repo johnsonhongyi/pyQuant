@@ -82,12 +82,13 @@ def get_sina_url(vol='0', type='0', pageCount='100'):
 
 if __name__ == "__main__":
 
+    width, height = 132, 18
     if cct.isMac():
-        width, height = 120,16
+        cct.set_console(width, height)
     else:
-        width, height = 120,16
+        cct.set_console(width, height)
 
-    cct.set_console(width, height)
+    # cct.set_console(width, height)
     # log.setLevel(LoggerFactory.DEBUG)
     status = False
     vol = ct.json_countVol

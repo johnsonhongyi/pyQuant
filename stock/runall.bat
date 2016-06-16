@@ -18,5 +18,5 @@ start cmd /k python sina_Market-DurationUp.py
 ping -n 20 localhost > nul 
 start cmd /k python sina_Market-DurationDn.py
 ping -n 20 localhost > nul 
-start cmd /k python JSONData\powerCompute.py
+start cmd /k python LinePower.py
 rem start python LineHistogram.py

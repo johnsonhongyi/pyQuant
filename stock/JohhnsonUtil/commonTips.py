@@ -86,6 +86,7 @@ def set_console(width=80, height=15, color=3, title=None):
     else:
         # os.system('title=%s' % sys.argv[0])
         os.system('title=%s' % filename)
+        # os.system('mode %s,%s'%(width,height))
     # printf "\033]0;My Window title\007”
     # os.system('color %s'%color)
     # set_ctrl_handler()  

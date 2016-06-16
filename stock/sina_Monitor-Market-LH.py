@@ -59,11 +59,11 @@ if __name__ == "__main__":
     log = LoggerFactory.getLogger('SinaMarket')
     # log=LoggerFactory.JohnsonLoger('SinaMarket').setLevel(LoggerFactory.DEBUG)
     # log.setLevel(LoggerFactory.DEBUG)
-
+    width, height = 132, 18
     if cct.isMac():
-        cct.set_console(132, 16)
+        cct.set_console(width, height)
     else:
-        cct.set_console(132, 16)
+        cct.set_console(width, height)
     status = False
     vol = ct.json_countVol
     type = ct.json_countType
@@ -215,7 +215,7 @@ if __name__ == "__main__":
                 print "Rt:%0.1f dT:%s" % (
                     float(time.time() - time_Rt),
                     cct.get_time_to_date(time_s))
-                cct.set_console(
+                cct.set_console(width, height,
                     title=['dT:%s' % cct.get_time_to_date(time_s), 'G:%s' % len(top_dif), 'zxg: %s' % (blkname)])
 
                 if 'op' in top_temp.columns:

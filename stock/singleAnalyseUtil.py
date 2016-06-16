@@ -354,7 +354,7 @@ def get_hot_countNew(changepercent, rzrq,fibl=None,fibc=10):
     # print bigcount
     
             
-    cct.set_console(
+    cct.set_console(width, height,
         title=['B:%s-%s V:%s' % (bigcount[0], bigcount[2], bigcount[1]), 'ZL: %s' % (zlr if len(ff) > 0 else 0),
                'To:%s' % len(topTen), 'D:%s' % len(
                 crash), 'Sh: %s ' % ff['scent'] if len(ff) > 0 else '?', 'Vr:%s%% ' % ff['svol'] if len(ff) > 0 else '?',
@@ -399,10 +399,11 @@ def get_code_search_loop(num_input, code='', timed=60, dayl='10', ave=None):
 if __name__ == '__main__':
     # get_multiday_ave_compare('601198')
     # print len(sys.argv)
+    width, height = 108, 18
     if cct.isMac():
-        cct.set_console(108, 14)
+        cct.set_console(width, height)
     else:
-        cct.set_console(100, 14)
+        cct.set_console(width, height)
 
     if len(sys.argv) == 2:
         status = True

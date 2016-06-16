@@ -34,8 +34,9 @@ newstockdayl = 50
 changedays=0
 
 win7rootAsus = r'D:\Program Files\gfzq'
+win10Lengend = r'D:\Program\gfzq'
 win7rootXunji = r'E:\DOC\Parallels\WinTools\zd_pazq'
-win7rootList = [win7rootAsus,win7rootXunji]
+win7rootList = [win7rootAsus,win7rootXunji,win10Lengend]
 macroot = r'/Users/Johnson/Documents/Johnson/WinTools/zd_pazq'
 xproot = r'E:\DOC\Parallels\WinTools\zd_pazq'
 
@@ -57,6 +58,7 @@ def get_tdx_dir():
             for root in win7rootList:
                 basedir = root.replace('/', path_sep).replace('\\',path_sep)  # 如果你的安装路径不同,请改这里
                 if os.path.exists(basedir):
+                    log.info("%s : path:%s" % (os_platform,basedir))
                     break
     if not os.path.exists(basedir):
         log.error("basedir not exists")
@@ -144,10 +146,10 @@ def get_tdx_Exp_day_to_df(code, type='f', start=None, end=None, dt=None, dl=None
             df = df[df.date >= start]
         df = df.set_index('date')
         df = df.sort_index(ascending=True)
-        df['ma5d'] = pd.rolling_mean(df.close,5)
-        df['ma10d'] = pd.rolling_mean(df.close,10)
-        df['ma20d'] = pd.rolling_mean(df.close,20)
-        df['ma60d'] = pd.rolling_mean(df.close,60)
+        df['ma5d'] = df.close.rolling(window=5,center=False).mean()
+        df['ma10d'] = df.close.rolling(window=10,center=False).mean()
+        df['ma20d'] = df.close.rolling(window=20,center=False).mean()
+        df['ma60d'] = df.close.rolling(window=60,center=False).mean()
         df = df.sort_index(ascending=False)
         return df
     elif int(dl) == 1:
@@ -238,10 +240,10 @@ def get_tdx_Exp_day_to_df(code, type='f', start=None, end=None, dt=None, dl=None
             df = df[df.date >= start]
         df = df.set_index('date')
         df = df.sort_index(ascending=True)
-        df['ma5d'] = pd.rolling_mean(df.close,5)
-        df['ma10d'] = pd.rolling_mean(df.close,10)
-        df['ma20d'] = pd.rolling_mean(df.close,20)
-        df['ma60d'] = pd.rolling_mean(df.close,60)
+        df['ma5d'] = df.close.rolling(window=5,center=False).mean()
+        df['ma10d'] = df.close.rolling(window=10,center=False).mean()
+        df['ma20d'] = df.close.rolling(window=20,center=False).mean()
+        df['ma60d'] = df.close.rolling(window=60,center=False).mean()
         df = df.sort_index(ascending=False)
         return df
 
@@ -550,10 +552,10 @@ def get_tdx_append_now_df_api(code, start=None, end=None, type='f',df=None,dm=No
         #     log.debug("df:%s" % df[-3:])
         # print df
     df = df.sort_index(ascending=True)
-    df['ma5d'] = pd.rolling_mean(df.close,5)
-    df['ma10d'] = pd.rolling_mean(df.close,10)
-    df['ma20d'] = pd.rolling_mean(df.close,20)
-    df['ma60d'] = pd.rolling_mean(df.close,60)
+    df['ma5d'] = df.close.rolling(window=5,center=False).mean()
+    df['ma10d'] = df.close.rolling(window=10,center=False).mean()
+    df['ma20d'] = df.close.rolling(window=20,center=False).mean()
+    df['ma60d'] = df.close.rolling(window=60,center=False).mean()
     df = df.sort_index(ascending=False)
 
     return df
@@ -749,10 +751,10 @@ def get_tdx_power_now_df(code, start=None, end=None, type='f',df=None,dm=None,dl
         df['name']=c_name
         log.debug("c_name:%s df.name:%s"%(c_name,df.name[-1]))
     df = df.sort_index(ascending=True)
-    df['ma5d'] = pd.rolling_mean(df.close,5)
-    df['ma10d'] = pd.rolling_mean(df.close,10)
-    df['ma20d'] = pd.rolling_mean(df.close,20)
-    df['ma60d'] = pd.rolling_mean(df.close,60)
+    df['ma5d'] = df.close.rolling(window=5,center=False).mean()
+    df['ma10d'] = df.close.rolling(window=10,center=False).mean()
+    df['ma20d'] = df.close.rolling(window=20,center=False).mean()
+    df['ma60d'] = df.close.rolling(window=60,center=False).mean()
     df = df.sort_index(ascending=False)    
     return df
 

@@ -109,7 +109,7 @@ if __name__ == "__main__":
                         op, ra, st, days = pct.get_linear_model_status(args.code,df=df, dtype=args.dtype, start=start, end=end,
                                                                    days=args.days, ptype=ptype, filter=args.filter,
                                                                    dl=args.dl)
-                        print "%s op:%s ra:%s days:%s  start:%s" % (args.code, op, str(ra), str(days), st)
+                        print "%s op:%s ra:%s days:%s  start:%s" % (args.code, op, str(ra), str(days[0]), st)
                         # op, ra, st, days = get_linear_model_status(args.code, dtype=args.dtype, start=cct.day8_to_day10(
                         # args.start), end=cct.day8_to_day10(args.end), filter=args.filter, dl=args.dl)
                 # print "code:%s op:%s ra/days:%s  start:%s" % (code, op, str(ra) + '/' + str(days), st)

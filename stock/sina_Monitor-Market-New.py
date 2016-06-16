@@ -33,10 +33,11 @@ if __name__ == "__main__":
     # log.level=log.debug
     # error_handler = SyslogHandler('Sina-M-Log', level='ERROR')
 
+    width, height = 132, 18
     if cct.isMac():
-        cct.set_console(132, 16)
+        cct.set_console(width, height)
     else:
-        cct.set_console(132, 15)
+        cct.set_console(width, height)
     status = False
     vol = ct.json_countVol
     type = ct.json_countType
@@ -249,7 +250,7 @@ if __name__ == "__main__":
                     len(top_now[top_now['volume'] <= 0]), len(top_dif))),
                 # print "Rt:%0.3f" % (float(time.time() - time_Rt))
                 print "Rt:%0.1f dT:%s" % (float(time.time() - time_Rt), cct.get_time_to_date(time_s))
-                cct.set_console(
+                cct.set_console(width, height,
                     title=['dT:%s' % cct.get_time_to_date(time_s), 'G:%s' % len(top_dif), 'zxg: %s' % (blkname)])
                
                 if 'op' in top_temp.columns:

@@ -166,10 +166,11 @@ if __name__ == "__main__":
     # log.setLevel(LoggerFactory.DEBUG)
 
 
+    width, height = 132, 18
     if cct.isMac():
-        cct.set_console(132, 16)
+        cct.set_console(width, height)
     else:
-        cct.set_console(132, 16)
+        cct.set_console(width, height)
     status = False
     vol = ct.json_countVol
     type = ct.json_countType
@@ -354,7 +355,7 @@ if __name__ == "__main__":
                     df_count, now_count, len(top_all[top_all['buy'] > 0]),
                     len(top_now[top_now['volume'] <= 0]), len(top_dif))),
                 print "Rt:%0.1f dT:%s" % (float(time.time() - time_Rt), cct.get_time_to_date(time_s))
-                cct.set_console(
+                cct.set_console(width, height,
                     title=['dT:%s' % cct.get_time_to_date(time_s), 'G:%s' % len(top_dif), 'zxg: %s' % (blkname)])
               
                 if 'op' in top_temp.columns:
