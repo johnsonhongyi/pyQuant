@@ -761,7 +761,7 @@ def get_linear_model_candles(code, ptype='low', dtype='d', start=None, end=None,
         # print assertL[-1],assert[0]
         setRegLinearPlt(assetL, xaxis=xaxisInit, status=status)
         op, ra, st, dss = get_linear_model_status(code, df=df[df.index >= dt], start=dt, filter='y', ptype=ptype,days=days)
-        print "%s op:%s ra:%s days:%s  start:%s" % (code, op, str(ra), str(dss), st)
+        print "%s op:%s ra:%s days:%s  start:%s" % (code, op, str(ra), str(dss[0]), st)
 
     status = setRegLinearPlt(asset)
     # if filter == 'n':
