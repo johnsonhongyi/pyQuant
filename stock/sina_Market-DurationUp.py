@@ -38,7 +38,7 @@ if __name__ == "__main__":
     # log.level = log.debug
     # error_handler = SyslogHandler('Sina-M-Log', level='ERROR')
 
-    width, height = 150, 21
+    width, height = 154, 21
     def set_duration_console(duration_date):
         if cct.isMac():
             cct.set_console(width, height)
@@ -53,14 +53,14 @@ if __name__ == "__main__":
     delay_time = 720000
     # delay_time = cct.get_delay_time()
     First = True
-    blkname = '061.blk'
+    blkname = '066.blk'
     block_path = tdd.get_tdx_dir_blocknew() + blkname
     status_change = False
     lastpTDX_DF = pd.DataFrame()
     dl=30
     ptype='low'
     op, ra, duration_date, days = pct.get_linear_model_status('999999', filter='y', dl=dl, ptype=ptype, days=1)
-    duration_date = 21
+    duration_date = 60
     end_date = None
     ptype = 'low'
     filter = 'y'
@@ -79,7 +79,7 @@ if __name__ == "__main__":
     while 1:
         try:
             # df = sina_data.Sina().all
-            df = rl.get_sina_Market_json('all')
+            df = rl.get_sina_Market_json('cyb')
             top_now = rl.get_market_price_sina_dd_realTime(df, vol, type)
             top_dif = top_now
             # top_now.to_hdf("testhdf5", 'marketDD', format='table', complevel=9)
@@ -251,14 +251,14 @@ if __name__ == "__main__":
                     # top_temp = top_temp.sort_values(by=['op','ldate','ra','diff', 'percent', 'ratio'], ascending=[0,0,0,0, 0, 1])[:10]
                 
                 if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935:
-                    top_temp = top_temp[ (top_temp['ma5d'] > top_temp['ma10d']) & (top_temp['buy'] > top_temp['ma5d']) ][:10]
+                    top_temp = top_temp[ (top_temp['ma5d'] > top_temp['ma10d']) & (top_temp['buy'] > top_temp['ma10d']) ][:10]
                     # top_temp = top_temp[top_temp['ma5d'] > top_temp['ma10d']][:10]
                     top_dd = pd.concat([top_temp, top_end], axis=0)
                     top_dd = top_dd.loc[:,
                              ['name', 'buy', 'ma5d','ma10d','diff', 'ra','op', 'fib','percent','volume' , 'ratio', 'counts', 'high',
                               'ldate', 'date']]
                 else:
-                    top_temp = top_temp[ (top_temp['ma5d'] > top_temp['ma10d']) & (top_temp['trade'] > top_temp['ma5d']) ][:10]
+                    top_temp = top_temp[ (top_temp['ma5d'] > top_temp['ma10d']) & (top_temp['trade'] > top_temp['ma10d']) ][:10]
                     # top_temp = top_temp[top_temp['trade'] > top_temp['ma10d']]
                     # top_temp = top_temp[top_temp['ma5d'] > top_temp['ma10d']][:10]
                     top_dd = pd.concat([top_temp, top_end], axis=0)

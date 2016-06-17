@@ -38,7 +38,7 @@ if __name__ == "__main__":
     # log.level = log.debug
     # error_handler = SyslogHandler('Sina-M-Log', level='ERROR')
 
-    width, height = 150, 21
+    width, height = 154, 21
     def set_duration_console(duration_date):
         if cct.isMac():
             cct.set_console(width, height)
@@ -58,12 +58,12 @@ if __name__ == "__main__":
     block_path = tdd.get_tdx_dir_blocknew() + blkname
     status_change = False
     lastpTDX_DF = pd.DataFrame()
-    dl=30
+    dl=60
     ptype='high'
     op, ra, duration_date, days = pct.get_linear_model_status('999999', filter='y', dl=dl, ptype=ptype, days=1)
     # duration_date = 30
     # print cct.last_tddate(2)
-    end_date = cct.last_tddate(days=3)
+    end_date = cct.last_tddate(days=2)
     ptype = 'high'
     filter = 'y'
     if len(str(duration_date)) < 4:
@@ -81,7 +81,7 @@ if __name__ == "__main__":
     while 1:
         try:
             # df = sina_data.Sina().all
-            df = rl.get_sina_Market_json('all')
+            df = rl.get_sina_Market_json('cyb')
             top_now = rl.get_market_price_sina_dd_realTime(df, vol, type)
             top_dif = top_now
             # top_now.to_hdf("testhdf5", 'marketDD', format='table', complevel=9)
@@ -242,7 +242,7 @@ if __name__ == "__main__":
                                        'zxg: %s' % (blkname)])
 
                 if 'op' in top_temp.columns:
-                    top_temp = top_temp.sort_values(by=['ra', 'op','percent'],ascending=[0, 0,0])[:10]
+                    top_temp = top_temp.sort_values(by=['ra', 'op','percent'],ascending=[0, 0,0])
                     
                     # top_temp = top_temp.sort_values(by=['ra', 'op'],ascending=[0, 0])[:10]
 
@@ -257,7 +257,7 @@ if __name__ == "__main__":
                 if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935:
                     # top_temp = top_temp[top_temp['buy'] > top_temp['ma10d']]
                     # top_temp = top_temp[top_temp['ma5d'] > top_temp['ma10d']][:10]
-                    top_temp = top_temp[ (top_temp['ma5d'] > top_temp['ma10d']) & (top_temp['buy'] > top_temp['ma5d']) ][:10]
+                    top_temp = top_temp[ (top_temp['ma5d'] > top_temp['ma10d']) & (top_temp['buy'] > top_temp['ma10d']) ][:10]
                     top_dd = pd.concat([top_temp, top_end], axis=0)
                     top_dd = top_dd.loc[:,
                              ['name', 'buy', 'ma5d','ma10d','diff', 'ra','op', 'fib', 'percent', 'volume', 'ratio', 'counts', 'high',
@@ -265,7 +265,7 @@ if __name__ == "__main__":
                 else:
                     # top_temp = top_temp[top_temp['trade'] > top_temp['ma10d']]
                     # top_temp = top_temp[top_temp['ma5d'] > top_temp['ma10d']][:10]
-                    top_temp = top_temp[ (top_temp['ma5d'] > top_temp['ma10d']) & (top_temp['trade'] > top_temp['ma5d']) ][:10]
+                    top_temp = top_temp[ (top_temp['ma5d'] > top_temp['ma10d']) & (top_temp['trade'] > top_temp['ma10d']) ][:10]
                     top_dd = pd.concat([top_temp, top_end], axis=0)
                     top_dd = top_dd.loc[:,
                              ['name', 'trade', 'ma5d','ma10d','diff', 'ra','op', 'fib', 'percent', 'volume', 'ratio', 'counts', 'high',
@@ -370,7 +370,8 @@ if __name__ == "__main__":
                 #     dt = ''
                 args = parserDuraton.parse_args(st.split()[1:])
                 if len(str(args.start)) > 0:
-                    end_date = args.end
+                    if args.end:
+                        end_date = args.end
                     duration_date = args.start.strip()
                     if len(str(duration_date)) < 4:
                         duration_date = tdd.get_duration_Index_date('999999',dl=int(duration_date))

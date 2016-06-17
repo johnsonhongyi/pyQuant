@@ -60,10 +60,10 @@ if __name__ == "__main__":
     # log=LoggerFactory.JohnsonLoger('SinaMarket').setLevel(LoggerFactory.DEBUG)
     # log.setLevel(LoggerFactory.DEBUG)
     if cct.isMac():
-        width, height = 132, 16
+        width, height = 142, 16
         cct.set_console(width, height)
     else:
-        width, height = 132, 18
+        width, height = 142, 18
         cct.set_console(width, height)
     status = False
     vol = ct.json_countVol
@@ -208,7 +208,7 @@ if __name__ == "__main__":
                 # top_all=top_all.sort_values(by=['percent','diff','counts','ratio'],ascending=[0,0,1,1])
 
                 top_temp = top_dif[:ct.PowerCount].copy()
-                top_temp = pct.powerCompute_df(top_temp, dl=ct.PowerCountdl)
+                top_temp = pct.powerCompute_df(top_temp, dl=ct.PowerCountdl,talib=True)
                 print("A:%s N:%s K:%s %s G:%s" % (
                     df_count, now_count, len(top_all[top_all['buy'] > 0]),
                     len(top_now[top_now['volume'] <= 0]), len(top_dif))),
@@ -228,12 +228,14 @@ if __name__ == "__main__":
                     
                     # top_temp = top_temp.sort_values(by=['op','ra','diff', 'percent', 'ratio'], ascending=[0,0,0, 0, 1])
                 if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935:
+                    top_temp = top_temp[ (top_temp['ma5d'] > top_temp['ma10d']) & (top_temp['buy'] > top_temp['ma10d']) ]
                     top_temp = top_temp.loc[:,
-                             ['name', 'buy', 'ma5d','diff', 'ra','op', 'fib', 'percent','volume', 'ratio', 'counts',
+                             ['name', 'buy', 'ma5d', 'ma10d','diff', 'ra','op', 'fib', 'percent','volume', 'ratio', 'counts',
                               'ldate', 'date']]
                 else:
+                    top_temp = top_temp[ (top_temp['ma5d'] > top_temp['ma10d']) & (top_temp['buy'] > top_temp['ma10d']) ]
                     top_temp = top_temp.loc[:,
-                             ['name', 'buy', 'ma5d','diff', 'ra','op', 'fib', 'percent', 'volume', 'ratio', 'counts',
+                             ['name', 'buy', 'ma5d', 'ma10d','diff', 'ra','op', 'fib', 'percent', 'volume', 'ratio', 'counts',
                               'ldate','date']]
                 print rl.format_for_print(top_temp[:10]) 
                 
