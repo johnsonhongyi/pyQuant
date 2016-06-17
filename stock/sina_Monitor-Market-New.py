@@ -33,10 +33,12 @@ if __name__ == "__main__":
     # log.level=log.debug
     # error_handler = SyslogHandler('Sina-M-Log', level='ERROR')
 
-    width, height = 132, 18
+    # width, height = 132, 18
     if cct.isMac():
+        width, height = 132, 16
         cct.set_console(width, height)
     else:
+        width, height = 132, 18
         cct.set_console(width, height)
     status = False
     vol = ct.json_countVol

@@ -82,10 +82,12 @@ def get_sina_url(vol='0', type='0', pageCount='100'):
 
 if __name__ == "__main__":
 
-    width, height = 132, 18
+    # width, height = 132, 18
     if cct.isMac():
+        width, height = 132, 16
         cct.set_console(width, height)
     else:
+        width, height = 132, 20
         cct.set_console(width, height)
 
     # cct.set_console(width, height)

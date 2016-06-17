@@ -399,10 +399,11 @@ def get_code_search_loop(num_input, code='', timed=60, dayl='10', ave=None):
 if __name__ == '__main__':
     # get_multiday_ave_compare('601198')
     # print len(sys.argv)
-    width, height = 108, 18
     if cct.isMac():
+        width, height = 108, 16
         cct.set_console(width, height)
     else:
+        width, height = 108, 18
         cct.set_console(width, height)
 
     if len(sys.argv) == 2:
