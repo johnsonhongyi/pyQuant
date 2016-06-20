@@ -8,8 +8,8 @@ REM start python sina_Monitor.py
 REM ping -n 15 localhost > nul
 start cmd /k python sina_Monitor-GOLD.py
 ping -n 20 localhost > nul
-start cmd /k python sina_Monitor-Market.py
-ping -n 20 localhost > nul
+rem start cmd /k python sina_Monitor-Market.py
+rem ping -n 20 localhost > nul
 start cmd /k python sina_Monitor-Market-New.py
 ping -n 20 localhost > nul
 start cmd /k python sina_Monitor-Market-LH.py
