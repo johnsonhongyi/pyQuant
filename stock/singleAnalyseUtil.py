@@ -244,7 +244,9 @@ def fibonacciCount(code, dl=60, start=None):
             fib = cct.getFibonacci(300, daysData[0])
             # log.debug('st:%s days:%s fib:%s'%(st,days,fib))
             # print "%s op:%s ra:%s days:%s fib:%s %s" % (code, op, ra,days,fib, st)
-            fibl.append([code, op, ra,[daysData[0],int(daysData[1].ma5d[0])],fib,st])
+            if daysData[1].ma5d[0] == 'NaN':
+                daysData[1].ma5d[0] = 0
+            fibl.append([code, op, ra,[daysData[0],int()],fib,st])
     return fibl
 def get_hot_countNew(changepercent, rzrq,fibl=None,fibc=10):
     global fibcount
@@ -400,10 +402,10 @@ if __name__ == '__main__':
     # get_multiday_ave_compare('601198')
     # print len(sys.argv)
     if cct.isMac():
-        width, height = 108, 16
+        width, height = 108, 15
         cct.set_console(width, height)
     else:
-        width, height = 108, 18
+        width, height = 108, 15
         cct.set_console(width, height)
 
     if len(sys.argv) == 2:

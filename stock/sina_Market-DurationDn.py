@@ -58,22 +58,23 @@ if __name__ == "__main__":
     block_path = tdd.get_tdx_dir_blocknew() + blkname
     status_change = False
     lastpTDX_DF = pd.DataFrame()
-    dl=60
+    # dl=60
     ptype='high'
-    op, ra, duration_date, days = pct.get_linear_model_status('999999', filter='y', dl=dl, ptype=ptype, days=1)
-    # duration_date = 30
+    # op, ra, duration_date, days = pct.get_linear_model_status('999999', filter='y', dl=dl, ptype=ptype, days=1)
+    duration_date = 30
+    du_date = duration_date
     # print cct.last_tddate(2)
     end_date = cct.last_tddate(days=2)
     ptype = 'high'
     filter = 'y'
     if len(str(duration_date)) < 4:
         # duration_date = tdd.get_duration_price_date('999999', dl=duration_date, end=end_date, ptype='dutype')
-        duration_date = tdd.get_duration_Index_date('999999',dl=duration_date)
-        if cct.get_today_duration(duration_date) <=3:
+        du_date = tdd.get_duration_Index_date('999999',dl=duration_date)
+        if cct.get_today_duration(du_date) <=3:
             duration_date = 5
-            print ("duaration: %s duration_date:%s" %(cct.get_today_duration(duration_date),duration_date))
-        log.info("duaration: %s duration_date:%s" %(cct.get_today_duration(duration_date),duration_date))
-    set_duration_console(duration_date)
+            print ("duaration: %s duration_date:%s" %(cct.get_today_duration(du_date),duration_date))
+        log.info("duaration: %s duration_date:%s" %(cct.get_today_duration(du_date),duration_date))
+    set_duration_console(du_date)
     percent_status = 'n'
     # all_diffpath = tdd.get_tdx_dir_blocknew() + '062.blk'
     parser = cct.MoniterArgmain()
@@ -81,7 +82,7 @@ if __name__ == "__main__":
     while 1:
         try:
             # df = sina_data.Sina().all
-            df = rl.get_sina_Market_json('cyb')
+            df = rl.get_sina_Market_json('sz')
             top_now = rl.get_market_price_sina_dd_realTime(df, vol, type)
             top_dif = top_now
             # top_now.to_hdf("testhdf5", 'marketDD', format='table', complevel=9)
@@ -107,8 +108,8 @@ if __name__ == "__main__":
                     log.info('toTDXlist:%s' % len(codelist))
                     # tdxdata = tdd.get_tdx_all_day_LastDF(codelist,dt=duration_date,ptype=ptype)
                     # print "duration_date:%s ptype=%s filter:%s"%(duration_date, ptype,filter)
-                    tdxdata = tdd.get_tdx_exp_all_LastDF(codelist, dt=duration_date, end=end_date, ptype=ptype,
-                                                         filter=filter)
+                    # tdxdata = tdd.get_tdx_exp_all_LastDF(codelist, dt=duration_date, end=end_date, ptype=ptype,filter=filter)
+                    tdxdata = tdd.get_tdx_exp_all_LastDF_DL(codelist, dt=duration_date, end=end_date, ptype=ptype,filter=filter)
                     log.debug("TdxLastP: %s %s" % (len(tdxdata), tdxdata.columns.values))
                     tdxdata.rename(columns={'low': 'llow'}, inplace=True)
                     tdxdata.rename(columns={'high': 'lhigh'}, inplace=True)
@@ -164,12 +165,13 @@ if __name__ == "__main__":
                         map(lambda x, y: round(x / y / radio_t, 1), top_dif.volume.values, top_dif.lvol.values))
                 # top_dif = top_dif[top_dif.volume < 100]
                 # print top_dif.loc['002504',:]
+
+                # if filter == 'y':
+                #     top_dif = top_dif[top_dif.date >= cct.day8_to_day10(duration_date)]
+                    # log.info('dif1-filter:%s' % len(top_dif))
+                
                 # print top_dif.loc['600533',:]
-                if filter == 'y':
-                    top_dif = top_dif[top_dif.date >= cct.day8_to_day10(duration_date)]
-                log.info('dif1-filter:%s' % len(top_dif))
-                # print top_dif.loc['600533',:]
-                log.info(top_dif[:1])
+                # log.info(top_dif[:1])
                 # top_dif = top_dif[top_dif.buy > top_dif.lastp]
                 # top_dif = top_dif[top_dif.buy > top_dif.lhigh]
                 # log.debug('dif2:%s' % len(top_dif))
@@ -180,97 +182,98 @@ if __name__ == "__main__":
 
                 if len(top_dif) == 0:
                     print "No G,DataFrame is Empty!!!!!!"
-                log.debug('dif6 vol:%s' % (top_dif[:1].volume))
-                log.debug('dif6 vol>lvol:%s' % len(top_dif))
-
-                # top_dif = top_dif[top_dif.buy >= top_dif.open*0.99]
-                # log.debug('dif5 buy>open:%s'%len(top_dif))
-                # top_dif = top_dif[top_dif.trade >= top_dif.buy]
-                # df['volume']= df['volume'].apply(lambda x:x/100)
-
-                goldstock = len(top_dif[top_dif.buy >= top_dif.lhigh * 0.99])
-                ## goldstock=len(top_dif[top_dif.buy >(top_dif.high-top_dif.low)/2])
-                if ptype == 'low':
-                    top_dif = top_dif[top_dif.lvol > ct.LvolumeSize]
-                    if cct.get_now_time_int() > 925 and cct.get_work_time():
-                        top_dif = top_dif[(top_dif.volume > ct.VolumeMinR) & (top_dif.volume < ct.VolumeMaxR)]
-                    # top_dif = top_dif[top_dif.lvol > 12000]
-                    if 'counts' in top_dif.columns.values:
-                        top_dif = top_dif.sort_values(by=['diff', 'percent', 'volume', 'counts', 'ratio'],
-                                                      ascending=[0, 0, 0, 1, 1])
-                    else:
-                        top_dif = top_dif.sort_values(by=['diff', 'percent', 'ratio'], ascending=[0, 0, 1])
                 else:
-                    # top_dif['diff'] = top_dif['diff'].apply(lambda x: x * 2 if x > 0 else x)
-                    top_dif = top_dif[top_dif.lvol > ct.LvolumeSize]
-                    top_dif['diff']=top_dif['diff'].apply(lambda x:x*2 if x < 0 else x )
-                    if 'counts' in top_dif.columns.values:
-                        top_dif = top_dif.sort_values(by=['diff', 'percent', 'volume', 'counts', 'ratio'],
-                                                      ascending=[1, 0, 0, 1, 1])
+                    log.debug('dif6 vol:%s' % (top_dif[:1].volume))
+                    log.debug('dif6 vol>lvol:%s' % len(top_dif))
+
+                    # top_dif = top_dif[top_dif.buy >= top_dif.open*0.99]
+                    # log.debug('dif5 buy>open:%s'%len(top_dif))
+                    # top_dif = top_dif[top_dif.trade >= top_dif.buy]
+                    # df['volume']= df['volume'].apply(lambda x:x/100)
+
+                    goldstock = len(top_dif[top_dif.buy >= top_dif.lhigh * 0.99])
+                    ## goldstock=len(top_dif[top_dif.buy >(top_dif.high-top_dif.low)/2])
+                    if ptype == 'low':
+                        top_dif = top_dif[top_dif.lvol > ct.LvolumeSize]
+                        if cct.get_now_time_int() > 925 and cct.get_work_time():
+                            top_dif = top_dif[(top_dif.volume > ct.VolumeMinR) & (top_dif.volume < ct.VolumeMaxR)]
+                        # top_dif = top_dif[top_dif.lvol > 12000]
+                        if 'counts' in top_dif.columns.values:
+                            top_dif = top_dif.sort_values(by=['diff', 'percent', 'volume', 'counts', 'ratio'],
+                                                          ascending=[0, 0, 0, 1, 1])
+                        else:
+                            top_dif = top_dif.sort_values(by=['diff', 'percent', 'ratio'], ascending=[0, 0, 1])
                     else:
-                        top_dif = top_dif.sort_values(by=['diff', 'percent', 'ratio'], ascending=[1, 0, 1])
+                        # top_dif['diff'] = top_dif['diff'].apply(lambda x: x * 2 if x > 0 else x)
+                        top_dif = top_dif[top_dif.lvol > ct.LvolumeSize]
+                        top_dif['diff']=top_dif['diff'].apply(lambda x:x*2 if x < 0 else x )
+                        if 'counts' in top_dif.columns.values:
+                            top_dif = top_dif.sort_values(by=['diff', 'percent', 'volume', 'counts', 'ratio'],
+                                                          ascending=[1, 0, 0, 1, 1])
+                        else:
+                            top_dif = top_dif.sort_values(by=['diff', 'percent', 'ratio'], ascending=[1, 0, 1])
 
-                # top_all=top_all.sort_values(by=['percent','diff','counts','ratio'],ascending=[0,0,1,1])
-                # print rl.format_for_print(top_dif[:10])
-                # top_dd = pd.concat([top_dif[:5],top_temp[:3],top_dif[-3:],top_temp[-3:]], axis=0)
-                if percent_status == 'y' and (
-                                cct.get_now_time_int() > 935 or cct.get_now_time_int() < 900) and ptype == 'low':
-                    top_temp = top_dif[top_dif.percent > 0]
-                    top_temp = top_dif[:ct.PowerCount].copy()
-                    top_end = top_dif[-5:].copy()
-                    top_temp = pct.powerCompute_df(top_temp,talib=True)
-                    top_end = pct.powerCompute_df(top_end,talib=True)
+                    # top_all=top_all.sort_values(by=['percent','diff','counts','ratio'],ascending=[0,0,1,1])
+                    # print rl.format_for_print(top_dif[:10])
+                    # top_dd = pd.concat([top_dif[:5],top_temp[:3],top_dif[-3:],top_temp[-3:]], axis=0)
+                    if percent_status == 'y' and (
+                                    cct.get_now_time_int() > 935 or cct.get_now_time_int() < 900) and ptype == 'low':
+                        top_temp = top_dif[top_dif.percent > 0]
+                        top_temp = top_dif[:ct.PowerCount].copy()
+                        top_end = top_dif[-5:].copy()
+                        top_temp = pct.powerCompute_df(top_temp,talib=True)
+                        top_end = pct.powerCompute_df(top_end,talib=True)
 
-                # elif percent_status == 'y' and cct.get_now_time_int() > 935 and ptype == 'high' :
-                elif ptype == 'low':
-                    top_temp = top_dif[:ct.PowerCount].copy()
-                    top_end = top_dif[-5:].copy()
-                    top_temp = pct.powerCompute_df(top_temp,talib=True)
-                    top_end = pct.powerCompute_df(top_end,talib=True)
-                else:
-                    top_end = top_dif[:5].copy()
-                    top_temp = top_dif[-ct.PowerCount:].copy()
-                    top_temp = pct.powerCompute_df(top_temp, dl=ct.PowerCountdl,talib=True)
-                    top_end = pct.powerCompute_df(top_end, dl=ct.PowerCountdl,talib=True)
+                    # elif percent_status == 'y' and cct.get_now_time_int() > 935 and ptype == 'high' :
+                    elif ptype == 'low':
+                        top_temp = top_dif[:ct.PowerCount].copy()
+                        top_end = top_dif[-5:].copy()
+                        top_temp = pct.powerCompute_df(top_temp,talib=True)
+                        top_end = pct.powerCompute_df(top_end,talib=True)
+                    else:
+                        top_end = top_dif[:5].copy()
+                        top_temp = top_dif[-ct.PowerCount:].copy()
+                        top_temp = pct.powerCompute_df(top_temp, dl=ct.PowerCountdl,talib=True)
+                        top_end = pct.powerCompute_df(top_end, dl=ct.PowerCountdl,talib=True)
 
-                print ("N:%s K:%s %s G:%s" % (
-                    now_count, len(top_all[top_all['buy'] > 0]),
-                    len(top_now[top_now['volume'] <= 0]), goldstock)),
-                print "Rt:%0.1f dT:%s" % (float(time.time() - time_Rt), cct.get_time_to_date(time_s))
-                cct.set_console(width, height,
-                                title=[duration_date, 'dT:%s' % cct.get_time_to_date(time_s), 'G:%s' % goldstock,
-                                       'zxg: %s' % (blkname)])
+                    print ("N:%s K:%s %s G:%s" % (
+                        now_count, len(top_all[top_all['buy'] > 0]),
+                        len(top_now[top_now['volume'] <= 0]), goldstock)),
+                    print "Rt:%0.1f dT:%s" % (float(time.time() - time_Rt), cct.get_time_to_date(time_s))
+                    cct.set_console(width, height,
+                                    title=[du_date, 'dT:%s' % cct.get_time_to_date(time_s), 'G:%s' % goldstock,
+                                           'zxg: %s' % (blkname)])
 
-                if 'op' in top_temp.columns:
-                    top_temp = top_temp.sort_values(by=['ra', 'op','percent'],ascending=[0, 0,0])
+                    if 'op' in top_temp.columns:
+                        top_temp = top_temp.sort_values(by=['ra', 'op','percent'],ascending=[0, 0,0])
+                        
+                        # top_temp = top_temp.sort_values(by=['ra', 'op'],ascending=[0, 0])[:10]
+
+
+                        # top_temp = top_temp.sort_values(by=['diff', 'op', 'ra', 'percent', 'ratio'],
+                        #                                 ascending=[0, 0, 0, 0, 1])[:10]
+                                                        
+                        # top_temp = top_temp.sort_values(by=['op', 'ra', 'diff', 'percent', 'ratio'],
+                        #                                 ascending=[0, 0, 0, 0, 1])[:10]
+                        # top_temp = top_temp.sort_values(by=['op','ldate','ra','diff', 'percent', 'ratio'], ascending=[0,0,0,0, 0, 1])[:10]                
                     
-                    # top_temp = top_temp.sort_values(by=['ra', 'op'],ascending=[0, 0])[:10]
-
-
-                    # top_temp = top_temp.sort_values(by=['diff', 'op', 'ra', 'percent', 'ratio'],
-                    #                                 ascending=[0, 0, 0, 0, 1])[:10]
-                                                    
-                    # top_temp = top_temp.sort_values(by=['op', 'ra', 'diff', 'percent', 'ratio'],
-                    #                                 ascending=[0, 0, 0, 0, 1])[:10]
-                    # top_temp = top_temp.sort_values(by=['op','ldate','ra','diff', 'percent', 'ratio'], ascending=[0,0,0,0, 0, 1])[:10]                
-                
-                if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935:
-                    # top_temp = top_temp[top_temp['buy'] > top_temp['ma10d']]
-                    # top_temp = top_temp[top_temp['ma5d'] > top_temp['ma10d']][:10]
-                    top_temp = top_temp[ (top_temp['ma5d'] > top_temp['ma10d']) & (top_temp['buy'] > top_temp['ma10d']) ][:10]
-                    top_dd = pd.concat([top_temp, top_end], axis=0)
-                    top_dd = top_dd.loc[:,
-                             ['name', 'buy', 'ma5d','ma10d','diff', 'ra','op', 'fib', 'percent', 'volume', 'ratio', 'counts', 'high',
-                              'ldate', 'date']]
-                else:
-                    # top_temp = top_temp[top_temp['trade'] > top_temp['ma10d']]
-                    # top_temp = top_temp[top_temp['ma5d'] > top_temp['ma10d']][:10]
-                    top_temp = top_temp[ (top_temp['ma5d'] > top_temp['ma10d']) & (top_temp['trade'] > top_temp['ma10d']) ][:10]
-                    top_dd = pd.concat([top_temp, top_end], axis=0)
-                    top_dd = top_dd.loc[:,
-                             ['name', 'trade', 'ma5d','ma10d','diff', 'ra','op', 'fib', 'percent', 'volume', 'ratio', 'counts', 'high',
-                              'ldate', 'date']]
-                print rl.format_for_print(top_dd)
+                    if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935:
+                        # top_temp = top_temp[top_temp['buy'] > top_temp['ma10d']]
+                        # top_temp = top_temp[top_temp['ma5d'] > top_temp['ma10d']][:10]
+                        top_temp = top_temp[ (top_temp['ma5d'] > top_temp['ma10d']) & (top_temp['buy'] > top_temp['ma10d']) ][:10]
+                        top_dd = pd.concat([top_temp, top_end], axis=0)
+                        top_dd = top_dd.loc[:,
+                                 ['name', 'buy', 'ma5d','ma10d','diff', 'ra','op', 'fib', 'percent', 'volume', 'ratio', 'counts', 'high',
+                                  'ldate', 'date']]
+                    else:
+                        # top_temp = top_temp[top_temp['trade'] > top_temp['ma10d']]
+                        # top_temp = top_temp[top_temp['ma5d'] > top_temp['ma10d']][:10]
+                        top_temp = top_temp[ (top_temp['ma5d'] > top_temp['ma10d']) & (top_temp['trade'] > top_temp['ma10d']) ][:10]
+                        top_dd = pd.concat([top_temp, top_end], axis=0)
+                        top_dd = top_dd.loc[:,
+                                 ['name', 'trade', 'ma5d','ma10d','diff', 'ra','op', 'fib', 'percent', 'volume', 'ratio', 'counts', 'high',
+                                  'ldate', 'date']]
+                    print rl.format_for_print(top_dd)
                 # if cct.get_now_time_int() < 930 or cct.get_now_time_int() > 1505 or (cct.get_now_time_int() > 1125 and cct.get_now_time_int() < 1505):
                 # print rl.format_for_print(top_dif[-10:])
                 # print top_all.loc['000025',:]
@@ -374,8 +377,8 @@ if __name__ == "__main__":
                         end_date = args.end
                     duration_date = args.start.strip()
                     if len(str(duration_date)) < 4:
-                        duration_date = tdd.get_duration_Index_date('999999',dl=int(duration_date))
-                    set_duration_console(duration_date)
+                        du_date = tdd.get_duration_Index_date('999999',dl=int(duration_date))
+                    set_duration_console(du_date)
                     top_all = pd.DataFrame()
                     time_s = time.time()
                     status = False

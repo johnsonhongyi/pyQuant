@@ -58,7 +58,6 @@ open sina_Market-DurationUp.py;
 sleep 0.3;osascript -e 'tell application "Python Launcher" to quit';sleep 16;
 open sina_Market-DurationDn.py;
 sleep 0.3;osascript -e 'tell application "Python Launcher" to quit';sleep 16;
-rem cd JSONData;
 open LinePower.py;
 sleep 0.3;osascript -e 'tell application "Python Launcher" to quit';sleep 5;
 '''
