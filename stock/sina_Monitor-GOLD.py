@@ -188,6 +188,9 @@ if __name__ == "__main__":
                     if cct.get_now_time_int() > 915:
                         top_all = top_all[top_all.trade > top_all.lastp]
                         top_all = top_all[top_all.trade > top_all.lhigh]
+
+                    if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 931:
+                        top_all['percent']= (map(lambda x, y: round((x-y)/y*100,1) if int(y) > 0 else 0, top_all.trade, top_all.lastp))
                     # if cct.get_now_time_int() > 930 and 'lastp' in top_all.columns:
                     #     top_all = top_all[top_all.trade >= top_all.lastp]
                     # top_all = top_all.loc[:,
@@ -195,7 +198,8 @@ if __name__ == "__main__":
                     # if cct.get_now_time_int() > 1030 and cct.get_now_time_int() < 1400:
                         # top_all = top_all[(top_all.volume > ct.VolumeMinR) & (top_all.volume < ct.VolumeMaxR)]
 
-                top_all = top_all.sort_values(by=[ 'counts', 'diff','volume', 'ratio'], ascending=[0, 0, 0, 1])
+                # top_all = top_all.sort_values(by=[ 'counts', 'diff','volume', 'ratio'], ascending=[0, 0, 0, 1])
+                top_all = top_all.sort_values(by=[ 'counts', 'percent','diff','volume', 'ratio'], ascending=[0,0, 0, 0, 1])
                 # top_all = top_all.sort_values(by=[ 'counts'], ascending=[0])
                 # top_all=top_all.sort_values(by=['diff','percent','counts','ratio'],ascending=[0,0,1,1])
 

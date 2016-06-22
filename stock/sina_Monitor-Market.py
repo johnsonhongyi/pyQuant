@@ -167,7 +167,8 @@ if __name__ == "__main__":
                 top_dif = top_dif[top_dif.buy > top_dif.lastp]
                 log.debug('dif2:%s' % len(top_dif))
                 # log.debug('dif2:%s' % top_dif[:1])
-                # log
+                if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 931:
+                    top_dif['percent']= (map(lambda x, y: round((x-y)/y*100,1) if int(y) > 0 else 0, top_dif.buy, top_dif.lastp))
 
                 # if top_dif[:1].llow.values <> 0:
                 if len(top_dif[:5][top_dif[:5]['low'] > 0]) > 3:
@@ -211,7 +212,7 @@ if __name__ == "__main__":
 
 
                 if 'counts' in top_dif.columns.values:
-                    top_dif = top_dif.sort_values(by=['diff', 'volume', 'percent', 'counts', 'ratio'],
+                    top_dif = top_dif.sort_values(by=['diff', 'percent','volume','counts', 'ratio'],
                                                   ascending=[0, 0, 0, 1, 1])
                 else:
                     # print "Good Morning!!!"

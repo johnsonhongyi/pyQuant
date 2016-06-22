@@ -1496,21 +1496,24 @@ def get_tdx_all_day_LastDF(codeList, type=0, dt=None, ptype='close'):
         print ("TDX:%0.2f" % (time.time() - time_t)),
     return df
 
-def get_append_lastp_to_df(top_all):
+def get_append_lastp_to_df(top_all,lastpTDX_DF=None):
     codelist = top_all.index.tolist()
     log.info('toTDXlist:%s' % len(codelist))
-    tdxdata = get_tdx_all_day_LastDF(codelist)
+    if lastpTDX_DF is None or len(lastpTDX_DF) == 0:
+        tdxdata = get_tdx_all_day_LastDF(codelist)
+        tdxdata.rename(columns={'low': 'llow'}, inplace=True)
+        tdxdata.rename(columns={'high': 'lhigh'}, inplace=True)
+        tdxdata.rename(columns={'close': 'lastp'}, inplace=True)
+        tdxdata.rename(columns={'vol': 'lvol'}, inplace=True)
+        tdxdata = tdxdata.loc[
+            :, ['llow', 'lhigh', 'lastp', 'lvol', 'date']]
+        log.debug("TDX Col:%s" % tdxdata.columns.values)
+    else:
+        lastpTDX_DF = tdxdata
     log.debug("TdxLastP: %s %s" %
               (len(tdxdata), tdxdata.columns.values))
-    tdxdata.rename(columns={'low': 'llow'}, inplace=True)
-    tdxdata.rename(columns={'high': 'lhigh'}, inplace=True)
-    tdxdata.rename(columns={'close': 'lastp'}, inplace=True)
-    tdxdata.rename(columns={'vol': 'lvol'}, inplace=True)
-    tdxdata = tdxdata.loc[
-        :, ['llow', 'lhigh', 'lastp', 'lvol', 'date']]
         # :, ['llow', 'lhigh', 'lastp', 'lvol','ma5d', 'date']]
     # data.drop('amount',axis=0,inplace=True)
-    log.debug("TDX Col:%s" % tdxdata.columns.values)
     # df_now=top_all.merge(data,on='code',how='left')
     # df_now=pd.merge(top_all,data,left_index=True,right_index=True,how='left')
     top_all = top_all.merge(

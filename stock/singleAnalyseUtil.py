@@ -237,16 +237,16 @@ def fibonacciCount(code, dl=60, start=None):
     for code in codes:
         for ptype in ['low','high']:
             if ptype == 'low':
-                op, ra, st, daysData = pct.get_linear_model_status(code, filter='y', dl=int(dl/2), ptype=ptype, days=1)
+                op, ra, st, daysData = pct.get_linear_model_status(code, filter='y', dl=dl, ptype=ptype, days=1)
             else:
                 op, ra, st, daysData = pct.get_linear_model_status(code, filter='y', dl=dl, ptype=ptype, days=1)
                 
             fib = cct.getFibonacci(300, daysData[0])
             # log.debug('st:%s days:%s fib:%s'%(st,days,fib))
             # print "%s op:%s ra:%s days:%s fib:%s %s" % (code, op, ra,days,fib, st)
-            if daysData[1].ma5d[0] == 'NaN':
-                daysData[1].ma5d[0] = 0
-            fibl.append([code, op, ra,[daysData[0],int()],fib,st])
+            # if daysData[1].ma5d[0] == 'NaN':
+            #     daysData[1].ma5d[0] = 0
+            fibl.append([code, op, ra,[daysData[0],int(daysData[1].ma5d[0])],fib,st])
     return fibl
 def get_hot_countNew(changepercent, rzrq,fibl=None,fibc=10):
     global fibcount
@@ -261,9 +261,9 @@ def get_hot_countNew(changepercent, rzrq,fibl=None,fibc=10):
                 code, op, ra,daysData,fib, st = f[0],f[1],f[2],f[3],f[4],f[5]
                 int +=1
                 if int%2 != 0:
-                    print "%s op:%s ra:%s d:%s ma:%s fib:%s %s" % (code, f_print(3,op),f_print(5,ra),f_print(2,daysData[0]),f_print(4,daysData[1]),f_print(3,fib), st),
+                    print "%s op:%s ra:%s d:%s m5:%s fib:%s %s" % (code, f_print(3,op),f_print(5,ra),f_print(2,daysData[0]),f_print(4,daysData[1]),f_print(3,fib), st),
                 else:
-                    print "%s op:%s ra:%s d:%s ma:%s fib:%s" % (st,f_print(3,op), f_print(5,ra),f_print(2,daysData[0]),f_print(4,daysData[1]),f_print(3,fib))
+                    print "%s op:%s ra:%s d:%s m5:%s fib:%s" % (st,f_print(3,op), f_print(5,ra),f_print(2,daysData[0]),f_print(4,daysData[1]),f_print(3,fib))
        
     else:
         fibcount += 1

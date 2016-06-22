@@ -152,6 +152,10 @@ if __name__ == "__main__":
                 if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935:
                     top_dif = top_dif[top_dif.buy >= top_dif.lastp * 0.995]      
                     top_dif = top_dif[top_dif.buy >= top_dif.lhigh * 0.995]
+
+                if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 931:
+                    top_dif['percent']= (map(lambda x, y: round((x-y)/y*100,1) if int(y) > 0 else 0, top_dif.buy, top_dif.lastp))
+
                 top_dif = top_dif[top_dif.buy > 0]
                 top_dif['diff'] = (
                     map(lambda x, y: round((x - y) / y * 100, 1), top_dif['buy'].values, top_dif['lastp'].values))

@@ -196,6 +196,9 @@ if __name__ == "__main__":
 
                 # df['volume']= df['volume'].apply(lambda x:x/100)
 
+                if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 931:
+                    top_dif['percent']= (map(lambda x, y: round((x-y)/y*100,1) if int(y) > 0 else 0, top_dif.buy, top_dif.lastp))
+
                 if 'counts' in top_dif.columns.values:
                     top_dif = top_dif.sort_values(
                         by=['diff', 'percent', 'volume', 'counts', 'ratio'],

@@ -164,6 +164,7 @@ def get_sina_Market_json(market='sh', showtime=True, num='1000', retry_count=3, 
     if len(results)>0:
         df = df.append(results, ignore_index=True)
         # df['volume']= df['volume'].apply(lambda x:x/100)
+        # print df.columns
         df['ratio']=df['ratio'].apply(lambda x:round(x,1))
         df['percent']=df['percent'].apply(lambda x:round(x,1))
         df=df.drop_duplicates()
@@ -664,6 +665,11 @@ if __name__ == '__main__':
     # _get_sina_json_dd_url()
     # print sina_json_Big_Count()
     print getconfigBigCount(write=True)
+    df = get_sina_Market_json('sz')
+    print df[:1]
+    top_now = get_market_price_sina_dd_realTime(df, '0', type)
+    print top_now[:1]
+    sys.exit(0)
     # _parsing_Market_price_json('cyb')
     # sys.exit(0)
     # dd = get_sina_all_json_dd('0', '4')
