@@ -65,7 +65,7 @@ if __name__ == "__main__":
     end_date = None
     ptype = 'low'
     filter = 'y'
-    percent_status = 'n'
+    percent_status = 'y'
     if len(str(duration_date)) < 4:
         # duration_date = tdd.get_duration_price_date('999999', dl=duration_date, end=end_date, ptype='dutype')
         du_date = tdd.get_duration_Index_date('999999',dl=duration_date)
@@ -80,7 +80,8 @@ if __name__ == "__main__":
     while 1:
         try:
             # df = sina_data.Sina().all
-            df = rl.get_sina_Market_json('sz')
+            df = rl.get_sina_Market_json('cyb')
+            # df = rl.get_sina_Market_json('sz')
             top_now = rl.get_market_price_sina_dd_realTime(df, vol, type)
             top_dif = top_now
             # top_now.to_hdf("testhdf5", 'marketDD', format='table', complevel=9)
@@ -147,7 +148,7 @@ if __name__ == "__main__":
                 if 'trade' in top_dif.columns:
                     top_dif['buy'] = (
                         map(lambda x, y: y if int(x) == 0 else x, top_dif['buy'].values, top_dif['trade'].values))
-                if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935:
+                if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 1502:
                     top_dif = top_dif[top_dif.buy >= top_dif.lastp * 0.995]      
                     top_dif = top_dif[top_dif.buy >= top_dif.lhigh * 0.995]    
                 top_dif = top_dif[top_dif.buy > 0]
@@ -215,8 +216,8 @@ if __name__ == "__main__":
                     # print rl.format_for_print(top_dif[:10])
                     # top_dd = pd.concat([top_dif[:5],top_temp[:3],top_dif[-3:],top_temp[-3:]], axis=0)
                     if percent_status == 'y' and (
-                            cct.get_now_time_int() > 935 or cct.get_now_time_int() < 900) and ptype == 'low':
-                        top_temp = top_dif[top_dif.percent > 0]
+                            cct.get_now_time_int() > 915 and cct.get_now_time_int() < 1505) and ptype == 'low':
+                        top_dif = top_dif[top_dif.percent >= 0]
                         top_temp = top_dif[:ct.PowerCount].copy()
                         top_end = top_dif[-5:].copy()
                         top_temp = pct.powerCompute_df(top_temp,talib=True)
@@ -224,11 +225,13 @@ if __name__ == "__main__":
 
                     # elif percent_status == 'y' and cct.get_now_time_int() > 935 and ptype == 'high' :
                     elif ptype == 'low':
+                        top_dif = top_dif[top_dif.percent >= 0]
                         top_temp = top_dif[:ct.PowerCount].copy()
                         top_end = top_dif[-5:].copy()
                         top_temp = pct.powerCompute_df(top_temp,talib=True)
                         top_end = pct.powerCompute_df(top_end,talib=True)
                     else:
+                        top_dif = top_dif[top_dif.percent >= 0]
                         top_end = top_dif[:5].copy()
                         top_temp = top_dif[-ct.PowerCount:].copy()
                         top_temp = pct.powerCompute_df(top_temp, dl=ct.PowerCountdl,talib=True)

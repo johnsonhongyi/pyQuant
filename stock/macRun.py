@@ -61,7 +61,7 @@ sleep 0.3;osascript -e 'tell application "Python Launcher" to quit';sleep 16;
 open LinePower.py;
 sleep 0.3;osascript -e 'tell application "Python Launcher" to quit';sleep 5;
 '''
-
+closeLaunch ='''osascript -e 'tell application "Python Launcher" to quit';sleep 16;'''
 
 def doScript(scriptn):
     proc = subprocess.Popen(['osascript', '-'],
@@ -102,7 +102,7 @@ def setPosition(cmd=None, position=None):
                     # print doScript(script_get_position % ('get', str(n)))
             # position = doScript(scriptposition % ('get', str(n)))
             # print positio
-         
+        os.system(closeLaunch) 
     else:
         print "run Cmd"
         os.system(cmdRun)

@@ -261,9 +261,9 @@ def get_hot_countNew(changepercent, rzrq,fibl=None,fibc=10):
                 code, op, ra,daysData,fib, st = f[0],f[1],f[2],f[3],f[4],f[5]
                 int +=1
                 if int%2 != 0:
-                    print "%s op:%s ra:%s d:%s m5:%s fib:%s %s" % (code, f_print(3,op),f_print(5,ra),f_print(2,daysData[0]),f_print(4,daysData[1]),f_print(3,fib), st),
+                    print "%s op:%s ra:%s d:%s fib:%s m5:%s  %s" % (code, f_print(3,op),f_print(5,ra),f_print(2,daysData[0]),f_print(3,fib),f_print(4,daysData[1]), st),
                 else:
-                    print "%s op:%s ra:%s d:%s m5:%s fib:%s" % (st,f_print(3,op), f_print(5,ra),f_print(2,daysData[0]),f_print(4,daysData[1]),f_print(3,fib))
+                    print "%s op:%s ra:%s d:%s fib:%s m5:%s " % (st,f_print(3,op), f_print(5,ra),f_print(2,daysData[0]),f_print(3,fib),f_print(4,daysData[1]))
        
     else:
         fibcount += 1

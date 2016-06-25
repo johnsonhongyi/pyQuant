@@ -362,25 +362,31 @@ def get_url_data_R(url):
     return data
 
 
-def get_url_data(url):
+def get_url_data(url,retry_count=3,pause=0.01):
     # headers = {'User-Agent':'Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.6) Gecko/20091201 Firefox/3.5.6'}
     headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.2; rv:16.0) Gecko/20100101 Firefox/16.0',
                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
                'Connection': 'keep-alive'}
-    try:
-        data = requests.get(url, headers=headers, timeout=10)
-    except (socket.timeout,socket.error) as e:
-        data = ''
-        log.error('socket timed out - URL %s', url)
-    else:
-        log.info('Access successful.')
-    # print data.text
-    # fp = urlopen(req, timeout=5)
-    # data = fp.read()
-    # fp.close()
-    # print data.encoding
-    return data.text
-
+    for _ in range(retry_count):
+        time.sleep(pause)
+        try:
+            data = requests.get(url, headers=headers, timeout=10)
+        except (socket.timeout,socket.error) as e:
+            data = ''
+            log.error('socket timed out - URL %s', url)
+        except Exception as e:
+                print(e)
+        else:
+            log.info('Access successful.')
+        # print data.text
+        # fp = urlopen(req, timeout=5)
+        # data = fp.read()
+        # fp.close()
+        # print data.encoding
+            return data.text
+    #     else:
+    #         return df
+    raise IOError(ct.NETWORK_URL_ERROR_MSG)
 
 def get_div_list(ls, n):
     # if isinstance(codeList, list) or isinstance(codeList, set) or
@@ -636,6 +642,7 @@ def write_to_blocknew(p_name, data, append=True):
             #     if code_to_tdxblk(i).strip() == ic.strip():
             #         wstatus = False
             # if wstatus:
+            # print "len:",len(i)
             raw = code_to_tdxblk(i).strip() + '\r\n'
             if not raw in flist:
                 fout.write(raw)
