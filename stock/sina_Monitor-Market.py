@@ -88,6 +88,7 @@ if __name__ == "__main__":
                         map(lambda x, y: y if int(x) == 0 else x, top_now['buy'].values, top_now['trade'].values))
                 time_Rt = time.time()
                 if len(top_all) == 0:
+                    time_Rt = time.time()
                     top_all = top_now
                     top_all = tdd.get_append_lastp_to_df(top_now)
                 else:

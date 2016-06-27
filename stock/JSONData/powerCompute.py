@@ -291,7 +291,7 @@ def twoLineCompute(code, df=None, start=None, end=None, ptype='low'):
 
 
 def get_linear_model_status(code, df=None, dtype='d', type='m', start=None, end=None, days=1, filter='n',
-                            dl=None, countall=True, ptype='low'):
+                            dl=None, countall=True, ptype='low',power=True):
 
     # if code == "600760":
     # log.setLevel(LoggerFactory.DEBUG)
@@ -305,12 +305,12 @@ def get_linear_model_status(code, df=None, dtype='d', type='m', start=None, end=
         # index_d=cct.day8_to_day10(start)
         # log.debug("index_d:%s"%(index_d))
         index_d = cct.day8_to_day10(start)
-        start = tdd.get_duration_price_date(code, ptype=ptype, dt=start, df=df,dl=dl,power=True)
+        start = tdd.get_duration_price_date(code, ptype=ptype, dt=start, df=df,dl=dl,power=power)
         log.debug("start is not None start: %s  index_d:%s" % (start, index_d))
     elif end is not None and filter == 'y':
-        df = tdd.get_tdx_append_now_df_api(code, start=start, end=end,dl=dl).sort_index(ascending=True)
+        df = tdd.get_tdx_append_now_df_api(code, start=start, end=end,df=df,dl=dl,power=power).sort_index(ascending=True)
         index_d = cct.day8_to_day10(start)
-        start = tdd.get_duration_price_date(code, ptype=ptype, dt=start, df=df,dl=dl, power=True)
+        start = tdd.get_duration_price_date(code, ptype=ptype, dt=start, df=df,dl=dl, power=power)
         df = df[df.index >= start]
         if len(df) > 2 and dl is None:
             if df.index.values[0] < index_d:

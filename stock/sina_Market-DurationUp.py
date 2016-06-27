@@ -102,25 +102,33 @@ if __name__ == "__main__":
             if len(top_now) > 10 or cct.get_work_time():
                 time_Rt = time.time()
                 if len(top_all) == 0 and len(lastpTDX_DF) == 0:
+                    time_Rt = time.time()
                     top_all = top_now
                     codelist = top_all.index.tolist()
                     log.info('toTDXlist:%s' % len(codelist))
                     # tdxdata = tdd.get_tdx_all_day_LastDF(codelist,dt=duration_date,ptype=ptype)
                     # print "duration_date:%s ptype=%s filter:%s"%(duration_date, ptype,filter)
                     # tdxdata = tdd.get_tdx_exp_all_LastDF(codelist, dt=duration_date, end=end_date,ptype=ptype,filter=filter)
-                    tdxdata = tdd.get_tdx_exp_all_LastDF_DL(codelist, dt=duration_date, end=end_date,ptype=ptype,filter=filter)
+                    power=True
+                    tdxdata = tdd.get_tdx_exp_all_LastDF_DL(codelist, dt=duration_date, end=end_date,ptype=ptype,filter=filter,power=True)
                     log.debug("TdxLastP: %s %s" % (len(tdxdata), tdxdata.columns.values))
                     tdxdata.rename(columns={'low': 'llow'}, inplace=True)
                     tdxdata.rename(columns={'high': 'lhigh'}, inplace=True)
                     tdxdata.rename(columns={'close': 'lastp'}, inplace=True)
                     tdxdata.rename(columns={'vol': 'lvol'}, inplace=True)
-                    tdxdata = tdxdata.loc[:, ['llow', 'lhigh', 'lastp', 'lvol', 'date']]
+                    if power:
+                        tdxdata = tdxdata.loc[:, ['llow', 'lhigh', 'lastp', 'lvol', 'date','ra','op','fib','ldate']]
+                        # print tdxdata[(tdxdata.op >15) | (tdxdata.op <3)]
+                        print len(tdxdata[(tdxdata.op >15)]),
+                    else:
+                        tdxdata = tdxdata.loc[:, ['llow', 'lhigh', 'lastp', 'lvol', 'date']]
                     log.debug("TDX Col:%s" % tdxdata.columns.values)
                     top_all = top_all.merge(tdxdata, left_index=True, right_index=True, how='left')
                     lastpTDX_DF = tdxdata
                     log.info('Top-merge_now:%s' % (top_all[:1]))
                     top_all = top_all[top_all['llow'] > 0]
-                    time_Rt = time.time()
+                    # if power:
+                        # top_all=top_all[top_all.op > 15 | top_all <3]
                 elif len(top_all) == 0 and len(lastpTDX_DF) > 0:
                     top_all = top_now
                     top_all = top_all.merge(lastpTDX_DF, left_index=True, right_index=True, how='left')

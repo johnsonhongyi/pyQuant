@@ -10,11 +10,11 @@ import time
 import pandas as pd
 
 import JohhnsonUtil.johnson_cons as ct
-import LineHistogram as lhg
 import singleAnalyseUtil as sl
 from JSONData import powerCompute as pct
 from JSONData import realdatajson as rl
 from JSONData import tdx_data_Day as tdd
+from JSONData import sina_data
 from JohhnsonUtil import LoggerFactory as LoggerFactory
 from JohhnsonUtil import commonTips as cct
 
@@ -29,8 +29,10 @@ if __name__ == "__main__":
     # error_handler = SyslogHandler('Sina-M-Log', level='ERROR')
 
     try:
-        if cct.get_work_day_status() and cct.get_now_time_int >1505 :
-            tdx_data=tdd.get_tdx_all_day_DayL_DF(market='cyb', dayl=1)
+        if cct.get_work_day_status() and cct.get_now_time_int() <1505 :
+            # tdx_data=tdd.get_tdx_all_day_DayL_DF(market='cyb', dayl=1)
+            print sina_data.Sina().get_stock_code_data('300006')
+            tdx_data=rl.get_sina_Market_json('cyb')
             if len(tdx_data) < 1:
                 raise KeyboardInterrupt("StopTime")
             else:

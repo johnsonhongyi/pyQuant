@@ -83,8 +83,8 @@ if __name__ == "__main__":
                 if 'percent' in top_now.columns.values:
                     top_now = top_now[top_now['percent'] > 0]
                 if len(top_all) == 0:
-                    top_all = tdd.get_append_lastp_to_df(top_now)
                     time_s = time.time()
+                    top_all = tdd.get_append_lastp_to_df(top_now)
                     # dd=dd.fillna(0)
                 else:
                     for symbol in top_now.index:

@@ -126,6 +126,7 @@ if __name__ == "__main__":
                 #     top_now=top_now[top_now['percent']>0]
                 if len(top_all) == 0:
                     # top_all = top_now
+                    time_Rt = time.time()
                     top_all = tdd.get_append_lastp_to_df(top_now)
                 else:
                     # top_now = top_now[top_now.trade >= top_now.high * 0.98]
