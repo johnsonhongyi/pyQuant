@@ -105,6 +105,7 @@ if __name__ == "__main__":
     # block_path = tdd.get_tdx_dir_blocknew() + '065.blk'
     blkname = '065.blk'
     block_path = tdd.get_tdx_dir_blocknew() + blkname
+    lastpTDX_DF = pd.DataFrame()
     # all_diffpath = tdd.get_tdx_dir_blocknew() + '062.blk'
     while 1:
         try:
@@ -124,10 +125,14 @@ if __name__ == "__main__":
             if len(top_now) > 10 and len(top_now.columns) > 4:
                 # if 'percent' in top_now.columns.values:
                 #     top_now=top_now[top_now['percent']>0]
-                if len(top_all) == 0:
-                    # top_all = top_now
+                if len(top_all) == 0 and len(lastpTDX_DF) == 0:
                     time_Rt = time.time()
-                    top_all = tdd.get_append_lastp_to_df(top_now)
+                    top_all,lastpTDX_DF = tdd.get_append_lastp_to_df(top_now)
+                elif len(top_all) == 0 and len(lastpTDX_DF) > 0:
+                    time_Rt = time.time()
+                    top_all = tdd.get_append_lastp_to_df(top_now,lastpTDX_DF)
+                    # top_all = top_all.merge(lastpTDX_DF, left_index=True, right_index=True, how='left')
+                    # top_all = top_all[top_all['llow'] > 0]
                 else:
                     # top_now = top_now[top_now.trade >= top_now.high * 0.98]
                     for symbol in top_now.index:
@@ -218,8 +223,7 @@ if __name__ == "__main__":
 
                 top_temp = top_all[:ct.PowerCount].copy()
                 top_temp = pct.powerCompute_df(top_temp, dl=ct.PowerCountdl)
-                print "G:%s dt:%s " % (len(top_all),cct.get_time_to_date(time_s)),
-                print "Rt:%0.1f" % (float(time.time() - time_Rt))
+                print "G:%s Rt:%0.1f dT:%s " % (len(top_all),float(time.time() - time_Rt),cct.get_time_to_date(time_s))
                 cct.set_console(width, height,
                     title=['dT:%s' % cct.get_time_to_date(time_s), 'G:%s' % len(top_all), 'zxg: %s' % (blkname)])
                 

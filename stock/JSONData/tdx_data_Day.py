@@ -1234,7 +1234,7 @@ def get_tdx_exp_low_or_high_price(code, dt=None, ptype='close', dl=None,end=None
         dd = get_tdx_Exp_day_to_df(code, dl=1)
         return dd
 
-def get_tdx_exp_low_or_high_power(code, dt=None, ptype='close', dl=None,end=None,power=False):
+def get_tdx_exp_low_or_high_power(code, dt=None, ptype='close', dl=None,end=None,power=False,lastp=False):
     '''
     :param code:999999
     :param dayl:Duration Days
@@ -1277,7 +1277,12 @@ def get_tdx_exp_low_or_high_power(code, dt=None, ptype='close', dl=None,end=None
                 df['fib'] = fibl
                 df['ldate'] = stl
                 # print df[:1]
-
+            if lastp:
+                dd = df[:1]
+                dt = dd.index.values[0]
+                dd = dd.T[dt]
+                dd['date'] = dt
+                return dd
 
             if len(str(dt)) == 10:
                 dz = df[df.index >= dt]
@@ -1529,20 +1534,27 @@ def get_tdx_all_day_LastDF(codeList, type=0, dt=None, ptype='close'):
         print ("TDX:%0.2f" % (time.time() - time_t)),
     return df
 
-def get_append_lastp_to_df(top_all,lastpTDX_DF=None):
+def get_append_lastp_to_df(top_all,lastpTDX_DF=None,dl=30,end=None,ptype='low',filter='y',power=True,lastp=True):
     codelist = top_all.index.tolist()
     log.info('toTDXlist:%s' % len(codelist))
     if lastpTDX_DF is None or len(lastpTDX_DF) == 0:
-        tdxdata = get_tdx_all_day_LastDF(codelist)
+        # tdxdata = get_tdx_all_day_LastDF(codelist) '''only get lastp no powerCompute'''
+        tdxdata = get_tdx_exp_all_LastDF_DL(codelist,dt=dl,end=end,ptype=ptype,filter=filter,power=power,lastp=lastp)
         tdxdata.rename(columns={'low': 'llow'}, inplace=True)
         tdxdata.rename(columns={'high': 'lhigh'}, inplace=True)
         tdxdata.rename(columns={'close': 'lastp'}, inplace=True)
         tdxdata.rename(columns={'vol': 'lvol'}, inplace=True)
-        tdxdata = tdxdata.loc[
-            :, ['llow', 'lhigh', 'lastp', 'lvol', 'date']]
+        if power:
+            tdxdata = tdxdata.loc[:, ['llow', 'lhigh', 'lastp', 'lvol', 'date','ra','op','fib','ldate']]
+            # print len(tdxdata[tdxdata.op >15]),
+        else:
+            tdxdata = tdxdata.loc[:, ['llow', 'lhigh', 'lastp', 'lvol', 'date']]
+            # tdxdata = tdxdata.loc[
+            #     :, ['llow', 'lhigh', 'lastp', 'lvol', 'date']]
+
         log.debug("TDX Col:%s" % tdxdata.columns.values)
     else:
-        lastpTDX_DF = tdxdata
+        tdxdata = lastpTDX_DF
     log.debug("TdxLastP: %s %s" %
               (len(tdxdata), tdxdata.columns.values))
         # :, ['llow', 'lhigh', 'lastp', 'lvol','ma5d', 'date']]
@@ -1551,9 +1563,12 @@ def get_append_lastp_to_df(top_all,lastpTDX_DF=None):
     # df_now=pd.merge(top_all,data,left_index=True,right_index=True,how='left')
     top_all = top_all.merge(
         tdxdata, left_index=True, right_index=True, how='left')
-    log.info('Top-merge_now:%s' % (top_all[:1]))
+    # log.info('Top-merge_now:%s' % (top_all[:1]))
     top_all = top_all[top_all['llow'] > 0]
-    return top_all
+    if lastpTDX_DF is None:
+        return top_all,tdxdata
+    else:
+        return top_all
 
 def get_tdx_exp_all_LastDF(codeList, dt=None,end=None,ptype='low',filter='n'):
     time_t = time.time()
@@ -1613,7 +1628,7 @@ def get_tdx_exp_all_LastDF(codeList, dt=None,end=None,ptype='low',filter='n'):
         print ("TDXE:%0.2f" % (time.time() - time_t)),
     return df
 
-def get_tdx_exp_all_LastDF_DL(codeList, dt=None,end=None,ptype='low',filter='n',power=False):
+def get_tdx_exp_all_LastDF_DL(codeList, dt=None,end=None,ptype='low',filter='n',power=False,lastp=False):
     time_t = time.time()
     # df = rl.get_sina_Market_json(market)
     # code_list = np.array(df.code)
@@ -1641,7 +1656,7 @@ def get_tdx_exp_all_LastDF_DL(codeList, dt=None,end=None,ptype='low',filter='n',
                 dl = 30
                 dt = None
             log.info("LastDF:%s,%s" % (dt,dl))
-        results = cct.to_mp_run_async(get_tdx_exp_low_or_high_power, codeList, dt, ptype, dl,end,power)
+        results = cct.to_mp_run_async(get_tdx_exp_low_or_high_power, codeList, dt, ptype, dl,end,power,lastp)
         # results = get_tdx_exp_low_or_high_price(codeList[0], dt,ptype,dl)
         # results=[]
         # for code in codeList:
@@ -1667,7 +1682,7 @@ def get_tdx_exp_all_LastDF_DL(codeList, dt=None,end=None,ptype='low',filter='n',
                 dl = 30
                 dt = None
             log.info("LastDF:%s,%s" % (dt,dl))
-        results = cct.to_mp_run_async(get_tdx_exp_low_or_high_power, codeList, dt, ptype, dl,end,power)
+        results = cct.to_mp_run_async(get_tdx_exp_low_or_high_power, codeList, dt, ptype, dl,end,power,lastp)
         # print dt,ptype,dl,end
         # for code in codelist:
         #     print code  
@@ -1675,6 +1690,7 @@ def get_tdx_exp_all_LastDF_DL(codeList, dt=None,end=None,ptype='low',filter='n',
         
     else:
         # results = cct.to_mp_run_async(get_tdx_exp_low_or_high_price,codeList)
+        dl = None
         results = cct.to_mp_run_async(get_tdx_Exp_day_to_df, codeList, 'f', None, None, None, 1)
 
     # print results
@@ -1684,6 +1700,10 @@ def get_tdx_exp_all_LastDF_DL(codeList, dt=None,end=None,ptype='low',filter='n',
     # df.vol = df.vol.apply(lambda x: x / 100)
     log.info("get_to_mp:%s" % (len(df)))
     log.info("TDXTime:%s" % (time.time() - time_t))
+    if power and 'op' in df.columns:
+        df=df[df.op >10]
+        df=df[df.ra < 11]
+        print "op:",len(df),
     if dl != None:
         print ("TDXE:%0.2f" % (time.time() - time_t)),
     return df
@@ -1823,6 +1843,8 @@ if __name__ == '__main__':
     # print get_tdx_append_now_df_api('999999',start='2016-04-08')
     # print get_tdx_power_now_df('000001', dl=20)
     # print tdx_df.index
+    # print get_tdx_Exp_day_to_df('000001', dl=60).sort_index(ascending=False)[:1]
+    # sys.exit(0)
     print get_tdx_exp_low_or_high_power('300102', dt='2016-01-01', ptype='high', dl=60, end='2016-06-23', power=True)
     # print get_tdx_write_now_file_api('000001', type='f')
     # print get_tdx_write_now_file_api('999999', type='f')

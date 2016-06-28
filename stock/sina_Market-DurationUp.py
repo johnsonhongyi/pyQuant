@@ -60,7 +60,7 @@ if __name__ == "__main__":
     # dl=30
     ptype='low'
     # op, ra, duration_date, days = pct.get_linear_model_status('999999', filter='y', dl=dl, ptype=ptype, days=1)
-    duration_date = 30
+    duration_date = 60
     du_date = duration_date
     end_date = None
     ptype = 'low'
@@ -103,32 +103,32 @@ if __name__ == "__main__":
                 time_Rt = time.time()
                 if len(top_all) == 0 and len(lastpTDX_DF) == 0:
                     time_Rt = time.time()
-                    top_all = top_now
-                    codelist = top_all.index.tolist()
-                    log.info('toTDXlist:%s' % len(codelist))
-                    # tdxdata = tdd.get_tdx_all_day_LastDF(codelist,dt=duration_date,ptype=ptype)
-                    # print "duration_date:%s ptype=%s filter:%s"%(duration_date, ptype,filter)
-                    # tdxdata = tdd.get_tdx_exp_all_LastDF(codelist, dt=duration_date, end=end_date,ptype=ptype,filter=filter)
-                    power=True
-                    tdxdata = tdd.get_tdx_exp_all_LastDF_DL(codelist, dt=duration_date, end=end_date,ptype=ptype,filter=filter,power=True)
-                    log.debug("TdxLastP: %s %s" % (len(tdxdata), tdxdata.columns.values))
-                    tdxdata.rename(columns={'low': 'llow'}, inplace=True)
-                    tdxdata.rename(columns={'high': 'lhigh'}, inplace=True)
-                    tdxdata.rename(columns={'close': 'lastp'}, inplace=True)
-                    tdxdata.rename(columns={'vol': 'lvol'}, inplace=True)
-                    if power:
-                        tdxdata = tdxdata.loc[:, ['llow', 'lhigh', 'lastp', 'lvol', 'date','ra','op','fib','ldate']]
-                        # print tdxdata[(tdxdata.op >15) | (tdxdata.op <3)]
-                        print len(tdxdata[(tdxdata.op >15)]),
-                    else:
-                        tdxdata = tdxdata.loc[:, ['llow', 'lhigh', 'lastp', 'lvol', 'date']]
-                    log.debug("TDX Col:%s" % tdxdata.columns.values)
-                    top_all = top_all.merge(tdxdata, left_index=True, right_index=True, how='left')
-                    lastpTDX_DF = tdxdata
-                    log.info('Top-merge_now:%s' % (top_all[:1]))
-                    top_all = top_all[top_all['llow'] > 0]
+                    top_all,lastpTDX_DF = tdd.get_append_lastp_to_df(top_now, lastpTDX_DF=None, dl=duration_date,end=end_date,ptype=ptype,filter=filter, power=True, lastp=False)
+
+                    # codelist = top_all.index.tolist()
+                    # log.info('toTDXlist:%s' % len(codelist))
+                    # # tdxdata = tdd.get_tdx_all_day_LastDF(codelist,dt=duration_date,ptype=ptype)
+                    # # print "duration_date:%s ptype=%s filter:%s"%(duration_date, ptype,filter)
+                    # # tdxdata = tdd.get_tdx_exp_all_LastDF(codelist, dt=duration_date, end=end_date,ptype=ptype,filter=filter)
+                    # power=True
+                    # tdxdata = tdd.get_tdx_exp_all_LastDF_DL(codelist, dt=duration_date, end=end_date,ptype=ptype,filter=filter,power=True)
+                    # log.debug("TdxLastP: %s %s" % (len(tdxdata), tdxdata.columns.values))
+                    # tdxdata.rename(columns={'low': 'llow'}, inplace=True)
+                    # tdxdata.rename(columns={'high': 'lhigh'}, inplace=True)
+                    # tdxdata.rename(columns={'close': 'lastp'}, inplace=True)
+                    # tdxdata.rename(columns={'vol': 'lvol'}, inplace=True)
                     # if power:
-                        # top_all=top_all[top_all.op > 15 | top_all <3]
+                    #     tdxdata = tdxdata.loc[:, ['llow', 'lhigh', 'lastp', 'lvol', 'date','ra','op','fib','ldate']]
+                    #     # print tdxdata[(tdxdata.op >15) | (tdxdata.op <3)]
+                    #     # print len(tdxdata[(tdxdata.op >12)]),
+                    # else:
+                    #     tdxdata = tdxdata.loc[:, ['llow', 'lhigh', 'lastp', 'lvol', 'date']]
+                    # log.debug("TDX Col:%s" % tdxdata.columns.values)
+                    # top_all = top_all.merge(tdxdata, left_index=True, right_index=True, how='left')
+                    # lastpTDX_DF = tdxdata
+                    # log.info('Top-merge_now:%s' % (top_all[:1]))
+                    # top_all = top_all[top_all['llow'] > 0]
+
                 elif len(top_all) == 0 and len(lastpTDX_DF) > 0:
                     top_all = top_now
                     top_all = top_all.merge(lastpTDX_DF, left_index=True, right_index=True, how='left')
@@ -170,6 +170,12 @@ if __name__ == "__main__":
                         # top_dif.loc['600610','volume':'lvol']
                     top_dif['volume'] = (
                         map(lambda x, y: round(x / y / radio_t, 1), top_dif.volume.values, top_dif.lvol.values))                
+                
+                if 'op' in top_dif.columns:
+                    top_dif=top_dif[top_dif.op >12]
+                    print "op:",len(top_dif),
+   
+
                 # top_dif = top_dif[top_dif.volume < 100]
                 # print top_dif.loc['002504',:]
 
@@ -255,7 +261,7 @@ if __name__ == "__main__":
 
                     if 'op' in top_temp.columns:
                         top_temp = top_temp.sort_values(by=['ra', 'op','percent'],ascending=[0, 0,0])
-                        
+                        top_temp=top_temp[top_temp.op >12]
                         # top_temp = top_temp.sort_values(by=['ra', 'op'],ascending=[0, 0])[:10]
 
                         # top_temp = top_temp.sort_values(by=['diff', 'op', 'ra', 'percent', 'ratio'],
@@ -367,11 +373,11 @@ if __name__ == "__main__":
                 # else:
                     # codew = (top_dd[-10:].index).tolist()
                 if st.lower() == 'a':
-                    codew = (top_dd[:10].index).tolist()
+                    codew = (top_dd.index[:10]).tolist()
                     cct.write_to_blocknew(block_path, codew)
                     # sl.write_to_blocknew(all_diffpath, codew)
                 else:
-                    codew = (top_dd.index).tolist()
+                    codew = (top_dd.index[:10]).tolist()
                     cct.write_to_blocknew(block_path, codew, False)
                     # sl.write_to_blocknew(all_diffpath, codew, False)
                 print "wri ok:%s" % block_path

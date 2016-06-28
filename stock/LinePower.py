@@ -76,7 +76,7 @@ if __name__ == "__main__":
                 start = cct.day8_to_day10(args.start)
                 end = cct.day8_to_day10(args.end)
                 df = None
-                if args.line == 'y':
+                if args.line == 'y' and args.mpl == 'y':
                     code = args.code
                     # print code, args.ptype, args.dtype, start, end
                     df=lht.get_linear_model_histogramDouble(code, dtype=args.dtype, start=start, end=end,filter=args.filter, dl=args.dl)

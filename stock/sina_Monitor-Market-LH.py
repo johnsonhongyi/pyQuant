@@ -80,6 +80,7 @@ if __name__ == "__main__":
     # blkname = '067.blk'
     blkname = '066.blk'
     block_path = tdd.get_tdx_dir_blocknew() + blkname
+    lastpTDX_DF = pd.DataFrame() 
     # all_diffpath = tdd.get_tdx_dir_blocknew() + '062.blk'
     while 1:
         try:
@@ -112,12 +113,14 @@ if __name__ == "__main__":
                 if 'trade' in top_now.columns:
                     top_now['buy'] = (
                         map(lambda x, y: y if int(x) == 0 else x, top_now['buy'].values, top_now['trade'].values))
-                if len(top_all) == 0:
+      
+                if len(top_all) == 0 and len(lastpTDX_DF) == 0:
                     time_Rt = time.time()
-                    top_all = tdd.get_append_lastp_to_df(top_now)
-                    # top_all['llow'] = 0
-                    # top_all['lastp'] = 0
-                    # top_all = top_all[top_all.buy > 0]
+                    top_all,lastpTDX_DF = tdd.get_append_lastp_to_df(top_now)
+                elif len(top_all) == 0 and len(lastpTDX_DF) > 0:
+                    time_Rt = time.time()
+                    top_all = tdd.get_append_lastp_to_df(top_now,lastpTDX_DF)
+
                     
 
                 else:

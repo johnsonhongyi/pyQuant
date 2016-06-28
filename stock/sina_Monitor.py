@@ -61,6 +61,7 @@ if __name__ == "__main__":
     # block_path = tdd.get_tdx_dir_blocknew() + '064.blk'
     blkname = '064.blk'
     block_path = tdd.get_tdx_dir_blocknew() + blkname
+    lastpTDX_DF = pd.DataFrame()
     while 1:
         try:
             df = rl.get_sina_all_json_dd(vol, type)
@@ -81,10 +82,14 @@ if __name__ == "__main__":
             if len(top_now) > 10 and len(top_now.columns) > 4:
                 top_now = top_now[top_now.trade >= top_now.high * 0.98]
                 if 'percent' in top_now.columns.values:
-                    top_now = top_now[top_now['percent'] > 0]
-                if len(top_all) == 0:
-                    time_s = time.time()
-                    top_all = tdd.get_append_lastp_to_df(top_now)
+                    top_now = top_now[top_now['percent'] >= 0]
+
+                if len(top_all) == 0 and len(lastpTDX_DF) == 0:
+                    time_Rt = time.time()
+                    top_all,lastpTDX_DF = tdd.get_append_lastp_to_df(top_now)
+                elif len(top_all) == 0 and len(lastpTDX_DF) > 0:
+                    time_Rt = time.time()
+                    top_all = tdd.get_append_lastp_to_df(top_now,lastpTDX_DF)
                     # dd=dd.fillna(0)
                 else:
                     for symbol in top_now.index:
@@ -174,8 +179,9 @@ if __name__ == "__main__":
 
                 top_temp = top_all[:ct.PowerCount].copy()
                 top_temp = pct.powerCompute_df(top_temp, dl=ct.PowerCountdl)
-                print "G:%s dt:%s" % (len(top_all), cct.get_time_to_date(time_s)),
-                print "Rt:%0.1f" % (float(time.time() - time_Rt))
+                
+                print "G:%s Rt:%0.1f dT:%s " % (len(top_all),float(time.time() - time_Rt),cct.get_time_to_date(time_s))
+
                
                 if 'op' in top_temp.columns:
                     top_temp = top_temp.sort_values(by=['ra','percent','counts'],ascending=[0, 0,0])
