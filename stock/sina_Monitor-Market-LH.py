@@ -204,9 +204,7 @@ if __name__ == "__main__":
                         top_dif['percent']= (map(lambda x, y: round((x-y)/y*100,1) if int(y) > 0 else 0, top_dif.buy, top_dif.lastp))
 
                     if 'counts' in top_dif.columns.values:
-                        top_dif = top_dif.sort_values(
-                            by=['diff', 'percent', 'volume', 'counts', 'ratio'],
-                            ascending=[0, 0, 0, 1, 0])
+                        top_dif = top_dif.sort_values(by=ct.MonitorMarket_sort_count,ascending=[0, 0, 0, 1, 0])
                     else:
                         # print "Good Morning!!!"
                         top_dif = top_dif.sort_values(
@@ -228,22 +226,18 @@ if __name__ == "__main__":
 
                     if 'op' in top_temp.columns:
 
-                        top_temp = top_temp.sort_values(by=['ra', 'op','percent'],ascending=[0, 0,0])
+                        # top_temp = top_temp.sort_values(by=['ra', 'op','percent'],ascending=[0, 0,0])
                         
-                        # top_temp = top_temp.sort_values(by=['diff', 'op', 'ra', 'percent', 'ratio'],
-                                                        # ascending=[0, 0, 0, 0, 1])
+                        top_temp = top_temp.sort_values(by=ct.MonitorMarket_sort_op,
+                                        ascending=[1,0, 0, 0, 0, 1])
                         
                         # top_temp = top_temp.sort_values(by=['op','ra','diff', 'percent', 'ratio'], ascending=[0,0,0, 0, 1])
                     if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935:
                         top_temp = top_temp[ (top_temp['ma5d'] > top_temp['ma10d']) & (top_temp['buy'] > top_temp['ma10d']) ]
-                        top_temp = top_temp.loc[:,
-                                 ['name', 'buy', 'ma5d', 'ma10d','diff', 'ra','op', 'fib', 'percent','volume', 'ratio', 'counts',
-                                  'ldate', 'date']]
+                        top_temp = top_temp.loc[:,ct.MonitorMarket_format_buy]
                     else:
                         top_temp = top_temp[ (top_temp['ma5d'] > top_temp['ma10d']) & (top_temp['buy'] > top_temp['ma10d']) ]
-                        top_temp = top_temp.loc[:,
-                                 ['name', 'buy', 'ma5d', 'ma10d','diff', 'ra','op', 'fib', 'percent', 'volume', 'ratio', 'counts',
-                                  'ldate','date']]
+                        top_temp = top_temp.loc[:,ct.MonitorMarket_format_buy]
                     print rl.format_for_print(top_temp[:10]) 
                 
                 # print rl.format_for_print(top_dif[:10])

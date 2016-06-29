@@ -320,9 +320,12 @@ def get_linear_model_status(code, df=None, dtype='d', type='m', start=None, end=
         #     log.setLevel(LoggerFactory.DEBUG)
         # else:
         #     log.setLevel(LoggerFactory.ERROR)
-
-        start, index_d, df = tdd.get_duration_price_date(
-            code, ptype=ptype, dl=dl, filter=False, df=df,power=True)
+        if power:
+            start, index_d, df = tdd.get_duration_price_date(
+                code, ptype=ptype, dl=dl, filter=False, df=df,power=power)
+        else:
+            start, index_d = tdd.get_duration_price_date(
+                code, ptype=ptype, dl=dl, filter=False, df=df,power=power)
         # print start,index_d,ptype
         log.debug("dl not None code:%s start: %s  index_d:%s" % (code, start, index_d))
 
@@ -349,7 +352,7 @@ def get_linear_model_status(code, df=None, dtype='d', type='m', start=None, end=
             start = '2016-01-01'
         # df = tdd.get_tdx_append_now_df(code,ptype, start, end).sort_index(ascending=True)
         df = tdd.get_tdx_append_now_df_api(
-            code, start, end).sort_index(ascending=True)
+            code, start,end).sort_index(ascending=True)
         # if (start is not None or dl is not None) and filter=='y':
         # print "code:",start
         if start is None:
@@ -882,17 +885,23 @@ def powerCompute_df(df, dtype='d', end=None, dl=None, filter='y',talib=False):
         opc = 0
         stl = ''
         rac = 0
-        fib = []
-        sep = '|'
+        # fib = []
+        fibl = '0'
+        fib = '0'
+        # sep = '|'
         for ptype in ['low', 'high']:
             op, ra, st, daysData  = get_linear_model_status(
                 code, df=tdx_df, dtype=dtype, start=start, end=end, dl=dl, filter=filter, ptype=ptype)
-            fib.append(str(daysData[0]))
+            # fib.append(str(daysData[0]))
             opc += op
             rac += ra
             if ptype == 'low':
                 stl = st
-        fibl = sep.join(fib)
+                fibl = str(daysData[0])
+            else:
+                fib = str(daysData[0])
+        # fibl = sep.join(fib)
+        
         # df.loc[code,'ma5'] = daysData[1].ma5d[0]
         # print tdx_df[:1].ma5d[0],daysData[1].ma5d[0]
         if tdx_df[:1].ma5d[0] is not None:
@@ -901,8 +910,10 @@ def powerCompute_df(df, dtype='d', end=None, dl=None, filter='y',talib=False):
             df.loc[code,'ma10d'] = round(float(tdx_df[:1].ma10d[0]),2)
         df.loc[code, 'op'] = opc
         df.loc[code, 'ra'] = rac
-        df.loc[code, 'fib'] = fibl
+        df.loc[code, 'fib'] = fib
+        df.loc[code, 'fibl'] = fibl
         df.loc[code, 'ldate'] = stl
+        df=df.fillna(0)
     return df
 
 

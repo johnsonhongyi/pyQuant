@@ -154,6 +154,7 @@ def get_tdx_Exp_day_to_df(code, type='f', start=None, end=None, dt=None, dl=None
         df['ma10d'] = pd.rolling_mean(df.close,10)
         df['ma20d'] = pd.rolling_mean(df.close,20)
         df['ma60d'] = pd.rolling_mean(df.close,60)
+        df = df.fillna(0)
         df = df.sort_index(ascending=False)
         return df
     elif dl is not None and int(dl) == 1:
@@ -248,6 +249,7 @@ def get_tdx_Exp_day_to_df(code, type='f', start=None, end=None, dt=None, dl=None
         df['ma10d'] = pd.rolling_mean(df.close,10)
         df['ma20d'] = pd.rolling_mean(df.close,20)
         df['ma60d'] = pd.rolling_mean(df.close,60)
+        df = df.fillna(0)
         df = df.sort_index(ascending=False)
         return df
 
@@ -1255,17 +1257,20 @@ def get_tdx_exp_low_or_high_power(code, dt=None, ptype='close', dl=None,end=None
                 opc = 0
                 stl = ''
                 rac = 0
-                fib = []
-                sep = '|'
+                # fib = []
+                # sep = '|'
+                fibl = '0'
+                fib = '0'
                 for pty in ['low', 'high']:
                     op, ra, st, daysData  = pct.get_linear_model_status(
                         code, df=df, dtype=dtype, start=dt, end=end, dl=dl, filter='y', ptype=pty,power=False)
-                    fib.append(str(daysData[0]))
                     opc += op
                     rac += ra
-                    if pty == 'low':
+                    if ptype == 'low':
                         stl = st
-                fibl = sep.join(fib)
+                        fibl = str(daysData[0])
+                    else:
+                        fib = str(daysData[0])
                 # df.loc[code,'ma5'] = daysData[1].ma5d[0]
                 # print tdx_df[:1].ma5d[0],daysData[1].ma5d[0]
                 if df[:1].ma5d[0] is not None:
@@ -1274,8 +1279,10 @@ def get_tdx_exp_low_or_high_power(code, dt=None, ptype='close', dl=None,end=None
                     df.loc[code,'ma10d'] = round(float(df[:1].ma10d[0]),2)
                 df['op'] = opc
                 df['ra'] = rac
-                df['fib'] = fibl
+                df.loc[code, 'fib'] = fib
+                df.loc[code, 'fibl'] = fibl
                 df['ldate'] = stl
+                df = df.fillna(0)
                 # print df[:1]
             if lastp:
                 dd = df[:1]
@@ -1700,10 +1707,10 @@ def get_tdx_exp_all_LastDF_DL(codeList, dt=None,end=None,ptype='low',filter='n',
     # df.vol = df.vol.apply(lambda x: x / 100)
     log.info("get_to_mp:%s" % (len(df)))
     log.info("TDXTime:%s" % (time.time() - time_t))
-    if power and 'op' in df.columns:
-        df=df[df.op >10]
-        df=df[df.ra < 11]
-        print "op:",len(df),
+    # if power and 'op' in df.columns:
+    #     df=df[df.op >10]
+    #     df=df[df.ra < 11]
+        # print "op:",len(df),
     if dl != None:
         print ("TDXE:%0.2f" % (time.time() - time_t)),
     return df
@@ -1846,6 +1853,7 @@ if __name__ == '__main__':
     # print get_tdx_Exp_day_to_df('000001', dl=60).sort_index(ascending=False)[:1]
     # sys.exit(0)
     print get_tdx_exp_low_or_high_power('300102', dt='2016-01-01', ptype='high', dl=60, end='2016-06-23', power=True)
+    get_tdx_exp_low_or_high_power('300102', dt=None, ptype='close', dl=None, end=None, power=False, lastp=False)
     # print get_tdx_write_now_file_api('000001', type='f')
     # print get_tdx_write_now_file_api('999999', type='f')
     time_s=time.time()

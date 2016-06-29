@@ -205,7 +205,7 @@ if __name__ == "__main__":
                         # top_all = top_all[(top_all.volume > ct.VolumeMinR) & (top_all.volume < ct.VolumeMaxR)]
 
                 # top_all = top_all.sort_values(by=[ 'counts', 'diff','volume', 'ratio'], ascending=[0, 0, 0, 1])
-                top_all = top_all.sort_values(by=[ 'counts', 'percent','diff','volume', 'ratio'], ascending=[0,0, 0, 0, 1])
+                top_all = top_all.sort_values(by=ct.Monitor_sort_count, ascending=[0,0, 0, 0, 1])
                 # top_all = top_all.sort_values(by=[ 'counts'], ascending=[0])
                 # top_all=top_all.sort_values(by=['diff','percent','counts','ratio'],ascending=[0,0,1,1])
 
@@ -228,20 +228,14 @@ if __name__ == "__main__":
                     title=['dT:%s' % cct.get_time_to_date(time_s), 'G:%s' % len(top_all), 'zxg: %s' % (blkname)])
                 
                 if 'op' in top_temp.columns:
-                    top_temp = top_temp.sort_values(by=['ra','op','counts'],ascending=[0, 0,0])
-                #     # top_temp = top_temp.sort_values(by=['diff', 'op', 'ra', 'percent', 'ratio'],
-                #     top_temp = top_temp.sort_values(by=['percent', 'op', 'ra','diff' , 'ratio'],
-                    
-                #                                     ascending=[0, 0, 0, 0, 1])
+                    # top_temp = top_temp.sort_values(by=['ra','op','counts'],ascending=[0, 0,0])
+                    # top_temp = top_temp.sort_values(by=['diff', 'op', 'ra', 'percent', 'ratio'],
+                    top_temp = top_temp.sort_values(by=ct.Monitor_sort_op,ascending=[1,0, 0, 0, 0, 1])
                     # top_temp = top_temp.sort_values(by=['op','ra','diff', 'percent', 'ratio'], ascending=[0,0,0, 0, 1])                
                 if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935:
-                    top_temp = top_temp.loc[:,
-                             ['name', 'trade', 'ma5d','diff', 'percent', 'ra','op', 'fib','volume', 'ratio', 'counts',
-                              'ldate']]
+                    top_temp = top_temp.loc[:,ct.Monitor_format_trade]
                 else:
-                    top_temp = top_temp.loc[:,
-                             ['name', 'trade', 'ma5d','diff', 'percent', 'ra','op', 'fib', 'volume', 'ratio', 'counts',
-                              'ldate']]
+                    top_temp = top_temp.loc[:,ct.Monitor_format_trade]
                 print rl.format_for_print(top_temp[:10]) 
                 
                 # print rl.format_for_print(top_all[:10])
