@@ -1273,9 +1273,9 @@ def get_tdx_exp_low_or_high_power(code, dt=None, ptype='close', dl=None,end=None
                         fib = str(daysData[0])
                 # df.loc[code,'ma5'] = daysData[1].ma5d[0]
                 # print tdx_df[:1].ma5d[0],daysData[1].ma5d[0]
-                if df[:1].ma5d[0] is not None:
+                if df[:1].ma5d[0] is not None and df[:1].ma5d[0] != 0:
                     df.loc[code,'ma5d'] = round(float(df[:1].ma5d[0]),2)
-                if df[:1].ma5d[0] is not None:
+                if df[:1].ma10d[0] is not None and df[:1].ma10d[0] != 0:
                     df.loc[code,'ma10d'] = round(float(df[:1].ma10d[0]),2)
                 df['op'] = opc
                 df['ra'] = rac
@@ -1541,7 +1541,7 @@ def get_tdx_all_day_LastDF(codeList, type=0, dt=None, ptype='close'):
         print ("TDX:%0.2f" % (time.time() - time_t)),
     return df
 
-def get_append_lastp_to_df(top_all,lastpTDX_DF=None,dl=30,end=None,ptype='low',filter='y',power=True,lastp=True):
+def get_append_lastp_to_df(top_all,lastpTDX_DF=None,dl=ct.PowerCountdl,end=None,ptype='low',filter='y',power=True,lastp=True):
     codelist = top_all.index.tolist()
     log.info('toTDXlist:%s' % len(codelist))
     if lastpTDX_DF is None or len(lastpTDX_DF) == 0:
@@ -1552,10 +1552,10 @@ def get_append_lastp_to_df(top_all,lastpTDX_DF=None,dl=30,end=None,ptype='low',f
         tdxdata.rename(columns={'close': 'lastp'}, inplace=True)
         tdxdata.rename(columns={'vol': 'lvol'}, inplace=True)
         if power:
-            tdxdata = tdxdata.loc[:, ['llow', 'lhigh', 'lastp', 'lvol', 'date','ra','op','fib','ldate']]
+            tdxdata = tdxdata.loc[:, ['llow', 'lhigh', 'lastp', 'lvol', 'date','ra','op','fib','ma5d','ma10d','ldate']]
             # print len(tdxdata[tdxdata.op >15]),
         else:
-            tdxdata = tdxdata.loc[:, ['llow', 'lhigh', 'lastp', 'lvol', 'date']]
+            tdxdata = tdxdata.loc[:, ['llow', 'lhigh', 'lastp', 'lvol','ma5d','ma10d','date']]
             # tdxdata = tdxdata.loc[
             #     :, ['llow', 'lhigh', 'lastp', 'lvol', 'date']]
 
@@ -1851,9 +1851,11 @@ if __name__ == '__main__':
     # print get_tdx_power_now_df('000001', dl=20)
     # print tdx_df.index
     # print get_tdx_Exp_day_to_df('000001', dl=60).sort_index(ascending=False)[:1]
-    # sys.exit(0)
+    print get_tdx_Exp_day_to_df('999999', type='f', start=None, end=None, dt=None, dl=15)
+    
+    sys.exit(0)
     print get_tdx_exp_low_or_high_power('300102', dt='2016-01-01', ptype='high', dl=60, end='2016-06-23', power=True)
-    get_tdx_exp_low_or_high_power('300102', dt=None, ptype='close', dl=None, end=None, power=False, lastp=False)
+    # get_tdx_exp_low_or_high_power('300102', dt=None, ptype='close', dl=None, end=None, power=False, lastp=False)
     # print get_tdx_write_now_file_api('000001', type='f')
     # print get_tdx_write_now_file_api('999999', type='f')
     time_s=time.time()
@@ -1902,15 +1904,15 @@ if __name__ == '__main__':
     # df = get_tdx_Exp_day_to_df('999999')
     # dd = get_tdx_stock_period_to_type(df)
     # df = get_tdx_exp_all_LastDF( ['999999', '603377','603377'], dt=30,ptype='high')
-    df = get_tdx_exp_all_LastDF(['600000', '603377', '601998', '002504'], dt=20160329,end=None, ptype='low', filter='y')
-    print df
+    # df = get_tdx_exp_all_LastDF(['600000', '603377', '601998', '002504'], dt=20160329,end=None, ptype='low', filter='y')
+    # print df
     sys.exit(0)
     # tdxdata = get_tdx_all_day_LastDF(['999999', '603377','603377'], dt=30,ptype='high')
     # print get_tdx_Exp_day_to_df('999999').sort_index(ascending=False)[:1]
 
     # tdxdata = get_tdx_exp_all_LastDF(['999999', '601998', '300499'], dt=20120101, ptype='high')
     
-    # print get_tdx_exp_low_or_high_price('600610',dt=20160201,dl=30)
+    print get_tdx_exp_low_or_high_price('600610',dl=30)
     # main_test()
     sys.exit()
     

@@ -904,9 +904,9 @@ def powerCompute_df(df, dtype='d', end=None, dl=None, filter='y',talib=False):
         
         # df.loc[code,'ma5'] = daysData[1].ma5d[0]
         # print tdx_df[:1].ma5d[0],daysData[1].ma5d[0]
-        if tdx_df[:1].ma5d[0] is not None:
+        if tdx_df[:1].ma5d[0] is not None and tdx_df[:1].ma5d[0] != 0:
             df.loc[code,'ma5d'] = round(float(tdx_df[:1].ma5d[0]),2)
-        if talib and tdx_df[:1].ma5d[0] is not None:
+        if tdx_df[:1].ma10d[0] is not None and tdx_df[:1].ma10d[0] != 0:
             df.loc[code,'ma10d'] = round(float(tdx_df[:1].ma10d[0]),2)
         df.loc[code, 'op'] = opc
         df.loc[code, 'ra'] = rac

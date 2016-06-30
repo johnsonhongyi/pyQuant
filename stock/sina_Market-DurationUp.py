@@ -262,7 +262,7 @@ if __name__ == "__main__":
                     if 'op' in top_temp.columns:
                         # top_temp = top_temp.sort_values(by=ct.Duration_sort_op,ascending=[1,0,0,0,0,1])
                         top_temp = top_temp.sort_values(by=ct.Duration_sort_op,
-                                    ascending=[1,0,0,0,1,0,1])
+                                    ascending=ct.Duration_sort_op_key)
                         # top_temp=top_temp[top_temp.op >12]
                         # top_temp = top_temp.sort_values(by=['ra', 'op'],ascending=[0, 0])[:10]
 

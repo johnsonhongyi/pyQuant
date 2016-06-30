@@ -36,10 +36,10 @@ if __name__ == "__main__":
 
 
     if cct.isMac():
-        width, height = 132, 16
+        width, height = 136, 16
         cct.set_console(width, height)
     else:
-        width, height = 132, 18
+        width, height = 136, 18
         cct.set_console(width, height)
     status = False
     vol = ct.json_countVol
@@ -59,7 +59,7 @@ if __name__ == "__main__":
     # all_diffpath = tdd.get_tdx_dir_blocknew() + '062.blk'
     while 1:
         try:
-            df = rl.get_sina_Market_json('all')
+            df = rl.get_sina_Market_json('cyb')
             top_now = rl.get_market_price_sina_dd_realTime(df, vol, type)
             # print top_now.loc['601900',:]
             df_count = len(df)
@@ -238,7 +238,7 @@ if __name__ == "__main__":
                     # top_temp = top_temp.sort_values(by=['ra', 'op','percent'],ascending=[0, 0,0])
 
                     top_temp = top_temp.sort_values(by=ct.MonitorMarket_sort_op,
-                                                    ascending=[1,0, 0, 0, 0, 1])
+                                                    ascending=ct.MonitorMarket_sort_op_key)
                     # top_temp = top_temp.sort_values(by=['op','ra','diff', 'percent', 'ratio'], ascending=[0,0,0, 0, 1])
                 if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935:
                     top_temp = top_temp.loc[:,ct.MonitorMarket_format_buy]
