@@ -4,7 +4,6 @@ from __future__ import division
 
 import os
 import sys
-
 sys.path.append("..")
 import time
 from struct import *
@@ -33,40 +32,42 @@ path_sep = os.path.sep
 newstockdayl = 50
 changedays=0
 
-win7rootAsus = r'D:\Program Files\gfzq'
-win10Lengend = r'D:\Program\gfzq'
-win7rootXunji = r'E:\DOC\Parallels\WinTools\zd_pazq'
-win7rootList = [win7rootAsus,win7rootXunji,win10Lengend]
-macroot = r'/Users/Johnson/Documents/Johnson/WinTools/zd_pazq'
-xproot = r'E:\DOC\Parallels\WinTools\zd_pazq'
+# win7rootAsus = r'D:\Program Files\gfzq'
+# win10Lengend = r'D:\Program\gfzq'
+# win7rootXunji = r'E:\DOC\Parallels\WinTools\zd_pazq'
+# win7rootList = [win7rootAsus,win7rootXunji,win10Lengend]
+# macroot = r'/Users/Johnson/Documents/Johnson/WinTools/zd_pazq'
+# xproot = r'E:\DOC\Parallels\WinTools\zd_pazq'
 
 def get_tdx_dir():
-    os_sys = cct.get_sys_system()
-    os_platform = cct.get_sys_platform()
-    if os_sys.find('Darwin') == 0:
-        log.info("DarwinFind:%s" % os_sys)
-        basedir = macroot.replace('/', path_sep).replace('\\',path_sep)
-        log.info("Mac:%s" % os_platform)
+    return cct.get_tdx_dir()
+#     os_sys = cct.get_sys_system()
+#     os_platform = cct.get_sys_platform()
+#     if os_sys.find('Darwin') == 0:
+#         log.info("DarwinFind:%s" % os_sys)
+#         basedir = macroot.replace('/', path_sep).replace('\\',path_sep)
+#         log.info("Mac:%s" % os_platform)
 
-    elif os_sys.find('Win') == 0:
-        log.info("Windows:%s" % os_sys)
-        if os_platform.find('XP') == 0:
-            log.info("XP:%s" % os_platform)
-            basedir = xproot.replace('/', path_sep).replace('\\',path_sep)  # 如果你的安装路径不同,请改这里
-        else:
-            log.info("Win7O:%s" % os_platform)
-            for root in win7rootList:
-                basedir = root.replace('/', path_sep).replace('\\',path_sep)  # 如果你的安装路径不同,请改这里
-                if os.path.exists(basedir):
-                    log.info("%s : path:%s" % (os_platform,basedir))
-                    break
-    if not os.path.exists(basedir):
-        log.error("basedir not exists")
-    return basedir
+#     elif os_sys.find('Win') == 0:
+#         log.info("Windows:%s" % os_sys)
+#         if os_platform.find('XP') == 0:
+#             log.info("XP:%s" % os_platform)
+#             basedir = xproot.replace('/', path_sep).replace('\\',path_sep)  # 如果你的安装路径不同,请改这里
+#         else:
+#             log.info("Win7O:%s" % os_platform)
+#             for root in win7rootList:
+#                 basedir = root.replace('/', path_sep).replace('\\',path_sep)  # 如果你的安装路径不同,请改这里
+#                 if os.path.exists(basedir):
+#                     log.info("%s : path:%s" % (os_platform,basedir))
+#                     break
+#     if not os.path.exists(basedir):
+#         log.error("basedir not exists")
+#     return basedir
 
 def get_tdx_dir_blocknew():
-    blocknew_path = get_tdx_dir() + r'/T0002/blocknew/'.replace('/', path_sep).replace('\\', path_sep)
-    return blocknew_path
+    return cct.get_tdx_dir_blocknew()
+#     blocknew_path = get_tdx_dir() + r'/T0002/blocknew/'.replace('/', path_sep).replace('\\', path_sep)
+#     return blocknew_path
 
 basedir = get_tdx_dir()
 blocknew = get_tdx_dir_blocknew()

@@ -117,58 +117,11 @@ if __name__ == "__main__":
                     for symbol in top_now.index:
                         # code = rl._symbol_to_code(symbol)
                         if symbol in top_all.index and top_now.loc[symbol, 'buy'] <> 0:
-                            # if top_all.loc[symbol,'diff'] == 0:
-                            # print "code:",symbol
-                            count_n = top_now.loc[symbol, 'buy']
-                            count_a = top_all.loc[symbol, 'buy']
-                            # print count_a,count_n
-                            # print count_n,count_a
-                            
-                            if count_a == 0 and count_n == 0:
-                                continue
-                            elif count_a == 0 and count_n !=0:
-                                top_all.loc[symbol, 'buy'] = top_now.loc[symbol, 'buy']
-                                count_a = count_n
+                            # top_now.loc[symbol, 'diff'] = round(((float(top_now.loc[symbol, 'buy']) - float(top_all.loc[symbol, 'lastp'])) / float(top_all.loc[symbol, 'lastp']) * 100), 1)
+                            if 'counts' in top_now.columns.values:
+                                    top_all.loc[symbol, 'buy':'prev_p'] = top_now.loc[symbol, 'buy':'prev_p']
                             else:
-                                pass
-                            
-                            
-                            if cct.get_now_time_int() < 930 and count_a != count_n:
-                                # if not count_n == count_a:
-                                top_all.loc[symbol, 'buy'] = top_now.loc[symbol, 'buy']
-                                
-                            else:
-                                if not count_n == count_a:
-                                    # log.info("n_buy-a_buy:%s" % (count_n - count_a))
-                                    top_now.loc[symbol, 'diff'] = round(
-                                        ((float(count_n) - float(count_a)) / float(count_a) * 100), 1)
-                                    if status_change and 'counts' in top_now.columns.values:
-                                        print "change:", time.time() - time_s
-                                        # top_now.loc[symbol,'lastp']=top_all.loc[symbol,'lastp']
-                                        # top_all.loc[symbol, 'buy':'counts'] = top_now.loc[symbol, 'buy':'counts']
-                                        top_all.loc[symbol, 'buy':'prev_p'] = top_now.loc[symbol, 'buy':'prev_p']
-                                    else:
-                                        # top_now.loc[symbol,'lastp']=top_all.loc[symbol,'lastp']
-                                        top_all.loc[symbol, 'diff':'low'] = top_now.loc[symbol, 'diff':'low']
-                                elif 'counts' in top_now.columns.values:
-                                    # log.info("n_buy==a_buy:update Counts")
-                                    top_all.loc[symbol, 'diff':'prev_p'] = top_now.loc[symbol, 'diff':'prev_p']
-                                else:
-                                    # log.info("n_buy==a_buy:no counts update low")
-                                    top_now.loc[symbol, 'diff'] = round(
-                                        ((float(top_now.loc[symbol, 'buy']) - float(top_all.loc[symbol, 'lastp'])) / float(top_all.loc[symbol, 'lastp']) * 100), 1)
-                                    top_all.loc[symbol, 'diff':'low'] = top_now.loc[symbol, 'diff':'low']
-
-                                    # top_all.loc[symbol]=top_now.loc[symbol]?
-                                    # top_all.loc[symbol,'diff']=top_now.loc[symbol,'counts']-top_all.loc[symbol,'counts']
-
-                                    # else:
-                                    # value=top_all.loc[symbol,'diff']
-
-                                    # else:
-                                    #     if float(top_now.loc[symbol,'low'])>float(top_all.loc[symbol,'lastp']):
-                                    #         # top_all.append(top_now.loc[symbol])
-                                    #         print "not all ???"
+                                top_all.loc[symbol, 'buy':'low'] = top_now.loc[symbol, 'buy':'low']
 
                 # top_all=top_all.sort_values(by=['diff','percent','counts'],ascending=[0,0,1])
                 # top_all=top_all.sort_values(by=['diff','ratio','percent','counts'],ascending=[0,1,0,1])
@@ -180,7 +133,7 @@ if __name__ == "__main__":
                 # top_all = top_all[top_all.buy >= top_all.lastp]
                 # top_all = top_all[top_all.percent >= 0]
 
-                if cct.get_now_time_int() < 930:
+                if cct.get_now_time_int() <1500:
                     top_all['diff'] = (
                         map(lambda x, y: round((x - y) / y * 100, 1), top_all['buy'].values, top_all['lastp'].values))
 

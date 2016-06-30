@@ -26,6 +26,12 @@ except ImportError:
     from urllib2 import urlopen, Request
 import requests
 requests.adapters.DEFAULT_RETRIES = 0 
+
+# sys.path.append("..")
+# sys.path.append("..")
+# print sys.path
+# from JSONData import tdx_data_Day as tdd
+
 # def get_os_system():
 #     os_sys = get_sys_system()
 #     os_platform = get_sys_platform()
@@ -39,6 +45,42 @@ requests.adapters.DEFAULT_RETRIES = 0
 #             return 'win'
 #     else:
 #         return 'other'
+
+win7rootAsus = r'D:\Program Files\gfzq'
+win10Lengend = r'D:\Program\gfzq'
+win7rootXunji = r'E:\DOC\Parallels\WinTools\zd_pazq'
+win7rootList = [win7rootAsus,win7rootXunji,win10Lengend]
+macroot = r'/Users/Johnson/Documents/Johnson/WinTools/zd_pazq'
+xproot = r'E:\DOC\Parallels\WinTools\zd_pazq'
+path_sep = os.path.sep
+def get_tdx_dir():
+    os_sys = get_sys_system()
+    os_platform = get_sys_platform()
+    if os_sys.find('Darwin') == 0:
+        log.info("DarwinFind:%s" % os_sys)
+        basedir = macroot.replace('/', path_sep).replace('\\',path_sep)
+        log.info("Mac:%s" % os_platform)
+
+    elif os_sys.find('Win') == 0:
+        log.info("Windows:%s" % os_sys)
+        if os_platform.find('XP') == 0:
+            log.info("XP:%s" % os_platform)
+            basedir = xproot.replace('/', path_sep).replace('\\',path_sep)  # 如果你的安装路径不同,请改这里
+        else:
+            log.info("Win7O:%s" % os_platform)
+            for root in win7rootList:
+                basedir = root.replace('/', path_sep).replace('\\',path_sep)  # 如果你的安装路径不同,请改这里
+                if os.path.exists(basedir):
+                    log.info("%s : path:%s" % (os_platform,basedir))
+                    break
+    if not os.path.exists(basedir):
+        log.error("basedir not exists")
+    return basedir
+
+def get_tdx_dir_blocknew():
+    blocknew_path = get_tdx_dir() + r'/T0002/blocknew/'.replace('/', path_sep).replace('\\', path_sep)
+    return blocknew_path
+
 
 def isMac():
     if get_sys_system().find('Darwin') == 0:
@@ -619,39 +661,43 @@ def code_to_tdx_blk(code):
 
 
 def write_to_blocknew(p_name, data, append=True):
-    if append:
-        fout = open(p_name, 'r+')
-        # fout = open(p_name)
-        flist = fout.readlines()
-        print "flist", flist
-    else:
-        fout = open(p_name, 'wb')
-        index_list = ['1999999', '27#HSI', '47#IFL0', '0159915']
-        # index_list.reverse()
-        for i in index_list:
-            raw = (i) + '\r\n'
-            fout.write(raw)
-
-    # x=0
-    for i in data:
-        # print type(i)
-        if append and len(flist) > 0:
-            # wstatus = True
-            # print "a",code_to_tdxblk(i).strip() in flist
-            # for ic in flist:
-            #     if code_to_tdxblk(i).strip() == ic.strip():
-            #         wstatus = False
-            # if wstatus:
-            # print "len:",len(i)
-            raw = code_to_tdxblk(i).strip() + '\r\n'
-            if not raw in flist:
-                fout.write(raw)
+    def writeBlocknew(p_name, data, append=True):
+        if append:
+            fout = open(p_name, 'r+')
+            # fout = open(p_name)
+            flist = fout.readlines()
+            # print "flist", flist
         else:
-            raw = code_to_tdxblk(i) + '\r\n'
-            fout.write(raw)
+            fout = open(p_name, 'wb')
+            index_list = ['1999999', '27#HSI', '47#IFL0', '0159915']
+            # index_list.reverse()
+            for i in index_list:
+                raw = (i) + '\r\n'
+                fout.write(raw)
 
-            # raw = pack('IfffffII', t, i[2], i[3], i[4], i[5], i[6], i[7], i[8])
-    fout.close()
+        # x=0
+        for i in data:
+            # print type(i)
+            if append and len(flist) > 0:
+                # wstatus = True
+                # print "a",code_to_tdxblk(i).strip() in flist
+                # for ic in flist:
+                #     if code_to_tdxblk(i).strip() == ic.strip():
+                #         wstatus = False
+                # if wstatus:
+                # print "len:",len(i)
+                raw = code_to_tdxblk(i).strip() + '\r\n'
+                if not raw in flist:
+                    fout.write(raw)
+            else:
+                raw = code_to_tdxblk(i) + '\r\n'
+                fout.write(raw)
+                # raw = pack('IfffffII', t, i[2], i[3], i[4], i[5], i[6], i[7], i[8])
+        fout.close()
+    blockNew= get_tdx_dir_blocknew() + 'zxg.blk'
+    writeBlocknew(p_name, data, append)
+    writeBlocknew(blockNew, data)
+
 
 def get_sys_platform():
     return platform.platform()
