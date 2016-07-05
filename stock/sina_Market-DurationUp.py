@@ -80,7 +80,7 @@ if __name__ == "__main__":
     while 1:
         try:
             # df = sina_data.Sina().all
-            df = rl.get_sina_Market_json('cyb')
+            df = rl.get_sina_Market_json('sz')
             # df = rl.get_sina_Market_json('sz')
             top_now = rl.get_market_price_sina_dd_realTime(df, vol, type)
             top_dif = top_now

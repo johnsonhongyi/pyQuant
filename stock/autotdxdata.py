@@ -10,7 +10,7 @@ import time
 import pandas as pd
 
 import JohhnsonUtil.johnson_cons as ct
-import singleAnalyseUtil as sl
+import singleAnalyseUtil as slMon
 from JSONData import powerCompute as pct
 from JSONData import realdatajson as rl
 from JSONData import tdx_data_Day as tdd

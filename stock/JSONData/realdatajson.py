@@ -645,7 +645,9 @@ def get_market_price_sina_dd_realTime(dp='',vol='0',type='0'):
             dm=dm.loc[:,ct.SINA_Market_Clean_UP_Columns]
         else:
             dp=dp.set_index('code')
-            dm=dp.loc[:,ct.SINA_Market_Clean_Columns]
+            dp['counts'] = 0
+            # dm=dp.loc[:,ct.SINA_Market_Clean_Columns]
+            dm=dm.loc[:,ct.SINA_Market_Clean_UP_Columns]
             # dm['prev_p']=0.0
                     # ['name','buy','diff','percent','ratio','high','open','volume','low','counts']
                     #['name','buy','diff','percent','trade','high','ratio','volume','counts']

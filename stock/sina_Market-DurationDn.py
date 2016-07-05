@@ -85,7 +85,7 @@ if __name__ == "__main__":
             df = rl.get_sina_Market_json('cyb')
             # df = rl.get_sina_Market_json('sz')
             top_now = rl.get_market_price_sina_dd_realTime(df, vol, type)
-            top_dif = top_now
+            # top_dif = top_now
             # top_now.to_hdf("testhdf5", 'marketDD', format='table', complevel=9)
             now_count = len(top_now)
             del df
@@ -152,7 +152,6 @@ if __name__ == "__main__":
                             # top_all.loc[symbol, 'buy'] = top_now.loc[symbol, 'buy']
                 # top_all = top_all[top_all.buy > 0]
                 top_dif = top_all.copy()
-
                 if 'trade' in top_dif.columns:
                     top_dif['buy'] = (
                         map(lambda x, y: y if int(x) == 0 else x, top_dif['buy'].values, top_dif['trade'].values))

@@ -32,7 +32,7 @@ Monitor_sort_count=[ 'counts', 'percent','diff','volume', 'ratio']
 Monitor_sort_op=['fib','diff','percent','fibl', 'op', 'ra' , 'ratio']
 Monitor_sort_op_key=[1,0, 0,1, 0, 0, 1]
 
-Monitor_format_trade=['name', 'trade', 'ma5d','diff', 'percent', 'ra','op', 'fib','volume', 'ratio', 'counts','ldate']
+Monitor_format_trade=['name', 'trade', 'ma5d','diff', 'percent', 'ra','op', 'fib','fibl','volume', 'ratio', 'counts','ldate']
 
 MonitorMarket_sort_count=['diff', 'percent', 'volume', 'counts', 'ratio']
 # MonitorMarket_sort_op=['fib','diff', 'op', 'ra', 'percent', 'ratio']
