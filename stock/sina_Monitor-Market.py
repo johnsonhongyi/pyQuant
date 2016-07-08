@@ -53,7 +53,7 @@ if __name__ == "__main__":
     First = True
     # base_path = tdd.get_tdx_dir()
     # block_path = tdd.get_tdx_dir_blocknew() + '063.blk'
-    blkname = '063.blk'
+    blkname = '068.blk'
     block_path = tdd.get_tdx_dir_blocknew() + blkname
     lastpTDX_DF = pd.DataFrame()
     # all_diffpath = tdd.get_tdx_dir_blocknew() + '062.blk'

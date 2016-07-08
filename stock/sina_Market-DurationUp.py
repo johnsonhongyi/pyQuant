@@ -53,7 +53,7 @@ if __name__ == "__main__":
     delay_time = 720000
     # delay_time = cct.get_delay_time()
     First = True
-    blkname = '066.blk'
+    blkname = '062.blk'
     block_path = tdd.get_tdx_dir_blocknew() + blkname
     status_change = False
     lastpTDX_DF = pd.DataFrame()
@@ -371,11 +371,11 @@ if __name__ == "__main__":
                 # else:
                     # codew = (top_dd[-10:].index).tolist()
                 if st.lower() == 'a':
-                    codew = (top_dd.index[:10]).tolist()
+                    codew = (top_dd.index[:ct.writeCount]).tolist()
                     cct.write_to_blocknew(block_path, codew)
                     # sl.write_to_blocknew(all_diffpath, codew)
                 else:
-                    codew = (top_dd.index[:10]).tolist()
+                    codew = (top_dd.index[:ct.writeCount]).tolist()
                     cct.write_to_blocknew(block_path, codew, False)
                     # sl.write_to_blocknew(all_diffpath, codew, False)
                 print "wri ok:%s" % block_path

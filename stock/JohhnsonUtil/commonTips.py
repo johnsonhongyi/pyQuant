@@ -666,6 +666,8 @@ def write_to_blocknew(p_name, data, append=True):
             fout = open(p_name, 'r+')
             # fout = open(p_name)
             flist = fout.readlines()
+            if str(flist[-1]).find('\r\n') < 0:
+                print "File:%s end not %s"%(p_name[-7:],str(flist[-1]))
             # print "flist", flist
         else:
             fout = open(p_name, 'wb')
@@ -687,16 +689,27 @@ def write_to_blocknew(p_name, data, append=True):
                 # if wstatus:
                 # print "len:",len(i)
                 raw = code_to_tdxblk(i).strip() + '\r\n'
-                if not raw in flist:
+                if len(raw) > 8 and not raw in flist:
                     fout.write(raw)
             else:
                 raw = code_to_tdxblk(i) + '\r\n'
-                fout.write(raw)
+                if len(raw) >8 :
+                    fout.write(raw)
                 # raw = pack('IfffffII', t, i[2], i[3], i[4], i[5], i[6], i[7], i[8])
         fout.close()
     blockNew= get_tdx_dir_blocknew() + 'zxg.blk'
-    writeBlocknew(p_name, data, append)
-    writeBlocknew(blockNew, data)
+    blockNewStart = get_tdx_dir_blocknew() + '066.blk'
+    # writeBlocknew(blockNew, data)
+    if p_name.find('061.blk') > 0 or p_name.find('062.blk') > 0 or p_name.find('063.blk') > 0:
+        writeBlocknew(p_name, data, append)
+        writeBlocknew(blockNew, data)
+        writeBlocknew(blockNewStart, data,append)
+        print "write to zxg and 066"
+    else:
+        writeBlocknew(p_name, data, append)
+        writeBlocknew(blockNewStart, data[:ct.writeCount - 1])
+        print "write to other and start"
+
 
 
 def get_sys_platform():
@@ -862,6 +875,7 @@ if __name__ == '__main__':
     # print get_run_path()
     # print get_work_time_ratio()
     # print typeday8_to_day10(None)
+    write_to_blocknew('abc', ['300380','601998'], append=True)
     print get_work_time_ratio()
     print get_work_day_status()
     # print last_tddate(days=3)

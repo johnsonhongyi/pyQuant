@@ -20,10 +20,12 @@ VolumeMaxR=50
 VolumeMinR=1.5
 PowerCount = 30
 PowerCountdl = 15
-
+writeCount=5
 # Duration_sort_op=['fib','op','ra','percent','ratio','diff','counts']
-Duration_sort_op=['fib','op','diff','fibl','ra','percent','ratio','volume','counts']
-Duration_sort_op_key=[1,0,0,1,0,0,1,1,1]
+# Duration_sort_op=['fib','op','diff','fibl','ra','percent','ratio','volume','counts']
+# Duration_sort_op_key=[1,0,0,1,0,0,1,1,1]
+Duration_sort_op=['diff','fib','op','fibl','ra','percent','ratio','volume','counts']
+Duration_sort_op_key=[0,1,0,1,0,0,1,1,1]
 
 Duration_format_buy=['name', 'buy', 'ma5d','ma10d','diff', 'ra','op', 'fib','fibl','percent','volume' , 'ratio', 'counts','ldate', 'date']
 Duration_format_trade=['name', 'trade', 'ma5d','ma10d','diff', 'ra','op', 'fib','fibl', 'percent','volume', 'ratio', 'counts', 'ldate', 'date']
@@ -37,8 +39,10 @@ Monitor_format_trade=['name', 'trade', 'ma5d','diff', 'percent', 'ra','op', 'fib
 MonitorMarket_sort_count=['diff', 'percent', 'volume', 'counts', 'ratio']
 # MonitorMarket_sort_op=['fib','diff', 'op', 'ra', 'percent', 'ratio']
                     #[1,0, 0, 0, 0, 1]
-MonitorMarket_sort_op=['fib','op','diff','fibl','ra','percent','ratio','volume','counts']
-MonitorMarket_sort_op_key=[1,0,0,1,0,0,1,1,1]
+# MonitorMarket_sort_op=['fib','op','diff','fibl','ra','percent','ratio','volume','counts']
+# MonitorMarket_sort_op_key=[1,0,0,1,0,0,1,1,1]
+MonitorMarket_sort_op=['diff','fib','op','fibl','ra','percent','ratio','volume','counts']
+MonitorMarket_sort_op_key=[0,1,0,1,0,0,1,1,1]
 
 MonitorMarket_format_buy=['name', 'buy', 'ma5d', 'ma10d','diff', 'ra','op', 'fib','fibl', 'percent','volume', 'ratio', 'counts','ldate', 'date']
 MonitorMarket_format_trade=['name', 'trade', 'ma5d', 'ma10d','diff', 'ra','op', 'fib','fibl', 'percent','volume', 'ratio', 'counts','ldate']
@@ -173,7 +177,7 @@ SINA_Market_Clean_UP_Columns = ['name', 'buy','trade','diff', 'volume', 'percent
                                 'prev_p']
 SINA_Market_Clean_UP_ColumnsTrade = ['name', 'trade', 'diff', 'volume', 'percent', 'ratio', 'high', 'open', 'low', 'counts',
                                 'prev_p']                               
-SINA_Market_Clean_Columns=['name','buy','diff','volume','percent','ratio','high','open','low']
+SINA_Market_Clean_Columns=['name','buy','diff','volume','percent','ratio','high','open','low','counts']
 # SINA_Market_Clean_UP_Columns=['name','buy','diff','percent','trade','high','ratio','open','low','counts']
 
 THE_FIELDS = ['code', 'symbol', 'name', 'changepercent', 'trade', 'open', 'high', 'low', 'settlement', 'volume', 'turnoverratio']
