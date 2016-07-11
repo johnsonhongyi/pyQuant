@@ -20,12 +20,17 @@ VolumeMaxR=50
 VolumeMinR=1.5
 PowerCount = 30
 PowerCountdl = 15
-writeCount=5
+writeCount=10
 # Duration_sort_op=['fib','op','ra','percent','ratio','diff','counts']
 # Duration_sort_op=['fib','op','diff','fibl','ra','percent','ratio','volume','counts']
 # Duration_sort_op_key=[1,0,0,1,0,0,1,1,1]
 Duration_sort_op=['diff','fib','op','fibl','ra','percent','ratio','volume','counts']
 Duration_sort_op_key=[0,1,0,1,0,0,1,1,1]
+
+# Duration_sort_high_op=['date','diff','fib','op','fibl','ra','percent','ratio','volume','counts']
+Duration_sort_high_op=['diff','date','fib','op','fibl','ra','percent','ratio','volume','counts']
+Duration_sort_high_op_key=[0,1,1,0,1,0,0,1,1,1]
+
 
 Duration_format_buy=['name', 'buy', 'ma5d','ma10d','diff', 'ra','op', 'fib','fibl','percent','volume' , 'ratio', 'counts','ldate', 'date']
 Duration_format_trade=['name', 'trade', 'ma5d','ma10d','diff', 'ra','op', 'fib','fibl', 'percent','volume', 'ratio', 'counts', 'ldate', 'date']

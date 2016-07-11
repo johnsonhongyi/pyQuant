@@ -696,6 +696,7 @@ def write_to_blocknew(p_name, data, append=True):
                 if len(raw) >8 :
                     fout.write(raw)
                 # raw = pack('IfffffII', t, i[2], i[3], i[4], i[5], i[6], i[7], i[8])
+        fout.flush()    
         fout.close()
     blockNew= get_tdx_dir_blocknew() + 'zxg.blk'
     blockNewStart = get_tdx_dir_blocknew() + '066.blk'
