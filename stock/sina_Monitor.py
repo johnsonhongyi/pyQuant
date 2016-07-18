@@ -64,12 +64,14 @@ if __name__ == "__main__":
     lastpTDX_DF = pd.DataFrame()
     while 1:
         try:
-            df = rl.get_sina_all_json_dd(vol, type)
-            if len(df) > cut_num:
-                df = df[:cut_num]
-                print len(df),
-            top_now = rl.get_sina_dd_count_price_realTime(df)
+            # df = rl.get_sina_all_json_dd(vol, type)
+            # if len(df) > cut_num:
+            #     df = df[:cut_num]
+            #     print len(df),
+            # top_now = rl.get_sina_dd_count_price_realTime(df)
             # print len(top_now)
+            
+            top_now = tdd.getSinaAlldf(market='cyb', vol=ct.json_countVol, type=ct.json_countType)
             time_Rt = time.time()
             time_d = time.time()
             if time_d - time_s > delay_time:

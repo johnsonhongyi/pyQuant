@@ -109,8 +109,7 @@ if __name__ == "__main__":
     # all_diffpath = tdd.get_tdx_dir_blocknew() + '062.blk'
     while 1:
         try:
-            df = rl.get_sina_all_json_dd(vol, type)
-            top_now = rl.get_sina_dd_count_price_realTime(df)
+            top_now = tdd.getSinaAlldf(market='all', vol=ct.json_countVol, type=ct.json_countType)
             # print top_now
             # print top_now.columns
             time_Rt = time.time()

@@ -31,7 +31,8 @@ log = LoggerFactory.getLogger('TDX_Day')
 path_sep = os.path.sep
 newstockdayl = 50
 changedays=0
-
+global initTdxdata
+initTdxdata = 0
 # win7rootAsus = r'D:\Program Files\gfzq'
 # win10Lengend = r'D:\Program\gfzq'
 # win7rootXunji = r'E:\DOC\Parallels\WinTools\zd_pazq'
@@ -129,7 +130,7 @@ def get_tdx_Exp_day_to_df(code, type='f', start=None, end=None, dt=None, dl=None
             tvol = float(a[5])
             amount = round(float(a[6].replace('\r\n', '')), 1)  # int
             # tpre = int(a[7])  # back
-            if int(amount) == 0:
+            if int(topen) == 0 or int(amount) == 0:
                 continue
             dt_list.append(
                 {'code': code, 'date': tdate, 'open': topen, 'high': thigh, 'low': tlow, 'close': tclose,
@@ -185,7 +186,7 @@ def get_tdx_Exp_day_to_df(code, type='f', start=None, end=None, dt=None, dl=None
                 tvol = float(a[5])
                 amount = round(float(a[6].replace('\r\n', '')), 1)  # int
                 # tpre = int(a[7])  # back
-                if int(amount) == 0:
+                if int(topen) == 0 or int(amount) == 0:
                     continue
                 dt_list = Series(
                     {'code': code, 'date': tdate, 'open': topen, 'high': thigh, 'low': tlow, 'close': tclose,
@@ -226,7 +227,7 @@ def get_tdx_Exp_day_to_df(code, type='f', start=None, end=None, dt=None, dl=None
                 tvol = round(float(a[5]) / 10, 2)
                 amount = round(float(a[6].replace('\r\n', '')), 1)  # int
                 # tpre = int(a[7])  # back
-                if int(amount) == 0:
+                if int(topen) == 0 or int(amount) == 0:
                     continue
                 dt_list.append(
                     {'code': code, 'date': tdate, 'open': topen, 'high': thigh, 'low': tlow, 'close': tclose,
@@ -784,6 +785,49 @@ def get_sina_data_df(code):
     else:
         dm = sina_data.Sina().get_stock_code_data(code,index=index_status).set_index('code')
     return dm
+
+
+def getSinaJsondf(market='cyb',vol=ct.json_countVol,type=ct.json_countType):
+    df = rl.get_sina_Market_json(market)
+    top_now = rl.get_market_price_sina_dd_realTime(df, vol, type)
+    return top_now
+
+def getSinaAlldf(market='cyb',vol=ct.json_countVol,type=ct.json_countType):
+    global initTdxdata
+    df = rl.get_sina_Market_json(market)
+    # top_now = get_market_price_sina_dd_realTime(df, vol, type)
+    codelist = df.code.tolist()
+    # index_status=False
+    # if isinstance(codelist, list):
+    time_s=time.time()
+    dm = sina_data.Sina().get_stock_list_data(codelist)
+    dm['percent'] = map(lambda x: round(df[df.code == x].percent, 1), dm['code'].values)
+    dm['trade'] = dm['close']
+    dm['ratio'] = map(lambda x: round(df[df.code == x].ratio, 1), dm['code'].values)
+    # print len(dm)
+    if cct.get_now_time_int() > 935:
+        top_now = rl.get_market_price_sina_dd_realTime(dm, vol, type)
+    else:
+        dm =  dm.set_index('code')
+        top_now = dm
+        top_now['counts'] = 0
+    # print top_now[:1].b1_v
+    # print len(top_now),len(dm)
+    # print top_now.loc[top_now.index == '300076',['b1_v','a1_v','trade','buy','b1','a1']]
+    # print top_now.loc[top_now.index == '300004',['b1_v','a1_v','trade','buy','b1','a1']]
+    # print top_now.loc[top_now.index == '300228',['b1_v','a1_v','trade','buy','b1','a1']]
+    if initTdxdata > 0 and cct.get_now_time_int() > 916 and cct.get_now_time_int() <=926:
+        top_diff = top_now[(top_now.b1_v > top_now.a1_v) & (top_now.buy >= top_now.llastp * 0.99)]
+    # elif cct.get_now_time_int() > 930:
+    elif initTdxdata > 0 and cct.get_now_time_int() > 926:
+        top_diff = top_now[(top_now.b1_v > top_now.a1_v) & (top_now.trade >= top_now.buy) & (top_now.buy >= top_now.llastp * 0.99)]
+        # top_diff = top_diff[(top_diff.high)]
+    else:
+        initTdxdata +=1
+        top_diff = top_now
+    print "b1>%s:%s:%s"%(initTdxdata,len(top_diff),round(time.time()-time_s,1)),
+    return top_diff
+
 '''              
 def get_tdx_append_now_df(code, type='f', start=None, end=None):
     # start=cct.day8_to_day10(start)
@@ -1045,16 +1089,16 @@ def get_duration_date(code, ptype='low', dt=None, df=None, dl=None):
     else:
         dz=df
     if ptype == 'high':
-        lowp = dz.high.max()
-        lowdate = dz[dz.high == lowp].index.values[0]
+        lowp = dz.close.max()
+        lowdate = dz[dz.close == lowp].index.values[-1]
         log.debug("high:%s"%lowdate)
     elif ptype == 'close':
         lowp = dz.close.min()
-        lowdate = dz[dz.close == lowp].index.values[0]
+        lowdate = dz[dz.close == lowp].index.values[-1]
         log.debug("high:%s" % lowdate)
     else:
         lowp = dz.low.min()
-        lowdate = dz[dz.low == lowp].index.values[0]
+        lowdate = dz[dz.low == lowp].index.values[-1]
         log.debug("low:%s" % lowdate)
     # if ptype == 'high':
     #     lowp = dz.close.max()
@@ -1136,16 +1180,16 @@ def get_duration_price_date(code, ptype='low', dt=None, df=None, dl=None, end=No
         dz=df
     if len(dz) > 0:
         if ptype == 'high':
-            lowp = dz.high.max()
-            lowdate = dz[dz.high == lowp].index.values[0]
+            lowp = dz.close.max()
+            lowdate = dz[dz.close == lowp].index.values[-1]
             log.debug("high:%s" % lowdate)
         elif ptype == 'close':
             lowp = dz.close.min()
-            lowdate = dz[dz.close == lowp].index.values[0]
+            lowdate = dz[dz.close == lowp].index.values[-1]
             log.debug("high:%s" % lowdate)
         else:
             lowp = dz.low.min()
-            lowdate = dz[dz.low == lowp].index.values[0]
+            lowdate = dz[dz.low == lowp].index.values[-1]
             log.debug("low:%s" % lowdate)
         log.debug("date:%s %s:%s" % (lowdate, ptype, lowp))
     else:
@@ -1204,15 +1248,15 @@ def get_tdx_exp_low_or_high_price(code, dt=None, ptype='close', dl=None,end=None
             if dz is not None and not dz.empty:
                 if ptype == 'high':
                     lowp = dz.close.max()
-                    lowdate = dz[dz.close == lowp].index.values[0]
+                    lowdate = dz[dz.close == lowp].index.values[-1]
                     log.debug("high:%s" % lowdate)
                 elif ptype == 'close':
                     lowp = dz.close.min()
-                    lowdate = dz[dz.close == lowp].index.values[0]
+                    lowdate = dz[dz.close == lowp].index.values[-1]
                     log.debug("close:%s" % lowdate)
                 else:
                     lowp = dz.low.min()
-                    lowdate = dz[dz.low == lowp].index.values[0]
+                    lowdate = dz[dz.low == lowp].index.values[-1]
                     log.debug("low:%s" % lowdate)
 
                 log.debug("date:%s %s:%s" % (lowdate, ptype, lowp))
@@ -1280,10 +1324,10 @@ def get_tdx_exp_low_or_high_power(code, dt=None, ptype='close', dl=None,end=None
                     df.loc[code,'ma10d'] = round(float(df[:1].ma10d[0]),2)
                 df['op'] = opc
                 df['ra'] = rac
-                df.loc[code, 'fib'] = fib
-                df.loc[code, 'fibl'] = fibl
+                df['fib'] = fib
+                df['fibl'] = fibl
                 df['ldate'] = stl
-                df = df.fillna(0)
+                # df = df.fillna(0)
                 # print df[:1]
             if lastp:
                 dd = df[:1]
@@ -1317,15 +1361,15 @@ def get_tdx_exp_low_or_high_power(code, dt=None, ptype='close', dl=None,end=None
             if dz is not None and not dz.empty:
                 if ptype == 'high':
                     lowp = dz.close.max()
-                    lowdate = dz[dz.close == lowp].index.values[0]
+                    lowdate = dz[dz.close == lowp].index.values[-1]
                     log.debug("high:%s" % lowdate)
                 elif ptype == 'close':
                     lowp = dz.close.min()
-                    lowdate = dz[dz.close == lowp].index.values[0]
+                    lowdate = dz[dz.close == lowp].index.values[-1]
                     log.debug("close:%s" % lowdate)
                 else:
                     lowp = dz.low.min()
-                    lowdate = dz[dz.low == lowp].index.values[0]
+                    lowdate = dz[dz.low == lowp].index.values[-1]
                     log.debug("low:%s" % lowdate)
 
                 log.debug("date:%s %s:%s" % (lowdate, ptype, lowp))
@@ -1545,6 +1589,7 @@ def get_tdx_all_day_LastDF(codeList, type=0, dt=None, ptype='close'):
 def get_append_lastp_to_df(top_all,lastpTDX_DF=None,dl=ct.PowerCountdl,end=None,ptype='low',filter='y',power=True,lastp=True):
     codelist = top_all.index.tolist()
     log.info('toTDXlist:%s' % len(codelist))
+    # print codelist[5]
     if lastpTDX_DF is None or len(lastpTDX_DF) == 0:
         # tdxdata = get_tdx_all_day_LastDF(codelist) '''only get lastp no powerCompute'''
         tdxdata = get_tdx_exp_all_LastDF_DL(codelist,dt=dl,end=end,ptype=ptype,filter=filter,power=power,lastp=lastp)
@@ -1553,7 +1598,7 @@ def get_append_lastp_to_df(top_all,lastpTDX_DF=None,dl=ct.PowerCountdl,end=None,
         tdxdata.rename(columns={'close': 'lastp'}, inplace=True)
         tdxdata.rename(columns={'vol': 'lvol'}, inplace=True)
         if power:
-            tdxdata = tdxdata.loc[:, ['llow', 'lhigh', 'lastp', 'lvol', 'date','ra','op','fib','ma5d','ma10d','ldate']]
+            tdxdata = tdxdata.loc[:, ['llow', 'lhigh', 'lastp', 'lvol', 'date','ra','op','fib','fibl','ma5d','ma10d','ldate']]
             # print len(tdxdata[tdxdata.op >15]),
         else:
             tdxdata = tdxdata.loc[:, ['llow', 'lhigh', 'lastp', 'lvol','ma5d','ma10d','date']]
@@ -1851,11 +1896,13 @@ if __name__ == '__main__':
     # print get_tdx_append_now_df_api('999999',start='2016-04-08')
     # print get_tdx_power_now_df('000001', dl=20)
     # print tdx_df.index
-    # print get_tdx_Exp_day_to_df('000001', dl=60).sort_index(ascending=False)[:1]
-    print get_tdx_Exp_day_to_df('999999', type='f', start=None, end=None, dt=None, dl=15)
-    
+    print get_tdx_Exp_day_to_df('002775', dl=21).sort_index(ascending=False)
+    # print get_tdx_Exp_day_to_df('300076', type='f', start=None, end=None, dt=None, dl=20)
+    print get_tdx_exp_low_or_high_power('002775', dt='2016-06-01', ptype='high', dl=21, power=True)
+    df=getSinaAlldf(market='cyb')
+    print df[-1:],len(df)
     sys.exit(0)
-    print get_tdx_exp_low_or_high_power('300102', dt='2016-01-01', ptype='high', dl=60, end='2016-06-23', power=True)
+    # 
     # get_tdx_exp_low_or_high_power('300102', dt=None, ptype='close', dl=None, end=None, power=False, lastp=False)
     # print get_tdx_write_now_file_api('000001', type='f')
     # print get_tdx_write_now_file_api('999999', type='f')

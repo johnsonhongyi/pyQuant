@@ -21,8 +21,8 @@ def parseArgmain():
                         help='price type')
     parser.add_argument('-f', action="store", dest="filter", type=str, choices=['y', 'n'], default='n',
                         help='find duration low')
-    parser.add_argument('-l', action="store", dest="dl", type=int, default=None,
-                        help='dl')
+    parser.add_argument('-l', action="store", dest="dl", type=int, default=30,
+                        help='dl default=30')
     parser.add_argument('-dl', action="store", dest="days", type=int, default=1,
                         help='days')
     parser.add_argument('-m', action="store", dest="mpl", type=str, default='y',

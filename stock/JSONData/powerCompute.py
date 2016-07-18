@@ -12,10 +12,11 @@ from matplotlib.dates import num2date, date2num
 from matplotlib.lines import Line2D
 from matplotlib.patches import Rectangle
 import datetime
-from JohhnsonUtil import LoggerFactory as LoggerFactory
 from JohhnsonUtil import commonTips as cct
 from JSONData import tdx_data_Day as tdd
+from JSONData import get_macd_kdj_rsi as getab
 from JohhnsonUtil import zoompan
+from JohhnsonUtil import LoggerFactory as LoggerFactory
 
 log = LoggerFactory.getLogger("PowerCompute")
 # log.setLevel(LoggerFactory.INFO)
@@ -484,7 +485,9 @@ def get_linear_model_status(code, df=None, dtype='d', type='m', start=None, end=
             # log.debug("Line down !!! d:%s" % Y_hat[0])
             # print("Line down !!! d:%s nowp:%s" % (round(Y_hat[1],2),asset[-1:].values[0]))
             # return -3, round(ratio, 2)
+            # 
 
+    df = df.fillna(0)
     if len(df) > 1 + days:
         if days != 0:
             asset = df[:-days]
@@ -901,7 +904,11 @@ def powerCompute_df(df, dtype='d', end=None, dl=None, filter='y',talib=False):
             else:
                 fib = str(daysData[0])
         # fibl = sep.join(fib)
-        
+        tdx_df,operation = getab.Get_BBANDS(tdx_df, dtype='d')
+        opc +=operation
+        if opc > 21:
+            opc = 21
+        log.debug( "opc:%s op:%s"%(opc,operation))
         # df.loc[code,'ma5'] = daysData[1].ma5d[0]
         # print tdx_df[:1].ma5d[0],daysData[1].ma5d[0]
         if tdx_df[:1].ma5d[0] is not None and tdx_df[:1].ma5d[0] != 0:
@@ -913,6 +920,8 @@ def powerCompute_df(df, dtype='d', end=None, dl=None, filter='y',talib=False):
         df.loc[code, 'fib'] = fib
         df.loc[code, 'fibl'] = fibl
         df.loc[code, 'ldate'] = stl
+        # df = getab.Get_BBANDS(df, dtype='d')
+
         df=df.fillna(0)
     return df
 
@@ -961,11 +970,11 @@ if __name__ == "__main__":
     # print get_linear_model_status('600671', filter='y', start='20160329', ptype='high')
     # print get_linear_model_status('999999', filter='y', dl=30, ptype='high')
     # print get_linear_model_status('999999', filter='y', dl=30, ptype='low')
-    # print powerCompute_df(['300134','002171'], dtype='d',end=None, dl=10, filter='y')
+    print powerCompute_df(['300369','002171'], dtype='d',end=None, dl=21, filter='y')
     # # print powerCompute_df(['601198', '002791', '000503'], dtype='d', end=None, dl=30, filter='y')
     # print get_linear_model_status('999999', filter='y', dl=34, ptype='low', days=1)
     # print get_linear_model_status('399006', filter='y', dl=34, ptype='low', days=1)
-    # sys.exit()
+    sys.exit()
     if cct.isMac():
         cct.set_console(80, 19)
     else:

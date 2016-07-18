@@ -876,10 +876,10 @@ if __name__ == '__main__':
     # print get_run_path()
     # print get_work_time_ratio()
     # print typeday8_to_day10(None)
-    write_to_blocknew('abc', ['300380','601998'], append=True)
+    # write_to_blocknew('abc', ['300380','601998'], append=True)
     print get_work_time_ratio()
     print get_work_day_status()
-    # print last_tddate(days=3)
+    print last_tddate(days=3)
     for x in range(0, 4, 1):
         print x
         print last_tddate(x)

@@ -97,7 +97,6 @@ class Sina:
         self.stockcode = StockCode()
         self.stock_code_path = self.stockcode.stock_code_path
         self.stock_codes = self.stockcode.get_stock_codes()
-        # print type(self.stock_codes)
         self.load_stock_codes()
         self.stock_with_exchange_list = list(
             map(lambda stock_code: ('sh%s' if stock_code.startswith(('5', '6', '9')) else 'sz%s') % stock_code,
@@ -130,6 +129,7 @@ class Sina:
         # response = yield From(loop.run_in_executor(None,self.get_url_data_R, (self.sina_stock_api + self.stock_list[index])))
         response = yield From(loop.run_in_executor(None,requests.get, (self.sina_stock_api + self.stock_list[index])))
         # response = yield (requests.get(self.sina_stock_api + self.stock_list[index]))
+        # log.debug("url:%s"%(self.sina_stock_api + self.stock_list[index]))
         log.debug("res_encoding:%s"%response.encoding)
         self.stock_data.append(response.text)
         # Return(self.stock_data.append(response.text))
@@ -176,16 +176,31 @@ class Sina:
         return self.dataframe    
     
     def get_stock_list_data(self,ulist):
-        self.stock_codes = ulist
-        # self.stock_with_exchange_list = list(
-        #     map(lambda stock_code: ('sh%s' if stock_code.startswith(('5', '6', '9')) else 'sz%s') % stock_code,
-        #         ulist))
-        self.stock_codes = map(lambda stock_code: ('sh%s' if stock_code.startswith(('5', '6', '9')) else 'sz%s') % stock_code,ulist)
-        self.url = self.sina_stock_api + ','.join(self.stock_codes)
-        log.info("stock_list:%s"%self.url)
-        response = requests.get(self.url)
-        self.stock_data.append(response.text)
-        self.dataframe=self.format_response_data()
+        if len(ulist) > self.max_num:
+            # print "a"
+            self.stock_list = []
+            self.stock_with_exchange_list = list(
+                map(lambda stock_code: ('sh%s' if stock_code.startswith(('5', '6', '9')) else 'sz%s') % stock_code,
+                    ulist))
+            self.request_num = len(self.stock_with_exchange_list) // self.max_num
+            for range_start in range(self.request_num):
+                num_start = self.max_num * range_start
+                num_end = self.max_num * (range_start + 1)
+                request_list = ','.join(self.stock_with_exchange_list[num_start:num_end])
+                self.stock_list.append(request_list)
+            log.debug('all:%s'%len(self.stock_list))
+            return self.get_stock_data()
+        else:
+            self.stock_codes = ulist
+            # self.stock_with_exchange_list = list(
+            #     map(lambda stock_code: ('sh%s' if stock_code.startswith(('5', '6', '9')) else 'sz%s') % stock_code,
+            #         ulist))
+            self.stock_codes = map(lambda stock_code: ('sh%s' if stock_code.startswith(('5', '6', '9')) else 'sz%s') % stock_code,ulist)
+            self.url = self.sina_stock_api + ','.join(self.stock_codes)
+            log.info("stock_list:%s"%self.url)
+            response = requests.get(self.url)
+            self.stock_data.append(response.text)
+            self.dataframe=self.format_response_data()
         # self.get_tdx_dd()
         return self.dataframe
         
@@ -244,10 +259,12 @@ class Sina:
         # if self.index_status and cct.get_work_time():
         # if self.index_status:
         if cct.get_work_time() or (cct.get_now_time_int() > 915) :
-            df = df.drop('close', axis=1)
+            # df = df.drop('close', axis=1)
+            df.rename(columns={'close': 'llastp'}, inplace=True)
             df.rename(columns={'now': 'close'}, inplace=True)
         df = df.drop_duplicates('code')
-        df = df.loc[:, ct.SINA_Total_Columns_Clean]
+        # df = df.loc[:, ct.SINA_Total_Columns_Clean]
+        # df = df.loc[:, ct.SINA_Total_Columns]
         # df.rename(columns={'turnover': 'amount'}, inplace=True)
         df = df.fillna(0)
         df=df.sort_values(by='code',ascending=0)
@@ -270,7 +287,9 @@ if __name__ == "__main__":
     # df= sina.all
     # code='601198'
     # df = sina.get_stock_list_data(['300134', '601998', '999999']).set_index('code')
-    df = sina.get_stock_code_data('000001',index=True).set_index('code')
+    # df = sina.get_stock_code_data('000001',index=True).set_index('code')
+    df = sina.get_stock_list_data(['002775','300376']).set_index('code')
+    # df = sina.get_stock_code_data('002775',index=False).set_index('code')
     print df
     # print df.loc['300380']
     # list=['000001','399001','399006','399005']

@@ -59,13 +59,12 @@ if __name__ == "__main__":
     # all_diffpath = tdd.get_tdx_dir_blocknew() + '062.blk'
     while 1:
         try:
-            df = rl.get_sina_Market_json('all')
-            top_now = rl.get_market_price_sina_dd_realTime(df, vol, type)
+            # df = rl.get_sina_Market_json('all')
+            # top_now = rl.get_market_price_sina_dd_realTime(df, vol, type)
+            top_now = tdd.getSinaAlldf(market='cyb', vol=ct.json_countVol, type=ct.json_countType)            
             # print top_now.loc['601900',:]
-            df_count = len(df)
+            df_count = len(top_now)
             now_count = len(top_now)
-            del df
-            gc.collect()
             radio_t = cct.get_work_time_ratio()
             time_Rt = time.time()
             time_d = time.time()

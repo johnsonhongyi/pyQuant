@@ -8,6 +8,9 @@ import pandas as pd
 import talib as ta
 import tushare as ts
 import tdx_data_Day as tdd
+from JohhnsonUtil import LoggerFactory as LoggerFactory
+log = LoggerFactory.getLogger("get_macd_kdj_rsi")
+# log.setLevel(LoggerFactory.DEBUG)
 
 #http://blog.sina.com.cn/s/blog_620987bf0102vlmz.html
 #获取股票列表
@@ -19,11 +22,25 @@ def Get_Stock_List():
     return df
 
 def Get_BBANDS(df,dtype='d'):
+    df = df.sort_index(ascending=True)
     upperband,middleband,lowerband=ta.BBANDS(np.array(df['close']),timeperiod=20,nbdevdn=2,matype=0)
     df['upbb%s'%dtype] = pd.Series(upperband,index=df.index)
     df['midb%s'%dtype] = pd.Series(middleband,index=df.index)
     df['lowb%s'%dtype] = pd.Series(lowerband,index=df.index)
-    return df
+    operate = 0
+    log.debug('midb:%s close:%s'%(df['midb%s'%dtype][-1],df.close[-1]))
+    if df.close[-1] > df['midb%s'%dtype][-1]:
+        # print '5'
+        operate = 5
+        if df.close[-1] == df.open[-1]:
+            operate = 20    
+        if df.close[-1] > df['upbb%s'%dtype][-1]:
+            operate = 10
+    else:
+        # print 'low'
+        pass
+    df = df.sort_index(ascending=False)
+    return df,operate
     
 #修改了的函数，按照多个指标进行分析
 
@@ -66,7 +83,7 @@ def Get_TA(df,dtype='d'):
     df['RSI%s'%dtype]=pd.Series(operate_array3,index=df.index)
     
     df = Get_BBANDS(df,dtype)
-    
+    df = df.sort_index(ascending=False)
     return df
 
 
@@ -74,6 +91,7 @@ def Get_TA(df,dtype='d'):
 #通过MACD判断买入卖出
 def Get_MACD(df,dtype='d'):
     #参数12,26,9
+    df = df.sort_index(ascending=True)
     macd, macdsignal, macdhist = ta.MACD(np.array(df['close']), fastperiod=12, slowperiod=26, signalperiod=9)
 
     SignalMA5 = ta.MA(macdsignal, timeperiod=5, matype=0)
@@ -131,7 +149,7 @@ def Get_MACD(df,dtype='d'):
             if df.loc[df.index[-1-i],'ddea%s'%dtype] >=0:#
                 operate = operate - 5
                 break
-
+    df = df.sort_index(ascending=False)
     return (df,operate)
 
 
@@ -139,6 +157,7 @@ def Get_MACD(df,dtype='d'):
 #通过KDJ判断买入卖出
 def Get_KDJ(df,dtype='d'):
     #参数9,3,3
+    df = df.sort_index(ascending=True)
     slowk, slowd = ta.STOCH(np.array(df['high']), np.array(df['low']), np.array(df['close']), fastk_period=9, slowk_period=3, slowk_matype=0, slowd_period=3, slowd_matype=0)
 
     slowkMA5 = ta.MA(slowk, timeperiod=5, matype=0)
@@ -191,12 +210,14 @@ def Get_KDJ(df,dtype='d'):
         if (slowkMA5[MAlen-1]>=slowkMA10[MAlen-1] and slowkMA10[MAlen-1]>=slowkMA20[MAlen-1]) or \
            (slowdMA5[MAlen-1]>=slowdMA10[MAlen-1] and slowdMA10[MAlen-1]>=slowdMA20[MAlen-1]): #K,D上涨
             operate = operate + 1
+    df = df.sort_index(ascending=False)
     return (df,operate)
 
 
 #通过RSI判断买入卖出
 def Get_RSI(df,dtype='d'):
     #参数14,5
+    df = df.sort_index(ascending=True)
     slowreal = ta.RSI(np.array(df['close']), timeperiod=14)
     fastreal = ta.RSI(np.array(df['close']), timeperiod=5)
 
@@ -248,6 +269,7 @@ def Get_RSI(df,dtype='d'):
         operate = operate + 10
     elif fast< slow and fast2>=slow2:
         operate = operate - 10
+    df = df.sort_index(ascending=False)
     return (df,operate)
 
 def Output_Csv(df,Dist):
@@ -282,11 +304,14 @@ if __name__ == '__main__':
     # Dist = 'E:\\Quant\\'
     # df = Get_TA(df,Dist)
     # df = ts.get_hist_data('sh')
-    code='600702'
-    df = tdd.get_tdx_append_now_df_api(code,start='2015-01-01').sort_index(ascending=True)
-    print df[-1:]
+    code='300110'
+    df = tdd.get_tdx_append_now_df_api(code,dl=21)
+    print df[:3]
     # df = Get_BBANDS(df)
-    df = Get_TA(df)
+    # df = Get_TA(df)
+    df,op = Get_BBANDS(df, dtype='d')
+    # print df[:2]
+    print op
     # for dtype in ['w','m']:
     # for dtype in ['w']:
         # df = tdd.get_tdx_stock_period_to_type(df, dtype).sort_index(ascending=True).set_index('date')
@@ -301,7 +326,7 @@ if __name__ == '__main__':
     colmaw=[ u'name',u'code', u'open', u'high', u'low', u'close',
       u'ma5d', u'ma10d', u'ma20d',u'MACDd',u'MACDw', u'KDJd',u'KDJw', u'RSId', u'RSIw',
       u'upbbd',  u'upbbw', u'midbd', u'midbw',]
-    print ("df:"),df.loc[df.index[-1]:,colmd]
+    # print ("df:"),df.loc[df.index[0],colmd]
     col=[u'code', u'open', u'high', u'low', u'close', u'vol', u'amount', u'name',
           u'ma5d', u'ma10d', u'ma20d', u'diffd', u'dead', u'ddead', u'slowkd',
           u'slowdd', u'slowreald', u'fastreald', u'MACDd', u'KDJd', u'RSId',

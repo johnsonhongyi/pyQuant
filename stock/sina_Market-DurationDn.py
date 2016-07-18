@@ -64,7 +64,7 @@ if __name__ == "__main__":
     duration_date = 15
     du_date = duration_date
     # print cct.last_tddate(2)
-    end_date = cct.last_tddate(days=3)
+    end_date = cct.last_tddate(days=2)
     ptype = 'high'
     filter = 'y'
     if len(str(duration_date)) < 4:
@@ -81,15 +81,16 @@ if __name__ == "__main__":
     parserDuraton = cct.DurationArgmain()
     while 1:
         try:
+            '''
             # df = sina_data.Sina().all
             df = rl.get_sina_Market_json('cyb')
             # df = rl.get_sina_Market_json('sz')
             top_now = rl.get_market_price_sina_dd_realTime(df, vol, type)
             # top_dif = top_now
             # top_now.to_hdf("testhdf5", 'marketDD', format='table', complevel=9)
+            '''
+            top_now = tdd.getSinaAlldf(market='sz', vol=ct.json_countVol, type=ct.json_countType)
             now_count = len(top_now)
-            del df
-            gc.collect()
             radio_t = cct.get_work_time_ratio()
             # top_now = top_now[top_now.buy > 0]
             time_Rt = time.time()

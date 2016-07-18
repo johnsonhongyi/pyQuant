@@ -56,19 +56,16 @@ if __name__ == "__main__":
     block_path = tdd.get_tdx_dir_blocknew() + blkname
     lastpTDX_DF = pd.DataFrame()
     status_change = False
-
+    # initTdx = True
     # all_diffpath = tdd.get_tdx_dir_blocknew() + '062.blk'
     while 1:
         try:
             # df = sina_data.Sina().all
-            df = rl.get_sina_Market_json('all')
-            top_now = rl.get_market_price_sina_dd_realTime(df, vol, type)
+            top_now = tdd.getSinaAlldf(market='all', vol=ct.json_countVol, type=ct.json_countType)
             # print top_now.loc['300208','name']
             # top_now.to_hdf("testhdf5", 'marketDD', format='table', complevel=9)
-            df_count = len(df)
+            df_count = len(top_now)
             now_count = len(top_now)
-            del df
-            gc.collect()
             radio_t = cct.get_work_time_ratio()
             time_Rt = time.time()
             # top_now = top_now[top_now.buy > 0]
@@ -141,8 +138,8 @@ if __name__ == "__main__":
                 log.info('dif1:%s' % len(top_dif))
                 top_dif=top_dif[top_dif.lvol > ct.LvolumeSize]
                 if cct.get_now_time_int() > 915:
-                    top_dif = top_dif[top_dif.buy > top_dif.lastp]
-                    top_dif = top_dif[top_dif.buy > top_dif.lhigh]
+                    top_dif = top_dif[top_dif.buy >= top_dif.lastp* 0.995]
+                    top_dif = top_dif[top_dif.buy >= top_dif.lhigh* 0.995]
                 log.debug('dif2:%s' % len(top_dif))
                 # log.debug('dif2:%s' % top_dif[:1])
                 # log
@@ -152,18 +149,18 @@ if __name__ == "__main__":
                 # if top_dif[:1].llow.values <> 0:
                 if len(top_dif[:5][top_dif[:5]['low'] > 0]) > 3:
                     log.debug('diff2-0-low>0')
-                    top_dif = top_dif[top_dif.low >= top_dif.llow]
+                    top_dif = top_dif[top_dif.low >= top_dif.llow* 0.995]
                     log.debug('diff2-1:%s' % len(top_dif))
 
-                    top_dif = top_dif[top_dif.low >= top_dif.lastp]
+                    top_dif = top_dif[top_dif.low >= top_dif.lastp* 0.995]
                     log.debug('dif3 low<>0 :%s' % len(top_dif))
 
-                    top_dif = top_dif[top_dif.open >= top_dif.lastp]
+                    top_dif = top_dif[top_dif.open >= top_dif.lastp* 0.995]
 
                     log.debug('dif4 open>lastp:%s' % len(top_dif))
                     log.debug('dif4-2:%s' % top_dif[:1])
 
-                    top_dif = top_dif[top_dif.low >= top_dif.lhigh]
+                    top_dif = top_dif[top_dif.low >= top_dif.lhigh* 0.995]
 
                     log.debug("dif5-0-low>lhigh>0:%s" % len(top_dif))
 
@@ -186,57 +183,57 @@ if __name__ == "__main__":
                     print "No G,DataFrame is Empty!!!!!!"
                     # top_dif = top_all
 
-                log.debug('dif6 vol:%s' % (top_dif[:1].volume))
+                    log.debug('dif6 vol:%s' % (top_dif[:1].volume))
 
-                log.debug('dif6 vol>lvol:%s' % len(top_dif))
+                    log.debug('dif6 vol>lvol:%s' % len(top_dif))
 
-                # top_dif = top_dif[top_dif.buy >= top_dif.open*0.99]
-                # log.debug('dif5 buy>open:%s'%len(top_dif))
-                # top_dif = top_dif[top_dif.trade >= top_dif.buy]
+                    # top_dif = top_dif[top_dif.buy >= top_dif.open*0.99]
+                    # log.debug('dif5 buy>open:%s'%len(top_dif))
+                    # top_dif = top_dif[top_dif.trade >= top_dif.buy]
 
-                # df['volume']= df['volume'].apply(lambda x:x/100)
-
-
-                if 'counts' in top_dif.columns.values:
-                    top_dif = top_dif.sort_values(by=ct.MonitorMarket_sort_count, ascending=[0, 0, 0, 1, 1])
+                    # df['volume']= df['volume'].apply(lambda x:x/100)
                 else:
-                    # print "Good Morning!!!"
-                    top_dif = top_dif.sort_values(by=['diff', 'percent', 'ratio'], ascending=[0, 0, 1])
-    
-                # top_all=top_all.sort_values(by=['percent','diff','counts','ratio'],ascending=[0,0,1,1])
-                # print rl.format_for_print(top_dif[:10])
-                top_temp = top_dif[:ct.PowerCount].copy()
-                top_temp = pct.powerCompute_df(top_temp, dl=ct.PowerCountdl)
-                print ("A:%s N:%s K:%s %s G:%s" % (
-                    df_count, now_count, len(top_all[top_all['buy'] > 0]),
-                    len(top_now[top_now['volume'] <= 0]), len(top_dif))),
-                # print "Rt:%0.3f" % (float(time.time() - time_Rt))
-                print "Rt:%0.1f dT:%s" % (float(time.time() - time_Rt), cct.get_time_to_date(time_s))
-                cct.set_console(width, height,
-                    title=['dT:%s' % cct.get_time_to_date(time_s), 'G:%s' % len(top_dif), 'zxg: %s' % (blkname)])
-               
-                if 'op' in top_temp.columns:
 
-                    # top_temp = top_temp.sort_values(by=['ra', 'op','percent'],ascending=[0, 0,0])
+                    if 'counts' in top_dif.columns.values:
+                        top_dif = top_dif.sort_values(by=ct.MonitorMarket_sort_count, ascending=[0, 0, 0, 1, 1])
+                    else:
+                        # print "Good Morning!!!"
+                        top_dif = top_dif.sort_values(by=['diff', 'percent', 'ratio'], ascending=[0, 0, 1])
+        
+                    # top_all=top_all.sort_values(by=['percent','diff','counts','ratio'],ascending=[0,0,1,1])
+                    # print rl.format_for_print(top_dif[:10])
+                    top_temp = top_dif[:ct.PowerCount].copy()
+                    top_temp = pct.powerCompute_df(top_temp, dl=ct.PowerCountdl)
+                    print ("A:%s N:%s K:%s %s G:%s" % (
+                        df_count, now_count, len(top_all[top_all['buy'] > 0]),
+                        len(top_now[top_now['volume'] <= 0]), len(top_dif))),
+                    # print "Rt:%0.3f" % (float(time.time() - time_Rt))
+                    print "Rt:%0.1f dT:%s" % (float(time.time() - time_Rt), cct.get_time_to_date(time_s))
+                    cct.set_console(width, height,
+                        title=['dT:%s' % cct.get_time_to_date(time_s), 'G:%s' % len(top_dif), 'zxg: %s' % (blkname)])
+                   
+                    if 'op' in top_temp.columns:
 
-                    top_temp = top_temp.sort_values(by=ct.MonitorMarket_sort_op,
-                                                    ascending=ct.MonitorMarket_sort_op_key)
-                    # top_temp = top_temp.sort_values(by=['op','ra','diff', 'percent', 'ratio'], ascending=[0,0,0, 0, 1])
-                if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935:
-                    top_temp = top_temp.loc[:,ct.MonitorMarket_format_buy]
-                else:
-                    top_temp = top_temp.loc[:,ct.MonitorMarket_format_buy]
-                print rl.format_for_print(top_temp[:10])
-                # print rl.format_for_print(top_dif[:10])
-                # print top_all.loc['000025',:]
-                # print "staus",status
+                        # top_temp = top_temp.sort_values(by=['ra', 'op','percent'],ascending=[0, 0,0])
 
-                if status:
-                    for code in top_dif[:10].index:
-                        code = re.findall('(\d+)', code)
-                        if len(code) > 0:
-                            code = code[0]
-                            kind = sl.get_multiday_ave_compare_silent(code)
+                        top_temp = top_temp.sort_values(by=ct.MonitorMarket_sort_op,
+                                                        ascending=ct.MonitorMarket_sort_op_key)
+                        # top_temp = top_temp.sort_values(by=['op','ra','diff', 'percent', 'ratio'], ascending=[0,0,0, 0, 1])
+                    if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935:
+                        top_temp = top_temp.loc[:,ct.MonitorMarket_format_buy]
+                    else:
+                        top_temp = top_temp.loc[:,ct.MonitorMarket_format_buy]
+                    print rl.format_for_print(top_temp[:10])
+                    # print rl.format_for_print(top_dif[:10])
+                    # print top_all.loc['000025',:]
+                    # print "staus",status
+
+                    if status:
+                        for code in top_dif[:10].index:
+                            code = re.findall('(\d+)', code)
+                            if len(code) > 0:
+                                code = code[0]
+                                kind = sl.get_multiday_ave_compare_silent(code)
                             # print top_all[top_all.low.values==0]
 
                             # else:

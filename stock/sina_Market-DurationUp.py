@@ -32,7 +32,7 @@ from JohhnsonUtil import commonTips as cct
 if __name__ == "__main__":
     # parsehtml(downloadpage(url_s))
     # StreamHandler(sys.stdout).push_application()
-    log = LoggerFactory.getLogger('SinaMarketNew')
+    log = LoggerFactory.getLogger('sina_Market-DurationUp')
     # log.setLevel(LoggerFactory.DEBUG)
     # handler=StderrHandler(format_string='{record.channel}: {record.message) [{record.extra[cwd]}]')
     # log.level = log.debug
@@ -80,14 +80,11 @@ if __name__ == "__main__":
     while 1:
         try:
             # df = sina_data.Sina().all
-            df = rl.get_sina_Market_json('sz')
-            # df = rl.get_sina_Market_json('sz')
-            top_now = rl.get_market_price_sina_dd_realTime(df, vol, type)
+            top_now = tdd.getSinaAlldf(market='sz', vol=ct.json_countVol, type=ct.json_countType)
+            
             top_dif = top_now
             # top_now.to_hdf("testhdf5", 'marketDD', format='table', complevel=9)
             now_count = len(top_now)
-            del df
-            gc.collect()
             radio_t = cct.get_work_time_ratio()
             # top_now = top_now[top_now.buy > 0]
             time_Rt = time.time()
@@ -104,7 +101,7 @@ if __name__ == "__main__":
                 if len(top_all) == 0 and len(lastpTDX_DF) == 0:
                     time_Rt = time.time()
                     top_all,lastpTDX_DF = tdd.get_append_lastp_to_df(top_now, lastpTDX_DF=None, dl=duration_date,end=end_date,ptype=ptype,filter=filter, power=True, lastp=False)
-
+                    log.debug("len:%s"%(len(top_all)))
                     # codelist = top_all.index.tolist()
                     # log.info('toTDXlist:%s' % len(codelist))
                     # # tdxdata = tdd.get_tdx_all_day_LastDF(codelist,dt=duration_date,ptype=ptype)
@@ -153,13 +150,18 @@ if __name__ == "__main__":
                             # top_all.loc[symbol, 'buy'] = top_now.loc[symbol, 'buy']
                 # top_all = top_all[top_all.buy > 0]
                 top_dif = top_all.copy()
+                log.debug('top_dif:%s'%(len(top_dif)))
                 if 'trade' in top_dif.columns:
                     top_dif['buy'] = (
                         map(lambda x, y: y if int(x) == 0 else x, top_dif['buy'].values, top_dif['trade'].values))
+                log.debug('top_dif:%s'%(len(top_dif)))
                 if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 1502:
-                    top_dif = top_dif[top_dif.buy >= top_dif.lastp * 0.995]      
-                    top_dif = top_dif[top_dif.buy >= top_dif.lhigh * 0.995]    
+                    top_dif = top_dif[top_dif.buy >= top_dif.lastp * 0.995]    
+                    log.debug('top_dif:%s'%(len(top_dif)))
+                    top_dif = top_dif[top_dif.buy >= top_dif.lhigh * 0.995]
+                    log.debug('top_dif:%s'%(len(top_dif)))
                 top_dif = top_dif[top_dif.buy > 0]
+                log.debug('top_dif:%s'%(len(top_dif)))
                 top_dif['diff'] = (
                     map(lambda x, y: round((x - y) / y * 100, 1), top_dif['buy'].values, top_dif['lastp'].values))
                 # print top_dif.loc['600610',:]
