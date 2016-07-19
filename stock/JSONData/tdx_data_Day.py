@@ -797,20 +797,37 @@ def getSinaAlldf(market='cyb',vol=ct.json_countVol,type=ct.json_countType):
     df = rl.get_sina_Market_json(market)
     # top_now = get_market_price_sina_dd_realTime(df, vol, type)
     codelist = df.code.tolist()
+    df = df.set_index('code')
     # index_status=False
     # if isinstance(codelist, list):
     time_s=time.time()
     dm = sina_data.Sina().get_stock_list_data(codelist)
-    dm['percent'] = map(lambda x: round(df[df.code == x].percent, 1), dm['code'].values)
+    # if cct.get_work_time() or (cct.get_now_time_int() > 915) :
+    dm['percent'] = map(lambda x,y: round((x-y)/y*100, 1), dm.close.values,dm.llastp.values)
     dm['trade'] = dm['close']
-    dm['ratio'] = map(lambda x: round(df[df.code == x].ratio, 1), dm['code'].values)
+    # print 'ratio' in dm.columns
+    # print time.time()-time_s
+    if (len(df) != len(dm)) or len(df) < 10 or len(dm) < 10:
+        log.error("len(df):%s dm:%s"%(len(df),len(dm)))
+    # print dm.columns,df.columns
+    # print dm[:1],df[:1]
+    # dm['ratio'] = map(lambda x: round(df[df.index == x].ratio.values, 1), dm['code'].values)
+    dm=pd.merge(dm,df.loc[:,['name','ratio']],on='name',how='left')
+    # print dz[:1].ratio
+    # dm['ratio'] = map(lambda x: round(df[df.code == x].ratio, 1) if len(df[df.code == x].ratio) > 0 else 0, dm['code'].values)
     # print len(dm)
+    # dm = dz
+    # print dm.ratio[0],dm.name[0]
+    # print time.time()-time_s
     if cct.get_now_time_int() > 935:
         top_now = rl.get_market_price_sina_dd_realTime(dm, vol, type)
     else:
         dm =  dm.set_index('code')
         top_now = dm
         top_now['counts'] = 0
+        top_now['diff'] = 0
+        top_now['prev_p'] = 0
+
     # print top_now[:1].b1_v
     # print len(top_now),len(dm)
     # print top_now.loc[top_now.index == '300076',['b1_v','a1_v','trade','buy','b1','a1']]
@@ -1896,10 +1913,11 @@ if __name__ == '__main__':
     # print get_tdx_append_now_df_api('999999',start='2016-04-08')
     # print get_tdx_power_now_df('000001', dl=20)
     # print tdx_df.index
-    print get_tdx_Exp_day_to_df('002775', dl=21).sort_index(ascending=False)
+    
+    # print get_tdx_Exp_day_to_df('002775', dl=21).sort_index(ascending=False)
     # print get_tdx_Exp_day_to_df('300076', type='f', start=None, end=None, dt=None, dl=20)
-    print get_tdx_exp_low_or_high_power('002775', dt='2016-06-01', ptype='high', dl=21, power=True)
-    df=getSinaAlldf(market='cyb')
+    # print get_tdx_exp_low_or_high_power('002775', dt='2016-06-01', ptype='high', dl=21, power=True)
+    df=getSinaAlldf(market='all')
     print df[-1:],len(df)
     sys.exit(0)
     # 

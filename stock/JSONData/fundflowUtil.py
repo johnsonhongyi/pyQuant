@@ -98,7 +98,8 @@ def get_dfcfw_fund_SHSZ(url=ct.DFCFW_ZS_SHSZ):
         # for x in range(len(vol_l):
         data = vol_l[0].split(',')
         data2 = vol_l[1].split(',')
-        if len(data[3]) > 2:
+        # print data[3],data2[3],len(data[3]),len(data2[3])
+        if len(data[3]) > 2 and len(data2[3]) > 2 :
             dd['svol'] = round(float(data[3]) / 100000000, 1)
             dd['zvol'] = round(float(data2[3]) / 100000000, 1)
         else:
@@ -334,8 +335,8 @@ if __name__ == "__main__":
     # dd =get_dfcfw_fund_flow('cyb')
     # print dd
     print get_dfcfw_fund_SHSZ()
-    df = get_dfcfw_rzrq_SHSZ()
-    print df
+    # df = get_dfcfw_rzrq_SHSZ()
+    # print df
 
     # get_lhb_dd()
 

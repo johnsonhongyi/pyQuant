@@ -64,7 +64,7 @@ if __name__ == "__main__":
     duration_date = 15
     du_date = duration_date
     # print cct.last_tddate(2)
-    end_date = cct.last_tddate(days=2)
+    end_date = cct.last_tddate(days=3)
     ptype = 'high'
     filter = 'y'
     if len(str(duration_date)) < 4:
@@ -89,7 +89,7 @@ if __name__ == "__main__":
             # top_dif = top_now
             # top_now.to_hdf("testhdf5", 'marketDD', format='table', complevel=9)
             '''
-            top_now = tdd.getSinaAlldf(market='sz', vol=ct.json_countVol, type=ct.json_countType)
+            top_now = tdd.getSinaAlldf(market='cyb', vol=ct.json_countVol, type=ct.json_countType)
             now_count = len(top_now)
             radio_t = cct.get_work_time_ratio()
             # top_now = top_now[top_now.buy > 0]
