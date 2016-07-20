@@ -833,15 +833,15 @@ def getSinaAlldf(market='cyb',vol=ct.json_countVol,type=ct.json_countType):
     # print top_now.loc[top_now.index == '300076',['b1_v','a1_v','trade','buy','b1','a1']]
     # print top_now.loc[top_now.index == '300004',['b1_v','a1_v','trade','buy','b1','a1']]
     # print top_now.loc[top_now.index == '300228',['b1_v','a1_v','trade','buy','b1','a1']]
-    if initTdxdata > 0 and cct.get_now_time_int() > 916 and cct.get_now_time_int() <=926:
-        top_diff = top_now[(top_now.b1_v > top_now.a1_v) & (top_now.buy >= top_now.llastp * 0.99)]
-    # elif cct.get_now_time_int() > 930:
-    elif initTdxdata > 0 and cct.get_now_time_int() > 926:
-        top_diff = top_now[(top_now.b1_v > top_now.a1_v) & (top_now.trade >= top_now.buy) & (top_now.buy >= top_now.llastp * 0.99)]
-        # top_diff = top_diff[(top_diff.high)]
-    else:
-        initTdxdata +=1
-        top_diff = top_now
+
+    # if initTdxdata > 0 and cct.get_now_time_int() > 916 and cct.get_now_time_int() <=926:
+    #     top_diff = top_now[(top_now.b1_v > top_now.a1_v) & (top_now.buy >= top_now.llastp * 0.99)]
+    # elif initTdxdata > 0 and cct.get_now_time_int() > 926:
+    #     top_diff = top_now[(top_now.b1_v > top_now.a1_v) & (top_now.trade >= top_now.buy) & (top_now.buy >= top_now.llastp * 0.99)]
+    # else:
+    #     initTdxdata +=1
+    #     top_diff = top_now
+    top_diff = top_now
     print "b1>%s:%s:%s"%(initTdxdata,len(top_diff),round(time.time()-time_s,1)),
     return top_diff
 

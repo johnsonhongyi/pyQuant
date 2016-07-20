@@ -326,14 +326,14 @@ if __name__ == "__main__":
     times = time.time()
     sina = Sina()
     # print len(sina.all)
-    df = sina.all
-    print len(df)
+    # df = sina.all
+    # print len(df)
     # code='601198'
     # df = sina.get_stock_list_data(['300134', '601998', '999999']).set_index('code')
     # df = sina.get_stock_code_data('000001',index=True).set_index('code')
-    df = sina.get_stock_list_data(['002775', '300376']).set_index('code')
+    df = sina.get_stock_list_data(['600845', '300376']).set_index('code')
     # df = sina.get_stock_code_data('002775',index=False).set_index('code')
-    print len(df)
+    print len(df),df[:1]
     # print df.loc['300380']
     # list=['000001','399001','399006','399005']
     # df=sina.get_stock_list_data(list)

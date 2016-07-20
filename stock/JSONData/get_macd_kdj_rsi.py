@@ -48,6 +48,9 @@ def Get_BBANDS(df,dtype='d'):
 def Get_TA(df,dtype='d'):
     df = df.sort_index(ascending=True)
     if dtype != 'd':
+        # if not dtype == 'd':
+        df = tdd.get_tdx_stock_period_to_type(
+            df, dtype).sort_index(ascending=True)
         df['ma5%s'%dtype] = pd.rolling_mean(df.close,5)
         df['ma10%s'%dtype] = pd.rolling_mean(df.close,10)
         df['ma20%s'%dtype] = pd.rolling_mean(df.close,20)
@@ -69,6 +72,7 @@ def Get_TA(df,dtype='d'):
              print "error:%s"%e
              pass
     else:
+        log.error("dflen < 34:%s"%(len(df)))
         operate1=-9
         operate2=-9
         operate3=-9
@@ -82,7 +86,8 @@ def Get_TA(df,dtype='d'):
     df['KDJ%s'%dtype]=pd.Series(operate_array2,index=df.index)
     df['RSI%s'%dtype]=pd.Series(operate_array3,index=df.index)
     
-    df = Get_BBANDS(df,dtype)
+    df,op = Get_BBANDS(df,dtype)
+    print "boll:%s ma:%s kdj:%s rsi:%s"%(op,operate_array1,operate_array2,operate_array3)
     df = df.sort_index(ascending=False)
     return df
 
@@ -304,14 +309,16 @@ if __name__ == '__main__':
     # Dist = 'E:\\Quant\\'
     # df = Get_TA(df,Dist)
     # df = ts.get_hist_data('sh')
-    code='300110'
-    df = tdd.get_tdx_append_now_df_api(code,dl=21)
-    print df[:3]
+    # code='300110'
+    code='600845'
+    df = tdd.get_tdx_append_now_df_api(code,dl=60)
+    print df[:1]
+    # print df[:3]
     # df = Get_BBANDS(df)
-    # df = Get_TA(df)
-    df,op = Get_BBANDS(df, dtype='d')
+    df = Get_TA(df)
+    # a,op = Get_BBANDS(df, dtype='d')
     # print df[:2]
-    print op
+    # print op,len(df)
     # for dtype in ['w','m']:
     # for dtype in ['w']:
         # df = tdd.get_tdx_stock_period_to_type(df, dtype).sort_index(ascending=True).set_index('date')
