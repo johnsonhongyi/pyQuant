@@ -5,7 +5,7 @@ import os
 import platform
 import re
 import sys
-import time
+import time,random
 from compiler.ast import flatten
 from multiprocessing.pool import ThreadPool, cpu_count
 
@@ -300,6 +300,8 @@ def get_work_time():
         # return False
         return False
     else:
+        if now_t > 1300 and now_t <1302:
+            sleep(random.randint(5, 120))
         return True
 
 

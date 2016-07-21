@@ -906,8 +906,8 @@ def powerCompute_df(df, dtype='d', end=None, dl=None, filter='y',talib=False):
         # fibl = sep.join(fib)
         tdx_df,operation = getab.Get_BBANDS(tdx_df, dtype='d')
         opc +=operation
-        if opc > 21:
-            opc = 21
+        # if opc > 21:
+        #     opc = 21
         log.debug( "opc:%s op:%s"%(opc,operation))
         # df.loc[code,'ma5'] = daysData[1].ma5d[0]
         # print tdx_df[:1].ma5d[0],daysData[1].ma5d[0]
@@ -970,7 +970,7 @@ if __name__ == "__main__":
     # print get_linear_model_status('600671', filter='y', start='20160329', ptype='high')
     # print get_linear_model_status('999999', filter='y', dl=30, ptype='high')
     # print get_linear_model_status('999999', filter='y', dl=30, ptype='low')
-    print powerCompute_df(['300369','002171'], dtype='d',end=None, dl=21, filter='y')
+    print powerCompute_df(['000938','002171'], dtype='d',end=None, dl=21, filter='y')
     # # print powerCompute_df(['601198', '002791', '000503'], dtype='d', end=None, dl=30, filter='y')
     # print get_linear_model_status('999999', filter='y', dl=34, ptype='low', days=1)
     # print get_linear_model_status('399006', filter='y', dl=34, ptype='low', days=1)

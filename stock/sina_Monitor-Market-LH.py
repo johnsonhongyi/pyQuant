@@ -126,9 +126,10 @@ if __name__ == "__main__":
                             top_all['counts'] = 0
                             top_all['prev_p'] = 0
                     for symbol in top_now.index:
-                        if symbol in top_all.index and top_now.loc[symbol, 'buy'] != 0:
+                        if symbol in top_all.index and top_now.loc[symbol, 'buy'] <> 0:
                             # if top_all.loc[symbol,'diff'] == 0:
-                            if status_change and 'counts' in top_now.columns.values:
+                            # if status_change and 'counts' in top_now.columns.values:
+                            if 'counts' in top_now.columns.values:
                                 # top_now.loc[symbol,'lastp']=top_all.loc[symbol,'lastp']
                                 # top_all.loc[symbol, 'buy':'counts'] = top_now.loc[symbol, 'buy':'counts']
                                 top_all.loc[symbol, 'buy':'prev_p'] = top_now.loc[

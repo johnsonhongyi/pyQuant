@@ -116,9 +116,9 @@ if __name__ == "__main__":
                         if symbol in top_all.index and top_now.loc[symbol, 'buy'] <> 0:
                             # top_now.loc[symbol, 'diff'] = round(((float(top_now.loc[symbol, 'buy']) - float(top_all.loc[symbol, 'lastp'])) / float(top_all.loc[symbol, 'lastp']) * 100), 1)
                             if 'counts' in top_now.columns.values:
-                                    top_all.loc[symbol, 'buy':'prev_p'] = top_now.loc[symbol, 'buy':'prev_p']
+                                    top_all.loc[symbol, 'trade':'prev_p'] = top_now.loc[symbol, 'trade':'prev_p']
                             else:
-                                top_all.loc[symbol, 'buy':'low'] = top_now.loc[symbol, 'buy':'low']
+                                top_all.loc[symbol, 'trade':'low'] = top_now.loc[symbol, 'trade':'low']
 
                 # top_all=top_all.sort_values(by=['diff','percent','counts'],ascending=[0,0,1])
                 # top_all=top_all.sort_values(by=['diff','ratio','percent','counts'],ascending=[0,1,0,1])

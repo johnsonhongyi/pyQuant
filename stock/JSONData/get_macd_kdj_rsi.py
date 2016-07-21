@@ -10,7 +10,7 @@ import tushare as ts
 import tdx_data_Day as tdd
 from JohhnsonUtil import LoggerFactory as LoggerFactory
 log = LoggerFactory.getLogger("get_macd_kdj_rsi")
-# log.setLevel(LoggerFactory.DEBUG)
+log.setLevel(LoggerFactory.DEBUG)
 
 #http://blog.sina.com.cn/s/blog_620987bf0102vlmz.html
 #获取股票列表
@@ -28,14 +28,14 @@ def Get_BBANDS(df,dtype='d'):
     df['midb%s'%dtype] = pd.Series(middleband,index=df.index)
     df['lowb%s'%dtype] = pd.Series(lowerband,index=df.index)
     operate = 0
-    log.debug('midb:%s close:%s'%(df['midb%s'%dtype][-1],df.close[-1]))
+    log.debug('updbb:%s midb:%s close:%s'%(df['upbb%s'%dtype][-1],df['midb%s'%dtype][-1],df.close[-1]))
     if df.close[-1] > df['midb%s'%dtype][-1]:
         # print '5'
-        operate = 5
-        if df.close[-1] == df.open[-1]:
-            operate = 20    
+        operate = 1
+        if df.close[-1] == df.high[-1] and df.close[-1] >= df.open[-1]:
+            operate = 10    
         if df.close[-1] > df['upbb%s'%dtype][-1]:
-            operate = 10
+            operate = 5
     else:
         # print 'low'
         pass
@@ -121,7 +121,7 @@ def Get_MACD(df,dtype='d'):
             if diff > dea and diff2 <= dea2:
                 operate = operate + 10#买入
     else:
-        if dea <0:
+        if dea < 0:
             if diff == dea2 :
                 operate = operate - 10#卖出
 
@@ -310,12 +310,14 @@ if __name__ == '__main__':
     # df = Get_TA(df,Dist)
     # df = ts.get_hist_data('sh')
     # code='300110'
-    code='600845'
+    code='000938'
     df = tdd.get_tdx_append_now_df_api(code,dl=60)
-    print df[:1]
+    print df[:2]
+    dd,op=Get_MACD(df)
+    # print dd[:2],op
     # print df[:3]
     # df = Get_BBANDS(df)
-    df = Get_TA(df)
+    # df = Get_TA(df)
     # a,op = Get_BBANDS(df, dtype='d')
     # print df[:2]
     # print op,len(df)
