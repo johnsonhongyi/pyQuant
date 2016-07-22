@@ -31,8 +31,10 @@ log = LoggerFactory.getLogger('TDX_Day')
 path_sep = os.path.sep
 newstockdayl = 50
 changedays=0
-global initTdxdata
-initTdxdata = 0
+global initTdxdata,app_api_dm_count
+initTdxdata = 0  
+app_api_dm_count = 0
+
 # win7rootAsus = r'D:\Program Files\gfzq'
 # win10Lengend = r'D:\Program\gfzq'
 # win7rootXunji = r'E:\DOC\Parallels\WinTools\zd_pazq'
@@ -402,6 +404,8 @@ def get_tdx_append_now_df_api(code, start=None, end=None, type='f',df=None,dm=No
     if len(df) > 0:
         tdx_last_day = df.index[-1]
     else:
+        if start == None:
+            log.error("pls check tdx_data problem")
         tdx_last_day = start            
     duration = cct.get_today_duration(tdx_last_day)
     log.debug("duration:%s"%duration)
@@ -540,7 +544,10 @@ def get_tdx_append_now_df_api(code, start=None, end=None, type='f',df=None,dm=No
         if end is None and ((df is not None and df.empty) or (round(df.open[-1],2) != round(dm.open[-1], 2)) or (round(df.close[-1],2) != round(dm.close[-1],2))):
             if dm.open[0] > 0:
                 if dm_code.index == df.index[-1]:
-                    log.error("app_api_dm.Index:%s df:%s"%(dm_code.index.values,df.index[-1]))
+                    global app_api_dm_count
+                    if app_api_dm_count == 0 :
+                        app_api_dm_count +=1
+                        log.error("app_api_dm.Index:%s df:%s"%(dm_code.index.values,df.index[-1]))
                     df = df.drop(dm_code.index)
                 df = df.append(dm_code)
                 # df = df.astype(float)
@@ -794,7 +801,10 @@ def get_tdx_power_now_df(code, start=None, end=None, type='f',df=None,dm=None,dl
         if end is None and ((df is not None and df.empty) or (round(df.open[-1],2) != round(dm.open[-1], 2)) or (round(df.close[-1],2) != round(dm.close[-1],2))):
             if dm.open[0] > 0:
                 if dm_code.index == df.index[-1]:
-                    log.error("app_api_dm.Index:%s df:%s"%(dm_code.index.values,df.index[-1]))
+                    global app_api_dm_count
+                    if app_api_dm_count == 0 :
+                        app_api_dm_count +=1
+                        log.error("app_api_dm.Index:%s df:%s"%(dm_code.index.values,df.index[-1]))
                     df = df.drop(dm_code.index)
                 df = df.append(dm_code)           
                 
@@ -1950,7 +1960,7 @@ if __name__ == '__main__':
     # dd=rl.get_sina_Market_json('cyb').set_index('code')
     # codelist= dd.index.tolist()
     # df = get_tdx_exp_all_LastDF(codelist, dt=30,end=20160401, ptype='high', filter='y')
-    print get_tdx_append_now_df_api('000938',dl=10)[:2]
+    print get_tdx_append_now_df_api('000938',dl=10)
     # print get_tdx_power_now_df('000938', dl=20)[:2]
     # print get_tdx_write_now_file_api('000938', type='f')[:2]
     # print tdx_df.index

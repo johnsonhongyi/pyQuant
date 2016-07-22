@@ -10,7 +10,7 @@ import tushare as ts
 import tdx_data_Day as tdd
 from JohhnsonUtil import LoggerFactory as LoggerFactory
 log = LoggerFactory.getLogger("get_macd_kdj_rsi")
-log.setLevel(LoggerFactory.DEBUG)
+# log.setLevel(LoggerFactory.DEBUG)
 
 #http://blog.sina.com.cn/s/blog_620987bf0102vlmz.html
 #获取股票列表
