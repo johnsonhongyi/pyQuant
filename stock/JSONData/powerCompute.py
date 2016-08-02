@@ -904,11 +904,13 @@ def powerCompute_df(df, dtype='d', end=None, dl=None, filter='y',talib=False):
             else:
                 fib = str(daysData[0])
         # fibl = sep.join(fib)
+        
         tdx_df,operation = getab.Get_BBANDS(tdx_df, dtype='d')
-        opc +=operation
+        # opc +=operation
         # if opc > 21:
         #     opc = 21
-        log.debug( "opc:%s op:%s"%(opc,operation))
+        # log.debug( "opc:%s op:%s"%(opc,operation))
+        
         # df.loc[code,'ma5'] = daysData[1].ma5d[0]
         # print tdx_df[:1].ma5d[0],daysData[1].ma5d[0]
         if tdx_df[:1].ma5d[0] is not None and tdx_df[:1].ma5d[0] != 0:
@@ -920,9 +922,12 @@ def powerCompute_df(df, dtype='d', end=None, dl=None, filter='y',talib=False):
         df.loc[code, 'fib'] = fib
         df.loc[code, 'fibl'] = fibl
         df.loc[code, 'ldate'] = stl
+        df.loc[code, 'boll'] = operation
         # df = getab.Get_BBANDS(df, dtype='d')
 
         df=df.fillna(0)
+        # df = df.drop_duplicates()
+
     return df
 
 

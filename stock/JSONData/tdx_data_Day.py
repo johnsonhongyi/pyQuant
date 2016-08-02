@@ -540,7 +540,7 @@ def get_tdx_append_now_df_api(code, start=None, end=None, type='f',df=None,dm=No
         if end is None and ((df is not None and df.empty) or (round(df.open[-1],2) != round(dm.open[-1], 2)) or (round(df.close[-1],2) != round(dm.close[-1],2))):
             if dm.open[0] > 0:
                 if dm_code.index == df.index[-1]:
-                    log.error("app_api_dm.Index:%s df:%s"%(dm_code.index.values,df.index[-1]))
+                    log.debug("app_api_dm.Index:%s df:%s"%(dm_code.index.values,df.index[-1]))
                     df = df.drop(dm_code.index)
                 df = df.append(dm_code)
                 # df = df.astype(float)
@@ -794,7 +794,7 @@ def get_tdx_power_now_df(code, start=None, end=None, type='f',df=None,dm=None,dl
         if end is None and ((df is not None and df.empty) or (round(df.open[-1],2) != round(dm.open[-1], 2)) or (round(df.close[-1],2) != round(dm.close[-1],2))):
             if dm.open[0] > 0:
                 if dm_code.index == df.index[-1]:
-                    log.error("app_api_dm.Index:%s df:%s"%(dm_code.index.values,df.index[-1]))
+                    log.debug("app_api_dm.Index:%s df:%s"%(dm_code.index.values,df.index[-1]))
                     df = df.drop(dm_code.index)
                 df = df.append(dm_code)           
                 
@@ -834,8 +834,11 @@ def getSinaAlldf(market='cyb',vol=ct.json_countVol,type=ct.json_countType):
     global initTdxdata
     df = rl.get_sina_Market_json(market)
     # top_now = get_market_price_sina_dd_realTime(df, vol, type)
-    codelist = df.code.tolist()
-    df = df.set_index('code')
+    if len(df)>0:
+        codelist = df.code.tolist()
+        df = df.set_index('code')
+    else:
+        log.error("get_sina_Market_json %s : %s"%(market,len(df)))
     # index_status=False
     # if isinstance(codelist, list):
     time_s=time.time()

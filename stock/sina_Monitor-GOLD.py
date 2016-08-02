@@ -84,10 +84,10 @@ if __name__ == "__main__":
 
     # width, height = 132, 18
     if cct.isMac():
-        width, height = 132, 16
+        width, height = 136, 16
         cct.set_console(width, height)
     else:
-        width, height = 132, 20
+        width, height = 136, 20
         cct.set_console(width, height)
 
     # cct.set_console(width, height)
