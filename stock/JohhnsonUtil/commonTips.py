@@ -879,6 +879,7 @@ if __name__ == '__main__':
     # print get_work_time_ratio()
     # print typeday8_to_day10(None)
     # write_to_blocknew('abc', ['300380','601998'], append=True)
+    # print get_today_duration()
     print get_work_time_ratio()
     print get_work_day_status()
     print last_tddate(days=3)
