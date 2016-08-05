@@ -647,6 +647,7 @@ def get_market_price_sina_dd_realTime(dp='',vol='0',type='0'):
             dp=dp.set_index('code')
             dp['counts'] = 0
             dp['prev_p'] = 0
+            dm = dp
             # dm=dp.loc[:,ct.SINA_Market_Clean_Columns]
             # dm=dp.loc[:,ct.SINA_Market_Clean_UP_Columns]
             # dm['prev_p']=0.0
