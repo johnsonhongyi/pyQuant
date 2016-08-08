@@ -834,10 +834,13 @@ def getSinaAlldf(market='cyb',vol=ct.json_countVol,type=ct.json_countType):
     global initTdxdata
     df = rl.get_sina_Market_json(market)
     # top_now = get_market_price_sina_dd_realTime(df, vol, type)
-    if len(df)>0:
+    if len(df) > 0:
         codelist = df.code.tolist()
         df = df.set_index('code')
     else:
+        df = rl.get_sina_Market_json(market)
+        codelist = df.code.tolist()
+        df = df.set_index('code')
         log.error("get_sina_Market_json %s : %s"%(market,len(df)))
     # index_status=False
     # if isinstance(codelist, list):
