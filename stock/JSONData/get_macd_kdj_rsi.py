@@ -29,7 +29,7 @@ def Get_BBANDS(df,dtype='d'):
     df['lowb%s'%dtype] = pd.Series(lowerband,index=df.index)
     operate = 0
     log.debug('updbb:%s midb:%s close:%s'%(df['upbb%s'%dtype][-1],df['midb%s'%dtype][-1],df.close[-1]))
-    if df.close[-1] > df['midb%s'%dtype][-1]:
+    if df.close[-1] >= df['midb%s'%dtype][-1]:
         # print '5'
         operate = 1
         if df.close[-1] == df.high[-1] and df.close[-1] >= df.open[-1]:
@@ -38,7 +38,11 @@ def Get_BBANDS(df,dtype='d'):
             operate = 5
     else:
         # print 'low'
-        pass
+        operate = -1
+        if df.close[-1] > df['lowb%s'%dtype][-1]:
+            operate = -5
+        if df.close[-1] == df.low[-1] and df.close[-1] <= df.open[-1]:
+            operate = -10       
     df = df.sort_index(ascending=False)
     return df,operate
     
@@ -312,9 +316,11 @@ if __name__ == '__main__':
     # code='300110'
     code='000938'
     df = tdd.get_tdx_append_now_df_api(code,dl=60)
-    print df[:2]
+    # print df[:2]
     dd,op=Get_MACD(df)
-    # print dd[:2],op
+    print dd[:2],op
+    dd,op=Get_BBANDS(df, dtype='d')
+    print op
     # print df[:3]
     # df = Get_BBANDS(df)
     # df = Get_TA(df)
