@@ -883,7 +883,7 @@ def powerCompute_df(df, dtype='d', end=None, dl=None, filter='y',talib=False):
         start = cct.day8_to_day10(start)
         end = cct.day8_to_day10(end)
         dz = dm.loc[code].to_frame().T
-        tdx_df = tdd.get_tdx_power_now_df(code, start=start, end=end, type='f', df=None, dm=dz, dl=dl)
+        tdx_df = tdd.get_tdx_power_now_df(code, start=start, end=end, type='f', df=None, dm=dz, dl=dl*2)
         # print tdx_df
         opc = 0
         stl = ''

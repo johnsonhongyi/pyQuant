@@ -294,10 +294,10 @@ if __name__ == "__main__":
                 elif st.lower() == 'w' or st.lower() == 'a':
                     codew = (top_temp.index).tolist()
                     if st.lower() == 'a':
-                        cct.write_to_blocknew(block_path, codew[:10])
+                        cct.write_to_blocknew(block_path, codew[:ct.writeCount])
                         # cct.write_to_blocknew(all_diffpath, codew)
                     else:
-                        cct.write_to_blocknew(block_path, codew[:10], False)
+                        cct.write_to_blocknew(block_path, codew[:ct.writeCount], False)
                         # cct.write_to_blocknew(all_diffpath, codew, False)
                     print "wri ok:%s" % block_path
                     # cct.sleep(2)
@@ -327,7 +327,7 @@ if __name__ == "__main__":
                 # base_path=r"E:\DOC\Parallels\WinTools\zd_pazq\T0002\blocknew\\"
                 # block_path=base_path+'065.blk'
                 # all_diffpath=base_path+'\062.blk'
-                codew = top_temp[:10].index.tolist()
+                codew = top_temp[:ct.writeCount].index.tolist()
                 if st.lower() == 'a':
                     cct.write_to_blocknew(block_path, codew)
                     # cct.write_to_blocknew(all_diffpath,codew)

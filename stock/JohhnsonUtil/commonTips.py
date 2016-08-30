@@ -592,10 +592,11 @@ def _write_to_csv(df, filename, indexCode='code'):
     #     reload(sys)
     #     sys.setdefaultencoding( "gbk" )
     df = df.drop_duplicates(indexCode)
-    df = df.set_index(indexCode)
+    # df = df.set_index(indexCode)
+    # print df[['code','name']]
     df.to_csv(CURRENTDAY + '-' + filename + '.csv',
               encoding='gbk', index=False)  # 选择保存
-    print("write csv")
+    print("write csv:%s"%(CURRENTDAY + '-' + filename + '.csv'))
     # df.to_csv(filename, encoding='gbk', index=False)
 
 
@@ -673,7 +674,7 @@ def write_to_blocknew(p_name, data, append=True):
             # print "flist", flist
         else:
             fout = open(p_name, 'wb')
-            index_list = ['1999999', '27#HSI', '47#IFL0', '0159915']
+            index_list = ['1999999','47#IFL0', '27#HSI',  '0159915']
             # index_list.reverse()
             for i in index_list:
                 raw = (i) + '\r\n'

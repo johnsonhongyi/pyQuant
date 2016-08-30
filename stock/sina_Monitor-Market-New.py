@@ -297,10 +297,10 @@ if __name__ == "__main__":
             elif st.lower() == 'w' or st.lower() == 'a':
                 codew = (top_temp.index).tolist()
                 if st.lower() == 'a':
-                    cct.write_to_blocknew(block_path, codew[:10])
+                    cct.write_to_blocknew(block_path, codew[:ct.writeCount])
                     # sl.write_to_blocknew(all_diffpath, codew)
                 else:
-                    cct.write_to_blocknew(block_path, codew[:10], False)
+                    cct.write_to_blocknew(block_path, codew[:ct.writeCount], False)
                     # sl.write_to_blocknew(all_diffpath, codew, False)
                 print "wri ok:%s" % block_path
 
