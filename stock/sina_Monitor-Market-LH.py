@@ -175,7 +175,7 @@ if __name__ == "__main__":
                 else:
                     log.info('dif1:%s' % len(top_dif))
                     log.info(top_dif[:1])
-                    top_dif = top_dif[top_dif.buy > top_dif.lastp]
+                    top_dif = top_dif[top_dif.buy > top_dif.lastp * ct.changeRatio]
                     log.debug('dif2:%s' % len(top_dif))
                     top_dif['diff'] = (
                         map(lambda x, y:
@@ -226,15 +226,17 @@ if __name__ == "__main__":
 
                         # top_temp = top_temp.sort_values(by=['ra', 'op','percent'],ascending=[0, 0,0])
                         
-                        top_temp = top_temp.sort_values(by=ct.MonitorMarket_sort_op,
-                                        ascending=ct.MonitorMarket_sort_op_key)
+                        # top_temp = top_temp.sort_values(by=ct.MonitorMarket_sort_op,
+                                        # ascending=ct.MonitorMarket_sort_op_key)
+                        top_temp = top_temp.sort_values(by=ct.Duration_percent_op,
+                                        ascending=ct.Duration_percent_op_key)
                         
                         # top_temp = top_temp.sort_values(by=['op','ra','diff', 'percent', 'ratio'], ascending=[0,0,0, 0, 1])
                     if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935:
-                        top_temp = top_temp[ (top_temp['ma5d'] > top_temp['ma10d']) & (top_temp['buy'] > top_temp['ma10d']) ]
+                        # top_temp = top_temp[ (top_temp['ma5d'] > top_temp['ma10d']) & (top_temp['buy'] > top_temp['ma10d']) ]
                         top_temp = top_temp.loc[:,ct.MonitorMarket_format_buy]
                     else:
-                        top_temp = top_temp[ (top_temp['ma5d'] > top_temp['ma10d']) & (top_temp['buy'] > top_temp['ma10d']) ]
+                        # top_temp = top_temp[ (top_temp['ma5d'] > top_temp['ma10d']) & (top_temp['buy'] > top_temp['ma10d']) ]
                         top_temp = top_temp.loc[:,ct.MonitorMarket_format_buy]
                     print rl.format_for_print(top_temp[:10]) 
                 

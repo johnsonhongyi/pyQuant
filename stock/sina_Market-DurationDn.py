@@ -263,13 +263,12 @@ if __name__ == "__main__":
                                            'zxg: %s' % (blkname)])
 
                     if 'op' in top_temp.columns:
-                        # top_temp = top_temp.sort_values(by=ct.Duration_sort_op,ascending=[1,0,0, 0,0,1])
-                        if ptype == 'low':
-                            top_temp = top_temp.sort_values(by=ct.Duration_sort_op,
-                                        ascending=ct.Duration_sort_op_key)
-                        else:
-                            top_temp = top_temp.sort_values(by=ct.Duration_sort_high_op,
-                                        ascending=ct.Duration_sort_high_op_key)
+                        # if ptype == 'low':
+                        #     top_temp = top_temp.sort_values(by=ct.Duration_sort_op,
+                        #                 ascending=ct.Duration_sort_op_key)
+                        # else:
+                        #     top_temp = top_temp.sort_values(by=ct.Duration_sort_high_op,
+                        #                 ascending=ct.Duration_sort_high_op_key)
                         # top_temp=top_temp[top_temp.op >12]
                         # top_temp = top_temp.sort_values(by=['ra', 'op'],ascending=[0, 0])[:10]
 
@@ -281,18 +280,22 @@ if __name__ == "__main__":
                         #                                 ascending=[0, 0, 0, 0, 1])[:10]
                         # top_temp = top_temp.sort_values(by=['op','ldate','ra','diff', 'percent', 'ratio'], ascending=[0,0,0,0, 0, 1])[:10]                
                     
+                        top_temp = top_temp.sort_values(by=ct.Duration_percent_op,
+                                        ascending=ct.Duration_percent_op_key)
+
                     if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935:
                         # top_temp = top_temp[top_temp['buy'] > top_temp['ma10d']]
                         # top_temp = top_temp[top_temp['ma5d'] > top_temp['ma10d']][:10]
                         # top_temp = top_temp[ (top_temp['ma5d'] > top_temp['ma10d']) & (top_temp['buy'] > top_temp['ma10d']) ][:10]
-                        top_dd = pd.concat([top_temp, top_end], axis=0)
+                        top_dd = pd.concat([top_temp[:10], top_end], axis=0)
                         top_dd = top_dd.drop_duplicates()
                         top_dd = top_dd.loc[:,ct.Duration_format_buy]
                     else:
                         # top_temp = top_temp[top_temp['trade'] > top_temp['ma10d']]
                         # top_temp = top_temp[top_temp['ma5d'] > top_temp['ma10d']][:10]
                         # top_temp = top_temp[ (top_temp['ma5d'] > top_temp['ma10d']) & (top_temp['trade'] > top_temp['ma10d']) ][:10]
-                        top_dd = pd.concat([top_temp, top_end], axis=0)
+
+                        top_dd = pd.concat([top_temp[:10], top_end], axis=0)
                         top_dd = top_dd.drop_duplicates()
                         top_dd = top_dd.loc[:,ct.Duration_format_trade]
 

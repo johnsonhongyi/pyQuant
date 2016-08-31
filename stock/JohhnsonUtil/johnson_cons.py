@@ -28,6 +28,9 @@ changeRatio=0.98
 Duration_sort_op=['diff','op','fib','fibl','ra','percent','ratio','volume','counts']
 Duration_sort_op_key=[0,0,1,1,0,0,1,1,1]
 
+Duration_percent_op=['percent','diff','op','fib','fibl','ra','ratio','volume','counts']
+Duration_percent_op_key=[0,0,0,1,1,0,1,1,1]
+
 # Duration_sort_high_op=['date','diff','fib','op','fibl','ra','percent','ratio','volume','counts']
 Duration_sort_high_op=['diff','date','fib','op','fibl','ra','percent','ratio','volume','counts']
 Duration_sort_high_op_key=[0,1,1,0,1,0,0,1,1,1]

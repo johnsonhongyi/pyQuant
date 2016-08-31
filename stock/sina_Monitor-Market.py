@@ -124,7 +124,7 @@ if __name__ == "__main__":
                 log.info('dif1:%s' % len(top_dif))
                 top_dif=top_dif[top_dif.lvol > ct.LvolumeSize]
                 log.info(top_dif[:1])
-                top_dif = top_dif[top_dif.buy > top_dif.lastp]
+                top_dif = top_dif[top_dif.buy > top_dif.lastp * ct.changeRatio]
                 log.debug('dif2:%s' % len(top_dif))
                 # log.debug('dif2:%s' % top_dif[:1])
                 if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 931:
@@ -136,8 +136,8 @@ if __name__ == "__main__":
                     top_dif = top_dif[top_dif.low >= top_dif.llow]
                     log.debug('diff2-1:%s' % len(top_dif))
                     if cct.get_now_time_int() > 915:
-                        top_dif = top_dif[top_dif.buy > top_dif.lastp]
-                        top_dif = top_dif[top_dif.buy > top_dif.lhigh]
+                        top_dif = top_dif[top_dif.buy > top_dif.lastp * ct.changeRatio]
+                        top_dif = top_dif[top_dif.buy > top_dif.lhigh * ct.changeRatio]
                         # top_dif = top_dif[top_dif.low >= top_dif.lastp]
                         # top_dif = top_dif[top_dif.open >= top_dif.lastp]
                     # top_dif = top_dif[top_dif.low >= top_dif.lhigh]
@@ -193,8 +193,10 @@ if __name__ == "__main__":
 
                     # top_temp = top_temp.sort_values(by=['ra', 'op','percent'],ascending=[0, 0,0])
 
-                    top_temp = top_temp.sort_values(by=ct.MonitorMarket_sort_op,
-                                                    ascending=ct.MonitorMarket_sort_op_key)
+                    # top_temp = top_temp.sort_values(by=ct.MonitorMarket_sort_op,
+                                                    # ascending=ct.MonitorMarket_sort_op_key)
+                    top_temp = top_temp.sort_values(by=ct.Duration_percent_op,
+                                        ascending=ct.Duration_percent_op_key)                                
                     # top_temp = top_temp.sort_values(by=['op','ra','diff', 'percent', 'ratio'], ascending=[0,0,0, 0, 1])
                 if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935:
                     top_temp = top_temp.loc[:,ct.MonitorMarket_format_buy]
