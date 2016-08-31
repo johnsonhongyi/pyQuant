@@ -158,9 +158,9 @@ if __name__ == "__main__":
                 #判断主升
                 # log.debug('top_dif:%s'%(len(top_dif)))
                 # if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 1502:
-                #     top_dif = top_dif[top_dif.buy >= top_dif.lastp * 0.995]    
+                #     top_dif = top_dif[top_dif.buy >= top_dif.lastp * ct.changeRatio]    
                 #     log.debug('top_dif:%s'%(len(top_dif)))
-                #     top_dif = top_dif[top_dif.buy >= top_dif.lhigh * 0.995]
+                #     top_dif = top_dif[top_dif.buy >= top_dif.lhigh * ct.changeRatio]
                 #     log.debug('top_dif:%s'%(len(top_dif)))
                 
                 top_dif = top_dif[top_dif.buy > 0]
@@ -279,15 +279,15 @@ if __name__ == "__main__":
                         # top_temp = top_temp.sort_values(by=['op','ldate','ra','diff', 'percent', 'ratio'], ascending=[0,0,0,0, 0, 1])[:10]
                     
                     if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935:
-                        top_temp = top_temp[ (top_temp['ma5d'] > top_temp['ma10d']) & (top_temp['buy'] > top_temp['ma10d']) ][:10]
                         # top_temp = top_temp[top_temp['ma5d'] > top_temp['ma10d']][:10]
+                        # top_temp = top_temp[ (top_temp['ma5d'] > top_temp['ma10d']) & (top_temp['buy'] > top_temp['ma10d']) ][:10]
                         top_dd = pd.concat([top_temp, top_end], axis=0)
                         top_dd = top_dd.drop_duplicates()
                         top_dd = top_dd.loc[:,ct.Duration_format_buy]
                     else:
-                        top_temp = top_temp[ (top_temp['ma5d'] > top_temp['ma10d']) & (top_temp['trade'] > top_temp['ma10d']) ][:10]
                         # top_temp = top_temp[top_temp['trade'] > top_temp['ma10d']]
                         # top_temp = top_temp[top_temp['ma5d'] > top_temp['ma10d']][:10]
+                        # top_temp = top_temp[ (top_temp['ma5d'] > top_temp['ma10d']) & (top_temp['trade'] > top_temp['ma10d']) ][:10]
                         top_dd = pd.concat([top_temp, top_end], axis=0)
                         top_dd = top_dd.drop_duplicates()
                         top_dd = top_dd.loc[:,ct.Duration_format_trade]

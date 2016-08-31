@@ -21,10 +21,11 @@ VolumeMinR=1.5
 PowerCount = 30
 PowerCountdl = 14
 writeCount=5
+changeRatio=0.98
 # Duration_sort_op=['fib','op','ra','percent','ratio','diff','counts']
 # Duration_sort_op=['fib','op','diff','fibl','ra','percent','ratio','volume','counts']
 # Duration_sort_op_key=[1,0,0,1,0,0,1,1,1]
-Duration_sort_op=['op','diff','fib','fibl','ra','percent','ratio','volume','counts']
+Duration_sort_op=['diff','op','fib','fibl','ra','percent','ratio','volume','counts']
 Duration_sort_op_key=[0,0,1,1,0,0,1,1,1]
 
 # Duration_sort_high_op=['date','diff','fib','op','fibl','ra','percent','ratio','volume','counts']
@@ -36,8 +37,8 @@ Duration_format_buy=['name', 'buy', 'ma5d','boll','diff', 'percent','ra','op', '
 Duration_format_trade=['name', 'trade', 'ma5d','boll','diff','percent', 'ra','op', 'fib','fibl','volume', 'ratio', 'counts', 'ldate', 'date']
 
 Monitor_sort_count=[ 'counts', 'percent','diff','volume', 'ratio']
-Monitor_sort_op=['op','fib','diff','percent','fibl',  'ra' , 'ratio']
-Monitor_sort_op_key=[0, 1,0, 0,1, 0, 1]
+Monitor_sort_op=['fib','fibl','op','diff','percent',  'ra' , 'ratio']
+Monitor_sort_op_key=[ 1, 1,0,0, 0, 0, 1]
 
 Monitor_format_trade=['name', 'trade', 'ma5d','boll','diff', 'percent', 'ra','op', 'fib','fibl','volume', 'ratio', 'counts','ldate']
 
@@ -46,8 +47,8 @@ MonitorMarket_sort_count=['diff', 'percent', 'volume', 'counts', 'ratio']
                     #[1,0, 0, 0, 0, 1]
 # MonitorMarket_sort_op=['fib','op','diff','fibl','ra','percent','ratio','volume','counts']
 # MonitorMarket_sort_op_key=[1,0,0,1,0,0,1,1,1]
-MonitorMarket_sort_op=['op','diff','fib','fibl','ra','percent','ratio','volume','counts']
-MonitorMarket_sort_op_key=[0,0,1,1,0,0,1,1,1]
+MonitorMarket_sort_op=['diff','fib','fibl','op','ra','percent','ratio','volume','counts']
+MonitorMarket_sort_op_key=[0,0,1,0,0,0,1,1,1]
 
 MonitorMarket_format_buy=['name', 'buy', 'ma5d', 'boll','diff','percent', 'ra','op', 'fib','fibl','volume', 'ratio', 'counts','ldate', 'date']
 MonitorMarket_format_trade=['name', 'trade', 'ma5d', 'boll','diff','percent', 'ra','op', 'fib','fibl', 'volume', 'ratio', 'counts','ldate']

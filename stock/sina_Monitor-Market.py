@@ -22,7 +22,6 @@ from JohhnsonUtil import LoggerFactory
 from JohhnsonUtil import commonTips as cct
 import singleAnalyseUtil as sl
 from JSONData import LineHistogram as lhg
-
 # from logbook import Logger,StreamHandler,SyslogHandler
 # from logbook import StderrHandler
 

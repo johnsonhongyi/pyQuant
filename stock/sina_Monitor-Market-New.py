@@ -138,8 +138,8 @@ if __name__ == "__main__":
                 log.info('dif1:%s' % len(top_dif))
                 top_dif=top_dif[top_dif.lvol > ct.LvolumeSize]
                 if cct.get_now_time_int() > 915:
-                    top_dif = top_dif[top_dif.buy >= top_dif.lastp* 0.995]
-                    top_dif = top_dif[top_dif.buy >= top_dif.lhigh* 0.995]
+                    top_dif = top_dif[top_dif.buy >= top_dif.lastp* ct.changeRatio]
+                    top_dif = top_dif[top_dif.buy >= top_dif.lhigh* ct.changeRatio]
                 log.debug('dif2:%s' % len(top_dif))
                 # log.debug('dif2:%s' % top_dif[:1])
                 # log
@@ -149,18 +149,18 @@ if __name__ == "__main__":
                 # if top_dif[:1].llow.values <> 0:
                 if len(top_dif[:5][top_dif[:5]['low'] > 0]) > 3:
                     log.debug('diff2-0-low>0')
-                    top_dif = top_dif[top_dif.low >= top_dif.llow* 0.995]
+                    top_dif = top_dif[top_dif.low >= top_dif.llow* ct.changeRatio]
                     log.debug('diff2-1:%s' % len(top_dif))
 
-                    top_dif = top_dif[top_dif.low >= top_dif.lastp* 0.995]
+                    top_dif = top_dif[top_dif.low >= top_dif.lastp* ct.changeRatio]
                     log.debug('dif3 low<>0 :%s' % len(top_dif))
 
-                    top_dif = top_dif[top_dif.open >= top_dif.lastp* 0.995]
+                    top_dif = top_dif[top_dif.open >= top_dif.lastp* ct.changeRatio]
 
                     log.debug('dif4 open>lastp:%s' % len(top_dif))
                     log.debug('dif4-2:%s' % top_dif[:1])
 
-                    top_dif = top_dif[top_dif.low >= top_dif.lhigh* 0.995]
+                    # top_dif = top_dif[top_dif.low >= top_dif.lhigh* ct.changeRatio]
 
                     log.debug("dif5-0-low>lhigh>0:%s" % len(top_dif))
 

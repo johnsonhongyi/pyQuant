@@ -149,9 +149,9 @@ if __name__ == "__main__":
                     # top_dif = top_dif[top_dif.low >= top_dif.lastp]
                     # log.debug('dif3 low<>0 :%s' % len(top_dif))
                     # top_dif = top_dif[top_dif.open > 0]
-                    top_dif = top_dif[top_dif.buy >= top_dif.lastp * 0.995]
+                    top_dif = top_dif[top_dif.buy >= top_dif.lastp * ct.changeRatio]
                     if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 1502:                    
-                        top_dif = top_dif[top_dif.buy >= top_dif.lhigh * 0.995]
+                        top_dif = top_dif[top_dif.buy >= top_dif.lhigh * ct.changeRatio]
                     log.debug('dif4 open>low0.99:%s' % len(top_dif))
                     log.debug('dif4-2:%s' % top_dif[:1])
 
