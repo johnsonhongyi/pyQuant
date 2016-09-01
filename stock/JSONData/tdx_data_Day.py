@@ -224,7 +224,7 @@ def get_tdx_Exp_day_to_df(code, type='f', start=None, end=None, dt=None, dl=None
                 thigh = float(a[2])
                 tlow = float(a[3])
                 tclose = float(a[4])
-                tvol = round(float(a[5]) / 10, 2)
+                tvol = round(float(a[5]), 2)
                 amount = round(float(a[6].replace('\r\n', '')), 1)  # int
                 # tpre = int(a[7])  # back
                 if int(topen) == 0 or int(amount) == 0:
@@ -850,7 +850,16 @@ def getSinaAlldf(market='cyb',vol=ct.json_countVol,type=ct.json_countType):
     dm = sina_data.Sina().get_stock_list_data(codelist)
     # if cct.get_work_time() or (cct.get_now_time_int() > 915) :
     dm['percent'] = map(lambda x,y: round((x-y)/y*100, 1), dm.close.values,dm.llastp.values)
+    # dm['volume'] = map(lambda x: round(x / 100, 1), dm.volume.values)
     dm['trade'] = dm['close']
+    if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 925:
+        # print dm[dm.code=='000001'].b1
+        # print dm[dm.code=='000001'].a1
+        # print dm[dm.code=='000001'].a1_v
+        # print dm[dm.code=='000001'].b1_v
+        dm['volume'] = map(lambda x: x, dm.b1_v.values)
+        # print dm[dm.code=='000001'].volume
+    # print dm[dm.code == '002474'].volume
     # print 'ratio' in dm.columns
     # print time.time()-time_s
     if (len(df) != len(dm)) or len(df) < 10 or len(dm) < 10:
@@ -1967,7 +1976,8 @@ if __name__ == '__main__':
     # print get_tdx_Exp_day_to_df('300076', type='f', start=None, end=None, dt=None, dl=20)
     # print get_tdx_exp_low_or_high_power('002775', dt='2016-06-01', ptype='high', dl=21, power=True)
     df=getSinaAlldf(market='all')
-    print df[-1:],len(df),df[-1:].trade
+    print df[df.index=='002474'].volume
+    # print df[df.index=='002474'].vol
     print df.columns
     sys.exit(0)
     # 

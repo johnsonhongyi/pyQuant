@@ -158,12 +158,12 @@ if __name__ == "__main__":
                         map(lambda x, y: round(x / y / radio_t, 1), top_all['volume'].values, top_all['lvol'].values))
 
                     if cct.get_now_time_int() > 915:
-                        top_all = top_all[top_all.trade > top_all.lastp * ct.changeRatio]
+                        top_all = top_all[top_all.trade > top_all.llastp * ct.changeRatio]
                         top_all = top_all[top_all.trade > top_all.lhigh * ct.changeRatio]
 
-                    if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 931:
+                    if cct.get_now_time_int() > 915 and cct.get_now_time_int() <= 925:
                         top_all['percent'] = (map(lambda x, y: round(
-                            (x - y) / y * 100, 1) if int(y) > 0 else 0, top_all.trade, top_all.lastp))
+                            (x - y) / y * 100, 1) if int(y) > 0 else 0, top_all.trade, top_all.llastp))
 
                     # top_all = top_all[top_all.prev_p >= top_all.lhigh]
                     # top_all = top_all.loc[:,
@@ -178,7 +178,7 @@ if __name__ == "__main__":
                 # top_all=top_all.sort_values(by=['percent','diff','counts','ratio'],ascending=[0,0,1,1])
                 if cct.get_now_time_int() > 930 and 'lastp' in top_all.columns:
 
-                    top_all = top_all[top_all.trade >= top_all.lastp * ct.changeRatio]
+                    top_all = top_all[top_all.trade >= top_all.llastp * ct.changeRatio]
 
                 cct.set_console(width, height, title=[
                                 'G:%s' % len(top_all), 'zxg: %s' % (blkname)])

@@ -15,7 +15,7 @@ REAL_INDEX_LABELS=['sh_a','sz_a','cyb']
 INDEX_LIST = {'sh': 'sh000001', 'sz': 'sz399001', 'hs300': 'sz399300',
               'sz50': 'sh000016', 'zxb': 'sz399005', 'cyb': 'sz399006'}
 DD_VOL_List={'0':'40000','1':'100000','2':'100000','3':'200000','4':'1000000'}
-LvolumeSize = 125000
+LvolumeSize = 12500
 VolumeMaxR=50
 VolumeMinR=1.5
 PowerCount = 30

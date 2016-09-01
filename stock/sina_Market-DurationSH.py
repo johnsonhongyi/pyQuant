@@ -158,7 +158,7 @@ if __name__ == "__main__":
                 #判断主升
                 # log.debug('top_dif:%s'%(len(top_dif)))
                 # if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 1502:
-                #     top_dif = top_dif[top_dif.buy >= top_dif.lastp * ct.changeRatio]    
+                #     top_dif = top_dif[top_dif.buy >= top_dif.llastp * ct.changeRatio]    
                 #     log.debug('top_dif:%s'%(len(top_dif)))
                 #     top_dif = top_dif[top_dif.buy >= top_dif.lhigh * ct.changeRatio]
                 #     log.debug('top_dif:%s'%(len(top_dif)))
@@ -190,7 +190,7 @@ if __name__ == "__main__":
                 # log.info('dif1-filter:%s' % len(top_dif))
                 # print top_dif.loc['600533',:]
                 # log.info(top_dif[:1])
-                # top_dif = top_dif[top_dif.buy > top_dif.lastp]
+                # top_dif = top_dif[top_dif.buy > top_dif.llastp]
                 # top_dif = top_dif[top_dif.buy > top_dif.lhigh]
                 # log.debug('dif2:%s' % len(top_dif))
                 # top_dif['volume'] = top_dif['volume'].apply(lambda x: round(x / radio_t, 1))

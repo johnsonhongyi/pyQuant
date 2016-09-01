@@ -27,22 +27,25 @@ def Get_BBANDS(df,dtype='d'):
     df['upbb%s'%dtype] = pd.Series(upperband,index=df.index)
     df['midb%s'%dtype] = pd.Series(middleband,index=df.index)
     df['lowb%s'%dtype] = pd.Series(lowerband,index=df.index)
+    df = df.fillna(0)
     operate = 0
     log.debug('updbb:%s midb:%s close:%s'%(df['upbb%s'%dtype][-1],df['midb%s'%dtype][-1],df.close[-1]))
     if df.close[-1] >= df['midb%s'%dtype][-1]:
         # print '5'
         operate = 1
-        if df.close[-1] == df.high[-1] and df.close[-1] >= df.open[-1]:
-            operate = 10    
+        if df.high[-1] == df.low[-1]:
+            operate += -1 
+        if  df.close[-1] == df.high[-1] and df.close[-1] >= df.open[-1]:
+            operate += 10    
         if df.close[-1] > df['upbb%s'%dtype][-1]:
-            operate = 5
+            operate += 5
     else:
         # print 'low'
         operate = -1
         if df.close[-1] > df['lowb%s'%dtype][-1]:
-            operate = -5
-        if df.close[-1] == df.low[-1] and df.close[-1] <= df.open[-1]:
-            operate = -10       
+            operate += -5
+        elif df.close[-1] == df.low[-1] and df.close[-1] <= df.open[-1]:
+            operate += -10       
     df = df.sort_index(ascending=False)
     return df,operate
     
@@ -101,8 +104,9 @@ def Get_TA(df,dtype='d'):
 def Get_MACD(df,dtype='d'):
     #参数12,26,9
     df = df.sort_index(ascending=True)
+    if len(df) < 26:
+        return (df,1)
     macd, macdsignal, macdhist = ta.MACD(np.array(df['close']), fastperiod=12, slowperiod=26, signalperiod=9)
-
     SignalMA5 = ta.MA(macdsignal, timeperiod=5, matype=0)
     SignalMA10 = ta.MA(macdsignal, timeperiod=10, matype=0)
     SignalMA20 = ta.MA(macdsignal, timeperiod=20, matype=0)
@@ -314,11 +318,12 @@ if __name__ == '__main__':
     # df = Get_TA(df,Dist)
     # df = ts.get_hist_data('sh')
     # code='300110'
-    code='000938'
+    code='300338'
     df = tdd.get_tdx_append_now_df_api(code,dl=60)
-    # print df[:2]
-    dd,op=Get_MACD(df)
-    print dd[:2],op
+    print df[:2]
+    print "len:",len(df)
+    # dd,op=Get_MACD(df)
+    # print dd[:2],op
     dd,op=Get_BBANDS(df, dtype='d')
     print op
     # print df[:3]

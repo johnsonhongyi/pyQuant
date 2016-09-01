@@ -191,13 +191,13 @@ if __name__ == "__main__":
                         map(lambda x, y: round(x / y / radio_t, 1), top_all['volume'].values, top_all['lvol'].values))
                     
                     if cct.get_now_time_int() > 915:
-                        top_all = top_all[top_all.trade > top_all.lastp * ct.changeRatio]
+                        top_all = top_all[top_all.trade > top_all.llastp * ct.changeRatio]
                         top_all = top_all[top_all.trade > top_all.lhigh * ct.changeRatio]
 
-                    if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 931:
-                        top_all['percent']= (map(lambda x, y: round((x-y)/y*100,1) if int(y) > 0 else 0, top_all.trade, top_all.lastp))
+                    if cct.get_now_time_int() > 915 and cct.get_now_time_int() <= 925:
+                        top_all['percent']= (map(lambda x, y: round((x-y)/y*100,1) if int(y) > 0 else 0, top_all.trade, top_all.llastp))
                     # if cct.get_now_time_int() > 930 and 'lastp' in top_all.columns:
-                    #     top_all = top_all[top_all.trade >= top_all.lastp]
+                    #     top_all = top_all[top_all.trade >= top_all.llastp]
                     # top_all = top_all.loc[:,
                               # ['name', 'percent', 'ma5d','diff', 'counts', 'volume', 'trade', 'prev_p', 'ratio']]
                     # if cct.get_now_time_int() > 1030 and cct.get_now_time_int() < 1400:

@@ -337,7 +337,13 @@ def get_work_time_ratio():
     d1 = datetime.datetime.now()
     now_t = int(datetime.datetime.now().strftime("%H%M"))
     # d2 = datetime.datetime.strptime('201510111011','%Y%M%d%H%M')
-    if now_t > 930 and now_t <= 1000:
+    if now_t > 915 and now_t <= 930:
+        d2 = datetime.datetime.strptime(ymd + '09:29', '%Y:%m:%d:%H:%M')
+        d1 = datetime.datetime.strptime(ymd + '09:30', '%Y:%m:%d:%H:%M')
+        ds = float((d1 - d2).seconds)
+        init +=1            
+        ratio_t = round(ds / all_work_time/(initx+init*stepx)*initAll, 3)
+    elif now_t > 930 and now_t <= 1000:
         d2 = datetime.datetime.strptime(ymd + hm1, '%Y:%m:%d:%H:%M')
         ds = float((d1 - d2).seconds)
         init +=1            

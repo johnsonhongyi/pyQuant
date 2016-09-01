@@ -114,7 +114,7 @@ if __name__ == "__main__":
                 # top_all = top_all[top_all.buy >= top_all.open*0.99]
                 # top_all = top_all[top_all.trade >= top_all.low*0.99]
                 # top_all = top_all[top_all.trade >= top_all.high*0.99]
-                # top_all = top_all[top_all.buy >= top_all.lastp]
+                # top_all = top_all[top_all.buy >= top_all.llastp]
                 # top_all = top_all[top_all.percent >= 0]
                 
                 if cct.get_now_time_int() < 1500:
@@ -124,11 +124,11 @@ if __name__ == "__main__":
                 log.info('dif1:%s' % len(top_dif))
                 top_dif=top_dif[top_dif.lvol > ct.LvolumeSize]
                 log.info(top_dif[:1])
-                top_dif = top_dif[top_dif.buy > top_dif.lastp * ct.changeRatio]
+                top_dif = top_dif[top_dif.buy > top_dif.llastp * ct.changeRatio]
                 log.debug('dif2:%s' % len(top_dif))
                 # log.debug('dif2:%s' % top_dif[:1])
-                if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 931:
-                    top_dif['percent']= (map(lambda x, y: round((x-y)/y*100,1) if int(y) > 0 else 0, top_dif.buy, top_dif.lastp))
+                if cct.get_now_time_int() > 915 and cct.get_now_time_int() <= 925:
+                    top_dif['percent']= (map(lambda x, y: round((x-y)/y*100,1) if int(y) > 0 else 0, top_dif.buy, top_dif.llastp))
 
                 # if top_dif[:1].llow.values <> 0:
                 if len(top_dif[:5][top_dif[:5]['low'] > 0]) > 3:
@@ -136,10 +136,10 @@ if __name__ == "__main__":
                     top_dif = top_dif[top_dif.low >= top_dif.llow]
                     log.debug('diff2-1:%s' % len(top_dif))
                     if cct.get_now_time_int() > 915:
-                        top_dif = top_dif[top_dif.buy > top_dif.lastp * ct.changeRatio]
+                        top_dif = top_dif[top_dif.buy > top_dif.llastp * ct.changeRatio]
                         top_dif = top_dif[top_dif.buy > top_dif.lhigh * ct.changeRatio]
-                        # top_dif = top_dif[top_dif.low >= top_dif.lastp]
-                        # top_dif = top_dif[top_dif.open >= top_dif.lastp]
+                        # top_dif = top_dif[top_dif.low >= top_dif.llastp]
+                        # top_dif = top_dif[top_dif.open >= top_dif.llastp]
                     # top_dif = top_dif[top_dif.low >= top_dif.lhigh]
 
                     # if cct.get_work_time() and cct.get_now_time_int() > 930:

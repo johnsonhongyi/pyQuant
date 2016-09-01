@@ -146,10 +146,10 @@ if __name__ == "__main__":
                     log.debug('diff2-0-buy>0')
                     # top_dif = top_dif[top_dif.low >= top_dif.llow]
                     # log.debug('diff2-1:%s' % len(top_dif))
-                    # top_dif = top_dif[top_dif.low >= top_dif.lastp]
+                    # top_dif = top_dif[top_dif.low >= top_dif.llastp]
                     # log.debug('dif3 low<>0 :%s' % len(top_dif))
                     # top_dif = top_dif[top_dif.open > 0]
-                    top_dif = top_dif[top_dif.buy >= top_dif.lastp * ct.changeRatio]
+                    top_dif = top_dif[top_dif.buy >= top_dif.llastp * ct.changeRatio]
                     if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 1502:                    
                         top_dif = top_dif[top_dif.buy >= top_dif.lhigh * ct.changeRatio]
                     log.debug('dif4 open>low0.99:%s' % len(top_dif))
@@ -175,7 +175,7 @@ if __name__ == "__main__":
                 else:
                     log.info('dif1:%s' % len(top_dif))
                     log.info(top_dif[:1])
-                    top_dif = top_dif[top_dif.buy > top_dif.lastp * ct.changeRatio]
+                    top_dif = top_dif[top_dif.buy > top_dif.llastp * ct.changeRatio]
                     log.debug('dif2:%s' % len(top_dif))
                     top_dif['diff'] = (
                         map(lambda x, y:
@@ -198,8 +198,8 @@ if __name__ == "__main__":
 
                     # df['volume']= df['volume'].apply(lambda x:x/100)
 
-                    if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 931:
-                        top_dif['percent']= (map(lambda x, y: round((x-y)/y*100,1) if int(y) > 0 else 0, top_dif.buy, top_dif.lastp))
+                    if cct.get_now_time_int() > 915 and cct.get_now_time_int() <= 925:
+                        top_dif['percent']= (map(lambda x, y: round((x-y)/y*100,1) if int(y) > 0 else 0, top_dif.buy, top_dif.llastp))
 
                     if 'counts' in top_dif.columns.values:
                         top_dif = top_dif.sort_values(by=ct.MonitorMarket_sort_count,ascending=[0, 0, 0, 1, 0])
