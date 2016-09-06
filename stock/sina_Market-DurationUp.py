@@ -169,12 +169,12 @@ if __name__ == "__main__":
                     map(lambda x, y: round((x - y) / y * 100, 1), top_dif['buy'].values, top_dif['lastp'].values))
                 # print top_dif.loc['600610',:]
                 # top_dif = top_dif[top_dif.trade > 0]
-                if cct.get_now_time_int() > 932:
-                    top_dif = top_dif[top_dif.low > 0]
-                    log.debug("top_dif.low > 0:%s" % (len(top_dif)))
-                        # top_dif.loc['600610','volume':'lvol']
-                    top_dif['volume'] = (
-                        map(lambda x, y: round(x / y / radio_t, 1), top_dif.volume.values, top_dif.lvol.values))                
+                # if cct.get_now_time_int() >< 932:
+                top_dif = top_dif[top_dif.low > 0]
+                log.debug("top_dif.low > 0:%s" % (len(top_dif)))
+                    # top_dif.loc['600610','volume':'lvol']
+                top_dif['volume'] = (
+                    map(lambda x, y: round(x / y / radio_t, 1), top_dif.volume.values, top_dif.lvol.values))                
                 
                 # if 'op' in top_dif.columns:
                 #     top_dif=top_dif[top_dif.op >12]

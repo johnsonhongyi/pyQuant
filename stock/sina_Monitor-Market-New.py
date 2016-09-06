@@ -147,7 +147,7 @@ if __name__ == "__main__":
                     top_dif['percent']= (map(lambda x, y: round((x-y)/y*100,1) if int(y) > 0 else 0, top_dif.buy, top_dif.llastp))
 
                 # if top_dif[:1].llow.values <> 0:
-                if len(top_dif[:5][top_dif[:5]['low'] > 0]) > 3:
+                if len(top_dif[:5][top_dif[:5]['buy'] > 0]) > 3:
                     log.debug('diff2-0-low>0')
                     top_dif = top_dif[top_dif.low >= top_dif.llow* ct.changeRatio]
                     log.debug('diff2-1:%s' % len(top_dif))
