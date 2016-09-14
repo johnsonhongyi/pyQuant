@@ -692,7 +692,7 @@ def write_to_blocknew(p_name, data, append=True):
                 fout = open(p_name, 'wb+')
                 for code in flist:
                     fout.write(code)
-str
+
             # if not str(flist[-1]).endswith('\r\n'):
                 # print "File:%s end not %s"%(p_name[-7:],str(flist[-1]))
             # print "flist", flist
