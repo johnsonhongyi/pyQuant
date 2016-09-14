@@ -29,7 +29,7 @@ log = LoggerFactory.getLogger('TDX_Day')
 # log.setLevel(LoggerFactory.ERROR)
 
 path_sep = os.path.sep
-newstockdayl = 50
+newstockdayl = 15
 changedays=0
 global initTdxdata
 initTdxdata = 0
@@ -161,8 +161,8 @@ def get_tdx_Exp_day_to_df(code, type='f', start=None, end=None, dt=None, dl=None
         return df
     elif dl is not None and int(dl) == 1:
         # fileSize = os.path.getsize(file_path)
-        # if fileSize < 60 * newstockdayl:
-        #     return Series()
+        if fileSize < 60 * newstockdayl:
+            return Series()
         data = cct.read_last_lines(file_path, int(dl) + 3)
         data_l = data.split('\n')
         dt_list = Series()
@@ -203,8 +203,8 @@ def get_tdx_Exp_day_to_df(code, type='f', start=None, end=None, dt=None, dl=None
 
     else:
         fileSize = os.path.getsize(file_path)
-        # if fileSize < 60 * newstockdayl:
-            # return Series()
+        if fileSize < 60 * newstockdayl:
+            return Series()
         if dl is None:
             dl = 60
             log.error("dt:%s dl is None"%(dt))
@@ -1530,8 +1530,8 @@ def get_tdx_day_to_df_last(code, dayl=1, type=0, dt=None, ptype='close', dl=None
         b = fileSize
         ofile.seek(-fileSize, 2)
         no = int(fileSize / e)
-        # if no < newstockdayl:
-            # return Series()
+        if no < newstockdayl:
+            return Series()
         # print no,b,day_cout,fileSize
         buf = ofile.read()
         ofile.close()

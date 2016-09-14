@@ -672,14 +672,32 @@ def code_to_tdx_blk(code):
 def write_to_blocknew(p_name, data, append=True):
     def writeBlocknew(p_name, data, append=True):
         if append:
-            fout = open(p_name, 'r+')
+            fout = open(p_name, 'rb+')
             # fout = open(p_name)
-            flist = fout.readlines()
-            if str(flist[-1]).find('\r\n') < 0:
-                print "File:%s end not %s"%(p_name[-7:],str(flist[-1]))
+            flist_t = fout.readlines()
+            # flist_t = file(p_name, mode='rb+', buffering=None)
+            flist=[]
+            errstatus=False
+            for code in flist_t:
+                if not code.endswith('\r\n'):
+                    if len(code) <= 6:
+                        errstatus = True
+                        continue
+                    else:
+                        errstatus = True
+                        code = code+'\r\n'
+                flist.append(code)
+            if errstatus:
+                fout.close()
+                fout = open(p_name, 'wb+')
+                for code in flist:
+                    fout.write(code)
+str
+            # if not str(flist[-1]).endswith('\r\n'):
+                # print "File:%s end not %s"%(p_name[-7:],str(flist[-1]))
             # print "flist", flist
         else:
-            fout = open(p_name, 'wb')
+            fout = open(p_name, 'wb+')
             index_list = ['1999999','47#IFL0', '27#HSI',  '0159915']
             # index_list.reverse()
             for i in index_list:
