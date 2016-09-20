@@ -33,7 +33,6 @@ from JohhnsonUtil import LoggerFactory as LoggerFactory
 # cct.set_ctrl_handler()
 if __name__ == "__main__":
     # parsehtml(downloadpage(url_s))
-
     log = LoggerFactory.getLogger('SinaMarket')
     # log.setLevel(LoggerFactory.DEBUG)
     if cct.isMac():
@@ -241,7 +240,7 @@ if __name__ == "__main__":
                         cct.sleep(60)
                     else:
                         print "."
-                        cct.sleep(random.randint(0, 30))
+                        cct.sleeprandom(60)
                         top_all = pd.DataFrame()
                         time_s = time.time()
                         break
@@ -308,9 +307,7 @@ if __name__ == "__main__":
                 sys.exit(0)
         except (IOError, EOFError) as e:
             print "Error", e
-            sleeptime = random.randint(5, 15)
-            print "Error2sleep:%s" % (sleeptime)
-            cct.sleep(sleeptime)
+            cct.sleeprandom(120)
             # traceback.print_exc()
             # raw_input("Except")
 

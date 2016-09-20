@@ -274,7 +274,7 @@ if __name__ == "__main__":
                         print ".",
                         cct.sleep(60)
                     else:
-                        cct.sleep(random.randint(0, 30))
+                        cct.sleeprandom(60)
                         top_all = pd.DataFrame()
                         time_s = time.time()
                         print "."
@@ -326,9 +326,7 @@ if __name__ == "__main__":
         except (IOError, EOFError, Exception) as e:
             print "Error::", e
             #traceback.print_exc()
-            sleeptime=random.randint(5, 15)
-            print "Error2sleep:%s"%(sleeptime)
-            cct.sleep(sleeptime)
+            cct.sleeprandom(120)
             # raw_input("Except")
 
             # sl.get_code_search_loop()

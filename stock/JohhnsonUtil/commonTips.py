@@ -150,6 +150,11 @@ def sleep(timet):
             break
         time.sleep(0.5)
     # print time.time()-times
+def sleeprandom(timet):
+    sleeptime=random.randint(timet/3, timet)
+    print "Error2sleep:%s"%(sleeptime)
+    sleep(sleeptime)
+
 def get_cpu_count():
     return cpu_count()
 

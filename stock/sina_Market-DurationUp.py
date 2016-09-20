@@ -330,7 +330,7 @@ if __name__ == "__main__":
                         cct.sleep(120)
                     else:
                         # top_all = pd.DataFrame()
-                        cct.sleep(random.randint(0, 30))
+                        cct.sleeprandom(60)
                         time_s = time.time()
                         print "."
                         break
@@ -409,9 +409,7 @@ if __name__ == "__main__":
         except (IOError, EOFError, Exception) as e:
             print "Error", e
             #traceback.print_exc()
-            sleeptime=random.randint(5, 15)
-            print "Error2sleep:%s"%(sleeptime)
-            cct.sleep(sleeptime)
+            cct.sleeprandom(120)
 
 '''
 {symbol:"sz000001",code:"000001",name:"平安银行",trade:"0.00",pricechange:"0.000",changepercent:"0.000",buy:"12.36",sell:"12.36",settlement:"12.34",open:"0.00",high:"0.00",low:"0",volume:0,amount:0,ticktime:"09:17:55",per:7.133,pb:1.124,mktcap:17656906.355526,nmc:14566203.350486,turnoverratio:0},
