@@ -682,51 +682,67 @@ def write_to_blocknew(p_name, data, append=True):
             flist_t = fout.readlines()
             # flist_t = file(p_name, mode='rb+', buffering=None)
             flist=[]
-            errstatus=False
+            # errstatus=False
             for code in flist_t:
                 if not code.endswith('\r\n'):
                     if len(code) <= 6:
-                        errstatus = True
+                        # errstatus = True
                         continue
                     else:
-                        errstatus = True
+                        # errstatus = True
                         code = code+'\r\n'
                 flist.append(code)
-            if errstatus:
-                fout.close()
-                fout = open(p_name, 'wb+')
-                for code in flist:
-                    fout.write(code)
+            # if errstatus:
+            fout.close()
+            fout = open(p_name, 'wb+')
+            for code in flist:
+                fout.write(code)
 
             # if not str(flist[-1]).endswith('\r\n'):
                 # print "File:%s end not %s"%(p_name[-7:],str(flist[-1]))
             # print "flist", flist
         else:
-            fout = open(p_name, 'wb+')
-            index_list = ['1999999','47#IFL0', '27#HSI',  '0159915']
-            # index_list.reverse()
-            for i in index_list:
-                raw = (i) + '\r\n'
-                fout.write(raw)
+            fout = open(p_name, 'rb+')
+            flist_t = fout.readlines()
+            flist=[]
+            # flist_t = file(p_name, mode='rb+', buffering=None)
+            if len(flist_t) > 4:
+                # errstatus=False
+                for code in flist_t:
+                    if not code.endswith('\r\n'):
+                        if len(code) <= 6:
+                            # errstatus = True
+                            continue
+                        else:
+                            # errstatus = True
+                            code = code+'\r\n'
+                    flist.append(code)
+                # if errstatus:
+                fout.close()
+                flist=flist[:9]
+                fout = open(p_name, 'wb+')
+                for code in flist:
+                    fout.write(code)
+            else:
+                fout.close()            
+                fout = open(p_name, 'wb+')
+                index_list = ['1999999','47#IFL0', '27#HSI',  '0159915']
+                # index_list.reverse()
+                for i in index_list:
+                    raw = (i) + '\r\n'
+                    fout.write(raw)
 
         # x=0
         for i in data:
             # print type(i)
-            if append and len(flist) > 0:
-                # wstatus = True
-                # print "a",code_to_tdxblk(i).strip() in flist
-                # for ic in flist:
-                #     if code_to_tdxblk(i).strip() == ic.strip():
-                #         wstatus = False
-                # if wstatus:
-                # print "len:",len(i)
-                raw = code_to_tdxblk(i).strip() + '\r\n'
-                if len(raw) > 8 and not raw in flist:
-                    fout.write(raw)
-            else:
-                raw = code_to_tdxblk(i) + '\r\n'
-                if len(raw) >8 :
-                    fout.write(raw)
+            # if append and len(flist) > 0:
+            #     raw = code_to_tdxblk(i).strip() + '\r\n'
+            #     if len(raw) > 8 and not raw in flist:
+            #         fout.write(raw)
+            # else:
+            raw = code_to_tdxblk(i) + '\r\n'
+            if len(raw) > 8 and not raw in flist:
+                fout.write(raw)
                 # raw = pack('IfffffII', t, i[2], i[3], i[4], i[5], i[6], i[7], i[8])
         fout.flush()    
         fout.close()
