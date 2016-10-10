@@ -61,7 +61,7 @@ if __name__ == "__main__":
     # dl=60
     ptype='high'
     # op, ra, duration_date, days = pct.get_linear_model_status('999999', filter='y', dl=dl, ptype=ptype, days=1)
-    duration_date = 15
+    duration_date = ct.duration_date
     du_date = duration_date
     # print cct.last_tddate(2)
     end_date = cct.last_tddate(days=3)
@@ -280,8 +280,8 @@ if __name__ == "__main__":
                         #                                 ascending=[0, 0, 0, 0, 1])[:10]
                         # top_temp = top_temp.sort_values(by=['op','ldate','ra','diff', 'percent', 'ratio'], ascending=[0,0,0,0, 0, 1])[:10]                
                     
-                        top_temp = top_temp.sort_values(by=ct.Duration_percent_op,
-                                        ascending=ct.Duration_percent_op_key)
+                        top_temp = top_temp.sort_values(by=ct.Duration_percentdn_op,
+                                        ascending=ct.Duration_percentdn_op_key)
 
                     if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935:
                         # top_temp = top_temp[top_temp['buy'] > top_temp['ma10d']]

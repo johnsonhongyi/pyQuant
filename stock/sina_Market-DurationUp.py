@@ -60,7 +60,8 @@ if __name__ == "__main__":
     # dl=30
     ptype='low'
     # op, ra, duration_date, days = pct.get_linear_model_status('999999', filter='y', dl=dl, ptype=ptype, days=1)
-    duration_date = 300
+    duration_date = ct.duration_date
+    # duration_date = 300
     du_date = duration_date
     end_date = None
     ptype = 'low'
@@ -370,9 +371,9 @@ if __name__ == "__main__":
                         du_date = tdd.get_duration_Index_date('999999',dl=int(duration_date))
                         # print duration_date
                     set_duration_console(du_date)
-                    top_all = pd.DataFrame()
                     time_s = time.time()
                     status = False
+                    top_all = pd.DataFrame()
                     lastpTDX_DF = pd.DataFrame()
 
             elif st.lower() == 'w' or st.lower() == 'a':

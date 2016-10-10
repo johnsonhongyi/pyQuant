@@ -21,15 +21,20 @@ VolumeMaxR=50
 VolumeMinR=1.5
 PowerCount = 30
 PowerCountdl = 14
-writeCount=10
-changeRatio=0.99
+writeCount =10
+changeRatio = 0.99
+duration_date = 15
 # Duration_sort_op=['fib','op','ra','percent','ratio','diff','counts']
 # Duration_sort_op=['fib','op','diff','fibl','ra','percent','ratio','volume','counts']
 # Duration_sort_op_key=[1,0,0,1,0,0,1,1,1]
 Duration_sort_op=['diff','op','fib','fibl','ra','percent','ratio','volume','counts']
 Duration_sort_op_key=[0,0,1,1,0,0,1,1,1]
 
-Duration_percent_op=['percent','diff','op','fib','fibl','ra','ratio','volume','counts']
+Duration_percentdn_op=['percent','diff','op','fib','fibl','ra','ratio','volume','counts']
+# Duration_percentup_op=['diff','percent','op','fib','fibl','ra','ratio','volume','counts']
+Duration_percentdn_op_key=[0,0,0,1,1,0,1,1,1]
+
+Duration_percent_op=['diff','percent','op','fib','fibl','ra','ratio','volume','counts']
 Duration_percent_op_key=[0,0,0,1,1,0,1,1,1]
 
 # Duration_sort_high_op=['date','diff','fib','op','fibl','ra','percent','ratio','volume','counts']

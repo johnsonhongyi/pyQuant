@@ -60,7 +60,7 @@ if __name__ == "__main__":
     # dl=30
     ptype='low'
     # op, ra, duration_date, days = pct.get_linear_model_status('999999', filter='y', dl=dl, ptype=ptype, days=1)
-    duration_date = 15
+    duration_date = ct.duration_date
     du_date = duration_date
     end_date = None
     ptype = 'low'

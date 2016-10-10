@@ -96,6 +96,7 @@ def get_tdx_Exp_day_to_df(code, type='f', start=None, end=None, dl=None):
         file_path = exp_path + 'backp' + path_sep + code_u.upper() + ".txt"
     else:
         return None
+    # print file_path
     log.debug("daypath:%s" % file_path)
     # p_day_dir = day_path.replace('/', path_sep).replace('\\', path_sep)
     # p_exp_dir = exp_dir.replace('/', path_sep).replace('\\', path_sep)
@@ -203,6 +204,10 @@ def get_tdx_Exp_day_to_df(code, type='f', start=None, end=None, dl=None):
 
     else:
         fileSize = os.path.getsize(file_path)
+        if dl is not None and dl < 60:
+            newstockdayl = 60
+        else:
+            newstockdayl = 120
         if fileSize < 60 * newstockdayl:
             return Series()
         if dl is None:
@@ -392,11 +397,34 @@ def get_tdx_append_now_df_api(code, start=None, end=None, type='f',df=None,dm=No
 
     start=cct.day8_to_day10(start)
     end=cct.day8_to_day10(end)
+    # if code == '999999':
+    #     code = 'sh'
+    #     index_status = True
+    # elif code.startswith('399'):
+    #     index_status = True
+    #     for k in INDEX_LIST.keys():
+    #         if INDEX_LIST[k].find(code) > 0:
+    #             code = k
+    index_status = False
+    code_t=code
+    if code == '999999':
+        # code_t=code
+        code = 'sh'
+        index_status = True
+    elif code.startswith('399'):
+        index_status = True
+        for k in INDEX_LIST.keys():
+            if INDEX_LIST[k].find(code) > 0:
+                code = k
+
+
     if df is None:
         df = get_tdx_Exp_day_to_df(code, start=start, end=end,dl=dl).sort_index(ascending=True)
     else:
         df = df.sort_index(ascending=True)
     if not power:
+        if index_status:
+            df[code] = code_t
         return df
     today = cct.get_today()
     if len(df) > 0:
@@ -406,16 +434,7 @@ def get_tdx_append_now_df_api(code, start=None, end=None, type='f',df=None,dm=No
     duration = cct.get_today_duration(tdx_last_day)
     log.debug("duration:%s"%duration)
     log.debug("tdx_last_day:%s" % tdx_last_day)
-    index_status = False
-    code_t=None
-    if code == '999999':
-        code = 'sh'
-        index_status = True
-    elif code.startswith('399'):
-        index_status = True
-        for k in INDEX_LIST.keys():
-            if INDEX_LIST[k].find(code) > 0:
-                code = k
+    
     log.debug("duration:%s" % duration)
     if end is not None:
         # print end,df.index[-1]
@@ -1085,19 +1104,19 @@ def get_tdx_day_to_df(code):
     return df
 
 
-def get_duration_Index_date(code='999999', dt=None, ptype='low',dl=None):
+def get_duration_Index_date(code='999999', dt=None, ptype='low',dl=None,power=False):
     if dt is not None:
         if len(str(dt)) < 8:
             dl = int(dt)+changedays
             # df = get_tdx_day_to_df(code).sort_index(ascending=False)
-            df = get_tdx_append_now_df_api(code).sort_index(ascending=False)
+            df = get_tdx_append_now_df_api(code,power=power).sort_index(ascending=False)
             dt = get_duration_price_date(code, dt=dt,ptype=ptype,df=df)
             dt = df[df.index <= dt].index.values[changedays]
             log.info("LastDF:%s,%s" % (dt,dl))
         else:
             if len(str(dt)) == 8: dt = cct.day8_to_day10(dt)
             # df = get_tdx_day_to_df(code).sort_index(ascending=False)
-            df = get_tdx_append_now_df_api(code,start=dt).sort_index(ascending=False)
+            df = get_tdx_append_now_df_api(code,start=dt,power=power).sort_index(ascending=False)
             # dl = len(get_tdx_Exp_day_to_df(code, start=dt)) + changedays
             dl = len(df) + changedays
             dt = df[df.index <= dt].index.values[changedays]
@@ -1105,10 +1124,10 @@ def get_duration_Index_date(code='999999', dt=None, ptype='low',dl=None):
         return dt,dl
     if dl is not None:
         # dl = int(dl)
-        df = get_tdx_append_now_df_api(code,start=dt).sort_index(ascending=False)
+        df = get_tdx_append_now_df_api(code,start=dt,dl=dl,power=power).sort_index(ascending=False)
         # print df
         # dl = len(get_tdx_Exp_day_to_df(code, start=dt)) + changedays
-        # print dl
+        # print df[:dl].index,dl
         dt = df[:dl].index[-1]
         log.info("dl to dt:%s" % (dt))
         return dt
@@ -1980,13 +1999,15 @@ if __name__ == '__main__':
     # print df[df.index=='002474'].volume
     # print df[df.index=='002474'].vol
     # print df.columns
-    df=get_tdx_exp_low_or_high_power('002127', dt='20150715', ptype='close', dl=300, end=None, power=False, lastp=False)
-    print df[:1]
+    # df=get_tdx_exp_low_or_high_power('000034', dt=None, ptype='low', dl=300, end=None, power=False, lastp=False)
+    print get_duration_Index_date('999999',dl=15)
+    print get_tdx_exp_all_LastDF_DL(codeList = [u'000034', u'300290'], dt=200, end=None, ptype='low', filter='y', power=True)
+    # print df[:1]
     sys.exit(0)
     # 
     # print get_tdx_write_now_file_api('999999', type='f')
     time_s=time.time()
-    print get_tdx_exp_all_LastDF_DL(codeList = [u'300102', u'300290', u'300116', u'300319', u'300375', u'300519'], dt='2016101', end='2016-06-23', ptype='low', filter='n', power=True)
+    print get_tdx_exp_all_LastDF_DL(codeList = [u'000034', u'300290', u'300116', u'300319', u'300375', u'300519'], dt='2016101', end='2016-06-23', ptype='low', filter='n', power=True)
     print "T1:",round(time.time()-time_s,2)
     time_s=time.time()
     print get_tdx_exp_all_LastDF_DL(codeList = [u'300102', u'300290', u'300116', u'300319', u'300375', u'300519'], dt='2016101', end='2016-06-23', ptype='high', filter='n', power=True)
