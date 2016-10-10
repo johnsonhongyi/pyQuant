@@ -157,11 +157,11 @@ if __name__ == "__main__":
                 
                 #判断主升
                 # log.debug('top_dif:%s'%(len(top_dif)))
-                # if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 1502:
-                #     top_dif = top_dif[top_dif.buy >= top_dif.llastp * ct.changeRatio]    
-                #     log.debug('top_dif:%s'%(len(top_dif)))
-                #     top_dif = top_dif[top_dif.buy >= top_dif.lhigh * ct.changeRatio]
-                #     log.debug('top_dif:%s'%(len(top_dif)))
+                if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 1502:
+                    top_dif = top_dif[top_dif.buy >= top_dif.llastp * ct.changeRatio]    
+                    log.debug('top_dif:%s'%(len(top_dif)))
+                    top_dif = top_dif[top_dif.buy >= top_dif.lhigh * ct.changeRatio]
+                    log.debug('top_dif:%s'%(len(top_dif)))
                 
                 top_dif = top_dif[top_dif.buy > 0]
                 log.debug('top_dif:%s'%(len(top_dif)))

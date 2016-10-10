@@ -756,7 +756,8 @@ def write_to_blocknew(p_name, data, append=True):
         print "write to zxg and 066"
     else:
         writeBlocknew(p_name, data, append)
-        writeBlocknew(blockNewStart, data[:ct.writeCount - 1])
+        # writeBlocknew(blockNewStart, data[:ct.writeCount - 1])
+        writeBlocknew(blockNewStart, data)
         print "write to other and start"
 
 

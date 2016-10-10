@@ -29,7 +29,7 @@ log = LoggerFactory.getLogger('TDX_Day')
 # log.setLevel(LoggerFactory.ERROR)
 
 path_sep = os.path.sep
-newstockdayl = 15
+newstockdayl = 120
 changedays=0
 global initTdxdata
 initTdxdata = 0
@@ -84,7 +84,7 @@ exp_path = basedir + "/T0002/export/".replace('/', path_sep).replace('\\', path_
 day_path = {'sh': day_dir_sh, 'sz': day_dir_sz}
 
 # http://www.douban.com/note/504811026/
-def get_tdx_Exp_day_to_df(code, type='f', start=None, end=None, dt=None, dl=None):
+def get_tdx_Exp_day_to_df(code, type='f', start=None, end=None, dl=None):
     start=cct.day8_to_day10(start)
     end=cct.day8_to_day10(end)
     # day_path = day_dir % 'sh' if code[:1] in ['5', '6', '9'] else day_dir % 'sz'
@@ -108,7 +108,7 @@ def get_tdx_Exp_day_to_df(code, type='f', start=None, end=None, dt=None, dl=None
         log.error("file_path:not exists")
         return ds
     # ofile = open(file_path, 'rb')
-    if dt is None and dl is None:
+    if start is None and dl is None:
         ofile = open(file_path, 'rb')
         buf = ofile.readlines()
         ofile.close()
@@ -1295,7 +1295,7 @@ def get_tdx_exp_low_or_high_price(code, dt=None, ptype='close', dl=None,end=None
     # dt = cct.day8_to_day10(dt)
     if dt is not None and dl is not None:
         # log.debug("dt:%s dl:%s"%(dt,dl))
-        df = get_tdx_Exp_day_to_df(code, dt=dt, dl=dl,end=end).sort_index(ascending=False)
+        df = get_tdx_Exp_day_to_df(code, start=dt, dl=dl,end=end).sort_index(ascending=False)
         if df is not None and not df.empty:
             if len(str(dt)) == 10:
                 dz = df[df.index >= dt]
@@ -1367,7 +1367,7 @@ def get_tdx_exp_low_or_high_power(code, dt=None, ptype='close', dl=None,end=None
     # dt = cct.day8_to_day10(dt)
     if dt is not None or dl is not None:
         # log.debug("dt:%s dl:%s"%(dt,dl))
-        df = get_tdx_Exp_day_to_df(code, dt=dt, dl=dl,end=end).sort_index(ascending=False)
+        df = get_tdx_Exp_day_to_df(code, start=dt, dl=dl,end=end).sort_index(ascending=False)
         if df is not None and not df.empty:
 
             if power:
@@ -1791,10 +1791,11 @@ def get_tdx_exp_all_LastDF_DL(codeList, dt=None,end=None,ptype='low',filter='n',
     elif dt is not None:
         if len(str(dt)) < 8 :
             dl = int(dt)
-            dt = None
+            # dt = None
             # df = get_tdx_Exp_day_to_df('999999',end=end).sort_index(ascending=False)
             # dt = get_duration_price_date('999999', dt=dt,ptype=ptype,df=df)
             # dt = df[df.index <= dt].index.values[0]
+            dt=get_duration_Index_date('999999',dl=dt)
             log.info("LastDF:%s,%s" % (dt,dl))
         else:
             if len(str(dt)) == 8:
@@ -1975,13 +1976,14 @@ if __name__ == '__main__':
     # print get_tdx_Exp_day_to_df('002775', dl=21).sort_index(ascending=False)
     # print get_tdx_Exp_day_to_df('300076', type='f', start=None, end=None, dt=None, dl=20)
     # print get_tdx_exp_low_or_high_power('002775', dt='2016-06-01', ptype='high', dl=21, power=True)
-    df=getSinaAlldf(market='all')
-    print df[df.index=='002474'].volume
+    # df=getSinaAlldf(market='all')
+    # print df[df.index=='002474'].volume
     # print df[df.index=='002474'].vol
-    print df.columns
+    # print df.columns
+    df=get_tdx_exp_low_or_high_power('002127', dt='20150715', ptype='close', dl=300, end=None, power=False, lastp=False)
+    print df[:1]
     sys.exit(0)
     # 
-    # get_tdx_exp_low_or_high_power('300102', dt=None, ptype='close', dl=None, end=None, power=False, lastp=False)
     # print get_tdx_write_now_file_api('999999', type='f')
     time_s=time.time()
     print get_tdx_exp_all_LastDF_DL(codeList = [u'300102', u'300290', u'300116', u'300319', u'300375', u'300519'], dt='2016101', end='2016-06-23', ptype='low', filter='n', power=True)
