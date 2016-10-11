@@ -278,9 +278,12 @@ if __name__ == "__main__":
 
                         # top_temp = top_temp.sort_values(by=['op','ra','diff', 'percent', 'ratio'], ascending=[0,0,0, 0, 1])[:10]
                         # top_temp = top_temp.sort_values(by=['op','ldate','ra','diff', 'percent', 'ratio'], ascending=[0,0,0,0, 0, 1])[:10]
-                        
-                        top_temp = top_temp.sort_values(by=ct.Duration_percent_op,
-                                    ascending=ct.Duration_percent_op_key)
+                        if duration_date > ct.duration_date_sort:
+                            top_temp = top_temp.sort_values(by=ct.Duration_percent_op,
+                                        ascending=ct.Duration_percent_op_key)
+                        else:
+                            top_temp = top_temp.sort_values(by=ct.Duration_percentdn_op,
+                                        ascending=ct.Duration_percentdn_op_key)
 
                     if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935:
                         # top_temp = top_temp[ (top_temp['ma5d'] > top_temp['ma10d']) & (top_temp['buy'] > top_temp['ma10d']) ][:10]

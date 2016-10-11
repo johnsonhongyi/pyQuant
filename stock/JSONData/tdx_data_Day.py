@@ -29,7 +29,7 @@ log = LoggerFactory.getLogger('TDX_Day')
 # log.setLevel(LoggerFactory.ERROR)
 
 path_sep = os.path.sep
-newstockdayl = 120
+newstockdayl = 30
 changedays=0
 global initTdxdata
 initTdxdata = 0
@@ -204,15 +204,16 @@ def get_tdx_Exp_day_to_df(code, type='f', start=None, end=None, dl=None):
 
     else:
         fileSize = os.path.getsize(file_path)
-        if dl is not None and dl < 60:
-            newstockdayl = 60
-        else:
-            newstockdayl = 120
+        # if dl  is  None:
+        #     newstockdayl = 30
+        #     # print "60"
+        # else:
+        #     newstockdayl = 60
         if fileSize < 60 * newstockdayl:
             return Series()
         if dl is None:
             dl = 60
-            log.error("dt:%s dl is None"%(dt))
+            log.error("start:%s dl is None"%(start))
         data = cct.read_last_lines(file_path, int(dl) + 2)
         dt_list = []
         data_l = data.split('\n')
@@ -779,7 +780,10 @@ def get_tdx_power_now_df(code, start=None, end=None, type='f',df=None,dm=None,dl
     end=cct.day8_to_day10(end)
     if df is None:
         df = get_tdx_Exp_day_to_df(code, type=type, start=start, end=end, dl=dl).sort_index(ascending=True)
-        df['vol'] =  map(lambda x: round(x*10, 1), df.vol.values)
+        if len(df) > 0:
+            df['vol'] =  map(lambda x: round(x*10, 1), df.vol.values)
+        else:
+            log.warn("%s df is Empty"%(code))
         if end is not None:
             return df
     else:
@@ -1988,7 +1992,7 @@ if __name__ == '__main__':
     # codelist= dd.index.tolist()
     # df = get_tdx_exp_all_LastDF(codelist, dt=30,end=20160401, ptype='high', filter='y')
     # print get_tdx_append_now_df_api('000938',dl=10)[:2]
-    # print get_tdx_power_now_df('000938', dl=20)[:2]
+    print get_tdx_power_now_df('300522', start=20160819,dl=30)[:2]
     # print get_tdx_write_now_file_api('000938', type='f')[:2]
     # print tdx_df.index
     # sys.exit(0)
