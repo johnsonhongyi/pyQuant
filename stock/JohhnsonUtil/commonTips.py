@@ -719,13 +719,13 @@ def write_to_blocknew(p_name, data, append=True):
                     flist.append(code)
                 # if errstatus:
                 fout.close()
-                # flist=flist[:9]
+                flist=flist[:9]
                 index_list = ['1999999','47#IFL0', '27#HSI',  '0159915']
                 for co in index_list:
                     inx = (co) + '\r\n'
                     if inx not in flist:
                         flist.insert(index_list.index(co), inx)
-                print flist
+                # print flist
                 fout = open(p_name, 'wb+')
                 for code in flist:
                     fout.write(code)

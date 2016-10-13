@@ -406,6 +406,13 @@ def get_tdx_append_now_df_api(code, start=None, end=None, type='f',df=None,dm=No
     #     for k in INDEX_LIST.keys():
     #         if INDEX_LIST[k].find(code) > 0:
     #             code = k
+
+
+
+    if df is None:
+        df = get_tdx_Exp_day_to_df(code, start=start, end=end,dl=dl).sort_index(ascending=True)
+    else:
+        df = df.sort_index(ascending=True)
     index_status = False
     code_t=code
     if code == '999999':
@@ -417,13 +424,6 @@ def get_tdx_append_now_df_api(code, start=None, end=None, type='f',df=None,dm=No
         for k in INDEX_LIST.keys():
             if INDEX_LIST[k].find(code) > 0:
                 code = k
-
-
-    if df is None:
-        df = get_tdx_Exp_day_to_df(code, start=start, end=end,dl=dl).sort_index(ascending=True)
-    else:
-        df = df.sort_index(ascending=True)
-
     if index_status:
         df[code] = code_t
         # code = code_t
@@ -1995,11 +1995,11 @@ if __name__ == '__main__':
     # codelist= dd.index.tolist()
     # df = get_tdx_exp_all_LastDF(codelist, dt=30,end=20160401, ptype='high', filter='y')
     # print get_tdx_append_now_df_api('000938',dl=10)[:2]
-    print get_tdx_power_now_df('300522', start=20160819,dl=30)[:2]
+    # print get_tdx_power_now_df('300522', start=20160819,dl=30)[:2]
     # print get_tdx_write_now_file_api('000938', type='f')[:2]
     # print tdx_df.index
     # sys.exit(0)
-    # print get_tdx_Exp_day_to_df('002775', dl=21).sort_index(ascending=False)
+    # print get_tdx_Exp_day_to_df('999999', dl=21).sort_index(ascending=False)
     # print get_tdx_Exp_day_to_df('300076', type='f', start=None, end=None, dt=None, dl=20)
     # print get_tdx_exp_low_or_high_power('002775', dt='2016-06-01', ptype='high', dl=21, power=True)
     # df=getSinaAlldf(market='all')
