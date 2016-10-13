@@ -29,6 +29,7 @@ import singleAnalyseUtil as sl
 from JSONData import realdatajson as rl
 from JSONData import tdx_data_Day as tdd
 from JSONData import powerCompute as pct
+from JSONData import stockFilter as stf
 from JohhnsonUtil import LoggerFactory as LoggerFactory
 # cct.set_ctrl_handler()
 if __name__ == "__main__":
@@ -187,6 +188,7 @@ if __name__ == "__main__":
 
                 print "G:%s Rt:%0.1f dT:%s " % (len(top_all), float(time.time() - time_Rt), cct.get_time_to_date(time_s))
 
+                top_temp = stf.getBollFilter(df=top_temp, boll=6)
                 if 'op' in top_temp.columns:
                     # top_temp = top_temp.sort_values(by=['ra','percent','counts'],ascending=[0, 0,0])
                     

@@ -15,6 +15,7 @@ import singleAnalyseUtil as sl
 from JSONData import realdatajson as rl
 from JSONData import tdx_data_Day as tdd
 from JSONData import powerCompute as pct
+from JSONData import stockFilter as stf
 from JohhnsonUtil import LoggerFactory as LoggerFactory
 from JohhnsonUtil import commonTips as cct
 
@@ -136,7 +137,8 @@ if __name__ == "__main__":
 
                 top_dif = top_all
                 log.info('dif1:%s' % len(top_dif))
-                top_dif=top_dif[top_dif.lvol > ct.LvolumeSize]
+                if not (cct.get_now_time_int() > 915 and cct.get_now_time_int() <= 925):
+                    top_dif=top_dif[top_dif.lvol > ct.LvolumeSize]
                 if cct.get_now_time_int() > 915:
                     top_dif = top_dif[top_dif.buy >= top_dif.llastp * ct.changeRatio]
                     top_dif = top_dif[top_dif.buy >= top_dif.lhigh * ct.changeRatio]
@@ -212,6 +214,7 @@ if __name__ == "__main__":
                     cct.set_console(width, height,
                         title=['dT:%s' % cct.get_time_to_date(time_s), 'G:%s' % len(top_dif), 'zxg: %s' % (blkname)])
                    
+                    top_temp = stf.getBollFilter(df=top_temp, boll=6)
                     if 'op' in top_temp.columns:
 
                         # top_temp = top_temp.sort_values(by=['ra', 'op','percent'],ascending=[0, 0,0])

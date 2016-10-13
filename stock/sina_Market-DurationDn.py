@@ -12,6 +12,7 @@ import pandas as pd
 import JohhnsonUtil.johnson_cons as ct
 import singleAnalyseUtil as sl
 from JSONData import powerCompute as pct
+from JSONData import stockFilter as stf
 from JSONData import realdatajson as rl
 from JSONData import tdx_data_Day as tdd
 from JSONData import LineHistogram as lhg
@@ -262,6 +263,7 @@ if __name__ == "__main__":
                                     title=[du_date, 'dT:%s' % cct.get_time_to_date(time_s), 'G:%s' % goldstock,
                                            'zxg: %s' % (blkname)])
 
+                    top_temp = stf.getBollFilter(df=top_temp, boll=6)
                     if 'op' in top_temp.columns:
                         # if ptype == 'low':
                         #     top_temp = top_temp.sort_values(by=ct.Duration_sort_op,

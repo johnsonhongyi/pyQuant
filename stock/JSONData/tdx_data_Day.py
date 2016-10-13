@@ -213,7 +213,7 @@ def get_tdx_Exp_day_to_df(code, type='f', start=None, end=None, dl=None):
             return Series()
         if dl is None:
             dl = 60
-            log.error("start:%s dl is None"%(start))
+            # log.error("start:%s dl is None"%(start))
         data = cct.read_last_lines(file_path, int(dl) + 2)
         dt_list = []
         data_l = data.split('\n')
@@ -423,9 +423,11 @@ def get_tdx_append_now_df_api(code, start=None, end=None, type='f',df=None,dm=No
         df = get_tdx_Exp_day_to_df(code, start=start, end=end,dl=dl).sort_index(ascending=True)
     else:
         df = df.sort_index(ascending=True)
+
+    if index_status:
+        df[code] = code_t
+        # code = code_t
     if not power:
-        if index_status:
-            df[code] = code_t
         return df
     today = cct.get_today()
     if len(df) > 0:
@@ -471,17 +473,18 @@ def get_tdx_append_now_df_api(code, start=None, end=None, type='f',df=None,dm=No
                     code_ts = '999999'
                 else:
                     code_ts = code_t
-                ds['code'] = code_ts
+                ds['code'] = int(code_ts)
             else:
                 ds['code'] = code
-            # ds['vol'] = 0
+            # print ds[:1]
             ds = ds.loc[:, ['code', 'open', 'high', 'low', 'close', 'volume', 'amount']]
             # ds.rename(columns={'volume': 'amount'}, inplace=True)
             ds.rename(columns={'volume': 'vol'}, inplace=True)
             ds.sort_index(ascending=True, inplace=True)
             # log.debug("ds:%s" % ds[:1])
+            ds = ds.fillna(0)
             df = df.append(ds)
-            df = df.astype(float)
+            # df = df.astype(float)
             # pd.concat([df,ds],axis=0, join='outer')
             # result=pd.concat([df,ds])
 
