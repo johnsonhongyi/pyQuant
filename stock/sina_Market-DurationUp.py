@@ -172,8 +172,9 @@ if __name__ == "__main__":
                 # print top_dif.loc['600610',:]
                 # top_dif = top_dif[top_dif.trade > 0]
                 # if cct.get_now_time_int() >< 932:
-                top_dif = top_dif[top_dif.low > 0]
-                log.debug("top_dif.low > 0:%s" % (len(top_dif)))
+
+                # top_dif = top_dif[top_dif.low > 0]
+                # log.debug("top_dif.low > 0:%s" % (len(top_dif)))
                     # top_dif.loc['600610','volume':'lvol']
                 top_dif['volume'] = (
                     map(lambda x, y: round(x / y / radio_t, 1), top_dif.volume.values, top_dif.lvol.values))                
@@ -246,13 +247,13 @@ if __name__ == "__main__":
 
                     # elif percent_status == 'y' and cct.get_now_time_int() > 935 and ptype == 'high' :
                     elif ptype == 'low':
-                        top_dif = top_dif[top_dif.percent >= 0]
+                        # top_dif = top_dif[top_dif.percent >= 0]
                         top_temp = top_dif[:ct.PowerCount].copy()
                         top_end = top_dif[-5:].copy()
                         top_temp = pct.powerCompute_df(top_temp,dl=ct.PowerCountdl,talib=True)
                         top_end = pct.powerCompute_df(top_end,dl=ct.PowerCountdl,talib=True)
                     else:
-                        top_dif = top_dif[top_dif.percent >= 0]
+                        # top_dif = top_dif[top_dif.percent >= 0]
                         top_end = top_dif[:5].copy()
                         top_temp = top_dif[-ct.PowerCount:].copy()
                         top_temp = pct.powerCompute_df(top_temp, dl=ct.PowerCountdl,talib=True)

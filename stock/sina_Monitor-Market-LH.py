@@ -59,7 +59,7 @@ if __name__ == "__main__":
     # StreamHandler(sys.stdout).push_application()
     log = LoggerFactory.getLogger('SinaMarket')
     # log=LoggerFactory.JohnsonLoger('SinaMarket').setLevel(LoggerFactory.DEBUG)
-    # log.setLevel(LoggerFactory.DEBUG)
+    log.setLevel(LoggerFactory.DEBUG)
     if cct.isMac():
         width, height = 145, 16
         cct.set_console(width, height)
@@ -155,10 +155,10 @@ if __name__ == "__main__":
                     if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 1502:                    
                         top_dif = top_dif[top_dif.buy >= top_dif.lhigh * ct.changeRatio]
                     log.debug('dif4 open>low0.99:%s' % len(top_dif))
-                    log.debug('dif4-2:%s' % top_dif[:1])
+                    log.debug('dif4-2:%s' % top_dif.percent[:2])
 
-                    # if cct.get_work_time() and cct.get_now_time_int() > 930:
-                    top_dif = top_dif[top_dif.percent >= 0]
+                    if cct.get_work_time() and cct.get_now_time_int() > 930:
+                        top_dif = top_dif[top_dif.percent >= 0]
                     log.debug("dif5-percent>0:%s" % len(top_dif))
                     log.debug("Second:vol/vol/:%s" % radio_t)
                     top_dif['volume'] = (
