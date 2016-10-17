@@ -59,7 +59,7 @@ if __name__ == "__main__":
     # StreamHandler(sys.stdout).push_application()
     log = LoggerFactory.getLogger('SinaMarket')
     # log=LoggerFactory.JohnsonLoger('SinaMarket').setLevel(LoggerFactory.DEBUG)
-    log.setLevel(LoggerFactory.DEBUG)
+    # log.setLevel(LoggerFactory.DEBUG)
     if cct.isMac():
         width, height = 145, 16
         cct.set_console(width, height)
@@ -218,9 +218,9 @@ if __name__ == "__main__":
                         df_count, now_count, len(top_all[top_all['buy'] > 0]),
                         len(top_now[top_now['volume'] <= 0]), len(top_dif))),
                     # print "Rt:%0.3f" % (float(time.time() - time_Rt))
-                    print "Rt:%0.1f dT:%s" % (
+                    print "Rt:%0.1f dT:%s N:%s" % (
                         float(time.time() - time_Rt),
-                        cct.get_time_to_date(time_s))
+                        cct.get_time_to_date(time_s),cct.get_now_time())
                     cct.set_console(width, height,
                         title=['dT:%s' % cct.get_time_to_date(time_s), 'G:%s' % len(top_dif), 'zxg: %s' % (blkname)])
 

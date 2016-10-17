@@ -290,6 +290,14 @@ def get_today_duration(datastr):
     duration_day = (today - last_day).days
     return int(duration_day)
 
+def get_now_time():
+    # now = time.time()
+    # now = time.localtime()
+    # # d_time=time.strftime("%Y-%m-%d %H:%M:%S",now)
+    # d_time = time.strftime("%H:%M", now)
+    d_time = datetime.datetime.now().strftime("%H:%M")
+
+    return d_time
 
 def get_now_time_int():
     now_t = datetime.datetime.now().strftime("%H%M")
@@ -321,12 +329,6 @@ def get_work_duration():
         return False
 
 
-def get_now_time():
-    # now = time.time()
-    now = time.localtime()
-    # d_time=time.strftime("%Y-%m-%d %H:%M:%S",now)
-    d_time = time.strftime("%H:%M", now)
-    return d_time
 
 
 def get_work_time_ratio():
@@ -684,6 +686,8 @@ def write_to_blocknew(p_name, data, append=True):
             flist=[]
             # errstatus=False
             for code in flist_t:
+                if len(code) <= 6 or len(code) > 12:
+                    continue
                 if not code.endswith('\r\n'):
                     if len(code) <= 6:
                         # errstatus = True
@@ -692,6 +696,11 @@ def write_to_blocknew(p_name, data, append=True):
                         # errstatus = True
                         code = code+'\r\n'
                 flist.append(code)
+            index_list = ['1999999','47#IFL0', '27#HSI',  '0159915']
+            for co in index_list:
+                inx = (co) + '\r\n'
+                if inx not in flist:
+                    flist.insert(index_list.index(co), inx)
             # if errstatus:
             fout.close()
             fout = open(p_name, 'wb+')
@@ -933,6 +942,8 @@ if __name__ == '__main__':
     # print typeday8_to_day10(None)
     # write_to_blocknew('abc', ['300380','601998'], append=True)
     # print get_today_duration()
+    print get_now_time_int()
+    print get_now_time()
     print get_work_time_ratio()
     print get_work_day_status()
     print last_tddate(days=3)

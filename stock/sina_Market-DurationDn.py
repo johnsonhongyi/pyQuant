@@ -259,7 +259,7 @@ if __name__ == "__main__":
                     print ("N:%s K:%s %s G:%s" % (
                         now_count, len(top_all[top_all['buy'] > 0]),
                         len(top_now[top_now['volume'] <= 0]), goldstock)),
-                    print "Rt:%0.1f dT:%s" % (float(time.time() - time_Rt), cct.get_time_to_date(time_s))
+                    print "Rt:%0.1f dT:%s N:%s" % (float(time.time() - time_Rt), cct.get_time_to_date(time_s),cct.get_now_time())
                     cct.set_console(width, height,
                                     title=[du_date, 'dT:%s' % cct.get_time_to_date(time_s), 'G:%s' % goldstock,
                                            'zxg: %s' % (blkname)])

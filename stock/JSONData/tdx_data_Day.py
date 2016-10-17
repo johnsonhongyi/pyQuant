@@ -211,9 +211,12 @@ def get_tdx_Exp_day_to_df(code, type='f', start=None, end=None, dl=None):
         #     newstockdayl = 60
         if fileSize < 60 * newstockdayl:
             return Series()
-        if dl is None:
-            dl = 60
-            # log.error("start:%s dl is None"%(start))
+        if start is None:
+            if dl is None:
+                dl = 60
+        else:
+           dl = int(cct.get_today_duration(start) * 5 / 7)  
+           log.debug("start:%s dl:%s"%(start,dl))
         data = cct.read_last_lines(file_path, int(dl) + 2)
         dt_list = []
         data_l = data.split('\n')
@@ -459,7 +462,7 @@ def get_tdx_append_now_df_api(code, start=None, end=None, type='f',df=None,dm=No
             # df.index = pd.to_datetime(df.index)
         except (IOError, EOFError, Exception) as e:
             print "Error Duration:", e
-            cct.sleep(2)
+            cct.sleep(0.2)
             ds = ts.get_h_data(code_t, start=tdx_last_day, end=today, index=index_status)
             df.index = pd.to_datetime(df.index)
         if ds is not None and len(ds) > 1:
@@ -526,6 +529,9 @@ def get_tdx_append_now_df_api(code, start=None, end=None, type='f',df=None,dm=No
             #                 # df['name'] = dm.loc[code, 'name']
     if cct.get_now_time_int() > 830 and cct.get_now_time_int() < 930:
         log.debug("now > 830 and <930 return")
+        return df
+#    print df.index.values[-1]
+    if df is not None and df.index.values[-1] == today:
         return df
     if dm is None:
         # if dm is None and today != df.index[-1]:
@@ -1994,21 +2000,22 @@ if __name__ == '__main__':
     # dd=rl.get_sina_Market_json('cyb').set_index('code')
     # codelist= dd.index.tolist()
     # df = get_tdx_exp_all_LastDF(codelist, dt=30,end=20160401, ptype='high', filter='y')
-    # print get_tdx_append_now_df_api('000938',dl=10)[:2]
+    print get_tdx_append_now_df_api('399006',dl=10)
     # print get_tdx_power_now_df('300522', start=20160819,dl=30)[:2]
     # print get_tdx_write_now_file_api('000938', type='f')[:2]
     # print tdx_df.index
     # sys.exit(0)
-    # print get_tdx_Exp_day_to_df('999999', dl=21).sort_index(ascending=False)
-    # print get_tdx_Exp_day_to_df('300076', type='f', start=None, end=None, dt=None, dl=20)
+#    print get_tdx_Exp_day_to_df('999999', dl=200).sort_index(ascending=False)
+    #
+#    print get_tdx_Exp_day_to_df('399006', type='f', start=20150801, end=None , dl=None)
     # print get_tdx_exp_low_or_high_power('002775', dt='2016-06-01', ptype='high', dl=21, power=True)
     # df=getSinaAlldf(market='all')
     # print df[df.index=='002474'].volume
     # print df[df.index=='002474'].vol
     # print df.columns
     # df=get_tdx_exp_low_or_high_power('000034', dt=None, ptype='low', dl=300, end=None, power=False, lastp=False)
-    print get_duration_Index_date('999999',dl=15)
-    print get_tdx_exp_all_LastDF_DL(codeList = [u'000034', u'300290'], dt=200, end=None, ptype='low', filter='y', power=True)
+#    print get_duration_Index_date('999999',dl=15)
+#    print get_tdx_exp_all_LastDF_DL(codeList = [u'000034', u'300290'], dt=200, end=None, ptype='low', filter='y', power=True)
     # print df[:1]
     sys.exit(0)
     # 
