@@ -105,8 +105,11 @@ def get_tdx_Exp_day_to_df(code, type='f', start=None, end=None, dl=None):
         # ds = Series(
         #     {'code': code, 'date': cct.get_today(), 'open': 0, 'high': 0, 'low': 0, 'close': 0, 'amount': 0,
         #      'vol': 0})
+        global initTdxdata
         ds = pd.DataFrame()
-        log.error("file_path:not exists")
+        if initTdxdata == 0:
+            log.error("file_path:not exists")
+        initTdxdata += 1
         return ds
     # ofile = open(file_path, 'rb')
     if start is None and dl is None:
@@ -864,10 +867,13 @@ def getSinaJsondf(market='cyb',vol=ct.json_countVol,type=ct.json_countType):
 
 def getSinaAlldf(market='cyb',vol=ct.json_countVol,type=ct.json_countType):
     global initTdxdata
-    df = rl.get_sina_Market_json(market)
+    if market == 'rzrq':
+        df = cct.get_rzrq_code()
+    else:
+        df = rl.get_sina_Market_json(market)
     # codelist=df.code.tolist()
     # cct._write_to_csv(df,'codeall')
-    # top_now = get_market_price_sina_dd_realTime(df, vol, type)
+    # top_now = get_mmarket='all'arket_price_sina_dd_realTime(df, vol, type)
     if len(df) > 0:
         codelist = df.code.tolist()
         df = df.set_index('code')
@@ -1490,7 +1496,7 @@ def get_tdx_exp_low_or_high_power(code, dt=None, ptype='close', dl=None,end=None
                 dd = Series()
 
         else:
-            log.warning("code:%s no < dt:NULL" % (code))
+            log.debug("code:%s no < dt:NULL" % (code))
             dd = Series()
             # dd = Series(
             #     {'code': code, 'date': cct.get_today(), 'open': 0, 'high': 0, 'low': 0, 'close': 0, 'amount': 0,
@@ -2000,7 +2006,7 @@ if __name__ == '__main__':
     # dd=rl.get_sina_Market_json('cyb').set_index('code')
     # codelist= dd.index.tolist()
     # df = get_tdx_exp_all_LastDF(codelist, dt=30,end=20160401, ptype='high', filter='y')
-    print get_tdx_append_now_df_api('399006',dl=10)
+    # print get_tdx_append_now_df_api('399006',dl=10)
     # print get_tdx_power_now_df('300522', start=20160819,dl=30)[:2]
     # print get_tdx_write_now_file_api('000938', type='f')[:2]
     # print tdx_df.index
@@ -2009,7 +2015,8 @@ if __name__ == '__main__':
     #
 #    print get_tdx_Exp_day_to_df('399006', type='f', start=20150801, end=None , dl=None)
     # print get_tdx_exp_low_or_high_power('002775', dt='2016-06-01', ptype='high', dl=21, power=True)
-    # df=getSinaAlldf(market='all')
+    df=getSinaAlldf(market='rzrq')
+    print df[:1]
     # print df[df.index=='002474'].volume
     # print df[df.index=='002474'].vol
     # print df.columns

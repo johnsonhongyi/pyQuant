@@ -605,6 +605,7 @@ def get_market_price_sina_dd_realTime(dp='',vol='0',type='0'):
         dp=dp.drop_duplicates('code')
         log.info("Market_realTime:%s"%len(dp))
         # dp=dp.set_index('code')
+        dp=dp.fillna(0)
         dp=dp.dropna('index')
         # if dp[:1].volume.values >0:
         # log.debug("dp.volume>0:%s"%dp[:1].volume.values)
