@@ -301,8 +301,10 @@ class Sina:
         # if cct.get_work_time() or (cct.get_now_time_int() > 915) :
         # df = df.drop('close', axis=1)
         df.rename(columns={'close': 'llastp'}, inplace=True)
-        df.rename(columns={'now': 'close'}, inplace=True)
-
+        if (cct.get_now_time_int() > 915 and cct.get_now_time_int() < 926):
+            df.rename(columns={'buy': 'close'}, inplace=True)
+        else:
+            df.rename(columns={'now': 'close'}, inplace=True)
         df = df.drop_duplicates('code')
         # df = df.loc[:, ct.SINA_Total_Columns_Clean]
         # df = df.loc[:, ct.SINA_Total_Columns]
