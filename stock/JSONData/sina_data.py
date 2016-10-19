@@ -191,6 +191,8 @@ class Sina:
         #         ulist))
         if index:
             self.index_status = index
+            if isinstance(code,str) and code.startswith('999'):
+                code = '000001'   
             self.stock_codes = map(lambda stock_code: (
                 'sh%s' if stock_code.startswith(('0')) else 'sz%s') % stock_code, code.split())
         else:
@@ -302,7 +304,9 @@ class Sina:
         # df = df.drop('close', axis=1)
         df.rename(columns={'close': 'llastp'}, inplace=True)
         if (cct.get_now_time_int() > 915 and cct.get_now_time_int() < 926):
-            df.rename(columns={'buy': 'close'}, inplace=True)
+#            df.rename(columns={'buy': 'close'}, inplace=True)
+            df['close']=df['buy']
+            df['low']=df['buy']
         else:
             df.rename(columns={'now': 'close'}, inplace=True)
         df = df.drop_duplicates('code')
@@ -333,6 +337,7 @@ if __name__ == "__main__":
     # code='601198'
     # df = sina.get_stock_list_data(['300134', '601998', '999999']).set_index('code')
     # df = sina.get_stock_code_data('000001',index=True).set_index('code')
+    print sina.get_stock_code_data('999999',index=True)
     df = sina.get_stock_list_data(['600845', '300376']).set_index('code')
     # df = sina.get_stock_code_data('002775',index=False).set_index('code')
     print len(df),df[:1]

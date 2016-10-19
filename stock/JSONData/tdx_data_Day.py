@@ -443,7 +443,6 @@ def get_tdx_append_now_df_api(code, start=None, end=None, type='f',df=None,dm=No
     duration = cct.get_today_duration(tdx_last_day)
     log.debug("duration:%s"%duration)
     log.debug("tdx_last_day:%s" % tdx_last_day)
-    
     log.debug("duration:%s" % duration)
     if end is not None:
         # print end,df.index[-1]
@@ -455,8 +454,8 @@ def get_tdx_append_now_df_api(code, start=None, end=None, type='f',df=None,dm=No
             duration = 0
         else:
             today = end
-
-    if duration >= 1:
+#    print cct.last_tddate(duration)
+    if duration >= 1 and tdx_last_day != cct.last_tddate(duration):
         if index_status:
             code_t = INDEX_LIST[code][2:]
         try:
@@ -2006,7 +2005,10 @@ if __name__ == '__main__':
     # dd=rl.get_sina_Market_json('cyb').set_index('code')
     # codelist= dd.index.tolist()
     # df = get_tdx_exp_all_LastDF(codelist, dt=30,end=20160401, ptype='high', filter='y')
-    # print get_tdx_append_now_df_api('399006',dl=10)
+    print get_tdx_append_now_df_api('999999',dl=5)
+    print get_tdx_append_now_df_api('399006',dl=5)
+    print get_tdx_append_now_df_api('000838',dl=5)
+    print get_tdx_append_now_df_api('601998',dl=5)
     # print get_tdx_power_now_df('300522', start=20160819,dl=30)[:2]
     # print get_tdx_write_now_file_api('000938', type='f')[:2]
     # print tdx_df.index
@@ -2015,8 +2017,8 @@ if __name__ == '__main__':
     #
 #    print get_tdx_Exp_day_to_df('399006', type='f', start=20150801, end=None , dl=None)
     # print get_tdx_exp_low_or_high_power('002775', dt='2016-06-01', ptype='high', dl=21, power=True)
-    df=getSinaAlldf(market='rzrq')
-    print df[:1]
+    # df=getSinaAlldf(market='rzrq')
+    # print df[:1]
     # print df[df.index=='002474'].volume
     # print df[df.index=='002474'].vol
     # print df.columns

@@ -148,7 +148,7 @@ if __name__ == "__main__":
                     log.debug('diff2-0-buy>0')
                     # top_dif = top_dif[top_dif.low >= top_dif.llow]
                     # log.debug('diff2-1:%s' % len(top_dif))
-                    # top_dif = top_dif[top_dif.low >= top_dif.llastp]
+                    top_dif = top_dif[top_dif.low >= top_dif.llastp]
                     # log.debug('dif3 low<>0 :%s' % len(top_dif))
                     # top_dif = top_dif[top_dif.open > 0]
                     top_dif = top_dif[top_dif.buy >= top_dif.llastp * ct.changeRatio]

@@ -17,7 +17,7 @@ from JSONData import tdx_data_Day as tdd
 from JSONData import get_macd_kdj_rsi as getab
 from JohhnsonUtil import zoompan
 from JohhnsonUtil import LoggerFactory as LoggerFactory
-
+import time
 log = LoggerFactory.getLogger("PowerCompute")
 # log.setLevel(LoggerFactory.INFO)
 
@@ -859,6 +859,7 @@ def get_linear_model_candles(code, ptype='low', dtype='d', start=None, end=None,
 
 
 def powerCompute_df(df, dtype='d', end=None, dl=None, filter='y',talib=False):
+    ts=time.time()
     if isinstance(df, list):
         code_l = df
         statuslist = True
@@ -927,7 +928,7 @@ def powerCompute_df(df, dtype='d', end=None, dl=None, filter='y',talib=False):
 
         df=df.fillna(0)
         # df = df.drop_duplicates()
-
+    print "P:%0.2f"%(time.time()-ts),    
     return df
 
 
