@@ -125,6 +125,10 @@ if __name__ == "__main__":
             if len(top_now) > 10 and len(top_now.columns) > 4:
                 # if 'percent' in top_now.columns.values:
                 #     top_now=top_now[top_now['percent']>0]
+                if 'trade' in top_now.columns:
+                    top_now['buy'] = (
+                        map(lambda x, y: y if int(x) == 0 else x, top_now['buy'].values, top_now['trade'].values))
+      
                 if len(top_all) == 0 and len(lastpTDX_DF) == 0:
                     time_Rt = time.time()
                     top_all,lastpTDX_DF = tdd.get_append_lastp_to_df(top_now)
@@ -139,9 +143,9 @@ if __name__ == "__main__":
                         # code = rl._symbol_to_code(symbol)
                         if symbol in top_all.index:
 
-                            count_n = top_now.loc[symbol, 'trade']
-                            count_a = top_all.loc[symbol, 'lastp']
-                            top_now.loc[symbol, 'diff'] = round((count_n - count_a)/count_a*100,1)
+#                            count_n = top_now.loc[symbol, 'buy']
+#                            count_a = top_all.loc[symbol, 'lastp']
+#                            top_now.loc[symbol, 'diff'] = round((count_n - count_a)/count_a*100,1)
                             # count_n = top_now.loc[symbol, 'counts']
                             # count_a = top_all.loc[symbol, 'counts']
                             # top_now.loc[symbol, 'diff'] = count_n - count_a
@@ -175,6 +179,7 @@ if __name__ == "__main__":
 
                         else:
                             top_all.append(top_now.loc[symbol])
+                
 
                 # top_bak = top_all
                 # top_all['buy'] = (
@@ -190,7 +195,8 @@ if __name__ == "__main__":
                     log.debug("top_diff:vol")
                     top_all['volume'] = (
                         map(lambda x, y: round(x / y / radio_t, 1), top_all['volume'].values, top_all['lvol'].values))
-                    
+                    top_all['diff'] = (
+                        map(lambda x, y: round(((float(x) - float(y)) / float(y) * 100), 1),top_all['buy'].values,top_all['lastp'].values))
                     if cct.get_now_time_int() > 915:
                         top_all = top_all[top_all.trade > top_all.llastp * ct.changeRatio]
                         top_all = top_all[top_all.trade > top_all.lhigh * ct.changeRatio]
@@ -304,6 +310,7 @@ if __name__ == "__main__":
                         cct.write_to_blocknew(block_path, codew[:ct.writeCount], False)
                         # cct.write_to_blocknew(all_diffpath, codew, False)
                     print "wri ok:%s" % block_path
+                    cct.sleeprandom(120)
                     # cct.sleep(2)
                 else:
                     sys.exit(0)
@@ -339,6 +346,7 @@ if __name__ == "__main__":
                     cct.write_to_blocknew(block_path, codew, False)
                     # cct.write_to_blocknew(all_diffpath,codew,False)
                 print "wri ok:%s" % block_path
+                cct.sleeprandom(120)
 
                 # cct.sleep(5)
 

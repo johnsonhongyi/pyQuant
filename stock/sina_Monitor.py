@@ -271,6 +271,7 @@ if __name__ == "__main__":
                         cct.write_to_blocknew(block_path, codew[:ct.writeCount], False)
                         # cct.write_to_blocknew(all_diffpath, codew, False)
                     print "wri ok:%s" % block_path
+                    cct.sleeprandom(120)
                     # cct.sleep(2)
                 else:
                     sys.exit(0)
@@ -304,6 +305,7 @@ if __name__ == "__main__":
                     cct.write_to_blocknew(block_path, codew, False)
                     # cct.write_to_blocknew(all_diffpath,codew,False)
                 print "wri ok:%s" % block_path
+                cct.sleeprandom(120)
                 # cct.sleep(5)
             else:
                 sys.exit(0)

@@ -455,7 +455,7 @@ def get_tdx_append_now_df_api(code, start=None, end=None, type='f',df=None,dm=No
         else:
             today = end
 #    print cct.last_tddate(duration)
-    if duration >= 1 and tdx_last_day != cct.last_tddate(duration):
+    if duration >= 1 and tdx_last_day != cct.last_tddate(1):
         if index_status:
             code_t = INDEX_LIST[code][2:]
         try:
@@ -2006,9 +2006,9 @@ if __name__ == '__main__':
     # codelist= dd.index.tolist()
     # df = get_tdx_exp_all_LastDF(codelist, dt=30,end=20160401, ptype='high', filter='y')
     print get_tdx_append_now_df_api('999999',dl=5)
-    print get_tdx_append_now_df_api('399006',dl=5)
-    print get_tdx_append_now_df_api('000838',dl=5)
-    print get_tdx_append_now_df_api('601998',dl=5)
+#    print get_tdx_append_now_df_api('399006',dl=5)
+#    print get_tdx_append_now_df_api('000838',dl=5)
+#    print get_tdx_append_now_df_api('601998',dl=5)
     # print get_tdx_power_now_df('300522', start=20160819,dl=30)[:2]
     # print get_tdx_write_now_file_api('000938', type='f')[:2]
     # print tdx_df.index

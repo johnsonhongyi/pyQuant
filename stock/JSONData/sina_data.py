@@ -307,6 +307,11 @@ class Sina:
 #            df.rename(columns={'buy': 'close'}, inplace=True)
             df['close']=df['buy']
             df['low']=df['buy']
+        elif (cct.get_now_time_int() > 830 and cct.get_now_time_int() < 915):
+#            df.rename(columns={'buy': 'close'}, inplace=True)
+            df['buy']=df['llastp']
+            df['close']=df['buy']
+            df['low']=df['buy']
         else:
             df.rename(columns={'now': 'close'}, inplace=True)
         df = df.drop_duplicates('code')

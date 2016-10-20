@@ -396,6 +396,7 @@ if __name__ == "__main__":
                     cct.write_to_blocknew(block_path, codew, False)
                     # sl.write_to_blocknew(all_diffpath, codew, False)
                 print "wri ok:%s" % block_path
+                cct.sleeprandom(120)
             elif st.startswith('sh'):
                 while 1:
                     input = raw_input("code:")
