@@ -429,7 +429,9 @@ if __name__ == '__main__':
     while 1:
         try:
             if not status:
-                if len(rzrq) == 0:
+                if len(rzrq) == 0 or rzrq['shrz'] == 0 or rzrq['szrz'] == 0 or rzrq['diff'] == 0:
+                    if rzrq['shrz'] == 0 or rzrq['szrz'] == 0 or rzrq['diff'] == 0:
+                        log.warn("rzrq 0")
                     rzrq = ffu.get_dfcfw_rzrq_SHSZ()
                 if len(fibl) == 0 or fibcount >= fibc:
                     # print "change FibDiff"
@@ -535,7 +537,11 @@ if __name__ == '__main__':
             # traceback.print_exc()
             sleeptime=random.randint(5, 15)
             print "Error2sleep:%s"%(sleeptime)
-            cct.sleep(sleeptime)
+        except Exception as e:
+            print "Error Exception", e
+            cct.sleeprandom(120)
+        # finally:
+        #     cct.sleeprandom(120)
             # raw_input("Except")
             # num_input=num_input
             # print "status:",status

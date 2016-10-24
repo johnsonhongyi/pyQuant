@@ -873,6 +873,7 @@ def getSinaAlldf(market='cyb',vol=ct.json_countVol,type=ct.json_countType):
     # codelist=df.code.tolist()
     # cct._write_to_csv(df,'codeall')
     # top_now = get_mmarket='all'arket_price_sina_dd_realTime(df, vol, type)
+#    df =  df.dropna()
     if len(df) > 0:
         codelist = df.code.tolist()
         df = df.set_index('code')
@@ -1715,7 +1716,7 @@ def get_append_lastp_to_df(top_all,lastpTDX_DF=None,dl=ct.PowerCountdl,end=None,
             tdxdata = tdxdata.loc[:, ['llow', 'lhigh', 'lastp', 'lvol','ma5d','ma10d','date']]
             # tdxdata = tdxdata.loc[
             #     :, ['llow', 'lhigh', 'lastp', 'lvol', 'date']]
-
+#        tdxdata = tdxdata.dropna()
         log.debug("TDX Col:%s" % tdxdata.columns.values)
     else:
         tdxdata = lastpTDX_DF
@@ -1860,6 +1861,7 @@ def get_tdx_exp_all_LastDF_DL(codeList, dt=None,end=None,ptype='low',filter='n',
 
     # print results
     df = pd.DataFrame(results, columns=ct.TDX_Day_columns)
+    df = df.dropna(how='all')
     df = df.set_index('code')
     df.loc[:, 'open':'amount'] = df.loc[:, 'open':'amount'].astype(float)
     # df.vol = df.vol.apply(lambda x: x / 100)

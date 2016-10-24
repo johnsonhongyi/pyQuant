@@ -61,7 +61,7 @@ if __name__ == "__main__":
         try:
             # df = rl.get_sina_Market_json('all')
             # top_now = rl.get_market_price_sina_dd_realTime(df, vol, type)
-            top_now = tdd.getSinaAlldf(market='cyb', vol=ct.json_countVol, type=ct.json_countType)            
+            top_now = tdd.getSinaAlldf(market='all', vol=ct.json_countVol, type=ct.json_countType)            
             # print top_now.loc['601900',:]
             df_count = len(top_now)
             now_count = len(top_now)

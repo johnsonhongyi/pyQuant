@@ -295,7 +295,7 @@ class Sina:
                  'a4': float(stock[28]),
                  'a5_v': int(stock[29]),
                  'a5': float(stock[30])})
-
+#        print list_s    
         # df = pd.DataFrame.from_dict(stock_dict,columns=ct.SINA_Total_Columns)
         df = pd.DataFrame(list_s, columns=ct.SINA_Total_Columns)
         # if self.index_status and cct.get_work_time():

@@ -334,8 +334,8 @@ if __name__ == "__main__":
 
     # dd =get_dfcfw_fund_flow('cyb')
     # print dd
-    print get_dfcfw_fund_SHSZ()
-    # df = get_dfcfw_rzrq_SHSZ()
+#    print get_dfcfw_fund_SHSZ()
+     df = get_dfcfw_rzrq_SHSZ()
     # print df
 
     # get_lhb_dd()

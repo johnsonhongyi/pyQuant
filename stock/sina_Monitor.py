@@ -72,7 +72,7 @@ if __name__ == "__main__":
             # print len(top_now)
 
             top_now = tdd.getSinaAlldf(
-                market='cyb', vol=ct.json_countVol, type=ct.json_countType)
+                market='all', vol=ct.json_countVol, type=ct.json_countType)
             time_Rt = time.time()
             time_d = time.time()
             if time_d - time_s > delay_time:
