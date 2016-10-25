@@ -268,7 +268,9 @@ def get_hot_countNew(changepercent, rzrq,fibl=None,fibc=10):
     else:
         fibcount += 1
     allTop = pd.DataFrame()
-    for market in ct.SINA_Market_KEY:
+    indexKeys = [ 'sh','sz', 'cyb']
+    for market in indexKeys:
+        # market = ct.SINA_Market_KEY()
         df = rd.get_sina_Market_json(market, False)
         # count=len(df.index)
         log.info("market:%s" % df[:1])

@@ -165,7 +165,8 @@ def get_sina_Market_json(market='sh', showtime=True, num='1000', retry_count=3, 
         df = df.append(results, ignore_index=True)
         # df['volume']= df['volume'].apply(lambda x:x/100)
         # print df.columns
-        df['ratio']=df['ratio'].apply(lambda x:round(x,1))
+        if 'ratio' in df.columns:
+        	df['ratio']=df['ratio'].apply(lambda x:round(x,1))
         df['percent']=df['percent'].apply(lambda x:round(x,1))
         df=df.drop_duplicates()
         # print df[:1]

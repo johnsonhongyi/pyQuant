@@ -129,7 +129,7 @@ if __name__ == "__main__":
 
                 elif len(top_all) == 0 and len(lastpTDX_DF) > 0:
                     top_all = top_now
-                    top_all = top_all.merge(lastpTDX_DF, left_index=True, right_index=True, how='left')
+                    top_all = top_all.merge(lastpTDX_DF, left_index=True, right_index=True, how='inner')
                     # lastpTDX_DF=tdxdata
                     log.info('Top-merge_now:%s' % (top_all[:1]))
                     top_all = top_all[top_all['llow'] > 0]
@@ -139,16 +139,17 @@ if __name__ == "__main__":
                         if not 'counts' in top_all.columns.values:
                             top_all['counts'] = 0
                             top_all['prev_p'] = 0
-                    for symbol in top_now.index:
-                        if 'counts' in top_now.columns.values:
-                            top_all.loc[symbol, 'trade':'prev_p'] = top_now.loc[symbol, 'trade':'prev_p']
-                        else:
-                            # top_now.loc[symbol, 'diff'] = round(
-                            # ((float(top_now.loc[symbol, 'buy']) - float(
-                            # top_all.loc[symbol, 'lastp'])) / float(top_all.loc[symbol, 'lastp']) * 100),
-                            # 1)
-                            top_all.loc[symbol, 'trade':'low'] = top_now.loc[symbol, 'trade':'low']
-                            # top_all.loc[symbol, 'buy'] = top_now.loc[symbol, 'buy']
+                    for symbol in top_all.index:
+                        if symbol in top_now.index:
+                            if 'counts' in top_now.columns.values:
+                                top_all.loc[symbol, 'trade':'prev_p'] = top_now.loc[symbol, 'trade':'prev_p']
+                            else:
+                                # top_now.loc[symbol, 'diff'] = round(
+                                # ((float(top_now.loc[symbol, 'buy']) - float(
+                                # top_all.loc[symbol, 'lastp'])) / float(top_all.loc[symbol, 'lastp']) * 100),
+                                # 1)
+                                top_all.loc[symbol, 'trade':'low'] = top_now.loc[symbol, 'trade':'low']
+                                # top_all.loc[symbol, 'buy'] = top_now.loc[symbol, 'buy']
                 # top_all = top_all[top_all.buy > 0]
                 top_dif = top_all.copy()
                 log.debug('top_dif:%s'%(len(top_dif)))
@@ -322,7 +323,7 @@ if __name__ == "__main__":
             int_time = cct.get_now_time_int()
             if cct.get_work_time():
                 if int_time < 925:
-                    cct.sleep(120)
+                    cct.sleep(90)
                 elif int_time < 930:
                     cct.sleep((930 - int_time) * 60)
                     # top_all = pd.DataFrame()
