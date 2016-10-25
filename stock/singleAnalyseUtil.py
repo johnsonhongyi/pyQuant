@@ -429,7 +429,7 @@ if __name__ == '__main__':
     while 1:
         try:
             if not status:
-                if len(rzrq) == 0 or rzrq['shrz'] == 0 or rzrq['szrz'] == 0 or rzrq['diff'] == 0:
+                if len(rzrq) == 0 or rzrq['sh'] == 0 or rzrq['sz'] == 0 or rzrq['all'] == 0:
                     if rzrq['shrz'] == 0 or rzrq['szrz'] == 0 or rzrq['diff'] == 0:
                         log.warn("rzrq 0")
                     rzrq = ffu.get_dfcfw_rzrq_SHSZ()
