@@ -152,7 +152,7 @@ if __name__ == "__main__":
                     # log.debug('dif3 low<>0 :%s' % len(top_dif))
                     # top_dif = top_dif[top_dif.open > 0]
                     top_dif = top_dif[top_dif.buy >= top_dif.llastp * ct.changeRatio]
-                    if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 1502:                    
+                    if cct.get_now_time_int() > 925 and cct.get_now_time_int() < 1502:                    
                         top_dif = top_dif[top_dif.buy >= top_dif.lhigh * ct.changeRatio]
                     log.debug('dif4 open>low0.99:%s' % len(top_dif))
                     log.debug('dif4-2:%s' % top_dif.percent[:2])

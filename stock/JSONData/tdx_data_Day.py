@@ -31,8 +31,9 @@ log = LoggerFactory.getLogger('TDX_Day')
 path_sep = os.path.sep
 newstockdayl = 30
 changedays=0
-global initTdxdata
+global initTdxdata,initTushareCsv
 initTdxdata = 0
+initTushareCsv = 0
 # win7rootAsus = r'D:\Program Files\gfzq'
 # win10Lengend = r'D:\Program\gfzq'
 # win7rootXunji = r'E:\DOC\Parallels\WinTools\zd_pazq'
@@ -865,9 +866,19 @@ def getSinaJsondf(market='cyb',vol=ct.json_countVol,type=ct.json_countType):
     return top_now
 
 def getSinaAlldf(market='cyb',vol=ct.json_countVol,type=ct.json_countType):
-    global initTdxdata
+
     if market == 'rzrq':
         df = cct.get_rzrq_code()
+    elif market == 'zxb':
+        df = cct.get_tushare_market(market, renew=False)
+    elif market == 'captops':
+        global initTushareCsv
+        if initTushareCsv == 0:
+            initTushareCsv += 1 
+            df = cct.get_tushare_market(market=market, renew=True,days=10)
+        else:
+            df = cct.get_tushare_market(market, renew=False, days = 10)
+
     else:
         df = rl.get_sina_Market_json(market)
     # codelist=df.code.tolist()

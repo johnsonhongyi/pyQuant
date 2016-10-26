@@ -976,11 +976,11 @@ if __name__ == "__main__":
     # print get_linear_model_status('600671', filter='y', start='20160329', ptype='high')
     # print get_linear_model_status('999999', filter='y', dl=30, ptype='high')
     # print get_linear_model_status('999999', filter='y', dl=30, ptype='low')
-    print powerCompute_df(['000938','002171'], dtype='d',end=None, dl=21, filter='y')
+    # print powerCompute_df(['000938','002171'], dtype='d',end=None, dl=21, filter='y')
     # # print powerCompute_df(['601198', '002791', '000503'], dtype='d', end=None, dl=30, filter='y')
     # print get_linear_model_status('999999', filter='y', dl=34, ptype='low', days=1)
     # print get_linear_model_status('399006', filter='y', dl=34, ptype='low', days=1)
-    sys.exit()
+    # sys.exit()
     if cct.isMac():
         cct.set_console(80, 19)
     else:

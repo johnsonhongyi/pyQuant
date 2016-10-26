@@ -94,6 +94,46 @@ def get_rzrq_code(market='all'):
     dd = dfsz.append(dfsh,ignore_index=True)
     return dd
 
+def get_tushare_market(market='zxb',renew=False,days=5):
+    def tusharewrite_to_csv(market,filename,days):
+        import tushare as ts
+        if market == 'zxb':
+            df = ts.get_sme_classified()
+        elif market == 'captops':
+            df = ts.cap_tops(days).loc[:,['code','name']]
+            if days != 10:
+                initda = days * 2
+                df2 = ts.inst_tops(initda).loc[:,['code','name']]
+                df = df.append(df2)
+                df.drop_duplicates('code',inplace=True)
+        else:
+            log.warn('market not found')
+            return pd.DataFrame()
+        if len(df)>0:
+            df = df.set_index('code')
+        else:
+            log.warn("get error")
+        df.to_csv(filename,encoding='gbk')
+        log.warn("update %s :%s"%(market,len(df)))
+        df.reset_index(inplace=True)
+        return df
+
+    baser = os.getcwd().split('stock')[0]
+    base = baser  + 'stock' +path_sep + 'JohhnsonUtil' + path_sep
+    filepath = base + market+'.csv'
+    if os.path.exists(filepath):
+        if renew and creation_date_duration(filepath).days > 0:
+            df = tusharewrite_to_csv(market, filepath, days)
+        else:
+            df = pd.read_csv(filepath,dtype={'code':str},encoding = 'gbk')
+            # df = pd.read_csv(filepath,dtype={'code':str})
+            if len(df) == 0:
+                df = tusharewrite_to_csv(market, filepath ,days)    
+    else:
+        df = tusharewrite_to_csv(market, filepath , days)
+
+    return df
+
 def get_tdx_dir_blocknew():
     blocknew_path = get_tdx_dir() + r'/T0002/blocknew/'.replace('/', path_sep).replace('\\', path_sep)
     return blocknew_path
@@ -104,6 +144,27 @@ def isMac():
         return True
     else:
         return False
+
+def creation_date_duration(path_to_file):
+    """
+    Try to get the date that a file was created, falling back to when it was
+    last modified if that isn't possible.
+    See http://stackoverflow.com/a/39501288/1709587 for explanation.
+    """
+    # if platform.system() == 'Windows':
+    #     return os.path.getctime(path_to_file)
+    # else:
+    #     stat = os.stat(path_to_file)
+    #     try:
+    #         return stat.st_birthtime
+    #     except AttributeError:
+    #         # We're probably on Linux. No easy way to get creation dates here,
+    #         # so we'll settle for when its content was last modified.
+    #         return stat.st_mtime
+    dt = os.path.getmtime(path_to_file)
+    dtm = datetime.date.fromtimestamp(dt)
+    today = datetime.date.today()
+    return today - dtm
 
 def set_ctrl_handler():
     # os.environ['FOR_DISABLE_CONSOLE_CTRL_HANDLER'] = '1'
@@ -959,6 +1020,7 @@ if __name__ == '__main__':
     # print typeday8_to_day10(None)
     # write_to_blocknew('abc', ['300380','601998'], append=True)
     # print get_today_duration()
+    print get_tushare_market(market='captops', renew=True,days=10).shape
     print get_rzrq_code()[:3]
     print get_now_time_int()
     print get_now_time()
