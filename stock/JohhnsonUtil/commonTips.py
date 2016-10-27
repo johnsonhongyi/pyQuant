@@ -844,13 +844,13 @@ def write_to_blocknew(p_name, data, append=True):
     # writeBlocknew(blockNew, data)
     if p_name.find('061.blk') > 0 or p_name.find('062.blk') > 0 or p_name.find('063.blk') > 0:
         writeBlocknew(p_name, data, append)
-        writeBlocknew(blockNew, data)
+        writeBlocknew(blockNew, data,append)
         writeBlocknew(blockNewStart, data,append)
         print "write to zxg and 066"
     else:
         writeBlocknew(p_name, data, append)
         # writeBlocknew(blockNewStart, data[:ct.writeCount - 1])
-        writeBlocknew(blockNewStart, data)
+        writeBlocknew(blockNewStart, data,append)
         print "write to other and start"
 
 

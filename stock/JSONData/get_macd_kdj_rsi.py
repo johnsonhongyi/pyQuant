@@ -9,6 +9,7 @@ import talib as ta
 import tushare as ts
 import tdx_data_Day as tdd
 from JohhnsonUtil import LoggerFactory as LoggerFactory
+from JohhnsonUtil import johnson_cons as ct 
 log = LoggerFactory.getLogger("get_macd_kdj_rsi")
 # log.setLevel(LoggerFactory.DEBUG)
 
@@ -20,6 +21,39 @@ def Get_Stock_List():
     df = ts.get_stock_basics().head(10)
 #     print (df)
     return df
+
+def algoMultiDay(df,column='close',days=5,op=0):
+    if df is not None:
+        if column in df.columns:
+            for day in range(days):
+                idx = -1 - day
+                if df[column][idx] > df[column][idx-1]:
+                    op +=1
+                    if df['high'][idx] > df['high'][idx-1]:
+                        op+=1
+                    if df['low'][idx] > df['low'][idx-1]:
+                        op+=0.5
+                    else:
+                        op-=1
+                    if df['open'][idx] > df['close'][idx-1]:
+                        op+=1
+                    if df['open'][idx] < df['low'][idx-1]:
+                        op-=3
+                else:
+                    op += -1
+    return op                
+
+def algoMultiTech(df,column='close',days=5,op=0):
+    if df is not None:
+        if column in df.columns:
+            for day in range(days):
+                idx = -1 - day
+                if df[column][idx] > df[column][idx-1]:
+                    op +=1
+                else:
+                    op += -1
+    return op  
+
 
 def Get_BBANDS(df,dtype='d'):
     df = df.sort_index(ascending=True)
@@ -36,7 +70,11 @@ def Get_BBANDS(df,dtype='d'):
         if df.high[-1] == df.low[-1]:
             operate += -1 
         if  df.close[-1] == df.high[-1] and df.close[-1] >= df.open[-1]:
-            operate += 10    
+            operate += 10
+        if  df.close[-1] >= df.high[-1]*ct.changeRatio and df.close[-1] > df.open[-1] and df.open[-1] >= df.low[-1]*ct.changeRatio :
+            operate += 10
+        if  df.close[-1] >= df.open[-1]* 1.04  and df.open[-1] >= df.low[-1]*ct.changeRatio :
+            operate += 5
         if df.close[-1] > df['upbb%s'%dtype][-1]:
             operate += 5
     else:
@@ -45,7 +83,12 @@ def Get_BBANDS(df,dtype='d'):
         if df.close[-1] > df['lowb%s'%dtype][-1]:
             operate += -5
         elif df.close[-1] == df.low[-1] and df.close[-1] <= df.open[-1]:
-            operate += -10       
+            operate += -10
+    for cl in ['close','ma5d','ma10d','ma20d','midbd']:
+        operate = algoMultiTech(df, column=cl, days=5, op=operate)
+#        print operate
+#    operate = op
+    operate = algoMultiDay(df, column='close', days=5, op=operate)       
     df = df.sort_index(ascending=False)
     return df,operate
     
@@ -318,7 +361,7 @@ if __name__ == '__main__':
     # df = Get_TA(df,Dist)
     # df = ts.get_hist_data('sh')
     # code='300110'
-    code='300338'
+    code='300003'
     df = tdd.get_tdx_append_now_df_api(code,dl=60)
     print df[:2]
     print "len:",len(df)

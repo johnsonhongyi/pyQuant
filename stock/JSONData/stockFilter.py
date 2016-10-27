@@ -7,7 +7,7 @@ def getBollFilter(df=None,boll=1):
 		print "dataframe is None"
 		return None
 	if 'boll' in df.columns:
-		return df[df.boll >= boll]
+		return df[df.boll > boll]
 	else:
 		print "boll not in columns"
 		return df 

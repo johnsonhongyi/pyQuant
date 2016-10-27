@@ -190,7 +190,7 @@ if __name__ == "__main__":
                 cct.set_console(width, height,
                     title=['dT:%s' % cct.get_time_to_date(time_s), 'G:%s' % len(top_dif), 'zxg: %s' % (blkname)])
               
-                top_temp = stf.getBollFilter(df=top_temp, boll=6)
+                top_temp = stf.getBollFilter(df=top_temp, boll=ct.bollFilter)
                 if 'op' in top_temp.columns:
 
                     # top_temp = top_temp.sort_values(by=['ra', 'op','percent'],ascending=[0, 0,0])

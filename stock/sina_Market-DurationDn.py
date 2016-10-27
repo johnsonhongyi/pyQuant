@@ -264,7 +264,7 @@ if __name__ == "__main__":
                                     title=[du_date, 'dT:%s' % cct.get_time_to_date(time_s), 'G:%s' % goldstock,
                                            'zxg: %s' % (blkname)])
 
-                    top_temp = stf.getBollFilter(df=top_temp, boll=6)
+                    top_temp = stf.getBollFilter(df=top_temp, boll=ct.bollFilter)
                     if 'op' in top_temp.columns:
                         # if ptype == 'low':
                         #     top_temp = top_temp.sort_values(by=ct.Duration_sort_op,
@@ -412,6 +412,7 @@ if __name__ == "__main__":
                     duration_date = args.start.strip()
                     if len(str(duration_date)) < 4:
                         du_date = tdd.get_duration_Index_date('999999',dl=int(duration_date))
+                        ct.PowerCountdl = duration_date
                     set_duration_console(du_date)
                     top_all = pd.DataFrame()
                     time_s = time.time()

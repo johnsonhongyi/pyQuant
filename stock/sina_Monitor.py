@@ -188,7 +188,7 @@ if __name__ == "__main__":
 
                 print "G:%s Rt:%0.1f dT:%s N:%s" % (len(top_all), float(time.time() - time_Rt), cct.get_time_to_date(time_s),cct.get_now_time())
 
-                top_temp = stf.getBollFilter(df=top_temp, boll=6)
+                top_temp = stf.getBollFilter(df=top_temp, boll=ct.bollFilter)
                 if 'op' in top_temp.columns:
                     # top_temp = top_temp.sort_values(by=['ra','percent','counts'],ascending=[0, 0,0])
                     
