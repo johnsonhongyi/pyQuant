@@ -23,39 +23,71 @@ def Get_Stock_List():
     return df
 
 def algoMultiDay(df,column='close',days=5,op=0):
+    df = df.sort_index(ascending=True)
     if df is not None:
+        obo=0
         if column in df.columns:
             for day in range(days):
+                tmpdf=pd.DataFrame(df.loc[:,column][-days-2:-1-day], columns=[column])
+                c_max=tmpdf.max().values
+                c_min=tmpdf.min().values
+                c_mean=tmpdf.mean().values
                 idx = -1 - day
-                if df[column][idx] > df[column][idx-1]:
-                    op +=1
-                    if df['high'][idx] > df['high'][idx-1]:
+                nowp = round(df[column][idx],2)
+                lastp = round(df[column][idx-1],2)
+                if nowp >= c_max and day == 0:
+                    op+=10
+                    obo = 1
+                    continue
+                elif nowp > c_mean:
+                    if nowp > df['high'][idx-1]:
+                        op+=2
+                    elif nowp > lastp:
                         op+=1
-                    if df['low'][idx] > df['low'][idx-1]:
-                        op+=0.5
                     else:
-                        op-=1
-                    if df['open'][idx] > df['close'][idx-1]:
-                        op+=1
-                    if df['open'][idx] < df['low'][idx-1]:
-                        op-=3
+                        op+=0.5
+                
+                elif nowp < c_min:
+                    op +=-2
+                elif nowp < c_mean:
+                    op +=-1
                 else:
-                    op += -1
+                    if nowp > lastp:
+                        op +=1
+                        if df['high'][idx] > df['high'][idx-1]:
+                            op+=1
+                        if df['low'][idx] > df['low'][idx-1]:
+                            op+=0.5
+                        else:
+                            op-=1
+                        if df['open'][idx] > df['close'][idx-1] and df['close'][idx] > df['close'][idx-1]:
+                            op+=1
+                        if df['open'][idx] < df['low'][idx-1] and df['close'][idx] <= c_min:
+                            op-=10
+                    else:
+                        op += -1
+        if obo >0:
+            op +=10.1
+#        else:
+#            op +=-days
     return op                
 
 def algoMultiTech(df,column='close',days=5,op=0):
+    df = df.sort_index(ascending=True)
     if df is not None:
         if column in df.columns:
             for day in range(days):
                 idx = -1 - day
-                if df[column][idx] > df[column][idx-1]:
+                nowp = round(df[column][idx],2)
+                lastp = round(df[column][idx-1],2)
+                if nowp > lastp:
                     op +=1
                 else:
                     op += -1
     return op  
 
 
-def Get_BBANDS(df,dtype='d'):
+def Get_BBANDS(df,dtype='d',days=5):
     df = df.sort_index(ascending=True)
     upperband,middleband,lowerband=ta.BBANDS(np.array(df['close']),timeperiod=20,nbdevdn=2,matype=0)
     df['upbb%s'%dtype] = pd.Series(upperband,index=df.index)
@@ -75,8 +107,10 @@ def Get_BBANDS(df,dtype='d'):
             operate += 10
         if  df.close[-1] >= df.open[-1]* 1.04  and df.open[-1] >= df.low[-1]*ct.changeRatio :
             operate += 5
-        if df.close[-1] > df['upbb%s'%dtype][-1]:
-            operate += 5
+        if df.close[-1] > df.close[-2] and df.close[-1] > df['upbb%s'%dtype][-2]:
+            operate += 10
+#        if df.high[-1] > df['upbb%s'%dtype][-1]:
+#            operate += 5
     else:
         # print 'low'
         operate = -1
@@ -84,18 +118,17 @@ def Get_BBANDS(df,dtype='d'):
             operate += -5
         elif df.close[-1] == df.low[-1] and df.close[-1] <= df.open[-1]:
             operate += -10
-    for cl in ['close','ma5d','ma10d','ma20d','midbd']:
-        operate = algoMultiTech(df, column=cl, days=5, op=operate)
+    for cl in ['upbb%s'%dtype,'midb%s'%dtype,'lowb%s'%dtype]:
+        operate = algoMultiTech(df, column=cl, days=days, op=operate)
 #        print operate
-#    operate = op
-    operate = algoMultiDay(df, column='close', days=5, op=operate)       
+#    operate = op     
     df = df.sort_index(ascending=False)
     return df,operate
     
 #修改了的函数，按照多个指标进行分析
 
 #按照MACD，KDJ等进行分析
-def Get_TA(df,dtype='d'):
+def Get_TA(df,dtype='d',days=5):
     df = df.sort_index(ascending=True)
     if dtype != 'd':
         # if not dtype == 'd':
@@ -139,16 +172,45 @@ def Get_TA(df,dtype='d'):
     df,op = Get_BBANDS(df,dtype)
     print "boll:%s ma:%s kdj:%s rsi:%s"%(op,operate_array1,operate_array2,operate_array3)
     df = df.sort_index(ascending=False)
-    return df
+    return df,op
 
 
-
-#通过MACD判断买入卖出
-def Get_MACD(df,dtype='d'):
+def Get_MACD_OP(df,dtype='d',days=5):
     #参数12,26,9
     df = df.sort_index(ascending=True)
-    if len(df) < 26:
+    if len(df) < 30:
         return (df,1)
+#    df=df.fillna(0)
+    macd, macdsignal, macdhist = ta.MACD(np.array(df['close']), fastperiod=12, slowperiod=26, signalperiod=9)
+#    SignalMA5 = ta.MA(macdsignal, timeperiod=5, matype=0)
+#    SignalMA10 = ta.MA(macdsignal, timeperiod=10, matype=0)
+#    SignalMA20 = ta.MA(macdsignal, timeperiod=20, matype=0)
+    #13-15 DIFF  DEA  DIFF-DEA
+    df['diff%s'%dtype]=pd.Series(macd,index=df.index) #DIFF 13 
+    df['dea%s'%dtype]=pd.Series(macdsignal,index=df.index)#DEA  14 
+    df['ddea%s'%dtype]=pd.Series(macdhist,index=df.index)#DIFF-DEA  15
+#    dflen = df.shape[0]
+#    MAlen = len(SignalMA5)
+    operate = 0
+    #2个数组 1.DIFF、DEA均为正，DIFF向上突破DEA，买入信号。 2.DIFF、DEA均为负，DIFF向下跌破DEA，卖出信号。
+    #待修改
+#    diff=df.loc[df.index[-1],'diff%s'%dtype]
+#    diff2=df.loc[df.index[-2],'diff%s'%dtype]
+#    dea=df.loc[df.index[-1],'dea%s'%dtype]
+#    dea2=df.loc[df.index[-2],'dea%s'%dtype]
+
+    for cl in ['diff%s'%dtype,'dea%s'%dtype,'ddea%s'%dtype]:
+        operate=algoMultiTech(df, column=cl, days=days, op=operate)   
+    df = df.sort_index(ascending=False)
+    return (df,operate)
+    
+#通过MACD判断买入卖出
+def Get_MACD(df,dtype='d',days=5):
+    #参数12,26,9
+    df = df.sort_index(ascending=True)
+    if len(df) < 34:
+        return (df,1)
+#    df=df.fillna(0)
     macd, macdsignal, macdhist = ta.MACD(np.array(df['close']), fastperiod=12, slowperiod=26, signalperiod=9)
     SignalMA5 = ta.MA(macdsignal, timeperiod=5, matype=0)
     SignalMA10 = ta.MA(macdsignal, timeperiod=10, matype=0)
@@ -171,11 +233,12 @@ def Get_MACD(df,dtype='d'):
         if dea >0:
             if diff > dea and diff2 <= dea2:
                 operate = operate + 10#买入
+
     else:
         if dea < 0:
             if diff == dea2 :
                 operate = operate - 10#卖出
-
+             
     #3.DEA线与K线发生背离，行情反转信号。
     ma5 =  df.loc[df.index[-1],'ma5%s'%dtype]   #7
     ma10 =  df.loc[df.index[-1],'ma10%s'%dtype] #8
@@ -205,13 +268,16 @@ def Get_MACD(df,dtype='d'):
             if df.loc[df.index[-1-i],'ddea%s'%dtype] >=0:#
                 operate = operate - 5
                 break
+    for cl in ['diff%s'%dtype,'dea%s'%dtype]:
+        operate=algoMultiTech(df, column=cl, days=days, op=operate)   
     df = df.sort_index(ascending=False)
     return (df,operate)
 
 
+    
 
 #通过KDJ判断买入卖出
-def Get_KDJ(df,dtype='d'):
+def Get_KDJ(df,dtype='d',days=5):
     #参数9,3,3
     df = df.sort_index(ascending=True)
     slowk, slowd = ta.STOCH(np.array(df['high']), np.array(df['low']), np.array(df['close']), fastk_period=9, slowk_period=3, slowk_matype=0, slowd_period=3, slowd_matype=0)
@@ -266,12 +332,14 @@ def Get_KDJ(df,dtype='d'):
         if (slowkMA5[MAlen-1]>=slowkMA10[MAlen-1] and slowkMA10[MAlen-1]>=slowkMA20[MAlen-1]) or \
            (slowdMA5[MAlen-1]>=slowdMA10[MAlen-1] and slowdMA10[MAlen-1]>=slowdMA20[MAlen-1]): #K,D上涨
             operate = operate + 1
+    for cl in ['slowk%s'%dtype,'slowd%s'%dtype]:
+        operate=algoMultiTech(df, column=cl, days=days, op=operate)
     df = df.sort_index(ascending=False)
     return (df,operate)
 
 
 #通过RSI判断买入卖出
-def Get_RSI(df,dtype='d'):
+def Get_RSI(df,dtype='d',days=5):
     #参数14,5
     df = df.sort_index(ascending=True)
     slowreal = ta.RSI(np.array(df['close']), timeperiod=14)
@@ -325,6 +393,8 @@ def Get_RSI(df,dtype='d'):
         operate = operate + 10
     elif fast< slow and fast2>=slow2:
         operate = operate - 10
+    for cl in ['slowreal%s'%dtype,'fastreal%s'%dtype]:
+        operate=algoMultiTech(df, column=cl, days=days, op=operate)  
     df = df.sort_index(ascending=False)
     return (df,operate)
 
@@ -361,14 +431,55 @@ if __name__ == '__main__':
     # df = Get_TA(df,Dist)
     # df = ts.get_hist_data('sh')
     # code='300110'
-    code='300003'
-    df = tdd.get_tdx_append_now_df_api(code,dl=60)
-    print df[:2]
-    print "len:",len(df)
-    # dd,op=Get_MACD(df)
-    # print dd[:2],op
-    dd,op=Get_BBANDS(df, dtype='d')
-    print op
+#    code='300201'
+    codel=['300249','601555','002486','600321','002437','399006','999999']
+#    code='600321'
+#    code:002732 boll: 45 ma: 6.0  macd:-1 RSI:0 kdj: 3 time:0.0241
+#    code:002623 boll: 41 ma: 10.0  macd:-5 RSI:4 kdj: -1 time:0.0216
+    for code in codel:
+        df = tdd.get_tdx_append_now_df_api(code,dl=60)
+    #    df = tdd.get_tdx_power_now_df(code,dl=30)
+        # print df[:2]
+        # print "len:",len(df)
+        s=time.time()
+        print ('code:%s'%(code)),
+        dd,op=Get_BBANDS(df, dtype='d')
+        print 'boll:',op,
+        operate = algoMultiDay(df, column='close',days=5)
+        print 'ma:',operate,
+        dd,op=Get_MACD_OP(df)
+        print ' macd:%s'%(op),
+        dd,op=Get_RSI(df)
+        print 'RSI:%s'%(op),
+        import sys
+    #    sys.exit()
+        dd,op=Get_KDJ(df)
+        print 'kdj:',op,
+        print "time:%0.3f"%(time.time()-s)
+#    sys.exit()
+    while 1:
+        code = raw_input('pls:')
+        if len(code) != 6:
+            continue
+        else:
+            df = tdd.get_tdx_append_now_df_api(code,dl=60)
+            # print df[:2]
+            # print "len:",len(df)
+            s=time.time()
+            print ('code:%s'%(code)),
+            dd,op=Get_BBANDS(df, dtype='d')
+            print 'boll:',op,
+            operate = algoMultiDay(df, column='close')
+            print 'ma:',operate,
+            dd,op=Get_MACD_OP(df)
+            print ' macd:%s'%(op),
+            dd,op=Get_RSI(df)
+            print 'RSI:%s'%(op),
+        #    import sys
+        #    sys.exit()
+            dd,op=Get_KDJ(df)
+            print 'kdj:',op,
+            print "time:%0.3f"%(time.time()-s)
     # print df[:3]
     # df = Get_BBANDS(df)
     # df = Get_TA(df)

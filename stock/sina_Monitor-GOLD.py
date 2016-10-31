@@ -229,7 +229,9 @@ if __name__ == "__main__":
 
                 top_temp = top_all[:ct.PowerCount].copy()
                 top_temp = pct.powerCompute_df(top_temp, dl=ct.PowerCountdl)
-                print "G:%s Rt:%0.1f dT:%s N:%s" % (len(top_all),float(time.time() - time_Rt),cct.get_time_to_date(time_s),cct.get_now_time())
+                goldstock = len(top_all[(top_all.buy >= top_all.lhigh * 0.99) & (top_all.buy >= top_all.llastp * 0.99)])
+                # print "G:%s Rt:%0.1f dT:%s N:%s" % (len(top_all),float(time.time() - time_Rt),cct.get_time_to_date(time_s),cct.get_now_time())
+                print "G:%s Rt:%0.1f dT:%s N:%s" % (goldstock,float(time.time() - time_Rt),cct.get_time_to_date(time_s),cct.get_now_time())
                 cct.set_console(width, height,
                     title=['dT:%s' % cct.get_time_to_date(time_s), 'G:%s' % len(top_all), 'zxg: %s' % (blkname)])
                 

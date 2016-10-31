@@ -211,7 +211,8 @@ if __name__ == "__main__":
                     # top_dif = top_dif[top_dif.trade >= top_dif.buy]
                     # df['volume']= df['volume'].apply(lambda x:x/100)
 
-                    goldstock = len(top_dif[top_dif.buy >= top_dif.lhigh * 0.99])
+                    # goldstock = len(top_dif[top_dif.buy >= top_dif.lhigh * 0.99])
+                    goldstock = len(top_dif[(top_dif.buy >= top_dif.lhigh * 0.99) & (top_dif.buy >= top_dif.llastp * 0.99)])
                     ## goldstock=len(top_dif[top_dif.buy >(top_dif.high-top_dif.low)/2])
                     if ptype == 'low':
                         top_dif = top_dif[top_dif.lvol > ct.LvolumeSize]

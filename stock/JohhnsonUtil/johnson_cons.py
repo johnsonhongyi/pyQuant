@@ -37,8 +37,8 @@ Duration_percentdn_op_key=[0,0,0,1,1,0,1,1,1]
 
 # Duration_percent_op=['diff','percent','op','fib','fibl','ra','ratio','volume','counts']
 # Duration_percent_op_key=[0,0,0,1,1,0,1,1,1]
-Duration_percent_op=['diff','ra','percent','op','fib','fibl','ratio','volume','counts']
-Duration_percent_op_key=[0,0,0,0,1,1,1,1,1]
+Duration_percent_op=['boll','diff','ra','percent','op','fib','fibl','ratio','volume','counts']
+Duration_percent_op_key=[0,0,0,0,0,1,1,1,1,1]
 
 Duration_ra_op=['ra','diff','percent','op','fib','fibl','ratio','volume','counts']
 Duration_ra_op_key=[0,0,0,0,1,1,1,1,1]
@@ -48,14 +48,11 @@ Duration_sort_high_op=['diff','date','fib','op','fibl','ra','percent','ratio','v
 Duration_sort_high_op_key=[0,1,1,0,1,0,0,1,1,1]
 
 
-Duration_format_buy=['name', 'buy', 'ma5d','boll','diff', 'percent','ra','op', 'fib','fibl','volume' , 'ratio', 'counts','ldate', 'date']
-Duration_format_trade=['name', 'trade', 'ma5d','boll','diff','percent', 'ra','op', 'fib','fibl','volume', 'ratio', 'counts', 'ldate', 'date']
 
 Monitor_sort_count=[ 'counts', 'percent','diff','volume', 'ratio']
 Monitor_sort_op=['fib','fibl','op','diff','percent',  'ra' , 'ratio']
 Monitor_sort_op_key=[ 1, 1,0,0, 0, 0, 1]
 
-Monitor_format_trade=['name', 'trade', 'ma5d','boll','diff', 'percent', 'ra','op', 'fib','fibl','volume', 'ratio', 'counts','ldate']
 
 MonitorMarket_sort_count=['diff', 'percent', 'volume', 'counts', 'ratio']
 # MonitorMarket_sort_op=['fib','diff', 'op', 'ra', 'percent', 'ratio']
@@ -65,9 +62,22 @@ MonitorMarket_sort_count=['diff', 'percent', 'volume', 'counts', 'ratio']
 MonitorMarket_sort_op=['diff','fib','fibl','op','ra','percent','ratio','volume','counts']
 MonitorMarket_sort_op_key=[0,0,1,0,0,0,1,1,1]
 
-MonitorMarket_format_buy=['name', 'buy', 'ma5d', 'boll','diff','percent', 'ra','op', 'fib','fibl','volume', 'ratio', 'counts','ldate', 'date']
-MonitorMarket_format_trade=['name', 'trade', 'ma5d', 'boll','diff','percent', 'ra','op', 'fib','fibl', 'volume', 'ratio', 'counts','ldate']
+#edit 1031
+# Duration_format_buy=['name', 'buy', 'ma5d','boll','diff', 'percent','ra','op', 'fib','fibl','volume', 'ratio', 'counts','ldate', 'date']
+# Duration_format_trade=['name', 'trade', 'ma5d','boll','diff','percent', 'ra','op', 'fib','fibl','volume', 'ratio', 'counts','ldate', 'date']
+# Monitor_format_trade=['name', 'trade', 'ma5d','boll','diff', 'percent', 'ra','op', 'fib','fibl','volume', 'ratio', 'counts','ldate']
+# MonitorMarket_format_buy=['name', 'buy', 'ma5d', 'boll','diff','percent', 'ra','op', 'fib','fibl','volume', 'ratio', 'counts','ldate', 'date']
+# MonitorMarket_format_trade=['name', 'trade', 'ma5d', 'boll','diff','percent', 'ra','op', 'fib','fibl', 'volume', 'ratio', 'counts','ldate']
 # MonitorMarket_format_trade=['name', 'trade', 'ma5d', 'boll','diff', 'ra','op', 'fib','fibl', 'percent','volume', 'ratio', 'counts','ldate', 'date']
+Duration_format_buy=['name', 'buy', 'ma5d','boll','diff', 'percent','ra','op', 'fib','fibl','ma','macd','rsi','kdj', 'date']
+Duration_format_trade=['name', 'trade', 'ma5d','boll','diff','percent', 'ra','op', 'fib','fibl','ma','macd','rsi','kdj', 'date']
+Monitor_format_trade=['name', 'trade', 'ma5d','boll','diff', 'percent', 'ra','op', 'fib','fibl','ma','macd','rsi','kdj']
+MonitorMarket_format_buy=['name', 'buy', 'ma5d', 'boll','diff','percent', 'ra','op', 'fib','fibl','ma','macd','rsi','kdj', 'date']
+MonitorMarket_format_trade=['name', 'trade', 'ma5d', 'boll','diff','percent', 'ra','op', 'fib','fibl', 'ma','macd','rsi','kdj']
+
+
+
+
 
 DD_TYPE_List={'0':'5','1':'10','2':'20','3':'50','4':'100'}
 P_TYPE = {'http': 'http://', 'ftp': 'ftp://'}

@@ -214,9 +214,11 @@ if __name__ == "__main__":
 
                     top_temp = top_dif[:ct.PowerCount].copy()
                     top_temp = pct.powerCompute_df(top_temp, dl=ct.PowerCountdl,talib=True)
+                    goldstock = len(top_dif[(top_dif.buy >= top_dif.lhigh * 0.99) & (top_dif.buy >= top_dif.llastp * 0.99)])
+
                     print("A:%s N:%s K:%s %s G:%s" % (
                         df_count, now_count, len(top_all[top_all['buy'] > 0]),
-                        len(top_now[top_now['volume'] <= 0]), len(top_dif))),
+                        len(top_now[top_now['volume'] <= 0]), goldstock)),
                     # print "Rt:%0.3f" % (float(time.time() - time_Rt))
                     print "Rt:%0.1f dT:%s N:%s" % (
                         float(time.time() - time_Rt),
@@ -283,6 +285,8 @@ if __name__ == "__main__":
                         print "."
                         break
             else:
+#                import sys
+#                sys.exit(0)
                 raise KeyboardInterrupt("Stop")
         except (KeyboardInterrupt) as e:
             # print "key"

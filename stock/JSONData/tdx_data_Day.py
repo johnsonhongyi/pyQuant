@@ -611,6 +611,9 @@ def get_tdx_append_now_df_api(code, start=None, end=None, type='f',df=None,dm=No
 
     return df
 
+def write_tdx_tushare_to_file(code):
+    pass
+    
 def get_tdx_write_now_file_api(code, type='f',dm=None):
 
     dt_list=[]
@@ -676,46 +679,7 @@ def get_tdx_write_now_file_api(code, type='f',dm=None):
             ds.sort_index(ascending=True, inplace=True)
             # log.debug("ds:%s" % ds[:1])
             df = df.append(ds)
-            # df = df.astype(float)
-            # pd.concat([df,ds],axis=0, join='outer')
-            # result=pd.concat([df,ds])
 
-            # if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 1510:
-            #     log.debug("get_work_time:work")
-            #     if end is None:
-            #         # dm = rl.get_sina_Market_json('all').set_index('code')
-            #         if dm is None:
-            #             if index_status:
-            #                 log.debug("code:%s code_t:%s"%(code,code_t))
-            #                 dm = sina_data.Sina().get_stock_code_data(code_t,index=index_status)
-            #                 dm.code = code
-            #                 dm = dm.set_index('code')
-            #             else:
-            #                 dm = sina_data.Sina().get_stock_code_data(code,index=index_status).set_index('code')
-            #             log.debug("dm:%s now:%s"%(len(dm),dm))
-            #         if dm is not None and df is not None and not dm.empty  and not df.empty:
-            #             # dm=dm.drop_duplicates()
-            #             # log.debug("not None dm:%s" % dm[-1:])
-            #             dm.rename(columns={'volume': 'amount', 'turnover': 'vol'}, inplace=True)
-            #             c_name=dm.loc[code,['name']].values[0]
-            #             dm_code = (dm.loc[:, ['open', 'high', 'low', 'close', 'amount','vol']])
-            #             log.debug("dm_code:%s" % dm_code)
-            #             dm_code['amount'] = round(float(dm_code['amount']) / 100, 2)
-            #             dm_code['code'] = code
-            #             # dm_code['vol'] = 0
-            #             dm_code['date']=today
-            #             dm_code = dm_code.set_index('date')
-            #             # dm_code.name = today
-            #             # log.debug("dm_code_index:%s"%(dm_code))
-            #             log.debug("df.open:%s dm.open%s"%(df.open[-1],round(dm.open[-1],2)))
-
-            #             if df.close[-1] != round(dm.close[-1], 2):
-            #                 df = df.append(dm_code)
-            #                 # df = df.astype(float)
-            #             df['name']=c_name
-            #             log.debug("c_name:%s df.name:%s"%(c_name,df.name[-1]))
-            #                 # log.debug("df[-3:]:%s" % (df[-2:]))
-            #                 # df['name'] = dm.loc[code, 'name']
     if cct.get_now_time_int() > 830 and cct.get_now_time_int() < 930:
         log.debug("now > 830 and <930 return")
         return df
@@ -919,6 +883,7 @@ def getSinaAlldf(market='cyb',vol=ct.json_countVol,type=ct.json_countType):
         dm['ratio'] = 0
     else:
         dm=pd.merge(dm,df.loc[:,['name','ratio']],on='name',how='left')
+        dm=dm.drop_duplicates('code')
     # print dz[:1].ratio
     # dm['ratio'] = map(lambda x: round(df[df.code == x].ratio, 1) if len(df[df.code == x].ratio) > 0 else 0, dm['code'].values)
     # print len(dm)
@@ -1839,7 +1804,8 @@ def get_tdx_exp_all_LastDF_DL(codeList, dt=None,end=None,ptype='low',filter='n',
             # results.append(get_tdx_exp_low_or_high_price(code, dt, ptype, dl))
     elif dt is not None:
         if len(str(dt)) < 8 :
-            dl = int(dt)
+            dt = int(dt)
+            dl = dt
             # dt = None
             # df = get_tdx_Exp_day_to_df('999999',end=end).sort_index(ascending=False)
             # dt = get_duration_price_date('999999', dt=dt,ptype=ptype,df=df)

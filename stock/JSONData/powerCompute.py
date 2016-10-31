@@ -884,7 +884,8 @@ def powerCompute_df(df, dtype='d', end=None, dl=None, filter='y',talib=False):
         start = cct.day8_to_day10(start)
         end = cct.day8_to_day10(end)
         dz = dm.loc[code].to_frame().T
-        tdx_df = tdd.get_tdx_power_now_df(code, start=start, end=end, type='f', df=None, dm=dz, dl=dl*2)
+#        tdx_df = tdd.get_tdx_power_now_df(code, start=start, end=end, type='f', df=None, dm=dz, dl=dl*2)
+        tdx_df = tdd.get_tdx_append_now_df_api(code, start=start, end=end, type='f', df=None, dm=dz, dl=dl*2)
         # print tdx_df
         opc = 0
         stl = ''
@@ -924,8 +925,17 @@ def powerCompute_df(df, dtype='d', end=None, dl=None, filter='y',talib=False):
         df.loc[code, 'fibl'] = fibl
         df.loc[code, 'ldate'] = stl
         df.loc[code, 'boll'] = operation
-        # df = getab.Get_BBANDS(df, dtype='d')
 
+        tdx_df,opkdj = getab.Get_KDJ(tdx_df, dtype='d')
+        tdx_df,opmacd = getab.Get_MACD_OP(tdx_df, dtype='d')
+        tdx_df,oprsi = getab.Get_RSI(tdx_df, dtype='d')
+        opma = getab.algoMultiDay(tdx_df)
+        df.loc[code, 'kdj'] = opkdj
+        df.loc[code, 'macd'] = opmacd
+        df.loc[code, 'rsi'] = oprsi
+        df.loc[code, 'ma'] = opma
+        # df = getab.Get_BBANDS(df, dtype='d')
+        #'volume', 'ratio', 'counts','ldate' -> 'ma','macd','rsi','kdj'
         df=df.fillna(0)
         # df = df.drop_duplicates()
     print "P:%0.2f"%(time.time()-ts),    

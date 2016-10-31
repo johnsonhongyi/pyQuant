@@ -118,9 +118,9 @@ if __name__ == "__main__":
                 # top_all = top_all[top_all.buy >= top_all.llastp]
                 # top_all = top_all[top_all.percent >= 0]
                 
-                if cct.get_now_time_int() < 1500:
-                    top_all['diff'] = (
-                        map(lambda x, y: round((x - y) / y * 100, 1), top_all['buy'].values, top_all['lastp'].values))
+                # if cct.get_now_time_int() < 1500:
+                top_all['diff'] = (
+                    map(lambda x, y: round((x - y) / y * 100, 1), top_all['buy'].values, top_all['lastp'].values))
                 top_dif = top_all                
                 log.info('dif1:%s' % len(top_dif))
                 top_dif=top_dif[top_dif.lvol > ct.LvolumeSize]
@@ -183,9 +183,11 @@ if __name__ == "__main__":
 
                 top_temp = top_dif[:ct.PowerCount].copy()
                 top_temp = pct.powerCompute_df(top_temp, dl=ct.PowerCountdl)
+                goldstock = len(top_dif[(top_dif.buy >= top_dif.lhigh * 0.99) & (top_dif.buy >= top_dif.llastp * 0.99)])
+
                 print ("A:%s N:%s K:%s %s G:%s" % (
                     df_count, now_count, len(top_all[top_all['buy'] > 0]),
-                    len(top_now[top_now['volume'] <= 0]), len(top_dif))),
+                    len(top_now[top_now['volume'] <= 0]), goldstock)),
                 print "Rt:%0.1f dT:%s N:%s" % (float(time.time() - time_Rt), cct.get_time_to_date(time_s),cct.get_now_time())
                 cct.set_console(width, height,
                     title=['dT:%s' % cct.get_time_to_date(time_s), 'G:%s' % len(top_dif), 'zxg: %s' % (blkname)])
