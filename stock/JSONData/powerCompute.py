@@ -75,7 +75,7 @@ def LIS(X):
         lo = 1
         hi = L
         while lo <= hi:
-            mid = (lo + hi) // 2
+            mid = (lo + hi) / 2
             if (X[M[mid]] < X[i]):
                 lo = mid + 1
             else:
@@ -205,7 +205,7 @@ def Candlestick(ax, bars=None, quotes=None, width=0.5, colorup='k', colordown='r
     div_n = len(ax.get_xticks())
     allc = len(bars.index)
     # lastd = bars.index[-1]
-    if allc / div_n > 12:
+    if div_n > 0 and allc / div_n > 12:
         div_n = allc / 12
     ax.set_xticks(range(0, len(bars.index), div_n))
     new_xticks = [bars.index[d] for d in ax.get_xticks()]
@@ -330,7 +330,7 @@ def get_linear_model_status(code, df=None, dtype='d', type='m', start=None, end=
         # print start,index_d,ptype
         log.debug("dl not None code:%s start: %s  index_d:%s" % (code, start, index_d))
 
-    if df is not None:
+    if len(df) > 0 and  df is not None:
         df = df.sort_index(ascending=True)
         df = df[df.index >= start]
         # if start and index_d and len(df) > 2 and filter == 'y':
@@ -347,7 +347,7 @@ def get_linear_model_status(code, df=None, dtype='d', type='m', start=None, end=
                 # filter = 'y'
                 # print start,ptype
 
-    if df is None:
+    if len(df) ==0 or df is None :
         if start is not None and len(start) > 8 and int(start[:4]) > 2500:
             log.warn("code:%s ERROR:%s" % (code, start))
             start = '2016-01-01'
@@ -392,7 +392,10 @@ def get_linear_model_status(code, df=None, dtype='d', type='m', start=None, end=
         # Y_hat_t = Y * b + a
         # log.info("Y_hat:%s " % (Y_hat))
         # log.info("asset:%s " % (asset.values))
-        ratio = b / a * 100
+        if a != 0:
+            ratio = b / a * 100
+        else:
+            ratio = 0
         operation = 0
         # log.debug("line_now:%s src:%s" % (Y_hat[-1], Y_hat[0]))
         if Y_hat[-1] > Y_hat[0]:
@@ -825,7 +828,10 @@ def get_linear_model_candles(code, ptype='low', dtype='d', start=None, end=None,
                     Xa = X[ida - 1:]
                     Xb = Xa - Xa[0]
                     # sb=(bX - aX)*b+sa
-                    b = (sb - sa) / (bX - aX)
+                    if (bX - aX) > 0:
+                        b = (sb - sa) / (bX - aX)
+                    else:
+                        b = 0
                     Ylist = Xb * b + sa
                     Yhat = []
                     st = sb * 0.618
@@ -880,7 +886,6 @@ def powerCompute_df(df, dtype='d', end=None, dl=None, filter='y',talib=False):
                 # print start
             else:
                 start = None
-
         start = cct.day8_to_day10(start)
         end = cct.day8_to_day10(end)
         dz = dm.loc[code].to_frame().T
@@ -915,10 +920,11 @@ def powerCompute_df(df, dtype='d', end=None, dl=None, filter='y',talib=False):
         
         # df.loc[code,'ma5'] = daysData[1].ma5d[0]
         # print tdx_df[:1].ma5d[0],daysData[1].ma5d[0]
-        if tdx_df[:1].ma5d[0] is not None and tdx_df[:1].ma5d[0] != 0:
-            df.loc[code,'ma5d'] = round(float(tdx_df[:1].ma5d[0]),2)
-        if tdx_df[:1].ma10d[0] is not None and tdx_df[:1].ma10d[0] != 0:
-            df.loc[code,'ma10d'] = round(float(tdx_df[:1].ma10d[0]),2)
+        if len(tdx_df) > 0 and 'ma5d' in tdx_df.columns:
+            if tdx_df[:1].ma5d[0] is not None and tdx_df[:1].ma5d[0] != 0:
+                df.loc[code,'ma5d'] = round(float(tdx_df[:1].ma5d[0]),2)
+            if tdx_df[:1].ma10d[0] is not None and tdx_df[:1].ma10d[0] != 0:
+                df.loc[code,'ma10d'] = round(float(tdx_df[:1].ma10d[0]),2)
         df.loc[code, 'op'] = opc
         df.loc[code, 'ra'] = rac
         df.loc[code, 'fib'] = fib

@@ -412,7 +412,7 @@ if __name__ == "__main__":
                     duration_date = args.start.strip()
                     if len(str(duration_date)) < 4:
                         du_date = tdd.get_duration_Index_date('999999',dl=int(duration_date))
-                        ct.PowerCountdl = duration_date
+                        ct.PowerCountdl = int(duration_date)
                     set_duration_console(du_date)
                     top_all = pd.DataFrame()
                     time_s = time.time()

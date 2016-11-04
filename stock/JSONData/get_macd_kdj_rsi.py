@@ -84,6 +84,7 @@ def algoMultiTech(df,column='close',days=5,op=0):
                     op +=1
                 else:
                     op += -1
+    
     return op  
 
 
@@ -96,30 +97,59 @@ def Get_BBANDS(df,dtype='d',days=5):
     df = df.fillna(0)
     operate = 0
     log.debug('updbb:%s midb:%s close:%s'%(df['upbb%s'%dtype][-1],df['midb%s'%dtype][-1],df.close[-1]))
-    if df.close[-1] >= df['midb%s'%dtype][-1]:
+
+    cnowp=df.close[-1]
+    clastp=df.close[-2]
+    hnowp=df.high[-1]
+    hlastp=df.high[-2]
+    lnowp=df.low[-1]
+    llastp=df.low[-2]
+    upbbp=df['upbb%s'%dtype][-1]
+    lowbp=df['lowb%s'%dtype][-1]
+    openp=df.open[-1]
+    if df.close[-1] >= df['midb%s'%dtype][-1] and df['midb%s'%dtype][-1] > df['midb%s'%dtype][-2]:
         # print '5'
         operate = 1
-        if df.high[-1] == df.low[-1]:
-            operate += -1 
-        if  df.close[-1] == df.high[-1] and df.close[-1] >= df.open[-1]:
+
+#        if cnowp > clastp:
+#            if hnowp > hlastp:
+#                if cnowp > upbbp:
+#                    operate+=5
+#                elif lnowp > llastp:
+#                    operate+=1
+#                else:
+#                    operate+=0.5
+#        
+##            elif lnowp > llastp:
+            
+        if hnowp == lnowp and cnowp > clastp:
+            operate += 1
+        if  cnowp == hnowp and cnowp >= openp:
+            if cnowp >= clastp:
+                operate += 10
+        if  cnowp >= hnowp*ct.changeRatio and cnowp > openp and openp >= lnowp*ct.changeRatio :
             operate += 10
-        if  df.close[-1] >= df.high[-1]*ct.changeRatio and df.close[-1] > df.open[-1] and df.open[-1] >= df.low[-1]*ct.changeRatio :
-            operate += 10
-        if  df.close[-1] >= df.open[-1]* 1.04  and df.open[-1] >= df.low[-1]*ct.changeRatio :
+        if  cnowp >= openp* 1.04  and openp >= lnowp*ct.changeRatio :
             operate += 5
-        if df.close[-1] > df.close[-2] and df.close[-1] > df['upbb%s'%dtype][-2]:
+        if cnowp > clastp and cnowp > upbbp:
             operate += 10
-#        if df.high[-1] > df['upbb%s'%dtype][-1]:
-#            operate += 5
+        elif hnowp > upbbp:
+            operate += 5
     else:
         # print 'low'
         operate = -1
-        if df.close[-1] > df['lowb%s'%dtype][-1]:
-            operate += -5
-        elif df.close[-1] == df.low[-1] and df.close[-1] <= df.open[-1]:
-            operate += -10
-    for cl in ['upbb%s'%dtype,'midb%s'%dtype,'lowb%s'%dtype]:
-        operate = algoMultiTech(df, column=cl, days=days, op=operate)
+        if cnowp > clastp:
+            if hnowp > hlastp:
+                if cnowp < lowbp:
+                    operate+=-5
+                elif lnowp > llastp:
+                    operate+=-1
+                else:
+                    operate+=-0.5
+        else:
+            operate+=-2.5
+#    for cl in ['upbb%s'%dtype,'midb%s'%dtype,'lowb%s'%dtype]:
+#        operate = algoMultiTech(df, column=cl, days=days, op=operate)
 #        print operate
 #    operate = op     
     df = df.sort_index(ascending=False)
@@ -305,16 +335,17 @@ def Get_KDJ(df,dtype='d',days=5):
     ma10=df.loc[df.index[-1],'ma10%s'%dtype]
     ma20=df.loc[df.index[-1],'ma20%s'%dtype]
     #1.K线是快速确认线——数值在90以上为超买，数值在10以下为超卖；D大于80时，行情呈现超买现象。D小于20时，行情呈现超卖现象。
-    if kdjk>=90:
-        operate = operate - 3
-    elif kdjk<=10:
-        operate = operate + 3
-
-    if kdjd>=80:
-        operate = operate - 3
-    elif kdjd<=20:
-        operate = operate + 3
-
+#    if kdjk>=90:
+#        operate = operate - 3
+#    elif kdjk<=10:
+#        operate = operate + 3
+#
+#    if kdjd>=80:
+#        operate = operate - 3
+#    elif kdjd<=20:
+#        operate = operate + 3
+#    if len(kdjk) >1:
+#        raise Exception("Data not one,Drop_duplicates")
     #2.上涨趋势中，K值大于D值，K线向上突破D线时，为买进信号。#待修改
     if kdjk> kdjd and kdjk2 <=kdjd2:
         operate = operate + 10
@@ -363,10 +394,10 @@ def Get_RSI(df,dtype='d',days=5):
     fast=df.loc[df.index[-1],'fastreal%s'%dtype]
     fast2=df.loc[df.index[-2],'fastreal%s'%dtype]
     #RSI>80为超买区，RSI<20为超卖区
-    if slow>80 or fast>80:
-        operate = operate - 2
-    elif slow<20 or fast<20:
-        operate = operate + 2
+#    if slow>80 or fast>80:
+#        operate = operate - 2
+#    elif slow<20 or fast<20:
+#        operate = operate + 2
 
     #RSI上穿50分界线为买入信号，下破50分界线为卖出信号
     if (slow2 <=50 and slow >50) or (fast2<=50 and fast>50):
@@ -432,10 +463,11 @@ if __name__ == '__main__':
     # df = ts.get_hist_data('sh')
     # code='300110'
 #    code='300201'
-    codel=['300249','601555','002486','600321','002437','399006','999999']
+    codel=['002695','601555','002486','600321','002437','399006','999999']
 #    code='600321'
 #    code:002732 boll: 45 ma: 6.0  macd:-1 RSI:0 kdj: 3 time:0.0241
 #    code:002623 boll: 41 ma: 10.0  macd:-5 RSI:4 kdj: -1 time:0.0216
+    days=5    
     for code in codel:
         df = tdd.get_tdx_append_now_df_api(code,dl=60)
     #    df = tdd.get_tdx_power_now_df(code,dl=30)
@@ -443,17 +475,22 @@ if __name__ == '__main__':
         # print "len:",len(df)
         s=time.time()
         print ('code:%s'%(code)),
-        dd,op=Get_BBANDS(df, dtype='d')
+        dd,op=Get_BBANDS(df, dtype='d',days=days)
         print 'boll:',op,
-        operate = algoMultiDay(df, column='close',days=5)
+        dtype='d'
+        operate=0
+        for cl in ['upbb%s'%dtype,'midb%s'%dtype,'lowb%s'%dtype]:
+            operate = algoMultiTech(dd, column=cl, days=days,op=operate)
+        print 'bollc:',operate,
+        operate = algoMultiDay(df, column='close',days=days)
         print 'ma:',operate,
-        dd,op=Get_MACD_OP(df)
+        dd,op=Get_MACD_OP(df,days=days)
         print ' macd:%s'%(op),
-        dd,op=Get_RSI(df)
+        dd,op=Get_RSI(df,days=days)
         print 'RSI:%s'%(op),
         import sys
     #    sys.exit()
-        dd,op=Get_KDJ(df)
+        dd,op=Get_KDJ(df,days=days)
         print 'kdj:',op,
         print "time:%0.3f"%(time.time()-s)
 #    sys.exit()
@@ -462,22 +499,27 @@ if __name__ == '__main__':
         if len(code) != 6:
             continue
         else:
-            df = tdd.get_tdx_append_now_df_api(code,dl=60)
+            df = tdd.get_tdx_append_now_df_api(code,dl=30)
             # print df[:2]
             # print "len:",len(df)
             s=time.time()
             print ('code:%s'%(code)),
-            dd,op=Get_BBANDS(df, dtype='d')
+            dd,op=Get_BBANDS(df, dtype='d',days=days)
             print 'boll:',op,
-            operate = algoMultiDay(df, column='close')
+            dtype='d'
+            operate=0
+            for cl in ['upbb%s'%dtype,'midb%s'%dtype,'lowb%s'%dtype]:
+                operate = algoMultiTech(dd, column=cl, days=days,op=operate)
+            print 'bollc:',operate,
+            operate = algoMultiDay(df, column='close',days=days)
             print 'ma:',operate,
-            dd,op=Get_MACD_OP(df)
+            dd,op=Get_MACD_OP(df,days=days)
             print ' macd:%s'%(op),
-            dd,op=Get_RSI(df)
+            dd,op=Get_RSI(df,days=days)
             print 'RSI:%s'%(op),
-        #    import sys
+            import sys
         #    sys.exit()
-            dd,op=Get_KDJ(df)
+            dd,op=Get_KDJ(df,days=days)
             print 'kdj:',op,
             print "time:%0.3f"%(time.time()-s)
     # print df[:3]

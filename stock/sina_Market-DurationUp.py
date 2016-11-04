@@ -62,6 +62,7 @@ if __name__ == "__main__":
     ptype='low'
     # op, ra, duration_date, days = pct.get_linear_model_status('999999', filter='y', dl=dl, ptype=ptype, days=1)
     duration_date = ct.duration_date
+#    duration_date = 120
     # duration_date = 300
     du_date = duration_date
     end_date = None
@@ -165,7 +166,8 @@ if __name__ == "__main__":
                     top_dif = top_dif[top_dif.buy >= top_dif.lhigh * ct.changeRatio]
                     log.debug('top_dif:%s'%(len(top_dif)))
                 
-                top_dif = top_dif[top_dif.buy > 0]
+                    top_dif = top_dif[top_dif.buy > 0]
+
                 log.debug('top_dif:%s'%(len(top_dif)))
                 top_dif['diff'] = (
                     map(lambda x, y: round((x - y) / y * 100, 1), top_dif['buy'].values, top_dif['lastp'].values))

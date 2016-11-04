@@ -622,8 +622,8 @@ def to_mp_run_async(cmd, urllist, *args):
     for code in urllist:
         # result = pool.apply_async(cmd, (code, arg))
         # arg=(code)+','+(args)
-        # print arg
         result = pool.apply_async(cmd, (code,) + args).get()
+#            print code,
         results.append(result)
     pool.close()
     pool.join()
@@ -806,7 +806,11 @@ def write_to_blocknew(p_name, data, append=True):
                     flist.append(code)
                 # if errstatus:
                 fout.close()
-                flist=flist[:9]
+                if p_name.find('066.blk') > 0:
+                    writecount = ct.writeblockbakNum
+                else:
+                    writecount = 9
+                flist=flist[:writecount]
                 index_list = ['1999999','47#IFL0', '27#HSI',  '0159915']
                 for co in index_list:
                     inx = (co) + '\r\n'
@@ -844,11 +848,16 @@ def write_to_blocknew(p_name, data, append=True):
     # writeBlocknew(blockNew, data)
     if p_name.find('061.blk') > 0 or p_name.find('062.blk') > 0 or p_name.find('063.blk') > 0:
         writeBlocknew(p_name, data, append)
-        writeBlocknew(blockNew, data,append)
+        writeBlocknew(blockNew, data)
         writeBlocknew(blockNewStart, data,append)
         print "write to zxg and 066"
+    elif p_name.find('065.blk') > 0:
+        writeBlocknew(p_name, data, append)
+        writeBlocknew(blockNew,data,append)
+        writeBlocknew(blockNewStart, data,append)
     else:
         writeBlocknew(p_name, data, append)
+        writeBlocknew(blockNew, data)
         # writeBlocknew(blockNewStart, data[:ct.writeCount - 1])
         writeBlocknew(blockNewStart, data,append)
         print "write to other and start"
