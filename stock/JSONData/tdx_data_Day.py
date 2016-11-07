@@ -606,6 +606,12 @@ def write_tdx_tushare_to_file(code,df=None,start=None,type='f'):
 #    st=time.time()
 #    pname = 'sdata/SH601998.txt'
     if df is None:
+        ldatedf = get_tdx_Exp_day_to_df(code,dl=1)
+        lastd = ldatedf.date
+        # today = cct.get_today()
+        # duration = cct.get_today_duration(tdx_last_day)
+        if lastd == cct.last_tddate(1):
+            return False
         df = get_tdx_append_now_df_api(code,start=start)
     if len(df) == 0:
         return False
@@ -705,7 +711,7 @@ def Write_market_all_day_mp(market='all'):
         for mk in mlist:
             print ("market:%s"%(mk))
             time_t = time.time()
-            df = rl.get_sina_Market_json(mk),
+            df = rl.get_sina_Market_json(mk)
             code_list = np.array(df.code)
             log.info('code_list:%s' % len(code_list))
             results =[]
@@ -2125,10 +2131,18 @@ if __name__ == '__main__':
 #    codelist= dd.index.tolist()
 #    df = get_tdx_exp_all_LastDF(codelist, dt=30,end=20160401, ptype='high', filter='y')
 #    Write_market_all_day_mp('all')
-    code = '002486'
+    code = '601998'
+    # ldatedf = get_tdx_Exp_day_to_df(code,dl=1)
+    # lastd = ldatedf.date
+    # today = cct.get_today()
+    # duration = cct.get_today_duration(lastd)
+    # print cct.last_tddate(1)
+    print write_tdx_tushare_to_file(code)
+    # print lastd,duration,today
 #    300035,300047,300039
-#    print get_tdx_Exp_day_to_df(code,dl=30)[:2]
-    print get_tdx_append_now_df_api(code,dl=30)[:2]
+    print get_tdx_Exp_day_to_df(code,dl=1)
+
+    # print get_tdx_append_now_df_api(code,dl=30)[:2]
 #    print df
 #    print write_tdx_tushare_to_file(code,None)
     sys.exit(0)
