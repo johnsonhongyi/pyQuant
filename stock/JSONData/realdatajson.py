@@ -193,7 +193,7 @@ from configobj import ConfigObj
 import os
 # http://www.cnblogs.com/qq78292959/archive/2013/07/25/3213939.html
 def getconfigBigCount(count=None,write=False):
-    conf_ini = "count.ini"
+    conf_ini = cct.get_work_path('stock','JSONData','count.ini')
     # print os.chdir(os.path.dirname(sys.argv[0]))
     # print (os.path.dirname(sys.argv[0]))
     # log.setLevel(LoggerFactory.INFO)
@@ -221,6 +221,7 @@ def getconfigBigCount(count=None,write=False):
                 log.info("bigRt:%s"%bigRt)
                 config['BigCount']['ratio'] = bigRt
                 config.write()
+                return [big_now,bigRt,big_v]
             else:
                 log.info("not work:%s ra:%s"%(big_now,bigRt))
                 return [big_now,bigRt,big_v]
@@ -230,7 +231,8 @@ def getconfigBigCount(count=None,write=False):
         config['BigCount']['type2'] = sina_json_Big_Count()
         config['BigCount']['ratio'] = 0
         config.write()
-    cl=[config['BigCount']['type2'],config['BigCount']['ratio']]
+    big_v= 0
+    cl=[config['BigCount']['type2'],config['BigCount']['ratio'],0]
     return cl
         
 def sina_json_Big_Count(vol='1', type='0', num='10000'):
@@ -258,7 +260,7 @@ def _get_sina_json_dd_url(vol='0', type='0', num='10000', count=None):
         # print count
         if len(count) > 0:
             count = count[0]
-            bigcount=getconfigBigCount(count,write=True)
+            bigcount=getconfigBigCount(count,write=False)
             print ("Big:%s V:%s "%(bigcount[0],bigcount[1])),
             if int(count) >= int(num):
                 page_count = int(math.ceil(int(count) / int(num)))
@@ -671,11 +673,11 @@ if __name__ == '__main__':
     # _get_sina_json_dd_url()
     # print sina_json_Big_Count()
     print getconfigBigCount(write=True)
+    sys.exit(0)
     df = get_sina_Market_json('sz')
     print df[:1]
     top_now = get_market_price_sina_dd_realTime(df, '0', type)
     print top_now[:1]
-    sys.exit(0)
     # _parsing_Market_price_json('cyb')
     # sys.exit(0)
     # dd = get_sina_all_json_dd('0', '4')

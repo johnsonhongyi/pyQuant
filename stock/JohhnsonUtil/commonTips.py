@@ -77,6 +77,11 @@ def get_tdx_dir():
         log.error("basedir not exists")
     return basedir
 
+def get_work_path(base,dpath,fname):
+    baser = os.getcwd().split(base)[0]
+    base = baser  + base + path_sep + dpath + path_sep
+    filepath = base + fname
+    return filepath
 
 def get_rzrq_code(market='all'):
 

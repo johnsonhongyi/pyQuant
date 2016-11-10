@@ -528,7 +528,7 @@ def get_tdx_append_now_df_api(code, start=None, end=None, type='f',df=None,dm=No
             df = df.sort_index(ascending=False)
             return df
 #    else:
-    if cct.get_now_time_int() > '1530' or cct.get_now_time_int() < '925':
+    if cct.get_now_time_int() > 1530 or cct.get_now_time_int() < 925:
         return df
     if dm is None:
         # if dm is None and today != df.index[-1]:
@@ -607,7 +607,10 @@ def write_tdx_tushare_to_file(code,df=None,start=None,type='f'):
 #    pname = 'sdata/SH601998.txt'
     if df is None:
         ldatedf = get_tdx_Exp_day_to_df(code,dl=1)
-        lastd = ldatedf.date
+        if len(ldatedf) > 0:
+            lastd = ldatedf.date
+        else:
+            return False
         # today = cct.get_today()
         # duration = cct.get_today_duration(tdx_last_day)
         if lastd == cct.last_tddate(1):
@@ -698,41 +701,41 @@ def write_tdx_tushare_to_file(code,df=None,start=None,type='f'):
     return "NTrue"
     
 def Write_market_all_day_mp(market='all'):
-    sh_index = '999999'
-    dd = get_tdx_Exp_day_to_df(sh_index,dl=1)
-    start=dd.date
-    index_ts = ts.get_hist_data('sh',start=start)
+    # sh_index = '999999'
+    # dd = get_tdx_Exp_day_to_df(sh_index,dl=1)
+    # start=dd.date
+    # index_ts = ts.get_hist_data('sh',start=start)
     if market == 'all':
         mlist = ['sh','sz']
     else:
         mlist =[market]
-    if len(index_ts) > 1:
-        print "start:%s"%(start),
-        for mk in mlist:
-            print ("market:%s"%(mk))
-            time_t = time.time()
-            df = rl.get_sina_Market_json(mk)
-            code_list = np.array(df.code)
-            log.info('code_list:%s' % len(code_list))
-            results =[]
-        #        write_tdx_tushare_to_file(sh_index,index_ts)
-            results = cct.to_mp_run_async(write_tdx_tushare_to_file,code_list,None,start)
+    # if len(index_ts) > 1:
+    #     print "start:%s"%(start),
+    for mk in mlist:
+        print ("market:%s"%(mk))
+        time_t = time.time()
+        df = rl.get_sina_Market_json(mk)
+        code_list = np.array(df.code)
+        log.info('code_list:%s' % len(code_list))
+        results =[]
+    #        write_tdx_tushare_to_file(sh_index,index_ts)
+        results = cct.to_mp_run_async(write_tdx_tushare_to_file,code_list,None)
 #            for code in code_list:
 #                print "code:%s "%(code),
 #                res=write_tdx_tushare_to_file(code,None,start)
 #                print "status:%s"%(res)
 #                results.append(res)
-        #    print len(resuls),len(code_list)
-        results =list(set(results))
-        if  len(results)>1:
-            print results
-        else:
-            print "market:%s is succ"%(market),
-        print "t:", time.time() - time_t,
+    #    print len(resuls),len(code_list)
+    results =list(set(results))
+    if  len(results)>1:
+        print results
+    else:
+        print "market:%s is succ"%(market),
+    print "t:", time.time() - time_t,
     if market == 'all':
 #        write_tdx_tushare_to_file(sh_index,index_ts)
         for inx in ['999999','399006','399005']:
-            write_tdx_tushare_to_file(inx,df=None,start=start)
+            write_tdx_tushare_to_file(inx,df=None)
         print "Index Wri ok",
     print "All is ok"    
     return results
@@ -2130,8 +2133,15 @@ if __name__ == '__main__':
 #    dd=rl.get_sina_Market_json('cyb').set_index('code')
 #    codelist= dd.index.tolist()
 #    df = get_tdx_exp_all_LastDF(codelist, dt=30,end=20160401, ptype='high', filter='y')
-#    Write_market_all_day_mp('all')
-    code = '601998'
+    # Write_market_all_day_mp('cyb')
+    # sys.exit(0)
+
+    code = '399006'
+    df= get_tdx_Exp_day_to_df(code,dl=1)
+    print df.date
+    # sys.exit(0)
+
+    print get_tdx_append_now_df_api(code,dl=30)
     # ldatedf = get_tdx_Exp_day_to_df(code,dl=1)
     # lastd = ldatedf.date
     # today = cct.get_today()
@@ -2140,7 +2150,6 @@ if __name__ == '__main__':
     print write_tdx_tushare_to_file(code)
     # print lastd,duration,today
 #    300035,300047,300039
-    print get_tdx_Exp_day_to_df(code,dl=1)
 
     # print get_tdx_append_now_df_api(code,dl=30)[:2]
 #    print df
