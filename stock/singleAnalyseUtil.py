@@ -13,9 +13,10 @@ import JohhnsonUtil.johnson_cons as ct
 import JohhnsonUtil.commonTips as cct
 from JSONData import realdatajson as rd
 from JSONData import powerCompute as pct
+from JSONData import get_macd_kdj_rsi as getab
+from JSONData import tdx_data_Day as tdd
 import JohhnsonUtil.emacount as ema
 from JohhnsonUtil import LoggerFactory
-
 log = LoggerFactory.getLogger("SingleSAU")
 # log.setLevel(LoggerFactory.DEBUG)
 
@@ -237,10 +238,13 @@ def fibonacciCount(code, dl=60, start=None):
     for code in codes:
         for ptype in ['low','high']:
             if ptype == 'low':
-                op, ra, st, daysData = pct.get_linear_model_status(code, filter='y', dl=dl, ptype=ptype, days=1)
+                df = tdd.get_tdx_append_now_df_api(code,dl=dl)
+                op, ra, st, daysData = pct.get_linear_model_status(code,df=df,filter='y', dl=dl, ptype=ptype, days=1)
+                dd,op=getab.Get_BBANDS(df,days=days)
             else:
-                op, ra, st, daysData = pct.get_linear_model_status(code, filter='y', dl=dl, ptype=ptype, days=1)
-                
+                df = tdd.get_tdx_append_now_df_api(code,dl=dl)
+                op, ra, st, daysData = pct.get_linear_model_status(code,df=df,filter='y', dl=dl, ptype=ptype, days=1)
+                dd,op=getab.Get_BBANDS(df, dtype='d')
             fib = cct.getFibonacci(300, daysData[0])
             # log.debug('st:%s days:%s fib:%s'%(st,days,fib))
             # print "%s op:%s ra:%s days:%s fib:%s %s" % (code, op, ra,days,fib, st)
