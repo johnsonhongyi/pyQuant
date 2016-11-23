@@ -9,7 +9,7 @@ import talib as ta
 import tushare as ts
 import tdx_data_Day as tdd
 from JohhnsonUtil import LoggerFactory as LoggerFactory
-from JohhnsonUtil import johnson_cons as ct 
+from JohhnsonUtil import johnson_cons as ct
 log = LoggerFactory.getLogger("get_macd_kdj_rsi")
 # log.setLevel(LoggerFactory.DEBUG)
 
@@ -46,7 +46,7 @@ def algoMultiDay(df,column='close',days=5,op=0):
                         op+=1
                     else:
                         op+=0.5
-                
+
                 elif nowp < c_min:
                     op +=-2
                 elif nowp < c_mean:
@@ -70,7 +70,7 @@ def algoMultiDay(df,column='close',days=5,op=0):
             op +=10.1
 #        else:
 #            op +=-days
-    return op                
+    return op
 
 def algoMultiTech(df,column='close',days=5,op=0):
     df = df.sort_index(ascending=True)
@@ -84,8 +84,75 @@ def algoMultiTech(df,column='close',days=5,op=0):
                     op +=1
                 else:
                     op += -1
-    
-    return op  
+
+    return op
+
+def Get_BBANDS_algo(df):
+    if isinstance(df,type(pd.DataFrame())):
+        df = df.sort_index(ascending=True)
+        upperband,middleband,lowerband=ta.BBANDS(np.array(df['close']),timeperiod=20,nbdevdn=2,matype=0)
+    else:
+        upperband,middleband,lowerband=ta.BBANDS(np.array(df),timeperiod=20,nbdevdn=2,matype=0)
+
+    operate = 0
+    log.debug('updbb:%s midb:%s close:%s'%(df['upbb%s'%dtype][-1],df['midb%s'%dtype][-1],df.close[-1]))
+
+    cnowp=df.close[-1]
+    clastp=df.close[-2]
+    hnowp=df.high[-1]
+    hlastp=df.high[-2]
+    lnowp=df.low[-1]
+    llastp=df.low[-2]
+    upbbp=df['upbb%s'%dtype][-1]
+    lowbp=df['lowb%s'%dtype][-1]
+    openp=df.open[-1]
+    if df.close[-1] >= df['midb%s'%dtype][-1] and df['midb%s'%dtype][-1] > df['midb%s'%dtype][-2]:
+        # print '5'
+        operate = 1
+
+#        if cnowp > clastp:
+#            if hnowp > hlastp:
+#                if cnowp > upbbp:
+#                    operate+=5
+#                elif lnowp > llastp:
+#                    operate+=1
+#                else:
+#                    operate+=0.5
+#
+##            elif lnowp > llastp:
+
+        if hnowp == lnowp and cnowp > clastp:
+            operate += 1
+        if  cnowp == hnowp and cnowp >= openp:
+            if cnowp >= clastp:
+                operate += 10
+        if  cnowp >= hnowp*ct.changeRatio and cnowp > openp and openp >= lnowp*ct.changeRatio :
+            operate += 10
+        if  cnowp >= openp* 1.04  and openp >= lnowp*ct.changeRatio :
+            operate += 5
+        if cnowp > clastp and cnowp > upbbp:
+            operate += 10
+        elif hnowp > upbbp:
+            operate += 5
+    else:
+        # print 'low'
+        operate = -1
+        if cnowp > clastp:
+            if hnowp > hlastp:
+                if cnowp < lowbp:
+                    operate+=-5
+                elif lnowp > llastp:
+                    operate+=-1
+                else:
+                    operate+=-0.5
+        else:
+            operate+=-2.5
+#    for cl in ['upbb%s'%dtype,'midb%s'%dtype,'lowb%s'%dtype]:
+#        operate = algoMultiTech(df, column=cl, days=days, op=operate)
+#        print operate
+#    operate = op
+    return operate
+
 
 
 def Get_BBANDS(df,dtype='d',days=5):
@@ -119,9 +186,9 @@ def Get_BBANDS(df,dtype='d',days=5):
 #                    operate+=1
 #                else:
 #                    operate+=0.5
-#        
+#
 ##            elif lnowp > llastp:
-            
+
         if hnowp == lnowp and cnowp > clastp:
             operate += 1
         if  cnowp == hnowp and cnowp >= openp:
@@ -151,10 +218,10 @@ def Get_BBANDS(df,dtype='d',days=5):
 #    for cl in ['upbb%s'%dtype,'midb%s'%dtype,'lowb%s'%dtype]:
 #        operate = algoMultiTech(df, column=cl, days=days, op=operate)
 #        print operate
-#    operate = op     
+#    operate = op
     df = df.sort_index(ascending=False)
     return df,operate
-    
+
 #修改了的函数，按照多个指标进行分析
 
 #按照MACD，KDJ等进行分析
@@ -167,7 +234,7 @@ def Get_TA(df,dtype='d',days=5):
         df['ma5%s'%dtype] = pd.rolling_mean(df.close,5)
         df['ma10%s'%dtype] = pd.rolling_mean(df.close,10)
         df['ma20%s'%dtype] = pd.rolling_mean(df.close,20)
-    
+
     operate_array1=[]
     operate_array2=[]
     operate_array3=[]
@@ -194,11 +261,11 @@ def Get_TA(df,dtype='d',days=5):
     operate_array2.append(operate2)
     operate_array3.append(operate3)
 
-        
+
     df['MACD%s'%dtype]=pd.Series(operate_array1,index=df.index)
     df['KDJ%s'%dtype]=pd.Series(operate_array2,index=df.index)
     df['RSI%s'%dtype]=pd.Series(operate_array3,index=df.index)
-    
+
     df,op = Get_BBANDS(df,dtype)
     print "boll:%s ma:%s kdj:%s rsi:%s"%(op,operate_array1,operate_array2,operate_array3)
     df = df.sort_index(ascending=False)
@@ -216,8 +283,8 @@ def Get_MACD_OP(df,dtype='d',days=5):
 #    SignalMA10 = ta.MA(macdsignal, timeperiod=10, matype=0)
 #    SignalMA20 = ta.MA(macdsignal, timeperiod=20, matype=0)
     #13-15 DIFF  DEA  DIFF-DEA
-    df['diff%s'%dtype]=pd.Series(macd,index=df.index) #DIFF 13 
-    df['dea%s'%dtype]=pd.Series(macdsignal,index=df.index)#DEA  14 
+    df['diff%s'%dtype]=pd.Series(macd,index=df.index) #DIFF 13
+    df['dea%s'%dtype]=pd.Series(macdsignal,index=df.index)#DEA  14
     df['ddea%s'%dtype]=pd.Series(macdhist,index=df.index)#DIFF-DEA  15
 #    dflen = df.shape[0]
 #    MAlen = len(SignalMA5)
@@ -230,10 +297,10 @@ def Get_MACD_OP(df,dtype='d',days=5):
 #    dea2=df.loc[df.index[-2],'dea%s'%dtype]
 
     for cl in ['diff%s'%dtype,'dea%s'%dtype,'ddea%s'%dtype]:
-        operate=algoMultiTech(df, column=cl, days=days, op=operate)   
+        operate=algoMultiTech(df, column=cl, days=days, op=operate)
     df = df.sort_index(ascending=False)
     return (df,operate)
-    
+
 #通过MACD判断买入卖出
 def Get_MACD(df,dtype='d',days=5):
     #参数12,26,9
@@ -246,8 +313,8 @@ def Get_MACD(df,dtype='d',days=5):
     SignalMA10 = ta.MA(macdsignal, timeperiod=10, matype=0)
     SignalMA20 = ta.MA(macdsignal, timeperiod=20, matype=0)
     #13-15 DIFF  DEA  DIFF-DEA
-    df['diff%s'%dtype]=pd.Series(macd,index=df.index) #DIFF 13 
-    df['dea%s'%dtype]=pd.Series(macdsignal,index=df.index)#DEA  14 
+    df['diff%s'%dtype]=pd.Series(macd,index=df.index) #DIFF 13
+    df['dea%s'%dtype]=pd.Series(macdsignal,index=df.index)#DEA  14
     df['ddea%s'%dtype]=pd.Series(macdhist,index=df.index)#DIFF-DEA  15
     dflen = df.shape[0]
     MAlen = len(SignalMA5)
@@ -268,12 +335,12 @@ def Get_MACD(df,dtype='d',days=5):
         if dea < 0:
             if diff == dea2 :
                 operate = operate - 10#卖出
-             
+
     #3.DEA线与K线发生背离，行情反转信号。
     ma5 =  df.loc[df.index[-1],'ma5%s'%dtype]   #7
     ma10 =  df.loc[df.index[-1],'ma10%s'%dtype] #8
     ma20 =  df.loc[df.index[-1],'ma20%s'%dtype]  #9
-    
+
     if ma5 >= ma10 and ma10 >= ma20:#K线上涨
         if SignalMA5[MAlen-1]<=SignalMA10[MAlen-1] and SignalMA10[MAlen-1]<=SignalMA20[MAlen-1]: #DEA下降
             operate = operate - 1
@@ -285,7 +352,7 @@ def Get_MACD(df,dtype='d',days=5):
     #4.分析MACD柱状线，由负变正，买入信号。
     diffdea = df.loc[df.index[-1],'ddea%s'%dtype]
     # diffdea2 = df.loc[df.index[-2],'macdhist%s'%dtype]
-    
+
     if diffdea >0 and dflen >30 :
         for i in range(1,26):
             if df.loc[df.index[-1-i],'ddea%s'%dtype] <=0:#
@@ -299,12 +366,12 @@ def Get_MACD(df,dtype='d',days=5):
                 operate = operate - 5
                 break
     for cl in ['diff%s'%dtype,'dea%s'%dtype]:
-        operate=algoMultiTech(df, column=cl, days=days, op=operate)   
+        operate=algoMultiTech(df, column=cl, days=days, op=operate)
     df = df.sort_index(ascending=False)
     return (df,operate)
 
 
-    
+
 
 #通过KDJ判断买入卖出
 def Get_KDJ(df,dtype='d',days=5):
@@ -325,12 +392,12 @@ def Get_KDJ(df,dtype='d',days=5):
     dflen = df.shape[0]
     MAlen = len(slowkMA5)
     operate = 0
-    
+
     kdjk=df.loc[df.index[-1],'slowk%s'%dtype]
     kdjk2=df.loc[df.index[-2],'slowk%s'%dtype]
     kdjd=df.loc[df.index[-1],'slowd%s'%dtype]
     kdjd2=df.loc[df.index[-2],'slowd%s'%dtype]
-    
+
     ma5=df.loc[df.index[-1],'ma5%s'%dtype]
     ma10=df.loc[df.index[-1],'ma10%s'%dtype]
     ma20=df.loc[df.index[-1],'ma20%s'%dtype]
@@ -388,7 +455,7 @@ def Get_RSI(df,dtype='d',days=5):
     dflen = df.shape[0]
     MAlen = len(slowrealMA5)
     operate = 0
-    
+
     slow=df.loc[df.index[-1],'slowreal%s'%dtype]
     slow2=df.loc[df.index[-2],'slowreal%s'%dtype]
     fast=df.loc[df.index[-1],'fastreal%s'%dtype]
@@ -408,7 +475,7 @@ def Get_RSI(df,dtype='d',days=5):
     ma5=df.loc[df.index[-1],'ma5%s'%dtype]
     ma10=df.loc[df.index[-1],'ma10%s'%dtype]
     ma20=df.loc[df.index[-1],'ma20%s'%dtype]
-    
+
     #RSI掉头向下为卖出讯号，RSI掉头向上为买入信号
     if ma5 >=ma10 and ma10>=ma20:#K线上涨
         if (slowrealMA5[MAlen-1]<=slowrealMA10[MAlen-1] and slowrealMA10[MAlen-1]<=slowrealMA20[MAlen-1]) or \
@@ -425,7 +492,7 @@ def Get_RSI(df,dtype='d',days=5):
     elif fast< slow and fast2>=slow2:
         operate = operate - 10
     for cl in ['slowreal%s'%dtype,'fastreal%s'%dtype]:
-        operate=algoMultiTech(df, column=cl, days=days, op=operate)  
+        operate=algoMultiTech(df, column=cl, days=days, op=operate)
     df = df.sort_index(ascending=False)
     return (df,operate)
 
@@ -463,11 +530,12 @@ if __name__ == '__main__':
     # df = ts.get_hist_data('sh')
     # code='300110'
 #    code='300201'
-    codel=['002695','601555','002486','600321','002437','399006','999999']
+    import sys
+    codel=['000002','002695','601555','002486','600321','002437','399006','999999']
 #    code='600321'
 #    code:002732 boll: 45 ma: 6.0  macd:-1 RSI:0 kdj: 3 time:0.0241
 #    code:002623 boll: 41 ma: 10.0  macd:-5 RSI:4 kdj: -1 time:0.0216
-    days=5    
+    days=5
     for code in codel:
         df = tdd.get_tdx_append_now_df_api(code,dl=60)
     #    df = tdd.get_tdx_power_now_df(code,dl=30)
@@ -476,7 +544,10 @@ if __name__ == '__main__':
         s=time.time()
         print ('code:%s'%(code)),
         dd,op=Get_BBANDS(df, dtype='d',days=days)
-        print 'boll:',op,
+        print 'boll:',op
+        print dd.loc[:,['close','upbbd','midbd','lowbd']][:5]
+#        print dd[:5]
+        sys.exit(0)
         dtype='d'
         operate=0
         for cl in ['upbb%s'%dtype,'midb%s'%dtype,'lowb%s'%dtype]:

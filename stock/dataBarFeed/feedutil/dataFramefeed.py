@@ -140,6 +140,7 @@ class Feed(dataFrameBarfeed.BarFeed):
         dataFrameBarfeed.BarFeed.__init__(self, frequency, maxLen)
         self.__timezone = timezone
         self.__sanitizeBars = False
+        self.dataframe = None
 
     def sanitizeBars(self, sanitize):
         self.__sanitizeBars = sanitize
@@ -158,7 +159,7 @@ class Feed(dataFrameBarfeed.BarFeed):
         :param timezone: The timezone to use to localize bars. Check :mod:`pyalgotrade.marketsession`.
         :type timezone: A pytz timezone.
         """
-
+        self.dataframe = dataFrame
         if isinstance(timezone, int):
             raise Exception("timezone as an int parameter is not supported anymore. Please use a pytz timezone instead.")
 
@@ -167,3 +168,6 @@ class Feed(dataFrameBarfeed.BarFeed):
 
         rowParser = RowParser(self.getDailyBarTime(), self.getFrequency(), timezone, self.__sanitizeBars)
         dataFrameBarfeed.BarFeed.addBarsFromDataFrame(self, instrument,rowParser,dataFrame)
+
+    def get_dataFrame(self):
+        return self.dataframe

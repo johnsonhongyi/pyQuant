@@ -888,7 +888,10 @@ def powerCompute_df(df, dtype='d', end=None, dl=None, filter='y',talib=False):
                 start = None
         start = cct.day8_to_day10(start)
         end = cct.day8_to_day10(end)
-        dz = dm.loc[code].to_frame().T
+        if code in dm.index:
+            dz = dm.loc[code].to_frame().T
+        else:
+            dz = tdd.get_sina_data_df(code)
 #        tdx_df = tdd.get_tdx_power_now_df(code, start=start, end=end, type='f', df=None, dm=dz, dl=dl*2)
         tdx_df = tdd.get_tdx_append_now_df_api(code, start=start, end=end, type='f', df=None, dm=dz, dl=dl*2)
         # print tdx_df

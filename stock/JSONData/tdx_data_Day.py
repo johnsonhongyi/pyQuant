@@ -157,7 +157,7 @@ def get_tdx_Exp_day_to_df(code, type='f', start=None, end=None, dl=None):
         # df['ma20d'] = df.close.rolling(window=20,center=False).mean()
         # df['ma60d'] = df.close.rolling(window=60,center=False).mean()
         if len(df) > 0:
-            df.drop_duplicates('date',inplace=True) 
+            df.drop_duplicates('date',inplace=True)
             df = df.set_index('date')
             df = df.sort_index(ascending=True)
             df['ma5d'] = pd.rolling_mean(df.close,5)
@@ -224,7 +224,7 @@ def get_tdx_Exp_day_to_df(code, type='f', start=None, end=None, dl=None):
             if dl is None:
                 dl = 60
         else:
-            dl = int(cct.get_today_duration(start) * 5 / 7)  
+            dl = int(cct.get_today_duration(start) * 5 / 7)
             log.debug("start:%s dl:%s"%(start,dl))
         data = cct.read_last_lines(file_path, int(dl) + 2)
         dt_list = []
@@ -291,11 +291,11 @@ INDEX_LIST = {'sh': 'sh000001', 'sz': 'sz399001', 'hs300': 'sz399300',
 #     df = get_tdx_Exp_day_to_df(code, type, start, end).sort_index(ascending=True)
 #     # print df.index.values[:1],df.index.values[-1:]
 #     today = cct.get_today()
-            
+
 #     if len(df) > 0:
 #         tdx_last_day = df.index[-1]
 #     else:
-#         tdx_last_day = start            
+#         tdx_last_day = start
 #     duration = cct.get_today_duration(tdx_last_day)
 #     log.debug("duration:%s"%duration)
 #     log.debug("tdx_last_day:%s" % tdx_last_day)
@@ -359,7 +359,7 @@ INDEX_LIST = {'sh': 'sh000001', 'sz': 'sz399001', 'hs300': 'sz399300',
 
 #         if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 1510:
 #             log.debug("get_work_time:work")
-#             if end is None:     
+#             if end is None:
 #                 # dm = rl.get_sina_Market_json('all').set_index('code')
 #                 if index_status:
 #                     log.debug("code:%s code_t:%s"%(code,code_t))
@@ -384,14 +384,14 @@ INDEX_LIST = {'sh': 'sh000001', 'sz': 'sz399001', 'hs300': 'sz399300',
 #                     # dm_code.name = today
 #                     # log.debug("dm_code_index:%s"%(dm_code))
 #                     log.debug("df.open:%s dm.open%s"%(df.open[-1],round(dm.open[-1],2)))
-                    
+
 #                     if df.open[-1] != round(dm.open[-1],2):
 #                         df = df.append(dm_code)
 #                     df['name']=c_name
 #                     log.debug("c_name:%s df.name:%s"%(c_name,df.name[-1]))
 #                     # log.debug("df[-3:]:%s" % (df[-2:]))
 #                     # df['name'] = dm.loc[code, 'name']
-                    
+
 #     if not 'name' in df.columns:
 #         if index_status:
 #             if code_t is None:
@@ -444,8 +444,8 @@ def get_tdx_append_now_df_api(code, start=None, end=None, type='f',df=None,dm=No
             tdx_last_day = start
         else:
             tdx_last_day = None
-#            log.warn("code :%s start is None and DF is None"%(code)) 
-    if tdx_last_day is not None:           
+#            log.warn("code :%s start is None and DF is None"%(code))
+    if tdx_last_day is not None:
         duration = cct.get_today_duration(tdx_last_day)
     else:
         duration = 10
@@ -463,7 +463,7 @@ def get_tdx_append_now_df_api(code, start=None, end=None, type='f',df=None,dm=No
         else:
             today = end
 #    print cct.last_tddate(duration)
-    if duration >= 1 and tdx_last_day != cct.last_tddate(1):
+    if duration >= 1 and (tdx_last_day != cct.last_tddate(1) or cct.get_now_time_int() > 1530):
         if index_status:
             code_t = INDEX_LIST[code][2:]
         try:
@@ -517,7 +517,7 @@ def get_tdx_append_now_df_api(code, start=None, end=None, type='f',df=None,dm=No
         df = df.sort_index(ascending=False)
         return df
 #    print df.index.values,code
-    if df is not None and len(df) >0: 
+    if df is not None and len(df) >0:
         if df.index.values[-1] == today:
             df = df.sort_index(ascending=True)
             df['ma5d'] = pd.rolling_mean(df.close,5)
@@ -626,21 +626,21 @@ def write_tdx_tushare_to_file(code,df=None,start=None,type='f'):
         file_path = exp_path + 'backp' + path_sep + code_u.upper() + ".txt"
     else:
         return None
-     
+
     limitpo=150
     if not os.path.exists(file_path) or os.path.getsize(file_path) < limitpo:
 #        log.warn("not path:%s"%(file_path))
         return False
 #    else:
 #        print "no"
-        
-#    print file_path    
+
+#    print file_path
     fo = open(file_path, "r+")
 #    os.path.getsize(file_path)
 #    print fo.tell()
-    fo.seek(-limitpo,2)
+#    fo.seek(-limitpo,2)
 #    print fo.readlines()
-    
+
     fo.seek(-limitpo,2)
     plist=[]
     line = True
@@ -679,7 +679,7 @@ def write_tdx_tushare_to_file(code,df=None,start=None,type='f'):
         fo.seek(po)
         for date in df.index:
             td=df.loc[date,['open','high','close','low','vol','amount']]
-            
+
             tdate = date
             topen = str(td.open)
             thigh = str(td.high)
@@ -699,7 +699,7 @@ def write_tdx_tushare_to_file(code,df=None,start=None,type='f'):
     fo.close()
 #    print "time:%0.4f"%(time.time()-st)
     return "NTrue"
-    
+
 def Write_market_all_day_mp(market='all'):
     # sh_index = '999999'
     # dd = get_tdx_Exp_day_to_df(sh_index,dl=1)
@@ -737,9 +737,9 @@ def Write_market_all_day_mp(market='all'):
         for inx in ['999999','399006','399005']:
             write_tdx_tushare_to_file(inx,df=None)
         print "Index Wri ok",
-    print "All is ok"    
+    print "All is ok"
     return results
-    
+
 def get_tdx_write_now_file_api(code, type='f',dm=None):
     #no use
     #no use
@@ -755,7 +755,7 @@ def get_tdx_write_now_file_api(code, type='f',dm=None):
         # print tdx_last_day
     else:
         log.error("error for read tdx last df")
-        return False          
+        return False
     duration = cct.get_today_duration(tdx_last_day)
     log.debug("duration:%s"%duration)
     log.debug("tdx_last_day:%s" % tdx_last_day)
@@ -807,7 +807,7 @@ def get_tdx_write_now_file_api(code, type='f',dm=None):
             ds.sort_index(ascending=True, inplace=True)
             # log.debug("ds:%s" % ds[:1])
             df = df.append(ds)
-            
+
 
     if cct.get_now_time_int() > 830 and cct.get_now_time_int() < 930:
         log.debug("now > 830 and <930 return")
@@ -853,12 +853,12 @@ def get_tdx_write_now_file_api(code, type='f',dm=None):
                 if dm_code.index == df.index[-1]:
                     log.error("app_api_dm.Index:%s df:%s"%(dm_code.index.values,df.index[-1]))
                     df = df.drop(dm_code.index)
-                df = df.append(dm_code)        
-                
+                df = df.append(dm_code)
+
             # df=pd.concat([df,dm],axis=0, ignore_index=True).set
         df['name'] = c_name
         log.debug("c_name:%s df.name:%s" % (c_name, df.name[-1]))
-    
+
     if len(df) > 0:
         df = df.sort_index(ascending=True)
         df['ma5d'] = pd.rolling_mean(df.close,5)
@@ -914,9 +914,9 @@ def get_tdx_power_now_df(code, start=None, end=None, type='f',df=None,dm=None,dl
         log.debug("df.open:%s dm.open%s"%(df.open[-1],round(dm.open[-1],2)))
         # print df.close[-1],round(dm.close[-1],2)
         # if df.close[-1] != round(dm.close[-1], 2) and end is None:
-     
+
         # if (df is not None and df.empty) or (df.open[-1] != round(dm.open[-1], 2) and end is None):
-        #     # print (dm),(df) 
+        #     # print (dm),(df)
         #     if dm.open[0] > 0:
         #         df = df.append(dm_code)
         #         df = df.astype(float)
@@ -925,8 +925,8 @@ def get_tdx_power_now_df(code, start=None, end=None, type='f',df=None,dm=None,dl
                 if dm_code.index == df.index[-1]:
                     log.debug("app_api_dm.Index:%s df:%s"%(dm_code.index.values,df.index[-1]))
                     df = df.drop(dm_code.index)
-                df = df.append(dm_code)           
-                
+                df = df.append(dm_code)
+
             # print dm
             # df=pd.concat([df,dm],axis=0, ignore_index=True).set
             # print df
@@ -943,7 +943,7 @@ def get_tdx_power_now_df(code, start=None, end=None, type='f',df=None,dm=None,dl
         # df['ma20d'].fillna(0)
         # df['ma60d'].fillna(0)
         df=df.fillna(0)
-        df = df.sort_index(ascending=False)    
+        df = df.sort_index(ascending=False)
     return df
 
 def get_sina_data_df(code):
@@ -969,7 +969,7 @@ def getSinaAlldf(market='cyb',vol=ct.json_countVol,type=ct.json_countType):
     elif market == 'captops':
         global initTushareCsv
         if initTushareCsv == 0:
-            initTushareCsv += 1 
+            initTushareCsv += 1
             df = cct.get_tushare_market(market=market, renew=True,days=10)
         else:
             df = cct.get_tushare_market(market, renew=False, days = 10)
@@ -1047,7 +1047,7 @@ def getSinaAlldf(market='cyb',vol=ct.json_countVol,type=ct.json_countType):
     print "b1>%s:%s:%s"%(initTdxdata,len(top_diff),round(time.time()-time_s,1)),
     return top_diff
 
-'''              
+'''
 def get_tdx_append_now_df(code, type='f', start=None, end=None):
     # start=cct.day8_to_day10(start)
     # end=cct.day8_to_day10(end)
@@ -1177,7 +1177,7 @@ def get_tdx_day_to_df(code):
       ktype：string
                   数据类型，D=日k线 W=周 M=月 5=5分钟 15=15分钟 30=30分钟 60=60分钟，默认为D
       retry_count : int, 默认 3
-                 如遇网络等问题重复执行的次数 
+                 如遇网络等问题重复执行的次数
       pause : int, 默认 0
                 重复请求数据过程中暂停的秒数，防止请求间隔时间太短出现的问题
     return
@@ -1279,7 +1279,7 @@ def get_duration_date(code, ptype='low', dt=None, df=None, dl=None):
                     if len(df) > int(dl):
                         dz = df[:int(dl)]
                     else:
-                        dz = df                
+                        dz = df
         elif len(str(dt)) == 8:
             dt=cct.day8_to_day10(dt)
             dz = df[df.index >= dt]
@@ -1293,7 +1293,7 @@ def get_duration_date(code, ptype='low', dt=None, df=None, dl=None):
                     if len(df) > int(dl):
                         dz = df[:int(dl)]
                     else:
-                        dz = df       
+                        dz = df
         else:
             if len(df) > int(dt):
                 dz = df[:int(dt)]
@@ -1804,7 +1804,7 @@ def get_tdx_all_day_LastDF(codeList, type=0, dt=None, ptype='close'):
     # results=[]
     # for code in codeList:
         # results.append(get_tdx_day_to_df_last(code, 1, type, dt,ptype))
-        
+
 
     df = pd.DataFrame(results, columns=ct.TDX_Day_columns)
     df = df.set_index('code')
@@ -1893,9 +1893,9 @@ def get_tdx_exp_all_LastDF(codeList, dt=None,end=None,ptype='low',filter='n'):
         results = cct.to_mp_run_async(get_tdx_exp_low_or_high_price, codeList, dt, ptype, dl,end)
         # print dt,ptype,dl,end
         # for code in codelist:
-        #     print code  
+        #     print code
         #     print get_tdx_exp_low_or_high_price('600654', dt, ptype, dl,end)
-        
+
     else:
         # results = cct.to_mp_run_async(get_tdx_exp_low_or_high_price,codeList)
         results = cct.to_mp_run_async(get_tdx_Exp_day_to_df, codeList, 'f', None, None, None, 1)
@@ -1975,9 +1975,9 @@ def get_tdx_exp_all_LastDF_DL(codeList, dt=None,end=None,ptype='low',filter='n',
 #            results.append(get_tdx_exp_low_or_high_power(code,dt,ptype,dl,end,power,lastp))
         # print dt,ptype,dl,end
         # for code in codelist:
-        #     print code  
+        #     print code
         #     print get_tdx_exp_low_or_high_price('600654', dt, ptype, dl,end)
-        
+
     else:
         # results = cct.to_mp_run_async(get_tdx_exp_low_or_high_price,codeList)
         dl = None
@@ -2031,7 +2031,7 @@ def get_tdx_all_day_DayL_DF(market='cyb', dayl=1):
     print "t:", time.time() - time_t
     return results
 
-    
+
 
 def get_tdx_search_day_DF(market='cyb'):
     time_t = time.time()
@@ -2120,7 +2120,7 @@ python %s -t txt 999999 20070101 20070302
             df = get_tdx_day_to_df('999999').sort_index(ascending=False)
             dl = len(get_tdx_Exp_day_to_df('999999', start=dt)) + changedays
             dt = cct.day8_to_day10(dt)
-        
+
         # print dt,dl
         # strip_tx = timeit.timeit(lambda: get_tdx_exp_low_or_high_price(codeList, dt, ptype, dl), number=run)
         strip_tx = timeit.timeit(lambda : get_tdx_exp_all_LastDF(codelist, dt=duration_date, ptype=ptype), number=run)
@@ -2136,9 +2136,10 @@ if __name__ == '__main__':
     # Write_market_all_day_mp('cyb')
     # sys.exit(0)
 
-    code = '399006'
-    df= get_tdx_Exp_day_to_df(code,dl=1)
-    print df.date
+    code = '603159'
+#    print get_sina_data_df(code).index
+#    df= get_tdx_Exp_day_to_df(code,dl=1)
+#    print df.date
     # sys.exit(0)
 
     print get_tdx_append_now_df_api(code,dl=30)
@@ -2177,7 +2178,7 @@ if __name__ == '__main__':
     df= get_tdx_exp_all_LastDF_DL(codeList = codelist, dt=30, end=None, ptype='low', filter='y', power=True)
     # print df[:1]
     sys.exit(0)
-    # 
+    #
     # print get_tdx_write_now_file_api('999999', type='f')
     time_s=time.time()
     print get_tdx_exp_all_LastDF_DL(codeList = [u'000034', u'300290', u'300116', u'300319', u'300375', u'300519'], dt='2016101', end='2016-06-23', ptype='low', filter='n', power=True)
@@ -2185,8 +2186,8 @@ if __name__ == '__main__':
     time_s=time.time()
     print get_tdx_exp_all_LastDF_DL(codeList = [u'300102', u'300290', u'300116', u'300319', u'300375', u'300519'], dt='2016101', end='2016-06-23', ptype='high', filter='n', power=True)
     print "T2:",round(time.time()-time_s,2)
-    
-    sys.exit(0) 
+
+    sys.exit(0)
     print "index_Date:",get_duration_Index_date('999999',dl=3)
     print get_duration_price_date('999999', dl=30, ptype='low', filter=False,power=True)
     print get_duration_price_date('399006', dl=30, ptype='high', filter=False,power=True)
@@ -2206,7 +2207,7 @@ if __name__ == '__main__':
     # df = get_tdx_all_day_LastDF(list,type=1)
     # print df
     '''
-    index_d,dl=get_duration_Index_date(dt='20160101')   
+    index_d,dl=get_duration_Index_date(dt='20160101')
     print index_d
     get_duration_price_date('000935',ptype='low',dt=index_d)
     df= get_tdx_append_now_df('99999').sort_index(ascending=True)
@@ -2232,11 +2233,11 @@ if __name__ == '__main__':
     # print get_tdx_Exp_day_to_df('999999').sort_index(ascending=False)[:1]
 
     # tdxdata = get_tdx_exp_all_LastDF(['999999', '601998', '300499'], dt=20120101, ptype='high')
-    
+
     print get_tdx_exp_low_or_high_price('600610',dl=30)
     # main_test()
     sys.exit()
-    
+
     # df = get_tdx_day_to_df_last('999999', dt=30,ptype='high')
     # print df
     # df = get_tdx_exp_low_or_high_price('603377', dt=20160101)

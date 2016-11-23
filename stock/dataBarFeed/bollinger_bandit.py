@@ -29,6 +29,7 @@ class Bollinger_Bandit(strategy.BacktestingStrategy):
         self.__longPos = None
         self.__shortPos = None
         self.__close = feed[instrument].getCloseDataSeries()
+        self.__open = feed[instrument].getOpenDataSeries()
         self.__high = feed[instrument].getHighDataSeries()
         self.__low = feed[instrument].getLowDataSeries()
         self.__datetime = feed[instrument].getDateTimes()
@@ -111,8 +112,11 @@ class Bollinger_Bandit(strategy.BacktestingStrategy):
         # If a position was not opened, check if we should enter a long position.
         
         bar = bars[self.__instrument]
-        
-        # filter datetime    
+        if len(self.__high) >1:
+            print self.__close[-1],self.__high[-1],self.__open[-1],self.__close[-2]
+        if self.__UpperBand is not None:
+            print self.__UpperBand[-1]
+        # filter datetime
         ###################################################################################        
         filterCon = len(self.__close) < max(self.__bollingerlength, self.__malength, self.__closelength)
         self.__filterCon.append(filterCon)
@@ -140,7 +144,7 @@ class Bollinger_Bandit(strategy.BacktestingStrategy):
             self.__malength = 50
 
         self.__ccMA = np.mean(self.__close[-self.__malength:])
-#        print self.__malength, self.__ccMA
+        # print self.__malength, self.__ccMA
         self.__MA.append(self.__ccMA)
         self.__ccMACon1.append(ccMACon1)
         self.__ccMACon2.append(ccMACon2)
@@ -150,7 +154,7 @@ class Bollinger_Bandit(strategy.BacktestingStrategy):
         self.__enterLong1 = (cross.cross_above(self.__high, self.__UpperBand) > 0)
         self.__enterLong2 = (bar.getClose() >= max(self.__close[-self.__closelength:]))
         self.__enter = ((self.__UpperBand[-1] - self.__LowerBand[-1]) / bar.getClose() > float(self.__space) / 1000)
-#        print (self.__UpperBand[-1] - self.__LowerBand[-1]) / bar.getClose()
+        # print (self.__UpperBand[-1] - self.__LowerBand[-1]) / bar.getClose()
         self.__enterShort1 = cross.cross_below(self.__low, self.__LowerBand) > 0 
         self.__enterShort2 = bar.getClose() <= min(self.__close[-self.__closelength:])
         self.__exitLong1 = (bar.getClose() < self.__ccMA)
@@ -171,31 +175,31 @@ class Bollinger_Bandit(strategy.BacktestingStrategy):
         #open and close  
         #######################################################################################        
         if self.__longPos is not None:         
-             if self.exitLongSignal():
+            if self.exitLongSignal():
                  self.__longPos.exitMarket()
-#             if self.__shortPos is not None:
-#                 print 11
-#                 self.info("intend long close")
-#                 print (self.__UpperBand[-1] - self.__LowerBand[-1]) / bar.getClose()
+            if self.__shortPos is not None:
+                print 11
+                self.info("intend long close")
+                print (self.__UpperBand[-1] - self.__LowerBand[-1]) / bar.getClose()
                  
         elif self.__shortPos is not None:
-             if self.exitShortSignal():
-                  self.__shortPos.exitMarket()
-#                  self.info("intend short close")
-#                  print (self.__UpperBand[-1] - self.__LowerBand[-1]) / bar.getClose()
+            if self.exitShortSignal():
+                self.__shortPos.exitMarket()
+                self.info("intend short close")
+                print (self.__UpperBand[-1] - self.__LowerBand[-1]) / bar.getClose()
                   
         else:
-             if self.enterLongSignal():
-                 shares = int(self.getBroker().getCash() * 0.2 / bars[self.__instrument].getPrice())
-                 self.__longPos = self.enterLong(self.__instrument, shares)
-#                 self.info("intend long open")
-#                 print (self.__UpperBand[-1] - self.__LowerBand[-1]) / bar.getClose()
+            if self.enterLongSignal():
+                shares = int(self.getBroker().getCash() * 0.2 / bars[self.__instrument].getPrice())
+                self.__longPos = self.enterLong(self.__instrument, shares)
+                self.info("intend long open")
+                print (self.__UpperBand[-1] - self.__LowerBand[-1]) / bar.getClose()
               
-             elif self.enterShortSignal():
-                 shares = int(self.getBroker().getCash() * 0.2 / bars[self.__instrument].getPrice())
-                 self.__shortPos = self.enterShort(self.__instrument, shares)
-#                 self.info("intend short open")
-#                 print (self.__UpperBand[-1] - self.__LowerBand[-1]) / bar.getClose()
+            elif self.enterShortSignal():
+                shares = int(self.getBroker().getCash() * 0.2 / bars[self.__instrument].getPrice())
+                self.__shortPos = self.enterShort(self.__instrument, shares)
+                self.info("intend short open")
+                print (self.__UpperBand[-1] - self.__LowerBand[-1]) / bar.getClose()
                  
     def enterLongSignal(self):
         if self.__enterLong1 and self.__enterLong2 and self.__enter:
@@ -215,18 +219,18 @@ class Bollinger_Bandit(strategy.BacktestingStrategy):
             
             
     
-def testStrategy():
+def testStrategy(code,start=None,plot=False):
     from pyalgotrade import bar
     from pyalgotrade import plotter
     
     strat = Bollinger_Bandit    
-    instrument = '600288'
+    # instrument = '600288'
     market = 'SH'
     fromDate = '20150101'
     toDate ='20150601'
     frequency = bar.Frequency.MINUTE
     paras = [40, 15, 35, 15, 60, 2]
-    plot = True
+    # plot = True
     
     #############################################path set ############################33 
     import os
@@ -234,18 +238,23 @@ def testStrategy():
         path = os.path.join('..', 'histdata', 'minute')
     elif frequency == bar.Frequency.DAY:
         path = os.path.join('..', 'histdata', 'day')
-    filepath = os.path.join(path, instrument + market + ".csv")
+    # filepath = os.path.join(path, instrument + market + ".csv")
     
     
     #############################################don't change ############################33  
-    from pyalgotrade.cn.csvfeed import Feed
-    
-    barfeed = Feed(frequency)
-    barfeed.setDateTimeFormat('%Y-%m-%d %H:%M:%S')
-    barfeed.loadBars(instrument, market, fromDate, toDate, filepath)
-    
-    pyalgotrade_id = instrument + '.' + market
-    strat = strat(barfeed, pyalgotrade_id, *paras)
+    # from pyalgotrade.cn.csvfeed import Feed
+    from feedutil import dataFramefeed
+    import powerTech as pt
+
+    # barfeed = Feed(frequency)
+    # barfeed.setDateTimeFormat('%Y-%m-%d %H:%M:%S')
+    # barfeed.loadBars(instrument, market, fromDate, toDate, filepath)
+    code = '000002'
+    start = '2016-01-01'
+    barfeed = pt.get_tdx_barfeed(code,start)
+    # pyalgotrade_id = instrument + '.' + market
+
+    strat = strat(barfeed, code, *paras)
     
     from pyalgotrade.stratanalyzer import returns
     from pyalgotrade.stratanalyzer import sharpe
@@ -287,7 +296,7 @@ def testStrategy():
 
 if __name__ == "__main__":
     #############################################para set ############################33    
-    testStrategy()
+    testStrategy('000002','2016-01-01')
 
 
 
