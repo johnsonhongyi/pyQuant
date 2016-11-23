@@ -25,7 +25,7 @@ try:
 except ImportError:
     from urllib2 import urlopen, Request
 import requests
-requests.adapters.DEFAULT_RETRIES = 0 
+requests.adapters.DEFAULT_RETRIES = 0
 
 # sys.path.append("..")
 # sys.path.append("..")
@@ -133,7 +133,7 @@ def get_tushare_market(market='zxb',renew=False,days=5):
             df = pd.read_csv(filepath,dtype={'code':str},encoding = 'gbk')
             # df = pd.read_csv(filepath,dtype={'code':str})
             if len(df) == 0:
-                df = tusharewrite_to_csv(market, filepath ,days)    
+                df = tusharewrite_to_csv(market, filepath ,days)
     else:
         df = tusharewrite_to_csv(market, filepath , days)
 
@@ -185,7 +185,7 @@ def set_ctrl_handler():
             # raise KeyboardInterrupt("CTRL-C!")
             return 1 # don't chain to the next handler
         return 0 # chain to the next handler
-    win32api.SetConsoleCtrlHandler(handler, 1)        
+    win32api.SetConsoleCtrlHandler(handler, 1)
 
 def set_console(width=80, height=15, color=3, title=None):
     # mode con cp select=936
@@ -214,7 +214,7 @@ def set_console(width=80, height=15, color=3, title=None):
         # os.system('mode %s,%s'%(width,height))
     # printf "\033]0;My Window title\007”
     # os.system('color %s'%color)
-    # set_ctrl_handler()  
+    # set_ctrl_handler()
 
 def timeit_time(cmd, num=5):
     import timeit
@@ -228,7 +228,7 @@ def get_delay_time():
 
 def sleep(timet):
     times=time.time()
-    for _ in range(int(timet)*2): 
+    for _ in range(int(timet)*2):
         if int(time.time()-times) >= int(timet):
             break
         time.sleep(0.5)
@@ -314,7 +314,7 @@ def last_tddate(days=1):
         lastday = get_work_day(today)
         today = lastday
     return str(lastday)
-    
+
     '''
     oday = lasd - datetime.timedelta(days)
     day_n = int(oday.strftime("%w"))
@@ -431,27 +431,27 @@ def get_work_time_ratio():
         d2 = datetime.datetime.strptime(ymd + '09:29', '%Y:%m:%d:%H:%M')
         d1 = datetime.datetime.strptime(ymd + '09:30', '%Y:%m:%d:%H:%M')
         ds = float((d1 - d2).seconds)
-        init +=1            
+        init +=1
         ratio_t = round(ds / all_work_time/(initx+init*stepx)*initAll, 3)
     elif now_t > 930 and now_t <= 1000:
         d2 = datetime.datetime.strptime(ymd + hm1, '%Y:%m:%d:%H:%M')
         ds = float((d1 - d2).seconds)
-        init +=1            
+        init +=1
         ratio_t = round(ds / all_work_time/(initx+init*stepx)*initAll, 3)
     elif now_t > 1000 and now_t <= 1030:
         d2 = datetime.datetime.strptime(ymd + hm1, '%Y:%m:%d:%H:%M')
         ds = float((d1 - d2).seconds)
-        init +=2            
+        init +=2
         ratio_t = round(ds / all_work_time/(initx+init*stepx)*initAll, 3)
     elif now_t > 1030 and now_t <= 1100:
         d2 = datetime.datetime.strptime(ymd + hm1, '%Y:%m:%d:%H:%M')
         ds = float((d1 - d2).seconds)
-        init +=3            
+        init +=3
         ratio_t = round(ds / all_work_time/(initx+init*stepx)*initAll, 3)
     elif now_t > 1100 and now_t <= 1130:
         d2 = datetime.datetime.strptime(ymd + hm1, '%Y:%m:%d:%H:%M')
         ds = float((d1 - d2).seconds)
-        init +=4            
+        init +=4
         ratio_t = round(ds / all_work_time/(initx+init*stepx)*initAll, 3)
     elif now_t > 1130 and now_t < 1300:
         init +=4
@@ -461,23 +461,23 @@ def get_work_time_ratio():
     elif now_t > 1300 and now_t <= 1330:
         d2 = datetime.datetime.strptime(ymd + hm2, '%Y:%m:%d:%H:%M')
         ds = float((d1 - d2).seconds)
-        init +=5            
+        init +=5
         ratio_t = round((ds + 7200) / all_work_time/(initx+init*stepx)*initAll, 3)
     elif now_t > 1330 and now_t <= 1400:
         d2 = datetime.datetime.strptime(ymd + hm2, '%Y:%m:%d:%H:%M')
         ds = float((d1 - d2).seconds)
-        init +=6            
+        init +=6
         ratio_t = round((ds + 7200) / all_work_time/(initx+init*stepx)*initAll, 3)
     elif now_t > 1400 and now_t <= 1430:
         d2 = datetime.datetime.strptime(ymd + hm2, '%Y:%m:%d:%H:%M')
         ds = float((d1 - d2).seconds)
-        init +=7            
+        init +=7
         ratio_t = round((ds + 7200) / all_work_time/(initx+init*stepx)*initAll, 3)
     else:
         d2 = datetime.datetime.strptime(ymd + hm2, '%Y:%m:%d:%H:%M')
         ds = float((d1 - d2).seconds)
         ratio_t = round((ds + 7200) / all_work_time, 3)
-        
+
     return ratio_t
 
 
@@ -675,7 +675,7 @@ def read_last_lines(filename, lines=1):
             # if read enough(more)
             if nl_count >= lines: break
         # get the exact start position
-        for n in range(nl_count - lines + 1):
+        for n in range(nl_count - lines ):
             start = block.find('\n', start) + 1
     finally:
         fsock.close()
@@ -826,7 +826,7 @@ def write_to_blocknew(p_name, data, append=True):
                 for code in flist:
                     fout.write(code)
             else:
-                fout.close()            
+                fout.close()
                 fout = open(p_name, 'wb+')
                 index_list = ['1999999','47#IFL0', '27#HSI',  '0159915']
                 # index_list.reverse()
@@ -846,7 +846,7 @@ def write_to_blocknew(p_name, data, append=True):
             if len(raw) > 8 and not raw in flist:
                 fout.write(raw)
                 # raw = pack('IfffffII', t, i[2], i[3], i[4], i[5], i[6], i[7], i[8])
-        fout.flush()    
+        fout.flush()
         fout.close()
     blockNew= get_tdx_dir_blocknew() + 'zxg.blk'
     blockNewStart = get_tdx_dir_blocknew() + '066.blk'
@@ -915,7 +915,7 @@ def getFibonacci(num,days=None):
             # fib = x
             # break
     # return fib
-    
+
 def get_stock_tdx_period_to_type(stock_data, type='w'):
     period_type = type
     # 转换周最后一日变量
@@ -979,8 +979,8 @@ def DurationArgmain():
     # help='type')
     parser.add_argument('-f', action="store", dest="filter", type=str, choices=['y', 'n'], default='n',
                         help='filter low')
-    return parser  
-    
+    return parser
+
 def LineArgmain():
     # from ConfigParser import ConfigParser
     # import shlex
@@ -1026,7 +1026,7 @@ def LineArgmain():
     # logger.setLevel(logging.DEBUG)
     # else:
     # logger.setLevel(logging.ERROR)
-    return parser    
+    return parser
 
 if __name__ == '__main__':
     # print get_run_path()
