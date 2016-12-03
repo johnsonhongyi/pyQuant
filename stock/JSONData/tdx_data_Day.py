@@ -226,7 +226,7 @@ def get_tdx_Exp_day_to_df(code, type='f', start=None, end=None, dl=None):
         else:
             dl = int(cct.get_today_duration(start) * 5 / 7)
             log.debug("start:%s dl:%s"%(start,dl))
-        data = cct.read_last_lines(file_path, int(dl) + 2)
+        data = cct.read_last_lines(file_path, int(dl) + 5)
         dt_list = []
         data_l = data.split('\n')
         data_l.reverse()
@@ -261,6 +261,7 @@ def get_tdx_Exp_day_to_df(code, type='f', start=None, end=None, dl=None):
         # df.sort_index(ascending=False, inplace=True)
         if start is not None and end is not None:
             df = df[(df.date >= start) & (df.date <= end)]
+            # print df
         elif end is not None:
             df = df[df.date <= end]
         elif start is not None:
@@ -530,7 +531,7 @@ def get_tdx_append_now_df_api(code, start=None, end=None, type='f',df=None,dm=No
 #    else:
     if cct.get_now_time_int() > 1530 or cct.get_now_time_int() < 925:
         return df
-    if dm is None:
+    if dm is None and end is None:
         # if dm is None and today != df.index[-1]:
         # log.warn('today != end:%s'%(df.index[-1]))
         if index_status:
@@ -1593,18 +1594,26 @@ def get_tdx_exp_low_or_high_power(code, dt=None, ptype='close', dl=None,end=None
                     lowdate = dz[dz.close == lowp].index.values[-1]
                     log.debug("close:%s" % lowdate)
                 else:
-                    lowp = dz.low.min()
-                    lowdate = dz[dz.low == lowp].index.values[-1]
+                    lowp = dz.close.min()
+                    lowdate = dz[dz.close == lowp].index.values[-1]
                     log.debug("low:%s" % lowdate)
 
                 log.debug("date:%s %s:%s" % (lowdate, ptype, lowp))
                 # log.debug("date:%s %s:%s" % (dt, ptype, lowp))
-                dd = df[df.index == lowdate]
+                dd = df[df.index == lowdate].copy()
+                if ptype == 'high':
+                    lowp = dz.low.min()
+                    dd.low =  lowp
+                else:
+                    highp = dz.high.max()
+                    dd.high =  highp
+                    # print dd.high
                 if len(dd) > 0:
                     dd = dd[:1]
                     dt = dd.index.values[0]
                     dd = dd.T[dt]
                     dd['date'] = dt
+                    # print dd
                 if 'ma5d' in df.columns and 'ma10d' in df.columns:
                     if df[:1].ma5d[0] is not None and df[:1].ma5d[0] != 0:
                         dd['ma5d'] = round(float(df[:1].ma5d[0]),2)
