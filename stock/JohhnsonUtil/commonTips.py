@@ -760,6 +760,8 @@ def code_to_tdx_blk(code):
 
 
 def write_to_blocknew(p_name, data, append=True):
+    index_list = ['1999999','47#IFL0',  '0399006', '27#HSI']
+    # index_list = ['1999999',  '0159915','47#IFL0', '27#HSI']
     def writeBlocknew(p_name, data, append=True):
         if append:
             fout = open(p_name, 'rb+')
@@ -779,7 +781,6 @@ def write_to_blocknew(p_name, data, append=True):
                         # errstatus = True
                         code = code+'\r\n'
                 flist.append(code)
-            index_list = ['1999999','47#IFL0', '27#HSI',  '0159915']
             for co in index_list:
                 inx = (co) + '\r\n'
                 if inx not in flist:
@@ -816,7 +817,7 @@ def write_to_blocknew(p_name, data, append=True):
                 else:
                     writecount = 9
                 flist=flist[:writecount]
-                index_list = ['1999999','47#IFL0', '27#HSI',  '0159915']
+
                 for co in index_list:
                     inx = (co) + '\r\n'
                     if inx not in flist:
@@ -828,7 +829,6 @@ def write_to_blocknew(p_name, data, append=True):
             else:
                 fout.close()
                 fout = open(p_name, 'wb+')
-                index_list = ['1999999','47#IFL0', '27#HSI',  '0159915']
                 # index_list.reverse()
                 for i in index_list:
                     raw = (i) + '\r\n'

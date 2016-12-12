@@ -81,7 +81,9 @@ if __name__ == "__main__":
     # blkname = '067.blk'
     blkname = '063.blk'
     block_path = tdd.get_tdx_dir_blocknew() + blkname
-    lastpTDX_DF = pd.DataFrame() 
+    lastpTDX_DF = pd.DataFrame()
+    duration_date = ct.duration_date
+    end_date = cct.last_tddate(days=2) 
     # all_diffpath = tdd.get_tdx_dir_blocknew() + '062.blk'
     while 1:
         try:
@@ -114,7 +116,7 @@ if __name__ == "__main__":
       
                 if len(top_all) == 0 and len(lastpTDX_DF) == 0:
                     time_Rt = time.time()
-                    top_all,lastpTDX_DF = tdd.get_append_lastp_to_df(top_now)
+                    top_all,lastpTDX_DF = tdd.get_append_lastp_to_df(top_now,end=end_date,dl=duration_date)
                 elif len(top_all) == 0 and len(lastpTDX_DF) > 0:
                     time_Rt = time.time()
                     top_all = tdd.get_append_lastp_to_df(top_now,lastpTDX_DF)
@@ -148,11 +150,11 @@ if __name__ == "__main__":
                     log.debug('diff2-0-buy>0')
                     # top_dif = top_dif[top_dif.low >= top_dif.llow]
                     # log.debug('diff2-1:%s' % len(top_dif))
-                    top_dif = top_dif[top_dif.low >= top_dif.llastp]
                     # log.debug('dif3 low<>0 :%s' % len(top_dif))
                     # top_dif = top_dif[top_dif.open > 0]
-                    top_dif = top_dif[top_dif.buy >= top_dif.llastp * ct.changeRatio]
-                    if cct.get_now_time_int() > 925 and cct.get_now_time_int() < 1502:                    
+                    if cct.get_now_time_int() > 925 and cct.get_now_time_int() < ct.checkfilter_end_time:
+                        top_dif = top_dif[top_dif.low >= top_dif.llastp]
+                        top_dif = top_dif[top_dif.buy >= top_dif.llastp * ct.changeRatio]
                         top_dif = top_dif[top_dif.buy >= top_dif.lhigh * ct.changeRatio]
                     log.debug('dif4 open>low0.99:%s' % len(top_dif))
                     log.debug('dif4-2:%s' % top_dif.percent[:2])
@@ -233,8 +235,15 @@ if __name__ == "__main__":
                         
                         # top_temp = top_temp.sort_values(by=ct.MonitorMarket_sort_op,
                                         # ascending=ct.MonitorMarket_sort_op_key)
-                        top_temp = top_temp.sort_values(by=ct.Duration_percent_op,
+                        if duration_date > ct.duration_date_sort:
+                            top_temp = top_temp.sort_values(by=ct.Duration_percent_op,
                                         ascending=ct.Duration_percent_op_key)
+                        else:
+                            top_temp = top_temp.sort_values(by=ct.Duration_percentdn_op,
+                                        ascending=ct.Duration_percentdn_op_key)
+
+                        # top_temp = top_temp.sort_values(by=ct.Duration_percent_op,
+                        #                 ascending=ct.Duration_percent_op_key)
                         
                         # top_temp = top_temp.sort_values(by=['op','ra','diff', 'percent', 'ratio'], ascending=[0,0,0, 0, 1])
                     if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935:

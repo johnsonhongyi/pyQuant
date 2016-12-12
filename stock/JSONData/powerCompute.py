@@ -370,7 +370,7 @@ def get_linear_model_status(code, df=None, dtype='d', type='m', start=None, end=
 
     # df = tdd.get_tdx_Exp_day_to_df(code, 'f').sort_index(ascending=True)
 
-    def get_linear_model_ratio(asset, type='M', nowP=None):
+    def get_linear_model_ratio(asset, nowP=None):
         duration = asset[-1:].index.values[0]
         # log.debug("duration:%s" % duration)
         # log.debug("duration:%s" % cct.get_today_duration(duration))
@@ -398,97 +398,44 @@ def get_linear_model_status(code, df=None, dtype='d', type='m', start=None, end=
             ratio = 0
         operation = 0
         # log.debug("line_now:%s src:%s" % (Y_hat[-1], Y_hat[0]))
+        Y_FutureM = X * b + a
+        log.debug("mid:%.2f"%(Y_FutureM[-1]))
+
+        i = (asset.values.T - Y_hat).argmin()
+        c_low = X[i] * b + a - asset.values[i]
+        Y_FutureL = X * b + a - c_low
+        log.debug("Bottom:%.2f"%(Y_FutureL[-1]))
+
+        i = (asset.values.T - Y_hat).argmax()
+        c_high = X[i] * b + a - asset.values[i]
+        Y_FutureH = X * b + a - c_high
+
+        log.debug("Top:%.2f"%(Y_FutureH[-1]))
+
+        if nowP is not None:
+            diff = nowP - Y_FutureM[-1]
+            diff_h = nowP - Y_FutureH[-1]
+            diff_l = nowP - Y_FutureL[-1]
+        else:
+            diff = asset[-1] - Y_FutureM[-1]
+            diff_h = asset[-1] - Y_FutureH[-1]
+            diff_l = asset[-1] - Y_FutureL[-1]
+
         if Y_hat[-1] > Y_hat[0]:
-            if type.upper() == 'M':
-                Y_Future = X * b + a
-                # Y_Future = Y * b + a
-                # ratio = b/a*100
-                # log.info("Type:M ratio: %0.1f %0.1f Y_Mid: %0.1f" %
-                # (b, ratio, Y_Future[-1]))
-                # diff = asset.iat[-1] - Y_hat[-1]
-                # if diff > 0:
-                # return True, len(asset), diff
-                # else:
-                # return False, len(asset), diff
-            elif type.upper() == 'L':
-                i = (asset.values.T - Y_hat).argmin()
-                c_low = X[i] * b + a - asset.values[i]
-                Y_Future = X * b + a - c_low
-                # Y_Future = Y * b + a - c_low
-                # log.info("Type:L b: %0.1f ratio:%0.1f Y_Mid: %0.1f" %
-                # (b, ratio, Y_Future[-1]))
-                # diff = asset.iat[-1] - Y_hatlow[-1]
-                # if asset.iat[-1] - Y_hatlow[-1] > 0:
-                # return True, len(asset), diff
-                # else:
-                # return False, len(asset), diff
-            elif type.upper() == 'H':
-                i = (asset.values.T - Y_hat).argmax()
-                c_high = X[i] * b + a - asset.values[i]
-                # Y_hathigh = X * b + a - c_high
-                Y_Future = X * b + a - c_high
-                # Y_Future = Y * b + a - c_high
-                # log.info("Type:H ratio: %0.1f %0.1f Y_Mid: %0.1f" %
-                # (b, ratio, Y_Future[-1]))
-            if nowP is not None:
-                diff = nowP - Y_Future[-1]
-            else:
-                diff = asset[-1] - Y_Future[-1]
             if diff > 0:
                 operation += 1
-                # log.info("Type: %s UP !!! Y_Future: %0.1f b:%0.1f ratio:%0.1f " % (
-                # type.upper(), Y_Future[-1], b, ratio))
-                # else:
-                # operation -=1
-                # log.info("Type: %s Down Y_Future: %0.1f b:%0.1f ratio:%0.1f" % (
-                # type.upper(), Y_Future[-1], b, ratio))
-            return operation, ratio
+            if diff_h > 0 :
+                operation += 1
+            if diff_l > 0 :
+                operation += 1
         else:
-            if type.upper() == 'M':
-                Y_Future = X * b + a
-                # Y_Future = Y * b + a
-                # ratio = b/a*100
-                # log.info("Type:M ratio: %0.1f %0.1f Y_Mid: %0.1f" %
-                # (b, ratio, Y_Future[-1]))
-            elif type.upper() == 'L':
-                i = (asset.values.T - Y_hat).argmin()
-                c_low = X[i] * b + a - asset.values[i]
-                Y_Future = X * b + a - c_low
-                # Y_Future = Y * b + a - c_low
-                # log.info("Type:L b: %0.1f ratio:%0.1f Y_Mid: %0.1f" %
-                # (b, ratio, Y_Future[-1]))
-                # diff = asset.iat[-1] - Y_hatlow[-1]
-                # if asset.iat[-1] - Y_hatlow[-1] > 0:
-                # return True, len(asset), diff
-                # else:
-                # return False, len(asset), diff
-            elif type.upper() == 'H':
-                i = (asset.values.T - Y_hat).argmax()
-                c_high = X[i] * b + a - asset.values[i]
-                # Y_hathigh = X * b + a - c_high
-                Y_Future = X * b + a - c_high
-                # Y_Future = Y * b + a - c_high
-                # log.info("Type:H ratio: %0.1f %0.1f Y_Mid: %0.1f" %
-                # (b, ratio, Y_Future[-1]))
-            if nowP is not None:
-                diff = nowP - Y_Future[-1]
-            else:
-                diff = asset[-1] - Y_Future[-1]
-            # log.info("as:%s Y:%s" % (asset[-1], Y_Future[-1]))
             if diff > 0:
-                # operation += 1
-                pass
-                # log.info("Type: %s UP !!! Y_Future: %0.1f b:%0.1f ratio:%0.1f " % (
-                # type.upper(), Y_Future[-1], b, ratio))
-            else:
                 operation -= 1
-                # log.info("Type: %s Down Y_Future: %0.1f b:%0.1f ratio:%0.1f" % (
-                # type.upper(), Y_Future[-1], b, ratio))
-            return operation, ratio
-            # log.debug("Line down !!! d:%s" % Y_hat[0])
-            # print("Line down !!! d:%s nowp:%s" % (round(Y_hat[1],2),asset[-1:].values[0]))
-            # return -3, round(ratio, 2)
-            # 
+            if diff_h > 0 :
+                operation -= 1
+            if diff_l > 0 :
+                operation -= 1
+        return operation, ratio
 
     df = df.fillna(0)
     if len(df) > 1 + days:
@@ -502,25 +449,22 @@ def get_linear_model_status(code, df=None, dtype='d', type='m', start=None, end=
         operationcount = 0
         ratio_l = []
         if countall:
-            # for co in ['high', 'close', 'low']:
             for co in ['low', 'high', 'close']:
-                for d_type in ['H', 'M', 'L']:
-                    assetratio = asset[co]
-                    nowpratio = df[co][-days] if len(df) > 1 + days else None
-                    # print assetratio,nowpratio
-                    op, ratio = get_linear_model_ratio(assetratio, d_type, nowpratio)
-                    ratio_l.append(round(ratio, 2))
-                    operationcount += op
+                assetratio = asset[co]
+                nowpratio = df[co][-days] if len(df) > 1 + days else None
+                # print assetratio,nowpratio
+                op, ratio = get_linear_model_ratio(assetratio, nowpratio)
+                ratio_l.append(round(ratio, 2))
+                operationcount += op
         else:
             assetratio = asset['close']
             nowpratio = df['close'][-days] if len(df) > 1 + days else None
-            op, ratio = get_linear_model_ratio(assetratio, type, nowpratio)
+            op, ratio = get_linear_model_ratio(assetratio, nowpratio)
             ratio_l.append(round(ratio, 2))
             operationcount += op
 
             # log.info("op:%s min:%s ratio_l:%s" %
             # (operationcount, min(ratio_l), ratio_l))
-            # 
         return operationcount, min(ratio_l), df[:1].index.values[0], [len(df),df[:1]]
 
     elif len(asset) == 1:

@@ -16,9 +16,15 @@ import sys
 sys.path.append("..")
 from JSONData import tdx_data_Day as tdd
 import powerTech as ptc
+from JohhnsonUtil import LoggerFactory as LoggerFactory
+# log = LoggerFactory.getLogger("tutest")
+# log.setLevel(LoggerFactory.INFO)
+# log.setLevel(LoggerFactory.WARN)
+# log.setLevel(LoggerFactory.DEBUG)
+
 
 class BBands(strategy.BacktestingStrategy):
-    def __init__(self, feed, instrument, bBandsPeriod):
+    def __init__(self, feed, instrument, bBandsPeriod, dl):
         strategy.BacktestingStrategy.__init__(self, feed)
         self.__instrument = instrument
         self.getBroker().setFillStrategy(DefaultStrategy(None))
@@ -38,66 +44,120 @@ class BBands(strategy.BacktestingStrategy):
         # self.__LowerBand = self.__bollinger.getLowerBand()
         # self.feed = feed[instrument].getCloseDataSeries()
 #        self.bar = feed[instrument].getClose()
+        self.dl = dl
         self.op = []
-        self.ra = []
+        # self.ra = []
+        self.ral = []
+        self.rah = []
         self.boll = []
         self.macd = []
         self.rsi = []
         self.kdj = []
         self.rsi = []
         self.ma = []
+        self.adj = []
+        # self.adjh = []
+        self.bdj = []
+        # self.bdjh = []
+        self.statusl = []
+        self.statush = []
     def getBollingerBands(self):
         return self.__bbands
 
     def getFeed(self,dt=None):
-        df = self.feed
-        dd = df[df.index <= str(dt)]
+        if dt is None:
+            dt = self.getlastDate()
+        # df = self.feed
+        dd = self.feed[self.feed.index <= str(dt)]
         # print "df:%s dt:%s"%(len(dd),dt)
         return dd
+    def getlastDate(self):
+        return str(self.datetime[-1])[:10]
+
     def get_max_min(self):
-        self.info("op:%s %s :%s"%(max(self.op),min(self.op), list(set(self.op))))
-        self.info("ra:%s %s :%s"%(max(self.ra),min(self.ra),list(set(self.ra))))
-        self.info("boll:%s %s :%s"%(max(self.boll),min(self.boll),list(set(self.boll))))
-        self.info("kdj:%s %s :%s"%(max(self.kdj),min(self.kdj),list(set(self.kdj))))
-        self.info("macd:%s %s :%s"%(max(self.macd),min(self.macd),list(set(self.macd))))
-        self.info("ma:%s %s :%s"%(max(self.ma),min(self.ma),list(set(self.ma))))
+        # self.info("op:%s %s :%s"%(max(self.op),min(self.op), list(set(self.op))))
+        # self.info("ra:%s %s :%s"%(max(self.ra),min(self.ra),list(set(self.ra))))
+        # self.info("boll:%s %s :%s"%(max(self.boll),min(self.boll),list(set(self.boll))))
+        # self.info("kdj:%s %s :%s"%(max(self.kdj),min(self.kdj),list(set(self.kdj))))
+        # self.info("macd:%s %s :%s"%(max(self.macd),min(self.macd),list(set(self.macd))))
+        # self.info("ma:%s %s :%s"%(max(self.ma),min(self.ma),list(set(self.ma))))
+        # self.info("ras:%s %s "%(max(ras),min(ras)))
+        pass
     # def getclose(self):
     #     return self.feed[-1]
+    def diff_index(self):
+        adj , bdj = ptc.get_diff_index(self.__instrument,self.getFeed(),end=self.getlastDate(),dl=int(self.dl/2))
+        self.adj.append(adj)
+        self.bdj.append(bdj)
+        if not (adj > 0 and bdj >0 ):
+            return 2
+        if self.adj > self.bdj:
+            return 1
+        else:
+            return 0
+        # if len(self.adj) > 2:
+        #     if self.adj[-3] < self.bdj[-3] and self.adj[-2] > self.bdj[-2] and self.adj[-1] > self.adj[-2]:
+        #         if adj > bdj :
+        #             print "up",self.getlastDate(),adj,bdj
+        #             return 1
+        #         else:
+        #             print "down",self.getlastDate(),adj,bdj
+        #             return 0
+        #     else:
+        #         return 2
+    def trendstatus(self):
+        opl, ral,statusl,statusdl = ptc.get_linear_model_rule(self.__instrument,self.getFeed(),dl=self.dl,ptype='low')
+        self.ral.append(ral)
+        self.statusl.append(statusdl)
+        oph, rah,statush,statusdh = ptc.get_linear_model_rule(self.__instrument,self.getFeed(),dl=int(self.dl*0.618),ptype='high')
+        self.rah.append(rah)
+        self.statush.append(statusdh)
+        print ("opl:%s oph:%s ral:%s rah:%s sl:%s sh:%s sdl:%s sdh:%s %s %.2f"%(opl,oph,ral,rah,statusl,statush,statusdl,statusdh,self.getlastDate(),self.close[-1]))
+        if statusl and opl > 0 and len(self.ral) > 1 and len(self.statush) > 1:
+            if opl > 0:
+                if ral > 0 :
+                    # if self.statush[-1] < self.statush[-2] and self.rah[-1] > self.rah[-2]:
+                    if self.statush[-1] < self.statush[-2] :
+                        if oph < 0:
+                            return 1
+                    elif self.statush[-1] == 1:
+                        return 2
+                    elif self.statush[-1] > self.statush[-2] and self.rah[-1] < self.rah[-2] and opl < 6:
+                        return 0
+                    # and ras[-1] > ras[-2] and ras[-2] > ras[-3]
+                    # if len(self.rah) > 1:
+                        # log.debug("ral:%s  %s  %s rah:%s %s %s"%(self.ral[-1],self.ral[-2],self.ral[-3],self.rah[-1],self.rah[-2],self.rah[-3]))
+                    # else:
+                    # if len(self.rah) > 2:
+                    #     self.debug("ral:%s  %s  %s rah:%s %s %s"%(self.ral[-1],self.ral[-2],self.ral[-3],self.rah[-1],self.rah[-2],self.rah[-3]))
+                    # else:
+                    #     self.debug("ral:%s  %s  %s "%(self.ral[-1],self.ral[-2],self.ral[-3]))
+
+                else:
+                    self.info("status 1 ra < 0  :%s  %s %s"%(self.ral[-1],self.ral[-2],self.ral[-3]))
+                    return 0
+        else:
+            # if len(self.ral) > 2 and statusdh < 4:
+            #     if ral > 0 and abs(ral)  > abs(rah):
+            #         self.info("status 0 ra >0 :%s  %s %s"%(self.ral[-1],self.ral[-2],self.ral[-3]))
+            #         return  2
+            #     else:
+            #         self.info("status 0 ra < 0 :%s  %s %s"%(self.ral[-1],self.ral[-2],self.ral[-3]))
+            #         return 0
+            # else:
+            return 0
 
     def buyCon1(self):
-        #        if cross.cross_above(self.__ma1, self.__ma2) > 0:
-        #        if self.bar[-1]  > self.upper:
-        #            return True
-        #         df,op=getab.Get_BBANDS(self.getFeed(self.__datetime[-1]))
-        #         self.oplist.append(op)
-        #         if op > 6:
-        #             return True
-        #         elif op > 20:
-        #             return False
-        #         elif op < 0:
-        #             return False
-        #         else:
-        #             return True
-        op,ra,fib,fibl,ldate,boll,kdj,macd,rsi,ma = ptc.get_power_status(self.__instrument,
-                                                                         self.getFeed(self.datetime[-1]),dl=30)
-        print ("op:%s ra:%0.2f ma:%s macd:%s rsi:%s kdj:%s boll:%s close:%s dt:%s ld:%s"%(op,ra,ma,macd,rsi,kdj,boll,self.close[-1],str(self.datetime[-1])[:10],ldate))
-        self.op.append(op)
-        self.ra.append(ra)
-        self.boll.append(boll)
-        self.kdj.append(kdj)
-        self.macd.append(macd)
-        self.ma.append(ma)
-        self.rsi.append(rsi)
         buyC2 = self.buyCon2()
         if buyC2 == 1:
             # print op,ra,fib,fibl,ldate,boll,kdj,macd,rsi,ma,str(self.__datetime[-1])[:10]
             # if fib < 3:
             # if ma > 0 and macd > -2 and rsi > 0 and kdj > 0 :
             # if ma > 0 and macd > -2  :
-            if op > 0 :
-                self.info("boll:%s ra:%s rsi:%s kdj:%s ldate:%s"%(boll,ra,rsi,kdj,ldate))
-                return 1
-            # return 1
+            # if op > 0 :
+            #     self.info("boll:%s ra:%s rsi:%s kdj:%s ldate:%s"%(boll,ra,rsi,kdj,ldate))
+            #     return 1
+            return 1
                 # else:
                 #     print fib
                 # if ma > 0 and macd <-10 and rsi > 0 and kdj > 0 and boll > 6:
@@ -117,20 +177,26 @@ class BBands(strategy.BacktestingStrategy):
         nowo = self.open[-1]
         nowh = self.high[-1]
         nowl = self.low[-1]
-        print nowp,nowo,nowh,nowl
-        if nowp == nowo and nowh == nowl:
-            return 2
-
-        if self.ra[-1] > 0 and nowh >= lasth * 0.99:
-            # if nowo > lastp and nowh > lasth:
-            self.info("buy")
-            return 1
-        else:
-            # if nowo < lastp and nowh < lasth:
-            if len(self.kdj) > 1 and (self.kdj[-2] >0 and self.kdj[-1] < 0) and nowo < lastp and nowh < lasth and nowp < lastp:
-                self.info("sell")
-                return 0
-        return 2
+        # print nowp,nowo,nowh,nowl
+        sts = self.trendstatus()
+        # if sts == 1:
+        #     diffstatus = self.diff_index()
+        #     if (nowp == nowo and nowh == nowl):
+        #         return 2
+        #
+        #     if diffstatus :
+        #     # if diffstatus and self.ra[-1] > 0 and nowh >= lasth * 0.99:
+        #         # if nowo > lastp and nowh > lasth:
+        #         # self.info("buy")
+        #         return 1
+        #     else:
+        #         # if nowo < lastp and nowh < lasth:
+        #         # if len(self.kdj) > 1 and (self.kdj[-2] >0 and self.kdj[-1] < 0) and nowo < lastp and nowh < lasth and nowp < lastp:
+        #         # self.info("sell")
+        #         return 0
+        # else:
+        #     return sts
+        return  sts
 #        if self.bar[-1] < self.middle:
 #            return True
 #        m1 = 0
@@ -554,16 +620,15 @@ import json
 # import tushare as ts
 
 
-def turtle_test(code,start=None,plot=True):
+def turtle_test(code,start=None,plot=True,dl=20):
     feed = ptc.get_tdx_barfeed(code,start)
     #myStrategy = pyalg_test.SMACrossOver(feed, "orcl", 20)
     pars=[2, 20, 60, 10]
 #    myStrategy = thrSMA_dayinfo(feed, "orcl",*pars)
-    myStrategy = BBands(feed, code,20)
+    myStrategy = BBands(feed, code,20,dl)
     # Attach a returns analyzers to the strategy.
 #    returnsAnalyzer = returns.Returns()
 #    myStrategy.attachAnalyzer(returnsAnalyzer)
-
 
 
 #    if dataString =='pyalg_util':
@@ -629,5 +694,5 @@ def turtle_test(code,start=None,plot=True):
 
 if __name__ == '__main__':
     #vwap(True)
-    code='999999'
-    turtle_test(code,'2016-01-01')
+    code='002024'
+    turtle_test(code,'2016-06-01',dl=30)

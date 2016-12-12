@@ -2145,13 +2145,13 @@ if __name__ == '__main__':
     # Write_market_all_day_mp('cyb')
     # sys.exit(0)
 
-    code = '603159'
+    code = '999999'
 #    print get_sina_data_df(code).index
-#    df= get_tdx_Exp_day_to_df(code,dl=1)
+    print get_tdx_Exp_day_to_df(code,dl=2)
 #    print df.date
-    # sys.exit(0)
+    sys.exit(0)
 
-    print get_tdx_append_now_df_api(code,dl=30)
+    # print get_tdx_append_now_df_api(code,dl=30)
     # ldatedf = get_tdx_Exp_day_to_df(code,dl=1)
     # lastd = ldatedf.date
     # today = cct.get_today()

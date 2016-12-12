@@ -123,10 +123,11 @@ if __name__ == "__main__":
                     map(lambda x, y: round((x - y) / y * 100, 1), top_all['buy'].values, top_all['lastp'].values))
                 top_dif = top_all                
                 log.info('dif1:%s' % len(top_dif))
-                top_dif=top_dif[top_dif.lvol > ct.LvolumeSize]
-                log.info(top_dif[:1])
-                top_dif = top_dif[top_dif.buy > top_dif.llastp * ct.changeRatio]
-                log.debug('dif2:%s' % len(top_dif))
+                if cct.get_now_time_int() > 915 and cct.get_now_time_int() < ct.checkfilter_end_time:
+                    top_dif=top_dif[top_dif.lvol > ct.LvolumeSize]
+                    log.info(top_dif[:1])
+                    top_dif = top_dif[top_dif.buy > top_dif.llastp * ct.changeRatio]
+                    log.debug('dif2:%s' % len(top_dif))
                 # log.debug('dif2:%s' % top_dif[:1])
                 if cct.get_now_time_int() > 915 and cct.get_now_time_int() <= 925:
                     top_dif['percent']= (map(lambda x, y: round((x-y)/y*100,1) if int(y) > 0 else 0, top_dif.buy, top_dif.llastp))

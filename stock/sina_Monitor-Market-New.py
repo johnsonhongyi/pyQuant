@@ -139,7 +139,7 @@ if __name__ == "__main__":
                 log.info('dif1:%s' % len(top_dif))
                 if not (cct.get_now_time_int() > 915 and cct.get_now_time_int() <= 925):
                     top_dif=top_dif[top_dif.lvol > ct.LvolumeSize]
-                if cct.get_now_time_int() > 915:
+                if cct.get_now_time_int() > 915 and cct.get_now_time_int() < ct.checkfilter_end_time:
                     top_dif = top_dif[top_dif.buy >= top_dif.llastp * ct.changeRatio]
                     top_dif = top_dif[top_dif.buy >= top_dif.lhigh * ct.changeRatio]
                 log.debug('dif2:%s' % len(top_dif))

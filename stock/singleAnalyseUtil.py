@@ -273,6 +273,11 @@ def get_hot_countNew(changepercent, rzrq,fibl=None,fibc=10):
         fibcount += 1
     allTop = pd.DataFrame()
     indexKeys = [ 'sh','sz', 'cyb']
+    ffindex = ffu.get_dfcfw_fund_flow('all')
+    ffall = {}
+    ffall['zlr'] = 0
+    ffall['zzb'] = 0
+
     for market in indexKeys:
         # market = ct.SINA_Market_KEY()
         df = rd.get_sina_Market_json(market, False)
@@ -300,10 +305,12 @@ def get_hot_countNew(changepercent, rzrq,fibl=None,fibc=10):
         # log.debug("ffurl:%s" % url)
         print(u"crashT:%s crash<-%s:%s" %
               (f_print(4, len(crashTen)), changepercent, f_print(4, len(crash)))),
-        ff = ffu.get_dfcfw_fund_flow(market)
+        ff = ffindex[market]
         if len(ff) > 0:
             zlr = float(ff['zlr'])
             zzb = float(ff['zzb'])
+            ffall['zlr'] = ffall['zlr'] + zlr
+            ffall['zzb'] = ffall['zzb'] + zzb
             # zt=str(ff['time'])
             # modfprint=lambda x:f_print(4,x) if x>0 else "-%s"%(f_print(4,str(x).replace('-','')))
             # print modfprint(zlr)
@@ -325,17 +332,20 @@ def get_hot_countNew(changepercent, rzrq,fibl=None,fibc=10):
     print(u"crashT:%s crash<-%s:%s" %
           (f_print(3, len(crashTen)), changepercent, f_print(4, len(crash)))),
                            
-    ff = ffu.get_dfcfw_fund_flow(ct.DFCFW_FUND_FLOW_ALL)
+    # ff = ffu.get_dfcfw_fund_flow(ct.DFCFW_FUND_FLOW_ALL)
+    ffall['time'] = ff['time']
+    ff = ffall
     zzb = 0
     if len(ff) > 0:
-        zlr = float(ff['zlr'])
-        zzb = float(ff['zzb'])
+        zlr = round(float(ff['zlr']),1)
+        zzb = round(float(ff['zzb'])/3,1)
         zt = str(ff['time'])
         print(u"流入: %s亿 占比: %s%% %s" %
               (f_print(4, zlr), f_print(4, zzb), f_print(4, zt)))
       
     ff = ffu.get_dfcfw_fund_SHSZ()
     hgt = ffu.get_dfcfw_fund_HGT()
+    szt = ffu.get_dfcfw_fund_HGT(url=ct.DFCFW_FUND_FLOW_SZT)
     log.debug("shzs:%s" % ff)
     log.debug("hgt:%s" % hgt)
     # if len(ff) > 0:
@@ -344,14 +354,14 @@ def get_hot_countNew(changepercent, rzrq,fibl=None,fibc=10):
     #         f_print(4, ff['zup']),
     #         f_print(5, ff['zvol']))),
     if len(ff) > 0:
-        print(u"\tSh: %s Vr:%s Sz: %s Vr:%s " % (
-            f_print(4, ff['scent']), f_print(5, ff['svol']), f_print(4, ff['zcent']), f_print(5, ff['zvol']))),
+        print(u"\t\tSh: %s Vr:%s Sz: %s Vr:%s " % (
+            f_print(4, ff['scent']), f_print(5, ff['svol']), f_print(4, ff['zcent']), f_print(5, ff['zvol'])))
     else:
-        print(u"\tSh: \t%s Vr:  \t%s Sz: \t%s Vr: \t%s ") % (0, 0, 0, 0),
+        print(u"\t\tSh: \t%s Vr:  \t%s Sz: \t%s Vr: \t%s ") % (0, 0, 0, 0)
     if len(hgt) > 0:
-        print("Hgt: %s Ggt: %s" % (hgt['hgt'], hgt['ggt']))
+        print("\t\tHgt: %s Ggt: %s Sgt: %s Gst: %s" % (hgt['hgt'], hgt['ggt'],szt['hgt'],szt['ggt']))
     else:
-        print("Hgt: \t%s Ggt: \t%s" % (0, 0))
+        print("\t\tHgt: \t%s Ggt: \t%s Sgt: %s Gst: %s" % (0, 0,0,0))
     if len(rzrq) > 0:
         shpcent = round((rzrq['shrz'] / rzrq['sh'] * 100), 1) if rzrq['sh'] > 0 else '?'
         szpcent = round((rzrq['szrz'] / rzrq['sz'] * 100), 1) if rzrq['sz'] > 0 else '?'

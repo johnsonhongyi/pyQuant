@@ -13,13 +13,14 @@ log = LoggerFactory.getLogger("FundFlow")
 # log.setLevel(LoggerFactory.DEBUG)
 import traceback
 # from bs4 import BeautifulSoup
-def get_dfcfw_fund_flow(market):
+def get_dfcfw_fund_flow_old(market):
     if market.startswith('http'):
         single = True
         url = market
     else:
         single = False
         url = ct.DFCFW_FUND_FLOW_URL % ct.SINA_Market_KEY_TO_DFCFW[market]
+        log.info("url:%s"%(url))
     data = cct.get_url_data_R(url)
     # vollist=re.findall('{data:(\d+)',code)
     vol_l = re.findall('\"([\d\D]+?)\"', data)
@@ -65,8 +66,79 @@ def get_dfcfw_fund_flow(market):
     return dd
 
 
+def get_dfcfw_fund_flow(market):
+    indexall = ['sh','sz','cyb']
+    if market.startswith('http'):
+        single = True
+        url = market
+    else:
+        single = False
+        if market == "all":
+            indexcode = ct.SINA_Market_KEY_TO_DFCFW_New['sh']+','+ct.SINA_Market_KEY_TO_DFCFW_New['sz']+','+ct.SINA_Market_KEY_TO_DFCFW_New['cyb']
+        else:
+            indexall = [market]
+            indexcode = ct.SINA_Market_KEY_TO_DFCFW_New[market]
+        url = ct.DFCFW_FUND_FLOW_URL_New % indexcode
+        log.info("url:%s"%(url))
+    data = cct.get_url_data_R(url).split('=')
+    # vollist=re.findall('{data:(\d+)',code)
+    # vol_l = []
+    if len(data) > 1:
+        # vol_l = re.findall('\"([\d\D]+?)\"', data[1])
+        data_s = data[1].replace("\"","")
+    else:
+        data_s = ''
+        # data_s = data[1]
+    dk = {}
+    start_inx = 0
+    for i in range(len(indexall)):
+        dd = {}
+        # start_inx = start_inx + i * 24
+        # end_inx = start_inx + (i+1)*24
+        if len(data_s) > 0:
+            data = data_s.split(',')
+            dd['zlr'] = round(float(data[5+i*25])/10000, 1)
+            dd['zzb'] = round(float(data[23+i*25].replace("%","")), 1)
+            dd['sjlr'] = round(float(data[9+i*25])/10000, 1)
+            dd['sjzb'] = round(float(data[10+i*25].replace("%","")), 1)
+            dd['time'] = data[24+i*25].split(" ")[1][:5]
+            # print dd['time']
+        else:
+            dd['zlr'] = 0.0
+            dd['zzb'] = 0.0
+            dd['sjlr'] = 0.0
+            dd['sjzb'] = 0.0
+            dd['time'] = 0.0
+            log.error("Fund_f NO Url:%s" % url)
+        if not single:
+            url = ct.SINA_JSON_API_URL % ct.INDEX_LIST[indexall[i]]
+            data = cct.get_url_data_R(url)
+            vol_l = re.findall('\"([\d\D]+?)\"', data)
+            if len(vol_l) == 1:
+                data = vol_l[0].split(',')
+                try:
+                    dd['open'] = round(float(data[1]), 2)
+                    dd['lastp'] = round(float(data[2]), 2)
+                    dd['close'] = round(float(data[3]), 2)
+                    dd['high'] = round(float(data[4]), 2)
+                    dd['low'] = round(float(data[5]), 2)
+                    dd['vol'] = round(float(data[8]) / 100000, 1)
+                    dd['amount'] = round(float(data[9]) / 100000000, 1)
+                except Exception, e:
+                    print e
+                    return dd
+                else:
+                    pass
+                finally:
+                    pass
+        dk[indexall[i]] = dd
+                # 1592652100,32691894461
+                # 215722046, 207426675004
+    return dk
 def get_dfcfw_fund_HGT(url=ct.DFCFW_FUND_FLOW_HGT):
     data = cct.get_url_data_R(url)
+    "http://nufm.dfcfw.com/EM_Finance2014NumericApplication/JS.aspx?type=CT&cmd=P.%28x%29,%28x%29,%28x%29|0000011|3990012|3990012,0000011,HSI5,BK07071,MK01461,MK01441,BK08041&sty=SHSTD|SZSTD|FCSHSTR&st=z&sr=&p=&ps=&cb=&js=var%20muXWEC=%28{data:[%28x%29]}%29&token=1942f5da9b46b069953c873404aad4b5"
+    log.info("url:%s" % url)
     # vollist=re.findall('{data:(\d+)',code)
     vol_l = re.findall('\"([\d\D]+?)\"', data)
     dd = {}
@@ -89,6 +161,7 @@ def get_dfcfw_fund_HGT(url=ct.DFCFW_FUND_FLOW_HGT):
 
 def get_dfcfw_fund_SHSZ(url=ct.DFCFW_ZS_SHSZ):
     data = cct.get_url_data_R(url)
+    log.info("url:%s"%(url))
     # vollist=re.findall('{data:(\d+)',code)
     vol_l = re.findall('\"([\d\D]+?)\"', data)
     dd = {}
@@ -330,12 +403,14 @@ if __name__ == "__main__":
     # pp=get_dfcfw_fund_HGT(ct.DFCFW_FUND_FLOW_HGT)
     # for x in pp.keys():
     # print pp[x]
-    #
-
-    # dd =get_dfcfw_fund_flow('cyb')
+    #get_dfcfw_fund_HGT
+    print get_dfcfw_fund_HGT(url=ct.DFCFW_FUND_FLOW_HGT)
+    print get_dfcfw_fund_HGT(url=ct.DFCFW_FUND_FLOW_SZT)
+    # print get_dfcfw_fund_flow('sz')
+    print get_dfcfw_fund_flow('all')
     # print dd
-#    print get_dfcfw_fund_SHSZ()
-     df = get_dfcfw_rzrq_SHSZ()
+    # print get_dfcfw_fund_SHSZ()
+    # print get_dfcfw_rzrq_SHSZ(url=ct.DFCFW_RZRQ_SHSZ)
     # print df
 
     # get_lhb_dd()
