@@ -24,12 +24,14 @@ PowerCountdl = 30
 writeCount = 8
 changeRatio = 0.99
 duration_date = 10
-duration_date_sort = 30
-bollFilter = -5
+duration_date_sort = 10
+bollFilter = -10
 writeblockbakNum = 12
 checkfilter = True
-checkfilter_end_time = 945 
-checkfilter_end_timeDu = 945 
+checkfilter_end_time = 945
+checkfilter_end_timeDu = 1000
+
+tdx_max_int = 10
 # Duration_sort_op=['fib','op','ra','percent','ratio','diff','counts']
 # Duration_sort_op=['fib','op','diff','fibl','ra','percent','ratio','volume','counts']
 # Duration_sort_op_key=[1,0,0,1,0,0,1,1,1]
@@ -193,7 +195,7 @@ SINA_Market_COLUMNS = ['code', 'name', 'trade', 'buy', 'percent', 'open', 'high'
 # SINA_Total_Columns_Clean = ['code', 'name', 'trade', 'buy','bid1','bid1_volume','ask1',
                       # 'ask1_volume', 'percent', 'open', 'close', 'high', 'low', 'volume',
                             # 'ratio']
-                           
+
 # SINA_Total_Columns = ['code', 'name', 'open','now','close', 'trade', 'high', 'low', 'buy', 'sell', 'volume',
                       # 'turnover', 'bid1_volume', 'bid1', 'bid2_volume', 'bid2', 'bid3_volume',
                       # 'bid3', 'bid4_volume', 'bid4', 'bid5_volume', 'bid5', 'ask1_volume',
@@ -202,7 +204,7 @@ SINA_Market_COLUMNS = ['code', 'name', 'trade', 'buy', 'percent', 'open', 'high'
 
 SINA_Total_Columns_Clean = ['code', 'name', 'buy','sell','b1','b1_v','a1',
                       'a1_v', 'open', 'close', 'high', 'low', 'volume',
-                            'turnover']                           
+                            'turnover']
 SINA_Total_Columns = ['code', 'name', 'open', 'close','now', 'trade', 'high', 'low', 'buy', 'sell', 'volume',
                       'turnover', 'b1_v', 'b1', 'b2_v', 'b2', 'b3_v',
                       'b3', 'b4_v', 'b4', 'b5_v', 'b5', 'a1_v',
@@ -214,7 +216,7 @@ SINA_DD_Clean_Count_Columns = ['name', 'percent', 'diff', 'counts', 'trade', 'hi
 SINA_Market_Clean_UP_Columns = ['name', 'buy','trade','diff', 'volume', 'percent', 'ratio', 'high', 'open', 'low', 'counts',
                                 'prev_p','sell','b1','b1_v','a1','a1_v']
 SINA_Market_Clean_UP_ColumnsTrade = ['name', 'trade', 'diff', 'volume', 'percent', 'ratio', 'high', 'open', 'low', 'counts',
-                                'prev_p']                               
+                                'prev_p']
 SINA_Market_Clean_Columns=['name','buy','diff','volume','percent','ratio','high','open','low','counts']
 # SINA_Market_Clean_UP_Columns=['name','buy','diff','percent','trade','high','ratio','open','low','counts']
 
@@ -234,7 +236,7 @@ DFCFW_FUND_FLOW_URL_New="http://nufm.dfcfw.com/EM_Finance2014NumericApplication/
 # DFCFW_FUND_FLOW_URL_New="http://nufm.dfcfw.com/EM_Finance2014NumericApplication/JS.aspx?type=CT&cmd=%s"
 
 # TDX_Day_columns=['code','date','open','high','low','close','vol','amount']
-TDX_Day_columns=['code','date','open','high','low','close','vol','amount','ra','op','fib','ma5d','ma10d','ldate']
+TDX_Day_columns=['code','date','open','high','low','close','vol','amount','ra','op','fib','ma5d','ma10d','ldate','hmax','lmin','cmean']
 
 DFCFW_FUND_FLOW_HGT="http://nufm.dfcfw.com/EM_Finance2014NumericApplication/JS.aspx?type=CT&cmd=0000011&sty=SHSTD&st=z&sr=&p=&ps=&cb=&js=var%20quote_zjl%3d{rank:[%28x%29],pages:%28pc%29}&token=beb0a0047196124721f56b0f0ff5a27c&jsName=quote_zjl&dt=1452070103085"
 DFCFW_FUND_FLOW_SZT="http://nufm.dfcfw.com/EM_Finance2014NumericApplication/JS.aspx?type=CT&cmd=0000011&sty=SZSTD&st=z&sr=&p=&ps=&cb=&js=var%20quote_zjl%3d{rank:[%28x%29],pages:%28pc%29}&token=beb0a0047196124721f56b0f0ff5a27c&jsName=quote_zjl&dt=1452070103085"

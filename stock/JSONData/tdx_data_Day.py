@@ -28,7 +28,7 @@ log = LoggerFactory.getLogger('TDX_Day')
 # log.setLevel(LoggerFactory.ERROR)
 
 path_sep = os.path.sep
-newstockdayl = 30
+newstockdayl = 10
 changedays=0
 global initTdxdata,initTushareCsv
 initTdxdata = 0
@@ -164,6 +164,9 @@ def get_tdx_Exp_day_to_df(code, type='f', start=None, end=None, dl=None):
             df['ma10d'] = pd.rolling_mean(df.close,10)
             df['ma20d'] = pd.rolling_mean(df.close,20)
             df['ma60d'] = pd.rolling_mean(df.close,60)
+            df['hmax'] = df.high[-ct.tdx_max_int:].max()
+            df['lmin'] = df.low[-ct.tdx_max_int:].min()
+            df['cmean'] = df.close[-ct.tdx_max_int:].mean()
             df = df.fillna(0)
             df = df.sort_index(ascending=False)
         return df
@@ -275,6 +278,9 @@ def get_tdx_Exp_day_to_df(code, type='f', start=None, end=None, dl=None):
             df['ma10d'] = pd.rolling_mean(df.close,10)
             df['ma20d'] = pd.rolling_mean(df.close,20)
             df['ma60d'] = pd.rolling_mean(df.close,60)
+            df['hmax'] = df.high[-ct.tdx_max_int:].max()
+            df['lmin'] = df.low[-ct.tdx_max_int:].min()
+            df['cmean'] = df.close[-ct.tdx_max_int:].mean()
             df = df.fillna(0)
             df = df.sort_index(ascending=False)
         return df
@@ -1833,17 +1839,17 @@ def get_append_lastp_to_df(top_all,lastpTDX_DF=None,dl=ct.PowerCountdl,end=None,
         # tdxdata = get_tdx_all_day_LastDF(codelist) '''only get lastp no powerCompute'''
         tdxdata = get_tdx_exp_all_LastDF_DL(codelist,dt=dl,end=end,ptype=ptype,filter=filter,power=power,lastp=lastp)
         tdxdata.rename(columns={'low': 'llow'}, inplace=True)
+        tdxdata.rename(columns={'open': 'lopen'}, inplace=True)
         tdxdata.rename(columns={'high': 'lhigh'}, inplace=True)
         tdxdata.rename(columns={'close': 'lastp'}, inplace=True)
         tdxdata.rename(columns={'vol': 'lvol'}, inplace=True)
-        if power:
-            tdxdata = tdxdata.loc[:, ['llow', 'lhigh', 'lastp', 'lvol', 'date','ra','op','fib','fibl','ma5d','ma10d','ldate']]
-            # print len(tdxdata[tdxdata.op >15]),
-        else:
-            tdxdata = tdxdata.loc[:, ['llow', 'lhigh', 'lastp', 'lvol','ma5d','ma10d','date']]
-            # tdxdata = tdxdata.loc[
-            #     :, ['llow', 'lhigh', 'lastp', 'lvol', 'date']]
-#        tdxdata = tdxdata.dropna()
+#        if power:
+#            tdxdata = tdxdata.loc[:, ['llow', 'lhigh', 'lastp', 'lvol', 'date','ra','op','fib','fibl','ma5d','ma10d','ldate']]
+#            # print len(tdxdata[tdxdata.op >15]),
+#        else:
+#            tdxdata = tdxdata.loc[:, ['llow', 'lhigh', 'lastp', 'lvol','ma5d','ma10d','date']]
+#            # tdxdata = tdxdata.loc[
+#            #     :, ['llow', 'lhigh', 'lastp', 'lvol', 'date']]
         log.debug("TDX Col:%s" % tdxdata.columns.values)
     else:
         tdxdata = lastpTDX_DF

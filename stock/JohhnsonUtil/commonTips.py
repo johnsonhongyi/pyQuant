@@ -760,8 +760,8 @@ def code_to_tdx_blk(code):
 
 
 def write_to_blocknew(p_name, data, append=True):
-    index_list = ['1999999','47#IFL0',  '0399006', '27#HSI']
-    # index_list = ['1999999',  '0159915','47#IFL0', '27#HSI']
+    # index_list = ['1999999','47#IFL0',  '0399006', '27#HSI']
+    index_list = ['1999999','47#IFL0', '27#HSI',  '0399006']
     def writeBlocknew(p_name, data, append=True):
         if append:
             fout = open(p_name, 'rb+')

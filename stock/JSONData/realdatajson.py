@@ -672,16 +672,16 @@ if __name__ == '__main__':
     # df=get_sina_Market_json('cyb')
     # _get_sina_json_dd_url()
     # print sina_json_Big_Count()
-    print getconfigBigCount(write=True)
-    sys.exit(0)
+    # print getconfigBigCount(write=True)
+    # sys.exit(0)
     df = get_sina_Market_json('sz')
     print df[:1]
-    top_now = get_market_price_sina_dd_realTime(df, '0', type)
+    top_now = get_market_price_sina_dd_realTime(df, '2', type)
     print top_now[:1]
     # _parsing_Market_price_json('cyb')
     # sys.exit(0)
     # dd = get_sina_all_json_dd('0', '4')
-    dd = get_sina_all_json_dd('0')
+    dd = get_sina_all_json_dd('2')
     print ""
     print dd[:2]
     df = get_sina_dd_count_price_realTime(dd)

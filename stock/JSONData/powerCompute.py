@@ -1,6 +1,5 @@
 # -*- coding:utf-8 -*-
 import sys
-
 sys.path.append("..")
 
 import numpy as np
@@ -336,7 +335,7 @@ def get_linear_model_status(code, df=None, dtype='d', type='m', start=None, end=
         # if start and index_d and len(df) > 2 and filter == 'y':
         #     if df.index.values[0] < index_d:
         #         df = df[df.index >= index_d]
-        #         
+        #
                 # if len(df) > 2 and start is not None and filter == 'y':
                 #     if df.index.values[0] < index_d:
                 #         df = df[df.index >= index_d]
@@ -858,13 +857,13 @@ def powerCompute_df(df, dtype='d', end=None, dl=None, filter='y',talib=False):
             else:
                 fib = str(daysData[0])
         # fibl = sep.join(fib)
-        
+
         tdx_df,operation = getab.Get_BBANDS(tdx_df, dtype='d')
         # opc +=operation
         # if opc > 21:
         #     opc = 21
         # log.debug( "opc:%s op:%s"%(opc,operation))
-        
+
         # df.loc[code,'ma5'] = daysData[1].ma5d[0]
         # print tdx_df[:1].ma5d[0],daysData[1].ma5d[0]
         if len(tdx_df) > 0 and 'ma5d' in tdx_df.columns:
@@ -891,7 +890,7 @@ def powerCompute_df(df, dtype='d', end=None, dl=None, filter='y',talib=False):
         #'volume', 'ratio', 'counts','ldate' -> 'ma','macd','rsi','kdj'
         df=df.fillna(0)
         # df = df.drop_duplicates()
-    print "P:%0.2f"%(time.time()-ts),    
+    print "P:%0.2f"%(time.time()-ts),
     return df
 
 

@@ -61,7 +61,7 @@ if __name__ == "__main__":
     # dl=30
     ptype='low'
     # op, ra, duration_date, days = pct.get_linear_model_status('999999', filter='y', dl=dl, ptype=ptype, days=1)
-    duration_date = ct.duration_date
+    duration_date = int(ct.duration_date * 1.4)
 #    duration_date = 120
     # duration_date = 300
     du_date = duration_date
@@ -83,7 +83,7 @@ if __name__ == "__main__":
     while 1:
         try:
             # df = sina_data.Sina().all
-            top_now = tdd.getSinaAlldf(market='zxb', vol=ct.json_countVol, type=ct.json_countType)
+            top_now = tdd.getSinaAlldf(market='all', vol=ct.json_countVol, type=ct.json_countType)
             
             top_dif = top_now
             # top_now.to_hdf("testhdf5", 'marketDD', format='table', complevel=9)
@@ -285,7 +285,7 @@ if __name__ == "__main__":
 
                         # top_temp = top_temp.sort_values(by=['op','ra','diff', 'percent', 'ratio'], ascending=[0,0,0, 0, 1])[:10]
                         # top_temp = top_temp.sort_values(by=['op','ldate','ra','diff', 'percent', 'ratio'], ascending=[0,0,0,0, 0, 1])[:10]
-                        if duration_date > ct.duration_date_sort:
+                        if cct.get_now_time_int() > ct.checkfilter_end_timeDu and duration_date > ct.duration_date_sort:
                             top_temp = top_temp.sort_values(by=ct.Duration_percent_op,
                                         ascending=ct.Duration_percent_op_key)
                         else:
