@@ -28,7 +28,7 @@ log = LoggerFactory.getLogger('TDX_Day')
 # log.setLevel(LoggerFactory.ERROR)
 
 path_sep = os.path.sep
-newstockdayl = 10
+newstockdayl = 6
 changedays=0
 global initTdxdata,initTushareCsv
 initTdxdata = 0
@@ -971,6 +971,8 @@ def getSinaAlldf(market='cyb',vol=ct.json_countVol,type=ct.json_countType):
 
     if market == 'rzrq':
         df = cct.get_rzrq_code()
+    elif market == 'cx':
+        df = cct.get_rzrq_code(market)
     elif market == 'zxb':
         df = cct.get_tushare_market(market, renew=False)
     elif market == 'captops':
@@ -2150,10 +2152,12 @@ if __name__ == '__main__':
 #    df = get_tdx_exp_all_LastDF(codelist, dt=30,end=20160401, ptype='high', filter='y')
     # Write_market_all_day_mp('cyb')
     # sys.exit(0)
-
+#    print getSinaAlldf('cx')
+    print get_tdx_exp_low_or_high_power('603585',dl=10,ptype='low')
+#    print get_tdx_append_now_df_api('603878')
     code = '999999'
 #    print get_sina_data_df(code).index
-    print get_tdx_Exp_day_to_df(code,dl=2)
+#    print get_tdx_Exp_day_to_df(code,dl=2)
 #    print df.date
     sys.exit(0)
 

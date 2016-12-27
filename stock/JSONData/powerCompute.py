@@ -838,6 +838,7 @@ def powerCompute_df(df, dtype='d', end=None, dl=None, filter='y',talib=False):
 #        tdx_df = tdd.get_tdx_power_now_df(code, start=start, end=end, type='f', df=None, dm=dz, dl=dl*2)
         tdx_df = tdd.get_tdx_append_now_df_api(code, start=start, end=end, type='f', df=None, dm=dz, dl=dl*2)
         # print tdx_df
+        tdx_df=tdx_df.fillna(0)
         opc = 0
         stl = ''
         rac = 0

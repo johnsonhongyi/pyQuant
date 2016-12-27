@@ -89,14 +89,23 @@ def get_rzrq_code(market='all'):
     base = baser  + 'stock' +path_sep + 'JohhnsonUtil' + path_sep
     szrz = base + 'szrzrq.csv'
     shrz = base + 'shrzrq.csv'
-    dfsz = pd.read_csv(szrz,dtype={'code':str},encoding = 'gbk')
-    if market == 'sz':
-        return dfsz
-    dfsh = pd.read_csv(shrz,dtype={'code':str},encoding ='gbk')
-    dfsh = dfsh.loc[:,['code','name']]
-    if market == 'sh':
-        return dfsh
-    dd = dfsz.append(dfsh,ignore_index=True)
+    if market in ['all','sz','sh']:
+        dfsz = pd.read_csv(szrz,dtype={'code':str},encoding = 'gbk')
+        if market == 'sz':
+            return dfsz
+        dfsh = pd.read_csv(shrz,dtype={'code':str},encoding ='gbk')
+        dfsh = dfsh.loc[:,['code','name']]
+        if market == 'sh':
+            return dfsh
+        dd = dfsz.append(dfsh,ignore_index=True)
+    elif market == 'cx':
+        cxzx = base +  'cxgzx.csv'
+        dfot = pd.read_csv(cxzx,dtype={'code':str},sep='\t',encoding ='gbk')
+        dd = dfot.loc[:,['code','name']]
+    else:
+        cxzx = base +  market + '.csv'
+        dfot = pd.read_csv(cxzx,dtype={'code':str},sep='\t',encoding ='gbk')
+        dd = dfot.loc[:,['code','name']]
     return dd
 
 def get_tushare_market(market='zxb',renew=False,days=5):
@@ -1034,8 +1043,10 @@ if __name__ == '__main__':
     # print typeday8_to_day10(None)
     # write_to_blocknew('abc', ['300380','601998'], append=True)
     # print get_today_duration()
-    print get_tushare_market(market='captops', renew=True,days=10).shape
-    print get_rzrq_code()[:3]
+    # print get_tushare_market(market='captops', renew=True,days=10).shape
+    # print get_rzrq_code()[:3]
+    print get_rzrq_code('cxgzx')[:3]
+    print get_rzrq_code('cx')[:3]
     print get_now_time_int()
     print get_now_time()
     print get_work_time_ratio()

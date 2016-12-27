@@ -156,6 +156,8 @@ def Get_BBANDS_algo(df):
 
 
 def Get_BBANDS(df,dtype='d',days=5):
+    if len(df) < 25:
+        return (df,1)
     df = df.sort_index(ascending=True)
     upperband,middleband,lowerband=ta.BBANDS(np.array(df['close']),timeperiod=20,nbdevdn=2,matype=0)
     df['upbb%s'%dtype] = pd.Series(upperband,index=df.index)
@@ -274,9 +276,9 @@ def Get_TA(df,dtype='d',days=5):
 
 def Get_MACD_OP(df,dtype='d',days=5):
     #参数12,26,9
-    df = df.sort_index(ascending=True)
     if len(df) < 30:
         return (df,1)
+    df = df.sort_index(ascending=True)
 #    df=df.fillna(0)
     macd, macdsignal, macdhist = ta.MACD(np.array(df['close']), fastperiod=12, slowperiod=26, signalperiod=9)
 #    SignalMA5 = ta.MA(macdsignal, timeperiod=5, matype=0)
@@ -376,69 +378,74 @@ def Get_MACD(df,dtype='d',days=5):
 #通过KDJ判断买入卖出
 def Get_KDJ(df,dtype='d',days=5):
     #参数9,3,3
-    df = df.sort_index(ascending=True)
-    slowk, slowd = ta.STOCH(np.array(df['high']), np.array(df['low']), np.array(df['close']), fastk_period=9, slowk_period=3, slowk_matype=0, slowd_period=3, slowd_matype=0)
+    if len(df) < 30:
+        return (df,1)
+    else:
+        df = df.sort_index(ascending=True)
+        slowk, slowd = ta.STOCH(np.array(df['high']), np.array(df['low']), np.array(df['close']), fastk_period=9, slowk_period=3, slowk_matype=0, slowd_period=3, slowd_matype=0)
 
-    slowkMA5 = ta.MA(slowk, timeperiod=5, matype=0)
-    slowkMA10 = ta.MA(slowk, timeperiod=10, matype=0)
-    slowkMA20 = ta.MA(slowk, timeperiod=20, matype=0)
-    slowdMA5 = ta.MA(slowd, timeperiod=5, matype=0)
-    slowdMA10 = ta.MA(slowd, timeperiod=10, matype=0)
-    slowdMA20 = ta.MA(slowd, timeperiod=20, matype=0)
+        slowkMA5 = ta.MA(slowk, timeperiod=5, matype=0)
+        slowkMA10 = ta.MA(slowk, timeperiod=10, matype=0)
+        slowkMA20 = ta.MA(slowk, timeperiod=20, matype=0)
+        slowdMA5 = ta.MA(slowd, timeperiod=5, matype=0)
+        slowdMA10 = ta.MA(slowd, timeperiod=10, matype=0)
+        slowdMA20 = ta.MA(slowd, timeperiod=20, matype=0)
 
-    #16-17 K,D
-    df['slowk%s'%dtype]=pd.Series(slowk,index=df.index) #K
-    df['slowd%s'%dtype]=pd.Series(slowd,index=df.index)#D
-    dflen = df.shape[0]
-    MAlen = len(slowkMA5)
-    operate = 0
+        #16-17 K,D
+        df['slowk%s'%dtype]=pd.Series(slowk,index=df.index) #K
+        df['slowd%s'%dtype]=pd.Series(slowd,index=df.index)#D
+        dflen = df.shape[0]
+        MAlen = len(slowkMA5)
+        operate = 0
 
-    kdjk=df.loc[df.index[-1],'slowk%s'%dtype]
-    kdjk2=df.loc[df.index[-2],'slowk%s'%dtype]
-    kdjd=df.loc[df.index[-1],'slowd%s'%dtype]
-    kdjd2=df.loc[df.index[-2],'slowd%s'%dtype]
+        kdjk=df.loc[df.index[-1],'slowk%s'%dtype]
+        kdjk2=df.loc[df.index[-2],'slowk%s'%dtype]
+        kdjd=df.loc[df.index[-1],'slowd%s'%dtype]
+        kdjd2=df.loc[df.index[-2],'slowd%s'%dtype]
 
-    ma5=df.loc[df.index[-1],'ma5%s'%dtype]
-    ma10=df.loc[df.index[-1],'ma10%s'%dtype]
-    ma20=df.loc[df.index[-1],'ma20%s'%dtype]
-    #1.K线是快速确认线——数值在90以上为超买，数值在10以下为超卖；D大于80时，行情呈现超买现象。D小于20时，行情呈现超卖现象。
-#    if kdjk>=90:
-#        operate = operate - 3
-#    elif kdjk<=10:
-#        operate = operate + 3
-#
-#    if kdjd>=80:
-#        operate = operate - 3
-#    elif kdjd<=20:
-#        operate = operate + 3
-#    if len(kdjk) >1:
-#        raise Exception("Data not one,Drop_duplicates")
-    #2.上涨趋势中，K值大于D值，K线向上突破D线时，为买进信号。#待修改
-    if kdjk> kdjd and kdjk2 <=kdjd2:
-        operate = operate + 10
-    #下跌趋势中，K小于D，K线向下跌破D线时，为卖出信号。#待修改
-    elif kdjk< kdjd and kdjk2>=kdjd2:
-        operate = operate - 10
+        ma5=df.loc[df.index[-1],'ma5%s'%dtype]
+        ma10=df.loc[df.index[-1],'ma10%s'%dtype]
+        ma20=df.loc[df.index[-1],'ma20%s'%dtype]
+        #1.K线是快速确认线——数值在90以上为超买，数值在10以下为超卖；D大于80时，行情呈现超买现象。D小于20时，行情呈现超卖现象。
+    #    if kdjk>=90:
+    #        operate = operate - 3
+    #    elif kdjk<=10:
+    #        operate = operate + 3
+    #
+    #    if kdjd>=80:
+    #        operate = operate - 3
+    #    elif kdjd<=20:
+    #        operate = operate + 3
+    #    if len(kdjk) >1:
+    #        raise Exception("Data not one,Drop_duplicates")
+        #2.上涨趋势中，K值大于D值，K线向上突破D线时，为买进信号。#待修改
+        if kdjk> kdjd and kdjk2 <=kdjd2:
+            operate = operate + 10
+        #下跌趋势中，K小于D，K线向下跌破D线时，为卖出信号。#待修改
+        elif kdjk< kdjd and kdjk2>=kdjd2:
+            operate = operate - 10
 
 
-    #3.当随机指标与股价出现背离时，一般为转势的信号。
-    if ma5>=ma10 and ma10>=ma20:#K线上涨
-        if (slowkMA5[MAlen-1]<=slowkMA10[MAlen-1] and slowkMA10[MAlen-1]<=slowkMA20[MAlen-1]) or \
-           (slowdMA5[MAlen-1]<=slowdMA10[MAlen-1] and slowdMA10[MAlen-1]<=slowdMA20[MAlen-1]): #K,D下降
-            operate = operate - 1
-    elif ma5<=ma10 and ma10<=ma20:#K线下降
-        if (slowkMA5[MAlen-1]>=slowkMA10[MAlen-1] and slowkMA10[MAlen-1]>=slowkMA20[MAlen-1]) or \
-           (slowdMA5[MAlen-1]>=slowdMA10[MAlen-1] and slowdMA10[MAlen-1]>=slowdMA20[MAlen-1]): #K,D上涨
-            operate = operate + 1
-    for cl in ['slowk%s'%dtype,'slowd%s'%dtype]:
-        operate=algoMultiTech(df, column=cl, days=days, op=operate)
-    df = df.sort_index(ascending=False)
+        #3.当随机指标与股价出现背离时，一般为转势的信号。
+        if ma5>=ma10 and ma10>=ma20:#K线上涨
+            if (slowkMA5[MAlen-1]<=slowkMA10[MAlen-1] and slowkMA10[MAlen-1]<=slowkMA20[MAlen-1]) or \
+               (slowdMA5[MAlen-1]<=slowdMA10[MAlen-1] and slowdMA10[MAlen-1]<=slowdMA20[MAlen-1]): #K,D下降
+                operate = operate - 1
+        elif ma5<=ma10 and ma10<=ma20:#K线下降
+            if (slowkMA5[MAlen-1]>=slowkMA10[MAlen-1] and slowkMA10[MAlen-1]>=slowkMA20[MAlen-1]) or \
+               (slowdMA5[MAlen-1]>=slowdMA10[MAlen-1] and slowdMA10[MAlen-1]>=slowdMA20[MAlen-1]): #K,D上涨
+                operate = operate + 1
+        for cl in ['slowk%s'%dtype,'slowd%s'%dtype]:
+            operate=algoMultiTech(df, column=cl, days=days, op=operate)
+        df = df.sort_index(ascending=False)
     return (df,operate)
 
 
 #通过RSI判断买入卖出
 def Get_RSI(df,dtype='d',days=5):
     #参数14,5
+    if len(df) < 30:
+        return (df,1)
     df = df.sort_index(ascending=True)
     slowreal = ta.RSI(np.array(df['close']), timeperiod=14)
     fastreal = ta.RSI(np.array(df['close']), timeperiod=5)
