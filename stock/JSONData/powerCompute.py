@@ -835,10 +835,14 @@ def powerCompute_df(df, dtype='d', end=None, dl=None, filter='y',talib=False):
             dz = dm.loc[code].to_frame().T
         else:
             dz = tdd.get_sina_data_df(code)
+#        print dz.open.values
+        if len(dz) > 0 and dz.open.values > 0:
+            tdx_df = tdd.get_tdx_append_now_df_api(code, start=start, end=end, type='f', df=None, dm=dz, dl=dl*2)
+            # print tdx_df
+            tdx_df=tdx_df.fillna(0)
+        else:
+            continue
 #        tdx_df = tdd.get_tdx_power_now_df(code, start=start, end=end, type='f', df=None, dm=dz, dl=dl*2)
-        tdx_df = tdd.get_tdx_append_now_df_api(code, start=start, end=end, type='f', df=None, dm=dz, dl=dl*2)
-        # print tdx_df
-        tdx_df=tdx_df.fillna(0)
         opc = 0
         stl = ''
         rac = 0
@@ -939,11 +943,11 @@ if __name__ == "__main__":
     # print get_linear_model_status('600671', filter='y', start='20160329', ptype='high')
     # print get_linear_model_status('999999', filter='y', dl=30, ptype='high')
     # print get_linear_model_status('999999', filter='y', dl=30, ptype='low')
-    # print powerCompute_df(['000938','002171'], dtype='d',end=None, dl=21, filter='y')
+    print powerCompute_df(['600506','000938','002171'], dtype='d',end=None, dl=21, filter='y')
     # # print powerCompute_df(['601198', '002791', '000503'], dtype='d', end=None, dl=30, filter='y')
     # print get_linear_model_status('999999', filter='y', dl=34, ptype='low', days=1)
     # print get_linear_model_status('399006', filter='y', dl=34, ptype='low', days=1)
-    # sys.exit()
+    sys.exit()
     if cct.isMac():
         cct.set_console(80, 19)
     else:

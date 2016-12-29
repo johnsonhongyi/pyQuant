@@ -61,7 +61,7 @@ if __name__ == "__main__":
     # dl=30
     ptype='low'
     # op, ra, duration_date, days = pct.get_linear_model_status('999999', filter='y', dl=dl, ptype=ptype, days=1)
-    duration_date = int(ct.duration_date * 1.4)
+    duration_date = int(ct.duration_date * 1.5)
 #    duration_date = 120
     # duration_date = 300
     du_date = duration_date
@@ -84,7 +84,7 @@ if __name__ == "__main__":
         try:
             # df = sina_data.Sina().all
             top_now = tdd.getSinaAlldf(market='all', vol=ct.json_countVol, type=ct.json_countType)
-            
+
             top_dif = top_now
             # top_now.to_hdf("testhdf5", 'marketDD', format='table', complevel=9)
             now_count = len(top_now)
@@ -157,15 +157,15 @@ if __name__ == "__main__":
                 if 'trade' in top_dif.columns:
                     top_dif['buy'] = (
                         map(lambda x, y: y if int(x) == 0 else x, top_dif['buy'].values, top_dif['trade'].values))
-                
+
                 #判断主升
                 # log.debug('top_dif:%s'%(len(top_dif)))
                 if ct.checkfilter and cct.get_now_time_int() > 915 and cct.get_now_time_int() < ct.checkfilter_end_timeDu:
-                    top_dif = top_dif[top_dif.buy >= top_dif.llastp * ct.changeRatio]    
+                    top_dif = top_dif[top_dif.buy >= top_dif.llastp * ct.changeRatio]
                     log.debug('top_dif:%s'%(len(top_dif)))
                     top_dif = top_dif[top_dif.buy >= top_dif.lhigh * ct.changeRatio]
                     log.debug('top_dif:%s'%(len(top_dif)))
-                    
+
                 if cct.get_now_time_int() > 915:
                     top_dif = top_dif[top_dif.buy > 0]
 
@@ -180,12 +180,12 @@ if __name__ == "__main__":
                 # log.debug("top_dif.low > 0:%s" % (len(top_dif)))
                     # top_dif.loc['600610','volume':'lvol']
                 top_dif['volume'] = (
-                    map(lambda x, y: round(x / y / radio_t, 1), top_dif.volume.values, top_dif.lvol.values))                
-                
+                    map(lambda x, y: round(x / y / radio_t, 1), top_dif.volume.values, top_dif.lvol.values))
+
                 # if 'op' in top_dif.columns:
                 #     top_dif=top_dif[top_dif.op >12]
                 #     print "op:",len(top_dif),
-   
+
 
                 # top_dif = top_dif[top_dif.volume < 100]
                 # print top_dif.loc['002504',:]
@@ -201,7 +201,7 @@ if __name__ == "__main__":
                 # log.debug('dif2:%s' % len(top_dif))
                 # top_dif['volume'] = top_dif['volume'].apply(lambda x: round(x / radio_t, 1))
                 # log.debug("top_diff:vol")
-                # 
+                #
 
                 if len(top_dif) == 0:
                     print "No G,DataFrame is Empty!!!!!!"
@@ -275,7 +275,7 @@ if __name__ == "__main__":
                     if 'op' in top_temp.columns:
                         # top_temp = top_temp.sort_values(by=ct.Duration_sort_op,
                         #             ascending=ct.Duration_sort_op_key)
-                        
+
                         # top_temp=top_temp[top_temp.op >12]
                         # top_temp = top_temp.sort_values(by=['ra', 'op'],ascending=[0, 0])[:10]
 

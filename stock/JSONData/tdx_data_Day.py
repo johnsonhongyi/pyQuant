@@ -28,7 +28,7 @@ log = LoggerFactory.getLogger('TDX_Day')
 # log.setLevel(LoggerFactory.ERROR)
 
 path_sep = os.path.sep
-newstockdayl = 6
+newdaysinit = 15
 changedays=0
 global initTdxdata,initTushareCsv
 initTdxdata = 0
@@ -84,9 +84,13 @@ exp_path = basedir + "/T0002/export/".replace('/', path_sep).replace('\\', path_
 day_path = {'sh': day_dir_sh, 'sz': day_dir_sz}
 
 # http://www.douban.com/note/504811026/
-def get_tdx_Exp_day_to_df(code, type='f', start=None, end=None, dl=None):
+def get_tdx_Exp_day_to_df(code, type='f', start=None, end=None, dl=None,newdays = None):
     start=cct.day8_to_day10(start)
     end=cct.day8_to_day10(end)
+    if newdays is not None:
+        newstockdayl = newdays
+    else:
+        newstockdayl = newdaysinit
     # day_path = day_dir % 'sh' if code[:1] in ['5', '6', '9'] else day_dir % 'sz'
     code_u = cct.code_to_symbol(code)
     log.debug("code:%s code_u:%s" % (code, code_u))
@@ -418,13 +422,13 @@ INDEX_LIST = {'sh': 'sh000001', 'sz': 'sz399001', 'hs300': 'sz399300',
 #         # print df
 #     # return df
 
-def get_tdx_append_now_df_api(code, start=None, end=None, type='f',df=None,dm=None,dl=None,power=True):
+def get_tdx_append_now_df_api(code, start=None, end=None, type='f',df=None,dm=None,dl=None,power=True,newdays=None):
 
     start=cct.day8_to_day10(start)
     end=cct.day8_to_day10(end)
 
     if df is None:
-        df = get_tdx_Exp_day_to_df(code, start=start, end=end,dl=dl).sort_index(ascending=True)
+        df = get_tdx_Exp_day_to_df(code, start=start, end=end,dl=dl,newdays=newdays).sort_index(ascending=True)
     else:
         df = df.sort_index(ascending=True)
     index_status = False
@@ -443,8 +447,10 @@ def get_tdx_append_now_df_api(code, start=None, end=None, type='f',df=None,dm=No
         # code = code_t
     if not power:
         return df
+
+
     today = cct.get_today()
-    if len(df) > 0:
+    if len(df) > 0 :
         tdx_last_day = df.index[-1]
     else:
         if start is not None:
@@ -470,16 +476,19 @@ def get_tdx_append_now_df_api(code, start=None, end=None, type='f',df=None,dm=No
         else:
             today = end
 #    print cct.last_tddate(duration)
-    if duration >= 1 and (tdx_last_day != cct.last_tddate(1) or cct.get_now_time_int() > 1530):
+#    if duration >= 1 and (tdx_last_day != cct.last_tddate(1) or cct.get_now_time_int() > 1530):
+    if duration >= 1 and (tdx_last_day != cct.last_tddate(1)):
         if index_status:
             code_t = INDEX_LIST[code][2:]
         try:
             ds = ts.get_hist_data(code, start=tdx_last_day, end=today)
+            ds['volume']=ds.volume.apply(lambda x: x * 100)
             # ds = ts.get_h_data('000001', start=tdx_last_day, end=today,index=index_status)
             # df.index = pd.to_datetime(df.index)
         except (IOError, EOFError, Exception) as e:
-            print "Error Duration:", e
-            cct.sleep(0.2)
+            print "Error Duration:", e,
+            print "code:%s"%(code)
+            cct.sleep(0.1)
             ds = ts.get_h_data(code_t, start=tdx_last_day, end=today, index=index_status)
             df.index = pd.to_datetime(df.index)
         if ds is not None and len(ds) > 1:
@@ -497,7 +506,7 @@ def get_tdx_append_now_df_api(code, start=None, end=None, type='f',df=None,dm=No
             else:
                 ds['code'] = code
             # print ds[:1]
-            ds['volume']=ds.volume.apply(lambda x: x * 100)
+#            ds['volume']=ds.volume.apply(lambda x: x * 100)
             if not 'amount' in ds.columns:
                 ds['amount']=map(lambda x,y,z:round((y+z)/2*x,2),ds.volume,ds.high,ds.low)
             ds = ds.loc[:, ['code', 'open', 'high', 'low', 'close', 'volume', 'amount']]
@@ -524,19 +533,6 @@ def get_tdx_append_now_df_api(code, start=None, end=None, type='f',df=None,dm=No
         df = df.sort_index(ascending=False)
         return df
 #    print df.index.values,code
-    if df is not None and len(df) >0:
-        if df.index.values[-1] == today:
-            df = df.sort_index(ascending=True)
-            df['ma5d'] = pd.rolling_mean(df.close,5)
-            df['ma10d'] = pd.rolling_mean(df.close,10)
-            df['ma20d'] = pd.rolling_mean(df.close,20)
-            df['ma60d'] = pd.rolling_mean(df.close,60)
-            df=df.fillna(0)
-            df = df.sort_index(ascending=False)
-            return df
-#    else:
-    if cct.get_now_time_int() > 1530 or cct.get_now_time_int() < 925:
-        return df
     if dm is None and end is None:
         # if dm is None and today != df.index[-1]:
         # log.warn('today != end:%s'%(df.index[-1]))
@@ -550,12 +546,39 @@ def get_tdx_append_now_df_api(code, start=None, end=None, type='f',df=None,dm=No
             dm = dm.set_index('code')
         else:
             dm = sina_data.Sina().get_stock_code_data(code).set_index('code')
+    if duration == 0:
+        writedm = False
+    else:
+        writedm = True
+    if df is not None and len(df) >0:
+        if df.index.values[-1] == today:
+            if dm is not None and not isinstance(dm,Series):
+                dz = dm.loc[code].to_frame().T
+            if index_status:
+                vol_div = 1000
+            else:
+                vol_div = 10
+            if dz.open.values == df.open[-1] and 'volume' in dz.columns and int(df.vol[-1]/vol_div) == int(dz.volume.values/vol_div):
+                df = df.sort_index(ascending=True)
+                df['ma5d'] = pd.rolling_mean(df.close,5)
+                df['ma10d'] = pd.rolling_mean(df.close,10)
+                df['ma20d'] = pd.rolling_mean(df.close,20)
+                df['ma60d'] = pd.rolling_mean(df.close,60)
+                df=df.fillna(0)
+                df = df.sort_index(ascending=False)
+                return df
+            else:
+                writedm = True
+
+    if not writedm and cct.get_now_time_int() > 1530 or cct.get_now_time_int() < 925:
+        return df
 
     if dm is not None and df is not None and not dm.empty and len(df) >0:
         dm.rename(columns={'volume': 'vol', 'turnover': 'amount'}, inplace=True)
         # dm.rename(columns={'volume': 'amount', 'turnover': 'vol'}, inplace=True)
         c_name = dm.loc[code, ['name']].values[0]
-        dm_code = (dm.loc[:, ['open', 'high', 'low', 'close', 'amount', 'vol']])
+#        dm_code = (dm.loc[:, ['open', 'high', 'low', 'close', 'amount', 'vol']])
+        dm_code = (dm.loc[code, ['open', 'high', 'low', 'close', 'amount', 'vol']]).to_frame().T
         log.debug("dm_code:%s" % dm_code)
         # dm_code['amount'] = round(float(dm_code['amount']), 2)
         if index_status:
@@ -606,6 +629,211 @@ def get_tdx_append_now_df_api(code, start=None, end=None, type='f',df=None,dm=No
         df['ma60d'] = pd.rolling_mean(df.close,60)
         df=df.fillna(0)
         df = df.sort_index(ascending=False)
+    if writedm:
+        if cct.get_now_time_int() < 900 or cct.get_now_time_int() > 1505:
+            if index_status:
+                sta=write_tdx_sina_data_to_file(code_ts,df=df)
+            else:
+                sta=write_tdx_sina_data_to_file(code,df=df)
+
+    return df
+
+
+def get_tdx_append_now_df_api_tofile(code,dm=None,newdays=None, start=None, end=None, type='f',df=None,dl=2,power=True):
+
+    start=cct.day8_to_day10(start)
+    end=cct.day8_to_day10(end)
+
+    if df is None:
+        df = get_tdx_Exp_day_to_df(code, start=start, end=end,dl=dl,newdays=newdays).sort_index(ascending=True)
+    else:
+        df = df.sort_index(ascending=True)
+    index_status = False
+    code_t=code
+    if code == '999999':
+        # code_t=code
+        code = 'sh'
+        index_status = True
+    elif code.startswith('399'):
+        index_status = True
+        for k in INDEX_LIST.keys():
+            if INDEX_LIST[k].find(code) > 0:
+                code = k
+    if index_status:
+        df[code] = code_t
+        # code = code_t
+    if not power:
+        return df
+
+
+    today = cct.get_today()
+    if len(df) > 0 :
+        tdx_last_day = df.index[-1]
+    else:
+        if start is not None:
+            tdx_last_day = start
+        else:
+            tdx_last_day = None
+#            log.warn("code :%s start is None and DF is None"%(code))
+    if tdx_last_day is not None:
+        duration = cct.get_today_duration(tdx_last_day)
+    else:
+        duration = 10
+    log.debug("duration:%s"%duration)
+    log.debug("tdx_last_day:%s" % tdx_last_day)
+    log.debug("duration:%s" % duration)
+    if end is not None:
+        # print end,df.index[-1]
+        if len(df)==0:
+            return df
+        if end <= df.index[-1]:
+            # print(end, df.index[-1])
+            # return df
+            duration = 0
+        else:
+            today = end
+#    print cct.last_tddate(duration)
+#    if duration >= 1 and (tdx_last_day != cct.last_tddate(1) or cct.get_now_time_int() > 1530):
+    if duration >= 1 and (tdx_last_day != cct.last_tddate(1)):
+        if index_status:
+            code_t = INDEX_LIST[code][2:]
+        try:
+            ds = ts.get_hist_data(code, start=tdx_last_day, end=today)
+            ds['volume']=ds.volume.apply(lambda x: x * 100)
+            # ds = ts.get_h_data('000001', start=tdx_last_day, end=today,index=index_status)
+            # df.index = pd.to_datetime(df.index)
+        except (IOError, EOFError, Exception) as e:
+            print "Error Duration:", e,
+            print "code:%s"%(code)
+            cct.sleep(0.1)
+            ds = ts.get_h_data(code_t, start=tdx_last_day, end=today, index=index_status)
+            df.index = pd.to_datetime(df.index)
+        if ds is not None and len(ds) >= 1:
+            if len(df) > 0:
+                lends = len(ds)
+            else:
+                lends = len(ds) + 1
+            ds = ds[:lends - 1]
+            if index_status:
+                if code == 'sh':
+                    code_ts = '999999'
+                else:
+                    code_ts = code_t
+                ds['code'] = int(code_ts)
+            else:
+                ds['code'] = code
+            # print ds[:1]
+#            ds['volume']=ds.volume.apply(lambda x: x * 100)
+            if not 'amount' in ds.columns:
+                ds['amount']=map(lambda x,y,z:round((y+z)/2*x,2),ds.volume,ds.high,ds.low)
+            ds = ds.loc[:, ['code', 'open', 'high', 'low', 'close', 'volume', 'amount']]
+            # ds.rename(columns={'volume': 'amount'}, inplace=True)
+            ds.rename(columns={'volume': 'vol'}, inplace=True)
+            ds.sort_index(ascending=True, inplace=True)
+            # log.debug("ds:%s" % ds[:1])
+            ds = ds.fillna(0)
+            df = df.append(ds)
+            if index_status:
+                sta=write_tdx_tushare_to_file(code_ts,df=df)
+            else:
+                sta=write_tdx_tushare_to_file(code,df=df)
+#            if not sta:
+#                log.warn("write %s error."%(code))
+    if cct.get_now_time_int() > 830 and cct.get_now_time_int() < 930:
+        log.debug("now > 830 and <930 return")
+        df = df.sort_index(ascending=True)
+        df['ma5d'] = pd.rolling_mean(df.close,5)
+        df['ma10d'] = pd.rolling_mean(df.close,10)
+        df['ma20d'] = pd.rolling_mean(df.close,20)
+        df['ma60d'] = pd.rolling_mean(df.close,60)
+        df=df.fillna(0)
+        df = df.sort_index(ascending=False)
+        return df
+#    print df.index.values,code
+    if dm is None and end is None:
+        # if dm is None and today != df.index[-1]:
+        # log.warn('today != end:%s'%(df.index[-1]))
+        if index_status:
+            log.debug("code:%s code_t:%s" % (code, code_t))
+            if code_t is None:
+                code_t = INDEX_LIST[code][2:]
+
+            dm = sina_data.Sina().get_stock_code_data(code_t,index=index_status)
+            dm.code = code
+            dm = dm.set_index('code')
+        else:
+            dm = sina_data.Sina().get_stock_code_data(code).set_index('code')
+    if duration == 0:
+        writedm = False
+    else:
+        writedm = True
+    if df is not None and len(df) >0:
+        if df.index.values[-1] == today:
+            if dm is not None and not isinstance(dm,Series):
+                dz = dm.loc[code].to_frame().T
+            if index_status:
+                vol_div = 1000
+            else:
+                vol_div = 10
+            if round(dz.open.values,1) == round(df.open[-1],1) and 'volume' in dz.columns and int(df.vol[-1]/vol_div) == int(dz.volume.values/vol_div):
+                df = df.sort_index(ascending=True)
+                df['ma5d'] = pd.rolling_mean(df.close,5)
+                df['ma10d'] = pd.rolling_mean(df.close,10)
+                df['ma20d'] = pd.rolling_mean(df.close,20)
+                df['ma60d'] = pd.rolling_mean(df.close,60)
+                df=df.fillna(0)
+                df = df.sort_index(ascending=False)
+                return df
+            else:
+                writedm = True
+
+    if not writedm and cct.get_now_time_int() > 1530 or cct.get_now_time_int() < 925:
+        return df
+
+    if dm is not None and df is not None and not dm.empty and len(df) >0:
+        dm.rename(columns={'volume': 'vol', 'turnover': 'amount'}, inplace=True)
+        # dm.rename(columns={'volume': 'amount', 'turnover': 'vol'}, inplace=True)
+        c_name = dm.loc[code, ['name']].values[0]
+        dm_code = (dm.loc[code, ['open', 'high', 'low', 'close', 'amount', 'vol']]).to_frame().T
+        log.debug("dm_code:%s" % dm_code)
+        # dm_code['amount'] = round(float(dm_code['amount']), 2)
+        if index_status:
+            if code == 'sh':
+                code_ts = '999999'
+            else:
+                code_ts = code_t
+            dm_code['code'] = code_ts
+        else:
+            dm_code['code'] = code
+        dm_code['date'] = today
+        dm_code = dm_code.set_index('date')
+        # log.debug("df.open:%s dm.open%s" % (df.open[-1], round(dm.open[-1], 2)))
+        # print df.close[-1],round(dm.close[-1],2)
+        if end is None and ((df is not None and df.empty) or (round(df.open[-1],2) != round(dm.open[-1], 2)) or (round(df.close[-1],2) != round(dm.close[-1],2))):
+            if dm.open[0] > 0 and len(df) >0:
+                if dm_code.index[-1] == df.index[-1]:
+                    log.debug("app_api_dm.Index:%s df:%s"%(dm_code.index.values,df.index[-1]))
+                    df = df.drop(dm_code.index)
+                df = df.append(dm_code)
+                # df = df.astype(float)
+            # df=pd.concat([df,dm],axis=0, ignore_index=True).set
+        df['name'] = c_name
+        log.debug("c_name:%s df.name:%s" % (c_name, df.name[-1]))
+
+    if len(df) > 0:
+        df = df.sort_index(ascending=True)
+        df['ma5d'] = pd.rolling_mean(df.close,5)
+        df['ma10d'] = pd.rolling_mean(df.close,10)
+        df['ma20d'] = pd.rolling_mean(df.close,20)
+        df['ma60d'] = pd.rolling_mean(df.close,60)
+        df=df.fillna(0)
+        df = df.sort_index(ascending=False)
+    if writedm and len(df) > 0:
+        if cct.get_now_time_int() < 900 or cct.get_now_time_int() > 1505:
+            if index_status:
+                sta=write_tdx_sina_data_to_file(code_ts,df=df)
+            else:
+                sta=write_tdx_sina_data_to_file(code,df=df)
 
     return df
 
@@ -623,6 +851,7 @@ def write_tdx_tushare_to_file(code,df=None,start=None,type='f'):
         if lastd == cct.last_tddate(1):
             return False
         df = get_tdx_append_now_df_api(code,start=start)
+
     if len(df) == 0:
         return False
     code_u = cct.code_to_symbol(code)
@@ -634,7 +863,9 @@ def write_tdx_tushare_to_file(code,df=None,start=None,type='f'):
     else:
         return None
 
-    limitpo=150
+    fsize = os.path.getsize(file_path)
+    limitpo = fsize if fsize < 150 else 150
+
     if not os.path.exists(file_path) or os.path.getsize(file_path) < limitpo:
 #        log.warn("not path:%s"%(file_path))
         return False
@@ -661,7 +892,7 @@ def write_tdx_tushare_to_file(code,df=None,start=None,type='f'):
             tvol = round(float(alist[5]),0)
             tamount = round(float(alist[6].replace('\r\n', '')),0)
 #            print int(tamount)
-            if int(tvol) == 0 or int(tamount) == 0:
+            if fsize > 600 and (int(tvol) == 0 or int(tamount) == 0):
                 continue
 #            print line,tmpo
             if tmpo not in plist:
@@ -679,15 +910,95 @@ def write_tdx_tushare_to_file(code,df=None,start=None,type='f'):
     df = df[df.index >= dater]
 #    print df.columns
 #    if len(df) > 0 and df.index.values != dater:
-    if len(df) > 1:
+    if len(df) >= 1:
 #        print df
         df=df.fillna(0)
         df.sort_index(ascending=True,inplace=True)
         fo.seek(po)
         for date in df.index:
             td=df.loc[date,['open','high','close','low','vol','amount']]
+            if td.open > 0 and td.high > 0 and td.low > 0 and td.close >0:
+                tdate = str(date)[:10]
+                topen = str(td.open)
+                thigh = str(td.high)
+                tlow = str(td.low)
+                tclose = str(td.close)
+                # tvol = round(float(a[5]) / 10, 2)
+                tvol = str(td.vol)
+                amount = str(td.amount)
+                tdata = tdate+','+topen+','+thigh+','+tlow+','+tclose+','+tvol+','+amount+'\r\n'
+                fo.write(tdata)
+        fo.close()
+        return True
+#        print "write,ok"
+#        fo.seek(po)
+#        print fo.readlines()
+#    fo.flush()
+    fo.close()
+#    print "time:%0.4f"%(time.time()-st)
+    return "NTrue"
 
+def write_tdx_sina_data_to_file(code,dm=None,df=None,dl=2,type='f'):
+#    ts=time.time()
+#    if dm is None:
+#        dm = get_sina_data_df(code)
+#    if df is None:
+#        dz = dm.loc[code].to_frame().T
+#        df = get_tdx_append_now_df_api2(code,dl=dl,dm=dz,newdays=5)
+
+#    if df is None or len(df) == 0:
+#        return False
+    code_u = cct.code_to_symbol(code)
+    log.debug("code:%s code_u:%s" % (code, code_u))
+    if type == 'f':
+        file_path = exp_path + 'forwardp' + path_sep + code_u.upper() + ".txt"
+    elif type == 'b':
+        file_path = exp_path + 'backp' + path_sep + code_u.upper() + ".txt"
+    else:
+        return None
+
+    fsize = os.path.getsize(file_path)
+    limitpo = fsize if fsize < 150 else 150
+
+    if not os.path.exists(file_path) or os.path.getsize(file_path) < limitpo:
+        return False
+#    print file_path
+    fo = open(file_path, "r+")
+
+    fo.seek(-limitpo,2)
+    plist=[]
+    line = True
+    while line:
+        tmpo=fo.tell()
+        line=fo.readline()
+        alist = line.split(',')
+        if len(alist) == 7 :
+            if len(alist[0]) !=10 :
+                continue
+            tvol = round(float(alist[5]),0)
+            tamount = round(float(alist[6].replace('\r\n', '')),0)
+#            print int(tamount)
+            if fsize > 600 and (int(tvol) == 0 or int(tamount) == 0):
+                continue
+#            print line,tmpo
+            if tmpo not in plist:
+                plist.append(tmpo)
+#                break
+    if len(plist) == 0:
+        raise Exception("data position is None")
+    po=plist[-1]
+    fo.seek(po)
+    dater= fo.read(10)
+    df = df[df.index >= dater]
+    if len(df) >= 1:
+        df=df.fillna(0)
+        df.sort_index(ascending=True,inplace=True)
+        fo.seek(po)
+        for date in df.index:
+            td=df.loc[date,['open','high','close','low','vol','amount']]
             tdate = date
+            if len(tdate) !=10:
+                continue
             topen = str(td.open)
             thigh = str(td.high)
             tlow = str(td.low)
@@ -699,12 +1010,8 @@ def write_tdx_tushare_to_file(code,df=None,start=None,type='f'):
             fo.write(tdata)
         fo.close()
         return True
-#        print "write,ok"
-#        fo.seek(po)
-#        print fo.readlines()
-#    fo.flush()
+    fo.flush()
     fo.close()
-#    print "time:%0.4f"%(time.time()-st)
     return "NTrue"
 
 def Write_market_all_day_mp(market='all'):
@@ -718,31 +1025,36 @@ def Write_market_all_day_mp(market='all'):
         mlist =[market]
     # if len(index_ts) > 1:
     #     print "start:%s"%(start),
+    result =[]
     for mk in mlist:
-        print ("market:%s"%(mk))
         time_t = time.time()
         df = rl.get_sina_Market_json(mk)
-        code_list = np.array(df.code)
+        df = df[df.buy > 0]
+        print ("market:%s A:%s"%(mk,len(df))),
+        code_list = df.code.tolist()
+        dm = get_sina_data_df(code_list)
         log.info('code_list:%s' % len(code_list))
-        results =[]
     #        write_tdx_tushare_to_file(sh_index,index_ts)
-        results = cct.to_mp_run_async(write_tdx_tushare_to_file,code_list,None)
-#            for code in code_list:
-#                print "code:%s "%(code),
-#                res=write_tdx_tushare_to_file(code,None,start)
-#                print "status:%s"%(res)
-#                results.append(res)
-    #    print len(resuls),len(code_list)
-    results =list(set(results))
-    if  len(results)>1:
-        print results
-    else:
-        print "market:%s is succ"%(market),
-    print "t:", time.time() - time_t,
+#        get_tdx_append_now_df_api2(code,dl=dl,dm=dz,newdays=5)
+        results = cct.to_mp_run_async(get_tdx_append_now_df_api_tofile,code_list,dm,5)
+#        for code in code_list:
+#            print "code:%s "%(code),
+#            res=get_tdx_append_now_df_api_tofile(code,dm,5)
+#            print "status:%s"%(res)
+#            results.append(res)
+#        result.append(results)
+   #    print len(resuls),len(code_list)
+        print "t:",round(time.time() - time_t,2)
+#    results =list(set(results))
+#    if  len(results)>1:
+#        print results
+#    else:
+#        print "market:%s is succ"%(market),
+#    print "t:", time.time() - time_t,
     if market == 'all':
 #        write_tdx_tushare_to_file(sh_index,index_ts)
         for inx in ['999999','399006','399005']:
-            write_tdx_tushare_to_file(inx,df=None)
+            get_tdx_append_now_df_api_tofile(inx)
         print "Index Wri ok",
     print "All is ok"
     return results
@@ -881,6 +1193,127 @@ def get_tdx_write_now_file_api(code, type='f',dm=None):
 
     return df
 
+def get_tdx_append_now_df_api2(code, start=None, end=None, type='f',df=None,dm=None,dl=None,power=True,newdays=None):
+
+    start=cct.day8_to_day10(start)
+    end=cct.day8_to_day10(end)
+
+    if df is None:
+        df = get_tdx_Exp_day_to_df(code, start=start, end=end,dl=dl,newdays=newdays).sort_index(ascending=True)
+    else:
+        df = df.sort_index(ascending=True)
+
+    if not isinstance(dm,Series):
+        dm = dm.loc[code].to_frame().T
+
+    if dm.open.values == df.open[-1] and int(df.vol[-1]) == int(dm.volume.values):
+        return False
+    index_status = False
+    code_t=code
+    if code == '999999':
+        # code_t=code
+        code = 'sh'
+        index_status = True
+    elif code.startswith('399'):
+        index_status = True
+        for k in INDEX_LIST.keys():
+            if INDEX_LIST[k].find(code) > 0:
+                code = k
+    if index_status:
+        df[code] = code_t
+        # code = code_t
+    if not power:
+        return df
+    today = cct.get_today()
+    if isinstance(df, Series):
+        tdx_last_day = df.date
+    elif  len(df) > 0:
+        tdx_last_day = df.index[-1]
+    else:
+        if start is not None:
+            tdx_last_day = start
+        else:
+            tdx_last_day = None
+    if tdx_last_day is not None:
+        duration = cct.get_today_duration(tdx_last_day)
+    else:
+        duration = 10
+    log.debug("duration:%s"%duration)
+    log.debug("tdx_last_day:%s" % tdx_last_day)
+    log.debug("duration:%s" % duration)
+    if end is not None:
+        if len(df)==0:
+            return df
+        if end <= df.index[-1]:
+            duration = 0
+        else:
+            today = end
+#    print cct.last_tddate(duration)
+
+    if cct.get_now_time_int() > 900 and cct.get_now_time_int() < 915:
+        log.debug("now > 830 and <930 return")
+        df = df.sort_index(ascending=True)
+        df['ma5d'] = pd.rolling_mean(df.close,5)
+        df['ma10d'] = pd.rolling_mean(df.close,10)
+        df['ma20d'] = pd.rolling_mean(df.close,20)
+        df['ma60d'] = pd.rolling_mean(df.close,60)
+        df=df.fillna(0)
+        df = df.sort_index(ascending=False)
+        return df
+
+    if dm is None and end is None:
+        # if dm is None and today != df.index[-1]:
+        # log.warn('today != end:%s'%(df.index[-1]))
+        if index_status:
+            log.debug("code:%s code_t:%s" % (code, code_t))
+            if code_t is None:
+                code_t = INDEX_LIST[code][2:]
+
+            dm = sina_data.Sina().get_stock_code_data(code_t,index=index_status)
+            dm.code = code
+            dm = dm.set_index('code')
+        else:
+            dm = sina_data.Sina().get_stock_code_data(code).set_index('code')
+
+    if dm is not None and df is not None and not dm.empty and len(df) >0:
+        dm.rename(columns={'volume': 'vol', 'turnover': 'amount'}, inplace=True)
+        # dm.rename(columns={'volume': 'amount', 'turnover': 'vol'}, inplace=True)
+        c_name = dm.loc[code, ['name']].values[0]
+        dm_code = (dm.loc[:, ['open', 'high', 'low', 'close', 'amount', 'vol']])
+        log.debug("dm_code:%s" % dm_code)
+        # dm_code['amount'] = round(float(dm_code['amount']), 2)
+        if index_status:
+            if code == 'sh':
+                code_ts = '999999'
+            else:
+                code_ts = code_t
+            dm_code['code'] = code_ts
+        else:
+            dm_code['code'] = code
+        dm_code['date'] = today
+        dm_code = dm_code.set_index('date')
+        # log.debug("df.open:%s dm.open%s" % (df.open[-1], round(dm.open[-1], 2)))
+        # print df.close[-1],round(dm.close[-1],2)
+        if not isinstance(df,Series):
+            if end is None and ((df is not None and df.empty) or (round(df.open[-1],2) != round(dm.open[-1], 2)) or (round(df.close[-1],2) != round(dm.close[-1],2))):
+                if dm.open[0] > 0 and len(df) >0:
+                    if dm_code.index == df.index[-1] and df.vol[-1] != dm_code.vol.values:
+                        log.debug("app_api_dm.Index:%s df:%s"%(dm_code.index.values,df.index[-1]))
+#                        writestatus = True
+                        df = df.drop(dm_code.index)
+                    df = df.append(dm_code)
+        else:
+            if end is None and ((df is not None and df.empty) or (round(df.open,2) != round(dm.open, 2)) or (round(df.close,2) != round(dm.close,2))):
+                if dm.open.values > 0 and len(df) >0:
+                    if dm_code.index == df.date:
+                        log.debug("app_api_dm.Index:%s df:%s"%(dm_code.index.values,df.index[-1]))
+                        df = dm_code
+                    else:
+                        df = df.append(dm_code)
+    if cct.get_now_time_int() < 900 or cct.get_now_time_int() > 1505:
+        sta=write_tdx_sina_data_to_file(code,df=df)
+    return sta
+
 def get_tdx_power_now_df(code, start=None, end=None, type='f',df=None,dm=None,dl=None):
     if code == '999999' or code.startswith('399'):
         # if dl is not None and start is None:
@@ -989,14 +1422,20 @@ def getSinaAlldf(market='cyb',vol=ct.json_countVol,type=ct.json_countType):
     # cct._write_to_csv(df,'codeall')
     # top_now = get_mmarket='all'arket_price_sina_dd_realTime(df, vol, type)
 #    df =  df.dropna()
+
     if len(df) > 0:
-        codelist = df.code.tolist()
+#        codelist = df.code.tolist()
         df = df.set_index('code')
     else:
         df = rl.get_sina_Market_json(market)
-        codelist = df.code.tolist()
+#        codelist = df.code.tolist()
         df = df.set_index('code')
         log.error("get_sina_Market_json %s : %s"%(market,len(df)))
+    if cct.get_now_time_int() > 915:
+#        df = df[(df.buy > 0) & (df.open != df.buy)]
+        if 'buy' in df.columns:
+            df = df[(df.buy > 0)]
+    codelist = df.index.tolist()
     # index_status=False
     # if isinstance(codelist, list):
     time_s=time.time()
@@ -2150,10 +2589,17 @@ if __name__ == '__main__':
 #    dd=rl.get_sina_Market_json('cyb').set_index('code')
 #    codelist= dd.index.tolist()
 #    df = get_tdx_exp_all_LastDF(codelist, dt=30,end=20160401, ptype='high', filter='y')
-    # Write_market_all_day_mp('cyb')
+    Write_market_all_day_mp('all')
     # sys.exit(0)
 #    print getSinaAlldf('cx')
-    print get_tdx_exp_low_or_high_power('603585',dl=10,ptype='low')
+#    print get_tdx_exp_low_or_high_power('603585',dl=10,ptype='low')
+#    code=['603878','300575']
+#    dm = get_sina_data_df(code)
+#    code='603878'
+#    print get_tdx_append_now_df_api_tofile('999999')
+#    Write_market_all_day_mp('cyb')
+#    print get_tdx_append_now_df_api2('603878',dl=2,dm=dm,newdays=5)
+#    print write_tdx_sina_data_to_file('999999',dm)
 #    print get_tdx_append_now_df_api('603878')
     code = '999999'
 #    print get_sina_data_df(code).index
@@ -2175,25 +2621,7 @@ if __name__ == '__main__':
 #    print df
 #    print write_tdx_tushare_to_file(code,None)
     sys.exit(0)
-#    print get_tdx_append_now_df_api('399006',dl=5)
-#    print get_tdx_append_now_df_api('000838',dl=5)
-#    print get_tdx_append_now_df_api('601998',dl=5)
-    # print get_tdx_power_now_df('300522', start=20160819,dl=30)[:2]
-    # print get_tdx_write_now_file_api('000938', type='f')[:2]
-    # print tdx_df.index
-    # sys.exit(0)
-#    print get_tdx_Exp_day_to_df('999999', dl=200).sort_index(ascending=False)
-    #
-#    print get_tdx_Exp_day_to_df('399006', type='f', start=20150801, end=None , dl=None)
-    # print get_tdx_exp_low_or_high_power('002775', dt='2016-06-01', ptype='high', dl=21, power=True)
-    # df=getSinaAlldf(market='rzrq')
-    # print df[:1]
-    # print df[df.index=='002474'].volume
-    # print df[df.index=='002474'].vol
-    # print df.columns
-    # df=get_tdx_exp_low_or_high_power('000034', dt=None, ptype='low', dl=300, end=None, power=False, lastp=False)
-#    print get_duration_Index_date('999999',dl=15)
-#    print get_tdx_exp_all_LastDF_DL(codeList = [u'300047'], dt=30, end=None, ptype='low', filter='y', power=True)
+#
     df= get_tdx_exp_all_LastDF_DL(codeList = codelist, dt=30, end=None, ptype='low', filter='y', power=True)
     # print df[:1]
     sys.exit(0)

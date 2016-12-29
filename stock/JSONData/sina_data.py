@@ -342,7 +342,7 @@ if __name__ == "__main__":
     # code='601198'
     # df = sina.get_stock_list_data(['300134', '601998', '999999']).set_index('code')
     # df = sina.get_stock_code_data('000001',index=True).set_index('code')
-    print sina.get_stock_code_data('999999',index=True)
+    print sina.get_stock_code_data('399006',index=True).turnover
     df = sina.get_stock_list_data(['600845', '300376']).set_index('code')
     # df = sina.get_stock_code_data('002775',index=False).set_index('code')
     print len(df),df[:1]
