@@ -64,6 +64,7 @@ if __name__ == "__main__":
     # op, ra, duration_date, days = pct.get_linear_model_status('999999', filter='y', dl=dl, ptype=ptype, days=1)
     duration_date = ct.duration_date
     du_date = duration_date
+    newdays = 5
     # print cct.last_tddate(2)
     end_date = cct.last_tddate(days=3 )
     ptype = 'high'
@@ -107,7 +108,7 @@ if __name__ == "__main__":
                 time_Rt = time.time()
                 if len(top_all) == 0 and len(lastpTDX_DF) == 0:
                     time_Rt = time.time()
-                    top_all,lastpTDX_DF = tdd.get_append_lastp_to_df(top_now, lastpTDX_DF=None, dl=duration_date,end=end_date,ptype=ptype,filter=filter, power=True, lastp=False)
+                    top_all,lastpTDX_DF = tdd.get_append_lastp_to_df(top_now, lastpTDX_DF=None, dl=duration_date,end=end_date,ptype=ptype,filter=filter, power=True, lastp=False,newdays=newdays)
                     # codelist = top_all.index.tolist()
                     # log.info('toTDXlist:%s' % len(codelist))
                     # # tdxdata = tdd.get_tdx_all_day_LastDF(codelist,dt=duration_date,ptype=ptype)

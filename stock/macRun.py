@@ -41,16 +41,16 @@ end tell
 #                'sina_Monitor.py': '85, 27',
 #                'singleAnalyseUtil.py': '583, 23',
 #                'LinePower.py':'767, 527',}
-positionKey = {'sina_Market-DurationDn.py': '313, 433',
+positionKey = {'sina_Market-DurationDn.py': '276, 437',
                'sina_Market-DurationUp.py': '-17, 470',
                'sina_Market-DurationSH.py': '148, 560',
                'sina_Monitor-Market-New.py': '-2, 371',
-               'sina_Monitor-Market-LH.py': '440, 293',
+               'sina_Monitor-Market-LH.py': '316, 282',
                'sina_Monitor-Market.py': '19, 179',
                'sina_Monitor-GOLD.py': '-15, 194',
                'sina_Monitor.py': '19, 22',
                'singleAnalyseUtil.py': '583, 23',
-               'LinePower.py':'767, 527',}
+               'LinePower.py':'44, 556',}
 
 cmdRun = '''cd /Users/Johnson/Documents/Quant/pyQuant/stock;
 open singleAnalyseUtil.py;
@@ -142,6 +142,7 @@ def setPosition(cmd=None, position=None):
 # os.system(cmdRun)
 print getPosition('sina_Market-DurationDn.py')
 print getPosition('sina_Market-DurationSH.py')
+print getPosition('sina_Monitor-Market-LH.py')
 print getPosition('sina_Market-DurationUp.py')
 print getPosition('sina_Monitor-GOLD.py')
 print getPosition('sina_Monitor.py')

@@ -8,7 +8,7 @@ import sys
 import time
 
 import pandas as pd
-
+import dfgui
 import JohhnsonUtil.johnson_cons as ct
 import singleAnalyseUtil as sl
 from JSONData import powerCompute as pct
@@ -65,6 +65,7 @@ if __name__ == "__main__":
 #    duration_date = 120
     # duration_date = 300
     du_date = duration_date
+    newdays = 5
     end_date = None
     ptype = 'low'
     filter = 'y'
@@ -103,7 +104,7 @@ if __name__ == "__main__":
                 time_Rt = time.time()
                 if len(top_all) == 0 and len(lastpTDX_DF) == 0:
                     time_Rt = time.time()
-                    top_all,lastpTDX_DF = tdd.get_append_lastp_to_df(top_now, lastpTDX_DF=None, dl=duration_date,end=end_date,ptype=ptype,filter=filter, power=True, lastp=False)
+                    top_all,lastpTDX_DF = tdd.get_append_lastp_to_df(top_now, lastpTDX_DF=None, dl=duration_date,end=end_date,ptype=ptype,filter=filter, power=True, lastp=False,newdays=newdays)
                     log.debug("len:%s"%(len(top_all)))
                     # codelist = top_all.index.tolist()
                     # log.info('toTDXlist:%s' % len(codelist))
@@ -306,6 +307,8 @@ if __name__ == "__main__":
                         top_dd = top_dd.drop_duplicates()
                         top_dd = top_dd.loc[:,ct.Duration_format_trade]
                     print rl.format_for_print(top_dd)
+
+                    dfgui.show(top_dif)
                 # if cct.get_now_time_int() < 930 or cct.get_now_time_int() > 1505 or (cct.get_now_time_int() > 1125 and cct.get_now_time_int() < 1505):
                 # print rl.format_for_print(top_dif[-10:])
                 # print top_all.loc['000025',:]

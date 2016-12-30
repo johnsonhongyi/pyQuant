@@ -836,11 +836,22 @@ def powerCompute_df(df, dtype='d', end=None, dl=None, filter='y',talib=False):
         else:
             dz = tdd.get_sina_data_df(code)
 #        print dz.open.values
-        if len(dz) > 0 and dz.open.values > 0:
+        if len(dz) > 0 and dz.buy.values > 0:
             tdx_df = tdd.get_tdx_append_now_df_api(code, start=start, end=end, type='f', df=None, dm=dz, dl=dl*2)
             # print tdx_df
             tdx_df=tdx_df.fillna(0)
         else:
+            df.loc[code, 'op'] = 0
+            df.loc[code, 'ra'] = 0
+            df.loc[code, 'fib'] = 0
+            df.loc[code, 'fibl'] = 0
+            df.loc[code, 'ldate'] = 0
+            df.loc[code, 'boll'] = 0
+            df.loc[code, 'kdj'] = 0
+            df.loc[code, 'macd'] = 0
+            df.loc[code, 'rsi'] = 0
+            df.loc[code, 'ma'] = 0
+            df=df.fillna(0)
             continue
 #        tdx_df = tdd.get_tdx_power_now_df(code, start=start, end=end, type='f', df=None, dm=dz, dl=dl*2)
         opc = 0
@@ -891,9 +902,9 @@ def powerCompute_df(df, dtype='d', end=None, dl=None, filter='y',talib=False):
         df.loc[code, 'macd'] = opmacd
         df.loc[code, 'rsi'] = oprsi
         df.loc[code, 'ma'] = opma
+        df=df.fillna(0)
         # df = getab.Get_BBANDS(df, dtype='d')
         #'volume', 'ratio', 'counts','ldate' -> 'ma','macd','rsi','kdj'
-        df=df.fillna(0)
         # df = df.drop_duplicates()
     print "P:%0.2f"%(time.time()-ts),
     return df
