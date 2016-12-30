@@ -629,7 +629,7 @@ def get_tdx_append_now_df_api(code, start=None, end=None, type='f',df=None,dm=No
         df['ma60d'] = pd.rolling_mean(df.close,60)
         df=df.fillna(0)
         df = df.sort_index(ascending=False)
-    if writedm:
+    if writedm and len(df) > 0:
         if cct.get_now_time_int() < 900 or cct.get_now_time_int() > 1505:
             if index_status:
                 sta=write_tdx_sina_data_to_file(code_ts,df=df)
@@ -1053,7 +1053,7 @@ def Write_market_all_day_mp(market='all'):
 #    print "t:", time.time() - time_t,
     if market == 'all':
 #        write_tdx_tushare_to_file(sh_index,index_ts)
-        for inx in ['999999','399006','399005']:
+        for inx in ['999999','399006','399005','399001']:
             get_tdx_append_now_df_api_tofile(inx)
         print "Index Wri ok",
     print "All is ok"

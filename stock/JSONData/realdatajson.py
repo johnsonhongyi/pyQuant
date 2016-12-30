@@ -674,6 +674,7 @@ if __name__ == '__main__':
     # print sina_json_Big_Count()
     # print getconfigBigCount(write=True)
     # sys.exit(0)
+    log.setLevel(LoggerFactory.INFO)
     df = get_sina_Market_json('sz')
     print df[:1]
     top_now = get_market_price_sina_dd_realTime(df, '2', type)
