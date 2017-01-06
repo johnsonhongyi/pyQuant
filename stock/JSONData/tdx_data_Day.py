@@ -33,6 +33,7 @@ changedays=0
 global initTdxdata,initTushareCsv
 initTdxdata = 0
 initTushareCsv = 0
+atomStockSize = 50
 # win7rootAsus = r'D:\Program Files\gfzq'
 # win10Lengend = r'D:\Program\gfzq'
 # win7rootXunji = r'E:\DOC\Parallels\WinTools\zd_pazq'
@@ -128,6 +129,7 @@ def get_tdx_Exp_day_to_df(code, type='f', start=None, end=None, dl=None,newdays 
         if initTdxdata == 0:
             log.error("file_path:not exists code:%s"%(code))
         initTdxdata += 1
+        ds.index = '2016-01-01'
         return ds
     # ofile = open(file_path, 'rb')
     if start is None and dl is None:
@@ -190,7 +192,7 @@ def get_tdx_Exp_day_to_df(code, type='f', start=None, end=None, dl=None,newdays 
         return df
     elif dl is not None and int(dl) == 1:
         fileSize = os.path.getsize(file_path)
-        if fileSize < 60 * newstockdayl:
+        if fileSize < atomStockSize * newstockdayl:
             return Series()
         data = cct.read_last_lines(file_path, int(dl) + 3)
         data_l = data.split('\n')
@@ -239,7 +241,7 @@ def get_tdx_Exp_day_to_df(code, type='f', start=None, end=None, dl=None,newdays 
         #     # print "60"
         # else:
         #     newstockdayl = 60
-        if fileSize < 60 * newstockdayl:
+        if fileSize < atomStockSize * newstockdayl:
             return Series()
         if start is None:
             if dl is None:
@@ -654,7 +656,7 @@ def get_tdx_append_now_df_api(code, start=None, end=None, type='f',df=None,dm=No
     return df
 
 
-def get_tdx_append_now_df_api_tofile(code,dm=None,newdays=None, start=None, end=None, type='f',df=None,dl=2,power=True):
+def get_tdx_append_now_df_api_tofile(code,dm=None,newdays=1, start=None, end=None, type='f',df=None,dl=2,power=True):
 
     start=cct.day8_to_day10(start)
     end=cct.day8_to_day10(end)
@@ -1030,7 +1032,7 @@ def write_tdx_sina_data_to_file(code,dm=None,df=None,dl=2,type='f'):
     return "NTrue"
 
 def Write_market_all_day_mp(market='all'):
-    sh_index = '999999'
+    sh_index = '601998'
     dd = get_tdx_Exp_day_to_df(sh_index,dl=1)
     # print dt,dd.date
     if len(dd) > 0:
@@ -1071,11 +1073,11 @@ def Write_market_all_day_mp(market='all'):
     #        write_tdx_tushare_to_file(sh_index,index_ts)
 #        get_tdx_append_now_df_api2(code,dl=dl,dm=dz,newdays=5)
         results = cct.to_mp_run_async(get_tdx_append_now_df_api_tofile,code_list,dm,5)
-#        for code in code_list:
-#            print "code:%s "%(code),
-#            res=get_tdx_append_now_df_api_tofile(code,dm,5)
-#            print "status:%s"%(res)
-#            results.append(res)
+        # for code in code_list:
+           # print "code:%s "%(code),
+           # res=get_tdx_append_now_df_api_tofile(code,dm,5)
+           # print "status:%s"%(res)
+        #            results.append(res)
         print "t:",round(time.time() - time_t,2)
 #        result.append(results)
 #    results = list(set(result))
@@ -2619,8 +2621,10 @@ if __name__ == '__main__':
 #    dd=rl.get_sina_Market_json('cyb').set_index('code')
 #    codelist= dd.index.tolist()
 #    df = get_tdx_exp_all_LastDF(codelist, dt=30,end=20160401, ptype='high', filter='y')
+    # print write_tdx_sina_data_to_file('300583',dm)
+    # print get_tdx_Exp_day_to_df('300583',dl=2,newdays=1)
     Write_market_all_day_mp('all')
-#    print get_tdx_append_now_df_api_tofile('603239')
+    # print get_tdx_append_now_df_api_tofile('300583')
     # sys.exit(0)
 #    print getSinaAlldf('cx')
 #    print get_tdx_exp_low_or_high_power('603585',dl=10,ptype='low')
