@@ -716,22 +716,22 @@ def post_login(root='http://upass.10jqka.com.cn/login'):
     # get_wencai_Market_url(url=None)
 
 
-def get_wencai_Market_url(url=None):
+def get_wencai_Market_url(url=None,filter='国企改革'):
     if url == None:
         time_s = time.time()
         wencairoot = 'http://www.iwencai.com/stockpick/search?typed=0&preParams=&ts=1&f=1&qs=result_original&selfsectsn=&querytype=&searchfilter=&tid=stockpick&w=%s'
-        url = wencairoot%('国企改革')
-        print url
+        url = wencairoot%(filter)
+        log.info("url:%s"%(url))
         # url = ct.get_url_data_R % (market)
         # print url
         cache_root="http://www.iwencai.com/stockpick/cache?token=%s&p=1&perpage=%s&showType="
-        perpage = 2
+        perpage = 5
         cache_ends = "[%22%22,%22%22,%22onTable%22,%22onTable%22,%22onTable%22,%22onTable%22,%22onTable%22,%22onTable%22,%22onTable%22,%22onTable%22]"
         data = cct.get_url_data(url)
         # print data
         # count = re.findall('(\d+)', data, re.S)
         # "token":"dcf3d42bbeeb32718a243a19a616c217"
-        print data.find('sp.')
+        # print data.find('sp.')
         # count = re.findall('token":"([\D\d].*)"', data, re.S)
         count = re.findall('token":"([\D\d]+?)"', data, re.S)
         urllist = []
@@ -740,7 +740,7 @@ def get_wencai_Market_url(url=None):
         # stock_codes = grep_stock_codes.findall(response.text)
         # print data
         print time.time()-time_s
-        print count
+        # print count
         if len(count) == 1:
             cacheurl = cache_root % (count[0],perpage)
             cacheurl =  cacheurl + cache_ends
@@ -748,14 +748,48 @@ def get_wencai_Market_url(url=None):
             time_s = time.time()
             data = cct.get_url_data(cacheurl)
             # count = re.findall('"(\d{6})\.S', data, re.S)
-            count = re.findall('result":(\[[\D\d]+\]),"oriColPos', data, re.S)
+            # count = re.findall('result":(\[[\D\d]+\]),"oriColPos', data, re.S)
+            count = re.findall('result":(\[[\D\d]+\]),"oriIndexID', data, re.S)
             # count = grep_stock_codes.findall(data,re.S)
             # print data
             html = data.decode('unicode-escape')
             # print html
             print time.time()-time_s
-            print count[0].decode('unicode-escape')
-            # print count[1].decode('unicode-escape')
+            if len(count) > 0:
+                result = eval(count[0])
+                # print result,len(result)
+                # print result[1]
+                urllist = []    
+                for xcode in result:
+                    # print xcode
+                    for x in xcode:
+                        # print x
+                        if isinstance(x, list):
+                            # print "list:",x
+                            for y in x:
+                                if isinstance(y, dict):
+                                    pass
+                                    # keylist=['URL','PageRawTitle']
+                                    # for key in y.keys():
+                                    #     if key in keylist:
+                                    #         if key == 'URL':
+                                    #             urls = str(y[key]).replace('\\','').strip()
+                                    #             if urls[-20] not in urllist:
+                                    #                 urllist.append(urls[-20])
+                                    #                 print urls.decode('unicode-escape'),
+                                    #             else:
+                                    #                 break
+                                    #         else:
+                                    #             urls = str(y[key])
+                                    #             print urls.decode('unicode-escape'),
+                                else:
+                                    print str(y).decode('unicode-escape'),
+                        else:
+                            print str(x).decode('unicode-escape'),
+                    print ''
+            # print type(count[0])
+            # print type(list(count[0]))
+            # print count[0].decode('unicode-escape')
 
     # print urllist[0],
     return urllist
