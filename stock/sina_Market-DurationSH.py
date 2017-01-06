@@ -284,7 +284,7 @@ if __name__ == "__main__":
                         # top_temp = top_temp.sort_values(by=['op','ra','diff', 'percent', 'ratio'], ascending=[0,0,0, 0, 1])[:10]
                         # top_temp = top_temp.sort_values(by=['op','ldate','ra','diff', 'percent', 'ratio'], ascending=[0,0,0,0, 0, 1])[:10]
                     
-                        if duration_date > ct.duration_date_sort:
+                        if cct.get_now_time_int() > ct.checkfilter_end_timeDu and int(duration_date * 1.5) > ct.duration_date_sort:
                             top_temp = top_temp.sort_values(by=ct.Duration_percent_op,
                                         ascending=ct.Duration_percent_op_key)
                         else:

@@ -1045,6 +1045,11 @@ if __name__ == '__main__':
     # print get_today_duration()
     # print get_tushare_market(market='captops', renew=True,days=10).shape
     # print get_rzrq_code()[:3]
+    # times =1483686638.0
+    # print get_time_to_date(times, format='%Y-%m-%d')
+    print get_work_day_status()
+    import sys
+    sys.exit(0)
     print get_rzrq_code('cxgzx')[:3]
     print get_rzrq_code('cx')[:3]
     print get_now_time_int()

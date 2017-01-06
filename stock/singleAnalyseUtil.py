@@ -512,12 +512,13 @@ if __name__ == '__main__':
                 if (cct.get_now_time_int() > 1500 and cct.get_now_time_int() < 1800):
                     while 1:
                         if cct.get_now_time_int() > 1502 and cct.get_now_time_int() < 1510:
-                            cct.sleep(60)
                             print ".",
+                            cct.sleep(60)
                         elif cct.get_now_time_int() < 1800:
                             print ".",
                             print "write dm to file"
-                            tdd.Write_market_all_day_mp('all')
+                            if cct.get_work_day_status():
+                                tdd.Write_market_all_day_mp('all')
                             break
                 # else:
                 #     dd = tdd.get_tdx_Exp_day_to_df('999999', type='f', dl=1)

@@ -807,7 +807,7 @@ def get_linear_model_candles(code, ptype='low', dtype='d', start=None, end=None,
     return df
 
 
-def powerCompute_df(df, dtype='d', end=None, dl=None, filter='y',talib=False):
+def powerCompute_df(df, dtype='d', end=None, dl=None, filter='y',talib=False,newdays=None):
     ts=time.time()
     if isinstance(df, list):
         code_l = df
@@ -837,7 +837,7 @@ def powerCompute_df(df, dtype='d', end=None, dl=None, filter='y',talib=False):
             dz = tdd.get_sina_data_df(code)
 #        print dz.open.values
         if len(dz) > 0 and dz.buy.values > 0:
-            tdx_df = tdd.get_tdx_append_now_df_api(code, start=start, end=end, type='f', df=None, dm=dz, dl=dl*2)
+            tdx_df = tdd.get_tdx_append_now_df_api(code, start=start, end=end, type='f', df=None, dm=dz, dl=dl*2,newdays=newdays)
             # print tdx_df
             tdx_df=tdx_df.fillna(0)
         else:

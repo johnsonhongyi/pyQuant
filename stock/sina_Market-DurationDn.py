@@ -65,7 +65,7 @@ if __name__ == "__main__":
     duration_date = ct.duration_date
     du_date = duration_date
     # print cct.last_tddate(2)
-    end_date = cct.last_tddate(days=3 )
+    end_date = cct.last_tddate(days=4)
     ptype = 'high'
     filter = 'y'
     if len(str(duration_date)) < 4:
@@ -285,7 +285,8 @@ if __name__ == "__main__":
                         #                                 ascending=[0, 0, 0, 0, 1])[:10]
                         # top_temp = top_temp.sort_values(by=['op','ldate','ra','diff', 'percent', 'ratio'], ascending=[0,0,0,0, 0, 1])[:10]                
                     
-                        if duration_date > ct.duration_date_sort:
+                        if cct.get_now_time_int() > 945 and int(duration_date * 1.5)  > ct.duration_date_sort:
+                        # if cct.get_now_time_int() > ct.checkfilter_end_timeDu and duration_date > ct.duration_date_sort:
                             top_temp = top_temp.sort_values(by=ct.Duration_percent_op,
                                         ascending=ct.Duration_percent_op_key)
                         else:

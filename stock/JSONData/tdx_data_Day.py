@@ -28,7 +28,7 @@ log = LoggerFactory.getLogger('TDX_Day')
 # log.setLevel(LoggerFactory.ERROR)
 
 path_sep = os.path.sep
-newdaysinit = 15
+newdaysinit = 30
 changedays=0
 global initTdxdata,initTushareCsv
 initTdxdata = 0
@@ -84,6 +84,20 @@ exp_path = basedir + "/T0002/export/".replace('/', path_sep).replace('\\', path_
 day_path = {'sh': day_dir_sh, 'sz': day_dir_sz}
 
 # http://www.douban.com/note/504811026/
+def get_code_file_path(code,type='f'):
+    if code == None:
+        raise Exception("code is None")
+    # os.path.getmtime(ff)
+    code_u = cct.code_to_symbol(code)
+    if type == 'f':
+        file_path = exp_path + 'forwardp' + path_sep + code_u.upper() + ".txt"
+    elif type == 'b':
+        file_path = exp_path + 'backp' + path_sep + code_u.upper() + ".txt"
+    else:
+        return None
+
+    return file_path
+
 def get_tdx_Exp_day_to_df(code, type='f', start=None, end=None, dl=None,newdays = None):
     start=cct.day8_to_day10(start)
     end=cct.day8_to_day10(end)
@@ -1016,8 +1030,27 @@ def write_tdx_sina_data_to_file(code,dm=None,df=None,dl=2,type='f'):
     return "NTrue"
 
 def Write_market_all_day_mp(market='all'):
-    # sh_index = '999999'
-    # dd = get_tdx_Exp_day_to_df(sh_index,dl=1)
+    sh_index = '999999'
+    dd = get_tdx_Exp_day_to_df(sh_index,dl=1)
+    # print dt,dd.date
+    if len(dd) > 0:
+        duration = cct.get_today_duration(dd.date)
+        if duration == 0:
+            print "Duration:%s is OK"%(duration)
+            return False
+
+        # fpath =  get_code_file_path(sh_index)
+        # mtime = os.path.getmtime(fpath)
+        # dt = cct.get_time_to_date(mtime,'%Y-%m-%d')
+        # if dt == dd.date:
+        #     hs = cct.get_time_to_date(mtime,'%H%M')
+        #     # print hs
+        #     if hs > 1500:
+        #         print "Data is out:%s"%(dd.close)
+        #         return False
+  
+
+    # import sys;sys.exit(0)
     # start=dd.date
     # index_ts = ts.get_hist_data('sh',start=start)
     if market == 'all':

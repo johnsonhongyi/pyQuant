@@ -242,22 +242,22 @@ if __name__ == "__main__":
                         top_dif = top_dif[top_dif.percent >= 0]
                         top_temp = top_dif[:ct.PowerCount].copy()
                         top_end = top_dif[-5:].copy()
-                        top_temp = pct.powerCompute_df(top_temp,dl=ct.PowerCountdl,talib=True)
-                        top_end = pct.powerCompute_df(top_end,dl=ct.PowerCountdl,talib=True)
+                        top_temp = pct.powerCompute_df(top_temp,dl=ct.PowerCountdl,talib=True,newdays=newdays)
+                        top_end = pct.powerCompute_df(top_end,dl=ct.PowerCountdl,talib=True,newdays=newdays)
 
                     # elif percent_status == 'y' and cct.get_now_time_int() > 935 and ptype == 'high' :
                     elif ptype == 'low':
                         # top_dif = top_dif[top_dif.percent >= 0]
                         top_temp = top_dif[:ct.PowerCount].copy()
                         top_end = top_dif[-5:].copy()
-                        top_temp = pct.powerCompute_df(top_temp,dl=ct.PowerCountdl,talib=True)
-                        top_end = pct.powerCompute_df(top_end,dl=ct.PowerCountdl,talib=True)
+                        top_temp = pct.powerCompute_df(top_temp,dl=ct.PowerCountdl,talib=True,newdays=newdays)
+                        top_end = pct.powerCompute_df(top_end,dl=ct.PowerCountdl,talib=True,newdays=newdays)
                     else:
                         # top_dif = top_dif[top_dif.percent >= 0]
                         top_end = top_dif[:5].copy()
                         top_temp = top_dif[-ct.PowerCount:].copy()
-                        top_temp = pct.powerCompute_df(top_temp, dl=ct.PowerCountdl,talib=True)
-                        top_end = pct.powerCompute_df(top_end, dl=ct.PowerCountdl,talib=True)
+                        top_temp = pct.powerCompute_df(top_temp, dl=ct.PowerCountdl,talib=True,newdays=newdays)
+                        top_end = pct.powerCompute_df(top_end, dl=ct.PowerCountdl,talib=True,newdays=newdays)
 
                     print ("N:%s K:%s %s G:%s" % (
                         now_count, len(top_all[top_all['buy'] > 0]),
