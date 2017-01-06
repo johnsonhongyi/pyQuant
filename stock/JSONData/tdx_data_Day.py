@@ -129,7 +129,8 @@ def get_tdx_Exp_day_to_df(code, type='f', start=None, end=None, dl=None,newdays 
         if initTdxdata == 0:
             log.error("file_path:not exists code:%s"%(code))
         initTdxdata += 1
-        ds.index = '2016-01-01'
+        # ds.index = '2016-01-01'
+        # ds = ds.fillna(0)
         return ds
     # ofile = open(file_path, 'rb')
     if start is None and dl is None:
