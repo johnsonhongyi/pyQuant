@@ -511,7 +511,7 @@ def get_url_data_R(url):
     return data
 
 
-def get_url_data(url,retry_count=3,pause=0.01):
+def get_url_data(url,retry_count=3,pause=0.05):
     # headers = {'User-Agent':'Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.6) Gecko/20091201 Firefox/3.5.6'}
     headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.2; rv:16.0) Gecko/20100101 Firefox/16.0',
                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
