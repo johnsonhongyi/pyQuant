@@ -14,6 +14,7 @@ import datetime
 from JohhnsonUtil import commonTips as cct
 from JSONData import tdx_data_Day as tdd
 from JSONData import get_macd_kdj_rsi as getab
+from JSONData import wencaiData as wcd
 from JohhnsonUtil import zoompan
 from JohhnsonUtil import LoggerFactory as LoggerFactory
 import time
@@ -818,6 +819,12 @@ def powerCompute_df(df, dtype='d', end=None, dl=None, filter='y',talib=False,new
     dm = tdd.get_sina_data_df(code_l)
     if statuslist:
         df = dm
+
+#    cname = ",".join(x for x in dm.name)
+    wcdf = wcd.get_codelist_df(dm.name)
+
+
+
     for code in code_l:
         if statuslist:
             start = None
@@ -902,6 +909,10 @@ def powerCompute_df(df, dtype='d', end=None, dl=None, filter='y',talib=False,new
         df.loc[code, 'macd'] = opmacd
         df.loc[code, 'rsi'] = oprsi
         df.loc[code, 'ma'] = opma
+        if len(wcdf[wcdf.index == code]) > 0:
+            df.loc[code,'type'] = wcdf.loc[code,'index']
+        else:
+            df.loc[code,'type'] = 0
         df=df.fillna(0)
         # df = getab.Get_BBANDS(df, dtype='d')
         #'volume', 'ratio', 'counts','ldate' -> 'ma','macd','rsi','kdj'

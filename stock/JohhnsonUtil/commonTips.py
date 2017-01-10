@@ -1047,6 +1047,8 @@ if __name__ == '__main__':
     # print get_rzrq_code()[:3]
     # times =1483686638.0
     # print get_time_to_date(times, format='%Y-%m-%d')
+    print get_today_duration('2017-01-06')
+    print last_tddate(2)
     print get_work_day_status()
     import sys
     sys.exit(0)

@@ -16,7 +16,7 @@ from JohhnsonUtil import LoggerFactory
 import trollius as asyncio
 # from urllib2 import Request,urlopen
 from trollius.coroutines import From
-import tdx_data_Day as tdd
+# import tdx_data_Day as tdd
 log = LoggerFactory.getLogger('Sina_data')
 # log.setLevel(LoggerFactory.DEBUG)
 
@@ -245,8 +245,8 @@ class Sina:
         # self.get_tdx_dd()
         return self.dataframe
 
-    def get_tdx_dd(self):
-        df = tdd.get_tdx_all_day_LastDF(self.stock_codes)
+    # def get_tdx_dd(self):
+    #     df = tdd.get_tdx_all_day_LastDF(self.stock_codes)
         # print df
 
     def format_response_data(self):

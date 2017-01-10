@@ -326,7 +326,7 @@ if __name__ == "__main__":
             int_time = cct.get_now_time_int()
             if cct.get_work_time():
                 if int_time < 925:
-                    cct.sleep(90)
+                    cct.sleep(60)
                 elif int_time < 930:
                     cct.sleep((930 - int_time) * 60)
                     # top_all = pd.DataFrame()

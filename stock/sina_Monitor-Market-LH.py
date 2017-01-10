@@ -19,6 +19,7 @@ from JSONData import realdatajson as rl
 from JSONData import tdx_data_Day as tdd
 from JSONData import powerCompute as pct
 from JSONData import stockFilter as stf
+from JSONData import wencaiData as wcd
 from JohhnsonUtil import LoggerFactory
 from JohhnsonUtil import commonTips as cct
 import singleAnalyseUtil as sl
@@ -61,10 +62,10 @@ if __name__ == "__main__":
     # log=LoggerFactory.JohnsonLoger('SinaMarket').setLevel(LoggerFactory.DEBUG)
     # log.setLevel(LoggerFactory.DEBUG)
     if cct.isMac():
-        width, height = 145, 16
+        width, height = 152, 16
         cct.set_console(width, height)
     else:
-        width, height = 145, 18
+        width, height = 152, 18
         cct.set_console(width, height)
     status = False
     vol = ct.json_countVol

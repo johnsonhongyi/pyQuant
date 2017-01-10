@@ -533,7 +533,7 @@ def get_tdx_append_now_df_api(code, start=None, end=None, type='f',df=None,dm=No
             # log.debug("ds:%s" % ds[:1])
             ds = ds.fillna(0)
             df = df.append(ds)
-            if len(ds) >1:
+            if (len(ds) == 1 and ds.index.values[0] != cct.get_today()) or len(ds) > 1:
                 if index_status:
                     sta=write_tdx_tushare_to_file(code_ts,df=df)
                 else:
@@ -753,14 +753,14 @@ def get_tdx_append_now_df_api_tofile(code,dm=None,newdays=1, start=None, end=Non
             # log.debug("ds:%s" % ds[:1])
             ds = ds.fillna(0)
             df = df.append(ds)
-            if len(ds) >1 :
+            if (len(ds) == 1 and ds.index.values[0] != cct.get_today()) or len(ds) > 1:
                 if index_status:
                     sta=write_tdx_tushare_to_file(code_ts,df=df)
                 else:
                     sta=write_tdx_tushare_to_file(code,df=df)
 #            if not sta:
 #                log.warn("write %s error."%(code))
-    if cct.get_now_time_int() > 830 and cct.get_now_time_int() < 930:
+    if cct.get_now_time_int() > 900 and cct.get_now_time_int() < 930 and len(df) > 0:
         log.debug("now > 830 and <930 return")
         df = df.sort_index(ascending=True)
         df['ma5d'] = pd.rolling_mean(df.close,5)
@@ -1051,7 +1051,7 @@ def Write_market_all_day_mp(market='all'):
         #     if hs > 1500:
         #         print "Data is out:%s"%(dd.close)
         #         return False
-  
+
 
     # import sys;sys.exit(0)
     # start=dd.date
@@ -1075,8 +1075,8 @@ def Write_market_all_day_mp(market='all'):
 #        get_tdx_append_now_df_api2(code,dl=dl,dm=dz,newdays=5)
         results = cct.to_mp_run_async(get_tdx_append_now_df_api_tofile,code_list,dm,5)
         # for code in code_list:
-           # print "code:%s "%(code),
-           # res=get_tdx_append_now_df_api_tofile(code,dm,5)
+        #    print "code:%s "%(code),
+        #    res=get_tdx_append_now_df_api_tofile(code,dm,5)
            # print "status:%s"%(res)
         #            results.append(res)
         print "t:",round(time.time() - time_t,2)
@@ -2615,6 +2615,13 @@ python %s -t txt 999999 20070101 20070302
         strip_tx = timeit.timeit(lambda : get_tdx_exp_all_LastDF(codelist, dt=duration_date, ptype=ptype), number=run)
         print("ex Read:", strip_tx)
 
+def write_to_all():
+    st = raw_input("will to Write Y or N:")
+    if str(st) == 'y':
+        Write_market_all_day_mp('all')
+    else:
+        print "not write"
+
 if __name__ == '__main__':
     import sys
     import timeit
@@ -2622,10 +2629,14 @@ if __name__ == '__main__':
 #    dd=rl.get_sina_Market_json('cyb').set_index('code')
 #    codelist= dd.index.tolist()
 #    df = get_tdx_exp_all_LastDF(codelist, dt=30,end=20160401, ptype='high', filter='y')
-    # print write_tdx_sina_data_to_file('300583',dm)
+    # print write_tdx_sina_data_to_file('300583')
     # print get_tdx_Exp_day_to_df('300583',dl=2,newdays=1)
-    Write_market_all_day_mp('all')
-    # print get_tdx_append_now_df_api_tofile('300583')
+
+    # write_to_all()
+#    print get_tdx_append_now_df_api('601999')[:1]
+
+
+#    print get_tdx_append_now_df_api_tofile('300583')
     # sys.exit(0)
 #    print getSinaAlldf('cx')
 #    print get_tdx_exp_low_or_high_power('603585',dl=10,ptype='low')
@@ -2635,7 +2646,6 @@ if __name__ == '__main__':
 #    Write_market_all_day_mp('cyb')
 #    print get_tdx_append_now_df_api2('603878',dl=2,dm=dm,newdays=5)
 #    print write_tdx_sina_data_to_file('999999',dm)
-#    print get_tdx_append_now_df_api('603878')
     code = '999999'
 #    print get_sina_data_df(code).index
 #    print get_tdx_Exp_day_to_df(code,dl=2)

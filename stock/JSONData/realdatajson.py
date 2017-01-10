@@ -663,136 +663,7 @@ def get_market_price_sina_dd_realTime(dp='',vol='0',type='0'):
     # print type(dm)
     return dm
 
-def post_login(root='http://upass.10jqka.com.cn/login'):
-    import urllib,urllib2
-    postData = {
-    'act':"login_submit",
-    'isiframe':"1",
-    'view':"iwc_quick",
-    'rsa_version':"default_2",
-    'redir':"http://www.iwencai.com/user/pop-logined",
-    'uname':"OuY03m5D1ojuPmpTAbgkpcm0dod5fMbU8jVOwd17WCPEW0pz52RyEcXU+2ZLiBmP+5jckGeUR5ba/fDjkUaPVaisn9Je4l7+JPv3iX/VS4erW25ueJEoVszK9kM3oF2mT3lraObawMclBteFcfwWHyWhsW7YmN19cgOdsQWWWno=",
-    'passwd':"IVORnBZ0Pdi+ix+ehVqiCdYTWCkGBy/kYEeTyTmi+5QBiL8SvYZZg3LLVzzfeMbOWaR/rK4Aoc80kSpqCIETfN3EmhA1CKK9ukI0TImlm8ASlqqz/lUq0lm5LwuMRdBjcD3hoP4RnvDc+W2+ng4XA31YsG6pBo+YF5IHcIxaScU=",
-    'captchaCode':"",
-    'longLogin':"on",
-    }
 
-    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.2; rv:16.0) Gecko/20100101 Firefox/16.0',
-           'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-           'Connection': 'keep-alive'}
-    from cookielib import CookieJar
-    cj = CookieJar()
-    opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
-    data_encoded = urllib.urlencode(postData)
-    url = 'http://www.iwencai.com/stockpick/search?typed=0&preParams=&ts=1&f=1&qs=result_original&selfsectsn=&querytype=&searchfilter=&tid=stockpick&w=%s'
-    url = url%('国企改革')
-    for ck in cj:
-        print ck
-    print ":"
-    try:
-        response = opener.open(root,data_encoded)
-        content = response.read()
-        # count = re.findall('\[[A-Za-z].*\]', data, re.S)
-        status = response.getcode()
-        # print content
-        for ck in cj:
-            print ck
-        print ":"
-        # cj["session"]["u_name_wc"] = "mx_149958484"
-        if status == 200:
-            response = opener.open(url)
-            page =  response.read()
-            print page
-            for ck in cj:
-                print ck
-    except  urllib2.HTTPError, e:
-         print e.code
-    # f= response.read().decode("utf8")
-    # outfile =open("rel_ip.txt","w")
-    # print >> outfile , "%s"   % ( f)
-    #打印响应的信息
-    # info = response.info()
-    # print info
-    # get_wencai_Market_url(url=None)
-
-
-def get_wencai_Market_url(url=None,filter='国企改革'):
-    if url == None:
-        time_s = time.time()
-        wencairoot = 'http://www.iwencai.com/stockpick/search?typed=0&preParams=&ts=1&f=1&qs=result_original&selfsectsn=&querytype=&searchfilter=&tid=stockpick&w=%s'
-        url = wencairoot%(filter)
-        log.info("url:%s"%(url))
-        # url = ct.get_url_data_R % (market)
-        # print url
-        cache_root="http://www.iwencai.com/stockpick/cache?token=%s&p=1&perpage=%s&showType="
-        perpage = 5
-        cache_ends = "[%22%22,%22%22,%22onTable%22,%22onTable%22,%22onTable%22,%22onTable%22,%22onTable%22,%22onTable%22,%22onTable%22,%22onTable%22]"
-        data = cct.get_url_data(url)
-        # print data
-        # count = re.findall('(\d+)', data, re.S)
-        # "token":"dcf3d42bbeeb32718a243a19a616c217"
-        # print data.find('sp.')
-        # count = re.findall('token":"([\D\d].*)"', data, re.S)
-        count = re.findall('token":"([\D\d]+?)"', data, re.S)
-        urllist = []
-        grep_stock_codes = re.compile('"(\d{6})\.S')
-        # response = requests.get(all_stock_codes_url)
-        # stock_codes = grep_stock_codes.findall(response.text)
-        # print data
-        print time.time()-time_s
-        # print count
-        if len(count) == 1:
-            cacheurl = cache_root % (count[0],perpage)
-            cacheurl =  cacheurl + cache_ends
-            print cacheurl
-            time_s = time.time()
-            data = cct.get_url_data(cacheurl)
-            # count = re.findall('"(\d{6})\.S', data, re.S)
-            # count = re.findall('result":(\[[\D\d]+\]),"oriColPos', data, re.S)
-            count = re.findall('result":(\[[\D\d]+\]),"oriIndexID', data, re.S)
-            # count = grep_stock_codes.findall(data,re.S)
-            # print data
-            html = data.decode('unicode-escape')
-            # print html
-            print time.time()-time_s
-            if len(count) > 0:
-                result = eval(count[0])
-                # print result,len(result)
-                # print result[1]
-                urllist = []    
-                for xcode in result:
-                    # print xcode
-                    for x in xcode:
-                        # print x
-                        if isinstance(x, list):
-                            # print "list:",x
-                            for y in x:
-                                if isinstance(y, dict):
-                                    pass
-                                    # keylist=['URL','PageRawTitle']
-                                    # for key in y.keys():
-                                    #     if key in keylist:
-                                    #         if key == 'URL':
-                                    #             urls = str(y[key]).replace('\\','').strip()
-                                    #             if urls[-20] not in urllist:
-                                    #                 urllist.append(urls[-20])
-                                    #                 print urls.decode('unicode-escape'),
-                                    #             else:
-                                    #                 break
-                                    #         else:
-                                    #             urls = str(y[key])
-                                    #             print urls.decode('unicode-escape'),
-                                else:
-                                    print str(y).decode('unicode-escape'),
-                        else:
-                            print str(x).decode('unicode-escape'),
-                    print ''
-            # print type(count[0])
-            # print type(list(count[0]))
-            # print count[0].decode('unicode-escape')
-
-    # print urllist[0],
-    return urllist
 
 
 
@@ -804,12 +675,12 @@ if __name__ == '__main__':
     # print sina_json_Big_Count()
     # print getconfigBigCount(write=True)
     # sys.exit(0)
-    get_wencai_Market_url()
     # post_login()
-    sys.exit()
-    log.setLevel(LoggerFactory.INFO)
+    # log.setLevel(LoggerFactory.INFO)
+    # get_wencai_Market_url(filter='热门股')
     df = get_sina_Market_json('sz')
     print df[:1]
+    sys.exit()
     top_now = get_market_price_sina_dd_realTime(df, '2', type)
     print top_now[:1]
     # _parsing_Market_price_json('cyb')

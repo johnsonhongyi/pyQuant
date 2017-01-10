@@ -331,7 +331,7 @@ if __name__ == "__main__":
             int_time = cct.get_now_time_int()
             if cct.get_work_time():
                 if int_time < 925:
-                    cct.sleep(120)
+                    cct.sleep(60)
                 elif int_time < 930:
                     cct.sleep((930 - int_time) * 60)
                     # top_all = pd.DataFrame()
@@ -428,11 +428,13 @@ if __name__ == "__main__":
                 # else:
                     # codew = (top_dd[-10:].index).tolist()
                 if st.lower() == 'a':
-                    codew = (top_dd.index[:ct.writeCount]).tolist()
+                    # codew = (top_dd.index[:ct.writeCount]).tolist()
+                    codew = (top_dd.index[:10]).tolist()
                     cct.write_to_blocknew(block_path, codew)
                     # sl.write_to_blocknew(all_diffpath, codew)
                 else:
-                    codew = (top_dd.index[:ct.writeCount]).tolist()
+                    # codew = (top_dd.index[:ct.writeCount]).tolist()
+                    codew = (top_dd.index[:10]).tolist()
                     cct.write_to_blocknew(block_path, codew, False)
                     # sl.write_to_blocknew(all_diffpath, codew, False)
                 print "wri ok:%s" % block_path
