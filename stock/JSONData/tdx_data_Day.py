@@ -12,6 +12,7 @@ import pandas as pd
 from pandas import Series
 
 from JSONData import realdatajson as rl
+from JSONData import wencaiData as wcd
 from JohhnsonUtil import LoggerFactory
 from JohhnsonUtil import commonTips as cct
 from JohhnsonUtil import johnson_cons as ct
@@ -138,7 +139,8 @@ def get_tdx_Exp_day_to_df(code, type='f', start=None, end=None, dl=None,newdays 
         buf = ofile.readlines()
         ofile.close()
         num = len(buf)
-        no = num - 1
+#        no = num - 1
+        no = num
         dt_list = []
         for i in xrange(no):
             a = buf[i].split(',')
@@ -495,6 +497,7 @@ def get_tdx_append_now_df_api(code, start=None, end=None, type='f',df=None,dm=No
 #    print cct.last_tddate(duration)
 #    if duration >= 1 and (tdx_last_day != cct.last_tddate(1) or cct.get_now_time_int() > 1530):
     if duration > 1 and (tdx_last_day != cct.last_tddate(1)):
+        import urllib2
         if index_status:
             code_t = INDEX_LIST[code][2:]
         try:
@@ -502,7 +505,7 @@ def get_tdx_append_now_df_api(code, start=None, end=None, type='f',df=None,dm=No
             ds['volume']=ds.volume.apply(lambda x: x * 100)
             # ds = ts.get_h_data('000001', start=tdx_last_day, end=today,index=index_status)
             # df.index = pd.to_datetime(df.index)
-        except (IOError, EOFError, Exception) as e:
+        except (IOError, EOFError, Exception,urllib2.URLError) as e:
             print "Error Duration:", e,
             print "code:%s"%(code)
             cct.sleep(0.1)
@@ -1440,7 +1443,7 @@ def getSinaAlldf(market='cyb',vol=ct.json_countVol,type=ct.json_countType):
     elif market == 'cx':
         df = cct.get_rzrq_code(market)
     elif market == 'zxb':
-        df = cct.get_tushare_market(market, renew=False)
+        df = cct.get_tushare_market(market, renew=True,days=60)
     elif market == 'captops':
         global initTushareCsv
         if initTushareCsv == 0:
@@ -1449,8 +1452,10 @@ def getSinaAlldf(market='cyb',vol=ct.json_countVol,type=ct.json_countType):
         else:
             df = cct.get_tushare_market(market, renew=False, days = 10)
 
-    else:
+    elif market in ['sh','sz','cyb','all']:
         df = rl.get_sina_Market_json(market)
+    else:
+        df = wcd.get_wcbk_df(market)
     # codelist=df.code.tolist()
     # cct._write_to_csv(df,'codeall')
     # top_now = get_mmarket='all'arket_price_sina_dd_realTime(df, vol, type)
@@ -2633,10 +2638,11 @@ if __name__ == '__main__':
     # print get_tdx_Exp_day_to_df('300583',dl=2,newdays=1)
 
     # write_to_all()
-#    print get_tdx_append_now_df_api('601999')[:1]
+#    print get_tdx_append_now_df_api('600760')[:3]
+    print get_tdx_append_now_df_api('000411')[:3]
 
 
-#    print get_tdx_append_now_df_api_tofile('300583')
+    # print get_tdx_append_now_df_api_tofile('300583')
     # sys.exit(0)
 #    print getSinaAlldf('cx')
 #    print get_tdx_exp_low_or_high_power('603585',dl=10,ptype='low')

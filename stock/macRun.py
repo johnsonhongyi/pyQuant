@@ -41,7 +41,7 @@ end tell
 #                'sina_Monitor.py': '85, 27',
 #                'singleAnalyseUtil.py': '583, 23',
 #                'LinePower.py':'767, 527',}
-positionKey = {'sina_Market-DurationDn.py': '276, 437',
+positionKey = {'sina_Market-DurationDn.py': '265, 409',
                'sina_Market-DurationUp.py': '-17, 470',
                'sina_Market-DurationSH.py': '148, 560',
                'sina_Monitor-Market-New.py': '-2, 371',

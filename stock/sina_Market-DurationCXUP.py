@@ -39,7 +39,7 @@ if __name__ == "__main__":
     # log.level = log.debug
     # error_handler = SyslogHandler('Sina-M-Log', level='ERROR')
 
-    width, height = 154, 21
+    width, height = 158, 21
     def set_duration_console(du_date):
         if cct.isMac():
             cct.set_console(width, height)
@@ -84,7 +84,7 @@ if __name__ == "__main__":
     while 1:
         try:
             # df = sina_data.Sina().all
-            top_now = tdd.getSinaAlldf(market='cx', vol=ct.json_countVol, type=ct.json_countType)
+            top_now = tdd.getSinaAlldf(market='混改', vol=ct.json_countVol, type=ct.json_countType)
 
             top_dif = top_now
             # top_now.to_hdf("testhdf5", 'marketDD', format='table', complevel=9)

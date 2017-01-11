@@ -11,7 +11,7 @@ from __future__ import division
 import json
 import math
 import re
-import sys
+import sys,os
 import time
 
 import pandas as pd
@@ -27,7 +27,7 @@ except ImportError:
 log=LoggerFactory.getLogger('wencaiData')
 
 
-def post_login(root='http://upass.10jqka.com.cn/login'):
+def post_login(root='http://upass.10jqka.com.cn/login',url=None):
     postData = {
     'act':"login_submit",
     'isiframe':"1",
@@ -65,9 +65,9 @@ def post_login(root='http://upass.10jqka.com.cn/login'):
         if status == 200:
             response = opener.open(url)
             page =  response.read()
-            print page
-            for ck in cj:
-                print ck
+#            print page
+#            for ck in cj:
+#                print ck
     except  urllib2.HTTPError, e:
          print e.code
     # f= response.read().decode("utf8")
@@ -94,6 +94,8 @@ def get_wencai_Market_url(filter='国企改革',perpage=1,url=None,):
         cache_root="http://www.iwencai.com/stockpick/cache?token=%s&p=1&perpage=%s&showType="
         cache_ends = "[%22%22,%22%22,%22onTable%22,%22onTable%22,%22onTable%22,%22onTable%22,%22onTable%22,%22onTable%22,%22onTable%22,%22onTable%22]"
         data = cct.get_url_data(url)
+#        if data.find('系统判断您访问次数过多'.en('utf8')) > 0 :
+#            log.error("acces fail")
         # print data
         # count = re.findall('(\d+)', data, re.S)
         # "token":"dcf3d42bbeeb32718a243a19a616c217"
@@ -121,7 +123,7 @@ def get_wencai_Market_url(filter='国企改革',perpage=1,url=None,):
 #            html = data.decode('unicode-escape')
             count = re.findall('(\[\["[0-9]{6}\.S[HZ][\D\d]+\]\]),"oriIndexID', html, re.S)
             # count = grep_stock_codes.findall(data,re.S)
-            log.info("count:%s len:%s"%(count,len(count)))
+            log.info("count: len:%s"%(len(count)))
             # print html
 
             log.info( time.time()-time_s)
@@ -182,8 +184,8 @@ def get_wencai_Market_url(filter='国企改革',perpage=1,url=None,):
                         percent = '0' if percent == '--' else percent
 
                         # index = code_t[4]
-                        index = ";".join(x for x in code_t[4].split(';')[:3])
-                        index = index[:20] if len(index) > 20 else index
+                        category = ";".join(x for x in code_t[4].split(';')[:3])
+                        category = category[:20] if len(category) > 20 else category
                         if len(key_t) > 0:
                             # print key_t[0]
                             title1 = key_t[0]
@@ -191,18 +193,23 @@ def get_wencai_Market_url(filter='国企改革',perpage=1,url=None,):
                                 title2 = key_t[1]
                             else:
                                 title2 = None
-                            dlist.append({'code': code, 'name': name, 'trade': trade, 'percent': percent, 'index': index, 'tilte1': title1,'tilte2': title2})
+                            dlist.append({'code': code, 'name': name, 'trade': trade, 'percent': percent, 'category': category, 'tilte1': title1,'tilte2': title2})
                         else:
-                            dlist.append({'code': code, 'name': name, 'trade': trade, 'percent': percent, 'index': index})
+                            dlist.append({'code': code, 'name': name, 'trade': trade, 'percent': percent, 'category': category})
                     # print ''
                 # df = pd.DataFrame(dt_list, columns=ct.TDX_Day_columns)
-                # df = pd.DataFrame(dlist, columns=['index','code','name','trade','percent','tilte1','tilte2'])
-                if len(dlist) > 0 and 'tilte1' in (dlist[0].keys()) :
-                    df = pd.DataFrame(dlist, columns=['code','name','trade','percent','index','tilte1','tilte2'])
-                else:
-                    df = pd.DataFrame(dlist, columns=['code','name','trade','percent','index'])
+                # df = pd.DataFrame(dlist, columns=['category','code','name','trade','percent','tilte1','tilte2'])
+
+                df = pd.DataFrame(dlist, columns=['code','name','trade','percent','category','tilte1','tilte2'])
+                # if len(dlist) > 0 and 'tilte1' in (dlist[0].keys()) :
+                #     df = pd.DataFrame(dlist, columns=['code','name','trade','percent','category','tilte1','tilte2'])
+                # else:
+                #     df = pd.DataFrame(dlist, columns=['code','name','trade','percent','category'])
                 df['code'] = (map(lambda x: x[:6],df['code']))
-                df = df.set_index('code')
+                if len(df) > 0:
+                        df.percent = df.percent.astype(float)
+                        df = df.sort_values(by='percent',ascending=[0])
+                # df = df.set_index('code')
             # print type(count[0])
             # print type(list(count[0]))
             # print count[0].decode('unicode-escape')
@@ -217,7 +224,7 @@ def get_codelist_df(codelist):
         # print "ti:",time.time()-time_s
 #        cnamelist =[]
         for li in div_list:
-            cname = ",".join(x for x in li)
+            cname = ",".join(x.encode('utf8') for x in li)
 #            cnamelist.append(cname)
             wcdf_t = get_wencai_Market_url(cname,len(li))
             wcdf = wcdf.append(wcdf_t)
@@ -227,12 +234,100 @@ def get_codelist_df(codelist):
         print ("w:%.2f"%(time.time()-time_s)),
         # print results
     else:
-        cname = ",".join(x for x in codelist)
+        cname = ",".join(x.encode('utf8') for x in codelist)
         wcdf = get_wencai_Market_url(cname,len(codelist))
 #        wcdf = wcdf.append(wcdf_t)
     if len(wcdf) != len(codelist):
         log.warn("wcdf:%s"%(len(wcdf)))
     return wcdf
+
+def get_wencai_data(codelist,market='wencai'):
+    if isinstance(codelist,list):
+        # code_l = []
+        # wcd_o = get_write_wencai_market_to_csv(market=market)
+        # for co in codelist:
+        #     if co not in wcd_o.code.values:
+        #         code_l.append(co)
+        # if len(code_l) > 0:
+        #     wcd_d = get_codelist_df(code_l)
+        #     get_write_wencai_market_to_csv(wcd_d,market=market)
+        wcd_d = get_codelist_df(codelist)
+        df = get_write_wencai_market_to_csv(wcd_d,market=market,renew=True,days=60)
+    else:
+        df = get_wencai_Market_url(codelist)
+    if 'code' in df.columns:
+        df = df.set_index('code')
+    return df
+
+def get_wencai_filepath(market):
+    path_sep = os.path.sep
+    baser = os.getcwd().split('stock')[0]
+    base = baser  + 'stock' +path_sep + 'JohhnsonUtil' + path_sep +'wencai' + path_sep
+    filepath = base + market+'.csv'
+    return filepath
+
+def get_write_wencai_market_to_csv(df=None,market='wcbk',renew=False,days=60):
+
+    def wencaiwrite_to_csv(df,filename,renew=False):
+        if len(df) == 0 :
+            log.warn("df is None")
+#        else:
+            # log.warn('market not found')
+            # return pd.DataFrame()
+        if len(df)>0 and 'code' in df.columns:
+            df.drop_duplicates('code',inplace=True)
+            df = df.set_index('code')
+            if not renew and os.path.exists(filepath) :
+                df.to_csv(filename,mode='a',encoding='gbk', header=False)
+            else:
+                df.to_csv(filename,mode='w',encoding='gbk')
+        else:
+            log.warn("df.columns:%s"%(df.columns))
+            return df
+#        log.warn("Wr%s :%s"%(market,len(df)))
+        print ("%s :%s"%(market,len(df)))
+        # df.reset_index(inplace=True)
+        return df
+
+    filepath = get_wencai_filepath(market)
+
+    if os.path.exists(filepath):
+        if isinstance(df,pd.DataFrame) and renew and cct.creation_date_duration(filepath) > days :
+            df = wencaiwrite_to_csv(df,filepath,renew)
+        else:
+            dfz = pd.read_csv(filepath,dtype={'code':str},encoding = 'gbk')
+            if isinstance(df,pd.DataFrame) and len(df) > 0 and len(dfz) != len(df):
+                if 'category' in df.columns and str(df[:1].category.values).find(';') > 0:
+                    dd = pd.DataFrame()
+                    for code in df.code.values:
+                        if not code in dfz.code.values:
+                            dd = dd.append(df[df.code == code])
+                    if len(dd) > 0:
+                        wencaiwrite_to_csv(dd, filepath)
+                        df = pd.read_csv(filepath,dtype={'code':str},encoding = 'gbk')
+                    else:
+                        df = dfz
+
+            else:
+                df = dfz
+            # df = pd.read_csv(filepath,dtype={'code':str})
+            if len(df) == 0:
+                df = wencaiwrite_to_csv(df, filepath)
+    else:
+        df = wencaiwrite_to_csv(df, filepath)
+
+    return df
+
+def get_wcbk_df(filter='混改',market='mnbk',perpage=1000,days=5):
+    fpath = get_wencai_filepath(market)
+    if os.path.exists(fpath) and cct.creation_date_duration(fpath) == 0 :
+        df = get_write_wencai_market_to_csv(None,market,renew=True,days=days)
+    else:
+        df = get_wencai_Market_url(filter.decode('utf8'),perpage)
+        df = get_write_wencai_market_to_csv(df,market,renew=True,days=days)
+    return df
+
+
 if __name__ == '__main__':
     # df = get_sina_all_json_dd('0', '3')
     # df=get_sina_Market_json('cyb')
@@ -244,10 +339,26 @@ if __name__ == '__main__':
 #    log.setLevel(LoggerFactory.INFO)
 #    df = get_wencai_Market_url(filter='国企改革',perpage=1000)
 #    df = get_wencai_Market_url('湖南发展,天龙集团,浙报传媒,中珠医疗,多喜爱',500)
-    df = get_wencai_Market_url('湖南发展',500)
+#    type='TMT'
+#    type='国企改革'
+#    df = get_wencai_Market_url('赢时胜,博腾股份,炬华科技,东土科技,华鹏飞,长亮科技,天银机电,润和软件,苏大维格,晶盛机电,掌趣科技,戴维医疗,邦讯技术,汉鼎宇佑,富春通信,三六五网,南通锻压,华昌达,梅安森,尔康制药,雅本化学,卫宁健康,初灵信息,乐金健康,迪安诊断',500)
+
+
+    df = get_wencai_Market_url('国企改革',10000)
+#    df = get_write_wencai_market_to_csv(df,'wcbk')
+
+    # df = get_wcbk_df('混改')
+
+#    print write_wencai_market_to_csv(df)[:2]
     # df = get_codelist_df(['天龙集团','太阳电缆','杭州解百'])
     # df = get_codelist_df([u'\u7ef4\u5b8f\u80a1\u4efd', u'\u6d77\u987a\u65b0\u6750', u'\u6da6\u6b23\u79d1\u6280', u'\u84dd\u6d77\u534e\u817e', u'\u5149\u529b\u79d1\u6280'])
+    # df = df.sort_values(by='percent',ascending=[0]) if len(df) > 0 else df
+    df.percent = df.percent.astype(float)
     df = df.sort_values(by='percent',ascending=[0])
-    print df[:10],len(df)
+
+    print "%s %s"%(type,len(df))
+    print "%s "%(df[:5])
+    # import dfgui
+    # dfgui.show(df)
     # get_wencai_Market_url()
     sys.exit()

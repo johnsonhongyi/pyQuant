@@ -821,7 +821,8 @@ def powerCompute_df(df, dtype='d', end=None, dl=None, filter='y',talib=False,new
         df = dm
 
 #    cname = ",".join(x for x in dm.name)
-    wcdf = wcd.get_codelist_df(dm.name.tolist())
+    wcdf = wcd.get_wencai_data(dm.name.tolist(),'wencai')
+#    wcdf = wcd.get_codelist_df(dm.name.tolist())
 
 
 

@@ -136,7 +136,7 @@ def get_tushare_market(market='zxb',renew=False,days=5):
     base = baser  + 'stock' +path_sep + 'JohhnsonUtil' + path_sep
     filepath = base + market+'.csv'
     if os.path.exists(filepath):
-        if renew and creation_date_duration(filepath).days > 0:
+        if renew and creation_date_duration(filepath) > 0:
             df = tusharewrite_to_csv(market, filepath, days)
         else:
             df = pd.read_csv(filepath,dtype={'code':str},encoding = 'gbk')
@@ -147,6 +147,8 @@ def get_tushare_market(market='zxb',renew=False,days=5):
         df = tusharewrite_to_csv(market, filepath , days)
 
     return df
+
+
 
 def get_tdx_dir_blocknew():
     blocknew_path = get_tdx_dir() + r'/T0002/blocknew/'.replace('/', path_sep).replace('\\', path_sep)
@@ -178,7 +180,7 @@ def creation_date_duration(path_to_file):
     dt = os.path.getmtime(path_to_file)
     dtm = datetime.date.fromtimestamp(dt)
     today = datetime.date.today()
-    return today - dtm
+    return (today - dtm).days
 
 def set_ctrl_handler():
     # os.environ['FOR_DISABLE_CONSOLE_CTRL_HANDLER'] = '1'
@@ -516,6 +518,7 @@ def get_url_data(url,retry_count=3,pause=0.05):
     headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.2; rv:16.0) Gecko/20100101 Firefox/16.0',
                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
                'Connection': 'keep-alive'}
+
     for _ in range(retry_count):
         time.sleep(pause)
         try:

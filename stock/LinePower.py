@@ -3,6 +3,7 @@
 import sys
 from JSONData import powerCompute as pct
 from JSONData import LineHistogram as lht
+from JSONData import wencaiData as wcd
 from JohhnsonUtil import commonTips as cct
 
 def parseArgmain():
@@ -29,6 +30,8 @@ def parseArgmain():
                         help='mpl show')
     parser.add_argument('-i', action="store", dest="line", type=str, choices=['y', 'n'], default='y',
                     help='LineHis show')
+    parser.add_argument('-w', action="store", dest="wencai", type=str, choices=['y', 'n'], default='n',
+                    help='WenCai Search')
     return parser
 
 
@@ -52,6 +55,7 @@ if __name__ == "__main__":
     # print get_linear_model_status('999999', filter='y', dl=34, ptype='low', days=1)
     # print get_linear_model_status('399006', filter='y', dl=34, ptype='low', days=1)
     # sys.exit()
+    import re
     if cct.isMac():
         cct.set_console(80, 19)
     else:
@@ -64,7 +68,22 @@ if __name__ == "__main__":
             # log.setLevel(LoggerFactory.DEBUG)
             code = raw_input("code:")
             args = parser.parse_args(code.split())
-            if len(str(args.code)) == 6:
+            # print str(args.code)
+            if not str(args.code) == 'None' and (args.wencai == 'y' or re.match('[ \u4e00 -\u9fa5]+',code) == None):
+                df  = wcd.get_wencai_Market_url(code,5)
+                print df
+                if len(df) == 1:
+                    start = cct.day8_to_day10(args.start)
+                    end = cct.day8_to_day10(args.end)
+                    args.filter = 'y'
+                    for ptype in ['low', 'high']:
+                        op, ra, st, days = pct.get_linear_model_status(args.code,df=None, dtype=args.dtype, start=start, end=end,
+                                                                   days=args.days, ptype=ptype, filter=args.filter,
+                                                                   dl=args.dl)
+                        print "%s op:%s ra:%s days:%s  start:%s" % (args.code, op, str(ra), str(days[0]), st)
+
+
+            elif len(str(args.code)) == 6:
                 if args.start is not None and len(args.start) < 4:
                     args.dl = int(args.start)
                     args.start = None
@@ -119,6 +138,7 @@ if __name__ == "__main__":
                 # print "%0.5f"%(time.time()-ts)
             elif code == 'q':
                 sys.exit(0)
+
             elif code == 'h' or code == 'help':
                 parser.print_help()
             else:
