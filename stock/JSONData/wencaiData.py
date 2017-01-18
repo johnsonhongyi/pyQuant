@@ -94,8 +94,9 @@ def get_wencai_Market_url(filter='国企改革',perpage=1,url=None,):
         cache_root="http://www.iwencai.com/stockpick/cache?token=%s&p=1&perpage=%s&showType="
         cache_ends = "[%22%22,%22%22,%22onTable%22,%22onTable%22,%22onTable%22,%22onTable%22,%22onTable%22,%22onTable%22,%22onTable%22,%22onTable%22]"
         data = cct.get_url_data(url)
-#        if data.find('系统判断您访问次数过多'.en('utf8')) > 0 :
-#            log.error("acces fail")
+        if len(re.findall('系统判断您访问次数过多'.decode('utf8'),data)):
+            log.error("acces deny:%s"%('系统判断您访问次数过多'))
+            return df
         # print data
         # count = re.findall('(\d+)', data, re.S)
         # "token":"dcf3d42bbeeb32718a243a19a616c217"
@@ -231,7 +232,7 @@ def get_codelist_df(codelist):
 #        results = cct.to_mp_run_async(get_wencai_Market_url, cnamelist,30)
 #        for res in results:
 #            wcdf = wcdf.append(res)
-        print ("w:%.2f"%(time.time()-time_s)),
+        print ("Wcai:%.2f"%(time.time()-time_s)),
         # print results
     else:
         cname = ",".join(x.encode('utf8') for x in codelist)
@@ -241,7 +242,7 @@ def get_codelist_df(codelist):
         log.warn("wcdf:%s"%(len(wcdf)))
     return wcdf
 
-def get_wencai_data(codelist,market='wencai'):
+def get_wencai_data(codelist,market='wencai',days=120):
     if isinstance(codelist,list):
         # code_l = []
         # wcd_o = get_write_wencai_market_to_csv(market=market)
@@ -251,8 +252,15 @@ def get_wencai_data(codelist,market='wencai'):
         # if len(code_l) > 0:
         #     wcd_d = get_codelist_df(code_l)
         #     get_write_wencai_market_to_csv(wcd_d,market=market)
+        df = get_write_wencai_market_to_csv(None,market,renew=True,days=days)
+        if len(df) > 0:
+            if  set(codelist) <= set(df.name.values):
+                if 'code' in df.columns:
+                    df = df.set_index('code')
+                    return df
         wcd_d = get_codelist_df(codelist)
-        df = get_write_wencai_market_to_csv(wcd_d,market=market,renew=True,days=60)
+        df = get_write_wencai_market_to_csv(wcd_d,market=market,renew=True,days=days)
+
     else:
         df = get_wencai_Market_url(codelist)
     if 'code' in df.columns:
@@ -285,7 +293,7 @@ def get_write_wencai_market_to_csv(df=None,market='wcbk',renew=False,days=60):
             log.warn("df.columns:%s"%(df.columns))
             return df
 #        log.warn("Wr%s :%s"%(market,len(df)))
-        print ("%s :%s"%(market,len(df)))
+        print ("%s :%s"%(market,len(df))),
         # df.reset_index(inplace=True)
         return df
 
@@ -311,8 +319,8 @@ def get_write_wencai_market_to_csv(df=None,market='wcbk',renew=False,days=60):
             else:
                 df = dfz
             # df = pd.read_csv(filepath,dtype={'code':str})
-            if len(df) == 0:
-                df = wencaiwrite_to_csv(df, filepath)
+#            if len(df) == 0:
+#                df = wencaiwrite_to_csv(df, filepath)
     else:
         df = wencaiwrite_to_csv(df, filepath)
 
@@ -344,7 +352,7 @@ if __name__ == '__main__':
 #    df = get_wencai_Market_url('赢时胜,博腾股份,炬华科技,东土科技,华鹏飞,长亮科技,天银机电,润和软件,苏大维格,晶盛机电,掌趣科技,戴维医疗,邦讯技术,汉鼎宇佑,富春通信,三六五网,南通锻压,华昌达,梅安森,尔康制药,雅本化学,卫宁健康,初灵信息,乐金健康,迪安诊断',500)
 
 
-    df = get_wencai_Market_url('国企改革',10000)
+    df = get_wencai_Market_url('业绩预祝',10000)
 #    df = get_write_wencai_market_to_csv(df,'wcbk')
 
     # df = get_wcbk_df('混改')
@@ -353,8 +361,9 @@ if __name__ == '__main__':
     # df = get_codelist_df(['天龙集团','太阳电缆','杭州解百'])
     # df = get_codelist_df([u'\u7ef4\u5b8f\u80a1\u4efd', u'\u6d77\u987a\u65b0\u6750', u'\u6da6\u6b23\u79d1\u6280', u'\u84dd\u6d77\u534e\u817e', u'\u5149\u529b\u79d1\u6280'])
     # df = df.sort_values(by='percent',ascending=[0]) if len(df) > 0 else df
-    df.percent = df.percent.astype(float)
-    df = df.sort_values(by='percent',ascending=[0])
+    # if 'percent' in df.columns:
+    #     df.percent = df.percent.astype(float)
+#    df = df.sort_values(by='percent',ascending=[0])
 
     print "%s %s"%(type,len(df))
     print "%s "%(df[:5])

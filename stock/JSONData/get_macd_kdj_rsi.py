@@ -200,7 +200,8 @@ def Get_BBANDS(df,dtype='d',days=5):
             operate += 10
         if  cnowp >= openp* 1.04  and openp >= lnowp*ct.changeRatio :
             operate += 5
-        if cnowp > clastp and cnowp > upbbp:
+        # if cnowp > clastp and cnowp > upbbp:
+        if cnowp > clastp and lnowp > upbbp:
             operate += 10
         elif hnowp > upbbp:
             operate += 5

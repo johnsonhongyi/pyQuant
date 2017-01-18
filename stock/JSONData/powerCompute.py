@@ -808,7 +808,7 @@ def get_linear_model_candles(code, ptype='low', dtype='d', start=None, end=None,
     return df
 
 
-def powerCompute_df(df, dtype='d', end=None, dl=None, filter='y',talib=False,newdays=None):
+def powerCompute_df(df, dtype='d', end=None, dl=None, filter='y',talib=False,newdays=None,days=1):
     ts=time.time()
     if isinstance(df, list):
         code_l = df
@@ -848,6 +848,9 @@ def powerCompute_df(df, dtype='d', end=None, dl=None, filter='y',talib=False,new
             tdx_df = tdd.get_tdx_append_now_df_api(code, start=start, end=end, type='f', df=None, dm=dz, dl=dl*2,newdays=newdays)
             # print tdx_df
             tdx_df=tdx_df.fillna(0)
+            if len(df) > days+1 and days != 0:
+                tdx_df = tdx_df.sort_index(ascending=True)
+                tdx_df = tdx_df[:-1-days]
         else:
             df.loc[code, 'op'] = 0
             df.loc[code, 'ra'] = 0
@@ -911,14 +914,14 @@ def powerCompute_df(df, dtype='d', end=None, dl=None, filter='y',talib=False,new
         df.loc[code, 'rsi'] = oprsi
         df.loc[code, 'ma'] = opma
         if len(wcdf[wcdf.index == code]) > 0:
-            df.loc[code,'type'] = wcdf.loc[code,'index']
+            df.loc[code,'category'] = wcdf.loc[code,'category']
         else:
-            df.loc[code,'type'] = 0
+            df.loc[code,'category'] = 0
         df=df.fillna(0)
         # df = getab.Get_BBANDS(df, dtype='d')
         #'volume', 'ratio', 'counts','ldate' -> 'ma','macd','rsi','kdj'
         # df = df.drop_duplicates()
-    print "P:%0.2f"%(time.time()-ts),
+    print "Pc:%0.2f"%(time.time()-ts),
     return df
 
 

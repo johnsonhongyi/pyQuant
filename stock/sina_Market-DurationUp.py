@@ -61,7 +61,8 @@ if __name__ == "__main__":
     # dl=30
     ptype='low'
     # op, ra, duration_date, days = pct.get_linear_model_status('999999', filter='y', dl=dl, ptype=ptype, days=1)
-    duration_date = int(ct.duration_date * 1.5)
+    # duration_date = int(ct.duration_date * 1.5)
+    duration_date = ct.duration_date_l
 #    duration_date = 120
     # duration_date = 300
     du_date = duration_date
@@ -285,7 +286,7 @@ if __name__ == "__main__":
 
                         # top_temp = top_temp.sort_values(by=['op','ra','diff', 'percent', 'ratio'], ascending=[0,0,0, 0, 1])[:10]
                         # top_temp = top_temp.sort_values(by=['op','ldate','ra','diff', 'percent', 'ratio'], ascending=[0,0,0,0, 0, 1])[:10]
-                        if cct.get_now_time_int() > ct.checkfilter_end_timeDu and duration_date > ct.duration_date_sort:
+                        if (cct.get_now_time_int() > ct.checkfilter_end_timeDu and duration_date > ct.duration_date_sort) or duration_date < 6:
                             top_temp = top_temp.sort_values(by=ct.Duration_percent_op,
                                         ascending=ct.Duration_percent_op_key)
                         else:
@@ -326,7 +327,7 @@ if __name__ == "__main__":
             int_time = cct.get_now_time_int()
             if cct.get_work_time():
                 if int_time < 925:
-                    cct.sleep(30)
+                    cct.sleep(ct.sleep_time)
                 elif int_time < 930:
                     cct.sleep((930 - int_time) * 60)
                     # top_all = pd.DataFrame()

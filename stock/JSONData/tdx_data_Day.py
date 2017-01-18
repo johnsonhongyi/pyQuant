@@ -2317,10 +2317,11 @@ def get_append_lastp_to_df(top_all,lastpTDX_DF=None,dl=ct.PowerCountdl,end=None,
     if lastpTDX_DF is None or len(lastpTDX_DF) == 0:
         # tdxdata = get_tdx_all_day_LastDF(codelist) '''only get lastp no powerCompute'''
         tdxdata = get_tdx_exp_all_LastDF_DL(codelist,dt=dl,end=end,ptype=ptype,filter=filter,power=power,lastp=lastp,newdays=newdays)
-        tdxdata.rename(columns={'low': 'llow'}, inplace=True)
+        tdxdata.rename(columns={'close': 'llow'}, inplace=True)
         tdxdata.rename(columns={'open': 'lopen'}, inplace=True)
         tdxdata.rename(columns={'high': 'lhigh'}, inplace=True)
-        tdxdata.rename(columns={'close': 'lastp'}, inplace=True)
+        # tdxdata.rename(columns={'close': 'lastp'}, inplace=True)
+        tdxdata.rename(columns={'low': 'lastp'}, inplace=True)
         tdxdata.rename(columns={'vol': 'lvol'}, inplace=True)
 #        if power:
 #            tdxdata = tdxdata.loc[:, ['llow', 'lhigh', 'lastp', 'lvol', 'date','ra','op','fib','fibl','ma5d','ma10d','ldate']]

@@ -62,10 +62,10 @@ if __name__ == "__main__":
     # log=LoggerFactory.JohnsonLoger('SinaMarket').setLevel(LoggerFactory.DEBUG)
     # log.setLevel(LoggerFactory.DEBUG)
     if cct.isMac():
-        width, height = 152, 16
+        width, height = 158, 16
         cct.set_console(width, height)
     else:
-        width, height = 152, 18
+        width, height = 158, 18
         cct.set_console(width, height)
     status = False
     vol = ct.json_countVol
@@ -275,7 +275,7 @@ if __name__ == "__main__":
             int_time = cct.get_now_time_int()
             if cct.get_work_time():
                 if int_time < 925:
-                    cct.sleep(30)
+                    cct.sleep(ct.sleep_time)
                 elif int_time < 930:
                     cct.sleep((930 - int_time) * 60)
                     top_all = pd.DataFrame()

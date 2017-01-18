@@ -192,7 +192,7 @@ class Sina:
         if index:
             self.index_status = index
             if isinstance(code,str) and code.startswith('999'):
-                code = '000001'   
+                code = '000001'
             self.stock_codes = map(lambda stock_code: (
                 'sh%s' if stock_code.startswith(('0')) else 'sz%s') % stock_code, code.split())
         else:
@@ -295,7 +295,7 @@ class Sina:
                  'a4': float(stock[28]),
                  'a5_v': int(stock[29]),
                  'a5': float(stock[30])})
-#        print list_s    
+#        print list_s
         # df = pd.DataFrame.from_dict(stock_dict,columns=ct.SINA_Total_Columns)
         df = pd.DataFrame(list_s, columns=ct.SINA_Total_Columns)
         # if self.index_status and cct.get_work_time():
@@ -303,7 +303,7 @@ class Sina:
         # if cct.get_work_time() or (cct.get_now_time_int() > 915) :
         # df = df.drop('close', axis=1)
         df.rename(columns={'close': 'llastp'}, inplace=True)
-        if (cct.get_now_time_int() > 915 and cct.get_now_time_int() < 926):
+        if (cct.get_now_time_int() > 915 and cct.get_now_time_int() < 931):
 #            df.rename(columns={'buy': 'close'}, inplace=True)
             df['close']=df['buy']
             df['low']=df['buy']

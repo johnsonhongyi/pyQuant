@@ -41,14 +41,15 @@ end tell
 #                'sina_Monitor.py': '85, 27',
 #                'singleAnalyseUtil.py': '583, 23',
 #                'LinePower.py':'767, 527',}
-positionKey = {'sina_Market-DurationDn.py': '265, 409',
+positionKey = {'sina_Market-DurationDn.py': '274, 441',
                'sina_Market-DurationUp.py': '-17, 470',
+               'sina_Market-DurationCXDN': '27, 122',
                'sina_Market-DurationSH.py': '148, 560',
                'sina_Monitor-Market-New.py': '-2, 371',
-               'sina_Monitor-Market-LH.py': '316, 282',
+               'sina_Monitor-Market-LH.py': '334, 191',
                'sina_Monitor-Market.py': '19, 179',
                'sina_Monitor-GOLD.py': '-15, 194',
-               'sina_Monitor.py': '19, 22',
+               'sina_Monitor.py': '69, 22',
                'singleAnalyseUtil.py': '583, 23',
                'LinePower.py':'44, 556',}
 
@@ -141,6 +142,8 @@ def setPosition(cmd=None, position=None):
 # count = doScript(scriptcount        
 # os.system(cmdRun)
 print getPosition('sina_Market-DurationDn.py')
+print getPosition('sina_Market-DurationCXDN.py')
+print getPosition('sina_Market-DurationCXUP.py')
 print getPosition('sina_Market-DurationSH.py')
 print getPosition('sina_Monitor-Market-LH.py')
 print getPosition('sina_Market-DurationUp.py')

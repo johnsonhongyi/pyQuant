@@ -128,7 +128,7 @@ def get_tushare_market(market='zxb',renew=False,days=5):
         else:
             log.warn("get error")
         df.to_csv(filename,encoding='gbk')
-        log.warn("update %s :%s"%(market,len(df)))
+        log.warn("update %s :%s"%(market,len(df))),
         df.reset_index(inplace=True)
         return df
 
@@ -514,7 +514,7 @@ def get_url_data_R(url):
 
 
 def get_url_data(url,retry_count=3,pause=0.05):
-    # headers = {'User-Agent':'Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.6) Gecko/20091201 Firefox/3.5.6'}
+#    headers = {'User-Agent':'Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.6) Gecko/20091201 Firefox/3.5.6'}
     headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.2; rv:16.0) Gecko/20100101 Firefox/16.0',
                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
                'Connection': 'keep-alive'}
