@@ -185,21 +185,35 @@ class Sina:
     #     return self.format_response_data()
 
     def get_stock_code_data(self, code, index=False):
-        self.stock_codes = code
+        code_t =  code.split(',')
+        if len(code_t) > 1:
+            code = code_t
+#        self.stock_codes = code
         # self.stock_with_exchange_list = list(
         #     map(lambda stock_code: ('sh%s' if stock_code.startswith(('5', '6', '9')) else 'sz%s') % stock_code,
         #         ulist))
         if index:
             self.index_status = index
-            if isinstance(code,str) and code.startswith('999'):
-                code = '000001'
-            self.stock_codes = map(lambda stock_code: (
-                'sh%s' if stock_code.startswith(('0')) else 'sz%s') % stock_code, code.split())
+            if isinstance(code, list):
+                code_l =[]
+                for x in code:
+                    if x.startswith('999'):
+                        code_l.append(str(1000000-int(x)).zfill(6))
+                    else:
+                        code_l.append(x)
+                self.stock_codes = map(lambda stock_code: (
+                'sh%s' if stock_code.startswith(('0')) else 'sz%s') % stock_code, code_l)
+
+            else:
+                if isinstance(code,str) and code.startswith('999'):
+                    code = '000001'
+                self.stock_codes = map(lambda stock_code: (
+                    'sh%s' if stock_code.startswith(('0')) else 'sz%s') % stock_code, code.split())
         else:
             self.stock_codes = map(lambda stock_code: ('sh%s' if stock_code.startswith(
                 ('5', '6', '9')) else 'sz%s') % stock_code, code.split())
         self.url = self.sina_stock_api + ','.join(self.stock_codes)
-        log.info("stock_list:%s" % self.url)
+        log.info("stock_list:%s" % self.url[:20])
         response = requests.get(self.url)
         self.stock_data.append(response.text)
         self.dataframe = self.format_response_data()
@@ -238,7 +252,7 @@ class Sina:
             self.stock_codes = map(lambda stock_code: ('sh%s' if stock_code.startswith(
                 ('5', '6', '9')) else 'sz%s') % stock_code, ulist)
             self.url = self.sina_stock_api + ','.join(self.stock_codes)
-            log.info("stock_list:%s" % self.url)
+            log.info("stock_list:%s" % self.url[:30])
             response = requests.get(self.url)
             self.stock_data.append(response.text)
             self.dataframe = self.format_response_data()
@@ -342,7 +356,8 @@ if __name__ == "__main__":
     # code='601198'
     # df = sina.get_stock_list_data(['300134', '601998', '999999']).set_index('code')
     # df = sina.get_stock_code_data('000001',index=True).set_index('code')
-    print sina.get_stock_code_data('399006',index=True).turnover
+#    print sina.get_stock_code_data('399006,999999',index=True)
+    print sina.get_stock_code_data('999999',index=True)
     df = sina.get_stock_list_data(['600845', '300376']).set_index('code')
     # df = sina.get_stock_code_data('002775',index=False).set_index('code')
     print len(df),df[:1]

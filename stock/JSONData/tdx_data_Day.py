@@ -1480,6 +1480,7 @@ def getSinaAlldf(market='cyb',vol=ct.json_countVol,type=ct.json_countType):
     dm = sina_data.Sina().get_stock_list_data(codelist)
     # if cct.get_work_time() or (cct.get_now_time_int() > 915) :
     dm['percent'] = map(lambda x,y: round((x-y)/y*100, 1), dm.close.values,dm.llastp.values)
+    log.info("dm percent:%s"%(dm[:1]))
     # dm['volume'] = map(lambda x: round(x / 100, 1), dm.volume.values)
     dm['trade'] = dm['close']
     if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 925:
@@ -2640,8 +2641,8 @@ if __name__ == '__main__':
 
     # write_to_all()
 #    print get_tdx_append_now_df_api('600760')[:3]
-    print get_tdx_append_now_df_api('000411')[:3]
-
+    # print get_tdx_append_now_df_api('000411')[:3]
+    print get_tdx_Exp_day_to_df('300311',dl=2)[:2]
 
     # print get_tdx_append_now_df_api_tofile('300583')
     # sys.exit(0)
@@ -2694,7 +2695,7 @@ if __name__ == '__main__':
     sys.exit(0)
     # print get_duration_price_date('999999',ptype='high',dt='2015-01-01')
     # print get_duration_price_date('999999',ptype='low',dt='2015-01-01')
-    # df = get_tdx_Exp_day_to_df('999999')
+    # df = get_tdx_Exp_day_to_df('300311')
     # print get_tdx_stock_period_to_type(df)
     # print get_sina_data_df(['601998','000503'])
     df=get_tdx_power_now_df('000001', start='20160329',end='20160401', type='f', df=None, dm=None)

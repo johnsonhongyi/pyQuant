@@ -8,6 +8,7 @@ import JohhnsonUtil.commonTips as cct
 import JohhnsonUtil.johnson_cons as ct
 import JohhnsonUtil.LoggerFactory as LoggerFactory
 import tdx_data_Day as tdd
+from sina_data import *
 log = LoggerFactory.getLogger("FundFlow")
 # log.setLevel(LoggerFactory.INFO)
 # log.setLevel(LoggerFactory.DEBUG)
@@ -160,39 +161,81 @@ def get_dfcfw_fund_HGT(url=ct.DFCFW_FUND_FLOW_HGT):
 
 
 def get_dfcfw_fund_SHSZ(url=ct.DFCFW_ZS_SHSZ):
-    data = cct.get_url_data_R(url)
-    log.info("url:%s"%(url))
-    # vollist=re.findall('{data:(\d+)',code)
-    vol_l = re.findall('\"([\d\D]+?)\"', data)
-    dd = {}
-    # print vol_l
-    # print len(vol_l)
-    if len(vol_l) == 2:
-        # for x in range(len(vol_l):
-        data = vol_l[0].split(',')
-        data2 = vol_l[1].split(',')
-        # print data[3],data2[3],len(data[3]),len(data2[3])
-        if len(data[3]) > 2 and len(data2[3]) > 2 :
-            dd['svol'] = round(float(data[3]) / 100000000, 1)
-            dd['zvol'] = round(float(data2[3]) / 100000000, 1)
-        else:
-            dd['svol'] = data[3]
-            dd['zvol'] = data2[3]
-            # print data[3],data2[3]
-        dd['scent'] = data[5]
-        dd['sup'] = data[6].split('|')[0]
-        dd['zcent'] = data2[5]
-        dd['zup'] = data2[7].split('|')[0]
-        df = get_zs_VolRatio()
-        if len(df['amount']) > 0:
-            radio_t = cct.get_work_time_ratio()
-            # print radio_t
-            # print df.loc['999999','amount']
-            # print type(dd['svol'])
-            log.debug("type:%s radio_t:%s" % (type(dd['svol']), radio_t))
-            if isinstance(dd['svol'], str) and dd['svol'].find('-') == 0:
-                log.info("svol:%s" % dd['svol'])
+#    sina = Sina()
+    dd = Sina().get_stock_code_data('999999,399001',index=True).set_index('code')
+    sh =  dd[dd.index == '000001']
+    sz = dd[dd.index == '399001']   
+    if len(sh) == 0 or len(sz) == 0:
+        data = cct.get_url_data_R(url)
+        log.info("url:%s"%(url))
+        # vollist=re.findall('{data:(\d+)',code)
+        vol_l = re.findall('\"([\d\D]+?)\"', data)
+        dd = {}
+        # print vol_l
+        # print len(vol_l)
+        if len(vol_l) == 2:
+            # for x in range(len(vol_l):
+            data = vol_l[0].split(',')
+            data2 = vol_l[1].split(',')
+            # print data[3],data2[3],len(data[3]),len(data2[3])
+            if len(data[3]) > 2 and len(data2[3]) > 2 :
+                dd['svol'] = round(float(data[3]) / 100000000, 1)
+                dd['zvol'] = round(float(data2[3]) / 100000000, 1)
             else:
+                dd['svol'] = data[3]
+                dd['zvol'] = data2[3]
+                # print data[3],data2[3]
+            dd['scent'] = data[5]
+            dd['sup'] = data[6].split('|')[0]
+            dd['zcent'] = data2[5]
+            dd['zup'] = data2[7].split('|')[0]
+            df = get_zs_VolRatio()
+            if len(df['amount']) > 0:
+                radio_t = cct.get_work_time_ratio()
+                # print radio_t
+                # print df.loc['999999','amount']
+                # print type(dd['svol'])
+                log.debug("type:%s radio_t:%s" % (type(dd['svol']), radio_t))
+                if isinstance(dd['svol'], str) and dd['svol'].find('-') == 0:
+                    log.info("svol:%s" % dd['svol'])
+                else:
+                    svol_r = round(
+                        dd['svol'] / (df.loc['999999', 'amount'] / 10000000) / radio_t, 1)
+                    svol_v = round(
+                        svol_r * (df.loc['999999', 'amount'] / 10000000), 1)
+                    zvol_r = round(
+                        dd['zvol'] / (df.loc['399001', 'amount'] / 10000000) / radio_t, 1)
+                    zvol_v = round(
+                        svol_r * (df.loc['399001', 'amount'] / 10000000), 1)
+                    dd['svol'] = "%s-%s-%s" % ((dd['svol'], svol_v, svol_r))
+                    dd['zvol'] = "%s-%s-%s" % ((dd['zvol'], zvol_v, zvol_r))
+            # dd['zzb']=data[1]
+            # dd['sjlr']=data[2]
+            # dd['sjzb']=data[3]
+            # dd['time']=vol_l[1]
+
+        else:
+            log.info("Fund_f NO Url:%s" % url)
+    else:
+        dd = {}
+        # print vol_l
+        # print len(vol_l)
+        #var C1Cache={quotation:["0000011,上证指数,3113.18,121762623488,4.41,0.14%,463|197|656|143,536|280|1187|217","3990012,
+        #深证成指,9816.71,145863270400,-10.08,-0.10%,463|197|656|143,536|280|1187|217"]}
+        if len(sh) == 1 and len(sz) == 1:
+            dd['svol'] = round(float(sh.turnover) / 100000000, 1)
+            dd['zvol'] = round(float(sz.turnover) / 100000000, 1)
+                # print data[3],data2[3]
+            dd['scent'] = str(round((sh.close[0] - sh.llastp[0]) / sh.llastp[0] *100,2))+'%'
+            dd['sup'] = round((sh.close[0] - sh.llastp[0]),2)
+            dd['zcent'] = str(round((sz.close[0] - sz.llastp[0]) / sz.llastp[0] *100,2))+ '%'
+            dd['zup'] = round((sz.close[0] - sz.llastp[0]),2)
+            df = get_zs_VolRatio()
+            if len(df['amount']) > 0:
+                radio_t = cct.get_work_time_ratio()
+                # print radio_t
+                # print df.loc['999999','amount']
+                # print type(dd['svol'])
                 svol_r = round(
                     dd['svol'] / (df.loc['999999', 'amount'] / 10000000) / radio_t, 1)
                 svol_v = round(
@@ -203,13 +246,6 @@ def get_dfcfw_fund_SHSZ(url=ct.DFCFW_ZS_SHSZ):
                     svol_r * (df.loc['399001', 'amount'] / 10000000), 1)
                 dd['svol'] = "%s-%s-%s" % ((dd['svol'], svol_v, svol_r))
                 dd['zvol'] = "%s-%s-%s" % ((dd['zvol'], zvol_v, zvol_r))
-        # dd['zzb']=data[1]
-        # dd['sjlr']=data[2]
-        # dd['sjzb']=data[3]
-        # dd['time']=vol_l[1]
-
-    else:
-        log.info("Fund_f NO Url:%s" % url)
     return dd
 
 
@@ -401,6 +437,7 @@ if __name__ == "__main__":
     # print ff
     #
     # pp=get_dfcfw_fund_HGT(ct.DFCFW_FUND_FLOW_HGT)
+    print get_dfcfw_fund_SHSZ()
     # for x in pp.keys():
     # print pp[x]
     #get_dfcfw_fund_HGT

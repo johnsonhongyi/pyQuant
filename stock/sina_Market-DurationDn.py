@@ -7,8 +7,8 @@ import re
 import sys
 import time
 
+import traceback
 import pandas as pd
-
 import JohhnsonUtil.johnson_cons as ct
 import singleAnalyseUtil as sl
 from JSONData import powerCompute as pct
@@ -62,8 +62,8 @@ if __name__ == "__main__":
     # dl=60
     ptype='high'
     # op, ra, duration_date, days = pct.get_linear_model_status('999999', filter='y', dl=dl, ptype=ptype, days=1)
-    duration_date = ct.duration_date
-    # duration_date = ct.duration_date_l
+#    duration_date = ct.duration_date
+    duration_date = ct.duration_date_l
     du_date = duration_date
     # print cct.last_tddate(2)
     end_date = cct.last_tddate(days=4)
@@ -159,7 +159,7 @@ if __name__ == "__main__":
                     top_dif['buy'] = (
                         map(lambda x, y: y if int(x) == 0 else x, top_dif['buy'].values, top_dif['trade'].values))
                 if ct.checkfilter and  cct.get_now_time_int() > 915 and cct.get_now_time_int() < ct.checkfilter_end_timeDu:
-                    top_dif = top_dif[top_dif.buy >= top_dif.llastp * ct.changeRatio]      
+                    top_dif = top_dif[top_dif.buy >= top_dif.llastp * ct.changeRatio]
                     top_dif = top_dif[top_dif.buy >= top_dif.lhigh * ct.changeRatio]
 
                 if cct.get_now_time_int() > 915 and cct.get_now_time_int() <= 925:
@@ -167,7 +167,7 @@ if __name__ == "__main__":
 
                 if cct.get_now_time_int() > 915:
                     top_dif = top_dif[top_dif.buy > 0]
-                    
+
                 top_dif['diff'] = (
                     map(lambda x, y: round((x - y) / y * 100, 1), top_dif['buy'].values, top_dif['lastp'].values))
                 # print top_dif.loc['600610',:]
@@ -190,7 +190,7 @@ if __name__ == "__main__":
                 # if filter == 'y':
                 #     top_dif = top_dif[top_dif.date >= cct.day8_to_day10(duration_date)]
                     # log.info('dif1-filter:%s' % len(top_dif))
-                
+
                 # print top_dif.loc['600533',:]
                 # log.info(top_dif[:1])
                 # top_dif = top_dif[top_dif.buy > top_dif.llastp]
@@ -199,7 +199,7 @@ if __name__ == "__main__":
                 # top_dif['volume'] = top_dif['volume'].apply(lambda x: round(x / radio_t, 1))
                 # log.debug("top_diff:vol")
                 # top_dif = top_dif[top_dif.volume > 1]
-                
+
 
                 if len(top_dif) == 0:
                     print "No G,DataFrame is Empty!!!!!!"
@@ -281,13 +281,13 @@ if __name__ == "__main__":
 
                         # top_temp = top_temp.sort_values(by=['diff', 'op', 'ra', 'percent', 'ratio'],
                         #                                 ascending=[0, 0, 0, 0, 1])[:10]
-                                                        
+
                         # top_temp = top_temp.sort_values(by=['op', 'ra', 'diff', 'percent', 'ratio'],
                         #                                 ascending=[0, 0, 0, 0, 1])[:10]
-                        # top_temp = top_temp.sort_values(by=['op','ldate','ra','diff', 'percent', 'ratio'], ascending=[0,0,0,0, 0, 1])[:10]                
-                    
+                        # top_temp = top_temp.sort_values(by=['op','ldate','ra','diff', 'percent', 'ratio'], ascending=[0,0,0,0, 0, 1])[:10]
+
                         # if cct.get_now_time_int() > 945 and int(duration_date * 1.5)  > ct.duration_date_sort:
-                        if cct.get_now_time_int() > ct.checkfilter_end_time and (duration_date > ct.duration_date_sort or duration_date < 6):
+                        if cct.get_now_time_int() > ct.checkfilter_end_timeDu and (int(duration_date) > int(ct.duration_date_sort) or int(duration_date) < 6):
                             top_temp = top_temp.sort_values(by=ct.Duration_percent_op,
                                         ascending=ct.Duration_percent_op_key)
                         else:
@@ -458,8 +458,8 @@ if __name__ == "__main__":
             else:
                 sys.exit(0)
         except (IOError, EOFError, Exception) as e:
-            print "Error", e
-            #traceback.print_exc()
+#            print "Error", e
+            traceback.print_exc()
             cct.sleeprandom(120)
 
 '''

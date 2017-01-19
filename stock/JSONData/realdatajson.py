@@ -486,7 +486,7 @@ def get_sina_dd_count_price_realTime(df='',mtype='all',vol='0',type='0'):
             dm=dm.set_index('code')
             dm=dm.dropna('index')
             log.info("dm.market2:%s" % dm[:1])
-            dm.loc[dm.percent>9.9,'percent']=10
+            # dm.loc[dm.percent>9.9,'percent']=10
             # print dm[-1:]
             dm=dm.loc[:,ct.SINA_DD_Clean_Count_Columns]
             dm.prev_price=dm.prev_price.fillna(0.0)
@@ -615,13 +615,15 @@ def get_market_price_sina_dd_realTime(dp='',vol='0',type='0'):
         # dp['volume']=dp['volume'].apply(lambda x:round(x/100,1))
         # dp=dp.loc[:,'trade':].astype(float)
         log.info("DP:%s" % dp[:1])
-        if len(dp[:10][dp[:10]['buy'] > 0]) > 2 and len(dp[:10][dp[:10]['percent'] == 0]) > 2:
-            if 'close' in dp.columns:
-                if len(dp[:5][dp[:5]['close'] > 0]) > 2:
-                    dp['percent'] = (map(lambda x, y: round((x - y) / y * 100, 1), dp['buy'].values, dp['close'].values))
-                    log.info("DP-1-percent==0:%s" % dp[:1].percent)
 
-        dp.loc[dp.percent>9.9,'percent']=10
+        # if len(dp[:10][dp[:10]['buy'] > 0]) > 2 and len(dp[:10][dp[:10]['percent'] == 0]) > 2:
+        #     if 'close' in dp.columns:
+        #         if len(dp[:5][dp[:5]['close'] > 0]) > 2:
+        #             dp['percent'] = (map(lambda x, y: round((x - y) / y * 100, 1), dp['buy'].values, dp['close'].values))
+        #             log.info("DP-1-percent==0:%s" % dp[:1].percent)
+
+        # dp.loc[dp.percent>9.9,'percent']=10
+        
         dp['diff']=0
         df=get_sina_all_json_dd(vol,type)
         if len(df)>10:

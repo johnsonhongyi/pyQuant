@@ -242,8 +242,9 @@ def get_codelist_df(codelist):
         log.warn("wcdf:%s"%(len(wcdf)))
     return wcdf
 
-def get_wencai_data(codelist,market='wencai',days=120):
-    if isinstance(codelist,list):
+def get_wencai_data(dm,market='wencai',days=120):
+#    if isinstance(codelist,list):
+    if len(dm) > 1:
         # code_l = []
         # wcd_o = get_write_wencai_market_to_csv(market=market)
         # for co in codelist:
@@ -254,15 +255,20 @@ def get_wencai_data(codelist,market='wencai',days=120):
         #     get_write_wencai_market_to_csv(wcd_d,market=market)
         df = get_write_wencai_market_to_csv(None,market,renew=True,days=days)
         if len(df) > 0:
-            if  set(codelist) <= set(df.name.values):
+#            if  set(codelist) <= set(df.name.values):
+            if  set(dm.index) <= set(df.code.values) :
                 if 'code' in df.columns:
                     df = df.set_index('code')
                     return df
-        wcd_d = get_codelist_df(codelist)
+            else:
+                for x in dm.index:
+                    if not x in df.code.values:
+                        print x,dm[x],
+        wcd_d = get_codelist_df(dm.tolist())
         df = get_write_wencai_market_to_csv(wcd_d,market=market,renew=True,days=days)
 
     else:
-        df = get_wencai_Market_url(codelist)
+        df = get_wencai_Market_url(dm.name)
     if 'code' in df.columns:
         df = df.set_index('code')
     return df
@@ -305,7 +311,8 @@ def get_write_wencai_market_to_csv(df=None,market='wcbk',renew=False,days=60):
         else:
             dfz = pd.read_csv(filepath,dtype={'code':str},encoding = 'gbk')
             if isinstance(df,pd.DataFrame) and len(df) > 0 and len(dfz) != len(df):
-                if 'category' in df.columns and str(df[:1].category.values).find(';') > 0:
+#                if 'category' in df.columns and str(df[:1].category.values).find(';') > 0:
+                if 'category' in df.columns and (str(df[:1].category.values).find(';') > 0 or len((df[:1].category.values) == 0 )):
                     dd = pd.DataFrame()
                     for code in df.code.values:
                         if not code in dfz.code.values:

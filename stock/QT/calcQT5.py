@@ -83,7 +83,11 @@ class Example(QtWidgets.QWidget):
         self.operator = '' # +,-,*,/
         self.numberType = 'int' # int与float两种，如果输入了小数点则为实数
 
+#qApp = QtGui.QApplication.instance()
+#if qApp is None:
+#        qApp = QtGui.QApplication(sys.argv)
 app = QtWidgets.QApplication(sys.argv)
+#app = QtWidgets.QApplication.instance()
 ex = Example()
 ex.show()
 sys.exit(app.exec_())

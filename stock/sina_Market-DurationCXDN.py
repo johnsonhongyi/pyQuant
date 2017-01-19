@@ -39,7 +39,7 @@ if __name__ == "__main__":
     # log.level = log.debug
     # error_handler = SyslogHandler('Sina-M-Log', level='ERROR')
 
-    width, height = 158, 21
+    width, height = 163, 21
     def set_duration_console(duration_date):
         if cct.isMac():
             cct.set_console(width, height)
@@ -288,7 +288,8 @@ if __name__ == "__main__":
                         #                                 ascending=[0, 0, 0, 0, 1])[:10]
                         # top_temp = top_temp.sort_values(by=['op','ldate','ra','diff', 'percent', 'ratio'], ascending=[0,0,0,0, 0, 1])[:10]                
                     
-                        if duration_date > ct.duration_date_sort:
+                        # if duration_date > ct.duration_date_sort:
+                        if (cct.get_now_time_int() > ct.checkfilter_end_timeDu and int(duration_date) > int(ct.duration_date_sort)) or int(duration_date) < 6:
                             top_temp = top_temp.sort_values(by=ct.Duration_percent_op,
                                         ascending=ct.Duration_percent_op_key)
                         else:
@@ -296,8 +297,7 @@ if __name__ == "__main__":
                                         ascending=ct.Duration_percentdn_op_key)
 
 
-                    # if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935:
-                    if (cct.get_now_time_int() > ct.checkfilter_end_timeDu and duration_date > ct.duration_date_sort) or duration_date < 6:
+                    if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935:
                         # top_temp = top_temp[top_temp['buy'] > top_temp['ma10d']]
                         # top_temp = top_temp[top_temp['ma5d'] > top_temp['ma10d']][:10]
                         # top_temp = top_temp[ (top_temp['ma5d'] > top_temp['ma10d']) & (top_temp['buy'] > top_temp['ma10d']) ][:10]
