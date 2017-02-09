@@ -292,9 +292,9 @@ def get_write_wencai_market_to_csv(df=None,market='wcbk',renew=False,days=60):
             df.drop_duplicates('code',inplace=True)
             df = df.set_index('code')
             if not renew and os.path.exists(filepath) :
-                df.to_csv(filename,mode='a',encoding='gbk', header=False)
+                df.to_csv(filename,mode='a',encoding='utf8', header=False)
             else:
-                df.to_csv(filename,mode='w',encoding='gbk')
+                df.to_csv(filename,mode='w',encoding='utf8')
         else:
             log.warn("df.columns:%s"%(df.columns))
             return df
@@ -309,7 +309,7 @@ def get_write_wencai_market_to_csv(df=None,market='wcbk',renew=False,days=60):
         if isinstance(df,pd.DataFrame) and renew and cct.creation_date_duration(filepath) > days :
             df = wencaiwrite_to_csv(df,filepath,renew)
         else:
-            dfz = pd.read_csv(filepath,dtype={'code':str},encoding = 'gbk')
+            dfz = pd.read_csv(filepath,dtype={'code':str},encoding = 'utf8')
             if isinstance(df,pd.DataFrame) and len(df) > 0 and len(dfz) != len(df):
 #                if 'category' in df.columns and str(df[:1].category.values).find(';') > 0:
                 if 'category' in df.columns and (str(df[:1].category.values).find(';') > 0 or len((df[:1].category.values) == 0 )):
@@ -319,7 +319,7 @@ def get_write_wencai_market_to_csv(df=None,market='wcbk',renew=False,days=60):
                             dd = dd.append(df[df.code == code])
                     if len(dd) > 0:
                         wencaiwrite_to_csv(dd, filepath)
-                        df = pd.read_csv(filepath,dtype={'code':str},encoding = 'gbk')
+                        df = pd.read_csv(filepath,dtype={'code':str},encoding = 'utf8')
                     else:
                         df = dfz
 
@@ -333,9 +333,9 @@ def get_write_wencai_market_to_csv(df=None,market='wcbk',renew=False,days=60):
 
     return df
 
-def get_wcbk_df(filter='混改',market='mnbk',perpage=1000,days=5):
+def get_wcbk_df(filter='混改',market='nybk',perpage=1000,days=60):
     fpath = get_wencai_filepath(market)
-    if os.path.exists(fpath) and cct.creation_date_duration(fpath) == 0 :
+    if os.path.exists(fpath) and os.path.getsize(fpath) > 200 and cct.creation_date_duration(fpath) == 0 :
         df = get_write_wencai_market_to_csv(None,market,renew=True,days=days)
     else:
         df = get_wencai_Market_url(filter.decode('utf8'),perpage)
@@ -358,8 +358,10 @@ if __name__ == '__main__':
 #    type='国企改革'
 #    df = get_wencai_Market_url('赢时胜,博腾股份,炬华科技,东土科技,华鹏飞,长亮科技,天银机电,润和软件,苏大维格,晶盛机电,掌趣科技,戴维医疗,邦讯技术,汉鼎宇佑,富春通信,三六五网,南通锻压,华昌达,梅安森,尔康制药,雅本化学,卫宁健康,初灵信息,乐金健康,迪安诊断',500)
 
-
-    df = get_wencai_Market_url('业绩预祝',10000)
+    df =  get_wcbk_df(filter='城建+一带一路',market='ydyl')
+#    df =  get_wcbk_df(filter='混改',market='wencai')
+    print df.shape,df[:5]
+    # df = get_wencai_Market_url('农业',10000)
 #    df = get_write_wencai_market_to_csv(df,'wcbk')
 
     # df = get_wcbk_df('混改')

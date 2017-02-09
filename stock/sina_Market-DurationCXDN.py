@@ -93,7 +93,8 @@ if __name__ == "__main__":
             # top_now.to_hdf("testhdf5", 'marketDD', format='table', complevel=9)
             '''
             # top_now = tdd.getSinaAlldf(market='cx', vol=ct.json_countVol, type=ct.json_countType)
-            top_now = tdd.getSinaAlldf(market='混改', vol=ct.json_countVol, type=ct.json_countType)
+            # top_now = tdd.getSinaAlldf(market='农业',filename='nybk', vol=ct.json_countVol, type=ct.json_countType)
+            top_now = tdd.getSinaAlldf(market=u'一带一路',filename='ydyl', vol=ct.json_countVol, type=ct.json_countType)
             now_count = len(top_now)
             radio_t = cct.get_work_time_ratio()
             # top_now = top_now[top_now.buy > 0]
@@ -161,7 +162,7 @@ if __name__ == "__main__":
                     top_dif['buy'] = (
                         map(lambda x, y: y if int(x) == 0 else x, top_dif['buy'].values, top_dif['trade'].values))
                 if ct.checkfilter and  cct.get_now_time_int() > 915 and cct.get_now_time_int() < ct.checkfilter_end_timeDu:
-                    top_dif = top_dif[top_dif.buy >= top_dif.llastp * ct.changeRatio]      
+                    top_dif = top_dif[top_dif.buy >= top_dif.llastp * ct.changeRatio]
                     top_dif = top_dif[top_dif.buy >= top_dif.lhigh * ct.changeRatio]
 
                 if cct.get_now_time_int() > 915 and cct.get_now_time_int() <= 925:
@@ -169,7 +170,7 @@ if __name__ == "__main__":
 
                 if cct.get_now_time_int() > 915:
                     top_dif = top_dif[top_dif.buy > 0]
-                    
+
                 top_dif['diff'] = (
                     map(lambda x, y: round((x - y) / y * 100, 1), top_dif['buy'].values, top_dif['lastp'].values))
                 # print top_dif.loc['600610',:]
@@ -192,7 +193,7 @@ if __name__ == "__main__":
                 # if filter == 'y':
                 #     top_dif = top_dif[top_dif.date >= cct.day8_to_day10(duration_date)]
                     # log.info('dif1-filter:%s' % len(top_dif))
-                
+
                 # print top_dif.loc['600533',:]
                 # log.info(top_dif[:1])
                 # top_dif = top_dif[top_dif.buy > top_dif.llastp]
@@ -201,7 +202,7 @@ if __name__ == "__main__":
                 # top_dif['volume'] = top_dif['volume'].apply(lambda x: round(x / radio_t, 1))
                 # log.debug("top_diff:vol")
                 # top_dif = top_dif[top_dif.volume > 1]
-                
+
 
                 if len(top_dif) == 0:
                     print "No G,DataFrame is Empty!!!!!!"
@@ -283,13 +284,15 @@ if __name__ == "__main__":
 
                         # top_temp = top_temp.sort_values(by=['diff', 'op', 'ra', 'percent', 'ratio'],
                         #                                 ascending=[0, 0, 0, 0, 1])[:10]
-                                                        
+
                         # top_temp = top_temp.sort_values(by=['op', 'ra', 'diff', 'percent', 'ratio'],
                         #                                 ascending=[0, 0, 0, 0, 1])[:10]
-                        # top_temp = top_temp.sort_values(by=['op','ldate','ra','diff', 'percent', 'ratio'], ascending=[0,0,0,0, 0, 1])[:10]                
-                    
+                        # top_temp = top_temp.sort_values(by=['op','ldate','ra','diff', 'percent', 'ratio'], ascending=[0,0,0,0, 0, 1])[:10]
+
                         # if duration_date > ct.duration_date_sort:
-                        if (cct.get_now_time_int() > ct.checkfilter_end_timeDu and int(duration_date) > int(ct.duration_date_sort)) or int(duration_date) < 6:
+
+                        # if (cct.get_now_time_int() > ct.checkfilter_end_timeDu and int(duration_date) > int(ct.duration_date_sort)) or int(duration_date) < 6:
+                        if cct.get_now_time_int() > ct.checkfilter_end_timeDu and (int(duration_date) > int(ct.duration_date_sort) or int(duration_date) < 6):
                             top_temp = top_temp.sort_values(by=ct.Duration_percent_op,
                                         ascending=ct.Duration_percent_op_key)
                         else:

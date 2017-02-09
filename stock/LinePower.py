@@ -70,8 +70,8 @@ if __name__ == "__main__":
             args = parser.parse_args(code.split())
             # print str(args.code)
             if not str(args.code) == 'None' and (args.wencai == 'y' or re.match('[ \u4e00 -\u9fa5]+',code) == None):
-                df  = wcd.get_wencai_Market_url(code,5)
-                print df
+                df  = wcd.get_wencai_Market_url(code,200)
+                print df.shape,df[:8]
                 if len(df) == 1:
                     start = cct.day8_to_day10(args.start)
                     end = cct.day8_to_day10(args.end)

@@ -311,11 +311,13 @@ if __name__ == "__main__":
             else:
                 sys.exit(0)
         except (IOError, EOFError) as e:
-            print "Error", e
+            print "IOError,EOFError", e
             cct.sleeprandom(120)
             # traceback.print_exc()
             # raw_input("Except")
-
+        except Exception as e:
+            print "other Error", e
+            cct.sleeprandom(120)
             # sl.get_code_search_loop()
             # print data.describe()
             # while 1:

@@ -43,7 +43,7 @@ end tell
 #                'LinePower.py':'767, 527',}
 positionKey = {'sina_Market-DurationDn.py': '274, 441',
                'sina_Market-DurationUp.py': '-17, 470',
-               'sina_Market-DurationCXDN': '27, 122',
+               'sina_Market-DurationCXDN': '23, 116',
                'sina_Market-DurationSH.py': '148, 560',
                'sina_Monitor-Market-New.py': '-2, 371',
                'sina_Monitor-Market-LH.py': '334, 191',
@@ -61,6 +61,8 @@ sleep 0.3;osascript -e 'tell application "Python Launcher" to quit';sleep 16;
 open sina_Monitor-GOLD.py;
 sleep 0.3;osascript -e 'tell application "Python Launcher" to quit';sleep 16;
 open sina_Monitor-Market-LH.py;
+sleep 0.3;osascript -e 'tell application "Python Launcher" to quit';sleep 16;
+open sina_Market-DurationCXDN.py;
 sleep 0.3;osascript -e 'tell application "Python Launcher" to quit';sleep 16;
 open sina_Market-DurationUp.py;
 sleep 0.3;osascript -e 'tell application "Python Launcher" to quit';sleep 16;

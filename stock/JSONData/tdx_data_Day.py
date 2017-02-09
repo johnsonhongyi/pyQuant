@@ -1436,7 +1436,7 @@ def getSinaJsondf(market='cyb',vol=ct.json_countVol,type=ct.json_countType):
     top_now = rl.get_market_price_sina_dd_realTime(df, vol, type)
     return top_now
 
-def getSinaAlldf(market='cyb',vol=ct.json_countVol,type=ct.json_countType):
+def getSinaAlldf(market='cyb',vol=ct.json_countVol,type=ct.json_countType,filename='mnbk'):
 
     if market == 'rzrq':
         df = cct.get_rzrq_code()
@@ -1455,7 +1455,7 @@ def getSinaAlldf(market='cyb',vol=ct.json_countVol,type=ct.json_countType):
     elif market in ['sh','sz','cyb','all']:
         df = rl.get_sina_Market_json(market)
     else:
-        df = wcd.get_wcbk_df(market)
+        df = wcd.get_wcbk_df(filter=market,market=filename,perpage=1000,days=5)
     # codelist=df.code.tolist()
     # cct._write_to_csv(df,'codeall')
     # top_now = get_mmarket='all'arket_price_sina_dd_realTime(df, vol, type)

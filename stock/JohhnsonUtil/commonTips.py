@@ -161,6 +161,66 @@ def isMac():
     else:
         return False
 
+# def whichEncode(text):
+#   text0 = text[0]
+#   try:
+#     text0.decode('utf8')
+#   except Exception, e:
+#     if "unexpected end of data" in str(e):
+#       return "utf8"
+#     elif "invalid start byte" in str(e):
+#       return "gbk_gb2312"
+#     elif "ascii" in str(e):
+#       return "Unicode"
+#   return "utf8"
+def getCoding(strInput):
+    '''
+    获取编码格式
+    '''
+    if isinstance(strInput, unicode):
+        return "unicode"
+    try:
+        strInput.decode("utf8")
+        return 'utf8'
+    except:
+        pass
+    try:
+        strInput.decode("gbk")
+        return 'gbk'
+    except:
+        pass
+    try:
+        strInput.decode("utf16")
+        return 'utf16'
+    except:
+        pass
+
+def tran2UTF8(strInput):
+    '''
+    转化为utf8格式
+    '''
+    strCodingFmt = getCoding(strInput)
+    if strCodingFmt == "utf8":
+        return strInput
+    elif strCodingFmt == "unicode":
+        return strInput.encode("utf8")
+    elif strCodingFmt == "gbk":
+        return strInput.decode("gbk").encode("utf8")
+
+def tran2GBK(strInput):
+    '''
+    转化为gbk格式
+    '''
+    strCodingFmt = getCoding(strInput)
+    if strCodingFmt == "gbk":
+        return strInput
+    elif strCodingFmt == "unicode":
+        return strInput.encode("gbk")
+    elif strCodingFmt == "utf8":
+        return strInput.decode("utf8").encode("gbk")
+
+
+
 def creation_date_duration(path_to_file):
     """
     Try to get the date that a file was created, falling back to when it was
@@ -1050,6 +1110,7 @@ if __name__ == '__main__':
     # print get_rzrq_code()[:3]
     # times =1483686638.0
     # print get_time_to_date(times, format='%Y-%m-%d')
+    print getCoding(u'啊中国'.encode("utf16"))
     print get_today_duration('2017-01-06')
     print last_tddate(2)
     print get_work_day_status()
