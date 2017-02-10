@@ -103,6 +103,10 @@ def get_code_file_path(code,type='f'):
 def get_tdx_Exp_day_to_df(code, type='f', start=None, end=None, dl=None,newdays = None):
     start=cct.day8_to_day10(start)
     end=cct.day8_to_day10(end)
+    if dl is not None and dl < 70:
+        tdx_max_int = dl
+    else:
+        tdx_max_int = ct.tdx_max_int
     if newdays is not None:
         newstockdayl = newdays
     else:
@@ -187,9 +191,10 @@ def get_tdx_Exp_day_to_df(code, type='f', start=None, end=None, dl=None,newdays 
             df['ma10d'] = pd.rolling_mean(df.close,10)
             df['ma20d'] = pd.rolling_mean(df.close,20)
             df['ma60d'] = pd.rolling_mean(df.close,60)
-            df['hmax'] = df.high[-ct.tdx_max_int:].max()
-            df['lmin'] = df.low[-ct.tdx_max_int:].min()
-            df['cmean'] = df.close[-ct.tdx_max_int:].mean()
+            # df['hmax'] = df.high[-tdx_max_int:].max()
+            df['hmax'] = df.close[-tdx_max_int:].max()
+            df['lmin'] = df.low[-tdx_max_int:].min()
+            df['cmean'] = df.close[-tdx_max_int:].mean()
             df = df.fillna(0)
             df = df.sort_index(ascending=False)
         return df
@@ -301,9 +306,10 @@ def get_tdx_Exp_day_to_df(code, type='f', start=None, end=None, dl=None,newdays 
             df['ma10d'] = pd.rolling_mean(df.close,10)
             df['ma20d'] = pd.rolling_mean(df.close,20)
             df['ma60d'] = pd.rolling_mean(df.close,60)
-            df['hmax'] = df.high[-ct.tdx_max_int:].max()
-            df['lmin'] = df.low[-ct.tdx_max_int:].min()
-            df['cmean'] = df.close[-ct.tdx_max_int:].mean()
+            # df['hmax'] = df.high[-tdx_max_int:].max()
+            df['hmax'] = df.close[-tdx_max_int:].max()
+            df['lmin'] = df.low[-tdx_max_int:].min()
+            df['cmean'] = df.close[-tdx_max_int:].mean()
             df = df.fillna(0)
             df = df.sort_index(ascending=False)
         return df

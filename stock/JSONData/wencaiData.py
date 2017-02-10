@@ -338,7 +338,7 @@ def get_wcbk_df(filter='混改',market='nybk',perpage=1000,days=60):
     if os.path.exists(fpath) and os.path.getsize(fpath) > 200 and cct.creation_date_duration(fpath) == 0 :
         df = get_write_wencai_market_to_csv(None,market,renew=True,days=days)
     else:
-        df = get_wencai_Market_url(filter.decode('utf8'),perpage)
+        df = get_wencai_Market_url(filter,perpage)
         df = get_write_wencai_market_to_csv(df,market,renew=True,days=days)
     return df
 
