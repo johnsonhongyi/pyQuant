@@ -539,13 +539,14 @@ if __name__ == '__main__':
     # code='300110'
 #    code='300201'
     import sys
-    codel=['000002','002695','601555','002486','600321','002437','399006','999999']
+    codel=['000737','002695','601555','002486','600321','002437','399006','999999']
 #    code='600321'
 #    code:002732 boll: 45 ma: 6.0  macd:-1 RSI:0 kdj: 3 time:0.0241
 #    code:002623 boll: 41 ma: 10.0  macd:-5 RSI:4 kdj: -1 time:0.0216
     days=5
+    dl=14
     for code in codel:
-        df = tdd.get_tdx_append_now_df_api(code,dl=60)
+        df = tdd.get_tdx_append_now_df_api(code,dl=int(dl*1.5)).sort_index(ascending=True)
     #    df = tdd.get_tdx_power_now_df(code,dl=30)
         # print df[:2]
         # print "len:",len(df)
@@ -553,7 +554,7 @@ if __name__ == '__main__':
         print ('code:%s'%(code)),
         dd,op=Get_BBANDS(df, dtype='d',days=days)
         print 'boll:',op
-        print dd.loc[:,['close','upbbd','midbd','lowbd']][:5]
+        print dd.shape,dd.loc[:,['close','upbbd','midbd','lowbd']][:2]
 #        print dd[:5]
         sys.exit(0)
         dtype='d'

@@ -23,6 +23,24 @@ from JohhnsonUtil import commonTips as cct
 # from logbook import StderrHandler
 # from logbook import Logger,StreamHandler,SyslogHandler
 
+def evalcmd(dir_mo):
+    end = True
+    while end:
+        cmd = (cct.cct_raw_input(" ".join(dir_mo)+": "))
+        # cmd = (cct.cct_raw_input(dir_mo.append(":")))
+        # if cmd == 'e' or cmd == 'q' or len(cmd) == 0:
+        if cmd == 'e' or cmd == 'q':
+            break
+        elif len(cmd)==0:
+            continue
+        else:
+            try:
+                print eval(cmd)
+                print ''
+            except Exception, e:
+                print e 
+                evalcmd(dir_mo)
+                break
 
 if __name__ == "__main__":
     # parsehtml(downloadpage(url_s))
@@ -280,17 +298,12 @@ if __name__ == "__main__":
             # if success > 3:
             #     raw_input("Except")
             #     sys.exit(0)
-            st = raw_input("status:[go(g),clear(c),quit(q,e),W(w),Wa(a)]:")
+            st = cct.cct_raw_input("status:[go(g),clear(c),quit(q,e),W(w),Wa(a)]:")
             if len(st) == 0:
                 status = False
             elif st.lower() == 'r':
-                end = True
-                while end:
-                    cmd=(raw_input('DEBUG[top_dif,top_dd,e|q]:'))
-                    if cmd =='e' or cmd=='q' or len(cmd)==0:
-                        break
-                    else:
-                        print eval(cmd)
+                dir_mo = eval(cct.eval_rule)
+                evalcmd(dir_mo)
             elif st.lower() == 'g' or st.lower() == 'go':
                 status = True
                 for code in top_dif[:10].index:
@@ -302,7 +315,7 @@ if __name__ == "__main__":
                 top_all = pd.DataFrame()
                 status = False
             elif st.lower() == 'w' or st.lower() == 'a':
-                codew = (top_temp.index).tolist()
+                codew = stf.WriteCountFilter(top_temp)
                 if st.lower() == 'a':
                     cct.write_to_blocknew(block_path, codew[:ct.writeCount])
                     # sl.write_to_blocknew(all_diffpath, codew)

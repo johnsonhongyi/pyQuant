@@ -28,7 +28,25 @@ from JohhnsonUtil import commonTips as cct
     # parser = argparse.ArgumentParser()
     # parser.add_argument('dt', type=str, nargs='?', help='20150612')
     # return parser
-
+def evalcmd(dir_mo):
+    end = True
+    while end:
+        cmd = (cct.cct_raw_input(" ".join(dir_mo)+": "))
+        # cmd = (cct.cct_raw_input(dir_mo.append(":")))
+        # if cmd == 'e' or cmd == 'q' or len(cmd) == 0:
+        # print cmd,":",len(cmd)
+        if cmd == 'e' or cmd == 'q':
+            break
+        elif len(cmd)==0:
+            continue
+        else:
+            try:
+                print eval(cmd)
+                print ''
+            except Exception, e:
+                print e                
+                evalcmd(dir_mo)
+                break
 
 if __name__ == "__main__":
     # parsehtml(downloadpage(url_s))
@@ -85,7 +103,8 @@ if __name__ == "__main__":
     while 1:
         try:
             # df = sina_data.Sina().all
-            top_now = tdd.getSinaAlldf(market='混改', filename='mnbk',vol=ct.json_countVol, type=ct.json_countType)
+            top_now = tdd.getSinaAlldf(market='cx', vol=ct.json_countVol, type=ct.json_countType)
+            # top_now = tdd.getSinaAlldf(market='混改', filename='mnbk',vol=ct.json_countVol, type=ct.json_countType)
 
             top_dif = top_now
             # top_now.to_hdf("testhdf5", 'marketDD', format='table', complevel=9)
@@ -288,7 +307,7 @@ if __name__ == "__main__":
                         # top_temp = top_temp.sort_values(by=['op','ra','diff', 'percent', 'ratio'], ascending=[0,0,0, 0, 1])[:10]
                         # top_temp = top_temp.sort_values(by=['op','ldate','ra','diff', 'percent', 'ratio'], ascending=[0,0,0,0, 0, 1])[:10]
                         # if cct.get_now_time_int() > ct.checkfilter_end_timeDu and duration_date > ct.duration_date_sort:
-                        # if (cct.get_now_time_int() > ct.checkfilter_end_timeDu and int(duration_date) > int(ct.duration_date_sort)) or int(duration_date) < 6:                        
+                        # if (cct.get_now_time_int() > ct.checkfilter_end_timeDu and int(duration_date) > int(ct.duration_date_sort)) or int(duration_date) < 6:
                         if cct.get_now_time_int() > ct.checkfilter_end_timeDu and (int(duration_date) > int(ct.duration_date_sort) or int(duration_date) < 6):
                             top_temp = top_temp.sort_values(by=ct.Duration_percent_op,
                                         ascending=ct.Duration_percent_op_key)
@@ -353,17 +372,17 @@ if __name__ == "__main__":
             else:
                 raise KeyboardInterrupt("StopTime")
         except (KeyboardInterrupt) as e:
-            st = raw_input("status:[go(g),clear(c),[d 20150101 [l|h]|[y|n|pn|py],quit(q),W(a),sh]:")
+            # try:
+            #     st = cct.cct_raw_input(status
+            # except (KeyboardInterrupt) as e:
+            #     st = ''
+            #     pass
+            st = cct.cct_raw_input("status:[go(g),clear(c),[d 20150101 [l|h]|[y|n|pn|py],quit(q),W(a),sh]:")
             if len(st) == 0:
                 status = False
             elif st.lower() == 'r':
-                end = True
-                while end:
-                    cmd = (raw_input('DEBUG[top_dif,top_now,e|q]:'))
-                    if cmd == 'e' or cmd == 'q' or len(cmd) == 0:
-                        break
-                    else:
-                        print eval(cmd)
+                dir_mo = eval(cct.eval_rule)
+                evalcmd(dir_mo)
                         # raise KeyboardInterrupt("StopTime")
             elif st.lower() == 'g' or st.lower() == 'go':
                 status = True
@@ -398,18 +417,18 @@ if __name__ == "__main__":
                 # else:
                     # codew = (top_dd[-10:].index).tolist()
                 if st.lower() == 'a':
-                    codew = (top_dd.index[:ct.writeCount]).tolist()
+                    codew = stf.WriteCountFilter(top_temp)
                     cct.write_to_blocknew(block_path, codew)
                     # sl.write_to_blocknew(all_diffpath, codew)
                 else:
-                    codew = (top_dd.index[:ct.writeCount]).tolist()
+                    codew = stf.WriteCountFilter(top_temp)
                     cct.write_to_blocknew(block_path, codew, False)
                     # sl.write_to_blocknew(all_diffpath, codew, False)
                 print "wri ok:%s" % block_path
                 cct.sleeprandom(120)
             elif st.startswith('sh'):
                 while 1:
-                    input = raw_input("code:")
+                    input = cct.cct_raw_input("code:")
                     if len(input) >= 6:
                         args = parser.parse_args(input.split())
                         if len(str(args.code)) == 6:

@@ -39,6 +39,24 @@ def time_sleep(timemin):
     time.sleep(timemin)
     return True
 
+def evalcmd(dir_mo):
+    end = True
+    while end:
+        cmd = (cct.cct_raw_input(" ".join(dir_mo)+": "))
+        # cmd = (cct.cct_raw_input(dir_mo.append(":")))
+        # if cmd == 'e' or cmd == 'q' or len(cmd) == 0:
+        if cmd == 'e' or cmd == 'q':
+            break
+        elif len(cmd)==0:
+            continue
+        else:
+            try:
+                print eval(cmd)
+                print ''
+            except Exception, e:
+                print e 
+                evalcmd(dir_mo)
+                break
 
 def get_all_toplist():
     # gold = {}
@@ -523,27 +541,27 @@ if __name__ == '__main__':
                 # else:
                 #     dd = tdd.get_tdx_Exp_day_to_df('999999', type='f', dl=1)
                 #     if dd.date.values 
-
-                st = raw_input("status:[go(g),clear(c),quit(q,e)]:")
-                if len(st) == 0:
-                    status = False
-                elif st.lower() == 'g' or st.lower() == 'go':
-                    status = True
-                    num_input = ''
-                    ave = None
-                    code = ''
-                elif len(st) == 6:
-                    status = True
-                    num_input = st
-                    ave = None
-                    code = ''
-                else:
-                    sys.exit(0)
+                raise KeyboardInterrupt("Stop Time")
+                # st = cct.cct_raw_input("status:[go(g),clear(c),quit(q,e)]:")
+                # if len(st) == 0:
+                #     status = False
+                # elif st.lower() == 'g' or st.lower() == 'go':
+                #     status = True
+                #     num_input = ''
+                #     ave = None
+                #     code = ''
+                # elif len(st) == 6:
+                #     status = True
+                #     num_input = st
+                #     ave = None
+                #     code = ''
+                # else:
+                #     sys.exit(0)
         except (KeyboardInterrupt) as e:
             # print "key"
             print "KeyboardInterrupt:", e
 
-            st = raw_input("status:[go(g),clear(c),quit(q,e)]:")
+            st = cct.cct_raw_input("status:[go(g),clear(c),quit(q,e)]:")
             if len(st) == 0:
                 status = False
             elif st.lower() == 'g' or st.lower() == 'go':
@@ -556,6 +574,9 @@ if __name__ == '__main__':
                 num_input = st
                 ave = None
                 code = ''
+            elif st.lower() == 'r':
+                dir_mo = eval(cct.eval_rule)
+                evalcmd(dir_mo)
             else:
                 sys.exit(0)
                 # cct.sleep(0.5)

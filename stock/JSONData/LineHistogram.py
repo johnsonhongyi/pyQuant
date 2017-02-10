@@ -809,7 +809,7 @@ if __name__ == "__main__":
     # get_tdx_and_now_data('002399')
     # sys.exit(0)
 
-    # args=main(raw_input('input').split())
+    # args=main(cct.cct_raw_input('input').split())
     # print (args.d)
     # sys.exit()
     if cct.isMac():
@@ -871,7 +871,7 @@ if __name__ == "__main__":
 
         except (KeyboardInterrupt) as e:
             print "KeyboardInterrupt:", e
-            st = raw_input("status:[go(g),clear(c),quit(q,e)]:")
+            st = cct.cct_raw_input("status:[go(g),clear(c),quit(q,e)]:")
             if st == 'q' or st == 'e':
                 sys.exit(0)
             else:
@@ -881,7 +881,7 @@ if __name__ == "__main__":
             import traceback
 
             traceback.print_exc()
-            # st = raw_input("status:[go(g),clear(c),quit(q,e)]:")
+            # st = cct.cct_raw_input("status:[go(g),clear(c),quit(q,e)]:")
             # if st == 'q' or st == 'e':
             #     sys.exit(0)
             # else:

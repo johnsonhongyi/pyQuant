@@ -297,15 +297,51 @@ def get_delay_time():
     delay_time = 8000
     return delay_time
 
+def cct_raw_input(sts):
+    # print sts
+    try:
+        st = raw_input(sts)
+    except (KeyboardInterrupt) as e:
+        inputerr = cct_raw_input(" Break: ")
+#        if inputerr == 'e' or inputerr == 'q':
+#            return 'e'
+            # raise Exception('raw interrupt')
+        if len(inputerr) > 0:
+            return inputerr
+        else:
+            return ''
+        # st = 'Except'
+    return st
+
+# eval_rule = "[elem for elem in dir() if not elem.startswith('_') and not elem.startswith('ti')]"
+eval_rule = "[elem for elem in dir() if elem.startswith('top')]"
+
+def cct_eval(cmd):
+    try:
+        st = eval(cmd)
+    except (Exception) as e:
+        st = ''
+        print e
+    return st
 def sleep(timet):
     times=time.time()
-    for _ in range(int(timet)*2):
-        if int(time.time()-times) >= int(timet):
-            break
-        time.sleep(0.5)
+    try:
+        for _ in range(int(timet)*2):
+            if int(time.time()-times) >= int(timet):
+                break
+            time.sleep(0.5)
+    except (KeyboardInterrupt) as e:
+        # raise KeyboardInterrupt("CTRL-C!")
+        print "Catch KeyboardInterrupt"
+        pass
+        # raise Exception("code is None")
     # print time.time()-times
 def sleeprandom(timet):
-    sleeptime=random.randint(timet/3, timet)
+    now_t = get_now_time_int()
+    if now_t > 915 and now_t < 925:
+        sleeptime=random.randint(10/3, 10)
+    else:
+        sleeptime=random.randint(timet/3, timet)
     print "Error2sleep:%s"%(sleeptime)
     sleep(sleeptime)
 

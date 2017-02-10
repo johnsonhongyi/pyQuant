@@ -808,7 +808,7 @@ def get_linear_model_candles(code, ptype='low', dtype='d', start=None, end=None,
     return df
 
 
-def powerCompute_df(df, dtype='d', end=None, dl=None, filter='y',talib=False,newdays=None,days=1):
+def powerCompute_df(df, dtype='d', end=None, dl=None, filter='y',talib=False,newdays=None,days=0):
     ts=time.time()
     if isinstance(df, list):
         code_l = df

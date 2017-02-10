@@ -9,6 +9,8 @@ def getBollFilter(df=None,boll=1):
     if df is None:
         print "dataframe is None"
         return None
+    else:
+        df.loc[df.percent>=9.9,'percent']=10
     if cct.get_now_time_int() > 915 and cct.get_now_time_int() <= 1445:
         df = df[df.buy > df.hmax * ct.changeRatio]
     # elif cct.get_now_time_int() > 945 and cct.get_now_time_int() <= 1100:
@@ -21,3 +23,15 @@ def getBollFilter(df=None,boll=1):
         print "boll not in columns"
         df['boll'] = 0
         return df
+
+def WriteCountFilter(df):
+    codel = []
+    if len(df) > 0 and 'percent' in df.columns:
+        dd =  df[df.percent == 10]
+        if len(dd) > ct.writeCount:
+            codel = dd.index.tolist()
+        else:
+            codel = df.index[:ct.writeCount].tolist()
+    else:
+        print "writeCount DF is None"
+    return codel

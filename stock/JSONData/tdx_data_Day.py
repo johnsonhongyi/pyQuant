@@ -2629,7 +2629,7 @@ python %s -t txt 999999 20070101 20070302
         print("ex Read:", strip_tx)
 
 def write_to_all():
-    st = raw_input("will to Write Y or N:")
+    st = cct.cct_raw_input("will to Write Y or N:")
     if str(st) == 'y':
         Write_market_all_day_mp('all')
     else:

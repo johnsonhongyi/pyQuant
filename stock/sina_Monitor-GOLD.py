@@ -79,7 +79,24 @@ def get_sina_url(vol='0', type='0', pageCount='100'):
     #             code_g[code]= df.loc[ix,'name']
     # interval = (time.time() - start_t)
     # print "time:", interval
-
+def evalcmd(dir_mo):
+    end = True
+    while end:
+        cmd = (cct.cct_raw_input(" ".join(dir_mo)+": "))
+        # cmd = (cct.cct_raw_input(dir_mo.append(":")))
+        # if cmd == 'e' or cmd == 'q' or len(cmd) == 0:
+        if cmd == 'e' or cmd == 'q':
+            break
+        elif len(cmd)==0:
+            continue
+        else:
+            try:
+                print eval(cmd)
+                print ''
+            except Exception, e:
+                print e 
+                evalcmd(dir_mo)
+                break
 
 if __name__ == "__main__":
 
@@ -288,35 +305,33 @@ if __name__ == "__main__":
                         print "."
                         break
             else:
-                # break
-                # cct.sleep(5)
-                st = raw_input("status:[go(g),clear(c),quit(q,e),W(w),Wa(a)]:")
-                if len(st) == 0:
-                    status = False
-                elif st.lower() == 'g' or st.lower() == 'go':
-                    status = True
-                    for code in top_all[:10].index:
-                        code = re.findall('(\d+)', code)
-                        if len(code) > 0:
-                            code = code[0]
-                            kind = sl.get_multiday_ave_compare_silent(code)
-                elif st.lower() == 'clear' or st.lower() == 'c':
-                    top_all = pd.DataFrame()
-                    status = False
-                elif st.lower() == 'w' or st.lower() == 'a':
-                    codew = (top_temp.index).tolist()
-                    if st.lower() == 'a':
-                        cct.write_to_blocknew(block_path, codew[:ct.writeCount])
-                        # cct.write_to_blocknew(all_diffpath, codew)
-                    else:
-                        cct.write_to_blocknew(block_path, codew[:ct.writeCount], False)
-                        # cct.write_to_blocknew(all_diffpath, codew, False)
-                    print "wri ok:%s" % block_path
-                    cct.sleeprandom(120)
-                    # cct.sleep(2)
-                else:
-                    sys.exit(0)
-
+                # st = cct.cct_raw_input("status:[go(g),clear(c),quit(q,e),W(w),Wa(a)]:")
+                # if len(st) == 0:
+                #     status = False
+                # elif st.lower() == 'g' or st.lower() == 'go':
+                #     status = True
+                #     for code in top_all[:10].index:
+                #         code = re.findall('(\d+)', code)
+                #         if len(code) > 0:
+                #             code = code[0]
+                #             kind = sl.get_multiday_ave_compare_silent(code)
+                # elif st.lower() == 'clear' or st.lower() == 'c':
+                #     top_all = pd.DataFrame()
+                #     status = False
+                # elif st.lower() == 'w' or st.lower() == 'a':
+                #     codew = stf.WriteCountFilter(top_temp)
+                #     if st.lower() == 'a':
+                #         cct.write_to_blocknew(block_path, codew[:ct.writeCount])
+                #         # cct.write_to_blocknew(all_diffpath, codew)
+                #     else:
+                #         cct.write_to_blocknew(block_path, codew[:ct.writeCount], False)
+                #         # cct.write_to_blocknew(all_diffpath, codew, False)
+                #     print "wri ok:%s" % block_path
+                #     cct.sleeprandom(120)
+                #     # cct.sleep(2)
+                # else:
+                #     sys.exit(0)
+                raise KeyboardInterrupt("StopTime")    
 
 
         except (KeyboardInterrupt) as e:
@@ -326,7 +341,7 @@ if __name__ == "__main__":
             # cct.sleep(1)
             # if success > 3:
             # st=raw_input("status:[go(g),clear(c),quit(q,e)]:")
-            st = raw_input("status:[go(g),clear(c),quit(q,e),W(w),Wa(a)]:")
+            st = cct.cct_raw_input("status:[go(g),clear(c),quit(q,e),W(w),Wa(a)]:")
 
             if len(st) == 0:
                 # top_all=pd.DataFrame()
@@ -340,7 +355,7 @@ if __name__ == "__main__":
                 # base_path=r"E:\DOC\Parallels\WinTools\zd_pazq\T0002\blocknew\\"
                 # block_path=base_path+'065.blk'
                 # all_diffpath=base_path+'\062.blk'
-                codew = top_temp[:ct.writeCount].index.tolist()
+                codew = stf.WriteCountFilter(top_temp)
                 if st.lower() == 'a':
                     cct.write_to_blocknew(block_path, codew)
                     # cct.write_to_blocknew(all_diffpath,codew)
@@ -351,7 +366,9 @@ if __name__ == "__main__":
                 cct.sleeprandom(120)
 
                 # cct.sleep(5)
-
+            elif st.lower() == 'r':
+                dir_mo = eval(cct.eval_rule)
+                evalcmd(dir_mo)
             else:
                 sys.exit(0)
 
