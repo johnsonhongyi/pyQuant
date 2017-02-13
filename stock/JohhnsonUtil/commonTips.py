@@ -323,7 +323,7 @@ def cct_eval(cmd):
         st = ''
         print e
     return st
-def sleep(timet):
+def sleep(timet,catch=True):
     times=time.time()
     try:
         for _ in range(int(timet)*2):
@@ -332,8 +332,11 @@ def sleep(timet):
             time.sleep(0.5)
     except (KeyboardInterrupt) as e:
         # raise KeyboardInterrupt("CTRL-C!")
-        print "Catch KeyboardInterrupt"
-        pass
+        # print "Catch KeyboardInterrupt"
+        if catch:
+            raise KeyboardInterrupt("Sleep Time")
+        else:
+            pass
         # raise Exception("code is None")
     # print time.time()-times
 def sleeprandom(timet):
@@ -343,7 +346,7 @@ def sleeprandom(timet):
     else:
         sleeptime=random.randint(timet/3, timet)
     print "Error2sleep:%s"%(sleeptime)
-    sleep(sleeptime)
+    sleep(sleeptime,False)
 
 def get_cpu_count():
     return cpu_count()

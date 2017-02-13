@@ -2657,7 +2657,11 @@ if __name__ == '__main__':
 #    code=['603878','300575']
 #    dm = get_sina_data_df(code)
 #    code='603878'
-#    Write_market_all_day_mp('cyb')
+    market = cct.cct_raw_input("write all data [all,cyb,sh,sz] :")
+    if market in  ['all','sh','sz','cyb']:  
+        Write_market_all_day_mp(market)
+    else:
+        print "market is None "
 #    print get_tdx_append_now_df_api2('603878',dl=2,dm=dm,newdays=5)
 #    print write_tdx_sina_data_to_file('999999',dm)
     code = '999999'
