@@ -144,9 +144,10 @@ if __name__ == "__main__":
                     top_dif=top_dif[top_dif.lvol > ct.LvolumeSize]
                     log.info(top_dif[:1])
                     top_dif = top_dif[top_dif.buy > top_dif.llastp * ct.changeRatio]
+                    top_dif = top_dif[top_dif.low > top_dif.llow * ct.changeRatio]
                     log.debug('dif2:%s' % len(top_dif))
                 # log.debug('dif2:%s' % top_dif[:1])
-                if cct.get_now_time_int() > 915 and cct.get_now_time_int() <= 925:
+                if cct.get_now_time_int() > 915 and cct.get_now_time_int() <= 926:
                     top_dif['percent']= (map(lambda x, y: round((x-y)/y*100,1) if int(y) > 0 else 0, top_dif.buy, top_dif.llastp))
 
                 # if top_dif[:1].llow.values <> 0:
@@ -156,7 +157,8 @@ if __name__ == "__main__":
                     log.debug('diff2-1:%s' % len(top_dif))
                     if cct.get_now_time_int() > 915:
                         top_dif = top_dif[top_dif.buy > top_dif.llastp * ct.changeRatio]
-                        top_dif = top_dif[top_dif.buy > top_dif.lhigh * ct.changeRatio]
+                        top_dif = top_dif[top_dif.low > top_dif.llow * ct.changeRatio]
+                        # top_dif = top_dif[top_dif.buy > top_dif.lhigh * ct.changeRatio]
                         # top_dif = top_dif[top_dif.low >= top_dif.llastp]
                         # top_dif = top_dif[top_dif.open >= top_dif.llastp]
                     # top_dif = top_dif[top_dif.low >= top_dif.lhigh]

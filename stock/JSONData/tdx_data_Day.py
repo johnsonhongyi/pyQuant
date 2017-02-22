@@ -107,6 +107,7 @@ def get_tdx_Exp_day_to_df(code, type='f', start=None, end=None, dl=None,newdays 
         tdx_max_int = dl
     else:
         tdx_max_int = ct.tdx_max_int
+    max_int_end = 3 if int(tdx_max_int) > 5 else int(tdx_max_int/2)
     if newdays is not None:
         newstockdayl = newdays
     else:
@@ -192,9 +193,9 @@ def get_tdx_Exp_day_to_df(code, type='f', start=None, end=None, dl=None,newdays 
             df['ma20d'] = pd.rolling_mean(df.close,20)
             df['ma60d'] = pd.rolling_mean(df.close,60)
             # df['hmax'] = df.high[-tdx_max_int:].max()
-            df['hmax'] = df.close[-tdx_max_int:].max()
-            df['lmin'] = df.low[-tdx_max_int:].min()
-            df['cmean'] = df.close[-tdx_max_int:].mean()
+            df['hmax'] = df.close[-tdx_max_int:-max_int_end].max()
+            df['lmin'] = df.low[-tdx_max_int:-max_int_end].min()
+            df['cmean'] = df.close[-tdx_max_int:-max_int_end].mean()
             df = df.fillna(0)
             df = df.sort_index(ascending=False)
         return df
@@ -307,9 +308,9 @@ def get_tdx_Exp_day_to_df(code, type='f', start=None, end=None, dl=None,newdays 
             df['ma20d'] = pd.rolling_mean(df.close,20)
             df['ma60d'] = pd.rolling_mean(df.close,60)
             # df['hmax'] = df.high[-tdx_max_int:].max()
-            df['hmax'] = df.close[-tdx_max_int:].max()
-            df['lmin'] = df.low[-tdx_max_int:].min()
-            df['cmean'] = df.close[-tdx_max_int:].mean()
+            df['hmax'] = df.close[-tdx_max_int:-max_int_end].max()
+            df['lmin'] = df.low[-tdx_max_int:-max_int_end].min()
+            df['cmean'] = df.close[-tdx_max_int:-max_int_end].mean()
             df = df.fillna(0)
             df = df.sort_index(ascending=False)
         return df
@@ -2324,11 +2325,12 @@ def get_append_lastp_to_df(top_all,lastpTDX_DF=None,dl=ct.PowerCountdl,end=None,
     if lastpTDX_DF is None or len(lastpTDX_DF) == 0:
         # tdxdata = get_tdx_all_day_LastDF(codelist) '''only get lastp no powerCompute'''
         tdxdata = get_tdx_exp_all_LastDF_DL(codelist,dt=dl,end=end,ptype=ptype,filter=filter,power=power,lastp=lastp,newdays=newdays)
-        tdxdata.rename(columns={'close': 'llow'}, inplace=True)
+        # tdxdata.rename(columns={'close': 'llow'}, inplace=True)
         tdxdata.rename(columns={'open': 'lopen'}, inplace=True)
         tdxdata.rename(columns={'high': 'lhigh'}, inplace=True)
-        # tdxdata.rename(columns={'close': 'lastp'}, inplace=True)
-        tdxdata.rename(columns={'low': 'lastp'}, inplace=True)
+        tdxdata.rename(columns={'close': 'lastp'}, inplace=True)
+        # tdxdata.rename(columns={'low': 'lastp'}, inplace=True)
+        tdxdata.rename(columns={'low': 'llow'}, inplace=True)
         tdxdata.rename(columns={'vol': 'lvol'}, inplace=True)
 #        if power:
 #            tdxdata = tdxdata.loc[:, ['llow', 'lhigh', 'lastp', 'lvol', 'date','ra','op','fib','fibl','ma5d','ma10d','ldate']]

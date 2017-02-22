@@ -208,7 +208,7 @@ if __name__ == "__main__":
                     # log.info("df:%s" % top_all[:1])
                     radio_t = cct.get_work_time_ratio()
                     log.debug("Second:vol/vol/:%s" % radio_t)
-                    # top_dif['volume'] = top_dif['volume'].apply(lambda x: round(x / radio_t, 1))
+                    # top_all['volume'] = top_all['volume'].apply(lambda x: round(x / radio_t, 1))
                     log.debug("top_diff:vol")
                     top_all['volume'] = (
                         map(lambda x, y: round(x / y / radio_t, 1), top_all['volume'].values, top_all['lvol'].values))
@@ -216,9 +216,10 @@ if __name__ == "__main__":
                         map(lambda x, y: round(((float(x) - float(y)) / float(y) * 100), 1),top_all['buy'].values,top_all['lastp'].values))
                     if cct.get_now_time_int() > 915 and cct.get_now_time_int() < ct.checkfilter_end_time:
                         top_all = top_all[top_all.trade > top_all.llastp * ct.changeRatio]
-                        top_all = top_all[top_all.trade > top_all.lhigh * ct.changeRatio]
+                        top_all = top_all[top_all.low > top_all.llow * ct.changeRatio]
+                        # top_all = top_all[top_all.trade > top_all.lhigh * ct.changeRatio]
 
-                    if cct.get_now_time_int() > 915 and cct.get_now_time_int() <= 925:
+                    if cct.get_now_time_int() > 915 and cct.get_now_time_int() <= 926:
                         top_all['percent']= (map(lambda x, y: round((x-y)/y*100,1) if int(y) > 0 else 0, top_all.trade, top_all.llastp))
                     # if cct.get_now_time_int() > 930 and 'lastp' in top_all.columns:
                     #     top_all = top_all[top_all.trade >= top_all.llastp]

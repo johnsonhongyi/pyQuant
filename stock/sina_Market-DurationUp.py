@@ -181,7 +181,8 @@ if __name__ == "__main__":
                 if ct.checkfilter and cct.get_now_time_int() > 915 and cct.get_now_time_int() < ct.checkfilter_end_timeDu:
                     top_dif = top_dif[top_dif.buy >= top_dif.llastp * ct.changeRatio]
                     log.debug('top_dif:%s'%(len(top_dif)))
-                    top_dif = top_dif[top_dif.buy >= top_dif.lhigh * ct.changeRatio]
+                    top_dif = top_dif[top_dif.low > top_dif.llow * ct.changeRatio]
+                    # top_dif = top_dif[top_dif.buy >= top_dif.lhigh * ct.changeRatio]
                     log.debug('top_dif:%s'%(len(top_dif)))
 
                 if cct.get_now_time_int() > 915:
@@ -308,8 +309,8 @@ if __name__ == "__main__":
                             top_temp = top_temp.sort_values(by=ct.Duration_percent_op,
                                         ascending=ct.Duration_percent_op_key)
                         else:
-                            top_temp = top_temp.sort_values(by=ct.Duration_percentdn_op,
-                                        ascending=ct.Duration_percentdn_op_key)
+                            top_temp = top_temp.sort_values(by=ct.Duration_percentdn_ra,
+                                        ascending=ct.Duration_percentdn_ra_key)
 
                     if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935:
                         # top_temp = top_temp[ (top_temp['ma5d'] > top_temp['ma10d']) & (top_temp['buy'] > top_temp['ma10d']) ][:10]
@@ -406,12 +407,12 @@ if __name__ == "__main__":
                     # codew = (top_dd[:10].index).tolist()
                 # else:
                     # codew = (top_dd[-10:].index).tolist()
+                codew = stf.WriteCountFilter(top_temp,'ra')
                 if st.lower() == 'a':
-                    codew = stf.WriteCountFilter(top_temp)
                     cct.write_to_blocknew(block_path, codew)
                     # sl.write_to_blocknew(all_diffpath, codew)
                 else:
-                    codew = stf.WriteCountFilter(top_temp)
+                    # codew = stf.WriteCountFilter(top_temp)
                     cct.write_to_blocknew(block_path, codew, False)
                     # sl.write_to_blocknew(all_diffpath, codew, False)
                 print "wri ok:%s" % block_path

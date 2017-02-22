@@ -358,7 +358,8 @@ if __name__ == '__main__':
 #    type='国企改革'
 #    df = get_wencai_Market_url('赢时胜,博腾股份,炬华科技,东土科技,华鹏飞,长亮科技,天银机电,润和软件,苏大维格,晶盛机电,掌趣科技,戴维医疗,邦讯技术,汉鼎宇佑,富春通信,三六五网,南通锻压,华昌达,梅安森,尔康制药,雅本化学,卫宁健康,初灵信息,乐金健康,迪安诊断',500)
 
-    df =  get_wcbk_df(filter='城建+一带一路',market='ydyl')
+    # df =  get_wcbk_df(filter='城建+一带一路',market='ydyl')
+    df =  get_wcbk_df(filter='新股与次新股',market='cxg')
 #    df =  get_wcbk_df(filter='混改',market='wencai')
     print df.shape,df[:5]
     # df = get_wencai_Market_url('农业',10000)

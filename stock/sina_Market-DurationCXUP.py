@@ -103,7 +103,9 @@ if __name__ == "__main__":
     while 1:
         try:
             # df = sina_data.Sina().all
-            top_now = tdd.getSinaAlldf(market='cx', vol=ct.json_countVol, type=ct.json_countType)
+            # top_now = tdd.getSinaAlldf(market='cx', vol=ct.json_countVol, type=ct.json_countType)
+            top_now = tdd.getSinaAlldf(market=u'新股与次新股',filename='cxg', vol=ct.json_countVol, type=ct.json_countType)
+            
             # top_now = tdd.getSinaAlldf(market='混改', filename='mnbk',vol=ct.json_countVol, type=ct.json_countType)
 
             top_dif = top_now
@@ -184,7 +186,8 @@ if __name__ == "__main__":
                 if ct.checkfilter and cct.get_now_time_int() > 915 and cct.get_now_time_int() < ct.checkfilter_end_timeDu:
                     top_dif = top_dif[top_dif.buy >= top_dif.llastp * ct.changeRatio]
                     log.debug('top_dif:%s'%(len(top_dif)))
-                    top_dif = top_dif[top_dif.buy >= top_dif.lhigh * ct.changeRatio]
+                    top_dif = top_dif[top_dif.low > top_dif.llow * ct.changeRatio]
+                    # top_dif = top_dif[top_dif.buy >= top_dif.lhigh * ct.changeRatio]
                     log.debug('top_dif:%s'%(len(top_dif)))
 
                 if cct.get_now_time_int() > 915:

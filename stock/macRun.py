@@ -41,17 +41,17 @@ end tell
 #                'sina_Monitor.py': '85, 27',
 #                'singleAnalyseUtil.py': '583, 23',
 #                'LinePower.py':'767, 527',}
-positionKey = {'sina_Market-DurationDn.py': '270, 408',
-               'sina_Market-DurationUp.py': '-17, 470',
-               'sina_Market-DurationCXDN': '23, 116',
-               'sina_Market-DurationSH.py': '148, 560',
+positionKey = {'sina_Market-DurationDn.py': '237, 403',
+               'sina_Market-DurationUp.py': '-23, 539',
+               'sina_Market-DurationCXDN': '31, 80',
+               'sina_Market-DurationSH.py': '217, 520',
                'sina_Monitor-Market-New.py': '-2, 371',
                'sina_Monitor-Market-LH.py': '341, 263',
                'sina_Monitor-Market.py': '19, 179',
-               'sina_Monitor-GOLD.py': '-15, 194',
+               'sina_Monitor-GOLD.py': '-7, 149',
                'sina_Monitor.py': '69, 22',
                'singleAnalyseUtil.py': '583, 22',
-               'LinePower.py':'44, 556',}
+               'LinePower.py':'42, 492',}
 
 cmdRun = '''cd /Users/Johnson/Documents/Quant/pyQuant/stock;
 open singleAnalyseUtil.py;

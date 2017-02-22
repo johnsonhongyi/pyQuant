@@ -173,10 +173,11 @@ if __name__ == "__main__":
                     # log.debug('diff2-1:%s' % len(top_dif))
                     # log.debug('dif3 low<>0 :%s' % len(top_dif))
                     # top_dif = top_dif[top_dif.open > 0]
-                    if cct.get_now_time_int() > 925 and cct.get_now_time_int() < ct.checkfilter_end_time:
-                        top_dif = top_dif[top_dif.low >= top_dif.llastp]
+                    if cct.get_now_time_int() > 915 and cct.get_now_time_int() < ct.checkfilter_end_time:
+                        # top_dif = top_dif[top_dif.low >= top_dif.llastp]
                         top_dif = top_dif[top_dif.buy >= top_dif.llastp * ct.changeRatio]
-                        top_dif = top_dif[top_dif.buy >= top_dif.lhigh * ct.changeRatio]
+                        top_dif = top_dif[top_dif.low > top_dif.llow * ct.changeRatio]
+                        # top_dif = top_dif[top_dif.buy >= top_dif.lhigh * ct.changeRatio]
                     log.debug('dif4 open>low0.99:%s' % len(top_dif))
                     log.debug('dif4-2:%s' % top_dif.percent[:2])
 
@@ -223,7 +224,7 @@ if __name__ == "__main__":
 
                     # df['volume']= df['volume'].apply(lambda x:x/100)
 
-                    if cct.get_now_time_int() > 915 and cct.get_now_time_int() <= 925:
+                    if cct.get_now_time_int() > 915 and cct.get_now_time_int() <= 926:
                         top_dif['percent']= (map(lambda x, y: round((x-y)/y*100,1) if int(y) > 0 else 0, top_dif.buy, top_dif.llastp))
 
                     if 'counts' in top_dif.columns.values:

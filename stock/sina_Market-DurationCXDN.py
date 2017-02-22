@@ -112,7 +112,8 @@ if __name__ == "__main__":
             '''
             # top_now = tdd.getSinaAlldf(market='cx', vol=ct.json_countVol, type=ct.json_countType)
             # top_now = tdd.getSinaAlldf(market='农业',filename='nybk', vol=ct.json_countVol, type=ct.json_countType)
-            top_now = tdd.getSinaAlldf(market=u'一带一路',filename='ydyl', vol=ct.json_countVol, type=ct.json_countType)
+            # top_now = tdd.getSinaAlldf(market=u'一带一路',filename='ydyl', vol=ct.json_countVol, type=ct.json_countType)
+            top_now = tdd.getSinaAlldf(market=u'新股与次新股',filename='cxg', vol=ct.json_countVol, type=ct.json_countType)
             now_count = len(top_now)
             radio_t = cct.get_work_time_ratio()
             # top_now = top_now[top_now.buy > 0]
@@ -181,9 +182,10 @@ if __name__ == "__main__":
                         map(lambda x, y: y if int(x) == 0 else x, top_dif['buy'].values, top_dif['trade'].values))
                 if ct.checkfilter and  cct.get_now_time_int() > 915 and cct.get_now_time_int() < ct.checkfilter_end_timeDu:
                     top_dif = top_dif[top_dif.buy >= top_dif.llastp * ct.changeRatio]
-                    top_dif = top_dif[top_dif.buy >= top_dif.lhigh * ct.changeRatio]
+                    top_dif = top_dif[top_dif.low > top_dif.llow * ct.changeRatio]
+                    # top_dif = top_dif[top_dif.buy >= top_dif.lhigh * ct.changeRatio]
 
-                if cct.get_now_time_int() > 915 and cct.get_now_time_int() <= 925:
+                if cct.get_now_time_int() > 915 and cct.get_now_time_int() <= 926:
                     top_dif['percent']= (map(lambda x, y: round((x-y)/y*100,1) if int(y) > 0 else 0, top_dif.buy, top_dif.llastp))
 
                 if cct.get_now_time_int() > 915:

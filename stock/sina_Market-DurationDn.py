@@ -84,6 +84,7 @@ if __name__ == "__main__":
     du_date = duration_date
     # print cct.last_tddate(2)
     end_date = cct.last_tddate(days=4)
+    print end_date
     ptype = 'high'
     filter = 'y'
     if len(str(duration_date)) < 4:
@@ -177,9 +178,10 @@ if __name__ == "__main__":
                         map(lambda x, y: y if int(x) == 0 else x, top_dif['buy'].values, top_dif['trade'].values))
                 if ct.checkfilter and  cct.get_now_time_int() > 915 and cct.get_now_time_int() < ct.checkfilter_end_timeDu:
                     top_dif = top_dif[top_dif.buy >= top_dif.llastp * ct.changeRatio]
-                    top_dif = top_dif[top_dif.buy >= top_dif.lhigh * ct.changeRatio]
+                    top_dif = top_dif[top_dif.low > top_dif.llow * ct.changeRatio]
+                    # top_dif = top_dif[top_dif.buy >= top_dif.lhigh * ct.changeRatio]
 
-                if cct.get_now_time_int() > 915 and cct.get_now_time_int() <= 925:
+                if cct.get_now_time_int() > 915 and cct.get_now_time_int() <= 926:
                     top_dif['percent']= (map(lambda x, y: round((x-y)/y*100,1) if int(y) > 0 else 0, top_dif.buy, top_dif.llastp))
 
                 if cct.get_now_time_int() > 915:
