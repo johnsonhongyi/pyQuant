@@ -19,6 +19,8 @@ import socket
 
 log = Log.getLogger('commonTipss')
 # log.setLevel(Log.DEBUG)
+# import numba as nb
+
 
 try:
     from urllib.request import urlopen, Request
@@ -77,6 +79,12 @@ def get_tdx_dir():
         log.error("basedir not exists")
     return basedir
 
+
+from numba.decorators import autojit
+def run_numba(func):
+    funct = autojit(lambda:func)
+    return funct
+    
 def get_work_path(base,dpath,fname):
     baser = os.getcwd().split(base)[0]
     base = baser  + base + path_sep + dpath + path_sep

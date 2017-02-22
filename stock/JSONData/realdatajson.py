@@ -681,7 +681,7 @@ if __name__ == '__main__':
     # log.setLevel(LoggerFactory.INFO)
     # get_wencai_Market_url(filter='热门股')
     df = get_sina_Market_json('sz')
-    print df[:1]
+    print df[:1],df.shape
     sys.exit()
     top_now = get_market_price_sina_dd_realTime(df, '2', type)
     print top_now[:1]

@@ -18,6 +18,7 @@ from JohhnsonUtil import commonTips as cct
 from JohhnsonUtil import johnson_cons as ct
 import tushare as ts
 import sina_data
+# import numba as nb
 # import datetime
 # import logbook
 
@@ -100,6 +101,8 @@ def get_code_file_path(code,type='f'):
 
     return file_path
 
+
+# @nb.autojit
 def get_tdx_Exp_day_to_df(code, type='f', start=None, end=None, dl=None,newdays = None):
     start=cct.day8_to_day10(start)
     end=cct.day8_to_day10(end)
@@ -2126,7 +2129,7 @@ def get_tdx_exp_low_or_high_power(code, dt=None, ptype='close', dl=None,end=None
         dd = get_tdx_Exp_day_to_df(code, dl=1)
         return dd
 
-def get_tdx_day_to_df_last(code, dayl=1, type=0, dt=None, ptype='close', dl=None):
+def get_tdx_day_to_df_last(code, dayl=1, type=0, dt=None, ptype='close', dl=None,newdays=None):
     '''
     :param code:999999
     :param dayl:Duration Days
@@ -2138,6 +2141,10 @@ def get_tdx_day_to_df_last(code, dayl=1, type=0, dt=None, ptype='close', dl=None
     # dayl=int(dayl)
     # type=int(type)
     # print "t:",dayl,"type",type
+    if newdays is not None:
+        newstockdayl = newdays
+    else:
+        newstockdayl = newdaysinit
     if not type == 0:
         f = (lambda x: str((1000000 - int(x))) if x.startswith('0') else x)
         code = f(code)
@@ -2581,14 +2588,15 @@ def get_tdx_stock_period_to_type(stock_data, type='w'):
     return period_stock_data
 
 
-def usage(p):
-    print """
-python %s [-t txt|zip] stkid [from] [to]
--t txt 表示从txt files 读取数据，否则从zip file 读取(这也是默认方式)
-for example :
-python %s 999999 20070101 20070302
-python %s -t txt 999999 20070101 20070302
-    """ % (p, p, p)
+def usage(p=None):
+    import timeit
+#     print """
+# python %s [-t txt|zip] stkid [from] [to]
+# -t txt 表示从txt files 读取数据，否则从zip file 读取(这也是默认方式)
+# for example :
+# python %s 999999 20070101 20070302
+# python %s -t txt 999999 20070101 20070302
+#     """ % (p, p, p)
     status=None
     run=1
     df = rl.get_sina_Market_json('cyb')
@@ -2609,7 +2617,9 @@ python %s -t txt 999999 20070101 20070302
             dt = int(dt)+changedays
         # print dt
         # top_now = rl.get_market_price_sina_dd_realTime(df, vol, type)
-        split_t = timeit.timeit(lambda : get_tdx_all_day_LastDF(codelist,dt=duration_date,ptype=ptype), number=run)
+        # get_tdx_exp_all_LastDF_DL(codelist,dt=duration_date,ptype=ptype)
+        split_t = timeit.timeit(lambda : get_tdx_exp_all_LastDF_DL(codelist,dt=duration_date,ptype=ptype), number=run)
+        # split_t = timeit.timeit(lambda : get_tdx_all_day_LastDF(codelist,dt=duration_date,ptype=ptype), number=run)
         # split_t = timeit.timeit(lambda: get_tdx_day_to_df_last(codeList, 1, type, dt,ptype),number=run)
         print("df Read:", split_t)
 
@@ -2627,7 +2637,8 @@ python %s -t txt 999999 20070101 20070302
 
         # print dt,dl
         # strip_tx = timeit.timeit(lambda: get_tdx_exp_low_or_high_price(codeList, dt, ptype, dl), number=run)
-        strip_tx = timeit.timeit(lambda : get_tdx_exp_all_LastDF(codelist, dt=duration_date, ptype=ptype), number=run)
+        strip_tx = timeit.timeit(lambda : get_tdx_exp_all_LastDF_DL(codelist, dt=duration_date, ptype=ptype), number=run)
+        # strip_tx = timeit.timeit(lambda : get_tdx_exp_all_LastDF(codelist, dt=duration_date, ptype=ptype), number=run)
         print("ex Read:", strip_tx)
 
 def write_to_all():
@@ -2637,9 +2648,41 @@ def write_to_all():
     else:
         print "not write"
 
+def python_resample(qs, xs, rands):
+    n = qs.shape[0]
+    lookup = np.cumsum(qs)
+    results = np.empty(n)
+
+    for j in range(n):
+        for i in range(n):
+            if rands[j] < lookup[i]:
+                results[j] = xs[i]
+                break
+    return results
+
+def testnumba(number=500):
+    import timeit
+    
+    n = 100
+    xs = np.arange(n, dtype=np.float64)
+    qs = np.array([1.0/n,]*n)
+    rands = np.random.rand(n)
+    from numba.decorators import autojit
+    print timeit.timeit(lambda:python_resample(qs, xs, rands),number=number)
+    # print timeit.timeit(lambda:cct.run_numba(python_resample(qs, xs, rands)),number=number)
+    print timeit.timeit(lambda:autojit(lambda:python_resample(qs, xs, rands)),number=number)
+    # print timeit.timeit(lambda:cct.run_numba(python_resample(qs, xs, rands)),number=number)
 if __name__ == '__main__':
     import sys
     import timeit
+    # testnumba(1000)
+    # n = 100
+    # xs = np.arange(n, dtype=np.float64)
+    # qs = np.array([1.0/n,]*n)
+    # rands = np.random.rand(n)
+    # print python_resample(qs, xs, rands)
+    
+    # print get_tdx_Exp_day_to_df('999999',end=None).sort_index(ascending=False).shape
     # print sina_data.Sina().get_stock_code_data('300006').set_index('code')
 #    dd=rl.get_sina_Market_json('cyb').set_index('code')
 #    codelist= dd.index.tolist()
@@ -2650,7 +2693,8 @@ if __name__ == '__main__':
     # write_to_all()
 #    print get_tdx_append_now_df_api('600760')[:3]
     # print get_tdx_append_now_df_api('000411')[:3]
-    print get_tdx_Exp_day_to_df('300311',dl=2)[:2]
+    # print get_tdx_Exp_day_to_df('300311',dl=2)[:2]
+    # usage()
 
     # print get_tdx_append_now_df_api_tofile('300583')
     # sys.exit(0)
@@ -2659,11 +2703,14 @@ if __name__ == '__main__':
 #    code=['603878','300575']
 #    dm = get_sina_data_df(code)
 #    code='603878'
+   
     market = cct.cct_raw_input("write all data [all,cyb,sh,sz] :")
     if market in  ['all','sh','sz','cyb']:  
         Write_market_all_day_mp(market)
     else:
         print "market is None "
+
+
 #    print get_tdx_append_now_df_api2('603878',dl=2,dm=dm,newdays=5)
 #    print write_tdx_sina_data_to_file('999999',dm)
     code = '999999'

@@ -544,7 +544,7 @@ if __name__ == '__main__':
 #    code:002732 boll: 45 ma: 6.0  macd:-1 RSI:0 kdj: 3 time:0.0241
 #    code:002623 boll: 41 ma: 10.0  macd:-5 RSI:4 kdj: -1 time:0.0216
     days=5
-    dl=14
+    dl=60
     for code in codel:
         df = tdd.get_tdx_append_now_df_api(code,dl=int(dl*1.5)).sort_index(ascending=True)
     #    df = tdd.get_tdx_power_now_df(code,dl=30)
@@ -556,12 +556,12 @@ if __name__ == '__main__':
         print 'boll:',op
         print dd.shape,dd.loc[:,['close','upbbd','midbd','lowbd']][:2]
 #        print dd[:5]
-        sys.exit(0)
+        # sys.exit(0)
         dtype='d'
         operate=0
         for cl in ['upbb%s'%dtype,'midb%s'%dtype,'lowb%s'%dtype]:
-            operate = algoMultiTech(dd, column=cl, days=days,op=operate)
-        print 'bollc:',operate,
+            operate += algoMultiTech(dd, column=cl, days=days,op=operate)
+        print 'bollcalgoMultiTech:',operate,
         operate = algoMultiDay(df, column='close',days=days)
         print 'ma:',operate,
         dd,op=Get_MACD_OP(df,days=days)
