@@ -531,6 +531,28 @@ def Write_Blog(strinput,Dist):
     fp.close()
     time.sleep(1)
 
+def get_All_Count(code,dl=14,days=5):
+    s=time.time()
+    df = tdd.get_tdx_append_now_df_api(code,dl=int(dl*2)).sort_index(ascending=True)
+    dd,op=Get_BBANDS(df, dtype='d',days=days)
+    print 'boll:%s'%(op),
+    dd,op=Get_KDJ(dd,days=days)
+    print 'kdj:',op,
+    dd,op=Get_MACD_OP(dd,days=days)
+    print ' macd:%s'%(op),
+    dd,op=Get_RSI(dd,days=days)
+    print 'RSI:%s'%(op),
+    operate = algoMultiDay(dd, column='close',days=days)
+    print 'ma:',operate,
+#    sys.exit()
+    # print dd.shape,dd.loc[:,['close','upbbd','midbd','lowbd']][:2]
+    dtype='d'
+    operate=0
+    for cl in ['upbb%s'%dtype,'midb%s'%dtype,'lowb%s'%dtype]:
+        operate += algoMultiTech(dd, column=cl, days=days,op=operate)
+    print 'bollCT:',operate,
+    print "time:%0.3f"%(time.time()-s)
+
 if __name__ == '__main__':
     # df = Get_Stock_List()
     # Dist = 'E:\\Quant\\'
@@ -545,6 +567,8 @@ if __name__ == '__main__':
 #    code:002623 boll: 41 ma: 10.0  macd:-5 RSI:4 kdj: -1 time:0.0216
     days=5
     dl=60
+    # get_All_Count('002371',14)
+    # sys.exit(0)
     for code in codel:
         df = tdd.get_tdx_append_now_df_api(code,dl=int(dl*1.5)).sort_index(ascending=True)
     #    df = tdd.get_tdx_power_now_df(code,dl=30)

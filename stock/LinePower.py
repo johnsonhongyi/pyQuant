@@ -4,6 +4,7 @@ import sys
 from JSONData import powerCompute as pct
 from JSONData import LineHistogram as lht
 from JSONData import wencaiData as wcd
+from JSONData import get_macd_kdj_rsi as getab
 from JohhnsonUtil import commonTips as cct
 
 def parseArgmain():
@@ -132,6 +133,8 @@ if __name__ == "__main__":
                         # op, ra, st, days = get_linear_model_status(args.code, dtype=args.dtype, start=cct.day8_to_day10(
                         # args.start), end=cct.day8_to_day10(args.end), filter=args.filter, dl=args.dl)
                 # print "code:%s op:%s ra/days:%s  start:%s" % (code, op, str(ra) + '/' + str(days), st)
+                getab.get_All_Count(args.code,dl=args.dl,days=5)
+
                 cct.sleep(0.1)
                 # ts=time.time()
                 # time.sleep(5)

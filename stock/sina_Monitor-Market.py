@@ -123,7 +123,7 @@ if __name__ == "__main__":
                             if 'counts' in top_now.columns.values:
                                     top_all.loc[symbol, 'trade':'prev_p'] = top_now.loc[symbol, 'trade':'prev_p']
                             else:
-                                top_all.loc[symbol, 'trade':'low'] = top_now.loc[symbol, 'trade':'low']
+                                top_all.loc[symbol, 'trade':'diff'] = top_now.loc[symbol, 'trade':'diff']
 
                 # top_all=top_all.sort_values(by=['diff','percent','counts'],ascending=[0,0,1])
                 # top_all=top_all.sort_values(by=['diff','ratio','percent','counts'],ascending=[0,1,0,1])

@@ -167,7 +167,7 @@ if __name__ == "__main__":
                                 # ((float(top_now.loc[symbol, 'buy']) - float(
                                 # top_all.loc[symbol, 'lastp'])) / float(top_all.loc[symbol, 'lastp']) * 100),
                                 # 1)
-                                top_all.loc[symbol, 'trade':'low'] = top_now.loc[symbol, 'trade':'low']
+                                top_all.loc[symbol, 'trade':'diff'] = top_now.loc[symbol, 'trade':'diff']
                                 # top_all.loc[symbol, 'buy'] = top_now.loc[symbol, 'buy']
                 # top_all = top_all[top_all.buy > 0]
                 top_dif = top_all.copy()
