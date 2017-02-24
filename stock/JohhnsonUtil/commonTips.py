@@ -645,6 +645,7 @@ def get_url_data(url,retry_count=3,pause=0.05):
             return data.text
     #     else:
     #         return df
+    print "url:%s"%(url)
     raise IOError(ct.NETWORK_URL_ERROR_MSG)
 
 def get_div_list(ls, n):

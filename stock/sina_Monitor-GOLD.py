@@ -259,8 +259,10 @@ if __name__ == "__main__":
                     # top_temp = top_temp.sort_values(by=['diff', 'op', 'ra', 'percent', 'ratio'],
                     # top_temp = top_temp.sort_values(by=ct.Monitor_sort_op,
                     #                 ascending=ct.Monitor_sort_op_key)
-                    top_temp = top_temp.sort_values(by=ct.Duration_ra_goldop,
-                                    ascending=ct.Duration_ra_goldop_key)
+                    top_temp = top_temp.sort_values(by=ct.ct.Duration_percentdn_ra,
+                                    ascending=ct.ct.Duration_percentdn_ra_key)
+                    # top_temp = top_temp.sort_values(by=ct.Duration_ra_goldop,
+                    #                 ascending=ct.Duration_ra_goldop_key)
                     # top_temp = top_temp.sort_values(by=['op','ra','diff', 'percent', 'ratio'], ascending=[0,0,0, 0, 1])                
                 if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935:
                     top_temp = top_temp.loc[:,ct.Monitor_format_trade]

@@ -6,34 +6,45 @@ from JSONData import LineHistogram as lht
 from JSONData import wencaiData as wcd
 from JSONData import get_macd_kdj_rsi as getab
 from JohhnsonUtil import commonTips as cct
+import argparse
 
 def parseArgmain():
     # from ConfigParser import ConfigParser
     # import shlex
-    import argparse
-    parser = argparse.ArgumentParser()
-    parser.add_argument('code', type=str, nargs='?', help='999999')
-    parser.add_argument('start', nargs='?', type=str, help='20150612')
-    parser.add_argument('end', nargs='?', type=str, help='20160101')
-    parser.add_argument('-d', action="store", dest="dtype", type=str, nargs='?', choices=['d', 'w', 'm'], default='d',
-                        help='DateType')
-    parser.add_argument('-v', action="store", dest="vtype", type=str, choices=['f', 'b'], default='f',
-                        help='Price Forward or back')
-    parser.add_argument('-p', action="store", dest="ptype", type=str, choices=['high', 'low', 'close'], default='low',
-                        help='price type')
-    parser.add_argument('-f', action="store", dest="filter", type=str, choices=['y', 'n'], default='n',
-                        help='find duration low')
-    parser.add_argument('-l', action="store", dest="dl", type=int, default=30,
-                        help='dl default=30')
-    parser.add_argument('-dl', action="store", dest="days", type=int, default=1,
-                        help='days')
-    parser.add_argument('-m', action="store", dest="mpl", type=str, default='y',
-                        help='mpl show')
-    parser.add_argument('-i', action="store", dest="line", type=str, choices=['y', 'n'], default='y',
-                    help='LineHis show')
-    parser.add_argument('-w', action="store", dest="wencai", type=str, choices=['y', 'n'], default='n',
-                    help='WenCai Search')
-    return parser
+    try:
+        parser = argparse.ArgumentParser()
+        parser.add_argument('code', type=str, nargs='?', help='999999')
+        parser.add_argument('start', nargs='?', type=str, help='20150612')
+        parser.add_argument('end', nargs='?', type=str, help='20160101')
+        parser.add_argument('-d', action="store", dest="dtype", type=str, nargs='?', choices=['d', 'w', 'm'], default='d',
+                            help='DateType')
+        parser.add_argument('-v', action="store", dest="vtype", type=str, choices=['f', 'b'], default='f',
+                            help='Price Forward or back')
+        parser.add_argument('-p', action="store", dest="ptype", type=str, choices=['high', 'low', 'close'], default='low',
+                            help='price type')
+        parser.add_argument('-f', action="store", dest="filter", type=str, choices=['y', 'n'], default='n',
+                            help='find duration low')
+        parser.add_argument('-l', action="store", dest="dl", type=int, default=30,
+                            help='dl default=30')
+        parser.add_argument('-dl', action="store", dest="days", type=int, default=1,
+                            help='days')
+        parser.add_argument('-m', action="store", dest="mpl", type=str, default='y',
+                            help='mpl show')
+        parser.add_argument('-i', action="store", dest="line", type=str, choices=['y', 'n'], default='y',
+                        help='LineHis show')
+        parser.add_argument('-w', action="store", dest="wencai", type=str, choices=['y', 'n'], default='n',
+                        help='WenCai Search')
+        return parser
+    except Exception, e:
+        # print 'Eerror:',e
+        pass
+        # raise "Error"
+    else:
+        # print 'Eerror:'
+        pass
+    finally:
+        # print 'Eerror:'
+        pass
 
 
 def maintest(code, start=None, type='m', filter='y'):
@@ -81,7 +92,8 @@ if __name__ == "__main__":
                         op, ra, st, days = pct.get_linear_model_status(args.code,df=None, dtype=args.dtype, start=start, end=end,
                                                                    days=args.days, ptype=ptype, filter=args.filter,
                                                                    dl=args.dl)
-                        print "%s op:%s ra:%s days:%s  start:%s" % (args.code, op, str(ra), str(days[0]), st)
+                        # print "%s op:%s ra:%s days:%s  start:%s" % (args.code, op, str(ra), str(days[0]), st)
+                        print "op:%s ra:%s days:%s  start:%s" % (op, str(ra), str(days[0]), st)
 
 
             elif len(str(args.code)) == 6:
@@ -102,7 +114,8 @@ if __name__ == "__main__":
                     df=lht.get_linear_model_histogramDouble(code, dtype=args.dtype, start=start, end=end,filter=args.filter, dl=args.dl)
                     # candlestick_powercompute(code,start, end)
                     op, ra, st, days = pct.get_linear_model_status(code,df=df, start=start, end=end, filter=args.filter)
-                    print "code:%s op:%s ra:%s  start:%s" % (code, op, ra, st)
+                    # print "%s op:%s ra:%s  start:%s" % (code, op, ra, st)
+                    print "op:%s ra:%s  start:%s" % (op, ra, st)
                     # p=multiprocessing.Process(target=get_linear_model_histogramDouble,args=(code, args.ptype, args.dtype, start, end,args.vtype,args.filter,))
                     # p.daemon = True
                     # p.start()
@@ -129,11 +142,12 @@ if __name__ == "__main__":
                         op, ra, st, days = pct.get_linear_model_status(args.code,df=df, dtype=args.dtype, start=start, end=end,
                                                                    days=args.days, ptype=ptype, filter=args.filter,
                                                                    dl=args.dl)
-                        print "%s op:%s ra:%s days:%s  start:%s" % (args.code, op, str(ra), str(days[0]), st)
+                        # print "%s op:%s ra:%s days:%s  start:%s" % (args.code, op, str(ra), str(days[0]), st)
+                        print "op:%s ra:%s days:%s  start:%s" % (op, str(ra), str(days[0]), st)
                         # op, ra, st, days = get_linear_model_status(args.code, dtype=args.dtype, start=cct.day8_to_day10(
                         # args.start), end=cct.day8_to_day10(args.end), filter=args.filter, dl=args.dl)
                 # print "code:%s op:%s ra/days:%s  start:%s" % (code, op, str(ra) + '/' + str(days), st)
-                getab.get_All_Count(args.code,dl=args.dl,days=5)
+                getab.get_All_Count(args.code,dl=args.dl,start=start, end=end,days=5)
 
                 cct.sleep(0.1)
                 # ts=time.time()
@@ -145,7 +159,9 @@ if __name__ == "__main__":
             elif code == 'h' or code == 'help':
                 parser.print_help()
             else:
-                print "code error"
+                # print "code error"
+                # print '',
+                pass
         except (KeyboardInterrupt) as e:
             # print "key"
             print "KeyboardInterrupt:", e

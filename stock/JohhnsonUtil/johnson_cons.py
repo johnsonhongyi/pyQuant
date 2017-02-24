@@ -42,8 +42,11 @@ Duration_sort_op_key=[0,0,1,1,0,0,1,1,1]
 Duration_percentdn_op=['percent','diff','op','fib','fibl','ra','ratio','volume','counts']
 Duration_percentdn_op_key=[0,0,0,1,1,0,1,1,1]
 
-Duration_percentdn_ra=['ra','percent','diff','op','fib','fibl','ratio','volume','counts']
+# Duration_percentdn_ra=['ra','percent','diff','op','fib','fibl','ratio','volume','counts']
+# Duration_percentdn_ra_key=[0,0,0,0,1,1,1,1,1]
+Duration_percentdn_ra=['diff','ra','percent','op','fib','fibl','ratio','volume','counts']
 Duration_percentdn_ra_key=[0,0,0,0,1,1,1,1,1]
+
 
 Duration_percentdn_opra=['op','ra','percent','diff','fib','fibl','ratio','volume','counts']
 Duration_percentdn_opra_key=[0,0,0,0,1,1,1,1,1]
@@ -51,6 +54,9 @@ Duration_percentdn_opra_key=[0,0,0,0,1,1,1,1,1]
 # Duration_percent_op_key=[0,0,0,1,1,0,1,1,1]
 Duration_percent_op=['diff','boll','ra','percent','op','fib','fibl','ratio','volume','counts']
 Duration_percent_op_key=[0,0,0,0,0,1,1,1,1,1]
+
+# Duration_percent_op=['diff','boll','ra','percent','op','fib','fibl','ratio','volume','counts']
+# Duration_percent_op_key=[0,0,0,0,0,1,1,1,1,1]
 
 Duration_ra_op=['ra','diff','percent','op','fib','fibl','ratio','volume','counts']
 Duration_ra_op_key=[0,0,0,0,1,1,1,1,1]

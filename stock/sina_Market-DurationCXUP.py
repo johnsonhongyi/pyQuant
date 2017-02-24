@@ -295,7 +295,7 @@ if __name__ == "__main__":
                                     title=[du_date, 'dT:%s' % cct.get_time_to_date(time_s), 'G:%s' % goldstock,
                                            'zxg: %s' % (blkname)])
 
-                    top_temp = stf.getBollFilter(df=top_temp, boll=ct.bollFilter)
+                    top_temp = stf.getBollFilter(df=top_temp, boll=ct.bollFilter,duration=ct.PowerCountdl)
                     if 'op' in top_temp.columns:
                         # top_temp = top_temp.sort_values(by=ct.Duration_sort_op,
                         #             ascending=ct.Duration_sort_op_key)
@@ -315,8 +315,8 @@ if __name__ == "__main__":
                             top_temp = top_temp.sort_values(by=ct.Duration_percent_op,
                                         ascending=ct.Duration_percent_op_key)
                         else:
-                            top_temp = top_temp.sort_values(by=ct.Duration_percentdn_op,
-                                        ascending=ct.Duration_percentdn_op_key)
+                            top_temp = top_temp.sort_values(by=ct.Duration_percentdn_ra,
+                                        ascending=ct.Duration_percentdn_ra_key)
 
                     if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935:
                         # top_temp = top_temp[ (top_temp['ma5d'] > top_temp['ma10d']) & (top_temp['buy'] > top_temp['ma10d']) ][:10]

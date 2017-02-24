@@ -1471,7 +1471,7 @@ def getSinaAlldf(market='cyb',vol=ct.json_countVol,type=ct.json_countType,filena
     # top_now = get_mmarket='all'arket_price_sina_dd_realTime(df, vol, type)
 #    df =  df.dropna()
 
-    if len(df) > 0:
+    if len(df) > 0 and 'code' in df.columns:
 #        codelist = df.code.tolist()
         df = df.set_index('code')
     else:

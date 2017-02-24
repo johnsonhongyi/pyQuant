@@ -360,6 +360,7 @@ if __name__ == '__main__':
 
     # df =  get_wcbk_df(filter='城建+一带一路',market='ydyl')
     df =  get_wcbk_df(filter='新股与次新股',market='cxg')
+    # df =  get_wcbk_df(filter='新能源',market='xny')
 #    df =  get_wcbk_df(filter='混改',market='wencai')
     print df.shape,df[:5]
     # df = get_wencai_Market_url('农业',10000)

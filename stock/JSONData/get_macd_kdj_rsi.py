@@ -17,6 +17,8 @@ log = LoggerFactory.getLogger("get_macd_kdj_rsi")
 #获取股票列表
 #code,代码 name,名称 industry,所属行业 area,地区 pe,市盈率 outstanding,流通股本 totals,总股本(万) totalAssets,总资产(万)liquidAssets,流动资产
 # fixedAssets,固定资产 reserved,公积金 reservedPerShare,每股公积金 eps,每股收益 bvps,每股净资 pb,市净率 timeToMarket,上市日期
+
+limitCount = 15
 def Get_Stock_List():
     df = ts.get_stock_basics().head(10)
 #     print (df)
@@ -156,7 +158,8 @@ def Get_BBANDS_algo(df):
 
 
 def Get_BBANDS(df,dtype='d',days=5):
-    if len(df) < 25:
+    log.info("BBANDS:",len(df))
+    if len(df) < limitCount:
         return (df,1)
     df = df.sort_index(ascending=True)
     upperband,middleband,lowerband=ta.BBANDS(np.array(df['close']),timeperiod=20,nbdevdn=2,matype=0)
@@ -277,7 +280,7 @@ def Get_TA(df,dtype='d',days=5):
 
 def Get_MACD_OP(df,dtype='d',days=5):
     #参数12,26,9
-    if len(df) < 30:
+    if len(df) < limitCount:
         return (df,1)
     df = df.sort_index(ascending=True)
 #    df=df.fillna(0)
@@ -308,7 +311,7 @@ def Get_MACD_OP(df,dtype='d',days=5):
 def Get_MACD(df,dtype='d',days=5):
     #参数12,26,9
     df = df.sort_index(ascending=True)
-    if len(df) < 34:
+    if len(df) < limitCount:
         return (df,1)
 #    df=df.fillna(0)
     macd, macdsignal, macdhist = ta.MACD(np.array(df['close']), fastperiod=12, slowperiod=26, signalperiod=9)
@@ -379,7 +382,7 @@ def Get_MACD(df,dtype='d',days=5):
 #通过KDJ判断买入卖出
 def Get_KDJ(df,dtype='d',days=5):
     #参数9,3,3
-    if len(df) < 30:
+    if len(df) < limitCount:
         return (df,1)
     else:
         df = df.sort_index(ascending=True)
@@ -407,6 +410,8 @@ def Get_KDJ(df,dtype='d',days=5):
         ma5=df.loc[df.index[-1],'ma5%s'%dtype]
         ma10=df.loc[df.index[-1],'ma10%s'%dtype]
         ma20=df.loc[df.index[-1],'ma20%s'%dtype]
+
+        # print kdjk,kdjk2,kdjd,kdjd2
         #1.K线是快速确认线——数值在90以上为超买，数值在10以下为超卖；D大于80时，行情呈现超买现象。D小于20时，行情呈现超卖现象。
     #    if kdjk>=90:
     #        operate = operate - 3
@@ -445,7 +450,7 @@ def Get_KDJ(df,dtype='d',days=5):
 #通过RSI判断买入卖出
 def Get_RSI(df,dtype='d',days=5):
     #参数14,5
-    if len(df) < 30:
+    if len(df) < limitCount:
         return (df,1)
     df = df.sort_index(ascending=True)
     slowreal = ta.RSI(np.array(df['close']), timeperiod=14)
@@ -531,9 +536,13 @@ def Write_Blog(strinput,Dist):
     fp.close()
     time.sleep(1)
 
-def get_All_Count(code,dl=14,days=5):
+def get_All_Count(code,dl=None,start=None, end=None,days=5):
     s=time.time()
-    df = tdd.get_tdx_append_now_df_api(code,dl=int(dl*2)).sort_index(ascending=True)
+    if start is not None or end is not None:
+        dl = None
+    # else:
+    #     dl = int(dl*2)
+    df = tdd.get_tdx_append_now_df_api(code,start=start, end=end,dl=dl).sort_index(ascending=True)
     dd,op=Get_BBANDS(df, dtype='d',days=days)
     print 'boll:%s'%(op),
     dd,op=Get_KDJ(dd,days=days)
@@ -567,8 +576,10 @@ if __name__ == '__main__':
 #    code:002623 boll: 41 ma: 10.0  macd:-5 RSI:4 kdj: -1 time:0.0216
     days=5
     dl=60
-    # get_All_Count('002371',14)
-    # sys.exit(0)
+    # for x in range(9,30):
+    for x in ['000737','002695','601555','002486','600321','002437','399006','999999']:
+        get_All_Count(x,9)
+    sys.exit(0)
     for code in codel:
         df = tdd.get_tdx_append_now_df_api(code,dl=int(dl*1.5)).sort_index(ascending=True)
     #    df = tdd.get_tdx_power_now_df(code,dl=30)
