@@ -103,7 +103,7 @@ def get_code_file_path(code,type='f'):
 
 
 # @nb.autojit
-def get_tdx_Exp_day_to_df(code, type='f', start=None, end=None, dl=None,newdays = None):
+def get_tdx_Exp_day_to_df(code, start=None, end=None, dl=None,newdays = None,type='f'):
     start=cct.day8_to_day10(start)
     end=cct.day8_to_day10(end)
     if dl is not None and dl < 70:
