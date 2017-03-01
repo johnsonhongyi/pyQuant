@@ -30,8 +30,13 @@ from JohhnsonUtil import commonTips as cct
     # return parser
 def evalcmd(dir_mo):
     end = True
+    import readline
+    import rlcompleter
+    # readline.set_completer(cct.MyCompleter(dir_mo).complete)
+    readline.parse_and_bind('tab:complete')
     while end:
-        cmd = (cct.cct_raw_input(" ".join(dir_mo)+": "))
+        # cmd = (cct.cct_raw_input(" ".join(dir_mo)+": "))
+        cmd = (cct.cct_raw_input(": "))
         # cmd = (cct.cct_raw_input(dir_mo.append(":")))
         # if cmd == 'e' or cmd == 'q' or len(cmd) == 0:
         # print cmd,":",len(cmd)

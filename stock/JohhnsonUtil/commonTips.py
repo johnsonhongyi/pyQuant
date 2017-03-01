@@ -322,7 +322,36 @@ def cct_raw_input(sts):
     return st
 
 # eval_rule = "[elem for elem in dir() if not elem.startswith('_') and not elem.startswith('ti')]"
+# eval_rule = "[elem for elem in dir() if not elem.startswith('_')]"
 eval_rule = "[elem for elem in dir() if elem.startswith('top')]"
+
+# import readline
+# import rlcompleter, readline
+# readline.set_completer(completer.complete)
+# readline.parse_and_bind('tab:complete')
+
+class MyCompleter(object):  # Custom completer
+
+    def __init__(self, options):
+        self.options = sorted(options)
+
+    def complete(self, text, state):
+        if state == 0:  # on first trigger, build possible matches
+            if text:  # cache matches (entries that start with entered text)
+                # self.matches = [s for s in self.options 
+                #                     if s and s.startswith(text)]
+                self.matches = [s for s in self.options 
+                                   if text in s]                                    
+            else:  # no text entered, all matches possible
+                self.matches = self.options[:]
+
+        # return match indexed by state
+        try: 
+            return self.matches[state]
+        except IndexError:
+            return None
+
+
 
 def cct_eval(cmd):
     try:

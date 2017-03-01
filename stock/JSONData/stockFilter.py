@@ -5,7 +5,7 @@ sys.path.append("..")
 from JohhnsonUtil import commonTips as cct
 import JohhnsonUtil.johnson_cons as ct
 import time
-def getBollFilter(df=None,boll=1,duration=14):
+def getBollFilter(df=None,boll=-4,duration=14):
     #return boll > int
     if df is None:
         print "dataframe is None"
@@ -32,13 +32,16 @@ def getBollFilter(df=None,boll=1,duration=14):
 #    df['diff'] = (map(lambda ra, fibl,rah,fib,ma,kdj,rsi:round(ra * fibl + rah*fib +ma +kdj+rsi),\
 #                         df['ra'].values, df['fibl'].astype(float).values,df['rah'].values,df['fib'].astype(float).values,df['ma'].values,\
 #                         df['kdj'].values,df['rsi'].values))
-    df['diff2'] = df['diff']
-    df['diff'] = (map(lambda ra, fibl,rah,fib,ma,kdj,rsi:round(ra * fibl + rah*(abs(duration-fibl))/fib +ma +kdj+rsi),\
-                         df['ra'].values, df['fibl'].astype(float).values,df['rah'].values,df['fib'].astype(float).values,df['ma'].values,\
+    # df['diff2'] = df['diff'].copy()
+    df.rename(columns={'diff': 'diff2'}, inplace=True)
+    df['diff'] = (map(lambda ra, fibl,rah,fib,ma,kdj,rsi:round(eval(ct.powerdiff%(duration)),1),\
+                         df['ra'].values, df['fibl'].values,df['rah'].values,df['fib'].values,df['ma'].values,\
                          df['kdj'].values,df['rsi'].values))
 #    print "map time:%s"%(round((time.time()-time_s),2))
     if 'ma5d' in df.columns:
         df = df[df.buy > df.ma5d * ct.changeRatio]
+    if 'ra' in df.columns and 'op' in df.columns:
+        df = df[ (df.ma > 0 ) & (df.diff > 1) & (df.ra > 1) & (df.op >= 5) ]
     if 'boll' in df.columns:
         return df[df.boll >= boll]
     else:

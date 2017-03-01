@@ -5,8 +5,10 @@ from JSONData import powerCompute as pct
 from JSONData import LineHistogram as lht
 from JSONData import wencaiData as wcd
 from JSONData import get_macd_kdj_rsi as getab
+import JohhnsonUtil.johnson_cons as ct
 from JohhnsonUtil import commonTips as cct
 import argparse
+
 
 def parseArgmain():
     # from ConfigParser import ConfigParser
@@ -22,13 +24,13 @@ def parseArgmain():
                             help='Price Forward or back')
         parser.add_argument('-p', action="store", dest="ptype", type=str, choices=['high', 'low', 'close'], default='low',
                             help='price type')
-        parser.add_argument('-f', action="store", dest="filter", type=str, choices=['y', 'n'], default='n',
+        parser.add_argument('-f', action="store", dest="filter", type=str, choices=['y', 'n'], default='y',
                             help='find duration low')
-        parser.add_argument('-l', action="store", dest="dl", type=int, default=30,
+        parser.add_argument('-l', action="store", dest="dl", type=int, default=14,
                             help='dl default=30')
         parser.add_argument('-dl', action="store", dest="days", type=int, default=1,
                             help='days')
-        parser.add_argument('-m', action="store", dest="mpl", type=str, default='y',
+        parser.add_argument('-m', action="store", dest="mpl", type=str, default='n',
                             help='mpl show')
         parser.add_argument('-i', action="store", dest="line", type=str, choices=['y', 'n'], default='y',
                         help='LineHis show')
@@ -113,9 +115,28 @@ if __name__ == "__main__":
                     # print code, args.ptype, args.dtype, start, end
                     df=lht.get_linear_model_histogramDouble(code, dtype=args.dtype, start=start, end=end,filter=args.filter, dl=args.dl)
                     # candlestick_powercompute(code,start, end)
-                    op, ra, st, days = pct.get_linear_model_status(code,df=df, start=start, end=end, filter=args.filter)
+                    
+                    # op, ra, st, days = pct.get_linear_model_status(code,df=df, start=start, end=end, filter=args.filter)
                     # print "%s op:%s ra:%s  start:%s" % (code, op, ra, st)
-                    print "op:%s ra:%s  start:%s" % (op, ra, st)
+                    # print "op:%s ra:%s  start:%s" % (op, ra, st)
+                    args.filter = 'y'
+                    for ptype in ['low', 'high']:
+                        op, ra, st, days = pct.get_linear_model_status(args.code,df=df, dtype=args.dtype, start=start, end=end,
+                                                                   days=args.days, ptype=ptype, filter=args.filter,
+                                                                   dl=args.dl)
+                        # print "%s op:%s ra:%s days:%s  start:%s" % (args.code, op, str(ra), str(days[0]), st)
+                        print "op:%s ra:%s days:%s  start:%s" % (op, str(ra), str(days[0]), st)
+                        if ptype == 'low':
+                            ral = ra
+                            opl = op
+                            stl = st
+                            fibl = int(days[0])
+                        else:
+                            oph = op
+                            rah = ra
+                            fib = int(days[0])
+                            ra = ral
+
                     # p=multiprocessing.Process(target=get_linear_model_histogramDouble,args=(code, args.ptype, args.dtype, start, end,args.vtype,args.filter,))
                     # p.daemon = True
                     # p.start()
@@ -144,11 +165,31 @@ if __name__ == "__main__":
                                                                    dl=args.dl)
                         # print "%s op:%s ra:%s days:%s  start:%s" % (args.code, op, str(ra), str(days[0]), st)
                         print "op:%s ra:%s days:%s  start:%s" % (op, str(ra), str(days[0]), st)
+                        if ptype == 'low':
+                            ral = ra
+                            opl = op
+                            stl = st
+                            fibl = (days[0])
+                        else:
+                            oph = op
+                            rah = ra
+                            fib = (days[0])
+                            ra = ral
                         # op, ra, st, days = get_linear_model_status(args.code, dtype=args.dtype, start=cct.day8_to_day10(
                         # args.start), end=cct.day8_to_day10(args.end), filter=args.filter, dl=args.dl)
                 # print "code:%s op:%s ra/days:%s  start:%s" % (code, op, str(ra) + '/' + str(days), st)
-                getab.get_All_Count(args.code,dl=args.dl,start=start, end=end,days=5)
+                # 'ra * fibl + rah*(abs(int(%s)-fibl))/fib +ma +kdj+rsi'
+                boll,kdj,macd,rsi,ma,bollCT = getab.get_All_Count(args.code,dl=args.dl*2,start=start, end=end,days=5)
+                # print ""
+                # print "ral,opl,fibl,oph,rah,fib,kdj,macd,rsi,ma=",ral,opl,fibl,oph,rah,fib,kdj,macd,rsi,ma
+                # ra, fibl,rah,fib,ma,kdj,rsi
+                # for x in [boll,kdj,macd,rsi,ma,bollCT,ra,fibl,rah,`]:
+                #     print type(x),x
+                # print args.dl,ra,fibl,rah,op
+                # print ra * fibl + rah*(abs(int(args.dl)-fibl))/fib +ma +kdj+rsi
 
+                diff=eval(ct.powerdiff%(ct.PowerCountdl))
+                print "Diff:%.1f"%(diff)
                 cct.sleep(0.1)
                 # ts=time.time()
                 # time.sleep(5)

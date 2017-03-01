@@ -886,11 +886,13 @@ def powerCompute_df(df, dtype='d', end=None, dl=None, filter='y',talib=False,new
                 ral = ra
                 opl = op
                 stl = st
-                fibl = str(daysData[0])
+                # fibl = str(daysData[0])
+                fibl = (daysData[0])
             else:
                 oph = op
                 rah = ra
-                fib = str(daysData[0])
+                # fib = str(daysData[0])
+                fib = (daysData[0])
         # fibl = sep.join(fib)
 
         tdx_df,operation = getab.Get_BBANDS(tdx_df, dtype='d')

@@ -30,8 +30,13 @@ from JohhnsonUtil import commonTips as cct
 # return parser
 def evalcmd(dir_mo):
     end = True
+    import readline
+    import rlcompleter
+    # readline.set_completer(cct.MyCompleter(dir_mo).complete)
+    readline.parse_and_bind('tab:complete')
     while end:
-        cmd = (cct.cct_raw_input(" ".join(dir_mo)+": "))
+        # cmd = (cct.cct_raw_input(" ".join(dir_mo)+": "))
+        cmd = (cct.cct_raw_input(": "))
         # cmd = (cct.cct_raw_input(dir_mo.append(":")))
         # if cmd == 'e' or cmd == 'q' or len(cmd) == 0:
         if str(cmd) == 'e' or str(cmd) == 'q':
@@ -110,11 +115,11 @@ if __name__ == "__main__":
             # top_dif = top_now
             # top_now.to_hdf("testhdf5", 'marketDD', format='table', complevel=9)
             '''
-            # top_now = tdd.getSinaAlldf(market='cx', vol=ct.json_countVol, type=ct.json_countType)
-            # top_now = tdd.getSinaAlldf(market='农业',filename='nybk', vol=ct.json_countVol, type=ct.json_countType)
+            top_now = tdd.getSinaAlldf(market='cx', vol=ct.json_countVol, type=ct.json_countType)
+            # top_now = tdd.getSinaAlldf(market='国企改革',filename='gqgg', vol=ct.json_countVol, type=ct.json_countType)
             # top_now = tdd.getSinaAlldf(market=u'一带一路',filename='ydyl', vol=ct.json_countVol, type=ct.json_countType)
             # top_now = tdd.getSinaAlldf(market=u'新股与次新股',filename='cxg', vol=ct.json_countVol, type=ct.json_countType)
-            top_now = tdd.getSinaAlldf(market=u'京津冀',filename='beijing', vol=ct.json_countVol, type=ct.json_countType)
+            # top_now = tdd.getSinaAlldf(market=u'京津冀',filename='beijing', vol=ct.json_countVol, type=ct.json_countType)
             now_count = len(top_now)
             radio_t = cct.get_work_time_ratio()
             # top_now = top_now[top_now.buy > 0]

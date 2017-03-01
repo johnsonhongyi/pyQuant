@@ -660,9 +660,13 @@ def get_tdx_append_now_df_api(code, start=None, end=None, type='f',df=None,dm=No
         df['ma60d'] = pd.rolling_mean(df.close,60)
         df=df.fillna(0)
         df = df.sort_index(ascending=False)
-    if writedm and len(df) > 0:
+    if end is None and writedm and len(df) > 0:
         if cct.get_now_time_int() < 900 or cct.get_now_time_int() > 1505:
             if index_status:
+                if code == 'sh':
+                    code_ts = '999999'
+                else:
+                    code_ts = code_t
                 sta=write_tdx_sina_data_to_file(code_ts,df=df)
             else:
                 sta=write_tdx_sina_data_to_file(code,df=df)
@@ -2662,7 +2666,7 @@ def python_resample(qs, xs, rands):
 
 def testnumba(number=500):
     import timeit
-    
+
     n = 100
     xs = np.arange(n, dtype=np.float64)
     qs = np.array([1.0/n,]*n)
@@ -2681,7 +2685,7 @@ if __name__ == '__main__':
     # qs = np.array([1.0/n,]*n)
     # rands = np.random.rand(n)
     # print python_resample(qs, xs, rands)
-    
+
     # print get_tdx_Exp_day_to_df('999999',end=None).sort_index(ascending=False).shape
     # print sina_data.Sina().get_stock_code_data('300006').set_index('code')
 #    dd=rl.get_sina_Market_json('cyb').set_index('code')
@@ -2703,9 +2707,9 @@ if __name__ == '__main__':
 #    code=['603878','300575']
 #    dm = get_sina_data_df(code)
 #    code='603878'
-   
+
     market = cct.cct_raw_input("write all data [all,cyb,sh,sz] :")
-    if market in  ['all','sh','sz','cyb']:  
+    if market in  ['all','sh','sz','cyb']:
         Write_market_all_day_mp(market)
     else:
         print "market is None "

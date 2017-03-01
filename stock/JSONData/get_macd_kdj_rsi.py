@@ -10,6 +10,7 @@ import tushare as ts
 import tdx_data_Day as tdd
 from JohhnsonUtil import LoggerFactory as LoggerFactory
 from JohhnsonUtil import johnson_cons as ct
+import math
 log = LoggerFactory.getLogger("get_macd_kdj_rsi")
 # log.setLevel(LoggerFactory.DEBUG)
 
@@ -26,6 +27,8 @@ def Get_Stock_List():
 
 def algoMultiDay(df,column='close',days=5,op=0):
     df = df.sort_index(ascending=True)
+    if len(df) < days:
+        days = len(df) - 1
     if df is not None:
         obo=0
         if column in df.columns:
@@ -35,6 +38,8 @@ def algoMultiDay(df,column='close',days=5,op=0):
                 c_min=tmpdf.min().values
                 c_mean=tmpdf.mean().values
                 idx = -1 - day
+                if math.isnan(df[column][idx]) or math.isnan(df[column][idx-1]):
+                    break
                 nowp = round(df[column][idx],2)
                 lastp = round(df[column][idx-1],2)
                 if nowp >= c_max and day == 0:
@@ -76,14 +81,20 @@ def algoMultiDay(df,column='close',days=5,op=0):
 
 def algoMultiTech(df,column='close',days=5,op=0):
     df = df.sort_index(ascending=True)
+    if len(df) < days:
+        days = len(df) - 1
     if df is not None:
         if column in df.columns:
             for day in range(days):
                 idx = -1 - day
+                if math.isnan(df[column][idx]) or math.isnan(df[column][idx-1]):
+                    break
                 nowp = round(df[column][idx],2)
                 lastp = round(df[column][idx-1],2)
+#                if math.isnan(nowp) or math.isnan(lastp):
+#                    break
                 if nowp > lastp:
-                    op +=1
+                    op
                 else:
                     op += -1
 
@@ -543,24 +554,25 @@ def get_All_Count(code,dl=None,start=None, end=None,days=5):
     # else:
     #     dl = int(dl*2)
     df = tdd.get_tdx_append_now_df_api(code,start=start, end=end,dl=dl).sort_index(ascending=True)
-    dd,op=Get_BBANDS(df, dtype='d',days=days)
-    print 'boll:%s'%(op),
-    dd,op=Get_KDJ(dd,days=days)
-    print 'kdj:',op,
-    dd,op=Get_MACD_OP(dd,days=days)
-    print ' macd:%s'%(op),
-    dd,op=Get_RSI(dd,days=days)
-    print 'RSI:%s'%(op),
-    operate = algoMultiDay(dd, column='close',days=days)
-    print 'ma:',operate,
+    dd,boll=Get_BBANDS(df, dtype='d',days=days)
+    print 'boll:%s'%(boll),
+    dd,kdj=Get_KDJ(dd,days=days)
+    print 'kdj:',kdj,
+    dd,macd=Get_MACD_OP(dd,days=days)
+    print ' macd:%s'%(macd),
+    dd,rsi=Get_RSI(dd,days=days)
+    print 'RSI:%s'%(rsi),
+    ma = algoMultiDay(dd, column='close',days=days)
+    print 'ma:',ma,
 #    sys.exit()
     # print dd.shape,dd.loc[:,['close','upbbd','midbd','lowbd']][:2]
     dtype='d'
-    operate=0
+    bollCT=0
     for cl in ['upbb%s'%dtype,'midb%s'%dtype,'lowb%s'%dtype]:
-        operate += algoMultiTech(dd, column=cl, days=days,op=operate)
-    print 'bollCT:',operate,
-    print "time:%0.3f"%(time.time()-s)
+        bollCT += algoMultiTech(dd, column=cl, days=days,op=bollCT)
+    print 'bollCT:',bollCT,
+    print "time:%0.3f"%(time.time()-s),
+    return boll,kdj,macd,rsi,ma,bollCT
 
 if __name__ == '__main__':
     # df = Get_Stock_List()

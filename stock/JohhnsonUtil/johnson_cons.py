@@ -33,6 +33,8 @@ checkfilter_end_time = 945
 checkfilter_end_timeDu = 1440
 sleep_time = 30
 tdx_max_int = 10
+
+powerdiff = 'ra * fibl + rah*(abs(float(%s)-fibl))/fib +ma +kdj+rsi'
 # Duration_sort_op=['fib','op','ra','percent','ratio','diff','counts']
 # Duration_sort_op=['fib','op','diff','fibl','ra','percent','ratio','volume','counts']
 # Duration_sort_op_key=[1,0,0,1,0,0,1,1,1]
@@ -44,7 +46,8 @@ Duration_percentdn_op_key=[0,0,0,1,1,0,1,1,1]
 
 # Duration_percentdn_ra=['ra','percent','diff','op','fib','fibl','ratio','volume','counts']
 # Duration_percentdn_ra_key=[0,0,0,0,1,1,1,1,1]
-Duration_percentdn_ra=['diff','ra','percent','op','fib','fibl','ratio','volume','counts']
+# Duration_percentdn_ra=['diff','ra','percent','op','fib','fibl','ratio','volume','counts']
+Duration_percentdn_ra=['ra','diff','percent','op','fib','fibl','ratio','volume','counts']
 Duration_percentdn_ra_key=[0,0,0,0,1,1,1,1,1]
 
 
