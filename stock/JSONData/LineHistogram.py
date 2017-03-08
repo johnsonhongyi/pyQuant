@@ -362,27 +362,31 @@ def get_linear_model_histogramDouble(code, ptype='low', dtype='d', start=None, e
                         i + 1]:
                 bV.append(lowp[i])
                 bP.append(i)
+            else:
+                bV.append(lowp[i-1])
+                bP.append(i-1)
+        if len(bV) > 0 :
 
-        d, p = LIS(bV)
+            d, p = LIS(bV)
 
-        idx = []
-        for i in range(len(p)):
-            idx.append(bP[p[i]])
-        lr = LinearRegression()
-        X = np.atleast_2d(np.array(idx)).T
-        Y = np.array(d)
-        lr.fit(X, Y)
-        estV = lr.predict(xt)
-        ax6.plot(closep, linewidth=2)
-        ax6.plot(idx, d, 'ko')
-        ax6.plot(xt, estV, '-r', linewidth=3)
-        ax6.plot(xt, yt, '-g', linewidth=3)
-        plt.grid(True)
+            idx = []
+            for i in range(len(p)):
+                idx.append(bP[p[i]])
+            lr = LinearRegression()
+            X = np.atleast_2d(np.array(idx)).T
+            Y = np.array(d)
+            lr.fit(X, Y)
+            estV = lr.predict(xt)
+            ax6.plot(closep, linewidth=2)
+            ax6.plot(idx, d, 'ko')
+            ax6.plot(xt, estV, '-r', linewidth=3)
+            ax6.plot(xt, yt, '-g', linewidth=3)
+            plt.grid(True)
 
-        # plt.tight_layout()
-        zp2 = zoompan.ZoomPan()
-        figZoom = zp2.zoom_factory(ax6, base_scale=scale)
-        figPan = zp2.pan_factory(ax6)
+            # plt.tight_layout()
+            zp2 = zoompan.ZoomPan()
+            figZoom = zp2.zoom_factory(ax6, base_scale=scale)
+            figPan = zp2.pan_factory(ax6)
 
     # 统计出每个区域内各股价的频数，得到直方图，为了更精细的显示各个区域的频数，这里将整个边界区间分成100份。
 

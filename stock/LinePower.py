@@ -1,5 +1,5 @@
  # -*- coding:utf-8 -*-
- # 
+ #
 import sys
 from JSONData import powerCompute as pct
 from JSONData import LineHistogram as lht
@@ -113,9 +113,10 @@ if __name__ == "__main__":
                 if args.line == 'y' and args.mpl == 'y':
                     code = args.code
                     # print code, args.ptype, args.dtype, start, end
+                    args.filter = 'n'
                     df=lht.get_linear_model_histogramDouble(code, dtype=args.dtype, start=start, end=end,filter=args.filter, dl=args.dl)
                     # candlestick_powercompute(code,start, end)
-                    
+
                     # op, ra, st, days = pct.get_linear_model_status(code,df=df, start=start, end=end, filter=args.filter)
                     # print "%s op:%s ra:%s  start:%s" % (code, op, ra, st)
                     # print "op:%s ra:%s  start:%s" % (op, ra, st)

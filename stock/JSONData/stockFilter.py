@@ -13,9 +13,11 @@ def getBollFilter(df=None,boll=-4,duration=14):
     else:
         df.loc[df.percent>=9.9,'percent']=10
     if cct.get_now_time_int() > 915 and cct.get_now_time_int() <= 945:
-        df = df[df.buy > df.hmax * ct.changeRatio]
+        df = df[df.buy > df.cmean * ct.changeRatioUp ]
+        # df = df[df.buy > df.hmax * ct.changeRatio]
     elif cct.get_now_time_int() > 945 and cct.get_now_time_int() <= 1445:
-        df = df[df.buy > df.cmean * ct.changeRatio]
+        df = df[df.buy > df.cmean ]
+        # df = df[df.buy > df.cmean * ct.changeRatio]
     # else:
     #     df = df[df.buy > df.lmin]
     # ra * fibl + rah*fib +ma +kdj+rsi
@@ -38,10 +40,12 @@ def getBollFilter(df=None,boll=-4,duration=14):
                          df['ra'].values, df['fibl'].values,df['rah'].values,df['fib'].values,df['ma'].values,\
                          df['kdj'].values,df['rsi'].values))
 #    print "map time:%s"%(round((time.time()-time_s),2))
+    # df.loc[:, ['fibl','op']] = df.loc[:, ['fibl','op']].astype(int)
+    # df.loc[:, 'fibl'] = df.loc[:, 'fibl'].astype(int)
     if 'ma5d' in df.columns:
         df = df[df.buy > df.ma5d * ct.changeRatio]
-    if 'ra' in df.columns and 'op' in df.columns:
-        df = df[ (df.ma > 0 ) & (df.diff > 1) & (df.ra > 1) & (df.op >= 5) ]
+    # if 'ra' in df.columns and 'op' in df.columns:
+    #     df = df[ (df.ma > 0 ) & (df.diff > 1) & (df.ra > 1) & (df.op >= 5) ]
     if 'boll' in df.columns:
         return df[df.boll >= boll]
     else:

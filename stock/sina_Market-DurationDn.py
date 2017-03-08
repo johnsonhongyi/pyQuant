@@ -88,7 +88,7 @@ if __name__ == "__main__":
     duration_date = ct.duration_date_l
     du_date = duration_date
     # print cct.last_tddate(2)
-    end_date = cct.last_tddate(days=4)
+    end_date = cct.last_tddate(days=2)
     ptype = 'high'
     filter = 'y'
     if len(str(duration_date)) < 4:

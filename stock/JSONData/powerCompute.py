@@ -716,7 +716,7 @@ def get_linear_model_candles(code, ptype='low', dtype='d', start=None, end=None,
         op, ra, st, dss = get_linear_model_status(code, df=df[df.index >= dt], start=dt, filter='y', ptype=ptype,days=days)
         # print "%s op:%s ra:%s days:%s  start:%s" % (code, op, str(ra), str(dss[0]), st)
         print "op:%s ra:%s days:%s  start:%s" % (op, str(ra), str(dss[0]), st)
-        
+
     status = setRegLinearPlt(asset)
     # if filter == 'n':
     setBollPlt(code, df, 'low', start, status=status)
@@ -751,11 +751,12 @@ def get_linear_model_candles(code, ptype='low', dtype='d', start=None, end=None,
                 sa = round(mlist[0], 2)
                 sb = round(mlist[-1], 2)
                 X = np.arange(len(df))
+                df[type] = df[type].apply(lambda x: round(x, 2))
                 aid = df[df[type] == sa].index.values[-1][:10]
                 ida = len(df[df.index <= aid])
                 aX = X[ida - 1]
 
-                bid = df[df[type] == mlist[-1]].index.values[-1][:10]
+                bid = df[df[type] == sb].index.values[-1][:10]
                 # print df[df[type] == sb].index.values
                 idb = len(df[df.index <= bid])
                 bX = X[idb - 1]
@@ -872,8 +873,8 @@ def powerCompute_df(df, dtype='d', end=None, dl=None, filter='y',talib=False,new
         stl = ''
         rac = 0
         # fib = []
-        fibl = '0'
-        fib = '0'
+        fibl = 0
+        fib = 0
         # sep = '|'
         for ptype in ['low', 'high']:
             op, ra, st, daysData  = get_linear_model_status(
@@ -887,12 +888,12 @@ def powerCompute_df(df, dtype='d', end=None, dl=None, filter='y',talib=False,new
                 opl = op
                 stl = st
                 # fibl = str(daysData[0])
-                fibl = (daysData[0])
+                fibl = int(daysData[0])
             else:
                 oph = op
                 rah = ra
                 # fib = str(daysData[0])
-                fib = (daysData[0])
+                fib = int(daysData[0])
         # fibl = sep.join(fib)
 
         tdx_df,operation = getab.Get_BBANDS(tdx_df, dtype='d')
@@ -914,6 +915,7 @@ def powerCompute_df(df, dtype='d', end=None, dl=None, filter='y',talib=False,new
         df.loc[code, 'rah'] = rah
         df.loc[code, 'fib'] = fib
         df.loc[code, 'fibl'] = fibl
+        # df.fibl.astype(float)
         df.loc[code, 'ldate'] = stl
         df.loc[code, 'boll'] = operation
 
@@ -933,6 +935,8 @@ def powerCompute_df(df, dtype='d', end=None, dl=None, filter='y',talib=False,new
         # df = getab.Get_BBANDS(df, dtype='d')
         #'volume', 'ratio', 'counts','ldate' -> 'ma','macd','rsi','kdj'
         # df = df.drop_duplicates()
+    df = df.fillna(0)
+    df.loc[:, 'fibl'] = df.loc[:, 'fibl'].astype(int)
     print "Pc:%0.2f"%(time.time()-ts),
     return df
 

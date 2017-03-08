@@ -90,7 +90,7 @@ if __name__ == "__main__":
     du_date = duration_date
     newdays = 5
     # print cct.last_tddate(2)
-    end_date = cct.last_tddate(days=3 )
+    end_date = cct.last_tddate(days=2 )
     ptype = 'high'
     filter = 'y'
     if len(str(duration_date)) < 4:
