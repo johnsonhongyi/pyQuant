@@ -199,6 +199,8 @@ def get_tdx_Exp_day_to_df(code, start=None, end=None, dl=None,newdays = None,typ
             df['hmax'] = df.close[-tdx_max_int:-max_int_end].max()
             df['lmin'] = df.low[-tdx_max_int:-max_int_end].min()
             df['cmean'] = df.close[-tdx_max_int:-max_int_end].mean()
+            df['hv'] = df.vol[-tdx_max_int:-max_int_end].max()
+            df['lv'] = df.vol[-tdx_max_int:-max_int_end].min()
             df = df.fillna(0)
             df = df.sort_index(ascending=False)
         return df
@@ -314,6 +316,8 @@ def get_tdx_Exp_day_to_df(code, start=None, end=None, dl=None,newdays = None,typ
             df['hmax'] = df.close[-tdx_max_int:-max_int_end].max()
             df['lmin'] = df.low[-tdx_max_int:-max_int_end].min()
             df['cmean'] = df.close[-tdx_max_int:-max_int_end].mean()
+            df['hv'] = df.vol[-tdx_max_int:-max_int_end].max()
+            df['lv'] = df.vol[-tdx_max_int:-max_int_end].min()
             df = df.fillna(0)
             df = df.sort_index(ascending=False)
         return df
@@ -2319,7 +2323,8 @@ def get_tdx_all_day_LastDF(codeList, type=0, dt=None, ptype='close'):
         # results.append(get_tdx_day_to_df_last(code, 1, type, dt,ptype))
 
 
-    df = pd.DataFrame(results, columns=ct.TDX_Day_columns)
+#    df = pd.DataFrame(results, columns=ct.TDX_Day_columns)
+    df = pd.DataFrame(results)
     df = df.set_index('code')
     df.loc[:, 'open':] = df.loc[:, 'open':].astype(float)
     # df.vol = df.vol.apply(lambda x: x / 100)
@@ -2343,6 +2348,7 @@ def get_append_lastp_to_df(top_all,lastpTDX_DF=None,dl=ct.PowerCountdl,end=None,
         # tdxdata.rename(columns={'low': 'lastp'}, inplace=True)
         tdxdata.rename(columns={'low': 'llow'}, inplace=True)
         tdxdata.rename(columns={'vol': 'lvol'}, inplace=True)
+        tdxdata.rename(columns={'amount': 'lamount'}, inplace=True)
 #        if power:
 #            tdxdata = tdxdata.loc[:, ['llow', 'lhigh', 'lastp', 'lvol', 'date','ra','op','fib','fibl','ma5d','ma10d','ldate']]
 #            # print len(tdxdata[tdxdata.op >15]),
@@ -2416,7 +2422,8 @@ def get_tdx_exp_all_LastDF(codeList, dt=None,end=None,ptype='low',filter='n'):
         results = cct.to_mp_run_async(get_tdx_Exp_day_to_df, codeList, 'f', None, None, None, 1)
 
     # print results
-    df = pd.DataFrame(results, columns=ct.TDX_Day_columns)
+#    df = pd.DataFrame(results, columns=ct.TDX_Day_columns)
+    df = pd.DataFrame(results)
     df = df.set_index('code')
     df.loc[:, 'open':] = df.loc[:, 'open':].astype(float)
     # df.vol = df.vol.apply(lambda x: x / 100)
@@ -2499,7 +2506,8 @@ def get_tdx_exp_all_LastDF_DL(codeList, dt=None,end=None,ptype='low',filter='n',
         results = cct.to_mp_run_async(get_tdx_Exp_day_to_df, codeList, 'f', None, None, None, 1)
 
     # print results
-    df = pd.DataFrame(results, columns=ct.TDX_Day_columns)
+#    df = pd.DataFrame(results, columns=ct.TDX_Day_columns)
+    df = pd.DataFrame(results)
     df = df.dropna(how='all')
     if len(df) > 0:
         df = df.set_index('code')

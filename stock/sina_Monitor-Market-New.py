@@ -40,12 +40,15 @@ def evalcmd(dir_mo):
             continue
         else:
             try:
-                print eval(cmd)
+                if not cmd.find(' =') < 0:
+                    exec(cmd)
+                else:
+                    print eval(cmd)
                 print ''
             except Exception, e:
                 print e 
-                evalcmd(dir_mo)
-                break
+                # evalcmd(dir_mo)
+                # break
 
 if __name__ == "__main__":
     # parsehtml(downloadpage(url_s))
@@ -250,11 +253,11 @@ if __name__ == "__main__":
                         top_temp = top_temp.sort_values(by=ct.Duration_percent_op,
                                         ascending=ct.Duration_percent_op_key)
                         # top_temp = top_temp.sort_values(by=['op','ra','diff', 'percent', 'ratio'], ascending=[0,0,0, 0, 1])
-                    if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935:
-                        top_temp = top_temp.loc[:,ct.MonitorMarket_format_buy]
-                    else:
-                        top_temp = top_temp.loc[:,ct.MonitorMarket_format_buy]
-                    print rl.format_for_print(top_temp[:10])
+                    # if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935:
+                    #     top_temp = top_temp.loc[:,ct.MonitorMarket_format_buy]
+                    # else:
+                    #     top_temp = top_temp.loc[:,ct.MonitorMarket_format_buy]
+                    print rl.format_for_print(top_temp.loc[:,ct.MonitorMarket_format_buy][:10])
                     # print rl.format_for_print(top_dif[:10])
                     # print top_all.loc['000025',:]
                     # print "staus",status
@@ -323,10 +326,10 @@ if __name__ == "__main__":
             elif st.lower() == 'w' or st.lower() == 'a':
                 codew = stf.WriteCountFilter(top_temp)
                 if st.lower() == 'a':
-                    cct.write_to_blocknew(block_path, codew[:ct.writeCount])
+                    cct.write_to_blocknew(block_path, codew)
                     # sl.write_to_blocknew(all_diffpath, codew)
                 else:
-                    cct.write_to_blocknew(block_path, codew[:ct.writeCount], False)
+                    cct.write_to_blocknew(block_path, codew, False)
                     # sl.write_to_blocknew(all_diffpath, codew, False)
                 print "wri ok:%s" % block_path
                 cct.sleeprandom(120)

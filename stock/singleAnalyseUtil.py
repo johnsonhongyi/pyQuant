@@ -465,6 +465,7 @@ if __name__ == '__main__':
     dl=34
     fibc = 3
     fibl = fibonacciCount(['999999', '399001', '399006'], dl=dl)
+    percentDuration=2
     while 1:
         try:
             if not status:
@@ -476,7 +477,7 @@ if __name__ == '__main__':
                     # print "change FibDiff"
                     fibcount = 0
                     fibl = fibonacciCount(['999999', '399001', '399006'], dl=dl)
-                get_hot_countNew(3, rzrq,fibl,fibc)
+                get_hot_countNew(percentDuration, rzrq,fibl,fibc)
                 fibcount += 1
             if status:
                 # status=True

@@ -4,8 +4,9 @@ import sys
 sys.path.append("..")
 from JohhnsonUtil import commonTips as cct
 import JohhnsonUtil.johnson_cons as ct
+import pandas as pd
 import time
-def getBollFilter(df=None,boll=-4,duration=14):
+def getBollFilter(df=None,boll=5,duration=ct.PowerCountdl,filter=True):
     #return boll > int
     if df is None:
         print "dataframe is None"
@@ -13,8 +14,8 @@ def getBollFilter(df=None,boll=-4,duration=14):
     else:
         df.loc[df.percent>=9.9,'percent']=10
     if cct.get_now_time_int() > 915 and cct.get_now_time_int() <= 945:
-        df = df[df.buy > df.cmean * ct.changeRatioUp ]
-        # df = df[df.buy > df.hmax * ct.changeRatio]
+        # df = df[df.buy > df.cmean * ct.changeRatioUp ]
+        df = df[df.buy > df.hmax * ct.changeRatio]
     elif cct.get_now_time_int() > 945 and cct.get_now_time_int() <= 1445:
         df = df[df.buy > df.cmean ]
         # df = df[df.buy > df.cmean * ct.changeRatio]
@@ -35,7 +36,9 @@ def getBollFilter(df=None,boll=-4,duration=14):
 #                         df['ra'].values, df['fibl'].astype(float).values,df['rah'].values,df['fib'].astype(float).values,df['ma'].values,\
 #                         df['kdj'].values,df['rsi'].values))
     # df['diff2'] = df['diff'].copy()
-    df.rename(columns={'diff': 'diff2'}, inplace=True)
+    pd.options.mode.chained_assignment = None
+    df.rename(columns={'diff': 'df2'}, inplace=True)
+    # df['diff2'] = df['diff']
     df['diff'] = (map(lambda ra, fibl,rah,fib,ma,kdj,rsi:round(eval(ct.powerdiff%(duration)),1),\
                          df['ra'].values, df['fibl'].values,df['rah'].values,df['fib'].values,df['ma'].values,\
                          df['kdj'].values,df['rsi'].values))
@@ -44,6 +47,16 @@ def getBollFilter(df=None,boll=-4,duration=14):
     # df.loc[:, 'fibl'] = df.loc[:, 'fibl'].astype(int)
     if 'ma5d' in df.columns:
         df = df[df.buy > df.ma5d * ct.changeRatio]
+
+    if 'vstd' in df.columns:
+        df = df[(df.lvol * df.volume > (df.vstd + df.lvol)) | ((df.percent > 3) & (df.hv/df.lv > 2.5))]
+#                [dd.lvol * dd.volume > (dd.vstd + dd.lvol) | dd.lvol * dd.volume >(dd.ldvolume + dd.vstd]
+    if filter and cct.get_now_time_int() > 920 and cct.get_now_time_int() <= 1445:
+        df = df[((df.fibl < int(duration / 1.5)) &  (df.volume > 2.5 * cct.get_work_time_ratio() )) | (df.percent > 3)]
+        df = df[df.oph > 10]
+    # elif filter and cct.get_now_time_int() > 1015 and cct.get_now_time_int() <= 1445:
+    #     df = df[((df.fibl < int(duration / 1.5)) &  (df.volume > 3)) | (df.percent > 3)]
+        # print df
     # if 'ra' in df.columns and 'op' in df.columns:
     #     df = df[ (df.ma > 0 ) & (df.diff > 1) & (df.ra > 1) & (df.op >= 5) ]
     if 'boll' in df.columns:
@@ -53,11 +66,11 @@ def getBollFilter(df=None,boll=-4,duration=14):
         df['boll'] = 0
         return df
 
-def WriteCountFilter(df,op='op'):
+def WriteCountFilter(df,op='op',duration=10):
     codel = []
     if len(df) > 0 and 'percent' in df.columns:
         dd =  df[df.percent == 10]
-        if op=='op' and len(dd) > ct.writeCount:
+        if duration > ct.duration_diff and op=='op' and len(dd) > ct.writeCount:
             codel = dd.index.tolist()
         else:
             codel = df.index[:ct.writeCount].tolist()

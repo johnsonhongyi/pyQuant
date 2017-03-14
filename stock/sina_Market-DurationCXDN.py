@@ -46,12 +46,18 @@ def evalcmd(dir_mo):
             continue
         else:
             try:
-                print eval(cmd)
+                if not cmd.find(' =') < 0:
+                    exec(cmd)
+                else:
+                    print eval(cmd)
                 print ''
             except Exception, e:
                 print e
-                evalcmd(dir_mo)
-                break
+                # else:
+                # print evalcmd(dir_mo)
+                # print ''
+                # evalcmd(dir_mo)
+                # break
 
 if __name__ == "__main__":
     # parsehtml(downloadpage(url_s))
@@ -62,7 +68,7 @@ if __name__ == "__main__":
     # log.level = log.debug
     # error_handler = SyslogHandler('Sina-M-Log', level='ERROR')
 
-    width, height = 163, 21
+    width, height = 165, 21
     def set_duration_console(duration_date):
         if cct.isMac():
             cct.set_console(width, height)
@@ -87,6 +93,7 @@ if __name__ == "__main__":
     # op, ra, duration_date, days = pct.get_linear_model_status('999999', filter='y', dl=dl, ptype=ptype, days=1)
     # duration_date = ct.duration_date
     duration_date = ct.duration_date_l
+#    duration_date = 3
     du_date = duration_date
     newdays = 5
     # print cct.last_tddate(2)
@@ -116,7 +123,7 @@ if __name__ == "__main__":
             # top_now.to_hdf("testhdf5", 'marketDD', format='table', complevel=9)
             '''
             top_now = tdd.getSinaAlldf(market='cx', vol=ct.json_countVol, type=ct.json_countType)
-            # top_now = tdd.getSinaAlldf(market='国企改革',filename='gqgg', vol=ct.json_countVol, type=ct.json_countType)
+            # top_now = tdd.getSinaAlldf(market='次新股',filename='cxg', vol=ct.json_countVol, type=ct.json_countType)
             # top_now = tdd.getSinaAlldf(market=u'一带一路',filename='ydyl', vol=ct.json_countVol, type=ct.json_countType)
             # top_now = tdd.getSinaAlldf(market=u'新股与次新股',filename='cxg', vol=ct.json_countVol, type=ct.json_countType)
             # top_now = tdd.getSinaAlldf(market=u'京津冀',filename='beijing', vol=ct.json_countVol, type=ct.json_countType)
@@ -297,6 +304,7 @@ if __name__ == "__main__":
                                            'zxg: %s' % (blkname)])
 
                     top_temp = stf.getBollFilter(df=top_temp, boll=ct.bollFilter,duration=ct.PowerCountdl)
+                    # top_end = stf.getBollFilter(df=top_end, boll=ct.bollFilter,duration=ct.PowerCountdl)
                     if 'op' in top_temp.columns:
                         # if ptype == 'low':
                         #     top_temp = top_temp.sort_values(by=ct.Duration_sort_op,
@@ -318,7 +326,7 @@ if __name__ == "__main__":
                         # if duration_date > ct.duration_date_sort:
 
                         # if (cct.get_now_time_int() > ct.checkfilter_end_timeDu and int(duration_date) > int(ct.duration_date_sort)) or int(duration_date) < 6:
-                        if cct.get_now_time_int() > ct.checkfilter_end_timeDu and (int(duration_date) > int(ct.duration_date_sort) or int(duration_date) < 6):
+                        if cct.get_now_time_int() > ct.checkfilter_end_timeDu and (int(duration_date) > int(ct.duration_date_sort) or int(duration_date) < ct.duration_diff):
                             top_temp = top_temp.sort_values(by=ct.Duration_percent_op,
                                         ascending=ct.Duration_percent_op_key)
                         else:
@@ -392,7 +400,7 @@ if __name__ == "__main__":
             elif st.lower() == 'r':
                 dir_mo = eval(cct.eval_rule)
                 evalcmd(dir_mo)
-                
+
             elif st.lower() == 'g' or st.lower() == 'go':
                 status = True
                 for code in top_dd[:10].index:
@@ -456,11 +464,11 @@ if __name__ == "__main__":
                 # else:
                     # codew = (top_dd[-10:].index).tolist()
                 if st.lower() == 'a':
-                    codew = stf.WriteCountFilter(top_temp)
+                    codew = stf.WriteCountFilter(top_temp,duration=duration_date)
                     cct.write_to_blocknew(block_path, codew)
                     # sl.write_to_blocknew(all_diffpath, codew)
                 else:
-                    codew = stf.WriteCountFilter(top_temp)
+                    codew = stf.WriteCountFilter(top_temp,duration=duration_date)
                     cct.write_to_blocknew(block_path, codew, False)
                     # sl.write_to_blocknew(all_diffpath, codew, False)
                 print "wri ok:%s" % block_path

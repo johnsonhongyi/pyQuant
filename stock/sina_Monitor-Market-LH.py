@@ -73,12 +73,15 @@ def evalcmd(dir_mo):
             continue
         else:
             try:
-                print eval(cmd)
+                if not cmd.find(' =') < 0:
+                    exec(cmd)
+                else:
+                    print eval(cmd)
                 print ''
             except Exception, e:
                 print e 
-                evalcmd(dir_mo)
-                break
+                # evalcmd(dir_mo)
+                # break
 
 if __name__ == "__main__":
     # parsehtml(downloadpage(url_s))
@@ -87,10 +90,10 @@ if __name__ == "__main__":
     # log=LoggerFactory.JohnsonLoger('SinaMarket').setLevel(LoggerFactory.DEBUG)
     # log.setLevel(LoggerFactory.DEBUG)
     if cct.isMac():
-        width, height = 158, 16
+        width, height = 165, 16
         cct.set_console(width, height)
     else:
-        width, height = 158, 18
+        width, height = 165, 18
         cct.set_console(width, height)
     status = False
     vol = ct.json_countVol
@@ -197,24 +200,24 @@ if __name__ == "__main__":
                     # if cct.get_now_time_int() > 1030 and cct.get_now_time_int() < 1400:
                         # top_dif = top_dif[(top_dif.volume > ct.VolumeMinR) & (top_dif.volume < ct.VolumeMaxR)]
 
-                    top_dif['diff'] = (
-                        map(lambda x, y: round(
-                            ((float(x) - float(y)) / float(y) * 100), 1),
-                            top_dif['buy'].values,
-                            top_dif['lastp'].values)
-                    )
+
                 else:
                     log.info('dif1:%s' % len(top_dif))
                     log.info(top_dif[:1])
                     top_dif = top_dif[top_dif.buy > top_dif.llastp * ct.changeRatio]
                     log.debug('dif2:%s' % len(top_dif))
-                    top_dif['diff'] = (
-                        map(lambda x, y:
-                            round(((float(x) - float(y)) / float(y) * 100), 1),
-                            top_dif['buy'].values,
-                            top_dif['lastp'].values)
-                    )
+                    # top_dif['diff'] = (
+                    #     map(lambda x, y:
+                    #         round(((float(x) - float(y)) / float(y) * 100), 1),
+                    #         top_dif['buy'].values,
+                    #         top_dif['lastp'].values)
+                    # )
 
+                top_dif['diff'] = (
+                    map(lambda x, y: round(
+                        ((float(x) - float(y)) / float(y) * 100), 1),
+                        top_dif['buy'].values,
+                        top_dif['lastp'].values))
 
                 if len(top_dif) == 0:
                     print "No G,DataFrame is Empty!!!!!!"
@@ -275,13 +278,13 @@ if __name__ == "__main__":
                         #                 ascending=ct.Duration_percent_op_key)
                         
                         # top_temp = top_temp.sort_values(by=['op','ra','diff', 'percent', 'ratio'], ascending=[0,0,0, 0, 1])
-                    if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935:
-                        # top_temp = top_temp[ (top_temp['ma5d'] > top_temp['ma10d']) & (top_temp['buy'] > top_temp['ma10d']) ]
-                        top_temp = top_temp.loc[:,ct.MonitorMarket_format_buy]
-                    else:
-                        # top_temp = top_temp[ (top_temp['ma5d'] > top_temp['ma10d']) & (top_temp['buy'] > top_temp['ma10d']) ]
-                        top_temp = top_temp.loc[:,ct.MonitorMarket_format_buy]
-                    print rl.format_for_print(top_temp[:10]) 
+                    # if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935:
+                    #     # top_temp = top_temp[ (top_temp['ma5d'] > top_temp['ma10d']) & (top_temp['buy'] > top_temp['ma10d']) ]
+                    #     top_temp = top_temp.loc[:,ct.MonitorMarket_format_buy]
+                    # else:
+                    #     # top_temp = top_temp[ (top_temp['ma5d'] > top_temp['ma10d']) & (top_temp['buy'] > top_temp['ma10d']) ]
+                    #     top_temp = top_temp.loc[:,ct.MonitorMarket_format_buy]
+                    print rl.format_for_print(top_temp.loc[:,ct.MonitorMarket_format_buy][:10]) 
                 
                 # print rl.format_for_print(top_dif[:10])
                 # print top_all.loc['000025',:]
@@ -353,10 +356,12 @@ if __name__ == "__main__":
             elif st.lower() == 'w' or st.lower() == 'a':
                 codew = stf.WriteCountFilter(top_temp)
                 if st.lower() == 'a':
-                    cct.write_to_blocknew(block_path, codew[:ct.writeCount])
+                    # cct.write_to_blocknew(block_path, codew[:ct.writeCount])
+                    cct.write_to_blocknew(block_path, codew)
                     # cct.write_to_blocknew(all_diffpath, codew)
                 else:
-                    cct.write_to_blocknew(block_path, codew[:ct.writeCount], False)
+                    # cct.write_to_blocknew(block_path, codew[:ct.writeCount], False)
+                    cct.write_to_blocknew(block_path, codew, False)
                     # cct.write_to_blocknew(all_diffpath, codew, False)
                 print "wri ok:%s" % block_path
                 cct.sleeprandom(120)

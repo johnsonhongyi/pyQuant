@@ -45,12 +45,15 @@ def evalcmd(dir_mo):
             continue
         else:
             try:
-                print eval(cmd)
+                if not cmd.find(' =') < 0:
+                    exec(cmd)
+                else:
+                    print eval(cmd)
                 print ''
             except Exception, e:
                 print e 
-                evalcmd(dir_mo)
-                break
+                # evalcmd(dir_mo)
+                # break
 
 if __name__ == "__main__":
     # parsehtml(downloadpage(url_s))
@@ -61,7 +64,7 @@ if __name__ == "__main__":
     # log.level = log.debug
     # error_handler = SyslogHandler('Sina-M-Log', level='ERROR')
 
-    width, height = 164, 21
+    width, height = 165, 21
     def set_duration_console(du_date):
         if cct.isMac():
             cct.set_console(width, height)
@@ -297,6 +300,7 @@ if __name__ == "__main__":
                                            'zxg: %s' % (blkname)])
 
                     top_temp = stf.getBollFilter(df=top_temp, boll=ct.bollFilter,duration=ct.PowerCountdl)
+                    # top_end = stf.getBollFilter(df=top_end, boll=ct.bollFilter,duration=ct.PowerCountdl)
                     if 'op' in top_temp.columns:
                         # top_temp = top_temp.sort_values(by=ct.Duration_sort_op,
                         #             ascending=ct.Duration_sort_op_key)

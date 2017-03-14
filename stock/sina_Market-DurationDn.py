@@ -45,12 +45,15 @@ def evalcmd(dir_mo):
             continue
         else:
             try:
-                print eval(cmd)
+                if not cmd.find(' =') < 0:
+                    exec(cmd)
+                else:
+                    print eval(cmd)
                 print ''
             except Exception, e:
-                print e                
-                evalcmd(dir_mo)
-                break
+                print e
+                # evalcmd(dir_mo)
+                # break
 
 if __name__ == "__main__":
     # parsehtml(downloadpage(url_s))
@@ -291,6 +294,7 @@ if __name__ == "__main__":
                                            'zxg: %s' % (blkname)])
 
                     top_temp = stf.getBollFilter(df=top_temp, boll=ct.bollFilter,duration=ct.PowerCountdl)
+                    # top_end = stf.getBollFilter(df=top_end, boll=ct.bollFilter,duration=ct.PowerCountdl)
                     if 'op' in top_temp.columns:
                         # if ptype == 'low':
                         #     top_temp = top_temp.sort_values(by=ct.Duration_sort_op,
@@ -310,7 +314,7 @@ if __name__ == "__main__":
                         # top_temp = top_temp.sort_values(by=['op','ldate','ra','diff', 'percent', 'ratio'], ascending=[0,0,0,0, 0, 1])[:10]
 
                         # if cct.get_now_time_int() > 945 and int(duration_date * 1.5)  > ct.duration_date_sort:
-                        if cct.get_now_time_int() > ct.checkfilter_end_timeDu and (int(duration_date) > int(ct.duration_date_sort) or int(duration_date) < 6):
+                        if cct.get_now_time_int() > ct.checkfilter_end_timeDu and (int(duration_date) > int(ct.duration_date_sort) or int(duration_date) < ct.duration_diff):
                             top_temp = top_temp.sort_values(by=ct.Duration_percent_op,
                                         ascending=ct.Duration_percent_op_key)
                         else:
@@ -447,12 +451,12 @@ if __name__ == "__main__":
                 # else:
                     # codew = (top_dd[-10:].index).tolist()
                 if st.lower() == 'a':
-                    codew = stf.WriteCountFilter(top_temp)
+                    codew = stf.WriteCountFilter(top_temp,duration=duration_date)
                     # codew = (top_dd.index[:10]).tolist()
                     cct.write_to_blocknew(block_path, codew)
                     # sl.write_to_blocknew(all_diffpath, codew)
                 else:
-                    codew = stf.WriteCountFilter(top_temp)
+                    codew = stf.WriteCountFilter(top_temp,duration=duration_date)
                     # codew = (top_dd.index[:10]).tolist()
                     cct.write_to_blocknew(block_path, codew, False)
                     # sl.write_to_blocknew(all_diffpath, codew, False)

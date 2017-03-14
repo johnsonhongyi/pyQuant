@@ -96,12 +96,15 @@ def evalcmd(dir_mo):
             continue
         else:
             try:
-                print eval(cmd)
+                if not cmd.find(' =') < 0:
+                    exec(cmd)
+                else:
+                    print eval(cmd)
                 print ''
             except Exception, e:
                 print e 
-                evalcmd(dir_mo)
-                break
+                # evalcmd(dir_mo)
+                # break
 
 if __name__ == "__main__":
 
@@ -271,11 +274,11 @@ if __name__ == "__main__":
                     top_temp = top_temp.sort_values(by=ct.Duration_ra_goldop,
                                     ascending=ct.Duration_ra_goldop_key)
                     # top_temp = top_temp.sort_values(by=['op','ra','diff', 'percent', 'ratio'], ascending=[0,0,0, 0, 1])                
-                if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935:
-                    top_temp = top_temp.loc[:,ct.Monitor_format_trade]
-                else:
-                    top_temp = top_temp.loc[:,ct.Monitor_format_trade]
-                print rl.format_for_print(top_temp[:10]) 
+                # if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935:
+                #     top_temp = top_temp.loc[:,ct.Monitor_format_trade]
+                # else:
+                #     top_temp = top_temp.loc[:,ct.Monitor_format_trade]
+                print rl.format_for_print(top_temp.loc[:, ct.Monitor_format_trade][:10]) 
                 
                 # print rl.format_for_print(top_all[:10])
                 if status:

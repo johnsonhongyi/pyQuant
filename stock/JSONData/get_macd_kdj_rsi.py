@@ -574,6 +574,19 @@ def get_All_Count(code,dl=None,start=None, end=None,days=5):
     print "time:%0.3f"%(time.time()-s),
     return boll,kdj,macd,rsi,ma,bollCT
 
+def powerStd(code=None,df=None,ptype='close',dl=60):
+    if df is None and code is not None:
+        df = tdd.get_tdx_Exp_day_to_df(code,dl=dl)
+        # print df
+    nowT = 'df.%s'%(ptype)
+    nowS = eval(nowT)
+    if ptype in df.columns:
+        res = np.std(nowS)
+    else:
+        log.warn("ptype is not in columns")
+    # print nowS[:3]
+    return res
+
 if __name__ == '__main__':
     # df = Get_Stock_List()
     # Dist = 'E:\\Quant\\'
@@ -582,6 +595,7 @@ if __name__ == '__main__':
     # code='300110'
 #    code='300201'
     import sys
+    print powerStd('600208',ptype='vol')
     codel=['000737','002695','601555','002486','600321','002437','399006','999999']
 #    code='600321'
 #    code:002732 boll: 45 ma: 6.0  macd:-1 RSI:0 kdj: 3 time:0.0241
@@ -589,8 +603,7 @@ if __name__ == '__main__':
     days=5
     dl=60
     # for x in range(9,30):
-    for x in ['000737','002695','601555','002486','600321','002437','399006','999999']:
-        get_All_Count(x,9)
+    # for x in ['000737','002695','601555','002486','600321','002437','399006','999999']:get_All_Count(x,9)
     sys.exit(0)
     for code in codel:
         df = tdd.get_tdx_append_now_df_api(code,dl=int(dl*1.5)).sort_index(ascending=True)

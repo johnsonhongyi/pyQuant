@@ -923,10 +923,14 @@ def powerCompute_df(df, dtype='d', end=None, dl=None, filter='y',talib=False,new
         tdx_df,opmacd = getab.Get_MACD_OP(tdx_df, dtype='d')
         tdx_df,oprsi = getab.Get_RSI(tdx_df, dtype='d')
         opma = getab.algoMultiDay(tdx_df)
+        volstd = getab.powerStd(code=code, df=tdx_df, ptype='vol')
         df.loc[code, 'kdj'] = opkdj
         df.loc[code, 'macd'] = opmacd
         df.loc[code, 'rsi'] = oprsi
         df.loc[code, 'ma'] = opma
+        df.loc[code, 'vstd'] = volstd
+        df.loc[code, 'lvolume'] = tdx_df.vol[1]
+
         if len(wcdf[wcdf.index == code]) > 0:
             df.loc[code,'category'] = wcdf.loc[code,'category']
         else:

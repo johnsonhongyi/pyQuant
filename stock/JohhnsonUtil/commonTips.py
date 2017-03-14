@@ -323,7 +323,7 @@ def cct_raw_input(sts):
 
 # eval_rule = "[elem for elem in dir() if not elem.startswith('_') and not elem.startswith('ti')]"
 # eval_rule = "[elem for elem in dir() if not elem.startswith('_')]"
-eval_rule = "[elem for elem in dir() if elem.startswith('top')]"
+eval_rule = "[elem for elem in dir() if elem.startswith('top') or elem.startswith('block') or elem.startswith('du') ]"
 
 # import readline
 # import rlcompleter, readline
@@ -551,7 +551,7 @@ def get_work_time():
 def get_work_duration():
     int_time = get_now_time_int()
     # now_t = int(now_t)
-    if (int_time > 830 and int_time < 915) or (int_time > 1130 and int_time < 1300):
+    if (int_time > 800 and int_time < 915) or (int_time > 1130 and int_time < 1300):
     # if (int_time > 830 and int_time < 915) or (int_time > 1130 and int_time < 1300) or (int_time > 1500 and int_time < 1510):
         # return False
         return True
@@ -910,7 +910,8 @@ def code_to_tdx_blk(code):
 
 def write_to_blocknew(p_name, data, append=True):
     # index_list = ['1999999','47#IFL0',  '0399006', '27#HSI']
-    index_list = ['1999999','47#IFL0', '27#HSI',  '0399006']
+    # index_list = ['1999999','47#IFL0', '27#HSI',  '0399006']
+    index_list = ['1999999','47#IFL0', '27#HSI',  '0159915']
     def writeBlocknew(p_name, data, append=True):
         if append:
             fout = open(p_name, 'rb+')
@@ -1187,6 +1188,7 @@ if __name__ == '__main__':
     # print get_rzrq_code()[:3]
     # times =1483686638.0
     # print get_time_to_date(times, format='%Y-%m-%d')
+    print get_work_time_ratio()
     print getCoding(u'啊中国'.encode("utf16"))
     print get_today_duration('2017-01-06')
     print last_tddate(2)

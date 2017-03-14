@@ -45,12 +45,15 @@ def evalcmd(dir_mo):
             continue
         else:
             try:
-                print eval(cmd)
+                if not cmd.find(' =') < 0:
+                    exec(cmd)
+                else:
+                    print eval(cmd)
                 print ''
             except Exception, e:
                 print e 
-                evalcmd(dir_mo)
-                break
+                # evalcmd(dir_mo)
+                # break
 
 if __name__ == "__main__":
     # parsehtml(downloadpage(url_s))
@@ -61,7 +64,7 @@ if __name__ == "__main__":
     # log.level = log.debug
     # error_handler = SyslogHandler('Sina-M-Log', level='ERROR')
 
-    width, height = 164, 21
+    width, height = 165, 21
     def set_duration_console(du_date):
         if cct.isMac():
             cct.set_console(width, height)
@@ -296,6 +299,7 @@ if __name__ == "__main__":
                                            'zxg: %s' % (blkname)])
 
                     top_temp = stf.getBollFilter(df=top_temp, boll=ct.bollFilter,duration=ct.PowerCountdl)
+                    # top_end = stf.getBollFilter(df=top_end, boll=ct.bollFilter,duration=ct.PowerCountdl)
                     if 'op' in top_temp.columns:
                         # top_temp = top_temp.sort_values(by=ct.Duration_sort_op,
                         #             ascending=ct.Duration_sort_op_key)
@@ -311,7 +315,7 @@ if __name__ == "__main__":
 
                         # if cct.get_now_time_int() > ct.checkfilter_end_timeDu and int(duration_date * 1.5) > ct.duration_date_sort:
                         # if (cct.get_now_time_int() > ct.checkfilter_end_timeDu and int(duration_date) > int(ct.duration_date_sort)) or int(duration_date) < 6:
-                        if cct.get_now_time_int() > ct.checkfilter_end_timeDu and (int(duration_date) > int(ct.duration_date_sort) or int(duration_date) < 6):
+                        if cct.get_now_time_int() > ct.checkfilter_end_timeDu and (int(duration_date) > int(ct.duration_date_sort) or int(duration_date) < ct.duration_diff):
                             top_temp = top_temp.sort_values(by=ct.Duration_percent_op,
                                         ascending=ct.Duration_percent_op_key)
                         else:
@@ -416,11 +420,11 @@ if __name__ == "__main__":
                 # else:
                     # codew = (top_dd[-10:].index).tolist()
                 if st.lower() == 'a':
-                    codew = stf.WriteCountFilter(top_temp)
+                    codew = stf.WriteCountFilter(top_temp,duration=duration_date)
                     cct.write_to_blocknew(block_path, codew)
                     # sl.write_to_blocknew(all_diffpath, codew)
                 else:
-                    codew = stf.WriteCountFilter(top_temp)
+                    codew = stf.WriteCountFilter(top_temp,duration=duration_date)
                     cct.write_to_blocknew(block_path, codew, False)
                     # sl.write_to_blocknew(all_diffpath, codew, False)
                 print "wri ok:%s" % block_path
