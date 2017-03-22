@@ -68,7 +68,7 @@ if __name__ == "__main__":
     # log.level = log.debug
     # error_handler = SyslogHandler('Sina-M-Log', level='ERROR')
 
-    width, height = 165, 21
+    width, height = 169, 21
     def set_duration_console(duration_date):
         if cct.isMac():
             cct.set_console(width, height)
@@ -122,10 +122,10 @@ if __name__ == "__main__":
             # top_dif = top_now
             # top_now.to_hdf("testhdf5", 'marketDD', format='table', complevel=9)
             '''
-            top_now = tdd.getSinaAlldf(market='cx', vol=ct.json_countVol, type=ct.json_countType)
-            # top_now = tdd.getSinaAlldf(market='次新股',filename='cxg', vol=ct.json_countVol, type=ct.json_countType)
+            # top_now = tdd.getSinaAlldf(market='cx', vol=ct.json_countVol, type=ct.json_countType)
+            # top_now = tdd.getSinaAlldf(market='央企',filename='yqg', vol=ct.json_countVol, type=ct.json_countType)
             # top_now = tdd.getSinaAlldf(market=u'一带一路',filename='ydyl', vol=ct.json_countVol, type=ct.json_countType)
-            # top_now = tdd.getSinaAlldf(market=u'新股与次新股',filename='cxg', vol=ct.json_countVol, type=ct.json_countType)
+            top_now = tdd.getSinaAlldf(market=u'次新股',filename='cxg', vol=ct.json_countVol, type=ct.json_countType)
             # top_now = tdd.getSinaAlldf(market=u'京津冀',filename='beijing', vol=ct.json_countVol, type=ct.json_countType)
             now_count = len(top_now)
             radio_t = cct.get_work_time_ratio()
@@ -330,8 +330,8 @@ if __name__ == "__main__":
                             top_temp = top_temp.sort_values(by=ct.Duration_percent_op,
                                         ascending=ct.Duration_percent_op_key)
                         else:
-                            top_temp = top_temp.sort_values(by=ct.Duration_percentdn_op,
-                                        ascending=ct.Duration_percentdn_op_key)
+                            top_temp = top_temp.sort_values(by=ct.Duration_percentdn_percent,
+                                        ascending=ct.Duration_percentdn_percent_key)
                             # top_temp = top_temp.sort_values(by=ct.Duration_percentdn_ra,
                             #             ascending=ct.Duration_percentdn_ra_key)
 
@@ -413,37 +413,6 @@ if __name__ == "__main__":
                 time_s = time.time()
                 status = False
             elif st.startswith('d') or st.startswith('dt'):
-                # dl = st.split()
-                # if len(dl) == 2:
-                #     dt = dl[1]
-                # elif len(dl) == 3:
-                #     dt = dl[1]
-                #     p_t = dl[2]
-                #     if p_t.startswith('l'):
-                #         ptype = 'low'
-                #     elif p_t.startswith('h'):
-                #         ptype = 'high'
-                #     elif p_t == 'y':
-                #         filter = 'y'
-                #     elif p_t == 'n':
-                #         filter = 'n'
-                #     elif p_t == 'py':
-                #         percent_status = 'y'
-                #     elif p_t == 'pn':
-                #         percent_status = 'n'
-                #     else:
-                #         print ("arg error:%s" % p_t)
-                # elif len(dl) == 4:
-                #     dt = dl[1]
-                #     ptype = dl[2]
-                #     if ptype == 'l':
-                #         ptype = 'low'
-                #     elif ptype == 'h':
-                #         ptype = 'high'
-                #     filter = dl[3]
-                #     percent_status = dl[3]
-                # else:
-                #     dt = ''
                 args = parserDuraton.parse_args(st.split()[1:])
                 if len(str(args.start)) > 0:
                     if args.end:
@@ -458,17 +427,13 @@ if __name__ == "__main__":
                     status = False
                     lastpTDX_DF = pd.DataFrame()
 
-            elif st.lower() == 'w' or st.lower() == 'a':
-                # if ptype == 'low':
-                    # codew = (top_dd[:10].index).tolist()
-                # else:
-                    # codew = (top_dd[-10:].index).tolist()
-                if st.lower() == 'a':
-                    codew = stf.WriteCountFilter(top_temp,duration=duration_date)
+            elif st.startswith('w') or st.startswith('a'):
+                args = cct.writeArgmain().parse_args(st.split())
+                codew = stf.WriteCountFilter(top_temp,duration=duration_date,writecount=args.dl)
+                if args.code == 'a':
                     cct.write_to_blocknew(block_path, codew)
                     # sl.write_to_blocknew(all_diffpath, codew)
                 else:
-                    codew = stf.WriteCountFilter(top_temp,duration=duration_date)
                     cct.write_to_blocknew(block_path, codew, False)
                     # sl.write_to_blocknew(all_diffpath, codew, False)
                 print "wri ok:%s" % block_path

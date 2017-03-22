@@ -5,7 +5,8 @@ import time
 import pandas as pd
 
 import JohhnsonUtil.commonTips as cct
-import LineHistogram as lrh
+# from JSONData import LineHistogram as lrh
+from JSONData import powerCompute as pct
 from JSONData import realdatajson as rl
 from JSONData import tdx_data_Day as tdd
 
@@ -24,7 +25,8 @@ if __name__ == "__main__":
         code_l = []
         code_d = []
         for code in df.index:
-            status, lenday, diff = lrh.get_linear_model_status(code, type=type, start=start, end=end)
+            status, lenday, diff = pct.get_linear_model_status_LSH(code, type=type, start=start, end=end)
+            # op, ra, status, dss = pct.get_linear_model_status(code, type=type, start=start, end=end)
             if status:
                 # print(df.loc[code,:])
                 # if df.loc[code, 'percent'] > 0 and lenday > 200:
@@ -50,10 +52,11 @@ if __name__ == "__main__":
     #     df = df.append(x)
     # print len(df)
     # df.iloc[:, 0:2].to_csv('stock-Line-%s.csv'%today, encoding='utf8')
-    type = 'm'
-    # start = '2016-01-18'
-    start = None
-    df_u, df_d = get_market_status('cyb', type, start)
+    type = 'h'
+    start = '2016-01-18'
+    # start = None
+    market = 'sh'
+    df_u, df_d = get_market_status(market, type, start)
     if not type == 'l':
         if len(df_u) > 0:
             print("Type: %s wri gold:%s %s" % (type, len(df_u.index.tolist()), block_path))

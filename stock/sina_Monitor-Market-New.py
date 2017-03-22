@@ -323,9 +323,10 @@ if __name__ == "__main__":
             elif st.lower() == 'clear' or st.lower() == 'c':
                 top_all = pd.DataFrame()
                 status = False
-            elif st.lower() == 'w' or st.lower() == 'a':
-                codew = stf.WriteCountFilter(top_temp)
-                if st.lower() == 'a':
+            elif st.startswith('w') or st.startswith('a'):
+                args = cct.writeArgmain().parse_args(st.split())
+                codew = stf.WriteCountFilter(top_temp,writecount=args.dl)
+                if args.code == 'a':
                     cct.write_to_blocknew(block_path, codew)
                     # sl.write_to_blocknew(all_diffpath, codew)
                 else:

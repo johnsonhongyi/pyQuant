@@ -283,7 +283,6 @@ if __name__ == "__main__":
             # cct.sleep(1)
             # if success > 3:
             #     raw_input("Except")
-            #     sys.exit(0)
             st = cct.cct_raw_input("status:[go(g),clear(c),quit(q,e),W(w),Wa(a)]:")
             if len(st) == 0:
                 status = False
@@ -300,9 +299,10 @@ if __name__ == "__main__":
             elif st.lower() == 'clear' or st.lower() == 'c':
                 top_all = pd.DataFrame()
                 status = False
-            elif st.lower() == 'w' or st.lower() == 'a':
-                codew = stf.WriteCountFilter(top_temp)
-                if st.lower() == 'a':
+            elif st.startswith('w') or st.startswith('a'):
+                args = cct.writeArgmain().parse_args(st.split())
+                codew = stf.WriteCountFilter(top_temp,writecount=args.dl)
+                if args.code == 'a':
                     cct.write_to_blocknew(block_path, codew)
                     # cct.write_to_blocknew(all_diffpath, codew)
                 else:

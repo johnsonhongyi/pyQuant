@@ -55,45 +55,45 @@ positionKey = {'sina_Market-DurationDn.py': '237, 403',
 
 cmdRun = '''cd /Users/Johnson/Documents/Quant/pyQuant/stock;
 open singleAnalyseUtil.py;
-sleep 0.01;osascript -e 'tell application "Python Launcher" to quit';sleep 16;
+sleep 0.03;osascript -e 'tell application "Python Launcher" to quit';sleep 16;
 open sina_Monitor.py;
-sleep 0.01;osascript -e 'tell application "Python Launcher" to quit';sleep 16;
+sleep 0.03;osascript -e 'tell application "Python Launcher" to quit';sleep 16;
 open sina_Monitor-GOLD.py;
-sleep 0.01;osascript -e 'tell application "Python Launcher" to quit';sleep 16;
+sleep 0.03;osascript -e 'tell application "Python Launcher" to quit';sleep 16;
 open sina_Monitor-Market-LH.py;
-sleep 0.01;osascript -e 'tell application "Python Launcher" to quit';sleep 16;
+sleep 0.03;osascript -e 'tell application "Python Launcher" to quit';sleep 16;
 open sina_Market-DurationCXDN.py;
-sleep 0.01;osascript -e 'tell application "Python Launcher" to quit';sleep 16;
+sleep 0.03;osascript -e 'tell application "Python Launcher" to quit';sleep 16;
 open sina_Market-DurationUp.py;
-sleep 0.01;osascript -e 'tell application "Python Launcher" to quit';sleep 16;
+sleep 0.03;osascript -e 'tell application "Python Launcher" to quit';sleep 16;
 open sina_Market-DurationDn.py;
-sleep 0.01;osascript -e 'tell application "Python Launcher" to quit';sleep 16;
+sleep 0.03;osascript -e 'tell application "Python Launcher" to quit';sleep 16;
 open sina_Market-DurationSH.py;
-sleep 0.01;osascript -e 'tell application "Python Launcher" to quit';sleep 16;
+sleep 0.03;osascript -e 'tell application "Python Launcher" to quit';sleep 16;
 open LinePower.py;
-sleep 0.01;osascript -e 'tell application "Python Launcher" to quit';sleep 5;
+sleep 0.03;osascript -e 'tell application "Python Launcher" to quit';sleep 5;
 '''
 # cmdRun = '''cd /Users/Johnson/Documents/Quant/pyQuant/stock;
 # open singleAnalyseUtil.py;
-# sleep 0.01;osascript -e 'tell application "Python Launcher" to quit';sleep 16;
+# sleep 0.03;osascript -e 'tell application "Python Launcher" to quit';sleep 16;
 # open sina_Monitor.py;
-# sleep 0.01;osascript -e 'tell application "Python Launcher" to quit';sleep 16;
+# sleep 0.03;osascript -e 'tell application "Python Launcher" to quit';sleep 16;
 # open sina_Monitor-GOLD.py;
-# sleep 0.01;osascript -e 'tell application "Python Launcher" to quit';sleep 16;
+# sleep 0.03;osascript -e 'tell application "Python Launcher" to quit';sleep 16;
 # open sina_Monitor-Market.py;
-# sleep 0.01;osascript -e 'tell application "Python Launcher" to quit';sleep 16;
+# sleep 0.03;osascript -e 'tell application "Python Launcher" to quit';sleep 16;
 # open sina_Monitor-Market-New.py;
-# sleep 0.01;osascript -e 'tell application "Python Launcher" to quit';sleep 16;
+# sleep 0.03;osascript -e 'tell application "Python Launcher" to quit';sleep 16;
 # open sina_Monitor-Market-LH.py;
-# sleep 0.01;osascript -e 'tell application "Python Launcher" to quit';sleep 16;
+# sleep 0.03;osascript -e 'tell application "Python Launcher" to quit';sleep 16;
 # open sina_Market-DurationUp.py;
-# sleep 0.01;osascript -e 'tell application "Python Launcher" to quit';sleep 16;
+# sleep 0.03;osascript -e 'tell application "Python Launcher" to quit';sleep 16;
 # open sina_Market-DurationDn.py;
-# sleep 0.01;osascript -e 'tell application "Python Launcher" to quit';sleep 16;
+# sleep 0.03;osascript -e 'tell application "Python Launcher" to quit';sleep 16;
 # open sina_Market-DurationSH.py;
-# sleep 0.01;osascript -e 'tell application "Python Launcher" to quit';sleep 16;
+# sleep 0.03;osascript -e 'tell application "Python Launcher" to quit';sleep 16;
 # open LinePower.py;
-# sleep 0.01;osascript -e 'tell application "Python Launcher" to quit';sleep 5;
+# sleep 0.03;osascript -e 'tell application "Python Launcher" to quit';sleep 5;
 # '''
 closeLaunch ='''osascript -e 'tell application "Python Launcher" to quit';sleep 16;'''
 
@@ -143,14 +143,17 @@ def setPosition(cmd=None, position=None):
         setPosition(cmd=None, position=None)
 # count = doScript(scriptcount        
 # os.system(cmdRun)
-print getPosition('singleAnalyseUtil.py')
-print getPosition('sina_Market-DurationDn.py')
-print getPosition('sina_Monitor-Market-LH.py')
-print getPosition('sina_Market-DurationSH.py')
-print getPosition('sina_Market-DurationCXDN.py')
-print getPosition('sina_Market-DurationCXUP.py')
-print getPosition('sina_Market-DurationUp.py')
-print getPosition('sina_Monitor-GOLD.py')
-print getPosition('sina_Monitor.py')
-print getPosition('LinePower.py')
+count = doScript(scriptcount)
+# print count
+if int(count) > 3:
+    print getPosition('singleAnalyseUtil.py')
+    print getPosition('sina_Market-DurationDn.py')
+    print getPosition('sina_Monitor-Market-LH.py')
+    print getPosition('sina_Market-DurationSH.py')
+    print getPosition('sina_Market-DurationCXDN.py')
+    print getPosition('sina_Market-DurationCXUP.py')
+    print getPosition('sina_Market-DurationUp.py')
+    print getPosition('sina_Monitor-GOLD.py')
+    print getPosition('sina_Monitor.py')
+    print getPosition('LinePower.py')
 setPosition(cmd=None, position=None)

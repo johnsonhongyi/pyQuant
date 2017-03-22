@@ -64,7 +64,7 @@ if __name__ == "__main__":
     # log.level = log.debug
     # error_handler = SyslogHandler('Sina-M-Log', level='ERROR')
 
-    width, height = 165, 21
+    width, height = 169, 21
     def set_duration_console(du_date):
         if cct.isMac():
             cct.set_console(width, height)
@@ -414,17 +414,13 @@ if __name__ == "__main__":
                     status = False
                     lastpTDX_DF = pd.DataFrame()
 
-            elif st.lower() == 'w' or st.lower() == 'a':
-                # if ptype == 'low':
-                    # codew = (top_dd[:10].index).tolist()
-                # else:
-                    # codew = (top_dd[-10:].index).tolist()
-                if st.lower() == 'a':
-                    codew = stf.WriteCountFilter(top_temp,duration=duration_date)
+            elif st.startswith('w') or st.startswith('a'):
+                args = cct.writeArgmain().parse_args(st.split())
+                codew = stf.WriteCountFilter(top_temp,duration=duration_date,writecount=args.dl)
+                if args.code == 'a':
                     cct.write_to_blocknew(block_path, codew)
                     # sl.write_to_blocknew(all_diffpath, codew)
                 else:
-                    codew = stf.WriteCountFilter(top_temp,duration=duration_date)
                     cct.write_to_blocknew(block_path, codew, False)
                     # sl.write_to_blocknew(all_diffpath, codew, False)
                 print "wri ok:%s" % block_path

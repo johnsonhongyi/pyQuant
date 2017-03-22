@@ -14,9 +14,7 @@ from JohhnsonUtil import johnson_cons as ct
 from JohhnsonUtil import commonTips as cct
 from JohhnsonUtil import LoggerFactory
 import trollius as asyncio
-# from urllib2 import Request,urlopen
 from trollius.coroutines import From
-# import tdx_data_Day as tdd
 log = LoggerFactory.getLogger('Sina_data')
 # log.setLevel(LoggerFactory.DEBUG)
 

@@ -290,6 +290,47 @@ def twoLineCompute(code, df=None, start=None, end=None, ptype='low'):
     # print p,str(idx)[:10]
     return mlist
 
+def get_linear_model_status_LSH(code, ptype='low', dtype='d', type='l', start=None, end=None):
+    # df = tdd.get_tdx_append_now_df(code, ptype, start, end).sort_index(ascending=True)
+    df = tdd.get_tdx_append_now_df_api(code, start, end).sort_index(ascending=True)
+    # print start,end,df.index.values[:1],df.index.values[-1:]
+    if len(df) < 2:
+        return False, 0, 0
+    if not dtype == 'd':
+        df = tdd.get_tdx_stock_period_to_type(df, dtype).sort_index(ascending=True)
+    # df = tdd.get_tdx_Exp_day_to_df(code, 'f').sort_index(ascending=True)
+    asset = df['close']
+    log.info("df:%s" % asset[:1])
+    asset = asset.dropna()
+    X = np.arange(len(asset))
+    x = sm.add_constant(X)
+    model = regression.linear_model.OLS(asset, x).fit()
+    a = model.params[0]
+    b = model.params[1]
+    log.info("X:%s a:%s b:%s" % (len(asset), a, b))
+    Y_hat = X * b + a
+    if Y_hat[-1] > Y_hat[1]:
+        log.debug("u:%s" % Y_hat[-1])
+        log.debug("price:" % asset.iat[-1])
+        if type.upper() == 'M':
+            diff = asset.iat[-1] - Y_hat[-1]
+            if diff > 0:
+                return True, len(asset), diff
+            else:
+                return False, len(asset), diff
+        elif type.upper() == 'L':
+            i = (asset.values.T - Y_hat).argmin()
+            c_low = X[i] * b + a - asset.values[i]
+            Y_hatlow = X * b + a - c_low
+            diff = asset.iat[-1] - Y_hatlow[-1]
+            if asset.iat[-1] - Y_hatlow[-1] > 0:
+                return True, len(asset), diff
+            else:
+                return False, len(asset), diff
+    else:
+        log.debug("d:%s" % Y_hat[1])
+        return False, 0, 0
+    return False, 0, 0
 
 def get_linear_model_status(code, df=None, dtype='d', type='m', start=None, end=None, days=1, filter='n',
                             dl=None, countall=True, ptype='low',power=True):
@@ -424,17 +465,29 @@ def get_linear_model_status(code, df=None, dtype='d', type='m', start=None, end=
         if Y_hat[-1] > Y_hat[0]:
             if diff > 0:
                 operation += 1
+            # else:
+                 # operation -= 1
             if diff_h > 0 :
                 operation += 1
+            # else:
+                 # operation -= 1
             if diff_l > 0 :
                 operation += 1
+            # else:
+                 # operation -= 1                
         else:
             if diff > 0:
                 operation -= 1
+            # else:
+                # operation += 1   
             if diff_h > 0 :
                 operation -= 1
+            # else:
+                # operation += 1 
             if diff_l > 0 :
                 operation -= 1
+            # else:
+                # operation += 1                 
         return operation, ratio
 
     df = df.fillna(0)

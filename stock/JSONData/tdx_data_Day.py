@@ -110,7 +110,7 @@ def get_tdx_Exp_day_to_df(code, start=None, end=None, dl=None,newdays = None,typ
         tdx_max_int = dl
     else:
         tdx_max_int = ct.tdx_max_int
-    max_int_end = 3 if int(tdx_max_int) > 5 else int(tdx_max_int/2)
+    max_int_end = -1 if int(tdx_max_int) > 10 else None
     if newdays is not None:
         newstockdayl = newdays
     else:
@@ -196,11 +196,11 @@ def get_tdx_Exp_day_to_df(code, start=None, end=None, dl=None,newdays = None,typ
             df['ma20d'] = pd.rolling_mean(df.close,20)
             df['ma60d'] = pd.rolling_mean(df.close,60)
             # df['hmax'] = df.high[-tdx_max_int:].max()
-            df['hmax'] = df.close[-tdx_max_int:-max_int_end].max()
-            df['lmin'] = df.low[-tdx_max_int:-max_int_end].min()
-            df['cmean'] = df.close[-tdx_max_int:-max_int_end].mean()
-            df['hv'] = df.vol[-tdx_max_int:-max_int_end].max()
-            df['lv'] = df.vol[-tdx_max_int:-max_int_end].min()
+            df['hmax'] = df.close[-tdx_max_int:max_int_end].max()
+            df['lmin'] = df.low[-tdx_max_int:max_int_end].min()
+            df['cmean'] = df.close[-tdx_max_int:max_int_end].mean()
+            df['hv'] = df.vol[-tdx_max_int:max_int_end].max()
+            df['lv'] = df.vol[-tdx_max_int:max_int_end].min()
             df = df.fillna(0)
             df = df.sort_index(ascending=False)
         return df
@@ -313,11 +313,11 @@ def get_tdx_Exp_day_to_df(code, start=None, end=None, dl=None,newdays = None,typ
             df['ma20d'] = pd.rolling_mean(df.close,20)
             df['ma60d'] = pd.rolling_mean(df.close,60)
             # df['hmax'] = df.high[-tdx_max_int:].max()
-            df['hmax'] = df.close[-tdx_max_int:-max_int_end].max()
-            df['lmin'] = df.low[-tdx_max_int:-max_int_end].min()
-            df['cmean'] = df.close[-tdx_max_int:-max_int_end].mean()
-            df['hv'] = df.vol[-tdx_max_int:-max_int_end].max()
-            df['lv'] = df.vol[-tdx_max_int:-max_int_end].min()
+            df['hmax'] = df.close[-tdx_max_int:max_int_end].max()
+            df['lmin'] = df.low[-tdx_max_int:max_int_end].min()
+            df['cmean'] = df.close[-tdx_max_int:max_int_end].mean()
+            df['hv'] = df.vol[-tdx_max_int:max_int_end].max()
+            df['lv'] = df.vol[-tdx_max_int:max_int_end].min()
             df = df.fillna(0)
             df = df.sort_index(ascending=False)
         return df

@@ -28,7 +28,7 @@ def parseArgmain():
                             help='find duration low')
         parser.add_argument('-l', action="store", dest="dl", type=int, default=14,
                             help='dl default=30')
-        parser.add_argument('-dl', action="store", dest="days", type=int, default=1,
+        parser.add_argument('-dl', action="store", dest="days", type=int, default=0,
                             help='days')
         parser.add_argument('-m', action="store", dest="mpl", type=str, default='n',
                             help='mpl show')

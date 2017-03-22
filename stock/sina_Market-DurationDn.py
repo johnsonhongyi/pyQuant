@@ -318,8 +318,8 @@ if __name__ == "__main__":
                             top_temp = top_temp.sort_values(by=ct.Duration_percent_op,
                                         ascending=ct.Duration_percent_op_key)
                         else:
-                            top_temp = top_temp.sort_values(by=ct.Duration_percentdn_op,
-                                        ascending=ct.Duration_percentdn_op_key)
+                            top_temp = top_temp.sort_values(by=ct.Duration_percentdn_percent,
+                                        ascending=ct.Duration_percentdn_percent_key)
                             # top_temp = top_temp.sort_values(by=ct.Duration_percentdn_ra,
                             #             ascending=ct.Duration_percentdn_ra_key)
 
@@ -445,19 +445,13 @@ if __name__ == "__main__":
                     status = False
                     lastpTDX_DF = pd.DataFrame()
 
-            elif st.lower() == 'w' or st.lower() == 'a':
-                # if ptype == 'low':
-                    # codew = (top_dd[:10].index).tolist()
-                # else:
-                    # codew = (top_dd[-10:].index).tolist()
-                if st.lower() == 'a':
-                    codew = stf.WriteCountFilter(top_temp,duration=duration_date)
-                    # codew = (top_dd.index[:10]).tolist()
+            elif st.startswith('w') or st.startswith('a'):
+                args = cct.writeArgmain().parse_args(st.split())
+                codew = stf.WriteCountFilter(top_temp,duration=duration_date,writecount=args.dl)
+                if args.code == 'a':
                     cct.write_to_blocknew(block_path, codew)
                     # sl.write_to_blocknew(all_diffpath, codew)
                 else:
-                    codew = stf.WriteCountFilter(top_temp,duration=duration_date)
-                    # codew = (top_dd.index[:10]).tolist()
                     cct.write_to_blocknew(block_path, codew, False)
                     # sl.write_to_blocknew(all_diffpath, codew, False)
                 print "wri ok:%s" % block_path

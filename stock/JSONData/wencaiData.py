@@ -19,15 +19,16 @@ sys.path.append("..")
 # import JohhnsonUtil.johnson_cons as ct
 from JohhnsonUtil import LoggerFactory
 from JohhnsonUtil import commonTips as cct
-try:
-    from urllib.request import urlopen, Request
-except ImportError:
-    from urllib2 import urlopen, Request
+# try:
+#     from urllib.request import urlopen, Request
+# except ImportError:
+#     from urllib2 import urlopen, Request
 
 log=LoggerFactory.getLogger('wencaiData')
 
 
 def post_login(root='http://upass.10jqka.com.cn/login',url=None):
+    import urllib2,urllib
     postData = {
     'act':"login_submit",
     'isiframe':"1",
@@ -350,7 +351,7 @@ if __name__ == '__main__':
     # print sina_json_Big_Count()
     # print getconfigBigCount(write=True)
     # sys.exit(0)
-    # post_login()
+    post_login()
 #    log.setLevel(LoggerFactory.INFO)
 #    df = get_wencai_Market_url(filter='国企改革',perpage=1000)
 #    df = get_wencai_Market_url('湖南发展,天龙集团,浙报传媒,中珠医疗,多喜爱',500)

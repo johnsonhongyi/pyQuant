@@ -28,7 +28,7 @@ duration_date = 10
 duration_diff = 6
 duration_date_l = 10
 duration_date_sort = 21
-bollFilter = 6
+bollFilter = 1
 writeblockbakNum = 12
 checkfilter = True
 checkfilter_end_time = 945
@@ -43,7 +43,10 @@ powerdiff = 'ra * fibl + rah*(abs(float(%s)-fibl))/fib +ma +kdj+rsi'
 Duration_sort_op=['diff','op','fib','fibl','ra','percent','ratio','volume','counts']
 Duration_sort_op_key=[0,0,1,1,0,0,1,1,1]
 
-Duration_percentdn_op=['percent','diff','op','fib','fibl','ra','ratio','volume','counts']
+Duration_percentdn_percent=['percent','diff','op','fib','fibl','ra','ratio','volume','counts']
+Duration_percentdn_percent_key=[0,0,0,1,1,0,1,1,1]
+
+Duration_percentdn_op=['diff','percent','op','fib','fibl','ra','ratio','volume','counts']
 Duration_percentdn_op_key=[0,0,0,1,1,0,1,1,1]
 
 # Duration_percentdn_ra=['ra','percent','diff','op','fib','fibl','ratio','volume','counts']

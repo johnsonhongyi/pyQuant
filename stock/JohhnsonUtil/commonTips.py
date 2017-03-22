@@ -1010,13 +1010,16 @@ def write_to_blocknew(p_name, data, append=True):
         writeBlocknew(p_name, data, append)
         writeBlocknew(blockNew,data,append)
         writeBlocknew(blockNewStart, data,append)
+    elif p_name.find('068.blk')  > 0 or p_name.find('069.blk') > 0:
+        
+        writeBlocknew(p_name, data, append)
+        print "write to %s"%(p_name)
     else:
         writeBlocknew(p_name, data, append)
         writeBlocknew(blockNew, data)
         # writeBlocknew(blockNewStart, data[:ct.writeCount - 1])
         writeBlocknew(blockNewStart, data,append)
         print "write to other and start"
-
 
 
 def get_sys_platform():
@@ -1112,6 +1115,29 @@ def MoniterArgmain():
                         help='find duration low')
     return parser
 
+def writeArgmain():
+    # from ConfigParser import ConfigParser
+    # import shlex
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument('code', type=str, nargs='?', help='w or a')
+    parser.add_argument('dl', nargs='?', type=int, help='1,5,10',default=ct.writeCount)
+    # parser.add_argument('end', nargs='?', type=str, help='20160101')
+    # parser.add_argument('-d', action="store", dest="dtype", type=str, nargs='?', choices=['d', 'w', 'm'], default='d',
+    #                     help='DateType')
+    # parser.add_argument('-v', action="store", dest="vtype", type=str, choices=['f', 'b'], default='f',
+    #                     help='Price Forward or back')
+    # parser.add_argument('-p', action="store", dest="ptype", type=str, choices=['high', 'low', 'close'], default='low',
+    #                     help='price type')
+    # parser.add_argument('-f', action="store", dest="filter", type=str, choices=['y', 'n'], default='n',
+    #                     help='find duration low')
+    # parser.add_argument('-l', action="store", dest="dl", type=int, default=None,
+    #                     help='dl')
+    # parser.add_argument('-dl', action="store", dest="days", type=int, default=1,
+    #                     help='days')
+    # parser.add_argument('-m', action="store", dest="mpl", type=str, default='y',
+    #                     help='mpl show')
+    return parser
 
 def DurationArgmain():
     parser = argparse.ArgumentParser()

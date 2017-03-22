@@ -318,32 +318,6 @@ if __name__ == "__main__":
                         print "."
                         break
             else:
-                # st = cct.cct_raw_input("status:[go(g),clear(c),quit(q,e),W(w),Wa(a)]:")
-                # if len(st) == 0:
-                #     status = False
-                # elif st.lower() == 'g' or st.lower() == 'go':
-                #     status = True
-                #     for code in top_all[:10].index:
-                #         code = re.findall('(\d+)', code)
-                #         if len(code) > 0:
-                #             code = code[0]
-                #             kind = sl.get_multiday_ave_compare_silent(code)
-                # elif st.lower() == 'clear' or st.lower() == 'c':
-                #     top_all = pd.DataFrame()
-                #     status = False
-                # elif st.lower() == 'w' or st.lower() == 'a':
-                #     codew = stf.WriteCountFilter(top_temp)
-                #     if st.lower() == 'a':
-                #         cct.write_to_blocknew(block_path, codew[:ct.writeCount])
-                #         # cct.write_to_blocknew(all_diffpath, codew)
-                #     else:
-                #         cct.write_to_blocknew(block_path, codew[:ct.writeCount], False)
-                #         # cct.write_to_blocknew(all_diffpath, codew, False)
-                #     print "wri ok:%s" % block_path
-                #     cct.sleeprandom(120)
-                #     # cct.sleep(2)
-                # else:
-                #     sys.exit(0)
                 raise KeyboardInterrupt("StopTime")    
 
 
@@ -364,12 +338,10 @@ if __name__ == "__main__":
             elif st.lower() == 'clear' or st.lower() == 'c':
                 top_all = pd.DataFrame()
                 status = False
-            elif st.lower() == 'w' or st.lower() == 'a':
-                # base_path=r"E:\DOC\Parallels\WinTools\zd_pazq\T0002\blocknew\\"
-                # block_path=base_path+'065.blk'
-                # all_diffpath=base_path+'\062.blk'
-                codew = stf.WriteCountFilter(top_temp)
-                if st.lower() == 'a':
+            elif st.startswith('w') or st.startswith('a'):
+                args = cct.writeArgmain().parse_args(st.split())
+                codew = stf.WriteCountFilter(top_temp,writecount=args.dl)
+                if args.code == 'a':
                     cct.write_to_blocknew(block_path, codew)
                     # cct.write_to_blocknew(all_diffpath,codew)
                 else:
