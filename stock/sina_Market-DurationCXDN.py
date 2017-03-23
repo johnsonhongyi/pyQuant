@@ -95,10 +95,11 @@ if __name__ == "__main__":
     duration_date = ct.duration_date_l
 #    duration_date = 3
     du_date = duration_date
-    newdays = 5
+    newdays = 18
     # print cct.last_tddate(2)
-    end_date = cct.last_tddate(days=2 )
+    end_date = cct.last_tddate(days=3 )
     ptype = 'high'
+    lastp = False
     filter = 'y'
     if len(str(duration_date)) < 4:
         # duration_date = tdd.get_duration_price_date('999999', dl=duration_date, end=end_date, ptype='dutype')
@@ -143,7 +144,7 @@ if __name__ == "__main__":
                 time_Rt = time.time()
                 if len(top_all) == 0 and len(lastpTDX_DF) == 0:
                     time_Rt = time.time()
-                    top_all,lastpTDX_DF = tdd.get_append_lastp_to_df(top_now, lastpTDX_DF=None, dl=duration_date,end=end_date,ptype=ptype,filter=filter, power=True, lastp=False,newdays=newdays)
+                    top_all,lastpTDX_DF = tdd.get_append_lastp_to_df(top_now, lastpTDX_DF=None, dl=duration_date,end=end_date,ptype=ptype,filter=filter, power=True, lastp=lastp,newdays=newdays)
                     # codelist = top_all.index.tolist()
                     # log.info('toTDXlist:%s' % len(codelist))
                     # # tdxdata = tdd.get_tdx_all_day_LastDF(codelist,dt=duration_date,ptype=ptype)
@@ -303,8 +304,8 @@ if __name__ == "__main__":
                                     title=[du_date, 'dT:%s' % cct.get_time_to_date(time_s), 'G:%s' % goldstock,
                                            'zxg: %s' % (blkname)])
 
-                    top_temp = stf.getBollFilter(df=top_temp, boll=ct.bollFilter,duration=ct.PowerCountdl)
-                    # top_end = stf.getBollFilter(df=top_end, boll=ct.bollFilter,duration=ct.PowerCountdl)
+                    top_temp = stf.getBollFilter(df=top_temp, boll=ct.bollFilter,duration=ct.PowerCountdl,filter=True,ma5d=True)
+                    # top_end = stf.getBollFilter(df=top_end, boll=ct.bollFilter,duration=ct.PowerCountdl,filter=False)
                     if 'op' in top_temp.columns:
                         # if ptype == 'low':
                         #     top_temp = top_temp.sort_values(by=ct.Duration_sort_op,
@@ -330,10 +331,12 @@ if __name__ == "__main__":
                             top_temp = top_temp.sort_values(by=ct.Duration_percent_op,
                                         ascending=ct.Duration_percent_op_key)
                         else:
-                            top_temp = top_temp.sort_values(by=ct.Duration_percentdn_percent,
-                                        ascending=ct.Duration_percentdn_percent_key)
+                            # top_temp = top_temp.sort_values(by=ct.Duration_percentdn_percent,
+                                        # ascending=ct.Duration_percentdn_percent_key)
                             # top_temp = top_temp.sort_values(by=ct.Duration_percentdn_ra,
                             #             ascending=ct.Duration_percentdn_ra_key)
+                            top_temp = top_temp.sort_values(by=ct.Duration_percentdn_op,
+                                        ascending=ct.Duration_percentdn_op_key)
 
                     if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935:
                         # top_temp = top_temp[top_temp['buy'] > top_temp['ma10d']]
@@ -429,7 +432,7 @@ if __name__ == "__main__":
 
             elif st.startswith('w') or st.startswith('a'):
                 args = cct.writeArgmain().parse_args(st.split())
-                codew = stf.WriteCountFilter(top_temp,duration=duration_date,writecount=args.dl)
+                codew = stf.WriteCountFilter(top_temp,duration=duration_date,writecount=args.dl,end=args.end)
                 if args.code == 'a':
                     cct.write_to_blocknew(block_path, codew)
                     # sl.write_to_blocknew(all_diffpath, codew)

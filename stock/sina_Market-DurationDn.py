@@ -85,13 +85,15 @@ if __name__ == "__main__":
     status_change = False
     lastpTDX_DF = pd.DataFrame()
     # dl=60
-    ptype='high'
+    ptype = 'high'
+    lastp = False
+    newdays = 30
     # op, ra, duration_date, days = pct.get_linear_model_status('999999', filter='y', dl=dl, ptype=ptype, days=1)
 #    duration_date = ct.duration_date
     duration_date = ct.duration_date_l
     du_date = duration_date
     # print cct.last_tddate(2)
-    end_date = cct.last_tddate(days=2)
+    end_date = cct.last_tddate(days=3)
     ptype = 'high'
     filter = 'y'
     if len(str(duration_date)) < 4:
@@ -117,6 +119,7 @@ if __name__ == "__main__":
             # top_now.to_hdf("testhdf5", 'marketDD', format='table', complevel=9)
             '''
             top_now = tdd.getSinaAlldf(market='all', vol=ct.json_countVol, type=ct.json_countType)
+#            top_now = tdd.getSinaAlldf(market=u'次新股',filename='cxg', vol=ct.json_countVol, type=ct.json_countType)
             now_count = len(top_now)
             radio_t = cct.get_work_time_ratio()
             # top_now = top_now[top_now.buy > 0]
@@ -129,11 +132,11 @@ if __name__ == "__main__":
             else:
                 status_change = False
             # print ("Buy>0:%s" % len(top_now[top_now['buy'] > 0])),
-            if len(top_now) > 10 or cct.get_work_time():
+            if len(top_now) > 0 or cct.get_work_time():
                 time_Rt = time.time()
                 if len(top_all) == 0 and len(lastpTDX_DF) == 0:
                     time_Rt = time.time()
-                    top_all,lastpTDX_DF = tdd.get_append_lastp_to_df(top_now, lastpTDX_DF=None, dl=duration_date,end=end_date,ptype=ptype,filter=filter, power=True, lastp=False)
+                    top_all,lastpTDX_DF = tdd.get_append_lastp_to_df(top_now, lastpTDX_DF=None, dl=duration_date,end=end_date,ptype=ptype,filter=filter, power=True, lastp=lastp,newdays=newdays)
                     # codelist = top_all.index.tolist()
                     # log.info('toTDXlist:%s' % len(codelist))
                     # # tdxdata = tdd.get_tdx_all_day_LastDF(codelist,dt=duration_date,ptype=ptype)
@@ -318,10 +321,12 @@ if __name__ == "__main__":
                             top_temp = top_temp.sort_values(by=ct.Duration_percent_op,
                                         ascending=ct.Duration_percent_op_key)
                         else:
-                            top_temp = top_temp.sort_values(by=ct.Duration_percentdn_percent,
-                                        ascending=ct.Duration_percentdn_percent_key)
+                            # top_temp = top_temp.sort_values(by=ct.Duration_percentdn_percent,
+                                        # ascending=ct.Duration_percentdn_percent_key)
                             # top_temp = top_temp.sort_values(by=ct.Duration_percentdn_ra,
                             #             ascending=ct.Duration_percentdn_ra_key)
+                            top_temp = top_temp.sort_values(by=ct.Duration_percentdn_op,
+                                        ascending=ct.Duration_percentdn_op_key)
 
                     if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935:
                         # top_temp = top_temp[top_temp['buy'] > top_temp['ma10d']]

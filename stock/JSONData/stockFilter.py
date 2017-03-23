@@ -4,10 +4,12 @@ import sys
 sys.path.append("..")
 from JohhnsonUtil import commonTips as cct
 import JohhnsonUtil.johnson_cons as ct
+from JSONData import powerCompute as pct
 import pandas as pd
 import time
-def getBollFilter(df=None,boll=5,duration=ct.PowerCountdl,filter=True):
+def getBollFilter(df=None,boll=5,duration=ct.PowerCountdl,filter=True,ma5d=True,dl=14):
     #return boll > int
+
     if df is None:
         print "dataframe is None"
         return None
@@ -15,9 +17,9 @@ def getBollFilter(df=None,boll=5,duration=ct.PowerCountdl,filter=True):
         df.loc[df.percent>=9.9,'percent']=10
     if cct.get_now_time_int() > 915 and cct.get_now_time_int() <= 1000:
         # df = df[df.buy > df.cmean * ct.changeRatioUp ]
-        df = df[df.buy > df.hmax * ct.changeRatio]
+        df = df[df.buy > df.cmean * ct.changeRatio]
     elif cct.get_now_time_int() > 1000 and cct.get_now_time_int() <= 1445:
-        df = df[df.buy > df.hmax]
+        df = df[df.buy > df.cmean]
     else:
         df = df[df.buy > df.cmean]
         # df = df[df.buy > df.cmean * ct.changeRatio]
@@ -50,12 +52,21 @@ def getBollFilter(df=None,boll=5,duration=ct.PowerCountdl,filter=True):
     if 'ma5d' in df.columns:
         df = df[df.buy > df.ma5d * ct.changeRatio]
 
-    if 'vstd' in df.columns:
-        df = df[(df.lvol * df.volume > (df.vstd + df.lvol)) | ((df.percent > 3) & (df.hv/df.lv > 3))]
-#                [dd.lvol * dd.volume > (dd.vstd + dd.lvol) | dd.lvol * dd.volume >(dd.ldvolume + dd.vstd]
-    if filter and cct.get_now_time_int() > 920 and cct.get_now_time_int() <= 1445:
-        df = df[((df.fibl < int(duration / 1.5)) &  (df.volume > 2.5 * cct.get_work_time_ratio() )) | (df.percent > 3)]
-        df = df[df.oph > 10]
+    if filter:
+        if ma5d:
+            op, ra, st, days = pct.get_linear_model_status('999999', filter='y', dl=dl, ptype='low')
+            oph, rah, sth, daysh = pct.get_linear_model_status('999999', filter='y', dl=dl, ptype='high')
+            fibl = str(days[0])
+            fibh = str(daysh[0])
+            if 1 < fibl < dl / 2 and fibh < dl / 2:
+                df = df[ ((df.ma5d * ct.changeRatio < df.low) & (df.low < df.ma5d * (2 - ct.changeRatio))) | ((df.percent > 1) & (df.volume > 3))]
+        if 'vstd' in df.columns:
+            df = df[(df.lvol * df.volume > (df.vstd + df.lvol)) | ((df.percent > -2) & (df.hv/df.lv > 3))]
+    #                [dd.lvol * dd.volume > (dd.vstd + dd.lvol) | dd.lvol * dd.volume >(dd.ldvolume + dd.vstd]
+        if  cct.get_now_time_int() > 920 and cct.get_now_time_int() <= 1450:
+#            df = df[((df.fibl < int(duration / 1.5)) &  (df.volume > 2.5 * cct.get_work_time_ratio() )) | (df.percent > 3)]
+            df = df[ (df.volume > 2.5 * cct.get_work_time_ratio()) | (df.percent > 3)]
+#            df = df[df.oph > 10]
     # elif filter and cct.get_now_time_int() > 1015 and cct.get_now_time_int() <= 1445:
     #     df = df[((df.fibl < int(duration / 1.5)) &  (df.volume > 3)) | (df.percent > 3)]
         # print df
@@ -68,21 +79,42 @@ def getBollFilter(df=None,boll=5,duration=ct.PowerCountdl,filter=True):
         df['boll'] = 0
         return df
 
-def WriteCountFilter(df,op='op',duration=10,writecount=ct.writeCount):
+def WriteCountFilter(df,op='op',duration=10,writecount=ct.writeCount,end=None):
     codel = []
-    if writecount < 100 and len(df) > 0 and 'percent' in df.columns:
-        dd =  df[df.percent == 10]
-        if duration > ct.duration_diff and op=='op' and len(dd) > ct.writeCount:
-            codel = dd.index.tolist()
-            if writecount < ct.writeCount :
-                for co in df.index[:writecount].tolist():
-                    if co not in codel:
-                        codel.append(co) 
+    if end is None and int(writecount) > 0:
+        writecount = int(writecount)
+        if writecount < 100 and len(df) > 0 and 'percent' in df.columns:
+            dd =  df[df.percent == 10]
+            if duration > ct.duration_diff and op=='op' and len(dd) > ct.writeCount:
+                codel = dd.index.tolist()
+                if writecount < ct.writeCount :
+                    for co in df.index[:writecount].tolist():
+                        if co not in codel:
+                            codel.append(co)
+            else:
+                codel = df.index[:writecount].tolist()
         else:
-            codel = df.index[:writecount].tolist()
+            if len(str(writecount)) >= 4 :
+                codel.append(str(writecount).zfill(6))
+            else:
+                print "writeCount DF is None or Wri:%s"%(writecount)
     else:
-        if len(str(writecount)) >= 4 :
-            codel.append(str(writecount).zfill(6))
+        if end is None:
+            writecount = int(writecount)
+            if writecount > 0:
+                writecount -= 1
+            codel.append(df.index.tolist()[writecount])
         else:
-            print "writeCount DF is None or Wri:%s"%(writecount)
+            writecount ,end = int(writecount),int(end)
+            if writecount > 0:
+                writecount -= 1
+            elif writecount < -1:
+                writecount += 1
+            # elif writecount = -1:
+            #     writecount = :
+            if writecount < end:
+                codel = df.index.tolist()[writecount:end]
+            else:
+                codel = df.index.tolist()[end:writecount]
+
     return codel

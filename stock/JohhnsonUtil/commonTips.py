@@ -1121,7 +1121,8 @@ def writeArgmain():
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument('code', type=str, nargs='?', help='w or a')
-    parser.add_argument('dl', nargs='?', type=int, help='1,5,10',default=ct.writeCount)
+    parser.add_argument('dl', nargs='?', type=str, help='1,5,10',default=ct.writeCount)
+    parser.add_argument('end', nargs='?', type=str, help='1,5,10',default=None)
     # parser.add_argument('end', nargs='?', type=str, help='20160101')
     # parser.add_argument('-d', action="store", dest="dtype", type=str, nargs='?', choices=['d', 'w', 'm'], default='d',
     #                     help='DateType')

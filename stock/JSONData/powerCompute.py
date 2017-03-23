@@ -1036,13 +1036,14 @@ def maintest(code, start=None, type='m', filter='y'):
 
 
 if __name__ == "__main__":
-    # print get_linear_model_status('600671', filter='y', dl=10, ptype='low')
+    op, ra, st, days = get_linear_model_status('999999', filter='y', dl=14, ptype='low')
+    print days[0]
     # print get_linear_model_status('600671', filter='y', dl=10, ptype='high')
     # print get_linear_model_status('600671', filter='y', start='20160329', ptype='low')
     # print get_linear_model_status('600671', filter='y', start='20160329', ptype='high')
     # print get_linear_model_status('999999', filter='y', dl=30, ptype='high')
     # print get_linear_model_status('999999', filter='y', dl=30, ptype='low')
-    print powerCompute_df(['600506','000938','002171'], dtype='d',end=None, dl=21, filter='y')
+    # print powerCompute_df(['600506','000938','002171'], dtype='d',end=None, dl=21, filter='y')
     # # print powerCompute_df(['601198', '002791', '000503'], dtype='d', end=None, dl=30, filter='y')
     # print get_linear_model_status('999999', filter='y', dl=34, ptype='low', days=1)
     # print get_linear_model_status('399006', filter='y', dl=34, ptype='low', days=1)

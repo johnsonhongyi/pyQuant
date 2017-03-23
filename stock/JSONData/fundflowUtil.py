@@ -430,6 +430,9 @@ def get_lhb_dd(retry_count=3, pause=0.001):
         traceback.print_exc()
         raise IOError(ct.NETWORK_URL_ERROR_MSG.decode('utf8').encode('gbk'))
 
+def dfcf_yyb_data():
+    url = 'http://datainterface3.eastmoney.com//EM_DataCenter_V3/api/YYBJXMX/GetYYBJXMX?tkn=eastmoney&salesCode=80035417&tdir=&dayNum=&startDateTime=2016-03-22&endDateTime=2017-03-22&sortfield=&sortdirec=1&pageNum=1&pageSize=50&cfg=yybjym'
+
 
 if __name__ == "__main__":
     # ff = get_dfcfw_fund_flow(ct.DFCFW_FUND_FLOW_URL % ct.SINA_Market_KEY_TO_DFCFW['sh'])

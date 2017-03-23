@@ -263,7 +263,8 @@ def get_tdx_Exp_day_to_df(code, start=None, end=None, dl=None,newdays = None,typ
         else:
             dl = int(cct.get_today_duration(start) * 5 / 7)
             log.debug("start:%s dl:%s"%(start,dl))
-        data = cct.read_last_lines(file_path, int(dl) + 5)
+        inxdl = int(dl) if int(dl) > 3 else int(dl) + 2
+        data = cct.read_last_lines(file_path, inxdl)
         dt_list = []
         data_l = data.split('\n')
         data_l.reverse()
@@ -2035,7 +2036,7 @@ def get_tdx_exp_low_or_high_power(code, dt=None, ptype='close', dl=None,end=None
                         code, df=df, dtype=dtype, start=dt, end=end, dl=dl, filter='y', ptype=pty,power=False)
                     opc += op
                     rac += ra
-                    if ptype == 'low':
+                    if pty == 'low':
                         stl = st
                         fibl = str(daysData[0])
                     else:
@@ -2334,8 +2335,9 @@ def get_tdx_all_day_LastDF(codeList, type=0, dt=None, ptype='close'):
         print ("TDX:%0.2f" % (time.time() - time_t)),
     return df
 
-def get_append_lastp_to_df(top_all,lastpTDX_DF=None,dl=ct.PowerCountdl,end=None,ptype='low',filter='y',power=True,lastp=True,newdays=None):
+def get_append_lastp_to_df(top_all,lastpTDX_DF=None,dl=ct.PowerCountdl,end=None,ptype='low',filter='y',power=True,lastp=False,newdays=None):
     codelist = top_all.index.tolist()
+#    codelist = ['603169']
     log.info('toTDXlist:%s' % len(codelist))
     # print codelist[5]
     if lastpTDX_DF is None or len(lastpTDX_DF) == 0:
@@ -2433,13 +2435,14 @@ def get_tdx_exp_all_LastDF(codeList, dt=None,end=None,ptype='low',filter='n'):
         print ("TDXE:%0.2f" % (time.time() - time_t)),
     return df
 
-def get_tdx_exp_all_LastDF_DL(codeList, dt=None,end=None,ptype='low',filter='n',power=False,lastp=False,newdays=None):
+def get_tdx_exp_all_LastDF_DL(codeList, dt=None,end=None,ptype='low',filter='n',power=False,lastp=False,newdays=None,dl=None):
     time_t = time.time()
     # df = rl.get_sina_Market_json(market)
     # code_list = np.array(df.code)
     # if type==0:
     #     results = cct.to_mp_run(get_tdx_day_to_df_last, codeList)
     # else:
+    end = cct.day8_to_day10(end)
     if dt is not None and filter == 'n':
         if len(str(dt)) < 8 :
             dl = int(dt)
@@ -2467,15 +2470,19 @@ def get_tdx_exp_all_LastDF_DL(codeList, dt=None,end=None,ptype='low',filter='n',
 #        for code in codeList:
 #            print code
 #            results.append(get_tdx_exp_low_or_high_price(code, dt, ptype, dl))
+
+#    elif dt is not None and filter == 'y':
+#        results = cct.to_mp_run_async(get_tdx_exp_low_or_high_power, codeList, dt, ptype, dl,end,power,lastp,newdays)
     elif dt is not None:
         if len(str(dt)) < 8 :
-            dt = int(dt)
-            dl = dt
+            dl = int(dt)
+#            dt = int(dt)
             # dt = None
             # df = get_tdx_Exp_day_to_df('999999',end=end).sort_index(ascending=False)
             # dt = get_duration_price_date('999999', dt=dt,ptype=ptype,df=df)
             # dt = df[df.index <= dt].index.values[0]
-            dt=get_duration_Index_date('999999',dl=dt)
+#            dt=get_duration_Index_date('999999',dl=dt)
+            dt = None
             log.info("LastDF:%s,%s" % (dt,dl))
         else:
             if len(str(dt)) == 8:
@@ -2711,7 +2718,12 @@ if __name__ == '__main__':
     # print get_tdx_append_now_df_api_tofile('300583')
     # sys.exit(0)
 #    print getSinaAlldf('cx')
-#    print get_tdx_exp_low_or_high_power('603585',dl=10,ptype='low')
+    get_append_lastp_to_df(None,end='2017-03-20',ptype='high')
+#    print get_tdx_exp_low_or_high_power('603169',dl=10,ptype='high')
+    print get_tdx_exp_low_or_high_power('603169',None ,'high', 14, '2017-03-20', True, True, None)
+
+
+#    get_tdx_exp_low_or_high_power, codeList, dt, ptype, dl,end,power,lastp,newdays
 #    code=['603878','300575']
 #    dm = get_sina_data_df(code)
 #    code='603878'
