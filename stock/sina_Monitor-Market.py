@@ -327,7 +327,7 @@ if __name__ == "__main__":
                     else:
                         pass
             else:
-                sys.exit(0)
+                print "input error:%s"%(st)
         except (IOError, EOFError, Exception) as e:
             print "Error", e
 

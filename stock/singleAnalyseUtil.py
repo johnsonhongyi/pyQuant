@@ -584,7 +584,7 @@ if __name__ == '__main__':
                 dir_mo = eval(cct.eval_rule)
                 evalcmd(dir_mo)
             else:
-                sys.exit(0)
+                print "input error:%s"%(st)
                 # cct.sleep(0.5)
                 # if success > 3:
                 #     raw_input("Except")

@@ -355,7 +355,7 @@ if __name__ == "__main__":
                 dir_mo = eval(cct.eval_rule)
                 evalcmd(dir_mo)
             else:
-                sys.exit(0)
+                print "input error:%s"%(st)
 
         except (IOError, EOFError) as e:
             print "Error", e

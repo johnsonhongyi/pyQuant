@@ -53,20 +53,21 @@ def getBollFilter(df=None,boll=5,duration=ct.PowerCountdl,filter=True,ma5d=True,
         df = df[df.buy > df.ma5d * ct.changeRatio]
 
     if filter:
-        if ma5d:
-            op, ra, st, days = pct.get_linear_model_status('999999', filter='y', dl=dl, ptype='low')
-            oph, rah, sth, daysh = pct.get_linear_model_status('999999', filter='y', dl=dl, ptype='high')
-            fibl = str(days[0])
-            fibh = str(daysh[0])
-            if 1 < fibl < dl / 2 and fibh < dl / 2:
-                df = df[ ((df.ma5d * ct.changeRatio < df.low) & (df.low < df.ma5d * (2 - ct.changeRatio))) | ((df.percent > 1) & (df.volume > 3))]
+        # if ma5d:
+        #     # op, ra, st, days = pct.get_linear_model_status('999999', filter='y', dl=dl, ptype='low')
+        #     oph, rah, sth, daysh = pct.get_linear_model_status('999999', filter='y', dl=dl, ptype='high')
+        #     # fibl = str(days[0])
+        #     fibh = str(daysh[0])
+        #     # if 1 < fibl < dl / 2 and fibh > dl / 3:
+        #     if fibh > dl / 3:
+        #         df = df[ ((df.ma5d * ct.changeRatio < df.low) & (df.low < df.ma5d * (2 - ct.changeRatio))) | ((df.percent > 1) & (df.volume > 3))]
         if 'vstd' in df.columns:
             df = df[(df.lvol * df.volume > (df.vstd + df.lvol)) | ((df.percent > -2) & (df.hv/df.lv > 3))]
     #                [dd.lvol * dd.volume > (dd.vstd + dd.lvol) | dd.lvol * dd.volume >(dd.ldvolume + dd.vstd]
         if  cct.get_now_time_int() > 920 and cct.get_now_time_int() <= 1450:
 #            df = df[((df.fibl < int(duration / 1.5)) &  (df.volume > 2.5 * cct.get_work_time_ratio() )) | (df.percent > 3)]
             df = df[ (df.volume > 2.5 * cct.get_work_time_ratio()) | (df.percent > 3)]
-#            df = df[df.oph > 10]
+            # df = df[df.oph > 10]
     # elif filter and cct.get_now_time_int() > 1015 and cct.get_now_time_int() <= 1445:
     #     df = df[((df.fibl < int(duration / 1.5)) &  (df.volume > 3)) | (df.percent > 3)]
         # print df

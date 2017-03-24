@@ -104,6 +104,20 @@ def get_code_file_path(code,type='f'):
 
 # @nb.autojit
 def get_tdx_Exp_day_to_df(code, start=None, end=None, dl=None,newdays = None,type='f'):
+    """[get local tdx data]
+    [description]
+    Arguments:
+        code {[str]} -- [999999]
+    Keyword Arguments:
+        start {date} -- [description] (default: {None})
+        end {date} -- [description] (default: {None})
+        dl {int} -- [description] (default: {None})
+        newdays {int} -- [description] (default: {None})
+        type {str} -- [description] (default: {'f'})
+    
+    Returns:
+        [type] -- [dateframe or series]
+    """
     start=cct.day8_to_day10(start)
     end=cct.day8_to_day10(end)
     if dl is not None and dl < 70:

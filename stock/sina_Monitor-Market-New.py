@@ -337,7 +337,7 @@ if __name__ == "__main__":
 
                 # cct.sleep(2)
             else:
-                sys.exit(0)
+                print "input error:%s"%(st)
         except (IOError, EOFError, Exception) as e:
             print "Error", e
             #traceback.print_exc()

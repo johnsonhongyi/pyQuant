@@ -269,8 +269,10 @@ if __name__ == "__main__":
                             top_temp = top_temp.sort_values(by=ct.Duration_percent_op,
                                         ascending=ct.Duration_percent_op_key)
                         else:
-                            top_temp = top_temp.sort_values(by=ct.Duration_percentdn_op,
-                                        ascending=ct.Duration_percentdn_op_key)
+                            top_temp = top_temp.sort_values(by=ct.Duration_percentdn_percent,
+                                        ascending=ct.Duration_percentdn_percent_key)
+                            # top_temp = top_temp.sort_values(by=ct.Duration_percentdn_op,
+                            #             ascending=ct.Duration_percentdn_op_key)
                             # top_temp = top_temp.sort_values(by=ct.Duration_percentdn_ra,
                             #             ascending=ct.Duration_percentdn_ra_key)
 
@@ -369,7 +371,7 @@ if __name__ == "__main__":
 
                 # cct.sleep(2)
             else:
-                sys.exit(0)
+                print "input error:%s"%(st)
         except (IOError, EOFError, Exception) as e:
             print "Error::", e
             #traceback.print_exc()

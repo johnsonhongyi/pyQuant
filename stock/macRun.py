@@ -42,7 +42,7 @@ end tell
 #                'singleAnalyseUtil.py': '583, 23',
 #                'LinePower.py':'767, 527',}
 positionKey = {'sina_Market-DurationDn.py': '237, 403',
-               'sina_Market-DurationUp.py': '-23, 539',
+               'sina_Market-DurationDnUP.py': '-23, 539',
                'sina_Market-DurationCXDN': '31, 80',
                'sina_Market-DurationSH.py': '217, 520',
                'sina_Monitor-Market-New.py': '-2, 371',
@@ -64,7 +64,7 @@ open sina_Monitor-Market-LH.py;
 sleep 0.03;osascript -e 'tell application "Python Launcher" to quit';sleep 16;
 open sina_Market-DurationCXDN.py;
 sleep 0.03;osascript -e 'tell application "Python Launcher" to quit';sleep 16;
-open sina_Market-DurationUp.py;
+open sina_Market-DurationDnUP.py;
 sleep 0.03;osascript -e 'tell application "Python Launcher" to quit';sleep 16;
 open sina_Market-DurationDn.py;
 sleep 0.03;osascript -e 'tell application "Python Launcher" to quit';sleep 16;
@@ -152,7 +152,7 @@ if int(count) > 3:
     print getPosition('sina_Market-DurationSH.py')
     print getPosition('sina_Market-DurationCXDN.py')
     print getPosition('sina_Market-DurationCXUP.py')
-    print getPosition('sina_Market-DurationUp.py')
+    print getPosition('sina_Market-DurationDnUP.py')
     print getPosition('sina_Monitor-GOLD.py')
     print getPosition('sina_Monitor.py')
     print getPosition('LinePower.py')
