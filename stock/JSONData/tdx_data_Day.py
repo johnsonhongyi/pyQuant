@@ -114,7 +114,7 @@ def get_tdx_Exp_day_to_df(code, start=None, end=None, dl=None,newdays = None,typ
         dl {int} -- [description] (default: {None})
         newdays {int} -- [description] (default: {None})
         type {str} -- [description] (default: {'f'})
-    
+
     Returns:
         [type] -- [dateframe or series]
     """
@@ -1488,7 +1488,7 @@ def getSinaAlldf(market='cyb',vol=ct.json_countVol,type=ct.json_countType,filena
     elif market in ['sh','sz','cyb','all']:
         df = rl.get_sina_Market_json(market)
     else:
-        df = wcd.get_wcbk_df(filter=market,market=filename,perpage=1000,days=5)
+        df = wcd.get_wcbk_df(filter=market,market=filename,perpage=1000,days=120)
     # codelist=df.code.tolist()
     # cct._write_to_csv(df,'codeall')
     # top_now = get_mmarket='all'arket_price_sina_dd_realTime(df, vol, type)
@@ -2732,7 +2732,7 @@ if __name__ == '__main__':
     # print get_tdx_append_now_df_api_tofile('300583')
     # sys.exit(0)
 #    print getSinaAlldf('cx')
-    get_append_lastp_to_df(None,end='2017-03-20',ptype='high')
+#    get_append_lastp_to_df(None,end='2017-03-20',ptype='high')
 #    print get_tdx_exp_low_or_high_power('603169',dl=10,ptype='high')
     print get_tdx_exp_low_or_high_power('603169',None ,'high', 14, '2017-03-20', True, True, None)
 

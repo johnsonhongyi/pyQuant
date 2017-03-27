@@ -288,15 +288,15 @@ if __name__ == "__main__":
                         top_temp = pct.powerCompute_df(top_temp, dl=ct.PowerCountdl,talib=True)
                         top_end = pct.powerCompute_df(top_end, dl=ct.PowerCountdl,talib=True)
 
-                    print ("N:%s K:%s %s G:%s" % (
-                        now_count, len(top_all[top_all['buy'] > 0]),
-                        len(top_now[top_now['volume'] <= 0]), goldstock)),
-                    print "Rt:%0.1f dT:%s N:%s" % (float(time.time() - time_Rt), cct.get_time_to_date(time_s),cct.get_now_time())
                     cct.set_console(width, height,
                                     title=[du_date, 'dT:%s' % cct.get_time_to_date(time_s), 'G:%s' % goldstock,
                                            'zxg: %s' % (blkname)])
 
                     top_temp = stf.getBollFilter(df=top_temp, boll=ct.bollFilter,duration=ct.PowerCountdl)
+                    print ("N:%s K:%s %s G:%s" % (
+                        now_count, len(top_all[top_all['buy'] > 0]),
+                        len(top_now[top_now['volume'] <= 0]), goldstock)),
+                    print "Rt:%0.1f dT:%s N:%s T:%s" % (float(time.time() - time_Rt), cct.get_time_to_date(time_s),cct.get_now_time(),len(top_temp))
                     # top_end = stf.getBollFilter(df=top_end, boll=ct.bollFilter,duration=ct.PowerCountdl)
                     if 'op' in top_temp.columns:
                         # if ptype == 'low':
@@ -318,10 +318,10 @@ if __name__ == "__main__":
 
                         # if cct.get_now_time_int() > 945 and int(duration_date * 1.5)  > ct.duration_date_sort:
                         if cct.get_now_time_int() > ct.checkfilter_end_timeDu and (int(duration_date) > int(ct.duration_date_sort) or int(duration_date) < ct.duration_diff):
-                            # top_temp = top_temp.sort_values(by=ct.Duration_percent_op,
-                                        # ascending=ct.Duration_percent_op_key)
-                            top_temp = top_temp.sort_values(by=ct.Duration_percentdn_percentra,
-                                        ascending=ct.Duration_percentdn_percentra_key)
+                            top_temp = top_temp.sort_values(by=ct.Duration_percent_op,
+                                        ascending=ct.Duration_percent_op_key)
+                            # top_temp = top_temp.sort_values(by=ct.Duration_percentdn_percentra,
+                                        # ascending=ct.Duration_percentdn_percentra_key)
                             # top_temp = top_temp.sort_values(by=ct.Duration_percentdn_percent,
                                         # ascending=ct.Duration_percentdn_percent_key)
                         else:
@@ -329,8 +329,10 @@ if __name__ == "__main__":
                                         # ascending=ct.Duration_percentdn_percent_key)
                             # top_temp = top_temp.sort_values(by=ct.Duration_percentdn_ra,
                             #             ascending=ct.Duration_percentdn_ra_key)
-                            top_temp = top_temp.sort_values(by=ct.Duration_percentdn_percentra,
-                                        ascending=ct.Duration_percentdn_percentra_key)
+                            # top_temp = top_temp.sort_values(by=ct.Duration_percentdn_percentra,
+                            #             ascending=ct.Duration_percentdn_percentra_key)
+                            top_temp = top_temp.sort_values(by=ct.Duration_percent_op,
+                                        ascending=ct.Duration_percent_op_key)
 
                     if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935:
                         # top_temp = top_temp[top_temp['buy'] > top_temp['ma10d']]

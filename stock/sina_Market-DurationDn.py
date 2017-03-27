@@ -288,15 +288,15 @@ if __name__ == "__main__":
                         top_temp = pct.powerCompute_df(top_temp, dl=ct.PowerCountdl,talib=True)
                         top_end = pct.powerCompute_df(top_end, dl=ct.PowerCountdl,talib=True)
 
-                    print ("N:%s K:%s %s G:%s" % (
-                        now_count, len(top_all[top_all['buy'] > 0]),
-                        len(top_now[top_now['volume'] <= 0]), goldstock)),
-                    print "Rt:%0.1f dT:%s N:%s" % (float(time.time() - time_Rt), cct.get_time_to_date(time_s),cct.get_now_time())
                     cct.set_console(width, height,
                                     title=[du_date, 'dT:%s' % cct.get_time_to_date(time_s), 'G:%s' % goldstock,
                                            'zxg: %s' % (blkname)])
 
                     top_temp = stf.getBollFilter(df=top_temp, boll=ct.bollFilter,duration=ct.PowerCountdl)
+                    print ("N:%s K:%s %s G:%s" % (
+                        now_count, len(top_all[top_all['buy'] > 0]),
+                        len(top_now[top_now['volume'] <= 0]), goldstock)),
+                    print "Rt:%0.1f dT:%s N:%s T:%s" % (float(time.time() - time_Rt), cct.get_time_to_date(time_s),cct.get_now_time(),len(top_temp))
                     # top_end = stf.getBollFilter(df=top_end, boll=ct.bollFilter,duration=ct.PowerCountdl)
                     if 'op' in top_temp.columns:
                         # if ptype == 'low':

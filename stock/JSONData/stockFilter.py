@@ -64,9 +64,11 @@ def getBollFilter(df=None,boll=5,duration=ct.PowerCountdl,filter=True,ma5d=True,
         if 'vstd' in df.columns:
             df = df[(df.lvol * df.volume > (df.vstd + df.lvol)) | ((df.percent > -2) & (df.hv/df.lv > 3))]
     #                [dd.lvol * dd.volume > (dd.vstd + dd.lvol) | dd.lvol * dd.volume >(dd.ldvolume + dd.vstd]
-        if  cct.get_now_time_int() > 920 and cct.get_now_time_int() <= 1450:
+        if  cct.get_now_time_int() > 920 and cct.get_now_time_int() <= 1400:
 #            df = df[((df.fibl < int(duration / 1.5)) &  (df.volume > 2.5 * cct.get_work_time_ratio() )) | (df.percent > 3)]
             df = df[ (df.volume > 2.5 * cct.get_work_time_ratio()) | (df.percent > 3)]
+        if cct.get_now_time_int() > 926 or cct.get_now_time_int() < 900:
+            df = df[df.percent > 1 ]
             # df = df[df.oph > 10]
     # elif filter and cct.get_now_time_int() > 1015 and cct.get_now_time_int() <= 1445:
     #     df = df[((df.fibl < int(duration / 1.5)) &  (df.volume > 3)) | (df.percent > 3)]

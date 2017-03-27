@@ -84,7 +84,7 @@ from numba.decorators import autojit
 def run_numba(func):
     funct = autojit(lambda:func)
     return funct
-    
+
 def get_work_path(base,dpath,fname):
     baser = os.getcwd().split(base)[0]
     base = baser  + base + path_sep + dpath + path_sep
@@ -156,7 +156,14 @@ def get_tushare_market(market='zxb',renew=False,days=5):
 
     return df
 
+def sys_default_utf8(default_encoding='utf-8'):
+    #import sys
+#    default_encoding = 'utf-8'
+    if sys.getdefaultencoding() != default_encoding:
+        reload(sys)
+        sys.setdefaultencoding(default_encoding)
 
+sys_default_utf8()
 
 def get_tdx_dir_blocknew():
     blocknew_path = get_tdx_dir() + r'/T0002/blocknew/'.replace('/', path_sep).replace('\\', path_sep)
@@ -318,7 +325,8 @@ def cct_raw_input(sts):
             return inputerr
         else:
             return ''
-        # st = 'Except'
+    except (IOError, EOFError, Exception) as e:
+        print "cct_raw_input:ExceptionError", e
     return st
 
 # eval_rule = "[elem for elem in dir() if not elem.startswith('_') and not elem.startswith('ti')]"
@@ -338,15 +346,15 @@ class MyCompleter(object):  # Custom completer
     def complete(self, text, state):
         if state == 0:  # on first trigger, build possible matches
             if text:  # cache matches (entries that start with entered text)
-                # self.matches = [s for s in self.options 
+                # self.matches = [s for s in self.options
                 #                     if s and s.startswith(text)]
-                self.matches = [s for s in self.options 
-                                   if text in s]                                    
+                self.matches = [s for s in self.options
+                                   if text in s]
             else:  # no text entered, all matches possible
                 self.matches = self.options[:]
 
         # return match indexed by state
-        try: 
+        try:
             return self.matches[state]
         except IndexError:
             return None
@@ -1011,7 +1019,7 @@ def write_to_blocknew(p_name, data, append=True):
         writeBlocknew(blockNew,data,append)
         writeBlocknew(blockNewStart, data,append)
     elif p_name.find('068.blk')  > 0 or p_name.find('069.blk') > 0:
-        
+
         writeBlocknew(p_name, data, append)
         print "write to %s"%(p_name)
     else:

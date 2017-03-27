@@ -1,6 +1,5 @@
-# -*- coding:utf-8 -*-
+# -*- coding: utf-8 -*-
 # !/usr/bin/env python
-
 import gc
 import random
 import re
@@ -19,6 +18,7 @@ from JSONData import LineHistogram as lhg
 from JohhnsonUtil import LoggerFactory as LoggerFactory
 from JohhnsonUtil import commonTips as cct
 
+
 # from logbook import Logger,StreamHandler,SyslogHandler
 # from logbook import StderrHandler
 
@@ -28,6 +28,10 @@ from JohhnsonUtil import commonTips as cct
     # parser = argparse.ArgumentParser()
 # parser.add_argument('dt', type=str, nargs='?', help='20150612')
 # return parser
+def quit(signum, frame):
+    print 'You choose to stop me.'
+    sys.exit()
+
 def evalcmd(dir_mo):
     end = True
     import readline
@@ -126,7 +130,7 @@ if __name__ == "__main__":
             # top_now = tdd.getSinaAlldf(market='cx', vol=ct.json_countVol, type=ct.json_countType)
             # top_now = tdd.getSinaAlldf(market='央企',filename='yqg', vol=ct.json_countVol, type=ct.json_countType)
             # top_now = tdd.getSinaAlldf(market=u'一带一路',filename='ydyl', vol=ct.json_countVol, type=ct.json_countType)
-            top_now = tdd.getSinaAlldf(market=u'次新股',filename='cxg', vol=ct.json_countVol, type=ct.json_countType)
+            top_now = tdd.getSinaAlldf(market='次新股',filename='cxg', vol=ct.json_countVol, type=ct.json_countType)
             # top_now = tdd.getSinaAlldf(market=u'京津冀',filename='beijing', vol=ct.json_countVol, type=ct.json_countType)
             now_count = len(top_now)
             radio_t = cct.get_work_time_ratio()
@@ -296,15 +300,15 @@ if __name__ == "__main__":
                         top_temp = pct.powerCompute_df(top_temp, dl=ct.PowerCountdl,talib=True,newdays=newdays)
                         top_end = pct.powerCompute_df(top_end, dl=ct.PowerCountdl,talib=True,newdays=newdays)
 
-                    print ("N:%s K:%s %s G:%s" % (
-                        now_count, len(top_all[top_all['buy'] > 0]),
-                        len(top_now[top_now['volume'] <= 0]), goldstock)),
-                    print "Rt:%0.1f dT:%s N:%s" % (float(time.time() - time_Rt), cct.get_time_to_date(time_s),cct.get_now_time())
                     cct.set_console(width, height,
                                     title=[du_date, 'dT:%s' % cct.get_time_to_date(time_s), 'G:%s' % goldstock,
                                            'zxg: %s' % (blkname)])
 
-                    top_temp = stf.getBollFilter(df=top_temp, boll=ct.bollFilter,duration=ct.PowerCountdl,filter=True,ma5d=True)
+                    top_temp = stf.getBollFilter(df=top_temp, boll=ct.bollFilter,duration=ct.PowerCountdl,filter=True)
+                    print ("N:%s K:%s %s G:%s" % (
+                        now_count, len(top_all[top_all['buy'] > 0]),
+                        len(top_now[top_now['volume'] <= 0]), goldstock)),
+                    print "Rt:%0.1f dT:%s N:%s T:%s" % (float(time.time() - time_Rt), cct.get_time_to_date(time_s),cct.get_now_time(),len(top_temp))    
                     # top_end = stf.getBollFilter(df=top_end, boll=ct.bollFilter,duration=ct.PowerCountdl,filter=False)
                     if 'op' in top_temp.columns:
                         # if ptype == 'low':

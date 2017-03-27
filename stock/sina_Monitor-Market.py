@@ -213,14 +213,14 @@ if __name__ == "__main__":
                 top_temp = pct.powerCompute_df(top_temp, dl=ct.PowerCountdl)
                 goldstock = len(top_dif[(top_dif.buy >= top_dif.lhigh * 0.99) & (top_dif.buy >= top_dif.llastp * 0.99)])
 
-                print ("A:%s N:%s K:%s %s G:%s" % (
-                    df_count, now_count, len(top_all[top_all['buy'] > 0]),
-                    len(top_now[top_now['volume'] <= 0]), goldstock)),
-                print "Rt:%0.1f dT:%s N:%s" % (float(time.time() - time_Rt), cct.get_time_to_date(time_s),cct.get_now_time())
                 cct.set_console(width, height,
                     title=['dT:%s' % cct.get_time_to_date(time_s), 'G:%s' % len(top_dif), 'zxg: %s' % (blkname)])
               
                 top_temp = stf.getBollFilter(df=top_temp, boll=ct.bollFilter,duration=ct.PowerCountdl)
+                print ("A:%s N:%s K:%s %s G:%s" % (
+                    df_count, now_count, len(top_all[top_all['buy'] > 0]),
+                    len(top_now[top_now['volume'] <= 0]), goldstock)),
+                print "Rt:%0.1f dT:%s N:%s T:%s" % (float(time.time() - time_Rt), cct.get_time_to_date(time_s),cct.get_now_time(),len(top_temp))
                 if 'op' in top_temp.columns:
 
                     # top_temp = top_temp.sort_values(by=['ra', 'op','percent'],ascending=[0, 0,0])

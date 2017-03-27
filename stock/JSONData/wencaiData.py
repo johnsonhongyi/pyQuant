@@ -94,7 +94,7 @@ def get_wencai_Market_url(filter='国企改革',perpage=1,url=None,):
         # print url
         cache_root="http://www.iwencai.com/stockpick/cache?token=%s&p=1&perpage=%s&showType="
         cache_ends = "[%22%22,%22%22,%22onTable%22,%22onTable%22,%22onTable%22,%22onTable%22,%22onTable%22,%22onTable%22,%22onTable%22,%22onTable%22]"
-        data = cct.get_url_data(url)
+        data = cct.get_url_data(url,retry_count=1)
         if len(re.findall('系统判断您访问次数过多'.decode('utf8'),data)):
             log.error("acces deny:%s"%('系统判断您访问次数过多'))
             return df
@@ -257,7 +257,8 @@ def get_wencai_data(dm,market='wencai',days=120):
         df = get_write_wencai_market_to_csv(None,market,renew=True,days=days)
         if len(df) > 0:
 #            if  set(codelist) <= set(df.name.values):
-            if  set(dm.index) <= set(df.code.values) :
+#            if  set(dm.index) <= set(df.code.values) :
+            if  len(dm) - len(set(dm.index) & set(df.code.values)) < 10 :
                 if 'code' in df.columns:
                     df = df.set_index('code')
                     return df
@@ -336,7 +337,7 @@ def get_write_wencai_market_to_csv(df=None,market='wcbk',renew=False,days=60):
 
 def get_wcbk_df(filter='混改',market='nybk',perpage=1000,days=60):
     fpath = get_wencai_filepath(market)
-    if os.path.exists(fpath) and os.path.getsize(fpath) > 200 and cct.creation_date_duration(fpath) == 0 :
+    if os.path.exists(fpath) and os.path.getsize(fpath) > 200 and cct.creation_date_duration(fpath) > 0 :
         df = get_write_wencai_market_to_csv(None,market,renew=True,days=days)
     else:
         df = get_wencai_Market_url(filter,perpage)
@@ -351,7 +352,7 @@ if __name__ == '__main__':
     # print sina_json_Big_Count()
     # print getconfigBigCount(write=True)
     # sys.exit(0)
-    post_login()
+    # post_login()
 #    log.setLevel(LoggerFactory.INFO)
 #    df = get_wencai_Market_url(filter='国企改革',perpage=1000)
 #    df = get_wencai_Market_url('湖南发展,天龙集团,浙报传媒,中珠医疗,多喜爱',500)
