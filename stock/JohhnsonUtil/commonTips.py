@@ -386,7 +386,7 @@ def sleep(timet,catch=True):
     # print time.time()-times
 def sleeprandom(timet):
     now_t = get_now_time_int()
-    if now_t > 915 and now_t < 925:
+    if now_t > 915 and now_t < 926:
         sleeptime=random.randint(10/3, 10)
     else:
         sleeptime=random.randint(timet/3, timet)
@@ -882,7 +882,7 @@ def code_to_symbol(code):
         生成symbol代码标志
     """
     if code in ct.INDEX_LABELS:
-        return ct.INDEX_LIST[code]
+        return ct.INDEX_LIST_TDX[code]
     else:
         if len(code) != 6:
             return ''
@@ -1223,6 +1223,10 @@ if __name__ == '__main__':
     # print get_rzrq_code()[:3]
     # times =1483686638.0
     # print get_time_to_date(times, format='%Y-%m-%d')
+    for x in range(1,120,5):
+        times=time.time()
+        print sleep(x)
+        print time.time()-times
     print get_work_time_ratio()
     print getCoding(u'啊中国'.encode("utf16"))
     print get_today_duration('2017-01-06')

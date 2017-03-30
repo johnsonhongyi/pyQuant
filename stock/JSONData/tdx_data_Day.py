@@ -212,7 +212,7 @@ def get_tdx_Exp_day_to_df(code, start=None, end=None, dl=None,newdays = None,typ
             # df['hmax'] = df.high[-tdx_max_int:].max()
             df['hmax'] = df.close[-tdx_max_int:max_int_end].max()
             df['lmin'] = df.low[-tdx_max_int:max_int_end].min()
-            df['cmean'] = df.close[-tdx_max_int:max_int_end].mean()
+            df['cmean'] = round(df.close[-tdx_max_int:max_int_end].mean(),2)
             df['hv'] = df.vol[-tdx_max_int:max_int_end].max()
             df['lv'] = df.vol[-tdx_max_int:max_int_end].min()
             df = df.fillna(0)
@@ -330,7 +330,7 @@ def get_tdx_Exp_day_to_df(code, start=None, end=None, dl=None,newdays = None,typ
             # df['hmax'] = df.high[-tdx_max_int:].max()
             df['hmax'] = df.close[-tdx_max_int:max_int_end].max()
             df['lmin'] = df.low[-tdx_max_int:max_int_end].min()
-            df['cmean'] = df.close[-tdx_max_int:max_int_end].mean()
+            df['cmean'] = round(df.close[-tdx_max_int:max_int_end].mean(),2)
             df['hv'] = df.vol[-tdx_max_int:max_int_end].max()
             df['lv'] = df.vol[-tdx_max_int:max_int_end].min()
             df = df.fillna(0)
@@ -1481,9 +1481,9 @@ def getSinaAlldf(market='cyb',vol=ct.json_countVol,type=ct.json_countType,filena
         global initTushareCsv
         if initTushareCsv == 0:
             initTushareCsv += 1
-            df = cct.get_tushare_market(market=market, renew=True,days=10)
+            df = cct.get_tushare_market(market=market, renew=True,days=5)
         else:
-            df = cct.get_tushare_market(market, renew=False, days = 10)
+            df = cct.get_tushare_market(market, renew=False, days = 5)
 
     elif market in ['sh','sz','cyb','all']:
         df = rl.get_sina_Market_json(market)
@@ -2714,7 +2714,7 @@ if __name__ == '__main__':
     # qs = np.array([1.0/n,]*n)
     # rands = np.random.rand(n)
     # print python_resample(qs, xs, rands)
-
+#    print get_tdx_Exp_day_to_df('sz',dl=20)
     # print get_tdx_Exp_day_to_df('999999',end=None).sort_index(ascending=False).shape
     # print sina_data.Sina().get_stock_code_data('300006').set_index('code')
 #    dd=rl.get_sina_Market_json('cyb').set_index('code')

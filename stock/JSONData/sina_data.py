@@ -356,7 +356,7 @@ if __name__ == "__main__":
     # df = sina.get_stock_code_data('000001',index=True).set_index('code')
 #    print sina.get_stock_code_data('399006,999999',index=True)
     print sina.get_stock_code_data('999999',index=True)
-    df = sina.get_stock_list_data(['600845', '300376']).set_index('code')
+    df = sina.get_stock_list_data(['601188', '000507']).set_index('code')
     # df = sina.get_stock_code_data('002775',index=False).set_index('code')
     print len(df),df[:1]
     # print df.loc['300380']

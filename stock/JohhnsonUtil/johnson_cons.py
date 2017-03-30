@@ -14,6 +14,8 @@ INDEX_LABELS = ['sh', 'sz', 'hs300', 'sz50', 'cyb', 'zxb']
 REAL_INDEX_LABELS=['sh_a','sz_a','cyb']
 INDEX_LIST = {'sh': 'sh000001', 'sz': 'sz399001', 'hs300': 'sz399300',
               'sz50': 'sh000016', 'zxb': 'sz399005', 'cyb': 'sz399006'}
+INDEX_LIST_TDX = {'sh': 'sh999999', 'sz': 'sz399001', 'hs300': 'sz399300',
+              'sz50': 'sh000016', 'zxb': 'sz399005', 'cyb': 'sz399006'}
 DD_VOL_List={'0':'40000','1':'100000','2':'100000','3':'200000','4':'1000000'}
 # LvolumeSize = 125000
 LvolumeSize = 12500
@@ -26,14 +28,15 @@ changeRatio = 0.975
 changeRatioUp = 1.03
 duration_date = 10
 duration_diff = 6
-duration_date_l = 10
+duration_date_l = 21
 duration_date_sort = 21
+lastdays = 4
 bollFilter = 1
 writeblockbakNum = 12
 checkfilter = True
 checkfilter_end_time = 945
 checkfilter_end_timeDu = 1440
-sleep_time = 30
+sleep_time = 25
 tdx_max_int = 10
 
 powerdiff = 'ra * fibl + rah*(abs(float(%s)-fibl))/fib +ma +kdj+rsi'

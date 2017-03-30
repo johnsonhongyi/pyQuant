@@ -324,7 +324,7 @@ while 1:
             print "\tNo Data"
         int_time = cct.get_now_time_int()
         if cct.get_work_time():
-            if int_time < 925:
+            if int_time < 926:
                 cct.sleep(120)
             elif int_time < 930:
                 cct.sleep((930 - int_time) * 60)

@@ -2,11 +2,14 @@
 from sqlalchemy import create_engine
 import sqlalchemy
 import MySQLdb
-import tushare as ts
+# import tushare as ts
+import sys
+sys.path.append("..")
+from JSONData import tdx_data_Day as tdd
 import time
 # import maptest as mp
 
-engine = create_engine('mysql://root:plokij@127.0.0.1/Quant?charset=utf8',echo=True)
+engine = create_engine('mysql://johnson:plokij@127.0.0.1/Quant?charset=utf8',echo=False)
 # engine = create_engine('mysql://root:plokij@127.0.0.1/Quant?charset=utf8',echo=True,strategy=’threadlocal’)
 # metadata = MetaData(engine)
 #
@@ -43,7 +46,7 @@ engine = create_engine('mysql://root:plokij@127.0.0.1/Quant?charset=utf8',echo=T
 codes=['000030','601198','600476']
 num=0
 for code in codes:
-    df = ts.get_hist_data(code)
+    df = tdd.get_tdx_Exp_day_to_df(code, start=None, end=None, dl=30, newdays=None, type='f')
     if not df.empty:
 
         #存入数据库
@@ -52,7 +55,8 @@ for code in codes:
         print num
         print code
 
-        df.to_sql(code,engine,if_exists='replace',dtype={'code':sqlalchemy.types.CHAR(length=6),'date':sqlalchemy.types.DATE})
+        df.to_sql(code,engine,if_exists='append',dtype={'code':sqlalchemy.types.CHAR(length=6),'date':sqlalchemy.types.DATE},index='date')
+        # df.to_sql(code,engine,if_exists='replace',dtype={'code':sqlalchemy.types.CHAR(length=6),'date':sqlalchemy.types.DATE})
         # time.sleep(1)
     else:
         print "df None"

@@ -93,7 +93,8 @@ if __name__ == "__main__":
     duration_date = ct.duration_date_l
     du_date = duration_date
     # print cct.last_tddate(2)
-    end_date = cct.last_tddate(days=3)
+    # end_date = cct.last_tddate(days=int(duration_date/4))
+    end_date = cct.last_tddate(days=ct.lastdays)
     ptype = 'high'
     filter = 'y'
     if len(str(duration_date)) < 4:
@@ -296,7 +297,7 @@ if __name__ == "__main__":
                     print ("N:%s K:%s %s G:%s" % (
                         now_count, len(top_all[top_all['buy'] > 0]),
                         len(top_now[top_now['volume'] <= 0]), goldstock)),
-                    print "Rt:%0.1f dT:%s N:%s T:%s" % (float(time.time() - time_Rt), cct.get_time_to_date(time_s),cct.get_now_time(),len(top_temp))
+                    print "Rt:%0.1f dT:%s N:%s T:%s %s%%" % (float(time.time() - time_Rt), cct.get_time_to_date(time_s),cct.get_now_time(),len(top_temp),round(len(top_temp)/now_count*100,1))
                     # top_end = stf.getBollFilter(df=top_end, boll=ct.bollFilter,duration=ct.PowerCountdl)
                     if 'op' in top_temp.columns:
                         # if ptype == 'low':
@@ -370,7 +371,7 @@ if __name__ == "__main__":
                 print "\tNo Data"
             int_time = cct.get_now_time_int()
             if cct.get_work_time():
-                if int_time < 925:
+                if int_time < 926:
                     cct.sleep(ct.sleep_time)
                 elif int_time < 930:
                     cct.sleep((930 - int_time) * 60)

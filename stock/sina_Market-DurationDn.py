@@ -93,7 +93,8 @@ if __name__ == "__main__":
     duration_date = ct.duration_date_l
     du_date = duration_date
     # print cct.last_tddate(2)
-    end_date = cct.last_tddate(days=3)
+    # end_date = cct.last_tddate(days=int(duration_date/4))
+    end_date = cct.last_tddate(days=ct.lastdays)
     ptype = 'high'
     filter = 'y'
     if len(str(duration_date)) < 4:
@@ -118,6 +119,7 @@ if __name__ == "__main__":
             # top_dif = top_now
             # top_now.to_hdf("testhdf5", 'marketDD', format='table', complevel=9)
             '''
+            # top_now = tdd.getSinaAlldf(market='cyb', vol=ct.json_countVol, type=ct.json_countType)
             top_now = tdd.getSinaAlldf(market='all', vol=ct.json_countVol, type=ct.json_countType)
 #            top_now = tdd.getSinaAlldf(market=u'次新股',filename='cxg', vol=ct.json_countVol, type=ct.json_countType)
             now_count = len(top_now)
@@ -268,7 +270,7 @@ if __name__ == "__main__":
                     # top_dd = pd.concat([top_dif[:5],top_temp[:3],top_dif[-3:],top_temp[-3:]], axis=0)
                     if percent_status == 'y' and (
                                     cct.get_now_time_int() > 935 or cct.get_now_time_int() < 900) and ptype == 'low':
-                        top_dif = top_dif[top_dif.percent >= 0]
+                        # top_dif = top_dif[top_dif.percent >= 0]
                         top_temp = top_dif[:ct.PowerCount].copy()
                         top_end = top_dif[-5:].copy()
                         top_temp = pct.powerCompute_df(top_temp,dl=ct.PowerCountdl,talib=True)
@@ -296,7 +298,7 @@ if __name__ == "__main__":
                     print ("N:%s K:%s %s G:%s" % (
                         now_count, len(top_all[top_all['buy'] > 0]),
                         len(top_now[top_now['volume'] <= 0]), goldstock)),
-                    print "Rt:%0.1f dT:%s N:%s T:%s" % (float(time.time() - time_Rt), cct.get_time_to_date(time_s),cct.get_now_time(),len(top_temp))
+                    print "Rt:%0.1f dT:%s N:%s T:%s %s%%" % (float(time.time() - time_Rt), cct.get_time_to_date(time_s),cct.get_now_time(),len(top_temp),round(len(top_temp)/now_count*100,1))
                     # top_end = stf.getBollFilter(df=top_end, boll=ct.bollFilter,duration=ct.PowerCountdl)
                     if 'op' in top_temp.columns:
                         # if ptype == 'low':
@@ -366,7 +368,7 @@ if __name__ == "__main__":
                 print "\tNo Data"
             int_time = cct.get_now_time_int()
             if cct.get_work_time():
-                if int_time < 925:
+                if int_time < 926:
                     cct.sleep(ct.sleep_time)
                 elif int_time < 930:
                     cct.sleep((930 - int_time) * 60)

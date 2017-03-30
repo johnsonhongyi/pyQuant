@@ -252,22 +252,22 @@ def f_print(lens, datastr):
     return data
 
 
-def fibonacciCount(code, dl=60, start=None):
+def fibonacciCount(code, dl=60, start=None,days=0):
     fibl=[]
     if not isinstance(code,list):
         codes = [code]
     else:
         codes = code
     for code in codes:
+        df = tdd.get_tdx_append_now_df_api(code,dl=dl)
         for ptype in ['low','high']:
             if ptype == 'low':
-                df = tdd.get_tdx_append_now_df_api(code,dl=dl)
-                op, ra, st, daysData = pct.get_linear_model_status(code,df=df,filter='y', dl=dl, ptype=ptype, days=1)
-                dd,op=getab.Get_BBANDS(df,days=days)
+                op, ra, st, daysData = pct.get_linear_model_status(code,df=df,filter='y', dl=dl, ptype=ptype, days=days)
+                dd,boll=getab.Get_BBANDS(df,days=days)
             else:
-                df = tdd.get_tdx_append_now_df_api(code,dl=dl)
-                op, ra, st, daysData = pct.get_linear_model_status(code,df=df,filter='y', dl=dl, ptype=ptype, days=1)
-                dd,op=getab.Get_BBANDS(df, dtype='d')
+                # df = tdd.get_tdx_append_now_df_api(code,dl=dl)
+                op, ra, st, daysData = pct.get_linear_model_status(code,df=df,filter='y', dl=dl, ptype=ptype, days=days)
+                dd,boll=getab.Get_BBANDS(df, dtype='d')
             fib = cct.getFibonacci(300, daysData[0])
             # log.debug('st:%s days:%s fib:%s'%(st,days,fib))
             # print "%s op:%s ra:%s days:%s fib:%s %s" % (code, op, ra,days,fib, st)

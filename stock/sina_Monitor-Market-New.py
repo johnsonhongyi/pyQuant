@@ -243,7 +243,7 @@ if __name__ == "__main__":
                         df_count, now_count, len(top_all[top_all['buy'] > 0]),
                         len(top_now[top_now['volume'] <= 0]), goldstock)),
                     # print "Rt:%0.3f" % (float(time.time() - time_Rt))
-                    print "Rt:%0.1f dT:%s N:%s T:%s" % (float(time.time() - time_Rt), cct.get_time_to_date(time_s),cct.get_now_time(),len(top_temp))
+                    print "Rt:%0.1f dT:%s N:%s T:%s %s%%" % (float(time.time() - time_Rt), cct.get_time_to_date(time_s),cct.get_now_time(),len(top_temp),round(len(top_temp)/now_count*100,1))
                     if 'op' in top_temp.columns:
 
                         # top_temp = top_temp.sort_values(by=['ra', 'op','percent'],ascending=[0, 0,0])
@@ -276,7 +276,7 @@ if __name__ == "__main__":
                 print "\tNo Data"
             int_time = cct.get_now_time_int()
             if cct.get_work_time():
-                if int_time < 925:
+                if int_time < 926:
                     cct.sleep(ct.sleep_time)
                 elif int_time < 930:
                     cct.sleep((930 - int_time) * 60)
