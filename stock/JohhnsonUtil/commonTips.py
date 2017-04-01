@@ -1213,6 +1213,30 @@ def LineArgmain():
     # logger.setLevel(logging.ERROR)
     return parser
 
+def sort_by_value(df,column='diff',num=5,asc=1):
+    """[summary]
+    [sort dataframe and print num]
+    Arguments:
+        df {dataframe} -- [description]
+    Keyword Arguments:
+        column {str} -- [description] (default: 'diff' or ['diff',])
+        num {number} -- [description] (default: {5})
+        asc {number} -- [description] (default: {1} or [1,1])
+    """
+    if not isinstance(column, list):
+        dd = df.sort_values(by=[column],ascending=[asc])
+    else:
+        dd = df.sort_values(by=column,ascending=asc)
+    if num >0:
+        print dd.iloc[0:num,0:10]
+        print dd.iloc[0:num,31:40]
+        print dd.iloc[0:num,-15:-4]
+    else:
+        print dd.iloc[num::,0:10]
+        print dd.iloc[0:num,31:40]
+        print dd.iloc[num::,-15:-4]
+    # return dd
+
 if __name__ == '__main__':
     # print get_run_path()
     # print get_work_time_ratio()

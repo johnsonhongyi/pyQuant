@@ -25,15 +25,25 @@ def Get_Stock_List():
 #     print (df)
     return df
 
-def algoMultiDay(df,column='close',days=5,op=0):
+def algoMultiDay(df,column='close',days=6,op=0):
     df = df.sort_index(ascending=True)
+    # print df[:2]
     if len(df) < days:
         days = len(df) - 1
+    # if len(df) < 20:
+    #     days = int(len(df)/2)
+    # elif 40 < len(df) < 60:
+    #     days = 25
+    # elif len(df) >= 60:
+    #     days = 30
+    # print days
     if df is not None:
         obo=0
         if column in df.columns:
-            for day in range(days):
+            for day in range(days,-1,-1):
+                # print day
                 tmpdf=pd.DataFrame(df.loc[:,column][-days-2:-1-day], columns=[column])
+                # print tmpdf.index
                 c_max=tmpdf.max().values
                 c_min=tmpdf.min().values
                 c_mean=tmpdf.mean().values
@@ -42,9 +52,15 @@ def algoMultiDay(df,column='close',days=5,op=0):
                     break
                 nowp = round(df[column][idx],2)
                 lastp = round(df[column][idx-1],2)
-                if nowp >= c_max and day == 0:
+                # if nowp >= c_max and day == 0:
+                if nowp >= c_max:
                     op+=10
-                    obo = 1
+                    # print obo,df.index[idx],df.index[idx-1]
+                    if obo < 0:
+                        op +=100
+                    else:
+                        op +=10
+                    obo += 1
                     continue
                 elif nowp > c_mean:
                     if nowp > df['high'][idx-1]:
@@ -55,9 +71,13 @@ def algoMultiDay(df,column='close',days=5,op=0):
                         op+=0.5
 
                 elif nowp < c_min:
-                    op +=-2
+                    op +=-10
+                    obo = -1
                 elif nowp < c_mean:
-                    op +=-1
+                    if obo > 0:
+                        op +=-100
+                    else:
+                        op +=-1
                 else:
                     if nowp > lastp:
                         op +=1
@@ -74,7 +94,7 @@ def algoMultiDay(df,column='close',days=5,op=0):
                     else:
                         op += -1
         if obo >0:
-            op +=10.1
+            op +=10.11
 #        else:
 #            op +=-days
     return op
@@ -595,7 +615,11 @@ if __name__ == '__main__':
     # code='300110'
 #    code='300201'
     import sys
-    print powerStd('600208',ptype='vol')
+    # print powerStd('600208',ptype='vol')
+    code = '002466'
+    dl=21
+    df=tdd.get_tdx_append_now_df_api(code,dl=dl).sort_index(ascending=True)
+    print algoMultiDay(df, column='close')
     codel=['000737','002695','601555','002486','600321','002437','399006','999999']
 #    code='600321'
 #    code:002732 boll: 45 ma: 6.0  macd:-1 RSI:0 kdj: 3 time:0.0241
