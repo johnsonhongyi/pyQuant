@@ -1484,7 +1484,11 @@ def getSinaAlldf(market='cyb',vol=ct.json_countVol,type=ct.json_countType,filena
             df = cct.get_tushare_market(market=market, renew=True,days=5)
         else:
             df = cct.get_tushare_market(market, renew=False, days = 5)
-
+    elif market.find('blk') > 0:
+            # blkname = '061.blk'
+            block_path = tdd.get_tdx_dir_blocknew() + blkname
+            # df = pd.read_csv(block_path,dtype={'code':str},encoding = 'gbk')
+            df = pd.read_csv(block_path)
     elif market in ['sh','sz','cyb','all']:
         df = rl.get_sina_Market_json(market)
     else:

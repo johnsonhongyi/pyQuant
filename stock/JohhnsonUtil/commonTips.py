@@ -1009,6 +1009,15 @@ def write_to_blocknew(p_name, data, append=True):
     blockNew= get_tdx_dir_blocknew() + 'zxg.blk'
     blockNewStart = get_tdx_dir_blocknew() + '066.blk'
     # writeBlocknew(blockNew, data)
+    p_data=['zxg','069','068','067','061']
+    if len(p_name) < 5:
+        if p_name in p_data:
+            p_name = get_tdx_dir_blocknew() + p_name +'.blk'
+            print "p_name:%s"%(p_name)
+        else:
+            print 'p_name is not ok'
+            return None
+
     if p_name.find('061.blk') > 0 or p_name.find('062.blk') > 0 or p_name.find('063.blk') > 0:
         writeBlocknew(p_name, data, append)
         writeBlocknew(blockNew, data)
@@ -1213,30 +1222,44 @@ def LineArgmain():
     # logger.setLevel(logging.ERROR)
     return parser
 
-def sort_by_value(df,column='diff',num=5,asc=1):
+def sort_by_value(df,column='diff',file=None,count=5,num=5,asc=0):
     """[summary]
-    [sort dataframe and print num]
+    
+    [description]
+    
     Arguments:
         df {dataframe} -- [description]
+    
     Keyword Arguments:
         column {str} -- [description] (default: 'diff' or ['diff',])
+        file {[type]} -- [description] (default: {069})
+        count {number} -- [description] (default: {5})
         num {number} -- [description] (default: {5})
-        asc {number} -- [description] (default: {1} or [1,1])
+        asc {number} -- [description] (default: {1} or [0,1])
+    
+    Returns:
+        [type] -- [description]
     """
     if not isinstance(column, list):
         dd = df.sort_values(by=[column],ascending=[asc])
     else:
         dd = df.sort_values(by=column,ascending=asc)
-    if num >0:
-        print dd.iloc[0:num,0:10]
-        print dd.iloc[0:num,31:40]
-        print dd.iloc[0:num,-15:-4]
+    if file is None:
+        if num >0:
+            print dd.iloc[0:num,0:10]
+            print dd.iloc[0:num,31:40]
+            print dd.iloc[0:num,-15:-4]
+        else:
+            print dd.iloc[num::,0:10]
+            print dd.iloc[0:num,31:40]
+            print dd.iloc[num::,-15:-4]
+        return dd
     else:
-        print dd.iloc[num::,0:10]
-        print dd.iloc[0:num,31:40]
-        print dd.iloc[num::,-15:-4]
-    # return dd
-
+        if str(count) == 'all':
+            write_to_blocknew(file, dd.index.tolist(), append=True)
+        else:
+            write_to_blocknew(file, dd.index.tolist()[:int(count)], append=True) 
+        print "file:%s"%(file)
 if __name__ == '__main__':
     # print get_run_path()
     # print get_work_time_ratio()

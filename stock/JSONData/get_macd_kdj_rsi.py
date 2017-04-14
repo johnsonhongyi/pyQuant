@@ -189,7 +189,7 @@ def Get_BBANDS_algo(df):
 
 
 def Get_BBANDS(df,dtype='d',days=5):
-    log.info("BBANDS:",len(df))
+    log.info("BBANDS:%s"%(len(df)))
     if len(df) < limitCount:
         return (df,1)
     df = df.sort_index(ascending=True)
@@ -616,7 +616,7 @@ if __name__ == '__main__':
 #    code='300201'
     import sys
     # print powerStd('600208',ptype='vol')
-    code = '002466'
+    code = '600744'
     dl=21
     df=tdd.get_tdx_append_now_df_api(code,dl=dl).sort_index(ascending=True)
     print algoMultiDay(df, column='close')
