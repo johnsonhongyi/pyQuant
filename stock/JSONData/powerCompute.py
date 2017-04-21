@@ -474,20 +474,20 @@ def get_linear_model_status(code, df=None, dtype='d', type='m', start=None, end=
             if diff_l > 0 :
                 operation += 1
             # else:
-                 # operation -= 1                
+                 # operation -= 1
         else:
             if diff > 0:
                 operation -= 1
             # else:
-                # operation += 1   
+                # operation += 1
             if diff_h > 0 :
                 operation -= 1
             # else:
-                # operation += 1 
+                # operation += 1
             if diff_l > 0 :
                 operation -= 1
             # else:
-                # operation += 1                 
+                # operation += 1
         return operation, ratio
 
     df = df.fillna(0)
@@ -598,7 +598,7 @@ def get_linear_model_status(code, df=None, dtype='d', type='m', start=None, end=
 
 
 def get_linear_model_candles(code, ptype='low', dtype='d', start=None, end=None, filter='n',
-                             df=None, dl=None,days=1):
+                             df=None, dl=None,days=1,opa=False):
     if start is not None and filter == 'y':
         if code not in ['999999', '399006', '399001']:
             index_d, dl = tdd.get_duration_Index_date(dt=start)
@@ -741,7 +741,7 @@ def get_linear_model_candles(code, ptype='low', dtype='d', start=None, end=None,
 
         return status_n
 
-    def setBollPlt(code, df, ptype='low', start=None, status=None):
+    def setBollPlt(code, df, ptype='low', start=None, status=None,opa=False):
         if start is None:
             dt = tdd.get_duration_price_date(code, ptype=ptype, dl=60, df=df, power=True)
         else:
@@ -766,14 +766,15 @@ def get_linear_model_candles(code, ptype='low', dtype='d', start=None, end=None,
         xaxisInit = len(df[df.index < dt])
         # print assertL[-1],assert[0]
         setRegLinearPlt(assetL, xaxis=xaxisInit, status=status)
-        op, ra, st, dss = get_linear_model_status(code, df=df[df.index >= dt], start=dt, filter='y', ptype=ptype,days=days)
-        # print "%s op:%s ra:%s days:%s  start:%s" % (code, op, str(ra), str(dss[0]), st)
-        print "op:%s ra:%s days:%s  start:%s" % (op, str(ra), str(dss[0]), st)
+        if opa:
+            op, ra, st, dss = get_linear_model_status(code, df=df[df.index >= dt], start=dt, filter='y', ptype=ptype,days=days)
+            # print "%s op:%s ra:%s days:%s  start:%s" % (code, op, str(ra), str(dss[0]), st)
+            print "op:%s ra:%s days:%s  start:%s" % (op, str(ra), str(dss[0]), st)
 
     status = setRegLinearPlt(asset)
     # if filter == 'n':
-    setBollPlt(code, df, 'low', start, status=status)
-    setBollPlt(code, df, 'high', start, status=status)
+    setBollPlt(code, df, 'low', start, status=status,opa=opa)
+    setBollPlt(code, df, 'high', start, status=status,opa=opa)
     # pass
     # eval("df.%s"%ptype).ewm(span=20).mean().plot(style='k')
     eval("df.%s" % 'close').plot(style='k')
@@ -879,7 +880,7 @@ def powerCompute_df(df, dtype='d', end=None, dl=None, filter='y',talib=False,new
     wcdf = wcd.get_wencai_data(dm.name,'wencai')
 #    wcdf = wcd.get_codelist_df(dm.name.tolist())
 
-
+    wcdf_code = wcdf.index.tolist()
 
     for code in code_l:
         if statuslist:
@@ -985,7 +986,10 @@ def powerCompute_df(df, dtype='d', end=None, dl=None, filter='y',talib=False,new
         df.loc[code, 'lvolume'] = tdx_df.vol[1]
 
         if len(wcdf[wcdf.index == code]) > 0:
-            df.loc[code,'category'] = wcdf.loc[code,'category']
+            if code in wcdf_code:
+                df.loc[code,'category'] = wcdf.loc[code,'category']
+            else:
+                log.warn("code not in wcdf:%s"%(code))
         else:
             df.loc[code,'category'] = 0
         df=df.fillna(0)
