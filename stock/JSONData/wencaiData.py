@@ -314,6 +314,11 @@ def get_write_wencai_market_to_csv(df=None,market='wcbk',renew=False,days=60):
             df = wencaiwrite_to_csv(df,filepath,renew)
         else:
             dfz = pd.read_csv(filepath,dtype={'code':str},encoding = 'utf8')
+            dfzcount = len(dfz)
+            dfdrop = dfz.drop_duplicates()
+            if dfzcount <> len(dfdrop):
+                wencaiwrite_to_csv(dfdrop,filepath,True)
+                dfz = dfdrop
             if isinstance(df,pd.DataFrame) and len(df) > 0 and len(dfz) != len(df):
 #                if 'category' in df.columns and str(df[:1].category.values).find(';') > 0:
                 if 'category' in df.columns and (str(df[:1].category.values).find(';') > 0 or len((df[:1].category.values) == 0 )):
@@ -334,7 +339,7 @@ def get_write_wencai_market_to_csv(df=None,market='wcbk',renew=False,days=60):
 #                df = wencaiwrite_to_csv(df, filepath)
     else:
         df = wencaiwrite_to_csv(df, filepath)
-
+    df = df.drop_duplicates()
     return df
 
 def get_wcbk_df(filter='混改',market='nybk',perpage=1000,days=60):
