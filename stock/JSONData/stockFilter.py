@@ -84,40 +84,41 @@ def getBollFilter(df=None,boll=5,duration=ct.PowerCountdl,filter=True,ma5d=True,
 
 def WriteCountFilter(df,op='op',writecount=ct.writeCount,end=None,duration=10):
     codel = []
-    if end is None and int(writecount) > 0:
-        writecount = int(writecount)
-        if writecount < 100 and len(df) > 0 and 'percent' in df.columns:
-            dd =  df[df.percent == 10]
-            codel = dd.index.tolist()
-            for co in df.index[:writecount].tolist():
-                if co not in codel:
-                    codel.append(co)
-        else:
-            if len(str(writecount)) >= 4 :
-                codel.append(str(writecount).zfill(6))
-            else:
-                print "writeCount DF is None or Wri:%s"%(writecount)
-    else:
-        if end is None:
+    if str(writecount) <> 'all':
+        if end is None and int(writecount) > 0:
             writecount = int(writecount)
-            if writecount > 0:
-                writecount -= 1
-            codel.append(df.index.tolist()[writecount])
-        else:
-            writecount ,end = int(writecount),int(end)
-
-            if writecount > end:
-                writecount,end = end,writecount
-            if end < -1:
-                end += 1
-                codel = df.index.tolist()[writecount:end]
-            elif end == -1:
-                codel = df.index.tolist()[writecount::]
+            if writecount < 100 and len(df) > 0 and 'percent' in df.columns:
+                dd =  df[df.percent == 10]
+                codel = dd.index.tolist()
+                for co in df.index[:writecount].tolist():
+                    if co not in codel:
+                        codel.append(co)
             else:
-                if writecount > 0 and end >0:
+                if len(str(writecount)) >= 4 :
+                    codel.append(str(writecount).zfill(6))
+                else:
+                    print "writeCount DF is None or Wri:%s"%(writecount)
+        else:
+            if end is None:
+                writecount = int(writecount)
+                if writecount > 0:
                     writecount -= 1
-                    end -=1
-                codel = df.index.tolist()[writecount:end]
-#                codel = df.index.tolist()[writecount:end]
+                codel.append(df.index.tolist()[writecount])
+            else:
+                writecount ,end = int(writecount),int(end)
 
+                if writecount > end:
+                    writecount,end = end,writecount
+                if end < -1:
+                    end += 1
+                    codel = df.index.tolist()[writecount:end]
+                elif end == -1:
+                    codel = df.index.tolist()[writecount::]
+                else:
+                    if writecount > 0 and end >0:
+                        writecount -= 1
+                        end -=1
+                    codel = df.index.tolist()[writecount:end]
+    else:
+        codel =  df.index.tolist()
     return codel

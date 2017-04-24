@@ -1022,21 +1022,22 @@ def write_to_blocknew(p_name, data, append=True):
         writeBlocknew(p_name, data, append)
         writeBlocknew(blockNew, data)
         writeBlocknew(blockNewStart, data,append)
-        print "write to zxg and 066"
+        print "write to zxg and 066:%s:%s"%(p_name,len(data))
     elif p_name.find('065.blk') > 0:
         writeBlocknew(p_name, data, append)
         writeBlocknew(blockNew,data,append)
         writeBlocknew(blockNewStart, data,append)
+        print "write to %s:%s"%(p_name,len(data))
     elif p_name.find('068.blk')  > 0 or p_name.find('069.blk') > 0:
 
         writeBlocknew(p_name, data, append)
-        print "write to %s"%(p_name)
+        print "write to %s:%s"%(p_name,len(data))
     else:
         writeBlocknew(p_name, data, append)
         writeBlocknew(blockNew, data)
         # writeBlocknew(blockNewStart, data[:ct.writeCount - 1])
         writeBlocknew(blockNewStart, data,append)
-        print "write to other and start"
+        print "write to other and start:%s :%s"%(p_name,len(data))
 
 
 def get_sys_platform():
@@ -1132,14 +1133,31 @@ def MoniterArgmain():
                         help='find duration low')
     return parser
 
+# def writeArgmainParser(args,defaul_all=30):
+#     # from ConfigParser import ConfigParser
+#     # import shlex
+#     import argparse
+#     parser = argparse.ArgumentParser()
+#     parser.add_argument('code', type=str, nargs='?', help='w or a or all')
+#     parser.add_argument('dl', nargs='?', type=str, help='1,5,10',default=ct.writeCount)
+#     parser.add_argument('end', nargs='?', type=str, help='1,5,10',default=None)
+#     arg_t = parser.parse_args(args)
+#     if arg_t.dl == 'all':
+#         # print arg_t.dl
+#         arg_t.dl = defaul_all
+#     # print arg_t.dl
+#     return arg_t
+
 def writeArgmain():
     # from ConfigParser import ConfigParser
     # import shlex
     import argparse
     parser = argparse.ArgumentParser()
-    parser.add_argument('code', type=str, nargs='?', help='w or a')
+    parser.add_argument('code', type=str, nargs='?', help='w or a or all')
     parser.add_argument('dl', nargs='?', type=str, help='1,5,10',default=ct.writeCount)
     parser.add_argument('end', nargs='?', type=str, help='1,5,10',default=None)
+    # if parser.code == 'all':
+    #     print parser.dl
     # parser.add_argument('end', nargs='?', type=str, help='20160101')
     # parser.add_argument('-d', action="store", dest="dtype", type=str, nargs='?', choices=['d', 'w', 'm'], default='d',
     #                     help='DateType')

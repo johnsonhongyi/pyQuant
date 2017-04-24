@@ -355,6 +355,7 @@ if __name__ == "__main__":
                 status = False
             elif st.startswith('w') or st.startswith('a'):
                 args = cct.writeArgmain().parse_args(st.split())
+                # args = cct.writeArgmainParser(st.split())
                 codew = stf.WriteCountFilter(top_temp,writecount=args.dl)
                 if args.code == 'a':
                     # cct.write_to_blocknew(block_path, codew[:ct.writeCount])
