@@ -41,17 +41,29 @@ end tell
 #                'sina_Monitor.py': '85, 27',
 #                'singleAnalyseUtil.py': '583, 23',
 #                'LinePower.py':'767, 527',}
-positionKey = {'sina_Market-DurationDn.py': '237, 403',
+               
+# positionKey = {'sina_Market-DurationDn.py': '237, 403',
+#                'sina_Market-DurationDnUP.py': '-23, 539',
+#                'sina_Market-DurationCXDN': '31, 80',
+#                'sina_Market-DurationSH.py': '217, 520',
+#                'sina_Monitor-Market-New.py': '-2, 371',
+#                'sina_Monitor-Market-LH.py': '341, 263',
+#                'sina_Monitor-Market.py': '19, 179',
+#                'sina_Monitor-GOLD.py': '-7, 149',
+#                'sina_Monitor.py': '69, 22',
+#                'singleAnalyseUtil.py': '583, 22',
+#                'LinePower.py':'42, 504',}
+
+
+positionKey = {'sina_Market-DurationDn.py': '246, 322',
                'sina_Market-DurationDnUP.py': '-23, 539',
-               'sina_Market-DurationCXDN': '31, 80',
+               'sina_Market-DurationCXDN': '24, 62',
                'sina_Market-DurationSH.py': '217, 520',
-               'sina_Monitor-Market-New.py': '-2, 371',
-               'sina_Monitor-Market-LH.py': '341, 263',
+               'sina_Market-DurationUP.py': '-15, 112',
                'sina_Monitor-Market.py': '19, 179',
-               'sina_Monitor-GOLD.py': '-7, 149',
-               'sina_Monitor.py': '69, 22',
+               'sina_Monitor.py': '83, 22',
                'singleAnalyseUtil.py': '583, 22',
-               'LinePower.py':'42, 504',}
+               'LinePower.py':'40, 497',}
 
 cmdRun = '''cd /Users/Johnson/Documents/Quant/pyQuant/stock;
 open sina_Market-DurationDn.py;
@@ -60,9 +72,7 @@ open singleAnalyseUtil.py;
 sleep 0.1;osascript -e 'tell application "Python Launcher" to quit';sleep 35;
 open sina_Monitor.py;
 sleep 0.1;osascript -e 'tell application "Python Launcher" to quit';sleep 35;
-open sina_Monitor-GOLD.py;
-sleep 0.1;osascript -e 'tell application "Python Launcher" to quit';sleep 35;
-open sina_Monitor-Market-LH.py;
+open sina_Market-DurationUP.py;
 sleep 0.1;osascript -e 'tell application "Python Launcher" to quit';sleep 35;
 open sina_Market-DurationCXDN.py;
 sleep 0.1;osascript -e 'tell application "Python Launcher" to quit';sleep 35;
@@ -148,12 +158,13 @@ count = doScript(scriptcount)
 if int(count) > 3:
     print getPosition('singleAnalyseUtil.py')
     print getPosition('sina_Market-DurationDn.py')
-    print getPosition('sina_Monitor-Market-LH.py')
+    # print getPosition('sina_Monitor-Market-LH.py')
+    print getPosition('sina_Market-DurationUP.py')
     print getPosition('sina_Market-DurationSH.py')
     print getPosition('sina_Market-DurationCXDN.py')
     print getPosition('sina_Market-DurationCXUP.py')
     print getPosition('sina_Market-DurationDnUP.py')
-    print getPosition('sina_Monitor-GOLD.py')
+    # print getPosition('sina_Monitor-GOLD.py')
     print getPosition('sina_Monitor.py')
     print getPosition('LinePower.py')
 setPosition(cmd=None, position=None)

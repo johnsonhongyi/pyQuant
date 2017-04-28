@@ -59,7 +59,7 @@ def evalcmd(dir_mo):
                 print eval(cmd)
                 print ''
             except Exception, e:
-                print e 
+                print e
                 evalcmd(dir_mo)
                 break
 
@@ -281,7 +281,7 @@ def get_hot_countNew(changepercent, rzrq,fibl=None,fibc=10):
         if fibcount >= fibc:
             fibcount = 1
         else:
-            fibcount += 1 
+            fibcount += 1
         if fibl is not None:
             int=0
             for f in fibl:
@@ -291,7 +291,7 @@ def get_hot_countNew(changepercent, rzrq,fibl=None,fibc=10):
                     print "%s op:%s ra:%s d:%s fib:%s m5:%s  %s" % (code, f_print(3,op),f_print(5,ra),f_print(2,daysData[0]),f_print(3,fib),f_print(4,daysData[1]), st),
                 else:
                     print "%s op:%s ra:%s d:%s fib:%s m5:%s " % (st,f_print(3,op), f_print(5,ra),f_print(2,daysData[0]),f_print(3,fib),f_print(4,daysData[1]))
-       
+
     else:
         fibcount += 1
     allTop = pd.DataFrame()
@@ -354,7 +354,7 @@ def get_hot_countNew(changepercent, rzrq,fibl=None,fibc=10):
             f_print(4, count), f_print(3, len(topTen)), changepercent, f_print(4, len(top)))),
     print(u"crashT:%s crash<-%s:%s" %
           (f_print(3, len(crashTen)), changepercent, f_print(4, len(crash)))),
-                           
+
     # ff = ffu.get_dfcfw_fund_flow(ct.DFCFW_FUND_FLOW_ALL)
     ffall['time'] = ff['time']
     ff = ffall
@@ -365,7 +365,7 @@ def get_hot_countNew(changepercent, rzrq,fibl=None,fibc=10):
         zt = str(ff['time'])
         print(u"流入: %s亿 占比: %s%% %s" %
               (f_print(4, zlr), f_print(4, zzb), f_print(4, zt)))
-      
+
     ff = ffu.get_dfcfw_fund_SHSZ()
     hgt = ffu.get_dfcfw_fund_HGT()
     szt = ffu.get_dfcfw_fund_HGT(url=ct.DFCFW_FUND_FLOW_SZT)
@@ -393,14 +393,14 @@ def get_hot_countNew(changepercent, rzrq,fibl=None,fibc=10):
             szpcent, f_print(4, rzrq['all']), f_print(5, rzrq['diff'])))
     bigcount = rd.getconfigBigCount(count=None, write=True)
     # print bigcount
-    
-            
+
+
     cct.set_console(width, height,
         title=['B:%s-%s V:%s' % (bigcount[0], bigcount[2], bigcount[1]), 'ZL: %s' % (zlr if len(ff) > 0 else 0),
                'To:%s' % len(topTen), 'D:%s' % len(
                 crash), 'Sh: %s ' % ff['scent'] if len(ff) > 0 else '?', 'Vr:%s%% ' % ff['svol'] if len(ff) > 0 else '?',
                'MR: %s' % zzb, 'ZL: %s' % (zlr if len(ff) > 0 else '?')])
-    
+
     return allTop
 
 
@@ -546,7 +546,7 @@ if __name__ == '__main__':
                             break
                 # else:
                 #     dd = tdd.get_tdx_Exp_day_to_df('999999', type='f', dl=1)
-                #     if dd.date.values 
+                #     if dd.date.values
                 raise KeyboardInterrupt("Stop Time")
                 # st = cct.cct_raw_input("status:[go(g),clear(c),quit(q,e)]:")
                 # if len(st) == 0:
@@ -591,10 +591,11 @@ if __name__ == '__main__':
                 #     sys.exit(0)
 
         except (IOError, EOFError) as e:
-            print "Error", e
+            print "SingleError", e
             # traceback.print_exc()
-            sleeptime=random.randint(5, 15)
-            print "Error2sleep:%s"%(sleeptime)
+#            sleeptime=random.randint(5, 15)
+            cct.sleeprandom(30)
+#            print "Error2sleep:%s"%(sleeptime)
         except Exception as e:
             print "Error Exception", e
             cct.sleeprandom(120)

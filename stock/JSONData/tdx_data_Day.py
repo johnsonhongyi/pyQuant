@@ -1068,11 +1068,14 @@ def write_tdx_sina_data_to_file(code,dm=None,df=None,dl=2,type='f'):
     fo.close()
     return "NTrue"
 
-def Write_market_all_day_mp(market='all'):
+def Write_market_all_day_mp(market='all',rewrite=False):
     sh_index = '601998'
     dd = get_tdx_Exp_day_to_df(sh_index,dl=1)
     # print dt,dd.date
-    if len(dd) > 0:
+    if market == 'alla':
+        rewrite = True
+        market = 'all'
+    if not rewrite and len(dd) > 0:
         duration = cct.get_today_duration(dd.date)
         if duration == 0:
             print "Duration:%s is OK"%(duration)
@@ -2746,9 +2749,12 @@ if __name__ == '__main__':
 #    dm = get_sina_data_df(code)
 #    code='603878'
 
-    market = cct.cct_raw_input("write all data [all,cyb,sh,sz] :")
-    if market in  ['all','sh','sz','cyb']:
-        Write_market_all_day_mp(market)
+    market = cct.cct_raw_input("write all data [all,cyb,sh,sz,alla] :")
+    if market in  ['all','sh','sz','cyb','alla']:
+        if market != 'all':
+            Write_market_all_day_mp(market,rewrite=True)
+        else:
+            Write_market_all_day_mp(market)
     else:
         print "market is None "
 

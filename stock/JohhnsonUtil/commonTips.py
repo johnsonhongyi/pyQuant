@@ -683,6 +683,7 @@ def get_url_data(url,retry_count=3,pause=0.05):
     #     else:
     #         return df
     print "url:%s"%(url)
+    sleeprandom(10)
     raise IOError(ct.NETWORK_URL_ERROR_MSG)
 
 def get_div_list(ls, n):
@@ -1242,19 +1243,19 @@ def LineArgmain():
 
 def sort_by_value(df,column='diff',file=None,count=5,num=5,asc=0):
     """[summary]
-    
+
     [description]
-    
+
     Arguments:
         df {dataframe} -- [description]
-    
+
     Keyword Arguments:
         column {str} -- [description] (default: 'diff' or ['diff',])
         file {[type]} -- [description] (default: {069})
         count {number} -- [description] (default: {5})
         num {number} -- [description] (default: {5})
         asc {number} -- [description] (default: {1} or [0,1])
-    
+
     Returns:
         [type] -- [description]
     """
@@ -1276,7 +1277,7 @@ def sort_by_value(df,column='diff',file=None,count=5,num=5,asc=0):
         if str(count) == 'all':
             write_to_blocknew(file, dd.index.tolist(), append=True)
         else:
-            write_to_blocknew(file, dd.index.tolist()[:int(count)], append=True) 
+            write_to_blocknew(file, dd.index.tolist()[:int(count)], append=True)
         print "file:%s"%(file)
 if __name__ == '__main__':
     # print get_run_path()
