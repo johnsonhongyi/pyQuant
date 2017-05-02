@@ -232,8 +232,8 @@ if __name__ == "__main__":
 
                     # df['volume']= df['volume'].apply(lambda x:x/100)
 
-                    if cct.get_now_time_int() > 915 and cct.get_now_time_int() <= 926:
-                        top_dif['percent']= (map(lambda x, y: round((x-y)/y*100,1) if int(y) > 0 else 0, top_dif.buy, top_dif.llastp))
+                    # if cct.get_now_time_int() > 915 and cct.get_now_time_int() <= 926:
+                        # top_dif['percent']= (map(lambda x, y: round((x-y)/y*100,1) if int(y) > 0 else 0, top_dif.buy, top_dif.llastp))
 
                     if 'counts' in top_dif.columns.values:
                         top_dif = top_dif.sort_values(by=ct.MonitorMarket_sort_count,ascending=[0, 0, 0, 1, 0])

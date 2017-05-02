@@ -90,7 +90,8 @@ def WriteCountFilter(df,op='op',writecount=ct.writeCount,end=None,duration=10):
             if writecount < 100 and len(df) > 0 and 'percent' in df.columns:
                 dd =  df[df.percent == 10]
                 codel = dd.index.tolist()
-                for co in df.index[:writecount].tolist():
+                df_list = df.index[:writecount].tolist()
+                for co in df_list:
                     if co not in codel:
                         codel.append(co)
             else:

@@ -169,13 +169,13 @@ if __name__ == "__main__":
                     for symbol in top_all.index:
                         if symbol in top_now.index:
                             if 'counts' in top_now.columns.values:
-                                top_all.loc[symbol, 'trade':'prev_p'] = top_now.loc[symbol, 'trade':'prev_p']
+                                top_all.loc[symbol, 'open':'prev_p'] = top_now.loc[symbol, 'open':'prev_p']
                             else:
                                 # top_now.loc[symbol, 'diff'] = round(
                                 # ((float(top_now.loc[symbol, 'buy']) - float(
                                 # top_all.loc[symbol, 'lastp'])) / float(top_all.loc[symbol, 'lastp']) * 100),
                                 # 1)
-                                top_all.loc[symbol, 'trade':'diff'] = top_now.loc[symbol, 'trade':'diff']
+                                top_all.loc[symbol, 'open':'diff'] = top_now.loc[symbol, 'open':'diff']
                                 # top_all.loc[symbol, 'buy'] = top_now.loc[symbol, 'buy']
                 # top_all = top_all[top_all.buy > 0]
                 top_dif = top_all.copy()

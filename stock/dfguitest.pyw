@@ -141,7 +141,7 @@ while 1:
                         top_all['prev_p'] = 0
                 for symbol in top_now.index:
                     if 'counts' in top_now.columns.values:
-                        top_all.loc[symbol, 'trade':'prev_p'] = top_now.loc[symbol, 'trade':'prev_p']
+                        top_all.loc[symbol, 'open':'prev_p'] = top_now.loc[symbol, 'open':'prev_p']
                     else:
                         # top_now.loc[symbol, 'diff'] = round(
                         # ((float(top_now.loc[symbol, 'buy']) - float(

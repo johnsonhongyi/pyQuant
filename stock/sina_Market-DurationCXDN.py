@@ -187,13 +187,13 @@ if __name__ == "__main__":
                             top_all['prev_p'] = 0
                     for symbol in top_now.index:
                         if 'counts' in top_now.columns.values:
-                            top_all.loc[symbol, 'trade':'prev_p'] = top_now.loc[symbol, 'trade':'prev_p']
+                            top_all.loc[symbol, 'open':'prev_p'] = top_now.loc[symbol, 'open':'prev_p']
                         else:
                             # top_now.loc[symbol, 'diff'] = round(
                             # ((float(top_now.loc[symbol, 'buy']) - float(
                             # top_all.loc[symbol, 'lastp'])) / float(top_all.loc[symbol, 'lastp']) * 100),
                             # 1)
-                            top_all.loc[symbol, 'trade':'diff'] = top_now.loc[symbol, 'trade':'diff']
+                            top_all.loc[symbol, 'open':'diff'] = top_now.loc[symbol, 'open':'diff']
                             # top_all.loc[symbol, 'buy'] = top_now.loc[symbol, 'buy']
                 # top_all = top_all[top_all.buy > 0]
                 top_dif = top_all.copy()
@@ -205,8 +205,8 @@ if __name__ == "__main__":
                     top_dif = top_dif[top_dif.low > top_dif.llow * ct.changeRatio]
                     # top_dif = top_dif[top_dif.buy >= top_dif.lhigh * ct.changeRatio]
 
-                if cct.get_now_time_int() > 915 and cct.get_now_time_int() <= 926:
-                    top_dif['percent']= (map(lambda x, y: round((x-y)/y*100,1) if int(y) > 0 else 0, top_dif.buy, top_dif.llastp))
+#                if cct.get_now_time_int() > 915 and cct.get_now_time_int() <= 926:
+#                    top_dif['percent']= (map(lambda x, y: round((x-y)/y*100,1) if int(y) > 0 else 0, top_dif.buy, top_dif.llastp))
 
                 if cct.get_now_time_int() > 915:
                     top_dif = top_dif[top_dif.buy > 0]
@@ -310,7 +310,7 @@ if __name__ == "__main__":
                     print ("N:%s K:%s %s G:%s" % (
                         now_count, len(top_all[top_all['buy'] > 0]),
                         len(top_now[top_now['volume'] <= 0]), goldstock)),
-                    print "Rt:%0.1f dT:%s N:%s T:%s %s%%" % (float(time.time() - time_Rt), cct.get_time_to_date(time_s),cct.get_now_time(),len(top_temp),round(len(top_temp)/now_count*100,1))    
+                    print "Rt:%0.1f dT:%s N:%s T:%s %s%%" % (float(time.time() - time_Rt), cct.get_time_to_date(time_s),cct.get_now_time(),len(top_temp),round(len(top_temp)/now_count*100,1))
                     # top_end = stf.getBollFilter(df=top_end, boll=ct.bollFilter,duration=ct.PowerCountdl,filter=False)
                     if 'op' in top_temp.columns:
                         # if ptype == 'low':

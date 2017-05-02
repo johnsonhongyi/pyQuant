@@ -129,9 +129,9 @@ if __name__ == "__main__":
                         if symbol in top_all.index and top_now.loc[symbol, 'buy'] <> 0:
                             # top_now.loc[symbol, 'diff'] = round(((float(top_now.loc[symbol, 'buy']) - float(top_all.loc[symbol, 'lastp'])) / float(top_all.loc[symbol, 'lastp']) * 100), 1)
                             if 'counts' in top_now.columns.values:
-                                    top_all.loc[symbol, 'trade':'prev_p'] = top_now.loc[symbol, 'trade':'prev_p']
+                                    top_all.loc[symbol, 'open':'prev_p'] = top_now.loc[symbol, 'open':'prev_p']
                             else:
-                                top_all.loc[symbol, 'trade':'diff'] = top_now.loc[symbol, 'trade':'diff']
+                                top_all.loc[symbol, 'open':'diff'] = top_now.loc[symbol, 'open':'diff']
 
                 # top_all=top_all.sort_values(by=['diff','percent','counts'],ascending=[0,0,1])
                 # top_all=top_all.sort_values(by=['diff','ratio','percent','counts'],ascending=[0,1,0,1])
@@ -154,9 +154,9 @@ if __name__ == "__main__":
                     top_dif = top_dif[top_dif.buy > top_dif.llastp * ct.changeRatio]
                     top_dif = top_dif[top_dif.low > top_dif.llow * ct.changeRatio]
                     log.debug('dif2:%s' % len(top_dif))
-                # log.debug('dif2:%s' % top_dif[:1])
-                if cct.get_now_time_int() > 915 and cct.get_now_time_int() <= 926:
-                    top_dif['percent']= (map(lambda x, y: round((x-y)/y*100,1) if int(y) > 0 else 0, top_dif.buy, top_dif.llastp))
+
+                # if cct.get_now_time_int() > 915 and cct.get_now_time_int() <= 926:
+                    # top_dif['percent']= (map(lambda x, y: round((x-y)/y*100,1) if int(y) > 0 else 0, top_dif.buy, top_dif.llastp))
 
                 # if top_dif[:1].llow.values <> 0:
                 if len(top_dif[:5][top_dif[:5]['low'] > 0]) > 3:
