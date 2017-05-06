@@ -1492,8 +1492,11 @@ def getSinaAlldf(market='cyb',vol=ct.json_countVol,type=ct.json_countType,filena
             block_path = tdd.get_tdx_dir_blocknew() + blkname
             # df = pd.read_csv(block_path,dtype={'code':str},encoding = 'gbk')
             df = pd.read_csv(block_path)
-    elif market in ['sh','sz','cyb','all']:
-        df = rl.get_sina_Market_json(market)
+    elif market in ['sh','sz','cyb']:
+        # df = rl.get_sina_Market_json(market)
+        df = sina_data.Sina().market(market)
+    elif market in ['all']:
+        df = sina_data.Sina().all
     else:
         df = wcd.get_wcbk_df(filter=market,market=filename,perpage=1000,days=120)
     # codelist=df.code.tolist()
@@ -2396,6 +2399,32 @@ def get_append_lastp_to_df(top_all,lastpTDX_DF=None,dl=ct.PowerCountdl,end=None,
         return top_all,tdxdata
     else:
         return top_all
+
+def get_powerdf_to_all(top_all,powerdf):
+    # codelist = top_all.index.tolist()
+    # all_t = top_all.reset_index()
+    # p_t = powerdf.reset_index()
+    # top_dif['buy'] = (map(lambda x, y: y if int(x) == 0 else x, top_dif['buy'].values, top_dif['trade'].values))    
+    time_s = time.time()
+    if not 'boll' in top_all.columns:
+        p_t = powerdf.loc[:,'ra':'df2']
+        # top_all.drop('column_name', axis=1, inplace=True)
+        # top_all.drop([''], axis = 1, inplace = True, errors = 'ignore')
+        top_all_co = top_all.columns
+        top_all.drop([col for col in top_all_co if col in p_t], axis=1, inplace=True)
+        top_all = top_all.merge(p_t, left_index=True, right_index=True, how='left')
+        top_all = top_all.fillna(0)
+    else:
+        p_t = powerdf.loc[:,'ra':'df2']
+        # p_t = powerdf.iloc[:,57:69]
+        # 'oph', u'rah', u'fibl', u'boll', u'kdj',u'macd', u'rsi', u'ma', u'vstd', u'lvolume', u'category'
+        for symbol in p_t.index:
+            if symbol in top_all.index:
+                # top_all.loc[symbol, 'oph':'category'] = p_t.loc[symbol, 'oph':'category']
+                top_all.loc[symbol, 'ra':'df2'] = p_t.loc[symbol, 'ra':'df2']
+    print "Pta:%0.2f"%(time.time()-time_s),
+    return top_all
+
 
 def get_tdx_exp_all_LastDF(codeList, dt=None,end=None,ptype='low',filter='n'):
     time_t = time.time()

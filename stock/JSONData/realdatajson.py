@@ -672,15 +672,17 @@ def get_market_price_sina_dd_realTime(dp='',vol='0',type='0'):
 if __name__ == '__main__':
     import sys
     # df = get_sina_all_json_dd('0', '3')
-    # df=get_sina_Market_json('cyb')
+    log.setLevel(LoggerFactory.DEBUG)
+    df=get_sina_Market_json('sh')
+    print df[df.code == '600581']
     # _get_sina_json_dd_url()
     # print sina_json_Big_Count()
     # print getconfigBigCount(write=True)
     # sys.exit(0)
     # post_login()
-    # log.setLevel(LoggerFactory.INFO)
     # get_wencai_Market_url(filter='热门股')
-    df = get_sina_Market_json('sz')
+    df = get_sina_Market_json('all')
+    print df[df.code == '600581']
     print df[:1],df.shape
     sys.exit()
     top_now = get_market_price_sina_dd_realTime(df, '2', type)

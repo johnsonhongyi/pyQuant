@@ -150,8 +150,8 @@ if __name__ == "__main__":
                 log.info('dif1:%s' % len(top_dif))
                 if cct.get_now_time_int() > 915 and cct.get_now_time_int() < ct.checkfilter_end_time:
                     top_dif=top_dif[top_dif.lvol > ct.LvolumeSize]
-                    log.info(top_dif[:1])
-                    top_dif = top_dif[top_dif.buy > top_dif.llastp * ct.changeRatio]
+                    # log.info(top_dif[:1])
+                    # top_dif = top_dif[top_dif.buy > top_dif.llastp * ct.changeRatio]
                     top_dif = top_dif[top_dif.low > top_dif.llow * ct.changeRatio]
                     log.debug('dif2:%s' % len(top_dif))
 
@@ -160,11 +160,7 @@ if __name__ == "__main__":
 
                 # if top_dif[:1].llow.values <> 0:
                 if len(top_dif[:5][top_dif[:5]['low'] > 0]) > 3:
-                    log.debug('diff2-0-low>0')
-                    top_dif = top_dif[top_dif.low >= top_dif.llow]
-                    log.debug('diff2-1:%s' % len(top_dif))
                     if cct.get_now_time_int() > 915:
-                        top_dif = top_dif[top_dif.buy > top_dif.llastp * ct.changeRatio]
                         top_dif = top_dif[top_dif.low > top_dif.llow * ct.changeRatio]
                         # top_dif = top_dif[top_dif.buy > top_dif.lhigh * ct.changeRatio]
                         # top_dif = top_dif[top_dif.low >= top_dif.llastp]

@@ -12,6 +12,7 @@ from matplotlib.lines import Line2D
 from matplotlib.patches import Rectangle
 import datetime
 from JohhnsonUtil import commonTips as cct
+from JohhnsonUtil import johnson_cons as ct
 from JSONData import tdx_data_Day as tdd
 from JSONData import get_macd_kdj_rsi as getab
 from JSONData import wencaiData as wcd
@@ -872,6 +873,10 @@ def powerCompute_df(df, dtype='d', end=None, dl=None, filter='y',talib=False,new
     else:
         code_l = df.index.tolist()
         statuslist = False
+    if 'boll' in df[:1].columns:
+            if df[:1].boll.values <> 0:
+                print "PcA:%0.2f"%(time.time()-ts),
+                return df
     dm = tdd.get_sina_data_df(code_l)
     if statuslist:
         df = dm
@@ -883,6 +888,10 @@ def powerCompute_df(df, dtype='d', end=None, dl=None, filter='y',talib=False,new
     wcdf_code = wcdf.index.tolist()
 
     for code in code_l:
+        if 'boll' in df.loc[code].index:
+            if df.loc[code].boll <> 0:
+#                print df.loc[code].boll
+                continue
         if statuslist:
             start = None
         else:
@@ -998,6 +1007,9 @@ def powerCompute_df(df, dtype='d', end=None, dl=None, filter='y',talib=False,new
         # df = df.drop_duplicates()
     df = df.fillna(0)
     df.loc[:, 'fibl'] = df.loc[:, 'fibl'].astype(int)
+    df['df2'] = (map(lambda ra, fibl,rah,fib,ma,kdj,rsi:round(eval(ct.powerdiff%(ct.PowerCountdl)),1),\
+                     df['ra'].values, df['fibl'].values,df['rah'].values,df['fib'].values,df['ma'].values,\
+                     df['kdj'].values,df['rsi'].values))
     print "Pc:%0.2f"%(time.time()-ts),
     return df
 

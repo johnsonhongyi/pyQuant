@@ -128,15 +128,15 @@ if __name__ == "__main__":
                 time_Rt = time.time()
                 if len(top_all) == 0 and len(lastpTDX_DF) == 0:
                     time_Rt = time.time()
-                    top_all,lastpTDX_DF = tdd.get_append_lastp_to_df(top_now, lastpTDX_DF=None, dl=duration_date,end=end_date,ptype=ptype,filter=filter, power=True, lastp=False)
+                    top_all,lastpTDX_DF = tdd.get_append_lastp_to_df(top_now, lastpTDX_DF=None, dl=duration_date,end=end_date,ptype=ptype,filter=filter, power=ct.lastPower, lastp=False)
                     log.debug("len:%s"%(len(top_all)))
                     # codelist = top_all.index.tolist()
                     # log.info('toTDXlist:%s' % len(codelist))
                     # # tdxdata = tdd.get_tdx_all_day_LastDF(codelist,dt=duration_date,ptype=ptype)
                     # # print "duration_date:%s ptype=%s filter:%s"%(duration_date, ptype,filter)
                     # # tdxdata = tdd.get_tdx_exp_all_LastDF(codelist, dt=duration_date, end=end_date,ptype=ptype,filter=filter)
-                    # power=True
-                    # tdxdata = tdd.get_tdx_exp_all_LastDF_DL(codelist, dt=duration_date, end=end_date,ptype=ptype,filter=filter,power=True)
+                    # power=ct.lastPower
+                    # tdxdata = tdd.get_tdx_exp_all_LastDF_DL(codelist, dt=duration_date, end=end_date,ptype=ptype,filter=filter,power=ct.lastPower)
                     # log.debug("TdxLastP: %s %s" % (len(tdxdata), tdxdata.columns.values))
                     # tdxdata.rename(columns={'low': 'llow'}, inplace=True)
                     # tdxdata.rename(columns={'high': 'lhigh'}, inplace=True)
@@ -187,8 +187,6 @@ if __name__ == "__main__":
                 #判断主升
                 # log.debug('top_dif:%s'%(len(top_dif)))
                 if ct.checkfilter and  cct.get_now_time_int() > 915 and cct.get_now_time_int() < ct.checkfilter_end_timeDu:
-                    top_dif = top_dif[top_dif.buy >= top_dif.llastp * ct.changeRatio]
-                    log.debug('top_dif:%s'%(len(top_dif)))
                     top_dif = top_dif[top_dif.low > top_dif.llow * ct.changeRatio]
                     # top_dif = top_dif[top_dif.buy >= top_dif.lhigh * ct.changeRatio]
                     log.debug('top_dif:%s'%(len(top_dif)))

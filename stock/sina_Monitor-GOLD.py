@@ -223,7 +223,6 @@ if __name__ == "__main__":
                     top_all['diff'] = (
                         map(lambda x, y: round(((float(x) - float(y)) / float(y) * 100), 1),top_all['buy'].values,top_all['lastp'].values))
                     if cct.get_now_time_int() > 915 and cct.get_now_time_int() < ct.checkfilter_end_time:
-                        top_all = top_all[top_all.trade > top_all.llastp * ct.changeRatio]
                         top_all = top_all[top_all.low > top_all.llow * ct.changeRatio]
                         # top_all = top_all[top_all.trade > top_all.lhigh * ct.changeRatio]
 

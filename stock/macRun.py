@@ -67,19 +67,19 @@ positionKey = {'sina_Market-DurationDn.py': '246, 322',
 
 cmdRun = '''cd /Users/Johnson/Documents/Quant/pyQuant/stock;
 open sina_Market-DurationDn.py;
-sleep 0.1;osascript -e 'tell application "Python Launcher" to quit';sleep 35;
+sleep 0.1;osascript -e 'tell application "Python Launcher" to quit';sleep 65;
 open singleAnalyseUtil.py;
 sleep 0.1;osascript -e 'tell application "Python Launcher" to quit';sleep 35;
 open sina_Monitor.py;
 sleep 0.1;osascript -e 'tell application "Python Launcher" to quit';sleep 35;
 open sina_Market-DurationUP.py;
-sleep 0.1;osascript -e 'tell application "Python Launcher" to quit';sleep 35;
+sleep 0.1;osascript -e 'tell application "Python Launcher" to quit';sleep 65;
 open sina_Market-DurationCXDN.py;
 sleep 0.1;osascript -e 'tell application "Python Launcher" to quit';sleep 35;
 open sina_Market-DurationSH.py;
 sleep 0.1;osascript -e 'tell application "Python Launcher" to quit';sleep 35;
 open LinePower.py;
-sleep 0.1;osascript -e 'tell application "Python Launcher" to quit';sleep 65;
+sleep 0.1;osascript -e 'tell application "Python Launcher" to quit';sleep 35;
 open sina_Market-DurationDnUP.py;
 sleep 0.1;osascript -e 'tell application "Python Launcher" to quit';sleep 35;
 '''

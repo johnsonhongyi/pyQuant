@@ -185,7 +185,6 @@ if __name__ == "__main__":
                         map(lambda x, y: round(x / y / radio_t, 1), top_all['volume'].values, top_all['lvol'].values))
 
                     if cct.get_now_time_int() > 915:
-                        top_all = top_all[top_all.trade > top_all.llastp * ct.changeRatio]
                         top_all = top_all[top_all.low > top_all.llow * ct.changeRatio]
                         # top_all = top_all[top_all.trade > top_all.lhigh * ct.changeRatio]
 

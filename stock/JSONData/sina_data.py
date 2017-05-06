@@ -24,8 +24,8 @@ class StockCode:
         self.start_t = time.time()
         self.STOCK_CODE_PATH = 'stock_codes.conf'
         self.stock_code_path = self.stock_code_path()
-        if not os.path.exists(self.stock_code_path):
-            print ("update stock_codes.conf")
+        if not os.path.exists(self.stock_code_path) or cct.creation_date_duration(self.stock_code_path) > 120:
+            print ("days:%s update stock_codes.conf"%(cct.creation_date_duration(self.stock_code_path)))
             self.get_stock_codes(True)
 
         self.stock_codes = None
@@ -100,8 +100,12 @@ class Sina:
         self.stock_code_path = self.stockcode.stock_code_path
         self.stock_codes = self.stockcode.get_stock_codes()
         self.load_stock_codes()
+        self.stock_codes = [elem for elem in self.stock_codes if elem.startswith(('6','30','00'))]
+        # self.stock_with_exchange_list = list(
+            # map(lambda stock_code: ('sh%s' if stock_code.startswith(('5', '6', '9')) else 'sz%s') % stock_code,
+                # self.stock_codes))
         self.stock_with_exchange_list = list(
-            map(lambda stock_code: ('sh%s' if stock_code.startswith(('5', '6', '9')) else 'sz%s') % stock_code,
+            map(lambda stock_code: ('sh%s' if stock_code.startswith(('6')) else 'sz%s') % stock_code,
                 self.stock_codes))
         self.stock_list = []
         self.request_num = len(self.stock_with_exchange_list) // self.max_num
@@ -129,6 +133,67 @@ class Sina:
         #           (len(self.stock_list), len(self.stock_list)))
         return self.get_stock_data()
 
+    def market(self,market):
+        if market in ['all']:
+            return self.all
+        else:
+            self.stockcode = StockCode()
+            self.stock_code_path = self.stockcode.stock_code_path
+            self.stock_codes = self.stockcode.get_stock_codes()
+            self.load_stock_codes()
+            # print type(self.stock_codes)
+            # self.stock_with_exchange_list = list(
+                # map(lambda stock_code: ('sh%s' if stock_code.startswith(('5', '6', '9')) else 'sz%s') % stock_code,
+                    # self.stock_codes))        elif market == 'cyb':
+            # print len(self.stock_codes)
+            # self.stock_codes = [elem for elem in self.stock_codes if elem.startswith(('6','30','00'))]
+            # print len(self.stock_codes)
+            if market == 'sh':
+                self.stock_codes = [elem for elem in self.stock_codes if elem.startswith('6')]
+                self.stock_with_exchange_list = list(
+                    map(lambda stock_code: ('sh%s') % stock_code,
+                        self.stock_codes))
+            elif market == 'sz':
+                self.stock_codes = [elem for elem in self.stock_codes if elem.startswith('00')]
+                self.stock_with_exchange_list = list(
+                    map(lambda stock_code: ('sz%s' ) % stock_code,
+                        self.stock_codes))
+            elif market == 'cyb':
+                self.stock_codes = [elem for elem in self.stock_codes if elem.startswith('30')]
+                self.stock_with_exchange_list = list(
+                    map(lambda stock_code: ('sz%s' )% stock_code,
+                        self.stock_codes))
+            self.stock_list = []
+            self.request_num = len(self.stock_with_exchange_list) // self.max_num
+            for range_start in range(self.request_num):
+                num_start = self.max_num * range_start
+                num_end = self.max_num * (range_start + 1)
+                request_list = ','.join(
+                    self.stock_with_exchange_list[num_start:num_end])
+                self.stock_list.append(request_list)
+            # print len(self.stock_with_exchange_list), num_end
+            # if self.request_num == 0:
+            #     num_end = self.max_num
+            if self.request_num > 0 and len(self.stock_with_exchange_list) > num_end:
+                request_list = ','.join(
+                    self.stock_with_exchange_list[num_end:])
+                self.stock_list.append(request_list)
+                self.request_num += 1
+            else:
+                request_list = ','.join(
+                    self.stock_with_exchange_list)
+                self.stock_list.append(request_list)
+            # a = 0
+            # for x in range(self.request_num):
+            #     print x
+            #     i = len(self.stock_list[x].split(','))
+            #     print i
+            #     a += i
+            #     print a
+            log.debug('all:%s' % len(self.stock_list))
+            # log.error('all:%s req:%s' %
+            #           (len(self.stock_list), len(self.stock_list)))
+            return self.get_stock_data()        
     # def get_url_data_R(url):
     #     # headers = {'User-Agent':'Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.6) Gecko/20091201 Firefox/3.5.6'}
     #     headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.2; rv:16.0) Gecko/20100101 Firefox/16.0',
@@ -159,7 +224,8 @@ class Sina:
             threads.append(self.get_stocks_by_range(index))
             log.debug("url:%s  len:%s" %
                       (self.sina_stock_api, len(self.stock_list[index])))
-
+        if self.request_num == 0:
+            threads.append(self.get_stocks_by_range(0))
         for _ in range(retry_count):
             time.sleep(pause)
             try:
@@ -347,18 +413,23 @@ class Sina:
 
 if __name__ == "__main__":
     times = time.time()
-    sina = Sina()
-    # print len(sina.all)
-    # df = sina.all
+    # sina = Sina()
     # print len(df)
     # code='601198'
     # df = sina.get_stock_list_data(['300134', '601998', '999999']).set_index('code')
     # df = sina.get_stock_code_data('000001',index=True).set_index('code')
 #    print sina.get_stock_code_data('399006,999999',index=True)
-    print sina.get_stock_code_data('999999',index=True)
-    df = sina.get_stock_list_data(['002158', '000507']).set_index('code')
-    # df = sina.get_stock_code_data('002775',index=False).set_index('code')
-    print len(df),df[:2]
+    log.setLevel(LoggerFactory.DEBUG)
+    for ma in ['sh','sz','cyb','all']:
+        print ma
+        df = Sina().market(ma)
+        # print len(sina.all)
+        print len(df)
+        print df[df.code == '600581']
+        # print sina.get_stock_code_data('999999',index=True)
+        # df = sina.get_stock_list_data(['600629', '000507']).set_index('code')
+        # df = sina.get_stock_code_data('002775',index=False).set_index('code')
+        print len(df)
     # print df.loc['300380']
     # list=['000001','399001','399006','399005']
     # df=sina.get_stock_list_data(list)

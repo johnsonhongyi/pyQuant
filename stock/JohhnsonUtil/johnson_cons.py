@@ -34,6 +34,7 @@ lastdays = 4
 bollFilter = 1
 writeblockbakNum = 12
 checkfilter = True
+lastPower = False
 checkfilter_end_time = 945
 checkfilter_end_timeDu = 1440
 sleep_time = 25

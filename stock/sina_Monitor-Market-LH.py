@@ -79,7 +79,7 @@ def evalcmd(dir_mo):
                     print eval(cmd)
                 print ''
             except Exception, e:
-                print e 
+                print e
                 # evalcmd(dir_mo)
                 # break
 
@@ -116,7 +116,7 @@ if __name__ == "__main__":
     # all_diffpath = tdd.get_tdx_dir_blocknew() + '062.blk'
     while 1:
         try:
-            top_now = tdd.getSinaAlldf(market='cyb', vol=ct.json_countVol, type=ct.json_countType)
+            top_now = tdd.getSinaAlldf(market='sh', vol=ct.json_countVol, type=ct.json_countType)
             # print top_now.loc['300208','name']
             df_count = len(top_now)
             now_count = len(top_now)
@@ -142,7 +142,7 @@ if __name__ == "__main__":
                 if 'trade' in top_now.columns:
                     top_now['buy'] = (
                         map(lambda x, y: y if int(x) == 0 else x, top_now['buy'].values, top_now['trade'].values))
-      
+
                 if len(top_all) == 0 and len(lastpTDX_DF) == 0:
                     time_Rt = time.time()
                     top_all,lastpTDX_DF = tdd.get_append_lastp_to_df(top_now,end=end_date,dl=duration_date)
@@ -150,7 +150,7 @@ if __name__ == "__main__":
                     time_Rt = time.time()
                     top_all = tdd.get_append_lastp_to_df(top_now,lastpTDX_DF)
 
-                    
+
 
                 else:
                     if 'counts' in top_now.columns.values:
@@ -182,17 +182,15 @@ if __name__ == "__main__":
                     # log.debug('dif3 low<>0 :%s' % len(top_dif))
                     # top_dif = top_dif[top_dif.open > 0]
                     if cct.get_now_time_int() > 915 and cct.get_now_time_int() < ct.checkfilter_end_time:
-                        # top_dif = top_dif[top_dif.low >= top_dif.llastp]
-                        top_dif = top_dif[top_dif.buy >= top_dif.llastp * ct.changeRatio]
                         top_dif = top_dif[top_dif.low > top_dif.llow * ct.changeRatio]
-                        # top_dif = top_dif[top_dif.buy >= top_dif.lhigh * ct.changeRatio]
                     log.debug('dif4 open>low0.99:%s' % len(top_dif))
                     log.debug('dif4-2:%s' % top_dif.percent[:2])
 
-                    if cct.get_work_time() and cct.get_now_time_int() > 930:
-                        top_dif = top_dif[top_dif.percent >= 0]
-                    log.debug("dif5-percent>0:%s" % len(top_dif))
-                    log.debug("Second:vol/vol/:%s" % radio_t)
+                    # if cct.get_work_time() and cct.get_now_time_int() > 930:
+                    #     top_dif = top_dif[top_dif.percent >= 0]
+                    # log.debug("dif5-percent>0:%s" % len(top_dif))
+                    # log.debug("Second:vol/vol/:%s" % radio_t)
+
                     top_dif['volume'] = (
                         map(lambda x, y: round(x / y / radio_t, 1),
                             top_dif['volume'].values, top_dif['lvol'].values))
@@ -204,7 +202,7 @@ if __name__ == "__main__":
                 else:
                     log.info('dif1:%s' % len(top_dif))
                     log.info(top_dif[:1])
-                    top_dif = top_dif[top_dif.buy > top_dif.llastp * ct.changeRatio]
+                    # top_dif = top_dif[top_dif.buy > top_dif.llastp * ct.changeRatio]
                     log.debug('dif2:%s' % len(top_dif))
                     # top_dif['diff'] = (
                     #     map(lambda x, y:
@@ -260,7 +258,7 @@ if __name__ == "__main__":
                     if 'op' in top_temp.columns:
 
                         # top_temp = top_temp.sort_values(by=['ra', 'op','percent'],ascending=[0, 0,0])
-                        
+
                         # top_temp = top_temp.sort_values(by=ct.MonitorMarket_sort_op,
                                         # ascending=ct.MonitorMarket_sort_op_key)
                         if duration_date > ct.duration_date_sort:
@@ -276,7 +274,7 @@ if __name__ == "__main__":
 
                         # top_temp = top_temp.sort_values(by=ct.Duration_percent_op,
                         #                 ascending=ct.Duration_percent_op_key)
-                        
+
                         # top_temp = top_temp.sort_values(by=['op','ra','diff', 'percent', 'ratio'], ascending=[0,0,0, 0, 1])
                     # if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935:
                     #     # top_temp = top_temp[ (top_temp['ma5d'] > top_temp['ma10d']) & (top_temp['buy'] > top_temp['ma10d']) ]
@@ -284,8 +282,8 @@ if __name__ == "__main__":
                     # else:
                     #     # top_temp = top_temp[ (top_temp['ma5d'] > top_temp['ma10d']) & (top_temp['buy'] > top_temp['ma10d']) ]
                     #     top_temp = top_temp.loc[:,ct.MonitorMarket_format_buy]
-                    print rl.format_for_print(top_temp.loc[:,ct.MonitorMarket_format_buy][:10]) 
-                
+                    print rl.format_for_print(top_temp.loc[:,ct.MonitorMarket_format_buy][:10])
+
                 # print rl.format_for_print(top_dif[:10])
                 # print top_all.loc['000025',:]
                 # print "staus",status
@@ -342,7 +340,7 @@ if __name__ == "__main__":
                 status = False
             elif st.lower() == 'r':
                 dir_mo = eval(cct.eval_rule)
-                evalcmd(dir_mo)               
+                evalcmd(dir_mo)
             elif st.lower() == 'g' or st.lower() == 'go':
                 status = True
                 for code in top_dif[:10].index:
