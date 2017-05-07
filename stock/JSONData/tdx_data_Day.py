@@ -193,6 +193,7 @@ def get_tdx_Exp_day_to_df(code, start=None, end=None, dl=None,newdays = None,typ
         # df.sort_index(ascending=False, inplace=True)
         if start is not None and end is not None:
             df = df[(df.date >= start) & (df.date <= end)]
+            print "startend"
         elif end is not None:
             df = df[df.date <= end]
         elif start is not None:
@@ -202,7 +203,7 @@ def get_tdx_Exp_day_to_df(code, start=None, end=None, dl=None,newdays = None,typ
         # df['ma20d'] = df.close.rolling(window=20,center=False).mean()
         # df['ma60d'] = df.close.rolling(window=60,center=False).mean()
         if len(df) > 0:
-            df.drop_duplicates('date',inplace=True)
+#            df.drop_duplicates('date',inplace=True)
             df = df.set_index('date')
             df = df.sort_index(ascending=True)
             df['ma5d'] = pd.rolling_mean(df.close,5)
@@ -313,14 +314,16 @@ def get_tdx_Exp_day_to_df(code, start=None, end=None, dl=None,newdays = None,typ
         # df.sort_index(ascending=False, inplace=True)
         if start is not None and end is not None:
             df = df[(df.date >= start) & (df.date <= end)]
+
             # print df
         elif end is not None:
             df = df[df.date <= end]
+
         elif start is not None:
             df = df[df.date >= start]
 #        print start,dl,len(df)
         if len(df) > 0:
-            df.drop_duplicates('date',inplace=True)
+#            df.drop_duplicates('date',inplace=True)
             df = df.set_index('date')
             df = df.sort_index(ascending=True)
             df['ma5d'] = pd.rolling_mean(df.close,5)
@@ -1556,7 +1559,7 @@ def getSinaAlldf(market='cyb',vol=ct.json_countVol,type=ct.json_countType,filena
     else:
         dm =  dm.set_index('code')
         top_now = dm
-        top_now['counts'] = 0
+        top_now['couts'] = 0
         top_now['diff'] = 0
         top_now['prev_p'] = 0
 
@@ -2527,7 +2530,8 @@ def get_tdx_exp_all_LastDF_DL(codeList, dt=None,end=None,ptype='low',filter='n',
 #        results=[]
 #        for code in codeList:
 #            print code
-#            results.append(get_tdx_exp_low_or_high_price(code, dt, ptype, dl))
+#            results.append(get_tdx_exp_low_or_high_price(code, dt, ptype, dl,end,power,lastp,newdays))
+        # results = get_tdx_exp_low_or_high_price(codeList[0], dt,ptype,dl)))
 
 #    elif dt is not None and filter == 'y':
 #        results = cct.to_mp_run_async(get_tdx_exp_low_or_high_power, codeList, dt, ptype, dl,end,power,lastp,newdays)
@@ -2555,11 +2559,17 @@ def get_tdx_exp_all_LastDF_DL(codeList, dt=None,end=None,ptype='low',filter='n',
                 dl = 30
                 dt = None
             log.info("LastDF:%s,%s" % (dt,dl))
+        if dl is not None and end is not None:
+            dl = dl + cct.get_today_duration(end,cct.get_today())
+#            print cct.get_today_duration(end,cct.get_today())
         results = cct.to_mp_run_async(get_tdx_exp_low_or_high_power, codeList, dt, ptype, dl,end,power,lastp,newdays)
 #        results=[]
+#        ts=time.time()
 #        for code in codeList:
-#            print code
-#            results.append(get_tdx_exp_low_or_high_power(code,dt,ptype,dl,end,power,lastp))
+#            ts_1=time.time()
+#            results.append(get_tdx_exp_low_or_high_power(code,dt,ptype,dl,end,power,lastp,newdays))
+#            print round(time.time()-ts_1,2),
+#        print round(time.time()-ts,2),
         # print dt,ptype,dl,end
         # for code in codelist:
         #     print code

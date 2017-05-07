@@ -171,27 +171,27 @@ if __name__ == "__main__":
 #                            count_n = top_now.loc[symbol, 'buy']
 #                            count_a = top_all.loc[symbol, 'lastp']
 #                            top_now.loc[symbol, 'diff'] = round((count_n - count_a)/count_a*100,1)
-                            # count_n = top_now.loc[symbol, 'counts']
-                            # count_a = top_all.loc[symbol, 'counts']
+                            # count_n = top_now.loc[symbol, 'couts']
+                            # count_a = top_all.loc[symbol, 'couts']
                             # top_now.loc[symbol, 'diff'] = count_n - count_a
                             # print top_now.columns
-                            # Index([u'name', u'percent', u'diff', u'counts', u'trade', u'high', u'open',
+                            # Index([u'name', u'percent', u'diff', u'couts', u'trade', u'high', u'open',
                             #        u'low', u'ratio', u'volume', u'prev_p'],
                             #       dtype='object')
-                            # Index([u'name', u'percent', u'diff', u'counts', u'volume', u'trade', u'prev_p',
+                            # Index([u'name', u'percent', u'diff', u'couts', u'volume', u'trade', u'prev_p',
                             #        u'ratio'],
                             #       dtype='object')
                             # print top_all.columns
                             # if status_change:
-                            top_all.loc[symbol,['name', 'percent', 'diff', 'counts', 'trade', 'high', 'open', 'low', 'ratio', 'volume',
-                           'prev_p']] = top_now.loc[symbol,['name', 'percent', 'diff', 'counts', 'trade', 'high', 'open', 'low', 'ratio', 'volume',
+                            top_all.loc[symbol,['name', 'percent', 'diff', 'couts', 'trade', 'high', 'open', 'low', 'ratio', 'volume',
+                           'prev_p']] = top_now.loc[symbol,['name', 'percent', 'diff', 'couts', 'trade', 'high', 'open', 'low', 'ratio', 'volume',
                            'prev_p']]
                                 
                             # else:
                             #     # top_all.loc[symbol, ['percent', 'diff']] = top_now.loc[symbol, ['percent', 'diff']]
                             #     # top_all.loc[symbol, 'trade':] = top_now.loc[symbol, 'trade':]
-                            #     top_all.loc[symbol,['diff', 'counts', 'trade', 'high', 'open', 'low', 'ratio', 'volume',
-                            #    'prev_p']] = top_now.loc[symbol,['diff', 'counts', 'trade', 'high', 'open', 'low', 'ratio', 'volume',
+                            #     top_all.loc[symbol,['diff', 'couts', 'trade', 'high', 'open', 'low', 'ratio', 'volume',
+                            #    'prev_p']] = top_now.loc[symbol,['diff', 'couts', 'trade', 'high', 'open', 'low', 'ratio', 'volume',
                             #    'prev_p']]
                                 # if not count_n==count_a:
                                 # top_now.loc[symbol,'diff']=round((count_n-count_a),1)
@@ -200,7 +200,7 @@ if __name__ == "__main__":
                                 # else:
                                 # top_all.loc[symbol,'diff':]=top_now.loc[symbol,'diff':]
                                 # else:
-                                # top_all.loc[symbol,'counts':]=top_now.loc[symbol,'counts':]
+                                # top_all.loc[symbol,'couts':]=top_now.loc[symbol,'couts':]
 
                         else:
                             top_all.append(top_now.loc[symbol])
@@ -231,17 +231,17 @@ if __name__ == "__main__":
                     # if cct.get_now_time_int() > 930 and 'lastp' in top_all.columns:
                     #     top_all = top_all[top_all.trade >= top_all.llastp]
                     # top_all = top_all.loc[:,
-                              # ['name', 'percent', 'ma5d','diff', 'counts', 'volume', 'trade', 'prev_p', 'ratio']]
+                              # ['name', 'percent', 'ma5d','diff', 'couts', 'volume', 'trade', 'prev_p', 'ratio']]
                     # if cct.get_now_time_int() > 1030 and cct.get_now_time_int() < 1400:
                         # top_all = top_all[(top_all.volume > ct.VolumeMinR) & (top_all.volume < ct.VolumeMaxR)]
 
-                # top_all = top_all.sort_values(by=[ 'counts', 'diff','volume', 'ratio'], ascending=[0, 0, 0, 1])
+                # top_all = top_all.sort_values(by=[ 'couts', 'diff','volume', 'ratio'], ascending=[0, 0, 0, 1])
                 top_all = top_all.sort_values(by=ct.Monitor_sort_count, ascending=[0,0, 0, 0, 1])
-                # top_all = top_all.sort_values(by=[ 'counts'], ascending=[0])
-                # top_all=top_all.sort_values(by=['diff','percent','counts','ratio'],ascending=[0,0,1,1])
+                # top_all = top_all.sort_values(by=[ 'couts'], ascending=[0])
+                # top_all=top_all.sort_values(by=['diff','percent','couts','ratio'],ascending=[0,0,1,1])
 
-                # top_all=top_all.sort_values(by=['diff','counts'],ascending=[0,0])
-                # top_all=top_all.sort_values(by=['diff','percent','counts','ratio'],ascending=[0,0,1,1])
+                # top_all=top_all.sort_values(by=['diff','couts'],ascending=[0,0])
+                # top_all=top_all.sort_values(by=['diff','percent','couts','ratio'],ascending=[0,0,1,1])
 
 
                 # print top_all
@@ -263,7 +263,7 @@ if __name__ == "__main__":
                 top_temp = stf.getBollFilter(df=top_temp, boll=1)
                 print "G:%s Rt:%0.1f dT:%s N:%s T:%s" % (goldstock,float(time.time() - time_Rt),cct.get_time_to_date(time_s),cct.get_now_time(),len(top_temp))
                 if 'op' in top_temp.columns:
-                    # top_temp = top_temp.sort_values(by=['ra','op','counts'],ascending=[0, 0,0])
+                    # top_temp = top_temp.sort_values(by=['ra','op','couts'],ascending=[0, 0,0])
                     # top_temp = top_temp.sort_values(by=['diff', 'op', 'ra', 'percent', 'ratio'],
                     # top_temp = top_temp.sort_values(by=ct.Monitor_sort_op,
                                     # ascending=ct.Monitor_sort_op_key)
@@ -356,6 +356,7 @@ if __name__ == "__main__":
                 evalcmd(dir_mo)
             else:
                 print "input error:%s"%(st)
+                sys.exit(0)
 
         except (IOError, EOFError) as e:
             print "Error", e
@@ -365,7 +366,7 @@ if __name__ == "__main__":
 
 
             # http://stackoverflow.com/questions/17709270/i-want-to-create-a-column-of-value-count-in-my-pandas-dataframe
-            # df['counts'] = df.groupby(['Color'])['Value'].transform('count')
+            # df['couts'] = df.groupby(['Color'])['Value'].transform('count')
             #
             # For example,
             #
@@ -378,7 +379,7 @@ if __name__ == "__main__":
             # 1   Red    150
             # 2  Blue     50
             #
-            # In [104]: df['counts'] = df.groupby(['Color'])['Value'].transform('count')
+            # In [104]: df['couts'] = df.groupby(['Color'])['Value'].transform('count')
             #
             # In [105]: df
             # Out[105]:

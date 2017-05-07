@@ -873,7 +873,7 @@ def powerCompute_df(df, dtype='d', end=None, dl=None, filter='y',talib=False,new
     else:
         code_l = df.index.tolist()
         statuslist = False
-    if 'boll' in df[:1].columns:
+    if not isinstance(df,list) and 'boll' in df[:1].columns:
             if df[:1].boll.values <> 0:
                 print "PcA:%0.2f"%(time.time()-ts),
                 return df
@@ -909,7 +909,7 @@ def powerCompute_df(df, dtype='d', end=None, dl=None, filter='y',talib=False,new
         else:
             dz = tdd.get_sina_data_df(code)
 #        print dz.open.values
-        if len(dz) > 0 and dz.buy.values > 0:
+        if len(dz) > 0 and (dz.buy.values > 0 or dz.sell.values > 0):
             tdx_df = tdd.get_tdx_append_now_df_api(code, start=start, end=end, type='f', df=None, dm=dz, dl=dl*2,newdays=newdays)
             # print tdx_df
             tdx_df=tdx_df.fillna(0)
@@ -1003,7 +1003,7 @@ def powerCompute_df(df, dtype='d', end=None, dl=None, filter='y',talib=False,new
             df.loc[code,'category'] = 0
         df=df.fillna(0)
         # df = getab.Get_BBANDS(df, dtype='d')
-        #'volume', 'ratio', 'counts','ldate' -> 'ma','macd','rsi','kdj'
+        #'volume', 'ratio', 'couts','ldate' -> 'ma','macd','rsi','kdj'
         # df = df.drop_duplicates()
     df = df.fillna(0)
     df.loc[:, 'fibl'] = df.loc[:, 'fibl'].astype(int)
@@ -1052,14 +1052,16 @@ def maintest(code, start=None, type='m', filter='y'):
 
 
 if __name__ == "__main__":
-    op, ra, st, days = get_linear_model_status('999999', filter='y', dl=14, ptype='low')
-    print days[0]
+    # op, ra, st, days = get_linear_model_status('999999', filter='y', dl=14, ptype='low')
+    # print days[0]
+    
     # print get_linear_model_status('600671', filter='y', dl=10, ptype='high')
     # print get_linear_model_status('600671', filter='y', start='20160329', ptype='low')
     # print get_linear_model_status('600671', filter='y', start='20160329', ptype='high')
     # print get_linear_model_status('999999', filter='y', dl=30, ptype='high')
     # print get_linear_model_status('999999', filter='y', dl=30, ptype='low')
-    # print powerCompute_df(['600506','000938','002171'], dtype='d',end=None, dl=21, filter='y')
+    # powerCompute_df(top_temp,dl=ct.PowerCountdl,talib=True)
+    print powerCompute_df(['600506','000938','002171'], dtype='d',end=None, dl=ct.PowerCountdl, talib=True,filter='y')
     # # print powerCompute_df(['601198', '002791', '000503'], dtype='d', end=None, dl=30, filter='y')
     # print get_linear_model_status('999999', filter='y', dl=34, ptype='low', days=1)
     # print get_linear_model_status('399006', filter='y', dl=34, ptype='low', days=1)

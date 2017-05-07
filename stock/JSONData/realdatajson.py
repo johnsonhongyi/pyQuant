@@ -462,15 +462,15 @@ def get_sina_dd_count_price_realTime(df='',mtype='all',vol='0',type='0'):
         df = get_sina_all_json_dd(vol,type)
 
     if len(df)>0:
-        df['counts']=df.groupby(['code'])['code'].transform('count')
+        df['couts']=df.groupby(['code'])['code'].transform('count')
         # df=df[(df['kind'] == 'U')]
-        df=df.sort_values(by='counts',ascending=0)
+        df=df.sort_values(by='couts',ascending=0)
         df=df.drop_duplicates('code')
         # df=df[df.price >df.prev_price]
-        df = df.loc[:, ['code', 'name', 'counts', 'prev_price']]
+        df = df.loc[:, ['code', 'name', 'couts', 'prev_price']]
         log.info("df.market:%s" % df[:1])
 
-        # dz.loc['sh600110','counts']=dz.loc['sh600110'].values[1]+3
+        # dz.loc['sh600110','couts']=dz.loc['sh600110'].values[1]+3
         df=df.set_index('code')
         # df=df.iloc[0:,0:2]
         df['diff']=0
@@ -627,38 +627,38 @@ def get_market_price_sina_dd_realTime(dp='',vol='0',type='0'):
         dp['diff']=0
         df=get_sina_all_json_dd(vol,type)
         if len(df)>10:
-            # df['counts']=0
-            df['counts']=df.groupby(['code'])['code'].transform('count')
+            # df['couts']=0
+            df['couts']=df.groupby(['code'])['code'].transform('count')
             # df=df[(df['kind'] == 'U')]
-            df=df.sort_values(by='counts',ascending=0)
+            df=df.sort_values(by='couts',ascending=0)
             df=df.drop_duplicates('code')
             # df=df[df.price >df.prev_price]
             log.info("sina-DD:%s" % df[:1])
-            df = df.loc[:, ['name', 'counts', 'kind', 'prev_price']]
-            # print df[df.counts>0][:2]
+            df = df.loc[:, ['name', 'couts', 'kind', 'prev_price']]
+            # print df[df.couts>0][:2]
             dm=pd.merge(dp,df,on='name',how='left')
             log.info("dmMerge:%s"%dm[:1])
-            # print dm[dm.counts>0][:2]
-            dm.counts=dm.counts.fillna(0)
+            # print dm[dm.couts>0][:2]
+            dm.couts=dm.couts.fillna(0)
             dm.prev_price=dm.prev_price.fillna(0.0)
-            dm.counts=dm.counts.astype(int)
+            dm.couts=dm.couts.astype(int)
             dm=dm.drop_duplicates('code')
             dm=dm.set_index('code')
             dm.rename(columns={'prev_price': 'prev_p'}, inplace=True)
-            # print dm.sort_values(by=['counts','percent','diff','ratio'],ascending=[0,0,0,1])[:2]
+            # print dm.sort_values(by=['couts','percent','diff','ratio'],ascending=[0,0,0,1])[:2]
             # dm=dm.fillna(int(0))
             # dm.ratio=dm.ratio
             # dm=dm.loc[:,ct.SINA_Market_Clean_UP_Columns]
         else:
             dp=dp.set_index('code')
-            dp['counts'] = 0
+            dp['couts'] = 0
             dp['prev_p'] = 0
             dm = dp
             # dm=dp.loc[:,ct.SINA_Market_Clean_Columns]
             # dm=dp.loc[:,ct.SINA_Market_Clean_UP_Columns]
             # dm['prev_p']=0.0
-                    # ['name','buy','diff','percent','ratio','high','open','volume','low','counts']
-                    #['name','buy','diff','percent','trade','high','ratio','volume','counts']
+                    # ['name','buy','diff','percent','ratio','high','open','volume','low','couts']
+                    #['name','buy','diff','percent','trade','high','ratio','volume','couts']
 
     else:
         dm=''

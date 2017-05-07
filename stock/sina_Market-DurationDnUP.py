@@ -138,6 +138,7 @@ if __name__ == "__main__":
                 if len(top_all) == 0 and len(lastpTDX_DF) == 0:
                     time_Rt = time.time()
                     top_all,lastpTDX_DF = tdd.get_append_lastp_to_df(top_now, lastpTDX_DF=None, dl=duration_date,end=end_date,ptype=ptype,filter=filter, power=ct.lastPower, lastp=lastp,newdays=newdays)
+                    # top_all,lastpTDX_DF = tdd.get_append_lastp_to_df(top_now, lastpTDX_DF=None, dl=duration_date,end=end_date,ptype=ptype,filter=filter, power=ct.lastPower, lastp=lastp)
                     # codelist = top_all.index.tolist()
                     # log.info('toTDXlist:%s' % len(codelist))
                     # # tdxdata = tdd.get_tdx_all_day_LastDF(codelist,dt=duration_date,ptype=ptype)
@@ -168,12 +169,12 @@ if __name__ == "__main__":
                     # log.info('Top-merge_now:%s' % (top_all[:1]))
 
                 else:
-                    if 'counts' in top_now.columns.values:
-                        if not 'counts' in top_all.columns.values:
-                            top_all['counts'] = 0
+                    if 'couts' in top_now.columns.values:
+                        if not 'couts' in top_all.columns.values:
+                            top_all['couts'] = 0
                             top_all['prev_p'] = 0
                     for symbol in top_now.index:
-                        if 'counts' in top_now.columns.values:
+                        if 'couts' in top_now.columns.values:
                             top_all.loc[symbol, ct.columns_now] = top_now.loc[symbol, ct.columns_now]
                         else:
                             # top_now.loc[symbol, 'diff'] = round(
@@ -248,8 +249,8 @@ if __name__ == "__main__":
                         if cct.get_now_time_int() > 925 and cct.get_work_time():
                             top_dif = top_dif[(top_dif.volume > ct.VolumeMinR) & (top_dif.volume < ct.VolumeMaxR)]
                         # top_dif = top_dif[top_dif.lvol > 12000]
-                        if 'counts' in top_dif.columns.values:
-                            top_dif = top_dif.sort_values(by=['diff', 'percent', 'volume', 'counts', 'ratio'],
+                        if 'couts' in top_dif.columns.values:
+                            top_dif = top_dif.sort_values(by=['diff', 'percent', 'volume', 'couts', 'ratio'],
                                                           ascending=[0, 0, 0, 1, 1])
                         else:
                             top_dif = top_dif.sort_values(by=['diff', 'percent', 'ratio'], ascending=[0, 0, 1])
@@ -257,13 +258,13 @@ if __name__ == "__main__":
                         # top_dif['diff'] = top_dif['diff'].apply(lambda x: x * 2 if x > 0 else x)
                         top_dif = top_dif[top_dif.lvol > ct.LvolumeSize]
                         top_dif['diff']=top_dif['diff'].apply(lambda x:x*2 if x < 0 else x )
-                        if 'counts' in top_dif.columns.values:
-                            top_dif = top_dif.sort_values(by=['diff', 'percent', 'volume', 'counts', 'ratio'],
+                        if 'couts' in top_dif.columns.values:
+                            top_dif = top_dif.sort_values(by=['diff', 'percent', 'volume', 'couts', 'ratio'],
                                                           ascending=[1, 0, 0, 1, 1])
                         else:
                             top_dif = top_dif.sort_values(by=['diff', 'percent', 'ratio'], ascending=[1, 0, 1])
 
-                    # top_all=top_all.sort_values(by=['percent','diff','counts','ratio'],ascending=[0,0,1,1])
+                    # top_all=top_all.sort_values(by=['percent','diff','couts','ratio'],ascending=[0,0,1,1])
                     # print rl.format_for_print(top_dif[:10])
                     # top_dd = pd.concat([top_dif[:5],top_temp[:3],top_dif[-3:],top_temp[-3:]], axis=0)
                     if percent_status == 'y' and (
@@ -486,6 +487,7 @@ if __name__ == "__main__":
                         pass
             else:
                 print "input error:%s"%(st)
+                sys.exit(0)
         except (IOError, EOFError, Exception) as e:
 #            print "Error", e
             traceback.print_exc()

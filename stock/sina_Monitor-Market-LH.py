@@ -153,17 +153,17 @@ if __name__ == "__main__":
 
 
                 else:
-                    if 'counts' in top_now.columns.values:
-                        if not 'counts' in top_all.columns.values:
-                            top_all['counts'] = 0
+                    if 'couts' in top_now.columns.values:
+                        if not 'couts' in top_all.columns.values:
+                            top_all['couts'] = 0
                             top_all['prev_p'] = 0
                     for symbol in top_now.index:
                         if symbol in top_all.index and top_now.loc[symbol, 'buy'] <> 0:
                             # if top_all.loc[symbol,'diff'] == 0:
-                            # if status_change and 'counts' in top_now.columns.values:
-                            if 'counts' in top_now.columns.values:
+                            # if status_change and 'couts' in top_now.columns.values:
+                            if 'couts' in top_now.columns.values:
                                 # top_now.loc[symbol,'lastp']=top_all.loc[symbol,'lastp']
-                                # top_all.loc[symbol, 'buy':'counts'] = top_now.loc[symbol, 'buy':'counts']
+                                # top_all.loc[symbol, 'buy':'couts'] = top_now.loc[symbol, 'buy':'couts']
                                 top_all.loc[symbol, 'buy':'prev_p'] = top_now.loc[
                                     symbol, 'buy':'prev_p']
                             else:
@@ -233,14 +233,14 @@ if __name__ == "__main__":
                     # if cct.get_now_time_int() > 915 and cct.get_now_time_int() <= 926:
                         # top_dif['percent']= (map(lambda x, y: round((x-y)/y*100,1) if int(y) > 0 else 0, top_dif.buy, top_dif.llastp))
 
-                    if 'counts' in top_dif.columns.values:
+                    if 'couts' in top_dif.columns.values:
                         top_dif = top_dif.sort_values(by=ct.MonitorMarket_sort_count,ascending=[0, 0, 0, 1, 0])
                     else:
                         # print "Good Morning!!!"
                         top_dif = top_dif.sort_values(
                             by=['diff', 'percent', 'ratio'], ascending=[0, 0, 1])
 
-                    # top_all=top_all.sort_values(by=['percent','diff','counts','ratio'],ascending=[0,0,1,1])
+                    # top_all=top_all.sort_values(by=['percent','diff','couts','ratio'],ascending=[0,0,1,1])
 
                     top_temp = top_dif[:ct.PowerCount].copy()
                     top_temp = pct.powerCompute_df(top_temp, dl=ct.PowerCountdl,talib=True)
@@ -370,6 +370,7 @@ if __name__ == "__main__":
                 # cct.sleep(2)
             else:
                 print "input error:%s"%(st)
+                sys.exit(0)
         except (IOError, EOFError, Exception) as e:
             print "Error::", e
             #traceback.print_exc()

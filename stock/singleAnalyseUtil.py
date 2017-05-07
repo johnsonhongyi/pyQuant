@@ -585,6 +585,7 @@ if __name__ == '__main__':
                 evalcmd(dir_mo)
             else:
                 print "input error:%s"%(st)
+                sys.exit(0)
                 # cct.sleep(0.5)
                 # if success > 3:
                 #     raw_input("Except")

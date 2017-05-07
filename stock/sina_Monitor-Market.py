@@ -119,22 +119,22 @@ if __name__ == "__main__":
                     time_Rt = time.time()
                     top_all = tdd.get_append_lastp_to_df(top_now,lastpTDX_DF)
                 else:
-                    if 'counts' in top_now.columns.values:
-                        if not 'counts' in top_all.columns.values:
-                            top_all['counts'] = 0
+                    if 'couts' in top_now.columns.values:
+                        if not 'couts' in top_all.columns.values:
+                            top_all['couts'] = 0
                             top_all['prev_p'] = 0
                     
                     for symbol in top_now.index:
                         # code = rl._symbol_to_code(symbol)
                         if symbol in top_all.index and top_now.loc[symbol, 'buy'] <> 0:
                             # top_now.loc[symbol, 'diff'] = round(((float(top_now.loc[symbol, 'buy']) - float(top_all.loc[symbol, 'lastp'])) / float(top_all.loc[symbol, 'lastp']) * 100), 1)
-                            if 'counts' in top_now.columns.values:
+                            if 'couts' in top_now.columns.values:
                                     top_all.loc[symbol, ct.columns_now] = top_now.loc[symbol, ct.columns_now]
                             else:
                                 top_all.loc[symbol, ct.columns_now] = top_now.loc[symbol, ct.columns_now]
 
-                # top_all=top_all.sort_values(by=['diff','percent','counts'],ascending=[0,0,1])
-                # top_all=top_all.sort_values(by=['diff','ratio','percent','counts'],ascending=[0,1,0,1])
+                # top_all=top_all.sort_values(by=['diff','percent','couts'],ascending=[0,0,1])
+                # top_all=top_all.sort_values(by=['diff','ratio','percent','couts'],ascending=[0,1,0,1])
 
                 # top_all = top_all[top_all.open>=top_all.low*0.99]
                 # top_all = top_all[top_all.buy >= top_all.open*0.99]
@@ -196,14 +196,14 @@ if __name__ == "__main__":
                 # df['volume']= df['volume'].apply(lambda x:x/100)
 
 
-                if 'counts' in top_dif.columns.values:
+                if 'couts' in top_dif.columns.values:
                     top_dif = top_dif.sort_values(by=ct.MonitorMarket_sort_count,
                                                   ascending=[0, 0, 0, 1, 1])
                 else:
                     # print "Good Morning!!!"
                     top_dif = top_dif.sort_values(by=['diff', 'percent', 'ratio'], ascending=[0, 0, 1])
 
-                # top_all=top_all.sort_values(by=['percent','diff','counts','ratio'],ascending=[0,0,1,1])
+                # top_all=top_all.sort_values(by=['percent','diff','couts','ratio'],ascending=[0,0,1,1])
 
                 top_temp = top_dif[:ct.PowerCount].copy()
                 top_temp = pct.powerCompute_df(top_temp, dl=ct.PowerCountdl)
@@ -325,6 +325,7 @@ if __name__ == "__main__":
                         pass
             else:
                 print "input error:%s"%(st)
+                sys.exit(0)
         except (IOError, EOFError, Exception) as e:
             print "Error", e
 
