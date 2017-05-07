@@ -4,8 +4,8 @@ sys.path.append("..")
 
 import numpy as np
 import pandas as pd
-import statsmodels.api as sm
 from statsmodels import regression
+import statsmodels.api as sm
 from pylab import plt, mpl
 from matplotlib.dates import num2date, date2num
 from matplotlib.lines import Line2D
@@ -371,7 +371,8 @@ def get_linear_model_status(code, df=None, dtype='d', type='m', start=None, end=
                 code, ptype=ptype, dl=dl, filter=False, df=df,power=power)
         # print start,index_d,ptype
         log.debug("dl not None code:%s start: %s  index_d:%s" % (code, start, index_d))
-
+    if index_d == cct.get_today() or start == cct.get_today():
+        return -11, -11, cct.get_today(), [0,pd.DataFrame()]
     if len(df) > 0 and  df is not None:
         df = df.sort_index(ascending=True)
         df = df[df.index >= start]
@@ -908,7 +909,7 @@ def powerCompute_df(df, dtype='d', end=None, dl=None, filter='y',talib=False,new
             dz = dm.loc[code].to_frame().T
         else:
             dz = tdd.get_sina_data_df(code)
-#        print dz.open.values
+
         if len(dz) > 0 and (dz.buy.values > 0 or dz.sell.values > 0):
             tdx_df = tdd.get_tdx_append_now_df_api(code, start=start, end=end, type='f', df=None, dm=dz, dl=dl*2,newdays=newdays)
             # print tdx_df
@@ -938,6 +939,8 @@ def powerCompute_df(df, dtype='d', end=None, dl=None, filter='y',talib=False,new
         # fib = []
         fibl = 0
         fib = 0
+        if len(tdx_df) < 2:
+            continue
         # sep = '|'
         for ptype in ['low', 'high']:
             op, ra, st, daysData  = get_linear_model_status(
@@ -1061,7 +1064,11 @@ if __name__ == "__main__":
     # print get_linear_model_status('999999', filter='y', dl=30, ptype='high')
     # print get_linear_model_status('999999', filter='y', dl=30, ptype='low')
     # powerCompute_df(top_temp,dl=ct.PowerCountdl,talib=True)
+    # import sina_data
+    # codelist = sina_data.Sina().market('cyb').code.tolist()
+    # print codelist
     print powerCompute_df(['600506','000938','002171'], dtype='d',end=None, dl=ct.PowerCountdl, talib=True,filter='y')
+    # powerCompute_df(codelist, dtype='d',end=None, dl=ct.PowerCountdl, talib=True,filter='y')
     # # print powerCompute_df(['601198', '002791', '000503'], dtype='d', end=None, dl=30, filter='y')
     # print get_linear_model_status('999999', filter='y', dl=34, ptype='low', days=1)
     # print get_linear_model_status('399006', filter='y', dl=34, ptype='low', days=1)

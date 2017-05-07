@@ -1927,7 +1927,18 @@ def get_duration_price_date(code, ptype='low', dt=None, df=None, dl=None, end=No
         else:
             dz = df
         if not filter:
-            index_d = dz[:1].index.values[0]
+            if len(dz) > 0:
+                index_d = dz[:1].index.values[0]
+            else:
+                index_d = cct.get_today()
+                lowdate = cct.get_today()
+                log.error("code:%s dz:%s"%(code,dz))
+                if filter:
+                    return lowdate
+                elif not power:
+                    return lowdate,index_d
+                else:
+                    return lowdate, index_d, pd.DataFrame()
     else:
         dz=df
     if len(dz) > 0:
