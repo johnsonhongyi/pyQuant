@@ -264,11 +264,15 @@ def get_wencai_data(dm,market='wencai',days=120):
                     df = df.drop_duplicates()
                     return df
             else:
-                for x in dm.index:
-                    if not x in df.code.values:
-                        print x,dm[x],
+                # diffcode = map( lambda x: x,set(dm.index) - (set(dm.index) & set(df.code.values)))
+                diff_code = [x for x in set(dm.index) - (set(dm.index) & set(df.code.values))]
+                dm.drop([col for col in dm.index if col not in diff_code], axis=0, inplace=True)
+                # for x in diff_code:
+                #     if not x in df.code.values:
+                #         print x,dm[x],
         wcd_d = get_codelist_df(dm.tolist())
-        df = get_write_wencai_market_to_csv(wcd_d,market=market,renew=True,days=days)
+        if len(wcd_d) > 0:
+            df = get_write_wencai_market_to_csv(wcd_d,market=market,renew=True,days=days)
 
     else:
         df = get_wencai_Market_url(dm.name)

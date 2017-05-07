@@ -883,7 +883,8 @@ def powerCompute_df(df, dtype='d', end=None, dl=None, filter='y',talib=False,new
         df = dm
 
 #    cname = ",".join(x for x in dm.name)
-    wcdf = wcd.get_wencai_data(dm.name,'wencai')
+    dmname = dm.name
+    wcdf = wcd.get_wencai_data(dmname,'wencai')
 #    wcdf = wcd.get_codelist_df(dm.name.tolist())
 
     wcdf_code = wcdf.index.tolist()
@@ -1064,11 +1065,12 @@ if __name__ == "__main__":
     # print get_linear_model_status('999999', filter='y', dl=30, ptype='high')
     # print get_linear_model_status('999999', filter='y', dl=30, ptype='low')
     # powerCompute_df(top_temp,dl=ct.PowerCountdl,talib=True)
+   
     # import sina_data
     # codelist = sina_data.Sina().market('cyb').code.tolist()
-    # print codelist
-    print powerCompute_df(['600506','000938','002171'], dtype='d',end=None, dl=ct.PowerCountdl, talib=True,filter='y')
+    print powerCompute_df(['300650','000938','002171'], dtype='d',end=None, dl=ct.PowerCountdl, talib=True,filter='y')
     # powerCompute_df(codelist, dtype='d',end=None, dl=ct.PowerCountdl, talib=True,filter='y')
+    
     # # print powerCompute_df(['601198', '002791', '000503'], dtype='d', end=None, dl=30, filter='y')
     # print get_linear_model_status('999999', filter='y', dl=34, ptype='low', days=1)
     # print get_linear_model_status('399006', filter='y', dl=34, ptype='low', days=1)
