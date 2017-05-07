@@ -114,6 +114,7 @@ def get_rzrq_code(market='all'):
         cxzx = base +  market + '.csv'
         dfot = pd.read_csv(cxzx,dtype={'code':str},sep='\t',encoding ='gbk')
         dd = dfot.loc[:,['code','name']]
+    print "rz:%s"%(len(dd)),
     return dd
 
 def get_tushare_market(market='zxb',renew=False,days=5):

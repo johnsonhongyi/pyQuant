@@ -249,6 +249,7 @@ if __name__ == "__main__":
                     cct.set_console(width, height,
                         title=['dT:%s' % cct.get_time_to_date(time_s), 'G:%s' % len(top_dif), 'zxg: %s' % (blkname)])
 
+                    top_all = tdd.get_powerdf_to_all(top_all,top_temp)
                     top_temp = stf.getBollFilter(df=top_temp, boll=ct.bollFilter,duration=ct.PowerCountdl)
                     print("A:%s N:%s K:%s %s G:%s" % (
                         df_count, now_count, len(top_all[top_all['buy'] > 0]),

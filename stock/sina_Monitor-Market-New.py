@@ -143,9 +143,9 @@ if __name__ == "__main__":
                         if symbol in top_all.index and top_now.loc[symbol, 'buy'] <> 0:
                             # top_now.loc[symbol, 'diff'] = round(((float(top_now.loc[symbol, 'buy']) - float(top_all.loc[symbol, 'lastp'])) / float(top_all.loc[symbol, 'lastp']) * 100), 1)
                             if 'counts' in top_now.columns.values:
-                                    top_all.loc[symbol, 'open':'prev_p'] = top_now.loc[symbol, 'open':'prev_p']
+                                    top_all.loc[symbol, ct.columns_now] = top_now.loc[symbol, ct.columns_now]
                             else:
-                                top_all.loc[symbol, 'open':'diff'] = top_now.loc[symbol, 'open':'diff']
+                                top_all.loc[symbol, ct.columns_now] = top_now.loc[symbol, ct.columns_now]
 
                 # top_all=top_all.sort_values(by=['diff','percent','counts'],ascending=[0,0,1])
                 # top_all=top_all.sort_values(by=['diff','ratio','percent','counts'],ascending=[0,1,0,1])
@@ -230,6 +230,7 @@ if __name__ == "__main__":
                     cct.set_console(width, height,
                         title=['dT:%s' % cct.get_time_to_date(time_s), 'G:%s' % len(top_dif), 'zxg: %s' % (blkname)])
                    
+                    top_all = tdd.get_powerdf_to_all(top_all,top_temp)
                     top_temp = stf.getBollFilter(df=top_temp, boll=ct.bollFilter,duration=ct.PowerCountdl)
                     print ("A:%s N:%s K:%s %s G:%s" % (
                         df_count, now_count, len(top_all[top_all['buy'] > 0]),

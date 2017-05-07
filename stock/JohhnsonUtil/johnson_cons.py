@@ -123,7 +123,11 @@ MonitorMarket_format_trade=['name', 'trade', 'ma5d', 'boll','diff','df2','percen
 
 
 
-
+columns_now = [u'open', u'llastp', u'close', u'trade', u'high', u'low',\
+                                           u'buy', u'sell', u'volume', u'turnover', u'b1_v', u'b1', u'b2_v', u'b2',\
+                                           u'b3_v', u'b3', u'b4_v', u'b4', u'b5_v', u'b5', u'a1_v', u'a1', u'a2_v',\
+                                           u'a2', u'a3_v', u'a3', u'a4_v', u'a4', u'a5_v', u'a5', u'percent',\
+                                           u'ratio', u'diff', u'counts', u'kind', u'prev_p']
 
 DD_TYPE_List={'0':'5','1':'10','2':'20','3':'50','4':'100'}
 P_TYPE = {'http': 'http://', 'ftp': 'ftp://'}

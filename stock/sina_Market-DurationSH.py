@@ -51,7 +51,7 @@ def evalcmd(dir_mo):
                     print eval(cmd)
                 print ''
             except Exception, e:
-                print e 
+                print e
                 # evalcmd(dir_mo)
                 # break
 
@@ -168,14 +168,15 @@ if __name__ == "__main__":
                             top_all['prev_p'] = 0
                     for symbol in top_all.index:
                         if symbol in top_now.index:
+                            
                             if 'counts' in top_now.columns.values:
-                                top_all.loc[symbol, 'open':'prev_p'] = top_now.loc[symbol, 'open':'prev_p']
+                                top_all.loc[symbol, ct.columns_now] = top_now.loc[symbol, ct.columns_now]
                             else:
                                 # top_now.loc[symbol, 'diff'] = round(
                                 # ((float(top_now.loc[symbol, 'buy']) - float(
                                 # top_all.loc[symbol, 'lastp'])) / float(top_all.loc[symbol, 'lastp']) * 100),
                                 # 1)
-                                top_all.loc[symbol, 'open':'diff'] = top_now.loc[symbol, 'open':'diff']
+                                top_all.loc[symbol, ct.columns_now] = top_now.loc[symbol, ct.columns_now]
                                 # top_all.loc[symbol, 'buy'] = top_now.loc[symbol, 'buy']
                 # top_all = top_all[top_all.buy > 0]
                 top_dif = top_all.copy()
@@ -292,6 +293,8 @@ if __name__ == "__main__":
                                     title=[du_date, 'dT:%s' % cct.get_time_to_date(time_s), 'G:%s' % goldstock,
                                            'zxg: %s' % (blkname)])
 
+                    top_all = tdd.get_powerdf_to_all(top_all,top_temp)
+                    top_all = tdd.get_powerdf_to_all(top_all,top_end)
                     top_temp = stf.getBollFilter(df=top_temp, boll=ct.bollFilter,duration=ct.PowerCountdl)
                     print ("N:%s K:%s %s G:%s" % (
                         now_count, len(top_all[top_all['buy'] > 0]),
@@ -325,7 +328,7 @@ if __name__ == "__main__":
                                         # ascending=ct.Duration_percentdn_op_key)
                             top_temp = top_temp.sort_values(by=ct.Duration_percentdn_percent,
                                         ascending=ct.Duration_percentdn_percent_key)
-                            
+
                     if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935:
                         # top_temp = top_temp[top_temp['ma5d'] > top_temp['ma10d']][:10]
                         # top_temp = top_temp[ (top_temp['ma5d'] > top_temp['ma10d']) & (top_temp['buy'] > top_temp['ma10d']) ][:10]

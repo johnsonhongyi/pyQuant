@@ -2404,10 +2404,13 @@ def get_powerdf_to_all(top_all,powerdf):
     # codelist = top_all.index.tolist()
     # all_t = top_all.reset_index()
     # p_t = powerdf.reset_index()
-    # top_dif['buy'] = (map(lambda x, y: y if int(x) == 0 else x, top_dif['buy'].values, top_dif['trade'].values))    
+    # top_dif['buy'] = (map(lambda x, y: y if int(x) == 0 else x, top_dif['buy'].values, top_dif['trade'].values))
     time_s = time.time()
+    columns_list = ['ra', 'op', 'fib', 'ma5d','ma10d', 'ldate', 'ma20d', 'ma60d', 'oph', \
+                    'rah', 'fibl', 'boll', 'kdj','macd','rsi', 'ma', 'vstd', 'lvolume', 'category', 'df2']
+#    columns_list = [col for col in powerdf.columns if col in top_all.columns]
     if not 'boll' in top_all.columns:
-        p_t = powerdf.loc[:,'ra':'df2']
+        p_t = powerdf.loc[:,columns_list]
         # top_all.drop('column_name', axis=1, inplace=True)
         # top_all.drop([''], axis = 1, inplace = True, errors = 'ignore')
         top_all_co = top_all.columns
@@ -2415,13 +2418,18 @@ def get_powerdf_to_all(top_all,powerdf):
         top_all = top_all.merge(p_t, left_index=True, right_index=True, how='left')
         top_all = top_all.fillna(0)
     else:
-        p_t = powerdf.loc[:,'ra':'df2']
+        # p_t = powerdf.loc[:,'ra':'df2']
+        po_inx = powerdf.index
+        top_all.drop([inx for inx in powerdf.index  if inx in top_all.index], axis=0, inplace=True)
         # p_t = powerdf.iloc[:,57:69]
         # 'oph', u'rah', u'fibl', u'boll', u'kdj',u'macd', u'rsi', u'ma', u'vstd', u'lvolume', u'category'
-        for symbol in p_t.index:
-            if symbol in top_all.index:
-                # top_all.loc[symbol, 'oph':'category'] = p_t.loc[symbol, 'oph':'category']
-                top_all.loc[symbol, 'ra':'df2'] = p_t.loc[symbol, 'ra':'df2']
+        # top_all = top_all.merge(p_t, left_index=True, right_index=True, how='left')
+        top_all = pd.concat([top_all, powerdf],axis=0)
+        # top_dd = pd.concat([top_temp[:10], top_end], axis=0)
+        # for symbol in p_t.index:
+        #     if symbol in top_all.index:
+        #         # top_all.loc[symbol, 'oph':'category'] = p_t.loc[symbol, 'oph':'category']
+        #         top_all.loc[symbol, 'ra':'df2'] = p_t.loc[symbol, 'ra':'df2']
     print "Pta:%0.2f"%(time.time()-time_s),
     return top_all
 

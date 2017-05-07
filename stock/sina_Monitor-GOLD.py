@@ -259,6 +259,7 @@ if __name__ == "__main__":
                 cct.set_console(width, height,
                     title=['dT:%s' % cct.get_time_to_date(time_s), 'G:%s' % len(top_all), 'zxg: %s' % (blkname)])
                 
+                top_all = tdd.get_powerdf_to_all(top_all,top_temp)
                 top_temp = stf.getBollFilter(df=top_temp, boll=1)
                 print "G:%s Rt:%0.1f dT:%s N:%s T:%s" % (goldstock,float(time.time() - time_Rt),cct.get_time_to_date(time_s),cct.get_now_time(),len(top_temp))
                 if 'op' in top_temp.columns:

@@ -190,7 +190,7 @@ class Sina:
             #     print i
             #     a += i
             #     print a
-            log.debug('all:%s' % len(self.stock_list))
+            print ('all:%s' % len(self.stock_codes)),
             # log.error('all:%s req:%s' %
             #           (len(self.stock_list), len(self.stock_list)))
             return self.get_stock_data()        
