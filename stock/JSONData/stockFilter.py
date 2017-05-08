@@ -27,22 +27,22 @@ def getBollFilter(df=None,boll=5,duration=ct.PowerCountdl,filter=True,ma5d=True,
     #     df = df[df.buy > df.lmin]
     # ra * fibl + rah*fib +ma +kdj+rsi
 #    time_s = time.time()
-    # df['diff'] = (map(lambda x, y: round((x - y) / y * 100, 1), df['buy'].values, df['lastp'].values))
+    # df['dff'] = (map(lambda x, y: round((x - y) / y * 100, 1), df['buy'].values, df['lastp'].values))
     # a = range(1,4)
     # b = range(3,6)
     # c = range(2,5)
     # (map(lambda ra,fibl,rah:(ra * fibl + rah),\
     #                      a,b,c ))
 
-#    df['diff'] = (map(lambda ra, fibl,rah,:round(float(ra) * float(fibl) + float(rah),2),df['ra'].values, df['fibl'].values,df['rah'].values))
+#    df['dff'] = (map(lambda ra, fibl,rah,:round(float(ra) * float(fibl) + float(rah),2),df['ra'].values, df['fibl'].values,df['rah'].values))
 
-#    df['diff'] = (map(lambda ra, fibl,rah,fib,ma,kdj,rsi:round(ra * fibl + rah*fib +ma +kdj+rsi),\
+#    df['dff'] = (map(lambda ra, fibl,rah,fib,ma,kdj,rsi:round(ra * fibl + rah*fib +ma +kdj+rsi),\
 #                         df['ra'].values, df['fibl'].astype(float).values,df['rah'].values,df['fib'].astype(float).values,df['ma'].values,\
 #                         df['kdj'].values,df['rsi'].values))
-    # df['diff2'] = df['diff'].copy()
+    # df['diff2'] = df['dff'].copy()
     pd.options.mode.chained_assignment = None
-    # df.rename(columns={'diff': 'df2'}, inplace=True)
-    # df['diff2'] = df['diff']
+    # df.rename(columns={'dff': 'df2'}, inplace=True)
+    # df['diff2'] = df['dff']
     
     # df['df2'] = (map(lambda ra, fibl,rah,fib,ma,kdj,rsi:round(eval(ct.powerdiff%(duration)),1),\
     #                      df['ra'].values, df['fibl'].values,df['rah'].values,df['fib'].values,df['ma'].values,\

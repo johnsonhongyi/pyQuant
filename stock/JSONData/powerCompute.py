@@ -371,7 +371,7 @@ def get_linear_model_status(code, df=None, dtype='d', type='m', start=None, end=
                 code, ptype=ptype, dl=dl, filter=False, df=df,power=power)
         # print start,index_d,ptype
         log.debug("dl not None code:%s start: %s  index_d:%s" % (code, start, index_d))
-    if index_d == cct.get_today() or start == cct.get_today():
+    if start != index_d and start == cct.get_today():
         return -11, -11, cct.get_today(), [0,pd.DataFrame()]
     if len(df) > 0 and  df is not None:
         df = df.sort_index(ascending=True)
@@ -874,10 +874,28 @@ def powerCompute_df(df, dtype='d', end=None, dl=None, filter='y',talib=False,new
     else:
         code_l = df.index.tolist()
         statuslist = False
-    if not isinstance(df,list) and 'boll' in df[:1].columns:
-            if df[:1].boll.values <> 0:
-                print "PcA:%0.2f"%(time.time()-ts),
-                return df
+    if not isinstance(df,list) and 'boll' in df.columns:
+            if 'time' in df.columns:
+                # if df[:1].boll.values <> 0 and time.time()- df[df.time <> 0].time[0] < ct.power_update_time:
+                if len(df[df.time <> 0]) > 0 and df[:1].boll.values <> 0 and time.time() - df[df.time <> 0].time[0] < ct.power_update_time:
+                    print "PcA:%0.2f"%(time.time()-ts),
+                    return df
+            else:
+                if len(df) > 0 and df[:1].boll.values <> 0:
+                    print "PcA:%0.2f"%(time.time()-ts),
+                    return df
+
+    # else:
+    #         if  len(dm) - len(set(dm.index) & set(df.code.values)) < 10 :
+    #             if 'code' in df.columns:
+    #                 df = df.set_index('code')
+    #                 df = df.drop_duplicates()
+    #                 return df
+    #         else:
+    #             # diffcode = map( lambda x: x,set(dm.index) - (set(dm.index) & set(df.code.values)))
+    #             diff_code = [x for x in set(dm.index) - (set(dm.index) & set(df.code.values))]
+    #             dm.drop([col for col in dm.index if col not in diff_code], axis=0, inplace=True)
+
     dm = tdd.get_sina_data_df(code_l)
     if statuslist:
         df = dm
@@ -1058,19 +1076,19 @@ def maintest(code, start=None, type='m', filter='y'):
 if __name__ == "__main__":
     # op, ra, st, days = get_linear_model_status('999999', filter='y', dl=14, ptype='low')
     # print days[0]
-    
+
     # print get_linear_model_status('600671', filter='y', dl=10, ptype='high')
     # print get_linear_model_status('600671', filter='y', start='20160329', ptype='low')
     # print get_linear_model_status('600671', filter='y', start='20160329', ptype='high')
     # print get_linear_model_status('999999', filter='y', dl=30, ptype='high')
     # print get_linear_model_status('999999', filter='y', dl=30, ptype='low')
     # powerCompute_df(top_temp,dl=ct.PowerCountdl,talib=True)
-   
+
     # import sina_data
     # codelist = sina_data.Sina().market('cyb').code.tolist()
     print powerCompute_df(['300650','000938','002171'], dtype='d',end=None, dl=ct.PowerCountdl, talib=True,filter='y')
     # powerCompute_df(codelist, dtype='d',end=None, dl=ct.PowerCountdl, talib=True,filter='y')
-    
+
     # # print powerCompute_df(['601198', '002791', '000503'], dtype='d', end=None, dl=30, filter='y')
     # print get_linear_model_status('999999', filter='y', dl=34, ptype='low', days=1)
     # print get_linear_model_status('399006', filter='y', dl=34, ptype='low', days=1)

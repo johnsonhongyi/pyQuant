@@ -1560,8 +1560,9 @@ def getSinaAlldf(market='cyb',vol=ct.json_countVol,type=ct.json_countType,filena
         dm =  dm.set_index('code')
         top_now = dm
         top_now['couts'] = 0
-        top_now['diff'] = 0
+        top_now['dff'] = 0
         top_now['prev_p'] = 0
+        top_now['kind'] = 0
 
     # print top_now[:1].b1_v
     # print len(top_now),len(dm)
@@ -2444,6 +2445,14 @@ def get_powerdf_to_all(top_all,powerdf):
         #     if symbol in top_all.index:
         #         # top_all.loc[symbol, 'oph':'category'] = p_t.loc[symbol, 'oph':'category']
         #         top_all.loc[symbol, 'ra':'df2'] = p_t.loc[symbol, 'ra':'df2']
+    if 'time' not in top_all.columns:
+#        top_all['time'] = cct.get_now_time_int()
+        top_all['time'] = time.time()
+    else:
+        top_all = top_all.fillna(0)
+        time_t = top_all[top_all.time <> 0].time[0] if len(top_all[top_all.time <> 0]) > 0 else 0
+        if time.time() - time_t > ct.power_update_time:
+            top_all['time'] = time.time()
     print "Pta:%0.2f"%(time.time()-time_s),
     return top_all
 

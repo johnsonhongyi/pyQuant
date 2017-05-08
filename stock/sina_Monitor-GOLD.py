@@ -170,35 +170,35 @@ if __name__ == "__main__":
 
 #                            count_n = top_now.loc[symbol, 'buy']
 #                            count_a = top_all.loc[symbol, 'lastp']
-#                            top_now.loc[symbol, 'diff'] = round((count_n - count_a)/count_a*100,1)
+#                            top_now.loc[symbol, 'dff'] = round((count_n - count_a)/count_a*100,1)
                             # count_n = top_now.loc[symbol, 'couts']
                             # count_a = top_all.loc[symbol, 'couts']
-                            # top_now.loc[symbol, 'diff'] = count_n - count_a
+                            # top_now.loc[symbol, 'dff'] = count_n - count_a
                             # print top_now.columns
-                            # Index([u'name', u'percent', u'diff', u'couts', u'trade', u'high', u'open',
+                            # Index([u'name', u'percent', u'dff', u'couts', u'trade', u'high', u'open',
                             #        u'low', u'ratio', u'volume', u'prev_p'],
                             #       dtype='object')
-                            # Index([u'name', u'percent', u'diff', u'couts', u'volume', u'trade', u'prev_p',
+                            # Index([u'name', u'percent', u'dff', u'couts', u'volume', u'trade', u'prev_p',
                             #        u'ratio'],
                             #       dtype='object')
                             # print top_all.columns
                             # if status_change:
-                            top_all.loc[symbol,['name', 'percent', 'diff', 'couts', 'trade', 'high', 'open', 'low', 'ratio', 'volume',
-                           'prev_p']] = top_now.loc[symbol,['name', 'percent', 'diff', 'couts', 'trade', 'high', 'open', 'low', 'ratio', 'volume',
+                            top_all.loc[symbol,['name', 'percent', 'dff', 'couts', 'trade', 'high', 'open', 'low', 'ratio', 'volume',
+                           'prev_p']] = top_now.loc[symbol,['name', 'percent', 'dff', 'couts', 'trade', 'high', 'open', 'low', 'ratio', 'volume',
                            'prev_p']]
                                 
                             # else:
-                            #     # top_all.loc[symbol, ['percent', 'diff']] = top_now.loc[symbol, ['percent', 'diff']]
+                            #     # top_all.loc[symbol, ['percent', 'dff']] = top_now.loc[symbol, ['percent', 'dff']]
                             #     # top_all.loc[symbol, 'trade':] = top_now.loc[symbol, 'trade':]
-                            #     top_all.loc[symbol,['diff', 'couts', 'trade', 'high', 'open', 'low', 'ratio', 'volume',
-                            #    'prev_p']] = top_now.loc[symbol,['diff', 'couts', 'trade', 'high', 'open', 'low', 'ratio', 'volume',
+                            #     top_all.loc[symbol,['dff', 'couts', 'trade', 'high', 'open', 'low', 'ratio', 'volume',
+                            #    'prev_p']] = top_now.loc[symbol,['dff', 'couts', 'trade', 'high', 'open', 'low', 'ratio', 'volume',
                             #    'prev_p']]
                                 # if not count_n==count_a:
-                                # top_now.loc[symbol,'diff']=round((count_n-count_a),1)
+                                # top_now.loc[symbol,'dff']=round((count_n-count_a),1)
                                 # if status_change:
                                 # top_all.loc[symbol]=top_now.loc[symbol]
                                 # else:
-                                # top_all.loc[symbol,'diff':]=top_now.loc[symbol,'diff':]
+                                # top_all.loc[symbol,'dff':]=top_now.loc[symbol,'dff':]
                                 # else:
                                 # top_all.loc[symbol,'couts':]=top_now.loc[symbol,'couts':]
 
@@ -220,7 +220,7 @@ if __name__ == "__main__":
                     log.debug("top_diff:vol")
                     top_all['volume'] = (
                         map(lambda x, y: round(x / y / radio_t, 1), top_all['volume'].values, top_all['lvol'].values))
-                    top_all['diff'] = (
+                    top_all['dff'] = (
                         map(lambda x, y: round(((float(x) - float(y)) / float(y) * 100), 1),top_all['buy'].values,top_all['lastp'].values))
                     if cct.get_now_time_int() > 915 and cct.get_now_time_int() < ct.checkfilter_end_time:
                         top_all = top_all[top_all.low > top_all.llow * ct.changeRatio]
@@ -231,17 +231,17 @@ if __name__ == "__main__":
                     # if cct.get_now_time_int() > 930 and 'lastp' in top_all.columns:
                     #     top_all = top_all[top_all.trade >= top_all.llastp]
                     # top_all = top_all.loc[:,
-                              # ['name', 'percent', 'ma5d','diff', 'couts', 'volume', 'trade', 'prev_p', 'ratio']]
+                              # ['name', 'percent', 'ma5d','dff', 'couts', 'volume', 'trade', 'prev_p', 'ratio']]
                     # if cct.get_now_time_int() > 1030 and cct.get_now_time_int() < 1400:
                         # top_all = top_all[(top_all.volume > ct.VolumeMinR) & (top_all.volume < ct.VolumeMaxR)]
 
-                # top_all = top_all.sort_values(by=[ 'couts', 'diff','volume', 'ratio'], ascending=[0, 0, 0, 1])
+                # top_all = top_all.sort_values(by=[ 'couts', 'dff','volume', 'ratio'], ascending=[0, 0, 0, 1])
                 top_all = top_all.sort_values(by=ct.Monitor_sort_count, ascending=[0,0, 0, 0, 1])
                 # top_all = top_all.sort_values(by=[ 'couts'], ascending=[0])
-                # top_all=top_all.sort_values(by=['diff','percent','couts','ratio'],ascending=[0,0,1,1])
+                # top_all=top_all.sort_values(by=['dff','percent','couts','ratio'],ascending=[0,0,1,1])
 
-                # top_all=top_all.sort_values(by=['diff','couts'],ascending=[0,0])
-                # top_all=top_all.sort_values(by=['diff','percent','couts','ratio'],ascending=[0,0,1,1])
+                # top_all=top_all.sort_values(by=['dff','couts'],ascending=[0,0])
+                # top_all=top_all.sort_values(by=['dff','percent','couts','ratio'],ascending=[0,0,1,1])
 
 
                 # print top_all
@@ -264,7 +264,7 @@ if __name__ == "__main__":
                 print "G:%s Rt:%0.1f dT:%s N:%s T:%s" % (goldstock,float(time.time() - time_Rt),cct.get_time_to_date(time_s),cct.get_now_time(),len(top_temp))
                 if 'op' in top_temp.columns:
                     # top_temp = top_temp.sort_values(by=['ra','op','couts'],ascending=[0, 0,0])
-                    # top_temp = top_temp.sort_values(by=['diff', 'op', 'ra', 'percent', 'ratio'],
+                    # top_temp = top_temp.sort_values(by=['dff', 'op', 'ra', 'percent', 'ratio'],
                     # top_temp = top_temp.sort_values(by=ct.Monitor_sort_op,
                                     # ascending=ct.Monitor_sort_op_key)
                     # top_temp = top_temp.sort_values(by=ct.Duration_percentdn_ra,
@@ -273,7 +273,7 @@ if __name__ == "__main__":
                     #                 ascending=ct.Duration_percent_op_key)                                    
                     top_temp = top_temp.sort_values(by=ct.Duration_ra_goldop,
                                     ascending=ct.Duration_ra_goldop_key)
-                    # top_temp = top_temp.sort_values(by=['op','ra','diff', 'percent', 'ratio'], ascending=[0,0,0, 0, 1])                
+                    # top_temp = top_temp.sort_values(by=['op','ra','dff', 'percent', 'ratio'], ascending=[0,0,0, 0, 1])                
                 # if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935:
                 #     top_temp = top_temp.loc[:,ct.Monitor_format_trade]
                 # else:

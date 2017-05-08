@@ -390,7 +390,7 @@ def get_hot_countNew(changepercent, rzrq,fibl=None,fibc=10):
         szpcent = round((rzrq['szrz'] / rzrq['sz'] * 100), 1) if rzrq['sz'] > 0 else '?'
         print(u"\tSh: %s rz:%s :%s%% sz: %s rz:%s :%s%% All: %s diff: %s亿" % (
             f_print(5, rzrq['sh']), f_print(4, rzrq['shrz']), shpcent, f_print(5, rzrq['sz']), f_print(4, rzrq['szrz']),
-            szpcent, f_print(4, rzrq['all']), f_print(5, rzrq['diff'])))
+            szpcent, f_print(4, rzrq['all']), f_print(5, rzrq['dff'])))
     bigcount = rd.getconfigBigCount(count=None, write=True)
     # print bigcount
 
@@ -470,7 +470,7 @@ if __name__ == '__main__':
         try:
             if not status:
                 if len(rzrq) == 0 or rzrq['sh'] == 0 or rzrq['sz'] == 0 or rzrq['all'] == 0:
-                    if rzrq['shrz'] == 0 or rzrq['szrz'] == 0 or rzrq['diff'] == 0:
+                    if rzrq['shrz'] == 0 or rzrq['szrz'] == 0 or rzrq['dff'] == 0:
                         log.warn("rzrq 0")
                     rzrq = ffu.get_dfcfw_rzrq_SHSZ()
                 if len(fibl) == 0 or fibcount >= fibc:

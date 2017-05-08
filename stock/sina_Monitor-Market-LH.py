@@ -159,7 +159,7 @@ if __name__ == "__main__":
                             top_all['prev_p'] = 0
                     for symbol in top_now.index:
                         if symbol in top_all.index and top_now.loc[symbol, 'buy'] <> 0:
-                            # if top_all.loc[symbol,'diff'] == 0:
+                            # if top_all.loc[symbol,'dff'] == 0:
                             # if status_change and 'couts' in top_now.columns.values:
                             if 'couts' in top_now.columns.values:
                                 # top_now.loc[symbol,'lastp']=top_all.loc[symbol,'lastp']
@@ -204,14 +204,14 @@ if __name__ == "__main__":
                     log.info(top_dif[:1])
                     # top_dif = top_dif[top_dif.buy > top_dif.llastp * ct.changeRatio]
                     log.debug('dif2:%s' % len(top_dif))
-                    # top_dif['diff'] = (
+                    # top_dif['dff'] = (
                     #     map(lambda x, y:
                     #         round(((float(x) - float(y)) / float(y) * 100), 1),
                     #         top_dif['buy'].values,
                     #         top_dif['lastp'].values)
                     # )
 
-                top_dif['diff'] = (
+                top_dif['dff'] = (
                     map(lambda x, y: round(
                         ((float(x) - float(y)) / float(y) * 100), 1),
                         top_dif['buy'].values,
@@ -238,9 +238,9 @@ if __name__ == "__main__":
                     else:
                         # print "Good Morning!!!"
                         top_dif = top_dif.sort_values(
-                            by=['diff', 'percent', 'ratio'], ascending=[0, 0, 1])
+                            by=['dff', 'percent', 'ratio'], ascending=[0, 0, 1])
 
-                    # top_all=top_all.sort_values(by=['percent','diff','couts','ratio'],ascending=[0,0,1,1])
+                    # top_all=top_all.sort_values(by=['percent','dff','couts','ratio'],ascending=[0,0,1,1])
 
                     top_temp = top_dif[:ct.PowerCount].copy()
                     top_temp = pct.powerCompute_df(top_temp, dl=ct.PowerCountdl,talib=True)
@@ -276,7 +276,7 @@ if __name__ == "__main__":
                         # top_temp = top_temp.sort_values(by=ct.Duration_percent_op,
                         #                 ascending=ct.Duration_percent_op_key)
 
-                        # top_temp = top_temp.sort_values(by=['op','ra','diff', 'percent', 'ratio'], ascending=[0,0,0, 0, 1])
+                        # top_temp = top_temp.sort_values(by=['op','ra','dff', 'percent', 'ratio'], ascending=[0,0,0, 0, 1])
                     # if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935:
                     #     # top_temp = top_temp[ (top_temp['ma5d'] > top_temp['ma10d']) & (top_temp['buy'] > top_temp['ma10d']) ]
                     #     top_temp = top_temp.loc[:,ct.MonitorMarket_format_buy]

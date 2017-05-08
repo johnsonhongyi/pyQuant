@@ -473,7 +473,7 @@ def get_sina_dd_count_price_realTime(df='',mtype='all',vol='0',type='0'):
         # dz.loc['sh600110','couts']=dz.loc['sh600110'].values[1]+3
         df=df.set_index('code')
         # df=df.iloc[0:,0:2]
-        df['diff']=0
+        df['dff']=0
 
         dp=get_sina_Market_json(mtype)
         log.info("dp.market:%s" % dp[:1])
@@ -624,7 +624,7 @@ def get_market_price_sina_dd_realTime(dp='',vol='0',type='0'):
 
         # dp.loc[dp.percent>9.9,'percent']=10
         
-        dp['diff']=0
+        dp['dff']=0
         df=get_sina_all_json_dd(vol,type)
         if len(df)>10:
             # df['couts']=0
@@ -645,7 +645,7 @@ def get_market_price_sina_dd_realTime(dp='',vol='0',type='0'):
             dm=dm.drop_duplicates('code')
             dm=dm.set_index('code')
             dm.rename(columns={'prev_price': 'prev_p'}, inplace=True)
-            # print dm.sort_values(by=['couts','percent','diff','ratio'],ascending=[0,0,0,1])[:2]
+            # print dm.sort_values(by=['couts','percent','dff','ratio'],ascending=[0,0,0,1])[:2]
             # dm=dm.fillna(int(0))
             # dm.ratio=dm.ratio
             # dm=dm.loc[:,ct.SINA_Market_Clean_UP_Columns]
@@ -657,8 +657,8 @@ def get_market_price_sina_dd_realTime(dp='',vol='0',type='0'):
             # dm=dp.loc[:,ct.SINA_Market_Clean_Columns]
             # dm=dp.loc[:,ct.SINA_Market_Clean_UP_Columns]
             # dm['prev_p']=0.0
-                    # ['name','buy','diff','percent','ratio','high','open','volume','low','couts']
-                    #['name','buy','diff','percent','trade','high','ratio','volume','couts']
+                    # ['name','buy','dff','percent','ratio','high','open','volume','low','couts']
+                    #['name','buy','dff','percent','trade','high','ratio','volume','couts']
 
     else:
         dm=''

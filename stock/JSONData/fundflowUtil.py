@@ -308,11 +308,11 @@ def get_dfcfw_rzrq_SHSZ(url=ct.DFCFW_RZRQ_SHSZ):
     log.info("data:%s,data2:%s", data, data2)
     if len(data2) > 0:
         # print data2
-        data['diff'] = round(data['all'] - data2['all'], 2)
+        data['dff'] = round(data['all'] - data2['all'], 2)
         data['shrz'] = round(data['sh'] - data2['sh'], 2)
         data['szrz'] = round(data['sz'] - data2['sz'], 2)
     else:
-        data['diff'] = 'error'
+        data['dff'] = 'error'
     if len(data) == 0:
         log.info("Fund_f NO Url:%s" % url)
     return data

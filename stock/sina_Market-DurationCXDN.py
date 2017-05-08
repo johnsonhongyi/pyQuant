@@ -72,7 +72,7 @@ if __name__ == "__main__":
     # log.level = log.debug
     # error_handler = SyslogHandler('Sina-M-Log', level='ERROR')
 
-    width, height = 171, 21
+    width, height = 173, 21
     def set_duration_console(duration_date):
         if cct.isMac():
             cct.set_console(width, height)
@@ -187,7 +187,7 @@ if __name__ == "__main__":
                         if 'couts' in top_now.columns.values:
                             top_all.loc[symbol, ct.columns_now] = top_now.loc[symbol, ct.columns_now]
                         else:
-                            # top_now.loc[symbol, 'diff'] = round(
+                            # top_now.loc[symbol, 'dff'] = round(
                             # ((float(top_now.loc[symbol, 'buy']) - float(
                             # top_all.loc[symbol, 'lastp'])) / float(top_all.loc[symbol, 'lastp']) * 100),
                             # 1)
@@ -208,7 +208,7 @@ if __name__ == "__main__":
                 if cct.get_now_time_int() > 915:
                     top_dif = top_dif[top_dif.buy > 0]
 
-                top_dif['diff'] = (
+                top_dif['dff'] = (
                     map(lambda x, y: round((x - y) / y * 100, 1), top_dif['buy'].values, top_dif['lastp'].values))
                 # print top_dif.loc['600610',:]
                 # top_dif = top_dif[top_dif.trade > 0]
@@ -259,21 +259,21 @@ if __name__ == "__main__":
                             top_dif = top_dif[(top_dif.volume > ct.VolumeMinR) & (top_dif.volume < ct.VolumeMaxR)]
                         # top_dif = top_dif[top_dif.lvol > 12000]
                         if 'couts' in top_dif.columns.values:
-                            top_dif = top_dif.sort_values(by=['diff', 'percent', 'volume', 'couts', 'ratio'],
+                            top_dif = top_dif.sort_values(by=['dff', 'percent', 'volume', 'couts', 'ratio'],
                                                           ascending=[0, 0, 0, 1, 1])
                         else:
-                            top_dif = top_dif.sort_values(by=['diff', 'percent', 'ratio'], ascending=[0, 0, 1])
+                            top_dif = top_dif.sort_values(by=['dff', 'percent', 'ratio'], ascending=[0, 0, 1])
                     else:
-                        # top_dif['diff'] = top_dif['diff'].apply(lambda x: x * 2 if x > 0 else x)
+                        # top_dif['dff'] = top_dif['dff'].apply(lambda x: x * 2 if x > 0 else x)
                         top_dif = top_dif[top_dif.lvol > ct.LvolumeSize]
-                        top_dif['diff']=top_dif['diff'].apply(lambda x:x*2 if x < 0 else x )
+                        top_dif['dff']=top_dif['dff'].apply(lambda x:x*2 if x < 0 else x )
                         if 'couts' in top_dif.columns.values:
-                            top_dif = top_dif.sort_values(by=['diff', 'percent', 'volume', 'couts', 'ratio'],
+                            top_dif = top_dif.sort_values(by=['dff', 'percent', 'volume', 'couts', 'ratio'],
                                                           ascending=[1, 0, 0, 1, 1])
                         else:
-                            top_dif = top_dif.sort_values(by=['diff', 'percent', 'ratio'], ascending=[1, 0, 1])
+                            top_dif = top_dif.sort_values(by=['dff', 'percent', 'ratio'], ascending=[1, 0, 1])
 
-                    # top_all=top_all.sort_values(by=['percent','diff','couts','ratio'],ascending=[0,0,1,1])
+                    # top_all=top_all.sort_values(by=['percent','dff','couts','ratio'],ascending=[0,0,1,1])
                     # print rl.format_for_print(top_dif[:10])
                     # top_dd = pd.concat([top_dif[:5],top_temp[:3],top_dif[-3:],top_temp[-3:]], axis=0)
                     if percent_status == 'y' and (
@@ -321,12 +321,12 @@ if __name__ == "__main__":
                         # top_temp = top_temp.sort_values(by=['ra', 'op'],ascending=[0, 0])[:10]
 
 
-                        # top_temp = top_temp.sort_values(by=['diff', 'op', 'ra', 'percent', 'ratio'],
+                        # top_temp = top_temp.sort_values(by=['dff', 'op', 'ra', 'percent', 'ratio'],
                         #                                 ascending=[0, 0, 0, 0, 1])[:10]
 
-                        # top_temp = top_temp.sort_values(by=['op', 'ra', 'diff', 'percent', 'ratio'],
+                        # top_temp = top_temp.sort_values(by=['op', 'ra', 'dff', 'percent', 'ratio'],
                         #                                 ascending=[0, 0, 0, 0, 1])[:10]
-                        # top_temp = top_temp.sort_values(by=['op','ldate','ra','diff', 'percent', 'ratio'], ascending=[0,0,0,0, 0, 1])[:10]
+                        # top_temp = top_temp.sort_values(by=['op','ldate','ra','dff', 'percent', 'ratio'], ascending=[0,0,0,0, 0, 1])[:10]
 
                         # if duration_date > ct.duration_date_sort:
 

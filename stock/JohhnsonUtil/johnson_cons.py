@@ -23,6 +23,7 @@ VolumeMaxR=50
 VolumeMinR=1.5
 PowerCount = 120
 PowerCountdl = 21
+power_update_time = 900
 writeCount = 4
 changeRatio = 0.975
 changeRatioUp = 1.03
@@ -41,86 +42,86 @@ sleep_time = 10
 tdx_max_int = 10
 
 powerdiff = 'ra * fibl + rah*(abs(float(%s)-fibl))/fib +ma +kdj+rsi'
-# Duration_sort_op=['fib','op','ra','percent','ratio','diff','couts']
-# Duration_sort_op=['fib','op','diff','fibl','ra','percent','ratio','volume','couts']
+# Duration_sort_op=['fib','op','ra','percent','ratio','dff','couts']
+# Duration_sort_op=['fib','op','dff','fibl','ra','percent','ratio','volume','couts']
 # Duration_sort_op_key=[1,0,0,1,0,0,1,1,1]
-Duration_sort_op=['diff','op','fib','fibl','ra','percent','ratio','volume','couts']
+Duration_sort_op=['dff','op','fib','fibl','ra','percent','ratio','volume','couts']
 Duration_sort_op_key=[0,0,1,1,0,0,1,1,1]
 
-Duration_percentdn_percent=['percent','diff','op','fib','fibl','ra','ratio','volume','couts']
+Duration_percentdn_percent=['percent','dff','op','fib','fibl','ra','ratio','volume','couts']
 Duration_percentdn_percent_key=[0,0,0,1,1,0,1,1,1]
 
-Duration_percentdn_percentra=['percent','ra','diff','op','fib','fibl','ratio','volume','couts']
+Duration_percentdn_percentra=['percent','ra','dff','op','fib','fibl','ratio','volume','couts']
 Duration_percentdn_percentra_key=[0,0,0,0,1,1,1,1,1]
 
-Duration_percentdn_op=['diff','percent','op','fib','fibl','ra','ratio','volume','couts']
+Duration_percentdn_op=['dff','percent','op','fib','fibl','ra','ratio','volume','couts']
 Duration_percentdn_op_key=[0,0,0,1,1,0,1,1,1]
 
-# Duration_percentdn_ra=['ra','percent','diff','op','fib','fibl','ratio','volume','couts']
+# Duration_percentdn_ra=['ra','percent','dff','op','fib','fibl','ratio','volume','couts']
 # Duration_percentdn_ra_key=[0,0,0,0,1,1,1,1,1]
-# Duration_percentdn_ra=['diff','ra','percent','op','fib','fibl','ratio','volume','couts']
-Duration_percentdn_ra=['ra','diff','percent','op','fib','fibl','ratio','volume','couts']
+# Duration_percentdn_ra=['dff','ra','percent','op','fib','fibl','ratio','volume','couts']
+Duration_percentdn_ra=['ra','dff','percent','op','fib','fibl','ratio','volume','couts']
 Duration_percentdn_ra_key=[0,0,0,0,1,1,1,1,1]
 
 
-Duration_percentdn_opra=['op','ra','percent','diff','fib','fibl','ratio','volume','couts']
+Duration_percentdn_opra=['op','ra','percent','dff','fib','fibl','ratio','volume','couts']
 Duration_percentdn_opra_key=[0,0,0,0,1,1,1,1,1]
-# Duration_percent_op=['diff','percent','op','fib','fibl','ra','ratio','volume','couts']
+# Duration_percent_op=['dff','percent','op','fib','fibl','ra','ratio','volume','couts']
 # Duration_percent_op_key=[0,0,0,1,1,0,1,1,1]
-Duration_percent_op=['diff','boll','ra','percent','op','fib','fibl','ratio','volume','couts']
+Duration_percent_op=['dff','boll','ra','percent','op','fib','fibl','ratio','volume','couts']
 Duration_percent_op_key=[0,0,0,0,0,1,1,1,1,1]
 
-# Duration_percent_op=['diff','boll','ra','percent','op','fib','fibl','ratio','volume','couts']
+# Duration_percent_op=['dff','boll','ra','percent','op','fib','fibl','ratio','volume','couts']
 # Duration_percent_op_key=[0,0,0,0,0,1,1,1,1,1]
 
-Duration_ra_op=['ra','diff','percent','op','fib','fibl','ratio','volume','couts']
+Duration_ra_op=['ra','dff','percent','op','fib','fibl','ratio','volume','couts']
 Duration_ra_op_key=[0,0,0,0,1,1,1,1,1]
 
-Duration_ra_goldop=['ra','boll','diff','percent','op','fib','fibl','ratio','volume','couts']
+Duration_ra_goldop=['ra','boll','dff','percent','op','fib','fibl','ratio','volume','couts']
 Duration_ra_goldop_key=[0,0,0,0,0,1,1,1,1,1]
 
-# Duration_sort_high_op=['date','diff','fib','op','fibl','ra','percent','ratio','volume','couts']
-Duration_sort_high_op=['diff','date','fib','op','fibl','ra','percent','ratio','volume','couts']
+# Duration_sort_high_op=['date','dff','fib','op','fibl','ra','percent','ratio','volume','couts']
+Duration_sort_high_op=['dff','date','fib','op','fibl','ra','percent','ratio','volume','couts']
 Duration_sort_high_op_key=[0,1,1,0,1,0,0,1,1,1]
 
 
 
-Monitor_sort_count=[ 'couts', 'percent','diff','volume', 'ratio']
-Monitor_sort_op=['fib','fibl','op','diff','percent',  'ra' , 'ratio']
+Monitor_sort_count=[ 'couts', 'percent','dff','volume', 'ratio']
+Monitor_sort_op=['fib','fibl','op','dff','percent',  'ra' , 'ratio']
 Monitor_sort_op_key=[ 1, 1,0,0, 0, 0, 1]
 
 
-MonitorMarket_sort_count=['diff', 'percent', 'volume', 'couts', 'ratio']
-# MonitorMarket_sort_op=['fib','diff', 'op', 'ra', 'percent', 'ratio']
+MonitorMarket_sort_count=['dff', 'percent', 'volume', 'couts', 'ratio']
+# MonitorMarket_sort_op=['fib','dff', 'op', 'ra', 'percent', 'ratio']
                     #[1,0, 0, 0, 0, 1]
-# MonitorMarket_sort_op=['fib','op','diff','fibl','ra','percent','ratio','volume','couts']
+# MonitorMarket_sort_op=['fib','op','dff','fibl','ra','percent','ratio','volume','couts']
 # MonitorMarket_sort_op_key=[1,0,0,1,0,0,1,1,1]
-MonitorMarket_sort_op=['diff','fib','fibl','op','ra','percent','ratio','volume','couts']
+MonitorMarket_sort_op=['dff','fib','fibl','op','ra','percent','ratio','volume','couts']
 MonitorMarket_sort_op_key=[0,0,1,0,0,0,1,1,1]
 
 #edit 1031
-# Duration_format_buy=['name', 'buy', 'ma5d','boll','diff', 'percent','ra','op', 'fib','fibl','volume', 'ratio', 'couts','ldate', 'date']
-# Duration_format_trade=['name', 'trade', 'ma5d','boll','diff','percent', 'ra','op', 'fib','fibl','volume', 'ratio', 'couts','ldate', 'date']
-# Monitor_format_trade=['name', 'trade', 'ma5d','boll','diff', 'percent', 'ra','op', 'fib','fibl','volume', 'ratio', 'couts','ldate']
-# MonitorMarket_format_buy=['name', 'buy', 'ma5d', 'boll','diff','percent', 'ra','op', 'fib','fibl','volume', 'ratio', 'couts','ldate', 'date']
-# MonitorMarket_format_trade=['name', 'trade', 'ma5d', 'boll','diff','percent', 'ra','op', 'fib','fibl', 'volume', 'ratio', 'couts','ldate']
-# MonitorMarket_format_trade=['name', 'trade', 'ma5d', 'boll','diff', 'ra','op', 'fib','fibl', 'percent','volume', 'ratio', 'couts','ldate', 'date']
+# Duration_format_buy=['name', 'buy', 'ma5d','boll','dff', 'percent','ra','op', 'fib','fibl','volume', 'ratio', 'couts','ldate', 'date']
+# Duration_format_trade=['name', 'trade', 'ma5d','boll','dff','percent', 'ra','op', 'fib','fibl','volume', 'ratio', 'couts','ldate', 'date']
+# Monitor_format_trade=['name', 'trade', 'ma5d','boll','dff', 'percent', 'ra','op', 'fib','fibl','volume', 'ratio', 'couts','ldate']
+# MonitorMarket_format_buy=['name', 'buy', 'ma5d', 'boll','dff','percent', 'ra','op', 'fib','fibl','volume', 'ratio', 'couts','ldate', 'date']
+# MonitorMarket_format_trade=['name', 'trade', 'ma5d', 'boll','dff','percent', 'ra','op', 'fib','fibl', 'volume', 'ratio', 'couts','ldate']
+# MonitorMarket_format_trade=['name', 'trade', 'ma5d', 'boll','dff', 'ra','op', 'fib','fibl', 'percent','volume', 'ratio', 'couts','ldate', 'date']
 
 
 
-# Duration_format_buy=['name', 'buy', 'ma5d','boll','diff', 'percent','ra','op', 'fib','fibl','ma','macd','rsi','kdj','volume', 'date','category']
-Duration_format_buy=['name', 'buy', 'ma5d','boll','diff','df2', 'percent','ra','op', 'fib','couts','ma','volume', 'date','category']
-# Duration_format_trade=['name', 'trade', 'ma5d','boll','diff','percent', 'ra','op', 'fib','fibl','ma','macd','rsi','kdj','volume', 'date','category']
-# Duration_format_trade=['name', 'trade', 'ma5d','boll','diff','df2','percent', 'ra','op', 'fib','fibl','ma','volume', 'date','category']
-Duration_format_trade=['name', 'trade', 'ma5d','boll','diff','df2','percent', 'ra','op', 'fib','couts','ma','volume', 'date','category']
-# Monitor_format_trade=['name', 'trade', 'ma5d','boll','diff', 'percent', 'ra','op', 'fib','fibl','ma','macd','rsi','kdj','volume']
-Monitor_format_trade=['name', 'trade', 'ma5d','boll','diff','df2', 'percent', 'ra','op', 'fib','fibl','ma','volume','category']
+# Duration_format_buy=['name', 'buy', 'ma5d','boll','dff', 'percent','ra','op', 'fib','fibl','ma','macd','rsi','kdj','volume', 'date','category']
+Duration_format_buy=['name', 'buy', 'ma5d','boll','dff','df2', 'percent','ra','op', 'fib','couts','ma','volume', 'date','category']
+# Duration_format_trade=['name', 'trade', 'ma5d','boll','dff','percent', 'ra','op', 'fib','fibl','ma','macd','rsi','kdj','volume', 'date','category']
+# Duration_format_trade=['name', 'trade', 'ma5d','boll','dff','df2','percent', 'ra','op', 'fib','fibl','ma','volume', 'date','category']
+Duration_format_trade=['name', 'trade', 'ma5d','boll','dff','df2','percent', 'ra','op', 'fib','couts','ma','volume', 'date','category']
+# Monitor_format_trade=['name', 'trade', 'ma5d','boll','dff', 'percent', 'ra','op', 'fib','fibl','ma','macd','rsi','kdj','volume']
+Monitor_format_trade=['name', 'trade', 'ma5d','boll','dff','df2', 'percent', 'ra','op', 'fib','fibl','ma','volume','category']
 
-Sina_Monitor_format=['name', 'trade', 'ma5d','boll','diff', 'percent', 'ra','op', 'fib','fibl','ma','volume','category']
-# MonitorMarket_format_buy=['name', 'buy', 'ma5d', 'boll','diff','percent', 'ra','op', 'fib','fibl','ma','macd','rsi','kdj','volume','date']
-MonitorMarket_format_buy=['name', 'buy', 'ma5d', 'boll','diff','df2','percent', 'ra','op', 'fib','fibl','ma','volume','date','category']
-# MonitorMarket_format_trade=['name', 'trade', 'ma5d', 'boll','diff','percent', 'ra','op', 'fib','fibl', 'ma','macd','rsi','volume','kdj']
-MonitorMarket_format_trade=['name', 'trade', 'ma5d', 'boll','diff','df2','percent', 'ra','op', 'fib','fibl', 'ma','volume','category']
+Sina_Monitor_format=['name', 'trade', 'ma5d','boll','dff','couts' ,'percent', 'ra','op', 'fib','fibl','ma','volume','category']
+# MonitorMarket_format_buy=['name', 'buy', 'ma5d', 'boll','dff','percent', 'ra','op', 'fib','fibl','ma','macd','rsi','kdj','volume','date']
+MonitorMarket_format_buy=['name', 'buy', 'ma5d', 'boll','dff','couts','df2','percent', 'ra','op', 'fib','ma','volume','date','category']
+# MonitorMarket_format_trade=['name', 'trade', 'ma5d', 'boll','dff','percent', 'ra','op', 'fib','fibl', 'ma','macd','rsi','volume','kdj']
+MonitorMarket_format_trade=['name', 'trade', 'ma5d', 'boll','dff','couts','df2','percent', 'ra','op', 'fib', 'ma','volume','category']
 
 
 
@@ -128,7 +129,7 @@ columns_now = [u'open', u'llastp', u'close', u'trade', u'high', u'low',\
                                            u'buy', u'sell', u'volume', u'turnover', u'b1_v', u'b1', u'b2_v', u'b2',\
                                            u'b3_v', u'b3', u'b4_v', u'b4', u'b5_v', u'b5', u'a1_v', u'a1', u'a2_v',\
                                            u'a2', u'a3_v', u'a3', u'a4_v', u'a4', u'a5_v', u'a5', u'percent',\
-                                           u'ratio', u'diff', u'couts', u'kind', u'prev_p']
+                                           u'ratio', u'dff', u'couts', u'kind', u'prev_p']
 
 DD_TYPE_List={'0':'5','1':'10','2':'20','3':'50','4':'100'}
 P_TYPE = {'http': 'http://', 'ftp': 'ftp://'}
@@ -253,14 +254,14 @@ SINA_Total_Columns = ['code', 'name', 'open', 'close','now', 'trade', 'high', 'l
                       'a1', 'a2_v', 'a2', 'a3_v', 'a3', 'a4_v',
                       'a4', 'a5_v', 'a5']
 
-SINA_DD_Clean_Count_Columns = ['name', 'percent', 'diff', 'couts', 'trade', 'high', 'open', 'low', 'ratio', 'volume',
+SINA_DD_Clean_Count_Columns = ['name', 'percent', 'dff', 'couts', 'trade', 'high', 'open', 'low', 'ratio', 'volume',
                                'prev_price']
-SINA_Market_Clean_UP_Columns = ['name', 'buy','trade','diff', 'volume', 'percent', 'ratio', 'high', 'open', 'low', 'couts',
+SINA_Market_Clean_UP_Columns = ['name', 'buy','trade','dff', 'volume', 'percent', 'ratio', 'high', 'open', 'low', 'couts',
                                 'prev_p','sell','b1','b1_v','a1','a1_v']
-SINA_Market_Clean_UP_ColumnsTrade = ['name', 'trade', 'diff', 'volume', 'percent', 'ratio', 'high', 'open', 'low', 'couts',
+SINA_Market_Clean_UP_ColumnsTrade = ['name', 'trade', 'dff', 'volume', 'percent', 'ratio', 'high', 'open', 'low', 'couts',
                                 'prev_p']
-SINA_Market_Clean_Columns=['name','buy','diff','volume','percent','ratio','high','open','low','couts']
-# SINA_Market_Clean_UP_Columns=['name','buy','diff','percent','trade','high','ratio','open','low','couts']
+SINA_Market_Clean_Columns=['name','buy','dff','volume','percent','ratio','high','open','low','couts']
+# SINA_Market_Clean_UP_Columns=['name','buy','dff','percent','trade','high','ratio','open','low','couts']
 
 THE_FIELDS = ['code', 'symbol', 'name', 'changepercent', 'trade', 'open', 'high', 'low', 'settlement', 'volume', 'turnoverratio']
 # Market_Center_COLUMNS = ['code','name','trade','changepercent','buy','sell','settlement','open','high','low','volume','ticktime','turnoverratio']

@@ -1247,7 +1247,7 @@ def LineArgmain():
     # logger.setLevel(logging.ERROR)
     return parser
 
-def sort_by_value(df,column='diff',file=None,count=5,num=5,asc=0):
+def sort_by_value(df,column='dff',file=None,count=5,num=5,asc=0):
     """[summary]
 
     [description]
@@ -1256,7 +1256,7 @@ def sort_by_value(df,column='diff',file=None,count=5,num=5,asc=0):
         df {dataframe} -- [description]
 
     Keyword Arguments:
-        column {str} -- [description] (default: 'diff' or ['diff',])
+        column {str} -- [description] (default: 'dff' or ['dff',])
         file {[type]} -- [description] (default: {069})
         count {number} -- [description] (default: {5})
         num {number} -- [description] (default: {5})
