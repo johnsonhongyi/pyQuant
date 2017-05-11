@@ -13,7 +13,8 @@ import numpy as np
 # import pandas as pd
 import statsmodels.api as sm
 from statsmodels import regression
-log = LoggerFactory.getLogger("powerTech")
+# log = LoggerFactory.getLogger("powerTech")
+log = LoggerFactory.log
 # log.setLevel(LoggerFactory.INFO)
 log.setLevel(LoggerFactory.WARN)
 

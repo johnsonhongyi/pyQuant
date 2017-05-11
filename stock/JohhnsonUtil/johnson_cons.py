@@ -38,7 +38,8 @@ checkfilter = True
 lastPower = False
 checkfilter_end_time = 945
 checkfilter_end_timeDu = 1440
-sleep_time = 10
+open_time = 930
+sleep_time = 6
 tdx_max_int = 10
 
 powerdiff = 'ra * fibl + rah*(abs(float(%s)-fibl))/fib +ma +kdj+rsi'
@@ -110,14 +111,14 @@ MonitorMarket_sort_op_key=[0,0,1,0,0,0,1,1,1]
 
 
 # Duration_format_buy=['name', 'buy', 'ma5d','boll','dff', 'percent','ra','op', 'fib','fibl','ma','macd','rsi','kdj','volume', 'date','category']
-Duration_format_buy=['name', 'buy', 'ma5d','boll','dff','df2', 'percent','ra','op', 'fib','couts','ma','volume', 'date','category']
+Duration_format_buy=['name', 'buy', 'ma5d','boll','dff','df2', 'percent','ra','op', 'ratio','couts','ma','volume', 'date','category']
 # Duration_format_trade=['name', 'trade', 'ma5d','boll','dff','percent', 'ra','op', 'fib','fibl','ma','macd','rsi','kdj','volume', 'date','category']
 # Duration_format_trade=['name', 'trade', 'ma5d','boll','dff','df2','percent', 'ra','op', 'fib','fibl','ma','volume', 'date','category']
-Duration_format_trade=['name', 'trade', 'ma5d','boll','dff','df2','percent', 'ra','op', 'fib','couts','ma','volume', 'date','category']
+Duration_format_trade=['name', 'trade', 'ma5d','boll','dff','df2','percent', 'ra','op', 'ratio','couts','ma','volume', 'date','category']
 # Monitor_format_trade=['name', 'trade', 'ma5d','boll','dff', 'percent', 'ra','op', 'fib','fibl','ma','macd','rsi','kdj','volume']
-Monitor_format_trade=['name', 'trade', 'ma5d','boll','dff','df2', 'percent', 'ra','op', 'fib','fibl','ma','volume','category']
+Monitor_format_trade=['name', 'trade', 'ma5d','boll','dff','df2', 'percent', 'ra','op', 'fib','ratio','ma','volume','category']
 
-Sina_Monitor_format=['name', 'trade', 'ma5d','boll','dff','couts' ,'percent', 'ra','op', 'fib','fibl','ma','volume','category']
+Sina_Monitor_format =['name', 'trade', 'ma5d','boll','dff','percent', 'ra','op', 'fib','ratio','ma','volume','category']
 # MonitorMarket_format_buy=['name', 'buy', 'ma5d', 'boll','dff','percent', 'ra','op', 'fib','fibl','ma','macd','rsi','kdj','volume','date']
 MonitorMarket_format_buy=['name', 'buy', 'ma5d', 'boll','dff','couts','df2','percent', 'ra','op', 'fib','ma','volume','date','category']
 # MonitorMarket_format_trade=['name', 'trade', 'ma5d', 'boll','dff','percent', 'ra','op', 'fib','fibl', 'ma','macd','rsi','volume','kdj']

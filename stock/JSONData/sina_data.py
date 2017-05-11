@@ -15,7 +15,8 @@ from JohhnsonUtil import commonTips as cct
 from JohhnsonUtil import LoggerFactory
 import trollius as asyncio
 from trollius.coroutines import From
-log = LoggerFactory.getLogger('Sina_data')
+# log = LoggerFactory.getLogger('Sina_data')
+log = LoggerFactory.log
 # log.setLevel(LoggerFactory.DEBUG)
 
 

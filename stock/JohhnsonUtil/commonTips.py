@@ -14,11 +14,12 @@ import pandas as pd
 import trollius as asyncio
 from trollius.coroutines import From
 
-import LoggerFactory as Log
+from LoggerFactory import log
 import johnson_cons as ct
 import socket
 
-log = Log.getLogger('commonTipss')
+# log = Log.getLogger('root')
+
 # log.setLevel(Log.DEBUG)
 # import numba as nb
 
@@ -48,11 +49,11 @@ requests.adapters.DEFAULT_RETRIES = 0
 #             return 'win'
 #     else:
 #         return 'other'
-
-win7rootAsus = r'D:\Program Files\gfzq'
 win10Lengend = r'D:\Program\gfzq'
+win10Lixin = r'C:\zd_zszq'
+win7rootAsus = r'D:\Program Files\gfzq'
 win7rootXunji = r'E:\DOC\Parallels\WinTools\zd_pazq'
-win7rootList = [win7rootAsus,win7rootXunji,win10Lengend]
+win7rootList = [win10Lixin,win7rootAsus,win7rootXunji,win10Lengend]
 macroot = r'/Users/Johnson/Documents/Johnson/WinTools/zd_pazq'
 xproot = r'E:\DOC\Parallels\WinTools\zd_pazq'
 path_sep = os.path.sep
@@ -157,6 +158,17 @@ def get_tushare_market(market='zxb',renew=False,days=5):
         df = tusharewrite_to_csv(market, filepath , days)
 
     return df
+
+sina_doc="""sina_Johnson.
+
+Usage:
+  sina_cxdn.py
+  sina_cxdn.py --debug
+
+Options:
+  -h --help     Show this screen.
+  --debug    Debug [default:False].
+"""
 
 def sys_default_utf8(default_encoding='utf-8'):
     #import sys
@@ -1096,24 +1108,18 @@ def getFibonacci(num,days=None):
 
 def get_stock_tdx_period_to_type(stock_data, type='w'):
     period_type = type
-    # 转换周最后一日变量
     stock_data.index = pd.to_datetime(stock_data.index)
     period_stock_data = stock_data.resample(period_type, how='last')
     # 周数据的每日change连续相乘
     # period_stock_data['percent']=stock_data['percent'].resample(period_type,how=lambda x:(x+1.0).prod()-1.0)
     # 周数据open等于第一日
-    period_stock_data['open'] = stock_data[
-        'open'].resample(period_type, how='first')
+    period_stock_data['open'] = stock_data['open'].resample(period_type, how='first')
     # 周high等于Max high
-    period_stock_data['high'] = stock_data[
-        'high'].resample(period_type, how='max')
-    period_stock_data['low'] = stock_data[
-        'low'].resample(period_type, how='min')
+    period_stock_data['high'] = stock_data['high'].resample(period_type, how='max')
+    period_stock_data['low'] = stock_data['low'].resample(period_type, how='min')
     # volume等于所有数据和
-    period_stock_data['amount'] = stock_data[
-        'amount'].resample(period_type, how='sum')
-    period_stock_data['vol'] = stock_data[
-        'vol'].resample(period_type, how='sum')
+    period_stock_data['amount'] = stock_data['amount'].resample(period_type, how='sum')
+    period_stock_data['vol'] = stock_data['vol'].resample(period_type, how='sum')
     # 计算周线turnover,【traded_market_value】 流通市值【market_value】 总市值【turnover】 换手率，成交量/流通股本
     # period_stock_data['turnover']=period_stock_data['vol']/(period_stock_data['traded_market_value'])/period_stock_data['close']
     # 去除无交易纪录

@@ -19,7 +19,8 @@ from JohhnsonUtil import LoggerFactory as LoggerFactory
 from JohhnsonUtil import commonTips as cct
 from JohhnsonUtil import zoompan
 
-log = LoggerFactory.getLogger('Linehistogram')
+# log = LoggerFactory.getLogger('Linehistogram')
+log = LoggerFactory.log
 # log.setLevel(LoggerFactory.DEBUG)
 from JSONData import tdx_data_Day as tdd
 

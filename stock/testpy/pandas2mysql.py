@@ -47,7 +47,7 @@ codes=['000030','601198','600476']
 num=0
 for code in codes:
     df = tdd.get_tdx_Exp_day_to_df(code, start=None, end=None, dl=30, newdays=None, type='f')
-    if not df.empty:
+    if df is not None and not df.empty:
 
         #存入数据库
         print "write to sql"

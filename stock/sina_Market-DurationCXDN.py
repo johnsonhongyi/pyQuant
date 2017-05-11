@@ -7,7 +7,6 @@ import sys
 import time
 
 import pandas as pd
-
 import JohhnsonUtil.johnson_cons as ct
 import singleAnalyseUtil as sl
 from JSONData import powerCompute as pct
@@ -17,7 +16,6 @@ from JSONData import tdx_data_Day as tdd
 from JSONData import LineHistogram as lhg
 from JohhnsonUtil import LoggerFactory as LoggerFactory
 from JohhnsonUtil import commonTips as cct
-
 
 # from logbook import Logger,StreamHandler,SyslogHandler
 # from logbook import StderrHandler
@@ -66,13 +64,19 @@ def evalcmd(dir_mo):
 if __name__ == "__main__":
     # parsehtml(downloadpage(url_s))
     # StreamHandler(sys.stdout).push_application()
-    log = LoggerFactory.getLogger('SinaMarketNew')
-    # log.setLevel(LoggerFactory.DEBUG)
+    # log = LoggerFactory.getLogger('root')
+    # args = docopt(__doc__,argv=None, help=False, version=None, options_first=False)
+    from docopt import docopt
+    log = LoggerFactory.log
+    args = docopt(cct.sina_doc, version='sina_cxdn')
+    log_level = LoggerFactory.DEBUG if args['--debug'] else LoggerFactory.ERROR
+    log.setLevel(log_level)  
+    # if log_level == LoggerFactory.DEBUG:
     # handler=StderrHandler(format_string='{record.channel}: {record.message) [{record.extra[cwd]}]')
     # log.level = log.debug
     # error_handler = SyslogHandler('Sina-M-Log', level='ERROR')
 
-    width, height = 173, 21
+    width, height = 175,21
     def set_duration_console(duration_date):
         if cct.isMac():
             cct.set_console(width, height)
@@ -380,7 +384,7 @@ if __name__ == "__main__":
                 print "\tNo Data"
             int_time = cct.get_now_time_int()
             if cct.get_work_time():
-                if int_time < 926:
+                if int_time < ct.open_time:
                     cct.sleep(ct.sleep_time)
                 elif int_time < 930:
                     cct.sleep((930 - int_time) * 60)

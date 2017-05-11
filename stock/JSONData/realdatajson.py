@@ -28,7 +28,8 @@ try:
 except ImportError:
     from urllib2 import urlopen, Request
 
-log=LoggerFactory.getLogger('Realdata')
+# log=LoggerFactory.getLogger('Realdata')
+log = LoggerFactory.log
 # log.setLevel(LoggerFactory.INFO)
 # log=LoggerFactory.JohnsonLoger('Realdata')
 
@@ -382,19 +383,19 @@ def get_sina_all_json_dd(vol='0', type='0', num='10000', retry_count=3, pause=0.
             #['code' 'name' 'ticktime' 'price' 'volume' 'prev_price' 'kind']
             log.debug("get_sina_all_json_dd:%s" % df[:1])
 
-        if not df.empty:
+        if df is not None and not df.empty:
             # for i in range(2, ct.PAGE_NUM[0]):
             #     newdf = _parsing_dayprice_json(i)
             #     df = df.append(newdf, ignore_index=True)
             # print len(df.index)
-            print (" dd-df: %0.2f" % ((time.time() - start_t))),
+            print (" dd-df:%0.2f" % ((time.time() - start_t))),
             return df
         else:
             print
-            print ("no data  json-df: %0.2f"%((time.time() - start_t))),
+            print ("no data  json-df:%0.2f"%((time.time() - start_t))),
             return ''
     else:
-        print ("Url None json-df: %0.2f "%((time.time() - start_t))),
+        print ("Url None json-df:%0.2f "%((time.time() - start_t))),
         return ''
 
 def _today_ticks(symbol, tdate, pageNo, retry_count, pause):

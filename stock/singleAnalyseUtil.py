@@ -17,7 +17,7 @@ from JSONData import get_macd_kdj_rsi as getab
 from JSONData import tdx_data_Day as tdd
 import JohhnsonUtil.emacount as ema
 from JohhnsonUtil import LoggerFactory
-log = LoggerFactory.getLogger("SingleSAU")
+# log = LoggerFactory.getLogger("SingleSAU")
 # log.setLevel(LoggerFactory.DEBUG)
 
 try:
@@ -31,9 +31,9 @@ except ImportError:
 #     today = TODAY.strftime('%Y-%m-%d')
 #     return today
 
-global fibcount
+global fibcount,except_count
 fibcount = 0
-
+except_count = 0
 def time_sleep(timemin):
     time1 = time.time()
     time.sleep(timemin)
@@ -94,10 +94,13 @@ def get_multiday_ave_compare(code, dayl='10'):
     d_hist = ema.getdata_ema_trend(code, dayl, 'd')
     # print d_hist
     day_t = ema.get_today()
-    if day_t in d_hist.index:
-        dl = d_hist.drop(day_t).index
+    if d_hist is not None:
+        if day_t in d_hist.index:
+            dl = d_hist.drop(day_t).index
+        else:
+            dl = d_hist.index
     else:
-        dl = d_hist.index
+        return 0
     # print dl
     # print dl
     ep_list = []
@@ -109,6 +112,7 @@ def get_multiday_ave_compare(code, dayl='10'):
             ep = td['amount'].sum() / td['volume'].sum()
             ep_list.append(ep)
             print("D: %s P: %s" % (da[-5:], ep))
+
     ave = ema.less_average(ep_list)
     if len(dtick.index) > 0:
         ep = dtick['amount'].sum() / dtick['volume'].sum()
@@ -439,6 +443,12 @@ def get_code_search_loop(num_input, code='', timed=60, dayl='10', ave=None):
 
 if __name__ == '__main__':
     # get_multiday_ave_compare('601198')
+    from docopt import docopt
+    log = LoggerFactory.log
+    args = docopt(cct.sina_doc, version='sina_cxdn')
+    log_level = LoggerFactory.DEBUG if args['--debug'] else LoggerFactory.ERROR
+    log.setLevel(log_level)
+#    log.setLevel(LoggerFactory.DEBUG)
     # print len(sys.argv)
     if cct.isMac():
         width, height = 108, 15
@@ -599,7 +609,15 @@ if __name__ == '__main__':
 #            print "Error2sleep:%s"%(sleeptime)
         except Exception as e:
             print "Error Exception", e
-            cct.sleeprandom(120)
+            import traceback
+            traceback.print_exc()
+            # global except_count
+            except_count +=1
+            if except_count < 4:
+                cct.sleeprandom(120)
+            else:
+                print "except_count >3"
+                sys.exit(0)
         # finally:
         #     cct.sleeprandom(120)
             # raw_input("Except")

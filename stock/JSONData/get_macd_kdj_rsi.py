@@ -11,7 +11,8 @@ import tdx_data_Day as tdd
 from JohhnsonUtil import LoggerFactory as LoggerFactory
 from JohhnsonUtil import johnson_cons as ct
 import math
-log = LoggerFactory.getLogger("get_macd_kdj_rsi")
+# log = LoggerFactory.getLogger("get_macd_kdj_rsi")
+log = LoggerFactory.log
 # log.setLevel(LoggerFactory.DEBUG)
 
 #http://blog.sina.com.cn/s/blog_620987bf0102vlmz.html

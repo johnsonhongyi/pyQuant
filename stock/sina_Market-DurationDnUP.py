@@ -58,13 +58,18 @@ def evalcmd(dir_mo):
 if __name__ == "__main__":
     # parsehtml(downloadpage(url_s))
     # StreamHandler(sys.stdout).push_application()
-    log = LoggerFactory.getLogger('SinaMarketNew')
+    # log = LoggerFactory.getLogger('SinaMarketNew')
+    from docopt import docopt
+    log = LoggerFactory.log
+    args = docopt(cct.sina_doc, version='sina_cxdn')
+    log_level = LoggerFactory.DEBUG if args['--debug'] else LoggerFactory.ERROR
+    log.setLevel(log_level)  
     # log.setLevel(LoggerFactory.DEBUG)
     # handler=StderrHandler(format_string='{record.channel}: {record.message) [{record.extra[cwd]}]')
     # log.level = log.debug
     # error_handler = SyslogHandler('Sina-M-Log', level='ERROR')
 
-    width, height = 169, 21
+    width, height = 175,21
     def set_duration_console(duration_date):
         if cct.isMac():
             cct.set_console(width, height)
@@ -373,7 +378,7 @@ if __name__ == "__main__":
                 print "\tNo Data"
             int_time = cct.get_now_time_int()
             if cct.get_work_time():
-                if int_time < 926:
+                if int_time < ct.open_time:
                     cct.sleep(ct.sleep_time)
                 elif int_time < 930:
                     cct.sleep((930 - int_time) * 60)

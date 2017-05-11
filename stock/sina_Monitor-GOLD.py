@@ -25,7 +25,7 @@ from JSONData import powerCompute as pct
 from JSONData import stockFilter as stf
 from JohhnsonUtil import LoggerFactory as LoggerFactory
 
-log = LoggerFactory.getLogger('SinaMonitor-Gold')
+# log = LoggerFactory.getLogger('SinaMonitor-Gold')
 
 # import json
 # try:
@@ -107,7 +107,11 @@ def evalcmd(dir_mo):
                 # break
 
 if __name__ == "__main__":
-
+    from docopt import docopt
+    log = LoggerFactory.log
+    args = docopt(cct.sina_doc, version='sina_cxdn')
+    log_level = LoggerFactory.DEBUG if args['--debug'] else LoggerFactory.ERROR
+    log.setLevel(log_level)  
     # width, height = 132, 18
     if cct.isMac():
         width, height = 155, 16

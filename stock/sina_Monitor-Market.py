@@ -55,7 +55,12 @@ def evalcmd(dir_mo):
 if __name__ == "__main__":
     # parsehtml(downloadpage(url_s))
     # StreamHandler(sys.stdout).push_application()
-    log = LoggerFactory.getLogger('SinaMarket')
+    # log = LoggerFactory.getLogger('SinaMarket')
+    from docopt import docopt
+    log = LoggerFactory.log
+    args = docopt(cct.sina_doc, version='sina_cxdn')
+    log_level = LoggerFactory.DEBUG if args['--debug'] else LoggerFactory.ERROR
+    log.setLevel(log_level)      
     # log=LoggerFactory.JohnsonLoger('SinaMarket').setLevel(LoggerFactory.DEBUG)
     # log.setLevel(LoggerFactory.DEBUG)
 
@@ -252,7 +257,7 @@ if __name__ == "__main__":
 
             int_time = cct.get_now_time_int()
             if cct.get_work_time():
-                if int_time < 926:
+                if int_time < ct.open_time:
                     cct.sleep(ct.sleep_time)
                 elif int_time < 930:
                     cct.sleep((930 - int_time) * 60)

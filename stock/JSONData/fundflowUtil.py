@@ -9,7 +9,8 @@ import JohhnsonUtil.johnson_cons as ct
 import JohhnsonUtil.LoggerFactory as LoggerFactory
 import tdx_data_Day as tdd
 from sina_data import *
-log = LoggerFactory.getLogger("FundFlow")
+# log = LoggerFactory.getLogger("FundFlow")
+log = LoggerFactory.log
 # log.setLevel(LoggerFactory.INFO)
 # log.setLevel(LoggerFactory.DEBUG)
 import traceback

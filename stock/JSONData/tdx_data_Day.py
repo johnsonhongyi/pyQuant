@@ -10,7 +10,6 @@ from struct import *
 import numpy as np
 import pandas as pd
 from pandas import Series
-
 from JSONData import realdatajson as rl
 from JSONData import wencaiData as wcd
 from JohhnsonUtil import LoggerFactory
@@ -23,7 +22,8 @@ import sina_data
 # import logbook
 
 # log=logbook.Logger('TDX_day')
-log = LoggerFactory.getLogger('TDX_Day')
+# log = LoggerFactory.getLogger('TDX_Day')
+log = LoggerFactory.log
 # log.setLevel(LoggerFactory.DEBUG)
 # log.setLevel(LoggerFactory.INFO)
 # log.setLevel(LoggerFactory.WARNING)
@@ -1496,8 +1496,8 @@ def getSinaAlldf(market='cyb',vol=ct.json_countVol,type=ct.json_countType,filena
             # df = pd.read_csv(block_path,dtype={'code':str},encoding = 'gbk')
             df = pd.read_csv(block_path)
     elif market in ['sh','sz','cyb']:
-        # df = rl.get_sina_Market_json(market)
-        df = sina_data.Sina().market(market)
+        df = rl.get_sina_Market_json(market)
+        # df = sina_data.Sina().market(market)
     elif market in ['all']:
         df = sina_data.Sina().all
     else:
@@ -1529,25 +1529,33 @@ def getSinaAlldf(market='cyb',vol=ct.json_countVol,type=ct.json_countType,filena
     log.info("dm percent:%s"%(dm[:1]))
     # dm['volume'] = map(lambda x: round(x / 100, 1), dm.volume.values)
     dm['trade'] = dm['close']
-    if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 925:
+    if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 926:
         # print dm[dm.code=='000001'].b1
         # print dm[dm.code=='000001'].a1
         # print dm[dm.code=='000001'].a1_v
         # print dm[dm.code=='000001'].b1_v
+        dm = dm[(dm.buy > 0)]
         dm['volume'] = map(lambda x: x, dm.b1_v.values)
         # print dm[dm.code=='000001'].volume
+    else:
+        dm = dm[dm.trade > 0]
     # print dm[dm.code == '002474'].volume
     # print 'ratio' in dm.columns
     # print time.time()-time_s
-    if (len(df) != len(dm)) or len(df) < 10 or len(dm) < 10:
+    if cct.get_now_time_int() > 932 and market not in ['sh','sz','cyb']:
+        dd = rl.get_sina_Market_json('all')
+        dd = dd.set_index('code')
+        dd.drop([inx for inx in dd.index  if inx not in df.index], axis=0, inplace=True)
+        df = dd
+    if len(df) < 10 or len(dm) < 10:
         log.error("len(df):%s dm:%s"%(len(df),len(dm)))
-    # print dm.columns,df.columns
-    # print dm[:1],df[:1]
-    # dm['ratio'] = map(lambda x: round(df[df.index == x].ratio.values, 1), dm['code'].values)
         dm['ratio'] = 0
     else:
+        if len(dm) <> len(df):
+            log.info("code:%s %s"%(len(dm),len(df))),
         dm=pd.merge(dm,df.loc[:,['name','ratio']],on='name',how='left')
         dm=dm.drop_duplicates('code')
+        dm=dm.fillna(0)
     # print dz[:1].ratio
     # dm['ratio'] = map(lambda x: round(df[df.code == x].ratio, 1) if len(df[df.code == x].ratio) > 0 else 0, dm['code'].values)
     # print len(dm)

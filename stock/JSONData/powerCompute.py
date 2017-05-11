@@ -19,7 +19,8 @@ from JSONData import wencaiData as wcd
 from JohhnsonUtil import zoompan
 from JohhnsonUtil import LoggerFactory as LoggerFactory
 import time
-log = LoggerFactory.getLogger("PowerCompute")
+# log = LoggerFactory.getLogger("PowerCompute")
+log = LoggerFactory.log
 # log.setLevel(LoggerFactory.INFO)
 
 if not cct.isMac():
@@ -908,10 +909,13 @@ def powerCompute_df(df, dtype='d', end=None, dl=None, filter='y',talib=False,new
     wcdf_code = wcdf.index.tolist()
 
     for code in code_l:
-        if 'boll' in df.loc[code].index:
-            if df.loc[code].boll <> 0:
-#                print df.loc[code].boll
-                continue
+
+        # if 'boll' in df.loc[code].index:
+        #     if 'time' in df.columns and len(df[df.time <> 0]) > 0 and df[:1].boll.values <> 0 and time.time() - df[df.time <> 0].time[0] < ct.power_update_time:
+        #         continue
+            # elif df.loc[code].boll <> 0:
+            #     continue
+                
         if statuslist:
             start = None
         else:

@@ -40,29 +40,33 @@ NOTSET = 0
 
 # http://blog.sina.com.cn/s/blog_411fed0c0100wkvj.html
 
-def getLogger(name):
+
+def getLogger(name=''):
     # now = time.strftime('%Y-%m-%d %H:%M:%S')
     # path_sep = get_os_path_sep()
     log_path = get_run_path() + 'stock.log'
+    _logformat = "[%(asctime)s] %(name)s:%(filename)s(%(funcName)s:%(lineno)s): %(message)s"
     logging.basicConfig(
         # level    =eval('logging.%s'%(level_s)),
         # format   = now +":" + name + ' LINE %(lineno)-4d  %(levelname)-8s %(message)s',
         # level=logging.DEBUG,
         # level=logging.ERROR,
         # level=logging.INFO,
-        format="[%(asctime)s] %(name)s:%(levelname)s: %(message)s",
+        format=_logformat,
         datefmt='%m-%d %H:%M',
         filename=log_path,
         filemode='w');
 
     console = logging.StreamHandler();
     console.setLevel(logging.DEBUG);
-    formatter = logging.Formatter(name + ': LINE %(lineno)-4d : %(levelname)-8s %(message)s');
+    # formatter = logging.Formatter(name + ': LINE %(lineno)-4d : %(levelname)-8s %(message)s');
+    formatter = logging.Formatter( '%(filename)s(%(funcName)s:%(lineno)s):%(levelname)-5s %(message)s');
     console.setFormatter(formatter);
     logger = logging.getLogger(name)
     logger.addHandler(console);
     return logger
-
+    
+log = getLogger('')
 
 # def log_format(record, handler):
 #     handler = StderrHandler()
@@ -112,7 +116,7 @@ class JohnsonLoger(logging.Logger):
             filemode='w');
         self.console=logging.StreamHandler();
         self.console.setLevel(logging.DEBUG);
-        formatter = logging.Formatter(self.name + ': LINE %(lineno)-4d : %(levelname)-8s %(message)s');
+        formatter = logging.Formatter(self.name + ': LINE %(lineno)-4d :%(levelname)-8s %(message)s');
         self.console.setFormatter(formatter);
         self.logger = logging.getLogger(self.name)
         self.logger.addHandler(self.console);
