@@ -674,8 +674,9 @@ if __name__ == '__main__':
     import sys
     # df = get_sina_all_json_dd('0', '3')
     log.setLevel(LoggerFactory.DEBUG)
-    df=get_sina_Market_json('sh')
-    print df[df.code == '600581']
+    df=get_sina_Market_json('all')
+    print len(df)
+    print df[:1]
     # _get_sina_json_dd_url()
     # print sina_json_Big_Count()
     # print getconfigBigCount(write=True)

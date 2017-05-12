@@ -32,13 +32,13 @@ duration_diff = 6
 duration_date_l = 10
 duration_date_sort = 21
 lastdays = 4
-bollFilter = -5
+bollFilter = -1
 writeblockbakNum = 12
 checkfilter = True
 lastPower = False
 checkfilter_end_time = 945
 checkfilter_end_timeDu = 1440
-open_time = 930
+open_time = 929
 sleep_time = 6
 tdx_max_int = 10
 
@@ -120,9 +120,9 @@ Monitor_format_trade=['name', 'trade', 'ma5d','boll','dff','df2', 'percent', 'ra
 
 Sina_Monitor_format =['name', 'trade', 'ma5d','boll','dff','percent', 'ra','op', 'fib','ratio','ma','volume','category']
 # MonitorMarket_format_buy=['name', 'buy', 'ma5d', 'boll','dff','percent', 'ra','op', 'fib','fibl','ma','macd','rsi','kdj','volume','date']
-MonitorMarket_format_buy=['name', 'buy', 'ma5d', 'boll','dff','couts','df2','percent', 'ra','op', 'fib','ma','volume','date','category']
+MonitorMarket_format_buy=['name', 'buy', 'ma5d', 'boll','dff','couts','df2','percent', 'ra','op', 'ratio','ma','volume','date','category']
 # MonitorMarket_format_trade=['name', 'trade', 'ma5d', 'boll','dff','percent', 'ra','op', 'fib','fibl', 'ma','macd','rsi','volume','kdj']
-MonitorMarket_format_trade=['name', 'trade', 'ma5d', 'boll','dff','couts','df2','percent', 'ra','op', 'fib', 'ma','volume','category']
+MonitorMarket_format_trade=['name', 'trade', 'ma5d', 'boll','dff','couts','df2','percent', 'ra','op', 'ratio', 'ma','volume','category']
 
 
 

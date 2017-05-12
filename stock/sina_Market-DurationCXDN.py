@@ -76,7 +76,7 @@ if __name__ == "__main__":
     # log.level = log.debug
     # error_handler = SyslogHandler('Sina-M-Log', level='ERROR')
 
-    width, height = 175,21
+    width, height = 172,21
     def set_duration_console(duration_date):
         if cct.isMac():
             cct.set_console(width, height)
@@ -387,7 +387,7 @@ if __name__ == "__main__":
                 if int_time < ct.open_time:
                     cct.sleep(ct.sleep_time)
                 elif int_time < 930:
-                    cct.sleep((930 - int_time) * 60)
+                    cct.sleep((ct.open_time - int_time) * 60)
                     # top_all = pd.DataFrame()
                     time_s = time.time()
                 else:

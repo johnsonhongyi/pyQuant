@@ -143,11 +143,12 @@ def get_tdx_Exp_day_to_df(code, start=None, end=None, dl=None,newdays = None,typ
     # p_day_dir = day_path.replace('/', path_sep).replace('\\', path_sep)
     # p_exp_dir = exp_dir.replace('/', path_sep).replace('\\', path_sep)
     # print p_day_dir,p_exp_dir
+    global initTdxdata
+
     if not os.path.exists(file_path):
         # ds = Series(
         #     {'code': code, 'date': cct.get_today(), 'open': 0, 'high': 0, 'low': 0, 'close': 0, 'amount': 0,
         #      'vol': 0})
-        global initTdxdata
         ds = pd.DataFrame()
         if initTdxdata == 0:
             log.error("file_path:not exists code:%s"%(code))
@@ -210,12 +211,16 @@ def get_tdx_Exp_day_to_df(code, start=None, end=None, dl=None,newdays = None,typ
             df['ma10d'] = pd.rolling_mean(df.close,10)
             df['ma20d'] = pd.rolling_mean(df.close,20)
             df['ma60d'] = pd.rolling_mean(df.close,60)
-            # df['hmax'] = df.high[-tdx_max_int:].max()
+            # df['msg'] = df.high[-tdx_max_int:].max()
             df['hmax'] = df.close[-tdx_max_int:max_int_end].max()
             df['lmin'] = df.low[-tdx_max_int:max_int_end].min()
             df['cmean'] = round(df.close[-tdx_max_int:max_int_end].mean(),2)
             df['hv'] = df.vol[-tdx_max_int:max_int_end].max()
             df['lv'] = df.vol[-tdx_max_int:max_int_end].min()
+            if dl < 30 and df.close[-tdx_max_int:max_int_end].max() > df.low[-tdx_max_int:max_int_end].min() * 2:
+                if initTdxdata < 3:
+                    log.error("%s outdata!"%(code))
+                initTdxdata +=1
             df = df.fillna(0)
             df = df.sort_index(ascending=False)
         return df
@@ -336,6 +341,10 @@ def get_tdx_Exp_day_to_df(code, start=None, end=None, dl=None,newdays = None,typ
             df['cmean'] = round(df.close[-tdx_max_int:max_int_end].mean(),2)
             df['hv'] = df.vol[-tdx_max_int:max_int_end].max()
             df['lv'] = df.vol[-tdx_max_int:max_int_end].min()
+            if dl < 30 and df.close[-tdx_max_int:max_int_end].max() > df.low[-tdx_max_int:max_int_end].min() * 2:
+                if initTdxdata < 3:
+                    log.error("%s outdata!"%(code)),            
+                initTdxdata +=1
             df = df.fillna(0)
             df = df.sort_index(ascending=False)
         return df
@@ -1529,16 +1538,7 @@ def getSinaAlldf(market='cyb',vol=ct.json_countVol,type=ct.json_countType,filena
     log.info("dm percent:%s"%(dm[:1]))
     # dm['volume'] = map(lambda x: round(x / 100, 1), dm.volume.values)
     dm['trade'] = dm['close']
-    if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 926:
-        # print dm[dm.code=='000001'].b1
-        # print dm[dm.code=='000001'].a1
-        # print dm[dm.code=='000001'].a1_v
-        # print dm[dm.code=='000001'].b1_v
-        dm = dm[(dm.buy > 0)]
-        dm['volume'] = map(lambda x: x, dm.b1_v.values)
-        # print dm[dm.code=='000001'].volume
-    else:
-        dm = dm[dm.trade > 0]
+
     # print dm[dm.code == '002474'].volume
     # print 'ratio' in dm.columns
     # print time.time()-time_s
@@ -1556,6 +1556,16 @@ def getSinaAlldf(market='cyb',vol=ct.json_countVol,type=ct.json_countType,filena
         dm=pd.merge(dm,df.loc[:,['name','ratio']],on='name',how='left')
         dm=dm.drop_duplicates('code')
         dm=dm.fillna(0)
+    if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 926:
+        # print dm[dm.code=='000001'].b1
+        # print dm[dm.code=='000001'].a1
+        # print dm[dm.code=='000001'].a1_v
+        # print dm[dm.code=='000001'].b1_v
+        dm = dm[(dm.buy > 0)]
+        dm['volume'] = map(lambda x: x, dm.b1_v.values)
+        # print dm[dm.code=='000001'].volume
+    else:
+        dm = dm[dm.trade > 0]
     # print dz[:1].ratio
     # dm['ratio'] = map(lambda x: round(df[df.code == x].ratio, 1) if len(df[df.code == x].ratio) > 0 else 0, dm['code'].values)
     # print len(dm)
@@ -1585,9 +1595,9 @@ def getSinaAlldf(market='cyb',vol=ct.json_countVol,type=ct.json_countType,filena
     # else:
     #     initTdxdata +=1
     #     top_diff = top_now
-    top_diff = top_now
-    print "b1>%s:%s:%s"%(initTdxdata,len(top_diff),round(time.time()-time_s,1)),
-    return top_diff
+#    top_diff = top_now
+    print "b1>%s:%s:%s"%(initTdxdata,len(top_now),round(time.time()-time_s,1)),
+    return top_now
 
 '''
 def get_tdx_append_now_df(code, type='f', start=None, end=None):
@@ -2623,6 +2633,9 @@ def get_tdx_exp_all_LastDF_DL(codeList, dt=None,end=None,ptype='low',filter='n',
     #     df=df[df.ra < 11]
         # print "op:",len(df),
     if dl != None:
+        global initTdxdata
+        if initTdxdata > 2:
+            print "All_OUT:%s"%(initTdxdata),
         print ("TDXE:%0.2f" % (time.time() - time_t)),
     return df
 
@@ -2796,7 +2809,7 @@ if __name__ == '__main__':
     # qs = np.array([1.0/n,]*n)
     # rands = np.random.rand(n)
     # print python_resample(qs, xs, rands)
-#    print get_tdx_Exp_day_to_df('sz',dl=20)
+    print get_tdx_Exp_day_to_df('300534',dl=20)
     # print get_tdx_Exp_day_to_df('999999',end=None).sort_index(ascending=False).shape
     # print sina_data.Sina().get_stock_code_data('300006').set_index('code')
 #    dd=rl.get_sina_Market_json('cyb').set_index('code')

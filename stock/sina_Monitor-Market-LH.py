@@ -95,10 +95,10 @@ if __name__ == "__main__":
     # log=LoggerFactory.JohnsonLoger('SinaMarket').setLevel(LoggerFactory.DEBUG)
     # log.setLevel(LoggerFactory.DEBUG)
     if cct.isMac():
-        width, height = 165, 16
+        width, height = 170, 16
         cct.set_console(width, height)
     else:
-        width, height = 165, 18
+        width, height = 170, 18
         cct.set_console(width, height)
     status = False
     vol = ct.json_countVol
@@ -121,7 +121,9 @@ if __name__ == "__main__":
     # all_diffpath = tdd.get_tdx_dir_blocknew() + '062.blk'
     while 1:
         try:
-            top_now = tdd.getSinaAlldf(market='sh', vol=ct.json_countVol, type=ct.json_countType)
+            # top_now = tdd.getSinaAlldf(market='sh', vol=ct.json_countVol, type=ct.json_countType)
+            top_now = tdd.getSinaAlldf(market='次新股',filename='cxg', vol=ct.json_countVol, type=ct.json_countType)
+            
             # print top_now.loc['300208','name']
             df_count = len(top_now)
             now_count = len(top_now)
@@ -312,7 +314,7 @@ if __name__ == "__main__":
                 if int_time < ct.open_time:
                     cct.sleep(ct.sleep_time)
                 elif int_time < 930:
-                    cct.sleep((930 - int_time) * 60)
+                    cct.sleep((ct.open_time - int_time) * 60)
                     top_all = pd.DataFrame()
                     time_s = time.time()
                 else:

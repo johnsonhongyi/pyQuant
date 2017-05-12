@@ -52,7 +52,7 @@ if __name__ == "__main__":
     #     df = df.append(x)
     # print len(df)
     # df.iloc[:, 0:2].to_csv('stock-Line-%s.csv'%today, encoding='utf8')
-    type = 'h'
+    type = 'l'
     start = '2016-01-18'
     # start = None
     market = 'sh'

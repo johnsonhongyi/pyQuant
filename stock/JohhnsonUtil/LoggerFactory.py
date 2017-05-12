@@ -45,12 +45,12 @@ def getLogger(name=''):
     # now = time.strftime('%Y-%m-%d %H:%M:%S')
     # path_sep = get_os_path_sep()
     log_path = get_run_path() + 'stock.log'
-    _logformat = "[%(asctime)s] %(name)s:%(filename)s(%(funcName)s:%(lineno)s): %(message)s"
+    _logformat = "[%(asctime)s] %(levelname)s:%(filename)s(%(funcName)s:%(lineno)s): %(message)s"
     logging.basicConfig(
         # level    =eval('logging.%s'%(level_s)),
         # format   = now +":" + name + ' LINE %(lineno)-4d  %(levelname)-8s %(message)s',
         # level=logging.DEBUG,
-        # level=logging.ERROR,
+        level=logging.ERROR,
         # level=logging.INFO,
         format=_logformat,
         datefmt='%m-%d %H:%M',
@@ -60,6 +60,7 @@ def getLogger(name=''):
     console = logging.StreamHandler();
     console.setLevel(logging.DEBUG);
     # formatter = logging.Formatter(name + ': LINE %(lineno)-4d : %(levelname)-8s %(message)s');
+    # formatter = logging.Formatter( '%(levelname)-5s %(message)s');
     formatter = logging.Formatter( '%(filename)s(%(funcName)s:%(lineno)s):%(levelname)-5s %(message)s');
     console.setFormatter(formatter);
     logger = logging.getLogger(name)
