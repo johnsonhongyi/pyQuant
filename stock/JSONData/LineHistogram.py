@@ -121,7 +121,7 @@ def get_linear_model_histogramDouble(code, ptype='low', dtype='d', start=None, e
     # code = '999999'
     # code = '601608'
     # code = '000002'
-    # asset = ts.get_hist_data(code)['close'].sort_index(ascending=True)
+    # asset = get_kdate_data(code)['close'].sort_index(ascending=True)
     # df = tdd.get_tdx_Exp_day_to_df(code, 'f').sort_index(ascending=True)
     # ptype='close'
     # if ptype == 'close' or ptype==''
@@ -450,7 +450,7 @@ def get_linear_model_histogram(code, ptype='low', dtype='d', start=None, end=Non
     # code = '999999'
     # code = '601608'
     # code = '000002'
-    # asset = ts.get_hist_data(code)['close'].sort_index(ascending=True)
+    # asset = get_kdate_data(code)['close'].sort_index(ascending=True)
     # df = tdd.get_tdx_Exp_day_to_df(code, 'f').sort_index(ascending=True)
     # ptype='close'
     # if ptype == 'close' or ptype==''

@@ -612,7 +612,7 @@ if __name__ == '__main__':
     # df = Get_Stock_List()
     # Dist = 'E:\\Quant\\'
     # df = Get_TA(df,Dist)
-    # df = ts.get_hist_data('sh')
+    # df = get_kdate_data('sh')
     # code='300110'
 #    code='300201'
     import sys

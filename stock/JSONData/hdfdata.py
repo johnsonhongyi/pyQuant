@@ -8,7 +8,7 @@ import pandas as pd
 import tables
 #import pandas.io.pytables
 code='601608'
-# df=ts.get_hist_data('601608')
+# df=get_kdate_data('601608')
 df= ts.get_today_ticks('601608')
 # .sort_index(ascending=True).dropna()
 print df[:1]
@@ -53,8 +53,8 @@ tst = f.create_ts('/',code,prices)
 # end = datetime(2014,5,2)
 
 # euro = web.DataReader("DEXUSEU", "fred", start, end)
-# euro = ts.get_hist_data(code).loc[:,['open','high','close']].sort_index(ascending=True).dropna()
-# df = ts.get_hist_data(code).loc[:,['open']].sort_index(ascending=True).dropna()
+# euro = get_kdate_data(code).loc[:,['open','high','close']].sort_index(ascending=True).dropna()
+# df = get_kdate_data(code).loc[:,['open']].sort_index(ascending=True).dropna()
 # print df[:1]
 df = ts.get_today_ticks('601608').loc[:,['time','price']]
 today=cct.get_today()

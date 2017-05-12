@@ -224,7 +224,7 @@ def twoLineCompute(code, df=None, start=None, end=None, ptype='low'):
     # ptype='low'
     # ptype='high'
     if df is None:
-        # df = ts.get_hist_data(code,start=start)
+        # df = get_kdate_data(code,start=start)
         df = tdd.get_tdx_append_now_df_api(
             code, start, end).sort_index(ascending=True)
     else:

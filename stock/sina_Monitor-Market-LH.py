@@ -87,6 +87,7 @@ if __name__ == "__main__":
     # parsehtml(downloadpage(url_s))
     # StreamHandler(sys.stdout).push_application()
     # log = LoggerFactory.getLogger('SinaMarket')
+    pd.options.mode.chained_assignment = None
     from docopt import docopt
     log = LoggerFactory.log
     args = docopt(cct.sina_doc, version='sina_cxdn')
@@ -257,7 +258,8 @@ if __name__ == "__main__":
                         title=['dT:%s' % cct.get_time_to_date(time_s), 'G:%s' % len(top_dif), 'zxg: %s' % (blkname)])
 
                     top_all = tdd.get_powerdf_to_all(top_all,top_temp)
-                    top_temp = stf.getBollFilter(df=top_temp, boll=ct.bollFilter,duration=ct.PowerCountdl)
+                    # top_temp = stf.getBollFilter(df=top_temp, boll=ct.bollFilter,duration=ct.PowerCountdl)
+                    top_temp = stf.getBollFilter(df=top_temp, boll=-10,duration=ct.PowerCountdl)
                     print("A:%s N:%s K:%s %s G:%s" % (
                         df_count, now_count, len(top_all[top_all['buy'] > 0]),
                         len(top_now[top_now['volume'] <= 0]), goldstock)),

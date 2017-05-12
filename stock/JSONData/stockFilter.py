@@ -14,7 +14,7 @@ def getBollFilter(df=None,boll=5,duration=ct.PowerCountdl,filter=True,ma5d=True,
         print "dataframe is None"
         return None
     else:
-        df.loc[df.percent>=9.9,'percent']=10
+        df.loc[df.percent > 9.95,'percent']=10
     if cct.get_now_time_int() > 915 and cct.get_now_time_int() <= 1000:
         # df = df[df.buy > df.cmean * ct.changeRatioUp ]
         df = df[df.buy > df.cmean * ct.changeRatio]
@@ -43,7 +43,7 @@ def getBollFilter(df=None,boll=5,duration=ct.PowerCountdl,filter=True,ma5d=True,
     pd.options.mode.chained_assignment = None
     # df.rename(columns={'dff': 'df2'}, inplace=True)
     # df['diff2'] = df['dff']
-    
+
     # df['df2'] = (map(lambda ra, fibl,rah,fib,ma,kdj,rsi:round(eval(ct.powerdiff%(duration)),1),\
     #                      df['ra'].values, df['fibl'].values,df['rah'].values,df['fib'].values,df['ma'].values,\
     #                      df['kdj'].values,df['rsi'].values))
@@ -65,16 +65,17 @@ def getBollFilter(df=None,boll=5,duration=ct.PowerCountdl,filter=True,ma5d=True,
         #     if fibh > dl / 3:
         #         df = df[ ((df.ma5d * ct.changeRatio < df.low) & (df.low < df.ma5d * (2 - ct.changeRatio))) | ((df.percent > 1) & (df.volume > 3))]
         if 'vstd' in df.columns:
-            df = df[(df.lvol * df.volume > (df.vstd + df.lvol)) | ((df.percent > -5) & (df.hv/df.lv > 3))]
+#            df = df[(df.lvol * df.volume > (df.vstd + df.lvol)) | ((df.percent > -5) & (df.hv/df.lv > 3))]
+            df = df[(df.lvol * df.volume > (df.vstd + df.lvol)) | ((df.percent > -5) & (df.hv/df.lv > 1.5))]
     #                [dd.lvol * dd.volume > (dd.vstd + dd.lvol) | dd.lvol * dd.volume >(dd.ldvolume + dd.vstd]
-        if percent:       
+        if percent:
             if  cct.get_now_time_int() > 920 and cct.get_now_time_int() <= 1400:
                 # df = df[((df.fibl < int(duration / 1.5)) &  (df.volume > 2.5 * cct.get_work_time_ratio() )) | (df.percent > 3)]
                 df = df[ (df.volume > 2.5 * cct.get_work_time_ratio()) | (df.percent > 3)]
             if cct.get_now_time_int() > 926 or cct.get_now_time_int() < 900:
                 df = df[df.percent > 1 ]
                 df = df[df.oph > 10]
-            
+
     # elif filter and cct.get_now_time_int() > 1015 and cct.get_now_time_int() <= 1445:
     #     df = df[((df.fibl < int(duration / 1.5)) &  (df.volume > 3)) | (df.percent > 3)]
         # print df
