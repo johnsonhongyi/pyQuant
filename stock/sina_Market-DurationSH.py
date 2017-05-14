@@ -10,14 +10,14 @@ import time
 import pandas as pd
 
 import JohhnsonUtil.johnson_cons as ct
+from JohhnsonUtil import LoggerFactory as LoggerFactory
+from JohhnsonUtil import commonTips as cct
 import singleAnalyseUtil as sl
 from JSONData import powerCompute as pct
 from JSONData import stockFilter as stf
 from JSONData import realdatajson as rl
 from JSONData import tdx_data_Day as tdd
 from JSONData import LineHistogram as lhg
-from JohhnsonUtil import LoggerFactory as LoggerFactory
-from JohhnsonUtil import commonTips as cct
 
 # from logbook import Logger,StreamHandler,SyslogHandler
 # from logbook import StderrHandler
@@ -63,7 +63,7 @@ if __name__ == "__main__":
     log = LoggerFactory.log
     args = docopt(cct.sina_doc, version='sina_cxdn')
     log_level = LoggerFactory.DEBUG if args['--debug'] else LoggerFactory.ERROR
-    log.setLevel(log_level)      
+    log.setLevel(log_level)
     # log.setLevel(LoggerFactory.DEBUG)
     # handler=StderrHandler(format_string='{record.channel}: {record.message) [{record.extra[cwd]}]')
     # log.level = log.debug
@@ -173,7 +173,7 @@ if __name__ == "__main__":
                             top_all['prev_p'] = 0
                     for symbol in top_all.index:
                         if symbol in top_now.index:
-                            
+
                             if 'couts' in top_now.columns.values:
                                 top_all.loc[symbol, ct.columns_now] = top_now.loc[symbol, ct.columns_now]
                             else:
@@ -300,7 +300,7 @@ if __name__ == "__main__":
 
                     top_all = tdd.get_powerdf_to_all(top_all,top_temp)
                     top_all = tdd.get_powerdf_to_all(top_all,top_end)
-                    
+
                     top_temp = stf.getBollFilter(df=top_temp, boll=ct.bollFilter,duration=ct.PowerCountdl)
                     print ("N:%s K:%s %s G:%s" % (
                         now_count, len(top_all[top_all['buy'] > 0]),

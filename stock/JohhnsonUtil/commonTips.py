@@ -56,6 +56,7 @@ win7rootXunji = r'E:\DOC\Parallels\WinTools\zd_pazq'
 win7rootList = [win10Lixin,win7rootAsus,win7rootXunji,win10Lengend]
 macroot = r'/Users/Johnson/Documents/Johnson/WinTools/zd_pazq'
 xproot = r'E:\DOC\Parallels\WinTools\zd_pazq'
+ramdisk_root = r'/Volumes/RamDisk'
 path_sep = os.path.sep
 def get_tdx_dir():
     os_sys = get_sys_system()
@@ -81,6 +82,28 @@ def get_tdx_dir():
         log.error("basedir not exists")
     return basedir
 
+def get_ramdisk_path(filename):
+    if filename:
+        basedir = ramdisk_root.replace('/', path_sep).replace('\\',path_sep)
+        if filename.find(basedir) >= 0:
+            log.info("file:%s"%(filename))
+            return filename
+
+        if not os.path.exists(basedir):
+            log.error("basedir not exists")
+            return None
+
+        if not filename.endswith('h5'):
+            filename = filename + '.h5'
+
+        file_path = basedir  + path_sep + filename 
+        # for root in win7rootList:
+        #     basedir = root.replace('/', path_sep).replace('\\',path_sep)  # 如果你的安装路径不同,请改这里
+        #     if os.path.exists(basedir):
+        #         log.info("%s : path:%s" % (os_platform,basedir))
+        #         break
+    return file_path    
+# get_ramdisk_path('/Volumes/RamDisk/top_now.h5')
 
 from numba.decorators import autojit
 def run_numba(func):
@@ -190,6 +213,9 @@ def isMac():
     else:
         return False
 
+def check_chinese(checkstr):
+    status = re.match('[ \u4e00 -\u9fa5]+',checkstr) == None
+    return status
 # def whichEncode(text):
 #   text0 = text[0]
 #   try:
@@ -530,7 +556,7 @@ def testdf(df):
 
 
 def testdf2(df):
-    if df is not None and not df.empty > 0:
+    if df is not None and not df.empty:
         pass
     else:
         pass
@@ -576,7 +602,7 @@ def get_work_time():
 def get_work_duration():
     int_time = get_now_time_int()
     # now_t = int(now_t)
-    if (int_time > 800 and int_time < 915) or (int_time > 1130 and int_time < 1300):
+    if get_work_day_status() and (int_time > 800 and int_time < 915) or (int_time > 1130 and int_time < 1300):
     # if (int_time > 830 and int_time < 915) or (int_time > 1130 and int_time < 1300) or (int_time > 1500 and int_time < 1510):
         # return False
         return True
@@ -1296,6 +1322,8 @@ if __name__ == '__main__':
     # print get_work_time_ratio()
     # print typeday8_to_day10(None)
     # write_to_blocknew('abc', ['300380','601998'], append=True)
+    print get_work_day_status()
+    print get_work_duration()
     print get_today_duration('2017-01-01','20170504')
     # print get_tushare_market(market='captops', renew=True,days=10).shape
     # print get_rzrq_code()[:3]

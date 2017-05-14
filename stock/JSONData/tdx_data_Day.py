@@ -1519,7 +1519,18 @@ def getSinaJsondf(market='cyb',vol=ct.json_countVol,type=ct.json_countType):
     top_now = rl.get_market_price_sina_dd_realTime(df, vol, type)
     return top_now
 
-def getSinaAlldf(market='cyb',vol=ct.json_countVol,type=ct.json_countType,filename='mnbk'):
+def getSinaAlldf(market='cyb',vol=ct.json_countVol,type=ct.json_countType,filename='mnbk',table='top_now'):
+    h5_limit_time = 120
+    h5_fname = 'tdx_now'
+    h5_table = market if not cct.check_chinese(market) else filename
+    h5 = top_hdf_api(fname=h5_fname,table=h5_table,df=None)
+    if h5 is not None and not h5.empty and 'time' in h5.columns:
+        o_time = h5[h5.time <> 0].time
+        if len(o_time) > 0:
+            o_time = o_time[0]
+#            print time.time() - o_time
+            if time.time() - o_time < h5_limit_time:
+                return h5
 
     if market == 'rzrq':
         df = cct.get_rzrq_code()
@@ -1617,6 +1628,7 @@ def getSinaAlldf(market='cyb',vol=ct.json_countVol,type=ct.json_countType,filena
         top_now['prev_p'] = 0
         top_now['kind'] = 0
 
+    top_now['time'] = time.time()
     # print top_now[:1].b1_v
     # print len(top_now),len(dm)
     # print top_now.loc[top_now.index == '300076',['b1_v','a1_v','trade','buy','b1','a1']]
@@ -1630,7 +1642,15 @@ def getSinaAlldf(market='cyb',vol=ct.json_countVol,type=ct.json_countType,filena
     # else:
     #     initTdxdata +=1
     #     top_diff = top_now
-#    top_diff = top_now
+    top_hdf_api(fname=h5_fname, table=h5_table, df=top_now)
+    # if 'time' in h5.columns:
+    #     o_time = h5[h5.time <> 0].time
+    #     if len(o_time) > 0:
+    #         o_time = o_time[0]
+    #         print time.time() - o_time
+    #         if time.time() - o_time < h5_limit_time:
+    #             top_now = h5
+    #             return h5
     print "b1>%s:%s:%s"%(initTdxdata,len(top_now),round(time.time()-time_s,1)),
     return top_now
 
@@ -2432,24 +2452,41 @@ def get_append_lastp_to_df(top_all,lastpTDX_DF=None,dl=ct.PowerCountdl,end=None,
 #    codelist = ['603169']
     log.info('toTDXlist:%s' % len(codelist))
     # print codelist[5]
+    h5_fname='tdx_last_Df'
+    market=ptype+'_'+str(dl)+'_'+filter
     if lastpTDX_DF is None or len(lastpTDX_DF) == 0:
-        # tdxdata = get_tdx_all_day_LastDF(codelist) '''only get lastp no powerCompute'''
-        tdxdata = get_tdx_exp_all_LastDF_DL(codelist,dt=dl,end=end,ptype=ptype,filter=filter,power=power,lastp=lastp,newdays=newdays)
-        # tdxdata.rename(columns={'close': 'llow'}, inplace=True)
-        tdxdata.rename(columns={'open': 'lopen'}, inplace=True)
-        tdxdata.rename(columns={'high': 'lhigh'}, inplace=True)
-        tdxdata.rename(columns={'close': 'lastp'}, inplace=True)
-        # tdxdata.rename(columns={'low': 'lastp'}, inplace=True)
-        tdxdata.rename(columns={'low': 'llow'}, inplace=True)
-        tdxdata.rename(columns={'vol': 'lvol'}, inplace=True)
-        tdxdata.rename(columns={'amount': 'lamount'}, inplace=True)
-#        if power:
-#            tdxdata = tdxdata.loc[:, ['llow', 'lhigh', 'lastp', 'lvol', 'date','ra','op','fib','fibl','ma5d','ma10d','ldate']]
-#            # print len(tdxdata[tdxdata.op >15]),
-#        else:
-#            tdxdata = tdxdata.loc[:, ['llow', 'lhigh', 'lastp', 'lvol','ma5d','ma10d','date']]
-#            # tdxdata = tdxdata.loc[
-#            #     :, ['llow', 'lhigh', 'lastp', 'lvol', 'date']]
+
+        h5 = top_hdf_api(fname=h5_fname,table=market,df=None)
+        if h5 is not None and not h5.empty:
+#            o_time = h5[h5.time <> 0].time
+#            if len(o_time) > 0:
+#                o_time = o_time[0]
+    #            print time.time() - o_time
+#                if time.time() - o_time > h5_limit_time:
+            tdxdata = h5
+        else:
+            # tdxdata = get_tdx_all_day_LastDF(codelist) '''only get lastp no powerCompute'''
+            tdxdata = get_tdx_exp_all_LastDF_DL(codelist,dt=dl,end=end,ptype=ptype,filter=filter,power=power,lastp=lastp,newdays=newdays)
+            # tdxdata.rename(columns={'close': 'llow'}, inplace=True)
+            tdxdata.rename(columns={'open': 'lopen'}, inplace=True)
+            tdxdata.rename(columns={'high': 'lhigh'}, inplace=True)
+            tdxdata.rename(columns={'close': 'lastp'}, inplace=True)
+            # tdxdata.rename(columns={'low': 'lastp'}, inplace=True)
+            tdxdata.rename(columns={'low': 'llow'}, inplace=True)
+            tdxdata.rename(columns={'vol': 'lvol'}, inplace=True)
+            tdxdata.rename(columns={'amount': 'lamount'}, inplace=True)
+    #        if power:
+    #            tdxdata = tdxdata.loc[:, ['llow', 'lhigh', 'lastp', 'lvol', 'date','ra','op','fib','fibl','ma5d','ma10d','ldate']]
+    #            # print len(tdxdata[tdxdata.op >15]),
+    #        else:
+    #            tdxdata = tdxdata.loc[:, ['llow', 'lhigh', 'lastp', 'lvol','ma5d','ma10d','date']]
+    #            # tdxdata = tdxdata.loc[
+    #            #     :, ['llow', 'lhigh', 'lastp', 'lvol', 'date']]
+
+            h5 = top_hdf_api(fname=h5_fname,table=market,df=tdxdata)
+
+
+
         log.debug("TDX Col:%s" % tdxdata.columns.values)
     else:
         tdxdata = lastpTDX_DF
@@ -2463,6 +2500,8 @@ def get_append_lastp_to_df(top_all,lastpTDX_DF=None,dl=ct.PowerCountdl,end=None,
         tdxdata, left_index=True, right_index=True, how='left')
     # log.info('Top-merge_now:%s' % (top_all[:1]))
     top_all = top_all[top_all['llow'] > 0]
+
+
     if lastpTDX_DF is None:
         return top_all,tdxdata
     else:
@@ -2835,9 +2874,98 @@ def testnumba(number=500):
     # print timeit.timeit(lambda:cct.run_numba(python_resample(qs, xs, rands)),number=number)
     print timeit.timeit(lambda:autojit(lambda:python_resample(qs, xs, rands)),number=number)
     # print timeit.timeit(lambda:cct.run_numba(python_resample(qs, xs, rands)),number=number)
+
+def get_hdf5_file(fpath,wr_mode='w',complevel=9,complib='zlib'):
+    # store=pd.HDFStore(fpath,wr_mode, complevel=complevel, complib=complib)
+    fpath = cct.get_ramdisk_path(fpath)
+    if not fpath:
+        print ("don't exists %s"%(fpath))
+        return None
+    if os.path.exists(fpath):
+        store=pd.HDFStore(fpath)
+    else:
+#        store = pd.HDFStore(fpath, format = "table", complevel=9, complib='blosc')
+        store = pd.HDFStore(fpath, format = "table", complevel=9)
+    # store.put("Year2015", dfMinutes, format="table", append=True, data_columns=['dt','code'])
+    return store
+    # fp='/Volumes/RamDisk/top_now.h5'
+    # get_hdf5_file(fp)
+    # def hdf5_read_file(file):
+        # store.select("Year2015", where=['dt<Timestamp("2015-01-07")','code=="000570"'])
+        # return store
+
+
+def varname(p):
+    import inspect
+    import re
+    for line in inspect.getframeinfo(inspect.currentframe().f_back)[3]:
+        m = re.search(r'\bvarname\s*\(\s*([A-Za-z_][A-Za-z0-9_]*)\s*\)', line)
+        if m:
+          return m.group(1)
+
+def varnamestr(obj, namespace=globals()):
+    # namestr(a, globals())
+    if isinstance(namespace,dict):
+        n_list = [name for name in namespace if namespace[name] is obj]
+    else:
+        log.error("namespce not dict")
+        return None
+        # n_list = [name for name in namespace if id(name) == id(obj)]
+
+    for n in n_list:
+        if n.startswith('_'):
+            continue
+        else:
+            return n
+    return None
+
+def top_hdf_api(fname='tdx',table=None,df=None):
+    if df is not None and not df.empty:
+        h5 = get_hdf5_file(fname)
+        if h5 is not None:
+            dd = df.dtypes.to_frame()
+            if 'object' in dd.values:
+                dd = dd[dd == 'object'].dropna()
+                col = dd.index.tolist()
+            df.index = df.index.astype(str)
+            # df[['name','kind']] = df[['name','kind']].astype(str)
+            df[col] = df[col].astype(str)
+#                table = varnamestr(df,globals())
+#                table = varname(df)
+            if table is not None:
+                h5[table] = df
+            else:
+                log.error("write table is None")
+            h5.close()
+            return df
+        else:
+            log.error("hdf is None")
+    else:
+        h5 = get_hdf5_file(fname)
+        if table is None and df is None:
+            df = h5.copy()
+            h5.close()
+            return df
+#        if table is None and df is not None:
+#            table = varnamestr(df,globals())
+#            table = varname(df)
+        if h5 is not None:
+            if table is not None:
+                for key in h5.keys():
+                    if key.find(table) >=0:
+                        df = h5[table]
+                        h5.close()
+                        return df
+                log.error("hdf is not find %s"%(table))
+        h5.close()
+        return None
+# top_now=getSinaAlldf(market='rzrq', vol=ct.json_countVol, type=ct.json_countType)
+# top_hdf_api('tdx', df=top_now, table=None)
+
 if __name__ == '__main__':
     import sys
     import timeit
+    print cct.get_ramdisk_path('tdx')
     # testnumba(1000)
     # n = 100
     # xs = np.arange(n, dtype=np.float64)
@@ -2846,7 +2974,8 @@ if __name__ == '__main__':
     # print python_resample(qs, xs, rands)
     # print get_kdate_data('300534', start='2017-05-01', end='', ktype='D')
 
-    print len(get_tdx_Exp_day_to_df('601996',dl=20))
+    df = get_tdx_Exp_day_to_df('601996',dl=20)
+
     # print get_tdx_Exp_day_to_df('300546',dl=20)
     # print get_tdx_Exp_day_to_df('999999',end=None).sort_index(ascending=False).shape
     # print sina_data.Sina().get_stock_code_data('300006').set_index('code')
