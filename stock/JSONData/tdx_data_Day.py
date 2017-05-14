@@ -109,7 +109,19 @@ def get_kdate_data(code,start='',end='',ktype='D'):
     df.sort_index(ascending=False,inplace=True)
 
     return df
-def get_tdx_Exp_day_to_df(code, start=None, end=None, dl=None,newdays = None,type='f'):
+
+def write_all_kdata_to_file(code,f_path,df=None):
+    fsize = os.path.getsize(f_path)
+    if fsize <> 0:
+        o_file = open(f_path,'w+')
+        o_file.truncate()
+        o_file.close()
+    if df is None:
+        df = get_kdate_data(code)
+    write_tdx_tushare_to_file(code, df=df)
+    print "writeCode:%s size:%s"%(code,os.path.getsize(f_path)/50)
+
+def get_tdx_Exp_day_to_df(code, start=None, end=None, dl=None,newdays = None,type='f',wds=True):
     """[get local tdx data]
     [description]
     Arguments:
@@ -150,7 +162,7 @@ def get_tdx_Exp_day_to_df(code, start=None, end=None, dl=None,newdays = None,typ
     # p_exp_dir = exp_dir.replace('/', path_sep).replace('\\', path_sep)
     # print p_day_dir,p_exp_dir
     global initTdxdata
-
+    write_k_data_status = wds
     if not os.path.exists(file_path):
         # ds = Series(
         #     {'code': code, 'date': cct.get_today(), 'open': 0, 'high': 0, 'low': 0, 'close': 0, 'amount': 0,
@@ -228,12 +240,13 @@ def get_tdx_Exp_day_to_df(code, start=None, end=None, dl=None,newdays = None,typ
             df['cmean'] = round(df.close[-tdx_max_int:max_int_end].mean(),2)
             df['hv'] = df.vol[-tdx_max_int:max_int_end].max()
             df['lv'] = df.vol[-tdx_max_int:max_int_end].min()
-            if dl < 30 and df.close[-tdx_max_int:].max() > df.open[-tdx_max_int:].min() * 2:
+            if dl < 15 and df.close[-tdx_max_int:].max() > df.open[-tdx_max_int:].min() * 2:
                 # if initTdxdata < 3:
                 log.error("%s outdata!"%(code))
                 initTdxdata +=1
-                write_all_kdata_to_file(code,f_path=file_path)
-                df = get_tdx_Exp_day_to_df(code, start=start, end=end, dl=dl, newdays=newdays, type='f')
+                if write_k_data_status:
+                    write_all_kdata_to_file(code,f_path=file_path)
+                    df = get_tdx_Exp_day_to_df(code, start=start, end=end, dl=dl, newdays=newdays, type='f',wds=False)
                 # write_tdx_sina_data_to_file(code, df=df)
             df = df.fillna(0)
             df = df.sort_index(ascending=False)
@@ -355,29 +368,20 @@ def get_tdx_Exp_day_to_df(code, start=None, end=None, dl=None,newdays = None,typ
             df['cmean'] = round(df.close[-tdx_max_int:max_int_end].mean(),2)
             df['hv'] = df.vol[-tdx_max_int:max_int_end].max()
             df['lv'] = df.vol[-tdx_max_int:max_int_end].min()
-            if dl < 30 and df.close[-tdx_max_int:].max() > df.open[-tdx_max_int:].min() * 2:
+            if dl < 15 and df.close[-tdx_max_int:].max() > df.open[-tdx_max_int:].min() * 2:
 
                 # if initTdxdata < 3:
                 log.error("%s outdata!"%(code))
                 initTdxdata +=1
-                write_all_kdata_to_file(code,file_path)
-                df = get_tdx_Exp_day_to_df(code, start=start, end=end, dl=dl, newdays=newdays, type='f')
+                if write_k_data_status:
+                    write_all_kdata_to_file(code,file_path)
+                    df = get_tdx_Exp_day_to_df(code, start=start, end=end, dl=dl, newdays=newdays, type='f',wds=False)
 
                 # write_tdx_sina_data_to_file(code, df=df)
             df = df.fillna(0)
             df = df.sort_index(ascending=False)
         return df
 
-def write_all_kdata_to_file(code,f_path,df=None):
-    fsize = os.path.getsize(f_path)
-    if fsize <> 0:
-        o_file = open(f_path,'w+')
-        o_file.truncate()
-        o_file.close()
-    if df is None:
-        df = get_kdate_data(code)
-    write_tdx_tushare_to_file(code, df=df)
-    print "writeCode:%s size:%s"%(code,os.path.getsize(f_path)/50)
 
 INDEX_LIST = {'sh': 'sh000001', 'sz': 'sz399001', 'hs300': 'sz399300',
               'sz50': 'sh000016', 'zxb': 'sz399005', 'cyb': 'sz399006'}
@@ -2935,11 +2939,11 @@ def top_hdf_api(fname='tdx',table=None,df=None):
             if table is not None:
                 h5[table] = df
             else:
-                log.error("write table is None")
+                log.error("write table is None:%s"%(fname))
             h5.close()
             return df
         else:
-            log.error("hdf is None")
+            log.error("hdf is Non:%s"%(fname))
     else:
         h5 = get_hdf5_file(fname)
         if table is None and df is None:
@@ -2956,12 +2960,12 @@ def top_hdf_api(fname='tdx',table=None,df=None):
                         df = h5[table]
                         h5.close()
                         return df
-                log.error("hdf is not find %s"%(table))
+                log.error("%s is not find %s"%(fname,table))
         h5.close()
         return None
 # top_now=getSinaAlldf(market='rzrq', vol=ct.json_countVol, type=ct.json_countType)
 # top_hdf_api('tdx', df=top_now, table=None)
-
+#get_tdx_Exp_day_to_df('603859',dl=20)
 if __name__ == '__main__':
     import sys
     import timeit
