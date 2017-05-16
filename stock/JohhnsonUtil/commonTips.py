@@ -85,6 +85,9 @@ def get_tdx_dir():
 def get_ramdisk_path(filename):
     if filename:
         basedir = ramdisk_root.replace('/', path_sep).replace('\\',path_sep)
+        if not os.path.isdir(basedir):
+            log.debug("ramdisk Root Err:%s"%(basedir))
+            return None
         if filename.find(basedir) >= 0:
             log.info("file:%s"%(filename))
             return filename

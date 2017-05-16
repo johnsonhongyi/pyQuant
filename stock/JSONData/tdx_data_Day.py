@@ -2942,8 +2942,8 @@ def testnumba(number=500):
 def get_hdf5_file(fpath,wr_mode='r',complevel=9,complib='zlib'):
     # store=pd.HDFStore(fpath,wr_mode, complevel=complevel, complib=complib)
     fpath = cct.get_ramdisk_path(fpath)
-    if not fpath:
-        print ("don't exists %s"%(fpath))
+    if fpath is None:
+        # print ("don't exists %s"%(fpath))
         return None
     if os.path.exists(fpath):
         if wr_mode == 'w':
@@ -3008,11 +3008,11 @@ def top_hdf_api(fname='tdx',wr_mode='r',table=None,df=None):
             return df
         else:
             log.error("hdf is Non:%s"%(fname))
-            if h5.is_open:
+            if h5 is not None and h5.is_open:
                 h5.close()
     else:
         h5 = get_hdf5_file(fname,wr_mode=wr_mode)
-        if table is None and df is None:
+        if table is None and df is None and h5 is not None:
             df = h5.copy()
             if h5.is_open:
                 h5.close()
@@ -3030,11 +3030,9 @@ def top_hdf_api(fname='tdx',wr_mode='r',table=None,df=None):
                         h5.close()
                     return df
                 log.error("%s is not find %s"%(fname,table))
-        if h5.is_open:
-            h5.close()
-        return None
-    if h5.is_open:
-        h5.close()
+            if h5.is_open:
+                h5.close()
+    return None
 
 # def load_hdf_db(fname,table='all',code_l=None,init=False,index='code'):
 def load_hdf_db(fname,table='all',code_l=None,index='code'):
