@@ -96,13 +96,13 @@ def get_ramdisk_path(filename):
         if not filename.endswith('h5'):
             filename = filename + '.h5'
 
-        file_path = basedir  + path_sep + filename 
+        file_path = basedir  + path_sep + filename
         # for root in win7rootList:
         #     basedir = root.replace('/', path_sep).replace('\\',path_sep)  # 如果你的安装路径不同,请改这里
         #     if os.path.exists(basedir):
         #         log.info("%s : path:%s" % (os_platform,basedir))
         #         break
-    return file_path    
+    return file_path
 # get_ramdisk_path('/Volumes/RamDisk/top_now.h5')
 
 from numba.decorators import autojit
@@ -1356,6 +1356,7 @@ if __name__ == '__main__':
     # print get_work_time_ratio()
     # print typeday8_to_day10(None)
     # write_to_blocknew('abc', ['300380','601998'], append=True)
+    print get_now_time_int()
     print get_work_day_status()
     print get_work_duration()
     print get_today_duration('2017-01-01','20170504')
@@ -1376,7 +1377,6 @@ if __name__ == '__main__':
     sys.exit(0)
     print get_rzrq_code('cxgzx')[:3]
     print get_rzrq_code('cx')[:3]
-    print get_now_time_int()
     print get_now_time()
     print get_work_time_ratio()
     print get_work_day_status()

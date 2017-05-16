@@ -87,17 +87,17 @@ class Sina:
         self.dataframe = pd.DataFrame()
         self.index_status = False
         self.hdf_name = 'sina_data'
-        self.table = None
-        h5 = self.load_hdf_db(mtype='all', code_l=None, init=True)
-        if h5 is None:
-            log.info("hdf5 None")
-            self.all
-        else:
-            if not h5.empty and 'time' in h5.columns:
-                # print  h5[h5.time <> 0].time
-                if cct.get_work_time() and time.time() - h5[h5.time <> 0].time[0] > ct.h5_limit_time:
-                    self.all
-        # self.all
+        self.table = 'all'
+        self.all
+        # h5 = self.load_hdf_db(table='all', code_l=None, init=True)
+        # if h5 is None:
+        #     # log.info("hdf5 None")
+        #     self.all
+        # else:
+        #     if not h5.empty and 'time' in h5.columns:
+        #         # print  h5[h5.time <> 0].time
+        #         if cct.get_work_time() and time.time() - h5[h5.time <> 0].time[0] > ct.h5_limit_time:
+        #             self.all
 
     def load_stock_codes(self):
         with open(self.stock_code_path) as f:
@@ -108,49 +108,50 @@ class Sina:
     #     response = requests.get(self.sina_stock_api + self.stock_list[index])
     #     self.stock_data.append(response.text)
 
-    def load_hdf_db(self,mtype='all',code_l=None,init=False):
-        h5=tdd.top_hdf_api(fname=self.hdf_name, table=mtype, df=None)
-        if not init:
-            if code_l is not None:
-                if len(code_l) == 0:
-                    return None
-            if h5 is not None and not h5.empty and 'time' in h5.columns:
-                    o_time = h5[h5.time <> 0].time
-                    if len(o_time) > 0:
-                        o_time = o_time[0]
-            #            print time.time() - o_time
-                        # if cct.get_work_hdf_status() and (not (915 < cct.get_now_time_int() < 930) and time.time() - o_time < ct.h5_limit_time):
-                        if not cct.get_work_time() or time.time() - o_time < ct.h5_limit_time:
-                            log.info("time hdf:%s %s"%(self.hdf_name,len(h5))),
-                            if 'time' in h5.columns:
-                                # h5=h5.drop(['time'],axis=1)
-                                if code_l is not None:
-                                    if 'code' in h5.columns:
-                                        h5 = h5.set_index('code')
-                                    # print [inx for inx in h5.index  if inx not in code_l]
-                                    h5.drop([inx for inx in h5.index  if inx not in code_l], axis=0, inplace=True)
-                                    log.info("time in idx hdf:%s %s"%(self.hdf_name,len(h5))),
-                            h5=h5.reset_index()
-                            return h5
-        else:
-            if h5 is not None and len(h5) > 1000:
-                return h5
-        return None
 
-    def write_hdf_db(self,df,code_l=None,mtype='all'):
-        # if 'code' in df.columns:
-            # df = df.set_index('code')
-        if code_l is not None and len(code_l) > 1000:
-            dd = df.copy()
-            if 'code' in dd.columns:
-                dd = dd.set_index('code')
-            dd['time'] =  time.time()
-            h5=tdd.top_hdf_api(fname=self.hdf_name,wr_mode='w', table=mtype, df=dd)
+    # def load_hdf_db(self,table='all',code_l=None):
+    #     h5=tdd.top_hdf_api(fname=self.hdf_name, table=table, df=None)
+    #     if code_l is not None:
+    #         if len(code_l) == 0:
+    #             return None
+    #     if h5 is not None and not h5.empty and 'time' in h5.columns:
+    #             o_time = h5[h5.time <> 0].time
+    #             if len(o_time) > 0:
+    #                 o_time = o_time[0]
+    #     #            print time.time() - o_time
+    #                 # if cct.get_work_hdf_status() and (not (915 < cct.get_now_time_int() < 930) and time.time() - o_time < ct.h5_limit_time):
+    #                 if not cct.get_work_time() or time.time() - o_time < ct.h5_limit_time:
+    #                     log.info("time hdf:%s %s"%(self.hdf_name,len(h5))),
+    #                     if 'time' in h5.columns:
+    #                         # h5=h5.drop(['time'],axis=1)
+    #                         if code_l is not None:
+    #                             if 'code' in h5.columns:
+    #                                 h5 = h5.set_index('code')
+    #                             # print [inx for inx in h5.index  if inx not in code_l]
+    #                             h5.drop([inx for inx in h5.index  if inx not in code_l], axis=0, inplace=True)
+    #                             log.info("time in idx hdf:%s %s"%(self.hdf_name,len(h5))),
+    #                     h5=h5.reset_index()
+    #                     return h5
+    #     else:
+    #         if h5 is not None:
+    #             return h5
+    #     return None
+
+
+    # def write_hdf_db(self,df,table='all'):
+    #     # if 'code' in df.columns:
+    #         # df = df.set_index('code')
+    #     if df is not None and len(df) > 1000:
+    #         dd = df.copy()
+    #         if 'code' in dd.columns:
+    #             dd = dd.set_index('code')
+    #         dd['time'] =  time.time()
+    #         h5=tdd.top_hdf_api(fname=self.hdf_name,wr_mode='w', table=table, df=dd)
 
     @property
     def all(self):
 
-        h5 = self.load_hdf_db(mtype='all')
+        h5 = tdd.load_hdf_db(self.hdf_name,self.table,index='int')
         if h5 is not None:
             log.info("hdf5 data:%s"%(len(h5)))
             return h5
@@ -223,7 +224,7 @@ class Sina:
                     map(lambda stock_code: ('sz%s' )% stock_code,
                         self.stock_codes))
 
-            h5 = self.load_hdf_db(mtype='all', code_l=self.stock_codes)
+            h5 = tdd.load_hdf_db(self.hdf_name,self.table, code_l=self.stock_codes,index='int')
             if h5 is not None:
                 return h5
 
@@ -346,7 +347,7 @@ class Sina:
                 ('5', '6', '9')) else 'sz%s') % stock_code, code_l)
 
         if not index:
-            h5 = self.load_hdf_db(mtype='all', code_l=code_l)
+            h5 = tdd.load_hdf_db(self.hdf_name,self.table, code_l=code_l,index='int')
             if h5 is not None:
                 log.info("not index hdf5 data:%s"%(len(h5)))
                 return h5
@@ -362,7 +363,7 @@ class Sina:
 
     def get_stock_list_data(self, ulist):
 
-        h5 = self.load_hdf_db(mtype='all', code_l=ulist)
+        h5 = tdd.load_hdf_db(self.hdf_name,self.table, code_l=ulist,index='int')
         if h5 is not None:
             log.info("hdf5 data:%s"%(len(h5)))
             return h5
@@ -485,7 +486,8 @@ class Sina:
         df = df.sort_values(by='code', ascending=0)
         # print ("Market-df:%s %s time: %s" % (
         # cct.get_now_time()))
-        self.write_hdf_db(df,self.stock_codes)
+        log.info("hdf:all%s %s"%(len(df),len(self.stock_codes)))
+        tdd.write_hdf_db(self.hdf_name,df,self.table)
         log.info("wr end:%0.2f"%(time.time() - self.start_t))
         return df
         # df = pd.DataFrame.from_dict(stock_dict, orient='columns',

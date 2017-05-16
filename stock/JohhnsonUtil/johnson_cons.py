@@ -42,7 +42,7 @@ open_time = 929
 sleep_time = 6
 tdx_max_int = 10
 wcd_limit_day = 30
-h5_limit_time = 120
+h5_limit_time = 180
 
 powerdiff = 'ra * fibl + rah*(abs(float(%s)-fibl))/fib +ma +kdj+rsi'
 # Duration_sort_op=['fib','op','ra','percent','ratio','dff','couts']
