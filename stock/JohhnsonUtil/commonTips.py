@@ -594,10 +594,20 @@ def get_work_time():
         # return False
         return False
     else:
-        if now_t > 1300 and now_t <1302:
-            sleep(random.randint(5, 120))
+        # if now_t > 1300 and now_t <1302:
+            # sleep(random.randint(5, 120))
         return True
 
+def get_work_hdf_status():
+    now_t = str(get_now_time()).replace(':', '')
+    now_t = int(now_t)
+    if not get_work_day_status():
+        return False
+    # if (now_t > 1130 and now_t < 1300) or now_t < 915 or now_t > 1502:
+    if 915 < now_t < 1502:
+        # return False
+        return True
+    return False
 
 def get_work_duration():
     int_time = get_now_time_int()
@@ -1131,6 +1141,30 @@ def getFibonacci(num,days=None):
             # fib = x
             # break
     # return fib
+
+def varname(p):
+    import inspect
+    import re
+    for line in inspect.getframeinfo(inspect.currentframe().f_back)[3]:
+        m = re.search(r'\bvarname\s*\(\s*([A-Za-z_][A-Za-z0-9_]*)\s*\)', line)
+        if m:
+          return m.group(1)
+
+def varnamestr(obj, namespace=globals()):
+    # namestr(a, globals())
+    if isinstance(namespace,dict):
+        n_list = [name for name in namespace if namespace[name] is obj]
+    else:
+        log.error("namespce not dict")
+        return None
+        # n_list = [name for name in namespace if id(name) == id(obj)]
+
+    for n in n_list:
+        if n.startswith('_'):
+            continue
+        else:
+            return n
+    return None
 
 def get_stock_tdx_period_to_type(stock_data, type='w'):
     period_type = type

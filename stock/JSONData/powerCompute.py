@@ -915,7 +915,7 @@ def powerCompute_df(df, dtype='d', end=None, dl=None, filter='y',talib=False,new
         #         continue
             # elif df.loc[code].boll <> 0:
             #     continue
-                
+
         if statuslist:
             start = None
         else:
@@ -1090,7 +1090,7 @@ if __name__ == "__main__":
 
     # import sina_data
     # codelist = sina_data.Sina().market('cyb').code.tolist()
-    print powerCompute_df(['300650','000938','002171'], dtype='d',end=None, dl=ct.PowerCountdl, talib=True,filter='y')
+    print powerCompute_df(['000788','000938','002171'], dtype='d',end=None, dl=ct.PowerCountdl, talib=True,filter='y')
     # powerCompute_df(codelist, dtype='d',end=None, dl=ct.PowerCountdl, talib=True,filter='y')
 
     # # print powerCompute_df(['601198', '002791', '000503'], dtype='d', end=None, dl=30, filter='y')

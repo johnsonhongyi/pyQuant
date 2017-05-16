@@ -7,7 +7,7 @@ import JohhnsonUtil.johnson_cons as ct
 from JSONData import powerCompute as pct
 import pandas as pd
 import time
-def getBollFilter(df=None,boll=5,duration=ct.PowerCountdl,filter=True,ma5d=True,dl=14,percent=False):
+def getBollFilter(df=None,boll=-5,duration=ct.PowerCountdl,filter=False,ma5d=True,dl=14,percent=False):
     #return boll > int
 
     if df is None:
@@ -65,28 +65,28 @@ def getBollFilter(df=None,boll=5,duration=ct.PowerCountdl,filter=True,ma5d=True,
         #     if fibh > dl / 3:
         #         df = df[ ((df.ma5d * ct.changeRatio < df.low) & (df.low < df.ma5d * (2 - ct.changeRatio))) | ((df.percent > 1) & (df.volume > 3))]
         if 'vstd' in df.columns:
-#            df = df[(df.lvol * df.volume > (df.vstd + df.lvol)) | ((df.percent > -5) & (df.hv/df.lv > 3))]
+            # df = df[(df.lvol * df.volume > (df.vstd + df.lvol)) | ((df.percent > -5) & (df.hv/df.lv > 3))]
             df = df[(df.lvol * df.volume > (df.vstd + df.lvol)) | ((df.percent > -5) & (df.hv/df.lv > 1.5))]
-    #                [dd.lvol * dd.volume > (dd.vstd + dd.lvol) | dd.lvol * dd.volume >(dd.ldvolume + dd.vstd]
+                    # [dd.lvol * dd.volume > (dd.vstd + dd.lvol) | dd.lvol * dd.volume >(dd.ldvolume + dd.vstd]
         if percent:
             if  cct.get_now_time_int() > 920 and cct.get_now_time_int() <= 1400:
                 # df = df[((df.fibl < int(duration / 1.5)) &  (df.volume > 2.5 * cct.get_work_time_ratio() )) | (df.percent > 3)]
                 df = df[ (df.volume > 2.5 * cct.get_work_time_ratio()) | (df.percent > 3)]
             if cct.get_now_time_int() > 926 or cct.get_now_time_int() < 900:
                 df = df[df.percent > 1 ]
-                df = df[df.oph > 10]
+                # df = df[df.oph > 10]
 
     # elif filter and cct.get_now_time_int() > 1015 and cct.get_now_time_int() <= 1445:
     #     df = df[((df.fibl < int(duration / 1.5)) &  (df.volume > 3)) | (df.percent > 3)]
         # print df
     # if 'ra' in df.columns and 'op' in df.columns:
     #     df = df[ (df.ma > 0 ) & (df.diff > 1) & (df.ra > 1) & (df.op >= 5) ]
-    if 'boll' in df.columns:
-        return df[df.boll >= boll]
-    else:
-        print "boll not in columns"
-        df['boll'] = 0
-        return df
+        if 'boll' in df.columns:
+            return df[df.boll >= boll]
+        # else:
+        #     print "boll not in columns"
+        #     df['boll'] = 0
+    return df
 
 def WriteCountFilter(df,op='op',writecount=ct.writeCount,end=None,duration=10):
     codel = []

@@ -315,10 +315,11 @@ if __name__ == "__main__":
         except (IOError, EOFError) as e:
             print "IOError,EOFError", e
             cct.sleeprandom(120)
-            # traceback.print_exc()
             # raw_input("Except")
         except Exception as e:
             print "other Error", e
+            import traceback
+            traceback.print_exc()
             cct.sleeprandom(120)
             # sl.get_code_search_loop()
             # print data.describe()

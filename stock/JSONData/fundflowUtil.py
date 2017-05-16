@@ -13,7 +13,6 @@ from sina_data import *
 log = LoggerFactory.log
 # log.setLevel(LoggerFactory.INFO)
 # log.setLevel(LoggerFactory.DEBUG)
-import traceback
 # from bs4 import BeautifulSoup
 def get_dfcfw_fund_flow_old(market):
     if market.startswith('http'):
@@ -426,10 +425,11 @@ def get_lhb_dd(retry_count=3, pause=0.001):
             # for row in soup.find_all('tr',attrs={"class":"gray","class":""}):
         except Exception as e:
             print "Except:", (e)
+            import traceback
+            traceback.print_exc()
         else:
             return df
-        traceback.print_exc()
-        raise IOError(ct.NETWORK_URL_ERROR_MSG.decode('utf8').encode('gbk'))
+        # raise IOError(ct.NETWORK_URL_ERROR_MSG.decode('utf8').encode('gbk'))
 
 def dfcf_yyb_data():
     url = 'http://datainterface3.eastmoney.com//EM_DataCenter_V3/api/YYBJXMX/GetYYBJXMX?tkn=eastmoney&salesCode=80035417&tdir=&dayNum=&startDateTime=2016-03-22&endDateTime=2017-03-22&sortfield=&sortdirec=1&pageNum=1&pageSize=50&cfg=yybjym'

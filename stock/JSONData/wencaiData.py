@@ -307,7 +307,7 @@ def get_write_wencai_market_to_csv(df=None,market='wcbk',renew=False,days=60):
             log.warn("df.columns:%s"%(df.columns))
             return df
 #        log.warn("Wr%s :%s"%(market,len(df)))
-        print ("%s :%s"%(market,len(df))),
+        print ("wencaimarket :%s"%(len(df))),
         # df.reset_index(inplace=True)
         return df
 
@@ -348,7 +348,7 @@ def get_write_wencai_market_to_csv(df=None,market='wcbk',renew=False,days=60):
 
 def get_wcbk_df(filter='混改',market='nybk',perpage=1000,days=60):
     fpath = get_wencai_filepath(market)
-    if os.path.exists(fpath) and os.path.getsize(fpath) > 200 and cct.creation_date_duration(fpath) > 0 :
+    if os.path.exists(fpath) and os.path.getsize(fpath) > 200 and cct.creation_date_duration(fpath) >= 0 :
         df = get_write_wencai_market_to_csv(None,market,renew=True,days=days)
     else:
         df = get_wencai_Market_url(filter,perpage)

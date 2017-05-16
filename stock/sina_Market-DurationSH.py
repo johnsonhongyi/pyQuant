@@ -456,7 +456,8 @@ if __name__ == "__main__":
                 sys.exit(0)
         except (IOError, EOFError, Exception) as e:
             print "Error", e
-            #traceback.print_exc()
+            import traceback
+            traceback.print_exc()
             cct.sleeprandom(120)
 
 '''

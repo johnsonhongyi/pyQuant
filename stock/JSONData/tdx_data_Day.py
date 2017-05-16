@@ -105,9 +105,13 @@ def get_kdate_data(code,start='',end='',ktype='D'):
 
     # df = ts.get_k_data(code=code, start=start, end=end, ktype=ktype, autype='qfq', index=index, retry_count=3, pause=0.001)
     df = ts.get_k_data(code=code, start=start, end=end, ktype=ktype)
-    df.set_index('date',inplace=True)
-    df.sort_index(ascending=False,inplace=True)
-
+    if len(df) > 0:
+        df.set_index('date',inplace=True)
+        df.sort_index(ascending=False,inplace=True)
+        lastdy = df.index[0]
+        if cct.get_work_hdf_status() and cct.get_today_duration(lastdy) == 0:
+            df.drop(lastdy,axis=0,inplace=True)
+            # print df.index
     return df
 
 def write_all_kdata_to_file(code,f_path,df=None):
@@ -192,6 +196,8 @@ def get_tdx_Exp_day_to_df(code, start=None, end=None, dl=None,newdays = None,typ
             a = buf[i].split(',')
             # 01/15/2016,27.57,28.15,26.30,26.97,714833.15,1946604544.000
             # da=a[0].split('/')
+            if len(a) < 7:
+                continue
             tdate = a[0]
             if len(tdate) != 10:
                 continue
@@ -240,15 +246,17 @@ def get_tdx_Exp_day_to_df(code, start=None, end=None, dl=None,newdays = None,typ
             df['cmean'] = round(df.close[-tdx_max_int:max_int_end].mean(),2)
             df['hv'] = df.vol[-tdx_max_int:max_int_end].max()
             df['lv'] = df.vol[-tdx_max_int:max_int_end].min()
-            if dl < 15 and df.close[-tdx_max_int:].max() > df.open[-tdx_max_int:].min() * 2:
+            if df.close[-5:].max() > df.open[-5:].min() * 1.6:
                 # if initTdxdata < 3:
-                log.error("%s outdata!"%(code))
+                log.error("%s dl None outdata!"%(code))
                 initTdxdata +=1
                 if write_k_data_status:
                     write_all_kdata_to_file(code,f_path=file_path)
                     df = get_tdx_Exp_day_to_df(code, start=start, end=end, dl=dl, newdays=newdays, type='f',wds=False)
                 # write_tdx_sina_data_to_file(code, df=df)
             df = df.fillna(0)
+            # df.index = df.index.to_datetime()
+            # df.index.name = code
             df = df.sort_index(ascending=False)
         return df
     elif dl is not None and int(dl) == 1:
@@ -368,10 +376,10 @@ def get_tdx_Exp_day_to_df(code, start=None, end=None, dl=None,newdays = None,typ
             df['cmean'] = round(df.close[-tdx_max_int:max_int_end].mean(),2)
             df['hv'] = df.vol[-tdx_max_int:max_int_end].max()
             df['lv'] = df.vol[-tdx_max_int:max_int_end].min()
-            if dl < 15 and df.close[-tdx_max_int:].max() > df.open[-tdx_max_int:].min() * 2:
+            if df.close[-5:].max() > df.open[-5:].min() * 1.6:
 
                 # if initTdxdata < 3:
-                log.error("%s outdata!"%(code))
+                log.error("%s st:%s dl:%s outdata!"%(code,start,dl))
                 initTdxdata +=1
                 if write_k_data_status:
                     write_all_kdata_to_file(code,file_path)
@@ -379,6 +387,8 @@ def get_tdx_Exp_day_to_df(code, start=None, end=None, dl=None,newdays = None,typ
 
                 # write_tdx_sina_data_to_file(code, df=df)
             df = df.fillna(0)
+            # df.index = df.index.to_datetime()
+            # df.index.name = code
             df = df.sort_index(ascending=False)
         return df
 
@@ -515,7 +525,7 @@ INDEX_LIST = {'sh': 'sh000001', 'sz': 'sz399001', 'hs300': 'sz399300',
 #         # print df
 #     # return df
 
-def get_tdx_append_now_df_api(code, start=None, end=None, type='f',df=None,dm=None,dl=None,power=True,newdays=None):
+def get_tdx_append_now_df_api(code, start=None, end=None, type='f',df=None,dm=None,dl=None,power=True,newdays=None,write_tushare=False):
 
     start=cct.day8_to_day10(start)
     end=cct.day8_to_day10(end)
@@ -610,7 +620,7 @@ def get_tdx_append_now_df_api(code, start=None, end=None, type='f',df=None,dm=No
             # log.debug("ds:%s" % ds[:1])
             ds = ds.fillna(0)
             df = df.append(ds)
-            if (len(ds) == 1 and ds.index.values[0] != cct.get_today()) or len(ds) > 1:
+            if write_tushare and (len(ds) == 1 and ds.index.values[0] != cct.get_today()) or len(ds) > 1:
                 if index_status:
                     sta=write_tdx_tushare_to_file(code_ts,df=df)
                 else:
@@ -627,6 +637,9 @@ def get_tdx_append_now_df_api(code, start=None, end=None, type='f',df=None,dm=No
         df=df.fillna(0)
         df = df.sort_index(ascending=False)
         return df
+    else:
+        if not write_tushare and cct.get_work_time() and cct.get_now_time_int() < 1505:
+            return df
 #    print df.index.values,code
     if dm is None and end is None:
         # if dm is None and today != df.index[-1]:
@@ -946,16 +959,21 @@ def write_tdx_tushare_to_file(code,df=None,start=None,type='f'):
 #    st=time.time()
 #    pname = 'sdata/SH601998.txt'
     if df is None:
-        ldatedf = get_tdx_Exp_day_to_df(code,dl=1)
+        ldatedf = get_tdx_Exp_day_to_df(code,dl=1,newdays=0)
         if len(ldatedf) > 0:
             lastd = ldatedf.date
         else:
-            return False
+            k_df = get_kdate_data(code)
+            if len(k_df) > 0:
+                df = k_df
+            else:
+                return False
         # today = cct.get_today()
         # duration = cct.get_today_duration(tdx_last_day)
-        if lastd == cct.last_tddate(1):
-            return False
-        df = get_tdx_append_now_df_api(code,start=start)
+        if df is None:
+            if lastd == cct.last_tddate(1):
+                return False
+            df = get_tdx_append_now_df_api(code,start=start,write_tushare=False)
 
     if len(df) == 0:
         return False
@@ -968,6 +986,12 @@ def write_tdx_tushare_to_file(code,df=None,start=None,type='f'):
     else:
         return None
 
+    if not os.path.exists(file_path) and len(df) > 0:
+        fo = open(file_path, "w+")
+#        return False
+    else:
+        fo = open(file_path, "r+")
+
     fsize = os.path.getsize(file_path)
     limitpo = fsize if fsize < 150 else 150
 
@@ -979,7 +1003,7 @@ def write_tdx_tushare_to_file(code,df=None,start=None,type='f'):
 #        print "no"
 
 #    print file_path
-    fo = open(file_path, "r+")
+    # fo = open(file_path, "r+")
 #    os.path.getsize(file_path)
 #    print fo.tell()
 #    fo.seek(-limitpo,2)
@@ -1019,6 +1043,8 @@ def write_tdx_tushare_to_file(code,df=None,start=None,type='f'):
             df.rename(columns={'volume': 'vol'}, inplace=True)
         if not 'amount' in df.columns:
             df['amount']=map(lambda x,y,z:round((y+z)/2*x,2),df.vol,df.high,df.low)
+        w_t=time.time()
+        wdata_list=[]
         for date in df.index:
             td=df.loc[date,['open','high','close','low','vol','amount']]
             if td.open > 0 and td.high > 0 and td.low > 0 and td.close >0:
@@ -1031,8 +1057,17 @@ def write_tdx_tushare_to_file(code,df=None,start=None,type='f'):
                 tvol = str(td.vol)
                 amount = str(td.amount)
                 tdata = tdate+','+topen+','+thigh+','+tlow+','+tclose+','+tvol+','+amount+'\r\n'
-                fo.write(tdata)
+                wdata_list.append(tdata)
+#        import cStringIO
+#        b = cStringIO.StringIO()
+#        x=0
+#        while x < len(wdata_list):
+#            b.write(wdata_list[x])
+#            x += 1
+##        fo.write(b.getvalue())
+        fo.writelines(wdata_list)
         fo.close()
+        log.info("write_done:%0.3f"%(time.time()-w_t))
         return True
     fo.close()
     return "NTrue"
@@ -1045,8 +1080,9 @@ def write_tdx_sina_data_to_file(code,dm=None,df=None,dl=2,type='f'):
 #        dz = dm.loc[code].to_frame().T
 #        df = get_tdx_append_now_df_api2(code,dl=dl,dm=dz,newdays=5)
 
-#    if df is None or len(df) == 0:
-#        return False
+    if df is None and dm is None or len(df) == 0:
+        return False
+
     code_u = cct.code_to_symbol(code)
     log.debug("code:%s code_u:%s" % (code, code_u))
     if type == 'f':
@@ -1099,6 +1135,7 @@ def write_tdx_sina_data_to_file(code,dm=None,df=None,dl=2,type='f'):
         df.sort_index(ascending=True,inplace=True)
         if limitpo > 40:
             fo.seek(po)
+        w_data=[]
         for date in df.index:
             td=df.loc[date,['open','high','close','low','vol','amount']]
             tdate = date
@@ -1112,7 +1149,8 @@ def write_tdx_sina_data_to_file(code,dm=None,df=None,dl=2,type='f'):
             tvol = str(td.vol)
             amount = str(td.amount)
             tdata = tdate+','+topen+','+thigh+','+tlow+','+tclose+','+tvol+','+amount+'\r\n'
-            fo.write(tdata)
+            w_data.append(tdata)
+        fo.writelines(w_data)
         fo.close()
         return True
     fo.flush()
@@ -1524,7 +1562,6 @@ def getSinaJsondf(market='cyb',vol=ct.json_countVol,type=ct.json_countType):
     return top_now
 
 def getSinaAlldf(market='cyb',vol=ct.json_countVol,type=ct.json_countType,filename='mnbk',table='top_now'):
-    h5_limit_time = 120
     h5_fname = 'tdx_now'
     h5_table = market if not cct.check_chinese(market) else filename
     h5 = top_hdf_api(fname=h5_fname,table=h5_table,df=None)
@@ -1533,7 +1570,8 @@ def getSinaAlldf(market='cyb',vol=ct.json_countVol,type=ct.json_countType,filena
         if len(o_time) > 0:
             o_time = o_time[0]
 #            print time.time() - o_time
-            if time.time() - o_time < h5_limit_time:
+            if cct.get_work_hdf_status() and (not (915 < cct.get_now_time_int() < 930) and time.time() - o_time < ct.h5_limit_time):
+                log.info("return hdf data:%s %s"%(h5_fname,h5_table))
                 return h5
 
     if market == 'rzrq':
@@ -1560,7 +1598,10 @@ def getSinaAlldf(market='cyb',vol=ct.json_countVol,type=ct.json_countType,filena
     elif market in ['all']:
         df = sina_data.Sina().all
     else:
-        df = wcd.get_wcbk_df(filter=market,market=filename,perpage=1000,days=120)
+        df = wcd.get_wcbk_df(filter=market,market=filename,perpage=1000,days=ct.wcd_limit_day)
+        if 'code' in df.columns:
+            df=df.set_index('code')
+        df = sina_data.Sina().get_stock_list_data(df.index.tolist())
     # codelist=df.code.tolist()
     # cct._write_to_csv(df,'codeall')
     # top_now = get_mmarket='all'arket_price_sina_dd_realTime(df, vol, type)
@@ -1646,7 +1687,9 @@ def getSinaAlldf(market='cyb',vol=ct.json_countVol,type=ct.json_countType,filena
     # else:
     #     initTdxdata +=1
     #     top_diff = top_now
-    top_hdf_api(fname=h5_fname, table=h5_table, df=top_now)
+    top_hdf_api(fname=h5_fname,wr_mode='w',table=h5_table, df=top_now)
+    # top_hdf_api(fname='tdx',wr_mode='w', table=None, df=None)
+    #
     # if 'time' in h5.columns:
     #     o_time = h5[h5.time <> 0].time
     #     if len(o_time) > 0:
@@ -1821,6 +1864,8 @@ def get_tdx_day_to_df(code):
     for i in xrange(no):
         a = unpack('IIIIIfII', buf[b:e])
         # dt=datetime.date(int(str(a[0])[:4]),int(str(a[0])[4:6]),int(str(a[0])[6:8]))
+        if len(a) < 7:
+            continue
         tdate = str(a[0])[:4] + '-' + str(a[0])[4:6] + '-' + str(a[0])[6:8]
         # tdate=dt.strftime('%Y-%m-%d')
         topen = float(a[1] / 100.0)
@@ -2295,6 +2340,8 @@ def get_tdx_day_to_df_last(code, dayl=1, type=0, dt=None, ptype='close', dl=None
         buf = ofile.read()
         ofile.close()
         a = unpack('IIIIIfII', buf[b:e])
+        # if len(a) < 7:
+        #     continue
         tdate = str(a[0])[:4] + '-' + str(a[0])[4:6] + '-' + str(a[0])[6:8]
         topen = float(a[1] / 100.0)
         thigh = float(a[2] / 100.0)
@@ -2329,6 +2376,8 @@ def get_tdx_day_to_df_last(code, dayl=1, type=0, dt=None, ptype='close', dl=None
         # df=pd.DataFrame()
         for i in xrange(no):
             a = unpack('IIIIIfII', buf[-e:b])
+            if len(a) < 7:
+                continue
             tdate = str(a[0])[:4] + '-' + str(a[0])[4:6] + '-' + str(a[0])[6:8]
             topen = float(a[1] / 100.0)
             thigh = float(a[2] / 100.0)
@@ -2387,6 +2436,8 @@ def get_tdx_day_to_df_last(code, dayl=1, type=0, dt=None, ptype='close', dl=None
         # df=pd.DataFrame()
         for i in xrange(no):
             a = unpack('IIIIIfII', buf[-e:b])
+            if len(a) < 7:
+                continue
             tdate = str(a[0])[:4] + '-' + str(a[0])[4:6] + '-' + str(a[0])[6:8]
             topen = float(a[1] / 100.0)
             thigh = float(a[2] / 100.0)
@@ -2457,7 +2508,7 @@ def get_append_lastp_to_df(top_all,lastpTDX_DF=None,dl=ct.PowerCountdl,end=None,
     log.info('toTDXlist:%s' % len(codelist))
     # print codelist[5]
     h5_fname='tdx_last_Df'
-    market=ptype+'_'+str(dl)+'_'+filter
+    market=ptype+'_'+str(dl)+'_'+filter+'_'+str(len(codelist))
     if lastpTDX_DF is None or len(lastpTDX_DF) == 0:
 
         h5 = top_hdf_api(fname=h5_fname,table=market,df=None)
@@ -2487,7 +2538,7 @@ def get_append_lastp_to_df(top_all,lastpTDX_DF=None,dl=ct.PowerCountdl,end=None,
     #            # tdxdata = tdxdata.loc[
     #            #     :, ['llow', 'lhigh', 'lastp', 'lvol', 'date']]
 
-            h5 = top_hdf_api(fname=h5_fname,table=market,df=tdxdata)
+            h5 = top_hdf_api(fname=h5_fname,wr_mode='w',table=market,df=tdxdata)
 
 
 
@@ -2879,17 +2930,20 @@ def testnumba(number=500):
     print timeit.timeit(lambda:autojit(lambda:python_resample(qs, xs, rands)),number=number)
     # print timeit.timeit(lambda:cct.run_numba(python_resample(qs, xs, rands)),number=number)
 
-def get_hdf5_file(fpath,wr_mode='w',complevel=9,complib='zlib'):
+def get_hdf5_file(fpath,wr_mode='r',complevel=9,complib='zlib'):
     # store=pd.HDFStore(fpath,wr_mode, complevel=complevel, complib=complib)
     fpath = cct.get_ramdisk_path(fpath)
     if not fpath:
         print ("don't exists %s"%(fpath))
         return None
     if os.path.exists(fpath):
-        store=pd.HDFStore(fpath)
+        if wr_mode == 'w':
+            store=pd.HDFStore(fpath,complevel=None, complib=None, fletcher32=False)
+        else:
+            store=pd.HDFStore(fpath, mode=wr_mode, complevel=None, complib=None, fletcher32=False)
     else:
-#        store = pd.HDFStore(fpath, format = "table", complevel=9, complib='blosc')
-        store = pd.HDFStore(fpath, format = "table", complevel=9)
+        store = pd.HDFStore(fpath,complevel=9,complib='zlib')
+        # store = pd.HDFStore(fpath, mode=wr_mode,complevel=9,complib='zlib')
     # store.put("Year2015", dfMinutes, format="table", append=True, data_columns=['dt','code'])
     return store
     # fp='/Volumes/RamDisk/top_now.h5'
@@ -2898,39 +2952,20 @@ def get_hdf5_file(fpath,wr_mode='w',complevel=9,complib='zlib'):
         # store.select("Year2015", where=['dt<Timestamp("2015-01-07")','code=="000570"'])
         # return store
 
-
-def varname(p):
-    import inspect
-    import re
-    for line in inspect.getframeinfo(inspect.currentframe().f_back)[3]:
-        m = re.search(r'\bvarname\s*\(\s*([A-Za-z_][A-Za-z0-9_]*)\s*\)', line)
-        if m:
-          return m.group(1)
-
-def varnamestr(obj, namespace=globals()):
-    # namestr(a, globals())
-    if isinstance(namespace,dict):
-        n_list = [name for name in namespace if namespace[name] is obj]
-    else:
-        log.error("namespce not dict")
-        return None
-        # n_list = [name for name in namespace if id(name) == id(obj)]
-
-    for n in n_list:
-        if n.startswith('_'):
-            continue
-        else:
-            return n
-    return None
-
-def top_hdf_api(fname='tdx',table=None,df=None):
+def top_hdf_api(fname='tdx',wr_mode='r',table=None,df=None):
     if df is not None and not df.empty:
-        h5 = get_hdf5_file(fname)
+        h5 = get_hdf5_file(fname,wr_mode=wr_mode)
         if h5 is not None:
+            if table is not None:
+                for key in h5.keys():
+                    if key.find(table) >=0:
+                        h5.remove(table)
+
             dd = df.dtypes.to_frame()
             if 'object' in dd.values:
                 dd = dd[dd == 'object'].dropna()
                 col = dd.index.tolist()
+                # log.error("obejct:%s"%(col))
             df.index = df.index.astype(str)
             # df[['name','kind']] = df[['name','kind']].astype(str)
             df[col] = df[col].astype(str)
@@ -2940,15 +2975,19 @@ def top_hdf_api(fname='tdx',table=None,df=None):
                 h5[table] = df
             else:
                 log.error("write table is None:%s"%(fname))
-            h5.close()
+            if h5.is_open:
+                h5.close()
             return df
         else:
             log.error("hdf is Non:%s"%(fname))
+            if h5.is_open:
+                h5.close()
     else:
-        h5 = get_hdf5_file(fname)
+        h5 = get_hdf5_file(fname,wr_mode=wr_mode)
         if table is None and df is None:
             df = h5.copy()
-            h5.close()
+            if h5.is_open:
+                h5.close()
             return df
 #        if table is None and df is not None:
 #            table = varnamestr(df,globals())
@@ -2958,18 +2997,62 @@ def top_hdf_api(fname='tdx',table=None,df=None):
                 for key in h5.keys():
                     if key.find(table) >=0:
                         df = h5[table]
-                        h5.close()
+                        if h5.is_open:
+                            h5.close()
                         return df
                 log.error("%s is not find %s"%(fname,table))
-        h5.close()
+        if h5.is_open:
+            h5.close()
         return None
+    if h5.is_open:
+        h5.close()
+
+def load_hdf_db(fname,mtype='all',code_l=None,init=False):
+    h5=top_hdf_api(fname=fname, table=mtype, df=None)
+    if not init:
+        if code_l is not None:
+            if len(code_l) == 0:
+                return None
+        if h5 is not None and not h5.empty and 'time' in h5.columns:
+                o_time = h5[h5.time <> 0].time
+                if len(o_time) > 0:
+                    o_time = o_time[0]
+        #            print time.time() - o_time
+                    # if cct.get_work_hdf_status() and (not (915 < cct.get_now_time_int() < 930) and time.time() - o_time < ct.h5_limit_time):
+                    if not cct.get_work_time() or time.time() - o_time < ct.h5_limit_time:
+                        log.info("time hdf:%s %s"%(fname,len(h5))),
+                        if 'time' in h5.columns:
+                            # h5=h5.drop(['time'],axis=1)
+                            if code_l is not None:
+                                if 'code' in h5.columns:
+                                    h5 = h5.set_index('code')
+                                h5.drop([inx for inx in h5.index  if inx not in code_l], axis=0, inplace=True)
+                                log.info("time in idx hdf:%s %s"%(fname,len(h5))),
+                        if 'code' not in h5.columns:
+                            h5=h5.reset_index()
+                        return h5
+    else:
+        if h5 is not None and len(h5) > 1000:
+            return h5
+    return None
+
+def write_hdf_db(fname,df,code_l=None,mtype='all'):
+    # if 'code' in df.columns:
+        # df = df.set_index('code')
+    if code_l is not None and len(code_l) > 1000:
+        dd = df.copy()
+        if 'code' in dd.columns:
+            dd = dd.set_index('code')
+        dd['time'] =  time.time()
+        h5=top_hdf_api(fname=fname,wr_mode='w', table=mtype, df=dd)
+
 # top_now=getSinaAlldf(market='rzrq', vol=ct.json_countVol, type=ct.json_countType)
 # top_hdf_api('tdx', df=top_now, table=None)
 #get_tdx_Exp_day_to_df('603859',dl=20)
 if __name__ == '__main__':
     import sys
     import timeit
-    print cct.get_ramdisk_path('tdx')
+    # print cct.get_ramdisk_path('tdx')
     # testnumba(1000)
     # n = 100
     # xs = np.arange(n, dtype=np.float64)
@@ -2977,9 +3060,61 @@ if __name__ == '__main__':
     # rands = np.random.rand(n)
     # print python_resample(qs, xs, rands)
     # print get_kdate_data('300534', start='2017-05-01', end='', ktype='D')
+    code='300174'
+    print get_tdx_Exp_day_to_df(code,dl=30,newdays=0)[:1]
+#    print write_tdx_tushare_to_file(code)
 
-    df = get_tdx_Exp_day_to_df('601996',dl=20)
-
+    hdf5_wri=cct.cct_raw_input("write all data to hdf[y|n]:")
+    # hdf5_wri='y'
+    if hdf5_wri == 'y':
+        df = sina_data.Sina().all
+        dfcode =df['code'].tolist()
+        f_name = 'tdx_all_df_30'
+        t_st=time.time()
+        st=get_hdf5_file(f_name,'w')
+        for code in dfcode[:3]:
+        # for code in dfcode:
+            df = get_tdx_Exp_day_to_df(code,dl=60)
+            # (map(lambda x, y: y if int(x) == 0 else x, top_dif['buy'].values, top_dif['trade'].values))
+            # print df.index
+            if len(df) > 0:
+                df.index = map(lambda x:x.replace('-','').replace('\n',''),df.index)
+                df.index = df.index.astype(int)
+                df.index.name = 'date'
+                df.code = df.code.astype(int)
+                # df.info()
+                # if 'code' in df.columns:
+                    # df.drop(['code'],axis=1,inplace=True)
+                df = df.reset_index()
+                df = df.set_index(['code','date'])
+                df = df.astype(float)
+                xcode = cct.code_to_symbol(code)
+                print xcode,
+                # st.append(xcode,df)
+                put_time = time.time()
+                st.put("df", df, format="table", append=True, data_columns=['code','date'])
+                # print "t:%0.1f"%(time.time()-put_time),
+                # aa[aa.index.get_level_values('code')==333]
+                # st.select_column('df','code').unique()
+                # %timeit st.select_column('df','code')
+                # %timeit st.select('df',columns=['close'])
+                # result_df = df.loc[(df.index.get_level_values('A') > 1.7) & (df.index.get_level_values('B') < 666)]
+                # x.loc[(x.A>=3.3)&(x.A<=6.6)]
+                                # st[xcode]=df
+                '''
+                Traceback (most recent call last):
+                  File "tdx_data_Day.py", line 3013, in <module>
+                    df = get_tdx_Exp_day_to_df(code,dl=30)
+                  File "tdx_data_Day.py", line 200, in get_tdx_Exp_day_to_df
+                    topen = float(a[1])
+                IndexError: list index out of range
+                Closing remaining open files:/Volumes/RamDisk/tdx_all_df_30.h5...done
+                '''
+                # print df
+                # print df.shape
+                # log.error("code :%s is None"%(code))
+        print ("hdf5 all :%s hd:%s time:%0.2f"%(len(dfcode),len(st.keys()),time.time()-t_st))
+        st.close()
     # print get_tdx_Exp_day_to_df('300546',dl=20)
     # print get_tdx_Exp_day_to_df('999999',end=None).sort_index(ascending=False).shape
     # print sina_data.Sina().get_stock_code_data('300006').set_index('code')
@@ -3032,7 +3167,6 @@ if __name__ == '__main__':
     # today = cct.get_today()
     # duration = cct.get_today_duration(lastd)
     # print cct.last_tddate(1)
-    print write_tdx_tushare_to_file(code)
     # print lastd,duration,today
 #    300035,300047,300039
 

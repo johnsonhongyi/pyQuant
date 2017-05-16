@@ -70,7 +70,7 @@ if __name__ == "__main__":
     log = LoggerFactory.log
     args = docopt(cct.sina_doc, version='sina_cxdn')
     log_level = LoggerFactory.DEBUG if args['--debug'] else LoggerFactory.ERROR
-    log.setLevel(log_level)  
+    log.setLevel(log_level)
     # if log_level == LoggerFactory.DEBUG:
     # handler=StderrHandler(format_string='{record.channel}: {record.message) [{record.extra[cwd]}]')
     # log.level = log.debug
@@ -135,7 +135,7 @@ if __name__ == "__main__":
             # top_now = tdd.getSinaAlldf(market='央企',filename='yqg', vol=ct.json_countVol, type=ct.json_countType)
             # top_now = tdd.getSinaAlldf(market=u'一带一路',filename='ydyl', vol=ct.json_countVol, type=ct.json_countType)
             # top_now = tdd.getSinaAlldf(market='次新股',filename='cxg', vol=ct.json_countVol, type=ct.json_countType)
-            top_now = tdd.getSinaAlldf(market='雄安新区',filename='xaxq', vol=ct.json_countVol, type=ct.json_countType)
+            top_now = tdd.getSinaAlldf(market='网络安全+雄安新区',filename='wlaq', vol=ct.json_countVol, type=ct.json_countType)
             # top_now = tdd.getSinaAlldf(market=u'京津冀',filename='beijing', vol=ct.json_countVol, type=ct.json_countType)
             now_count = len(top_now)
             radio_t = cct.get_work_time_ratio()
@@ -200,8 +200,7 @@ if __name__ == "__main__":
                 # top_all = top_all[top_all.buy > 0]
                 top_dif = top_all.copy(deep=True)
                 if 'trade' in top_dif.columns:
-                    top_dif['buy'] = (
-                        map(lambda x, y: y if int(x) == 0 else x, top_dif['buy'].values, top_dif['trade'].values))
+                    top_dif['buy'] = (map(lambda x, y: y if int(x) == 0 else x, top_dif['buy'].values, top_dif['trade'].values))
                 if ct.checkfilter and  cct.get_now_time_int() > 915 and cct.get_now_time_int() < ct.checkfilter_end_timeDu:
                     top_dif = top_dif[top_dif.low > top_dif.llow * ct.changeRatio]
                     # top_dif = top_dif[top_dif.buy >= top_dif.lhigh * ct.changeRatio]
@@ -471,7 +470,8 @@ if __name__ == "__main__":
                 sys.exit(0)
         except (IOError, EOFError, Exception) as e:
             print "Error", e
-            #traceback.print_exc()
+            import traceback
+            traceback.print_exc()
             cct.sleeprandom(120)
 
 '''

@@ -7,7 +7,6 @@ import re
 import sys
 import time
 
-import traceback
 import pandas as pd
 import JohhnsonUtil.johnson_cons as ct
 import singleAnalyseUtil as sl
@@ -495,6 +494,7 @@ if __name__ == "__main__":
                 sys.exit(0)
         except (IOError, EOFError, Exception) as e:
 #            print "Error", e
+            import traceback
             traceback.print_exc()
             cct.sleeprandom(120)
 

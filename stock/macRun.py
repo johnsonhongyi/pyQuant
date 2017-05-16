@@ -55,25 +55,25 @@ end tell
 #                'LinePower.py':'42, 504',}
 
 
-positionKeyDnup = {'sina_Market-DurationDn.py': '246, 322',
-               'sina_Market-DurationDnUP.py': '-23, 539',
-               'sina_Market-DurationCXDN': '19, 46',
-               'sina_Market-DurationSH.py': '217, 520',
-               'sina_Market-DurationUP.py': '-15, 112',
-               'sina_Monitor-Market-LH.py': '150, 159',
-               'sina_Monitor-Market.py': '19, 179',
-               'sina_Monitor.py': '83, 22',
-               'singleAnalyseUtil.py': '583, 22',
-               'LinePower.py':'40, 497',}
+# positionKeyDnup = {'sina_Market-DurationDn.py': '246, 322',
+#                'sina_Market-DurationDnUP.py': '-23, 539',
+#                'sina_Market-DurationCXDN': '19, 46',
+#                'sina_Market-DurationSH.py': '217, 520',
+#                'sina_Market-DurationUP.py': '-15, 112',
+#                'sina_Monitor-Market-LH.py': '150, 159',
+#                'sina_Monitor-Market.py': '19, 179',
+#                'sina_Monitor.py': '83, 22',
+#                'singleAnalyseUtil.py': '583, 22',
+#                'LinePower.py':'40, 497',}
 
 positionKey = {'sina_Market-DurationDn.py': '217, 520',
-               'sina_Market-DurationCXDN': '19, 46',
+               'sina_Market-DurationCXDN': '8, 52',
                'sina_Market-DurationSH.py': '-23, 539',
-               'sina_Market-DurationUP.py': '-15, 112',
+               'sina_Market-DurationUP.py': '-19, 111',
                'sina_Monitor-Market-LH.py': '184, 239',
                'sina_Monitor-Market.py': '19, 179',
-               'sina_Monitor.py': '83, 22',
-               'singleAnalyseUtil.py': '583, 22',
+               'sina_Monitor.py': '39, 22',
+               'singleAnalyseUtil.py': '620, 22',
                'LinePower.py':'40, 497',}
 
 cmdRun_dnup = '''cd /Users/Johnson/Documents/Quant/pyQuant/stock;
@@ -96,6 +96,7 @@ sleep 0.1;osascript -e 'tell application "Python Launcher" to quit';sleep 15;
 open sina_Market-DurationDnUP.py;
 sleep 0.1;osascript -e 'tell application "Python Launcher" to quit';sleep 15;
 '''
+
 cmdRun = '''cd /Users/Johnson/Documents/Quant/pyQuant/stock;
 open sina_Market-DurationDn.py;
 sleep 0.1;osascript -e 'tell application "Python Launcher" to quit';sleep 35;
@@ -111,7 +112,7 @@ open sina_Market-DurationSH.py;
 sleep 0.1;osascript -e 'tell application "Python Launcher" to quit';sleep 35;
 open LinePower.py;
 sleep 0.1;osascript -e 'tell application "Python Launcher" to quit';sleep 15;
-open sina_Market-DurationDnUP.py;
+open sina_Market-DurationUP.py;
 sleep 0.1;osascript -e 'tell application "Python Launcher" to quit';sleep 15;
 '''
 
