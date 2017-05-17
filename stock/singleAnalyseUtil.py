@@ -69,8 +69,7 @@ def get_all_toplist():
     df = ts.get_today_all()
     top = df[df['changepercent'] > 6]
     top = top[top['changepercent'] < 10]
-    # logging.info("top:", len(top['code']))
-    list = top['code']
+    list = top.index
     print len(list)
     return list
 
@@ -313,10 +312,16 @@ def get_hot_countNew(changepercent, rzrq,fibl=None,fibc=10):
         df = df.dropna()
         if 'percent' in df.columns.values:
             # and len(df[:20][df[:20]['percent']>0])>3:
-            top = df[df['percent'] > changepercent]['code']
-            topTen = df[df['percent'] > 9.9]['code']
-            crashTen = df[df['percent'] < -9.8]['code']
-            crash = df[df['percent'] < -changepercent]['code']
+            # if 'code' in df.columns:
+            #     top = df[df['percent'] > changepercent]
+            #     topTen = df[df['percent'] > 9.9]
+            #     crashTen = df[df['percent'] < -9.8]
+            #     crash = df[df['percent'] < -changepercent]
+            # else:
+            top = df[df['percent'] > changepercent]
+            topTen = df[df['percent'] > 9.9]
+            crashTen = df[df['percent'] < -9.8]
+            crash = df[df['percent'] < -changepercent]
         else:
             log.info("market No Percent:%s" % df[:1])
             top = '0'
@@ -349,10 +354,10 @@ def get_hot_countNew(changepercent, rzrq,fibl=None,fibc=10):
 
     df = allTop
     count = len(df.index)
-    top = df[df['percent'] > changepercent]['code']
-    topTen = df[df['percent'] > 9.9]['code']
-    crashTen = df[df['percent'] < -9.8]['code']
-    crash = df[df['percent'] < -changepercent]['code']
+    top = df[df['percent'] > changepercent]
+    topTen = df[df['percent'] > 9.9]
+    crashTen = df[df['percent'] < -9.8]
+    crash = df[df['percent'] < -changepercent]
     print(
         u" \tA:%s topT:%s top>%s:%s" % (
             f_print(4, count), f_print(3, len(topTen)), changepercent, f_print(4, len(top)))),
@@ -479,14 +484,14 @@ if __name__ == '__main__':
     while 1:
         try:
             if not status:
-                if len(rzrq) == 0 or rzrq['sh'] == 0 or rzrq['sz'] == 0 or rzrq['all'] == 0:
-                    if rzrq['shrz'] == 0 or rzrq['szrz'] == 0 or rzrq['dff'] == 0:
-                        log.warn("rzrq 0")
-                    rzrq = ffu.get_dfcfw_rzrq_SHSZ()
                 if len(fibl) == 0 or fibcount >= fibc:
                     # print "change FibDiff"
                     fibcount = 0
                     fibl = fibonacciCount(['999999', '399001', '399006'], dl=dl)
+                if len(rzrq) == 0 or rzrq['sh'] == 0 or rzrq['sz'] == 0 or rzrq['all'] == 0:
+                    if rzrq['shrz'] == 0 or rzrq['szrz'] == 0 or rzrq['dff'] == 0:
+                        log.warn("rzrq 0")
+                    rzrq = ffu.get_dfcfw_rzrq_SHSZ()
                 get_hot_countNew(percentDuration, rzrq,fibl,fibc)
                 fibcount += 1
             if status:

@@ -662,6 +662,8 @@ def get_tdx_append_now_df_api(code, start=None, end=None, type='f',df=None,dm=No
     if df is not None and len(df) >0:
         if df.index.values[-1] == today:
             if dm is not None and not isinstance(dm,Series):
+                print code
+                print dm.loc[code]
                 dz = dm.loc[code].to_frame().T
             if index_status:
                 vol_div = 1000
@@ -2961,6 +2963,7 @@ if __name__ == '__main__':
     # print python_resample(qs, xs, rands)
     # print get_kdate_data('300534', start='2017-05-01', end='', ktype='D')
     code='300174'
+    get_tdx_append_now_df_api(code, start=None, end=None, type='f', df=None, dm=None, dl=None, power=True, newdays=None, write_tushare=False)
     print get_tdx_Exp_day_to_df(code,dl=30,newdays=0)[:1]
 #    print write_tdx_tushare_to_file(code)
 

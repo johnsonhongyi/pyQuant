@@ -162,7 +162,7 @@ def get_dfcfw_fund_HGT(url=ct.DFCFW_FUND_FLOW_HGT):
 
 def get_dfcfw_fund_SHSZ(url=ct.DFCFW_ZS_SHSZ):
 #    sina = Sina()
-    dd = Sina().get_stock_code_data('999999,399001',index=True).set_index('code')
+    dd = Sina().get_stock_code_data('999999,399001',index=True)
     sh =  dd[dd.index == '000001']
     sz = dd[dd.index == '399001']   
     if len(sh) == 0 or len(sz) == 0:
