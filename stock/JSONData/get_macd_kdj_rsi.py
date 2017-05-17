@@ -190,7 +190,7 @@ def Get_BBANDS_algo(df):
 
 
 def Get_BBANDS(df,dtype='d',days=5):
-    log.info("BBANDS:%s"%(len(df)))
+    log.debug("BBANDS:%s"%(len(df)))
     if len(df) < limitCount:
         return (df,1)
     df = df.sort_index(ascending=True)

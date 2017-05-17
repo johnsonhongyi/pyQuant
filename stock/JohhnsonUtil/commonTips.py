@@ -82,7 +82,7 @@ def get_tdx_dir():
         log.error("basedir not exists")
     return basedir
 
-def get_ramdisk_path(filename):
+def get_ramdisk_path(filename,lock=False):
     if filename:
         basedir = ramdisk_root.replace('/', path_sep).replace('\\',path_sep)
         if not os.path.isdir(basedir):
@@ -96,8 +96,14 @@ def get_ramdisk_path(filename):
             log.error("basedir not exists")
             return None
 
-        if not filename.endswith('h5'):
-            filename = filename + '.h5'
+        if not lock:
+            if not filename.endswith('h5'):
+                filename = filename + '.h5'
+        else:
+            if filename.endswith('h5'):
+                filename = filename.replace('h5','lock')
+            else:
+                filename = filename + '.lock'
 
         file_path = basedir  + path_sep + filename
         # for root in win7rootList:
@@ -190,10 +196,12 @@ sina_doc="""sina_Johnson.
 Usage:
   sina_cxdn.py
   sina_cxdn.py --debug
+  sina_cxdn.py --info
 
 Options:
   -h --help     Show this screen.
   --debug    Debug [default:False].
+  --info    info [default:False].
 """
 
 def sys_default_utf8(default_encoding='utf-8'):
@@ -1354,6 +1362,36 @@ def sort_by_value(df,column='dff',file=None,count=5,num=5,asc=0):
         else:
             write_to_blocknew(file, dd.index.tolist()[:int(count)], append=True)
         print "file:%s"%(file)
+
+def combine_dataFrame(maindf,subdf,col=None,append=False):
+    times = time.time()
+    if not append:
+        if 'code' in maindf.columns:
+            maindf = maindf.set_index('code')
+        if 'code' in subdf.columns:
+            subdf = subdf.set_index('code')
+        no_index = maindf.drop([inx for inx in maindf.index  if inx not in subdf.index], axis=0)
+        if col is None:
+            sub_col = subdf.columns
+        else:
+            sub_col = list(set(subdf.columns)-set())
+        no_index.drop([col for col in no_index.columns if col in subdf.columns], axis=1,inplace=True)
+        no_index = no_index.merge(subdf, left_index=True, right_index=True, how='left')
+        maindf = maindf.drop([inx for inx in maindf.index  if inx in subdf.index], axis=0)
+        maindf = pd.concat([maindf, no_index],axis=0)
+    else:
+#        if len(list(set(maindf.columns)-set()))
+#        if len(maindf) < len(subdf):
+#            maindf,subdf =subdf,maindf
+        no_index = maindf.drop([col for col in maindf.index if col in subdf.index], axis=0)
+        maindf = pd.concat([maindf, subdf],axis=0)
+        maindf.reset_index(inplace=True)
+        maindf.drop_duplicates('code',inplace=True)
+        maindf.set_index('code',inplace=True)
+
+    log.info("combine df :%0.2f"%(time.time()-times))
+    return maindf
+
 if __name__ == '__main__':
     # print get_run_path()
     # print get_work_time_ratio()

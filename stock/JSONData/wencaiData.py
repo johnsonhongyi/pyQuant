@@ -89,7 +89,7 @@ def get_wencai_Market_url(filter='国企改革',perpage=1,url=None,):
         time_s = time.time()
         wencairoot = 'http://www.iwencai.com/stockpick/search?typed=0&preParams=&ts=1&f=1&qs=result_original&selfsectsn=&querytype=&searchfilter=&tid=stockpick&w=%s'
         url = wencairoot%(filter)
-        log.info("url:%s"%(url))
+        log.debug("url:%s"%(url))
         # url = ct.get_url_data_R % (market)
         # print url
         cache_root="http://www.iwencai.com/stockpick/cache?token=%s&p=1&perpage=%s&showType="
@@ -110,7 +110,7 @@ def get_wencai_Market_url(filter='国企改革',perpage=1,url=None,):
         # response = requests.get(all_stock_codes_url)
         # stock_codes = grep_stock_codes.findall(response.text)
         # print data
-        log.info( time.time()-time_s)
+        log.info("net time:%s"%(time.time()-time_s))
         # print count
         if len(count) == 1:
             cacheurl = cache_root % (count[0],perpage)
@@ -174,7 +174,7 @@ def get_wencai_Market_url(filter='国企改革',perpage=1,url=None,):
                         else:
                             code_t.append(str(x).decode('unicode-escape'))
 #                            code_t.append(str(x))
-                            log.info(str(x).decode('unicode-escape')),
+                            log.debug(str(x).decode('unicode-escape')),
 #                            log.info(str(x)),
 #                    log.info( key_t)
                     if len(code_t) > 4:
@@ -258,14 +258,14 @@ def get_wencai_data(dm,market='wencai',days=120):
         if len(df) > 0:
 #            if  set(codelist) <= set(df.name.values):
 #            if  set(dm.index) <= set(df.code.values) :
-            if  len(dm) - len(set(dm.index) & set(df.code.values)) < 10 :
+            if  len(dm) - len(set(dm.index) & set(df.index.values)) < 10 :
                 if 'code' in df.columns:
                     df = df.set_index('code')
                     df = df.drop_duplicates()
-                    return df
+                return df
             else:
                 # diffcode = map( lambda x: x,set(dm.index) - (set(dm.index) & set(df.code.values)))
-                diff_code = [x for x in set(dm.index) - (set(dm.index) & set(df.code.values))]
+                diff_code = [x for x in set(dm.index) - (set(dm.index) & set(df.index.values))]
                 dm.drop([col for col in dm.index if col not in diff_code], axis=0, inplace=True)
                 # for x in diff_code:
                 #     if not x in df.code.values:
@@ -344,6 +344,8 @@ def get_write_wencai_market_to_csv(df=None,market='wcbk',renew=False,days=60):
     else:
         df = wencaiwrite_to_csv(df, filepath)
     df = df.drop_duplicates()
+    if 'code' in df.columns:
+        df=df.set_index('code')
     return df
 
 def get_wcbk_df(filter='混改',market='nybk',perpage=1000,days=60):
@@ -353,6 +355,8 @@ def get_wcbk_df(filter='混改',market='nybk',perpage=1000,days=60):
     else:
         df = get_wencai_Market_url(filter,perpage)
         df = get_write_wencai_market_to_csv(df,market,renew=True,days=days)
+    if 'code' in df.columns:
+        df = df.set_index('code')
     return df
 
 

@@ -98,9 +98,9 @@ if __name__ == "__main__":
             # top_now = rl.get_sina_dd_count_price_realTime(df)
             # print len(top_now)
 
+            time_Rt = time.time()
             top_now = tdd.getSinaAlldf(
                 market='all', vol=ct.json_countVol, type=ct.json_countType)
-            time_Rt = time.time()
             time_d = time.time()
             if time_d - time_s > delay_time:
                 status_change = True
@@ -122,38 +122,28 @@ if __name__ == "__main__":
                     top_all = tdd.get_append_lastp_to_df(top_now, lastpTDX_DF)
                     # dd=dd.fillna(0)
                 else:
-                    for symbol in top_now.index:
+                    # for symbol in top_now.index:
+                    #     if symbol in top_all.index:
+                    #         count_n = top_now.loc[symbol, 'couts']
+                    #         count_a = top_all.loc[symbol, 'couts']
+                    #         top_now.loc[symbol, 'dff'] = count_n - count_a
+                    #         if status_change:
+                    #             # top_all.loc[symbol] = top_now.loc[symbol]
+                    #             top_all.loc[symbol, ['name', 'percent', 'dff', 'couts', 'trade', 'high', 'open', 'low', 'ratio', 'volume',
+                    #                                  'prev_p']] = top_now.loc[symbol, ['name', 'percent', 'dff', 'couts', 'trade', 'high', 'open', 'low', 'ratio', 'volume',
+                    #                                                                    'prev_p']]
+                    #         else:
+                    #             top_all.loc[symbol, ['percent', 'dff']] = top_now.loc[
+                    #                 symbol, ['percent', 'dff']]
+                    #             # top_all.loc[symbol, 'trade':] = top_now.loc[symbol, 'trade':]
+                    #             top_all.loc[symbol, ['trade', 'high', 'open', 'low', 'ratio', 'volume',
+                    #                                  'prev_p']] = top_now.loc[symbol, ['trade', 'high', 'open', 'low', 'ratio', 'volume',
+                    #                                                                    'prev_p']]
+                    #     else:
+                    #         top_all.append(top_now.loc[symbol])
+                    top_all=cct.combine_dataFrame(top_all,top_now, col='couts')
+                
 
-                        # code = rl._symbol_to_code(symbol)
-                        if symbol in top_all.index:
-                            # if top_all.loc[symbol,'dff'] == 0:
-                            # print "code:",symbol
-                            count_n = top_now.loc[symbol, 'couts']
-                            count_a = top_all.loc[symbol, 'couts']
-                            top_now.loc[symbol, 'dff'] = count_n - count_a
-                            if status_change:
-                                # top_all.loc[symbol] = top_now.loc[symbol]
-                                top_all.loc[symbol, ['name', 'percent', 'dff', 'couts', 'trade', 'high', 'open', 'low', 'ratio', 'volume',
-                                                     'prev_p']] = top_now.loc[symbol, ['name', 'percent', 'dff', 'couts', 'trade', 'high', 'open', 'low', 'ratio', 'volume',
-                                                                                       'prev_p']]
-                            else:
-                                top_all.loc[symbol, ['percent', 'dff']] = top_now.loc[
-                                    symbol, ['percent', 'dff']]
-                                # top_all.loc[symbol, 'trade':] = top_now.loc[symbol, 'trade':]
-                                top_all.loc[symbol, ['trade', 'high', 'open', 'low', 'ratio', 'volume',
-                                                     'prev_p']] = top_now.loc[symbol, ['trade', 'high', 'open', 'low', 'ratio', 'volume',
-                                                                                       'prev_p']]
-                                # top_all.loc[symbol,['percent','dff','trade','high','open','low','ratio']]=top_now.loc[symbol,['percent','dff','trade','high','open','low','ratio']]
-                                # else:
-                                # top_all.loc[symbol,['percent','trade','high','open','low','ratio']]=top_now.loc[symbol,['percent','dff','trade','high','open','low','ratio']]
-                                # top_all.loc[symbol]=top_now.loc[symbol]?
-                                # top_all.loc[symbol,'dff']=top_now.loc[symbol,'couts']-top_all.loc[symbol,'couts']
-
-                                # else:
-                                # value=top_all.loc[symbol,'dff']
-
-                        else:
-                            top_all.append(top_now.loc[symbol])
                 # top_all=top_all.sort_values(by=['dff','percent','couts'],ascending=[0,0,1])
                 # top_all=top_all.sort_values(by=['dff','ratio','percent','couts'],ascending=[0,1,0,1])
                 # top_all=top_all.sort_values(by=['dff','percent','couts','ratio'],ascending=[0,0,1,1])

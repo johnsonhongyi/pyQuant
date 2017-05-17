@@ -96,10 +96,10 @@ if __name__ == "__main__":
     # log=LoggerFactory.JohnsonLoger('SinaMarket').setLevel(LoggerFactory.DEBUG)
     # log.setLevel(LoggerFactory.DEBUG)
     if cct.isMac():
-        width, height = 170, 16
+        width, height = 174, 16
         cct.set_console(width, height)
     else:
-        width, height = 170, 18
+        width, height = 174, 18
         cct.set_console(width, height)
     status = False
     vol = ct.json_countVol
@@ -123,13 +123,12 @@ if __name__ == "__main__":
     while 1:
         try:
             # top_now = tdd.getSinaAlldf(market='sh', vol=ct.json_countVol, type=ct.json_countType)
+            time_Rt = time.time()
             top_now = tdd.getSinaAlldf(market='次新股',filename='cxg', vol=ct.json_countVol, type=ct.json_countType)
-            
             # print top_now.loc['300208','name']
             df_count = len(top_now)
             now_count = len(top_now)
             radio_t = cct.get_work_time_ratio()
-            time_Rt = time.time()
             time_d = time.time()
             if time_d - time_s > delay_time:
                 status_change = True
@@ -148,14 +147,13 @@ if __name__ == "__main__":
                 # if len(top_now) > 10 and not top_now[:1].buy.values == 0:
                 #     top_now=top_now[top_now['percent']>=0]
                 if 'trade' in top_now.columns:
-                    top_now['buy'] = (
-                        map(lambda x, y: y if int(x) == 0 else x, top_now['buy'].values, top_now['trade'].values))
+                    top_now['buy'] = (map(lambda x, y: y if int(x) == 0 else x, top_now['buy'].values, top_now['trade'].values))
 
                 if len(top_all) == 0 and len(lastpTDX_DF) == 0:
-                    time_Rt = time.time()
+                    # time_Rt = time.time()
                     top_all,lastpTDX_DF = tdd.get_append_lastp_to_df(top_now,end=end_date,dl=duration_date)
                 elif len(top_all) == 0 and len(lastpTDX_DF) > 0:
-                    time_Rt = time.time()
+                    # time_Rt = time.time()
                     top_all = tdd.get_append_lastp_to_df(top_now,lastpTDX_DF)
 
 
@@ -165,73 +163,35 @@ if __name__ == "__main__":
                         if not 'couts' in top_all.columns.values:
                             top_all['couts'] = 0
                             top_all['prev_p'] = 0
-                    for symbol in top_now.index:
-                        if symbol in top_all.index and top_now.loc[symbol, 'buy'] <> 0:
-                            # if top_all.loc[symbol,'dff'] == 0:
-                            # if status_change and 'couts' in top_now.columns.values:
-                            if 'couts' in top_now.columns.values:
-                                # top_now.loc[symbol,'lastp']=top_all.loc[symbol,'lastp']
-                                # top_all.loc[symbol, 'buy':'couts'] = top_now.loc[symbol, 'buy':'couts']
-                                top_all.loc[symbol, 'buy':'prev_p'] = top_now.loc[
-                                    symbol, 'buy':'prev_p']
-                            else:
-                                # top_now.loc[symbol,'lastp']=top_all.loc[symbol,'lastp']
-                                top_all.loc[symbol, 'buy':'low'] = top_now.loc[
-                                    symbol, 'buy':'low']
-
+                    # for symbol in top_now.index:
+                    #     if symbol in top_all.index and top_now.loc[symbol, 'buy'] <> 0:
+                    #         if 'couts' in top_now.columns.values:
+                    #             top_all.loc[symbol, 'buy':'prev_p'] = top_now.loc[
+                    #                 symbol, 'buy':'prev_p']
+                    #         else:
+                    #             top_all.loc[symbol, 'buy':'low'] = top_now.loc[
+                    #                 symbol, 'buy':'low']
+                    top_all=cct.combine_dataFrame(top_all,top_now, col=None)
                 top_dif = top_all
                 top_dif=top_dif[top_dif.lvol > ct.LvolumeSize]
                 # if top_dif[:1].llow.values <> 0:
                 # if not (cct.get_now_time_int() > 915 and cct.get_now_time_int() <= 925):
                 if len(top_dif[:5][top_dif[:5]['buy'] > 0]) > 3:
                     log.debug('diff2-0-buy>0')
-                    # top_dif = top_dif[top_dif.low >= top_dif.llow]
-                    # log.debug('diff2-1:%s' % len(top_dif))
-                    # log.debug('dif3 low<>0 :%s' % len(top_dif))
-                    # top_dif = top_dif[top_dif.open > 0]
                     if cct.get_now_time_int() > 915 and cct.get_now_time_int() < ct.checkfilter_end_time:
                         top_dif = top_dif[top_dif.low > top_dif.llow * ct.changeRatio]
                     log.debug('dif4 open>low0.99:%s' % len(top_dif))
-                    log.debug('dif4-2:%s' % top_dif.percent[:2])
-
-                    # if cct.get_work_time() and cct.get_now_time_int() > 930:
-                    #     top_dif = top_dif[top_dif.percent >= 0]
-                    # log.debug("dif5-percent>0:%s" % len(top_dif))
-                    # log.debug("Second:vol/vol/:%s" % radio_t)
-
-                    top_dif['volume'] = (
-                        map(lambda x, y: round(x / y / radio_t, 1),
-                            top_dif['volume'].values, top_dif['lvol'].values))
-                #    # top_dif = top_dif[top_dif.volume > 3]
-                    # if cct.get_now_time_int() > 1030 and cct.get_now_time_int() < 1400:
-                        # top_dif = top_dif[(top_dif.volume > ct.VolumeMinR) & (top_dif.volume < ct.VolumeMaxR)]
+                    # top_dif['buy'] = (map(lambda x, y: y if int(x) == 0 else x, top_dif['buy'].values, top_dif['trade'].values))
+                    # if 'volumn' in top_dif.columns and 'lvol' in top_dif.columns:
+                top_dif['volume'] = (map(lambda x, y: round(x / y / radio_t, 1),top_dif['volume'], top_dif['lvol']))
 
 
-                else:
-                    log.info('dif1:%s' % len(top_dif))
-                    log.info(top_dif[:1])
-                    # top_dif = top_dif[top_dif.buy > top_dif.llastp * ct.changeRatio]
-                    log.debug('dif2:%s' % len(top_dif))
-                    # top_dif['dff'] = (
-                    #     map(lambda x, y:
-                    #         round(((float(x) - float(y)) / float(y) * 100), 1),
-                    #         top_dif['buy'].values,
-                    #         top_dif['lastp'].values)
-                    # )
-
-                top_dif['dff'] = (
-                    map(lambda x, y: round(
-                        ((float(x) - float(y)) / float(y) * 100), 1),
-                        top_dif['buy'].values,
-                        top_dif['lastp'].values))
-
+                # if 'lastp' in top_dif.columns and 'buy' in top_dif.columns:
+                top_dif['dff']=map(lambda x, y: round((x - y)/y * 100, 1),top_dif['buy'].values,top_dif['lastp'].values)
+               
                 if len(top_dif) == 0:
                     print "No G,DataFrame is Empty!!!!!!"
                 else:
-                    log.debug('dif6 vol:%s' % (top_dif[:1].volume.values))
-
-                    log.debug('dif6 vol>lvol:%s' % len(top_dif))
-
                     # top_dif = top_dif[top_dif.buy >= top_dif.open*0.99]
                     # log.debug('dif5 buy>open:%s'%len(top_dif))
                     # top_dif = top_dif[top_dif.trade >= top_dif.buy]

@@ -91,12 +91,12 @@ if __name__ == "__main__":
         try:
             # df = rl.get_sina_Market_json('all')
             # top_now = rl.get_market_price_sina_dd_realTime(df, vol, type)
+            time_Rt = time.time()
             top_now = tdd.getSinaAlldf(market='all', vol=ct.json_countVol, type=ct.json_countType)            
             # print top_now.loc['601900',:]
             df_count = len(top_now)
             now_count = len(top_now)
             radio_t = cct.get_work_time_ratio()
-            time_Rt = time.time()
             time_d = time.time()
             if time_d - time_s > delay_time:
                 status_change = True
@@ -116,12 +116,12 @@ if __name__ == "__main__":
                 if 'trade' in top_now.columns:
                     top_now['buy'] = (
                         map(lambda x, y: y if int(x) == 0 else x, top_now['buy'].values, top_now['trade'].values))
-                time_Rt = time.time()
+                # time_Rt = time.time()
                 if len(top_all) == 0 and len(lastpTDX_DF) == 0:
                     time_Rt = time.time()
                     top_all,lastpTDX_DF = tdd.get_append_lastp_to_df(top_now)
                 elif len(top_all) == 0 and len(lastpTDX_DF) > 0:
-                    time_Rt = time.time()
+                    # time_Rt = time.time()
                     top_all = tdd.get_append_lastp_to_df(top_now,lastpTDX_DF)
                 else:
                     if 'couts' in top_now.columns.values:
@@ -129,14 +129,17 @@ if __name__ == "__main__":
                             top_all['couts'] = 0
                             top_all['prev_p'] = 0
                     
-                    for symbol in top_now.index:
-                        # code = rl._symbol_to_code(symbol)
-                        if symbol in top_all.index and top_now.loc[symbol, 'buy'] <> 0:
-                            # top_now.loc[symbol, 'dff'] = round(((float(top_now.loc[symbol, 'buy']) - float(top_all.loc[symbol, 'lastp'])) / float(top_all.loc[symbol, 'lastp']) * 100), 1)
-                            if 'couts' in top_now.columns.values:
-                                    top_all.loc[symbol, ct.columns_now] = top_now.loc[symbol, ct.columns_now]
-                            else:
-                                top_all.loc[symbol, ct.columns_now] = top_now.loc[symbol, ct.columns_now]
+                    # for symbol in top_now.index:
+                    #     # code = rl._symbol_to_code(symbol)
+                    #     if symbol in top_all.index and top_now.loc[symbol, 'buy'] <> 0:
+                    #         # top_now.loc[symbol, 'dff'] = round(((float(top_now.loc[symbol, 'buy']) - float(top_all.loc[symbol, 'lastp'])) / float(top_all.loc[symbol, 'lastp']) * 100), 1)
+                    #         if 'couts' in top_now.columns.values:
+                    #                 top_all.loc[symbol, ct.columns_now] = top_now.loc[symbol, ct.columns_now]
+                    #         else:
+                    #             top_all.loc[symbol, ct.columns_now] = top_now.loc[symbol, ct.columns_now]
+                    top_all=cct.combine_dataFrame(top_all,top_now, col=None)
+
+
 
                 # top_all=top_all.sort_values(by=['dff','percent','couts'],ascending=[0,0,1])
                 # top_all=top_all.sort_values(by=['dff','ratio','percent','couts'],ascending=[0,1,0,1])

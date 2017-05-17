@@ -878,13 +878,13 @@ def powerCompute_df(df, dtype='d', end=None, dl=None, filter='y',talib=False,new
     if not isinstance(df,list) and 'boll' in df.columns:
             if 'time' in df.columns:
                 # if df[:1].boll.values <> 0 and time.time()- df[df.time <> 0].time[0] < ct.power_update_time:
-                if len(df[df.time <> 0]) > 0 and df[:1].boll.values <> 0 and time.time() - df[df.time <> 0].time[0] < ct.power_update_time:
+                if not cct.get_work_time() and len(df[df.time <> 0]) > 0 and df[:1].boll.values <> 0 and time.time() - df[df.time <> 0].time[0] < ct.power_update_time:
                     print "PcA:%0.2f"%(time.time()-ts),
                     return df
-            else:
-                if len(df) > 0 and df[:1].boll.values <> 0:
-                    print "PcA:%0.2f"%(time.time()-ts),
-                    return df
+#            else:
+#                if len(df) > 0 and df[:1].boll.values <> 0:
+#                    print "PcA:%0.2f"%(time.time()-ts),
+#                    return df
 
     # else:
     #         if  len(dm) - len(set(dm.index) & set(df.code.values)) < 10 :
@@ -929,7 +929,12 @@ def powerCompute_df(df, dtype='d', end=None, dl=None, filter='y',talib=False,new
         start = cct.day8_to_day10(start)
         end = cct.day8_to_day10(end)
         if code in dm.index:
+            log.info("dz:%s"%(dm.loc[code]))
             dz = dm.loc[code].to_frame().T
+            # if len(dz) > 1:
+            #     dz=dz.to_frame()[0].T
+            # else:
+            #     dz=dz.to_frame().T
         else:
             dz = tdd.get_sina_data_df(code)
 

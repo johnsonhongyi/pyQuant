@@ -40,7 +40,7 @@ def getBollFilter(df=None,boll=-5,duration=ct.PowerCountdl,filter=False,ma5d=Tru
 #                         df['ra'].values, df['fibl'].astype(float).values,df['rah'].values,df['fib'].astype(float).values,df['ma'].values,\
 #                         df['kdj'].values,df['rsi'].values))
     # df['diff2'] = df['dff'].copy()
-    pd.options.mode.chained_assignment = None
+    # pd.options.mode.chained_assignment = None
     # df.rename(columns={'dff': 'df2'}, inplace=True)
     # df['diff2'] = df['dff']
 

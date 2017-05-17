@@ -18,7 +18,7 @@ from trollius.coroutines import From
 # log = LoggerFactory.getLogger('Sina_data')
 log = LoggerFactory.log
 # log.setLevel(LoggerFactory.DEBUG)
-import tdx_data_Day as tdd
+import tdx_hdf5_api as h5a
 
 class StockCode:
     def __init__(self):
@@ -56,11 +56,11 @@ class StockCode:
             print len(stock_codes)
             with open(self.stock_code_path, 'w') as f:
                 f.write(json.dumps(dict(stock=stock_codes)))
-            return stock_codes
+            return list(set(stock_codes))
         else:
             with open(self.stock_code_path) as f:
                 self.stock_codes = json.load(f)['stock']
-                return self.stock_codes
+                return list(set(self.stock_codes))
 
 
 # -*- encoding: utf-8 -*-
@@ -88,7 +88,7 @@ class Sina:
         self.index_status = False
         self.hdf_name = 'sina_data'
         self.table = 'all'
-        self.all
+        # self.all
         # h5 = self.load_hdf_db(table='all', code_l=None, init=True)
         # if h5 is None:
         #     # log.info("hdf5 None")
@@ -151,7 +151,7 @@ class Sina:
     @property
     def all(self):
 
-        h5 = tdd.load_hdf_db(self.hdf_name,self.table,index='int')
+        h5 = h5a.load_hdf_db(self.hdf_name,self.table)
         if h5 is not None:
             log.info("hdf5 data:%s"%(len(h5)))
             return h5
@@ -224,7 +224,7 @@ class Sina:
                     map(lambda stock_code: ('sz%s' )% stock_code,
                         self.stock_codes))
 
-            h5 = tdd.load_hdf_db(self.hdf_name,self.table, code_l=self.stock_codes,index='int')
+            h5 = h5a.load_hdf_db(self.hdf_name,self.table, code_l=self.stock_codes)
             if h5 is not None:
                 return h5
 
@@ -347,7 +347,7 @@ class Sina:
                 ('5', '6', '9')) else 'sz%s') % stock_code, code_l)
 
         if not index:
-            h5 = tdd.load_hdf_db(self.hdf_name,self.table, code_l=code_l,index='int')
+            h5 = h5a.load_hdf_db(self.hdf_name,self.table, code_l=code_l)
             if h5 is not None:
                 log.info("not index hdf5 data:%s"%(len(h5)))
                 return h5
@@ -363,7 +363,7 @@ class Sina:
 
     def get_stock_list_data(self, ulist):
 
-        h5 = tdd.load_hdf_db(self.hdf_name,self.table, code_l=ulist,index='int')
+        h5 = h5a.load_hdf_db(self.hdf_name,self.table, code_l=ulist)
         if h5 is not None:
             log.info("hdf5 data:%s"%(len(h5)))
             return h5
@@ -483,11 +483,12 @@ class Sina:
         # df = df.loc[:, ct.SINA_Total_Columns]
         # df.rename(columns={'turnover': 'amount'}, inplace=True)
         df = df.fillna(0)
-        df = df.sort_values(by='code', ascending=0)
+#        df = df.sort_values(by='code', ascending=0)
+        df = df.set_index('code')
         # print ("Market-df:%s %s time: %s" % (
         # cct.get_now_time()))
         log.info("hdf:all%s %s"%(len(df),len(self.stock_codes)))
-        tdd.write_hdf_db(self.hdf_name,df,self.table)
+        h5a.write_hdf_db(self.hdf_name,df,self.table)
         log.info("wr end:%0.2f"%(time.time() - self.start_t))
         return df
         # df = pd.DataFrame.from_dict(stock_dict, orient='columns',
@@ -510,7 +511,7 @@ if __name__ == "__main__":
     sina = Sina()
     # print len(df)
     # code='601198'
-    df = sina.get_stock_list_data(['300134', '601998', '999999']).set_index('code')
+    df = sina.get_stock_list_data(['300134', '601998', '999999'])
     print df
     # df = sina.get_stock_code_data('000001',index=True).set_index('code')
     # print sina.get_stock_code_data('399006,999999',index=True)

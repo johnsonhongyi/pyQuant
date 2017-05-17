@@ -10,6 +10,7 @@ from struct import *
 import numpy as np
 import pandas as pd
 from pandas import Series
+from JSONData import tdx_hdf5_api as h5a
 from JSONData import realdatajson as rl
 from JSONData import wencaiData as wcd
 from JohhnsonUtil import LoggerFactory
@@ -651,9 +652,9 @@ def get_tdx_append_now_df_api(code, start=None, end=None, type='f',df=None,dm=No
 
             dm = sina_data.Sina().get_stock_code_data(code_t,index=index_status)
             dm.code = code
-            dm = dm.set_index('code')
+#            dm = dm.set_index('code')
         else:
-            dm = sina_data.Sina().get_stock_code_data(code).set_index('code')
+            dm = sina_data.Sina().get_stock_code_data(code)
     if duration == 0:
         writedm = False
     else:
@@ -877,7 +878,7 @@ def get_tdx_append_now_df_api_tofile(code,dm=None,newdays=1, start=None, end=Non
             dm.code = code
             dm = dm.set_index('code')
         else:
-            dm = sina_data.Sina().get_stock_code_data(code).set_index('code')
+            dm = sina_data.Sina().get_stock_code_data(code)
     if len(df) !=0 and duration == 0:
         writedm = False
     else:
@@ -1304,7 +1305,7 @@ def get_tdx_write_now_file_api(code, type='f',dm=None):
             dm.code = code
             dm = dm.set_index('code')
         else:
-            dm = sina_data.Sina().get_stock_code_data(code).set_index('code')
+            dm = sina_data.Sina().get_stock_code_data(code)
 
     if dm is not None and df is not None and not dm.empty:
         # dm.rename(columns={'volume': 'amount', 'turnover': 'vol'}, inplace=True)
@@ -1434,7 +1435,7 @@ def get_tdx_append_now_df_api2(code, start=None, end=None, type='f',df=None,dm=N
             dm.code = code
             dm = dm.set_index('code')
         else:
-            dm = sina_data.Sina().get_stock_code_data(code).set_index('code')
+            dm = sina_data.Sina().get_stock_code_data(code)
 
     if dm is not None and df is not None and not dm.empty and len(df) >0:
         dm.rename(columns={'volume': 'vol', 'turnover': 'amount'}, inplace=True)
@@ -1498,7 +1499,7 @@ def get_tdx_power_now_df(code, start=None, end=None, type='f',df=None,dm=None,dl
     today = cct.get_today()
     if dm is None and (today != df.index[-1] or df.vol[-1] < df.vol[-2] * 0.8)and (cct.get_now_time_int() < 830 or cct.get_now_time_int() > 930):
         # log.warn('today != end:%s'%(df.index[-1]))
-        dm = sina_data.Sina().get_stock_code_data(code).set_index('code')
+        dm = sina_data.Sina().get_stock_code_data(code)
 
     if dm is not None and df is not None and not dm.empty:
         # dm.rename(columns={'volume': 'amount', 'turnover': 'vol'}, inplace=True)
@@ -1550,9 +1551,9 @@ def get_tdx_power_now_df(code, start=None, end=None, type='f',df=None,dm=None,dl
 def get_sina_data_df(code):
     index_status=False
     if isinstance(code, list):
-        dm = sina_data.Sina().get_stock_list_data(code).set_index('code')
+        dm = sina_data.Sina().get_stock_list_data(code)
     else:
-        dm = sina_data.Sina().get_stock_code_data(code,index=index_status).set_index('code')
+        dm = sina_data.Sina().get_stock_code_data(code,index=index_status)
     return dm
 
 
@@ -1594,31 +1595,32 @@ def getSinaAlldf(market='cyb',vol=ct.json_countVol,type=ct.json_countType,filena
     # cct._write_to_csv(df,'codeall')
     # top_now = get_mmarket='all'arket_price_sina_dd_realTime(df, vol, type)
 #    df =  df.dropna()
-    if len(df) > 0 and 'code' in df.columns:
-        df = df.set_index('code')
+    if len(df) > 0:
+        if 'code' in df.columns:
+            df = df.set_index('code')
     else:
         df = rl.get_sina_Market_json(market)
 #        codelist = df.code.tolist()
-        df = df.set_index('code')
+#        df = df.set_index('code')
         log.error("get_sina_Market_json %s : %s"%(market,len(df)))
     if cct.get_now_time_int() > 915:
         if 'buy' in df.columns:
             df = df[(df.buy > 0)]
 
-    codelist = df.index.tolist()
+    codelist = df.index.astype(str).tolist()
 
     h5_fname = 'tdx_now'
 #    h5_table = market if not cct.check_chinese(market) else filename
     h5_table = 'all'
 #    h5 = top_hdf_api(fname=h5_fname,table=h5_table,df=None)
-    h5 = load_hdf_db(h5_fname, table=h5_table, code_l=codelist)
-    if h5 is not None and not h5.empty and 'time' in h5.columns:
-        o_time = h5[h5.time <> 0].time
+    h5 = h5a.load_hdf_db(h5_fname, table=h5_table, code_l=codelist)
+    if h5 is not None and not h5.empty and 'timel' in h5.columns:
+        o_time = h5[h5.timel <> 0].timel
         if len(o_time) > 0:
             o_time = o_time[0]
 #            print time.time() - o_time
             if not cct.get_work_time() or (not (915 < cct.get_now_time_int() < 930) and time.time() - o_time < ct.h5_limit_time):
-                log.info("load hdf data:%s %s %s"%(h5_fname,h5_table,len(h5)))
+                log.info("load hdf data ok:%s %s %s"%(h5_fname,h5_table,len(h5)))
                 return h5
 
     # index_status=False
@@ -1636,7 +1638,7 @@ def getSinaAlldf(market='cyb',vol=ct.json_countVol,type=ct.json_countType,filena
     # print time.time()-time_s
     if cct.get_now_time_int() > 932 and market not in ['sh','sz','cyb']:
         dd = rl.get_sina_Market_json('all')
-        dd = dd.set_index('code')
+#        dd = dd.set_index('code')
         dd.drop([inx for inx in dd.index  if inx not in df.index], axis=0, inplace=True)
         df = dd
     if len(df) < 10 or len(dm) < 10:
@@ -1645,8 +1647,9 @@ def getSinaAlldf(market='cyb',vol=ct.json_countVol,type=ct.json_countType,filena
     else:
         if len(dm) <> len(df):
             log.info("code:%s %s"%(len(dm),len(df))),
-        dm=pd.merge(dm,df.loc[:,['name','ratio']],on='name',how='left')
-        dm=dm.drop_duplicates('code')
+#        dm=pd.merge(dm,df.loc[:,['name','ratio']],on='name',how='left')
+#        dm=dm.drop_duplicates('code')
+        dm = cct.combine_dataFrame(dm,df.loc[:,['name','ratio']])
         dm=dm.fillna(0)
     if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 926:
         # print dm[dm.code=='000001'].b1
@@ -1674,7 +1677,7 @@ def getSinaAlldf(market='cyb',vol=ct.json_countVol,type=ct.json_countType,filena
         top_now['prev_p'] = 0
         top_now['kind'] = 0
 
-    top_now['time'] = time.time()
+#    top_now['time'] = time.time()
     # print top_now[:1].b1_v
     # print len(top_now),len(dm)
     # print top_now.loc[top_now.index == '300076',['b1_v','a1_v','trade','buy','b1','a1']]
@@ -1691,7 +1694,7 @@ def getSinaAlldf(market='cyb',vol=ct.json_countVol,type=ct.json_countType,filena
 
 #    top_hdf_api(fname=h5_fname,wr_mode='w',table=h5_table, df=top_now)
 #    h5 = (h5_fname, wr_mode='w',table=h5_table, code_l=None, init=False)
-    h5 = write_hdf_db(h5_fname, top_now, table=h5_table)
+    h5 = h5a.write_hdf_db(h5_fname, top_now, table=h5_table)
     # top_hdf_api(fname='tdx',wr_mode='w', table=None, df=None)
     #
     # if 'time' in h5.columns:
@@ -2518,7 +2521,7 @@ def get_append_lastp_to_df(top_all,lastpTDX_DF=None,dl=ct.PowerCountdl,end=None,
     if lastpTDX_DF is None or len(lastpTDX_DF) == 0:
 
         # h5 = top_hdf_api(fname=h5_fname,table=market,df=None)
-        h5 = load_hdf_db(h5_fname, table=h5_table, code_l=codelist)
+        h5 = h5a.load_hdf_db(h5_fname, table=h5_table, code_l=codelist,timelimit=False)
 
         if h5 is not None and not h5.empty:
 #            o_time = h5[h5.time <> 0].time
@@ -2548,7 +2551,7 @@ def get_append_lastp_to_df(top_all,lastpTDX_DF=None,dl=ct.PowerCountdl,end=None,
     #            #     :, ['llow', 'lhigh', 'lastp', 'lvol', 'date']]
 
             # h5 = top_hdf_api(fname=h5_fname,wr_mode='w',table=market,df=tdxdata)
-            h5 = write_hdf_db(h5_fname, tdxdata, table=h5_table)
+            h5 = h5a.write_hdf_db(h5_fname, tdxdata, table=h5_table)
 
 
         log.debug("TDX Col:%s" % tdxdata.columns.values)
@@ -2939,135 +2942,7 @@ def testnumba(number=500):
     print timeit.timeit(lambda:autojit(lambda:python_resample(qs, xs, rands)),number=number)
     # print timeit.timeit(lambda:cct.run_numba(python_resample(qs, xs, rands)),number=number)
 
-def get_hdf5_file(fpath,wr_mode='r',complevel=9,complib='zlib'):
-    # store=pd.HDFStore(fpath,wr_mode, complevel=complevel, complib=complib)
-    fpath = cct.get_ramdisk_path(fpath)
-    if fpath is None:
-        # print ("don't exists %s"%(fpath))
-        return None
-    if os.path.exists(fpath):
-        if wr_mode == 'w':
-            store=pd.HDFStore(fpath,complevel=None, complib=None, fletcher32=False)
-        else:
-            store=pd.HDFStore(fpath, mode=wr_mode, complevel=None, complib=None, fletcher32=False)
-    else:
-        store = pd.HDFStore(fpath,complevel=9,complib='zlib')
-        # store = pd.HDFStore(fpath, mode=wr_mode,complevel=9,complib='zlib')
-    # store.put("Year2015", dfMinutes, format="table", append=True, data_columns=['dt','code'])
-    return store
-    # fp='/Volumes/RamDisk/top_now.h5'
-    # get_hdf5_file(fp)
-    # def hdf5_read_file(file):
-        # store.select("Year2015", where=['dt<Timestamp("2015-01-07")','code=="000570"'])
-        # return store
 
-def write_hdf_db(fname,df,table='all',baseCount=500):
-    # if 'code' in df.columns:
-        # df = df.set_index('code')
-    dd = df.copy()
-    if 'code' in dd.columns:
-        dd = dd.set_index('code')
-    dd['time'] =  time.time()
-    h5=top_hdf_api(fname=fname,wr_mode='w', table=table, df=dd)
-
-def top_hdf_api(fname='tdx',wr_mode='r',table=None,df=None):
-    if df is not None and not df.empty:
-        h5 = get_hdf5_file(fname,wr_mode=wr_mode)
-        if h5 is not None:
-            # if table is not None:
-            #     for key in h5.keys():
-            #         if key.find(table) >=0:
-            #             h5.remove(table)
-            dd = df.dtypes.to_frame()
-            if 'object' in dd.values:
-                dd = dd[dd == 'object'].dropna()
-                col = dd.index.tolist()
-                # log.error("obejct:%s"%(col))
-            df.index = df.index.astype(str)
-            # df[['name','kind']] = df[['name','kind']].astype(str)
-            df[col] = df[col].astype(str)
-#                table = varnamestr(df,globals())
-#                table = varname(df)
-            if table is not None:
-                if '/'+table in h5.keys():
-                    tmpdf = h5[table]
-                    if 'code' in tmpdf.columns:
-                        tmpdf = tmpdf.set_index('code')
-                    if 'code' in df.columns:
-                        df = df.set_index('code')
-                    allcode = set(tmpdf.index)|set(df.index)
-                    # diff_code = [x for x in set(dm.index) - (set(dm.index) & set(df.code.values))]
-                    tmpdf.drop([col for col in tmpdf.index if col in df.index], axis=0, inplace=True)
-                    df = pd.concat([tmpdf, df], axis=0)
-                h5[table] = df
-            #     h5[table] = df
-            else:
-                log.error("write table is None:%s"%(fname))
-            if h5.is_open:
-                h5.close()
-            return df
-        else:
-            log.error("hdf is Non:%s"%(fname))
-            if h5 is not None and h5.is_open:
-                h5.close()
-    else:
-        h5 = get_hdf5_file(fname,wr_mode=wr_mode)
-        if table is None and df is None and h5 is not None:
-            df = h5.copy()
-            if h5.is_open:
-                h5.close()
-            return df
-#        if table is None and df is not None:
-#            table = varnamestr(df,globals())
-#            table = varname(df)
-        if h5 is not None:
-            if table is not None:
-                if '/'+table in h5.keys():
-#                for key in h5.keys():
-#                    if key.find(table) >=0:
-                    df = h5[table]
-                    if h5.is_open:
-                        h5.close()
-                    return df
-                log.error("%s is not find %s"%(fname,table))
-            if h5.is_open:
-                h5.close()
-    return None
-
-# def load_hdf_db(fname,table='all',code_l=None,init=False,index='code'):
-def load_hdf_db(fname,table='all',code_l=None,index='code'):
-    h5=top_hdf_api(fname=fname, table=table, df=None)
-    if code_l is not None:
-        if len(code_l) == 0:
-            return None
-        if h5 is not None:
-            diffcode = set(code_l) - set(h5.index)
-            if len(diffcode) > 100:
-                log.error("diffcode:%s"%(len(diffcode)))
-                return None
-
-    if h5 is not None and not h5.empty and 'time' in h5.columns:
-            o_time = h5[h5.time <> 0].time
-            if len(o_time) > 0:
-                o_time = o_time[0]
-    #            print time.time() - o_time
-                # if cct.get_work_hdf_status() and (not (915 < cct.get_now_time_int() < 930) and time.time() - o_time < ct.h5_limit_time):
-                if not cct.get_work_time() or time.time() - o_time < ct.h5_limit_time:
-                    log.info("time hdf:%s %s"%(fname,len(h5))),
-                    if 'time' in h5.columns:
-                        # h5=h5.drop(['time'],axis=1)
-                        if code_l is not None:
-                            if 'code' in h5.columns:
-                                h5 = h5.set_index('code')
-                            h5.drop([inx for inx in h5.index  if inx not in code_l], axis=0, inplace=True)
-                            log.info("time in idx hdf:%s %s"%(fname,len(h5))),
-                    if index == 'int' and 'code' not in h5.columns:
-                        h5=h5.reset_index()
-                    return h5
-    else:
-        if h5 is not None:
-            return h5
-    return None
 
 
 
@@ -3093,7 +2968,7 @@ if __name__ == '__main__':
     # hdf5_wri='y'
     if hdf5_wri == 'y':
         df = sina_data.Sina().all
-        dfcode =df['code'].tolist()
+        dfcode =df.index.tolist()
         f_name = 'tdx_all_df_30'
         t_st=time.time()
         st=get_hdf5_file(f_name,'w')

@@ -69,7 +69,10 @@ if __name__ == "__main__":
     from docopt import docopt
     log = LoggerFactory.log
     args = docopt(cct.sina_doc, version='sina_cxdn')
-    log_level = LoggerFactory.DEBUG if args['--debug'] else LoggerFactory.ERROR
+    # log_level = args['--debug'] if args['--debug'] else LoggerFactory.ERROR
+    # print args['--debug']
+    log_level = LoggerFactory.INFO if args['--debug'] else LoggerFactory.ERROR
+    # log_level = LoggerFactory.DEBUG if args['--debug'] else LoggerFactory.ERROR
     log.setLevel(log_level)
     # if log_level == LoggerFactory.DEBUG:
     # handler=StderrHandler(format_string='{record.channel}: {record.message) [{record.extra[cwd]}]')
@@ -135,12 +138,12 @@ if __name__ == "__main__":
             # top_now = tdd.getSinaAlldf(market='央企',filename='yqg', vol=ct.json_countVol, type=ct.json_countType)
             # top_now = tdd.getSinaAlldf(market=u'一带一路',filename='ydyl', vol=ct.json_countVol, type=ct.json_countType)
             # top_now = tdd.getSinaAlldf(market='次新股',filename='cxg', vol=ct.json_countVol, type=ct.json_countType)
+            time_Rt = time.time()
             top_now = tdd.getSinaAlldf(market='网络安全+雄安新区',filename='wlaq', vol=ct.json_countVol, type=ct.json_countType)
             # top_now = tdd.getSinaAlldf(market=u'京津冀',filename='beijing', vol=ct.json_countVol, type=ct.json_countType)
             now_count = len(top_now)
             radio_t = cct.get_work_time_ratio()
             # top_now = top_now[top_now.buy > 0]
-            time_Rt = time.time()
             time_d = time.time()
             if time_d - time_s > delay_time:
                 status_change = True
@@ -187,17 +190,22 @@ if __name__ == "__main__":
                         if not 'couts' in top_all.columns.values:
                             top_all['couts'] = 0
                             top_all['prev_p'] = 0
-                    for symbol in top_now.index:
-                        if 'couts' in top_now.columns.values:
-                            top_all.loc[symbol, ct.columns_now] = top_now.loc[symbol, ct.columns_now]
-                        else:
-                            # top_now.loc[symbol, 'dff'] = round(
-                            # ((float(top_now.loc[symbol, 'buy']) - float(
-                            # top_all.loc[symbol, 'lastp'])) / float(top_all.loc[symbol, 'lastp']) * 100),
-                            # 1)
-                            top_all.loc[symbol, ct.columns_now] = top_now.loc[symbol, ct.columns_now]
-                            # top_all.loc[symbol, 'buy'] = top_now.loc[symbol, 'buy']
-                # top_all = top_all[top_all.buy > 0]
+                    # for symbol in top_now.index:
+                    #     if 'couts' in top_now.columns.values:
+                    #         top_all.loc[symbol, ct.columns_now] = top_now.loc[symbol, ct.columns_now]
+                    #     else:
+                    #         top_all.loc[symbol, ct.columns_now] = top_now.loc[symbol, ct.columns_now]
+                    # org_all = top_all.copy()
+                    # no_index = top_all.drop([inx for inx in top_all.index  if inx not in top_now.index], axis=0)
+                    # no_index.drop([col for col in no_index.columns if col in top_now.columns], axis=1,inplace=True)
+                    # no_index = no_index.merge(top_now, left_index=True, right_index=True, how='left')
+                    # top_all = top_all.drop([inx for inx in top_all.index  if inx in top_now.index], axis=0)
+                    # top_all = pd.concat([top_all, no_index],axis=0)
+                    # log.info("couts for time:%0.2f"%(time.time()-time_Rt))
+                    top_all=cct.combine_dataFrame(top_all,top_now, col=None)
+                    
+
+
                 top_dif = top_all.copy(deep=True)
                 if 'trade' in top_dif.columns:
                     top_dif['buy'] = (map(lambda x, y: y if int(x) == 0 else x, top_dif['buy'].values, top_dif['trade'].values))

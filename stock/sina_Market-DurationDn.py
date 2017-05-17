@@ -124,12 +124,12 @@ if __name__ == "__main__":
             # top_now.to_hdf("testhdf5", 'marketDD', format='table', complevel=9)
             '''
             # top_now = tdd.getSinaAlldf(market='cyb', vol=ct.json_countVol, type=ct.json_countType)
+            time_Rt = time.time()
             top_now = tdd.getSinaAlldf(market='all', vol=ct.json_countVol, type=ct.json_countType)
 #            top_now = tdd.getSinaAlldf(market=u'次新股',filename='cxg', vol=ct.json_countVol, type=ct.json_countType)
             now_count = len(top_now)
             radio_t = cct.get_work_time_ratio()
             # top_now = top_now[top_now.buy > 0]
-            time_Rt = time.time()
             time_d = time.time()
             if time_d - time_s > delay_time:
                 status_change = True
@@ -139,9 +139,9 @@ if __name__ == "__main__":
                 status_change = False
             # print ("Buy>0:%s" % len(top_now[top_now['buy'] > 0])),
             if len(top_now) > 0 or cct.get_work_time():
-                time_Rt = time.time()
+                # time_Rt = time.time()
                 if len(top_all) == 0 and len(lastpTDX_DF) == 0:
-                    time_Rt = time.time()
+                    # time_Rt = time.time()
                     top_all,lastpTDX_DF = tdd.get_append_lastp_to_df(top_now, lastpTDX_DF=None, dl=duration_date,end=end_date,ptype=ptype,filter=filter, power=ct.lastPower, lastp=lastp,newdays=newdays)
                     # codelist = top_all.index.tolist()
                     # log.info('toTDXlist:%s' % len(codelist))
@@ -165,7 +165,7 @@ if __name__ == "__main__":
                     # log.info('Top-merge_now:%s' % (top_all[:1]))
                     # top_all = top_all[top_all['llow'] > 0]
                 elif len(top_all) == 0 and len(lastpTDX_DF) > 0:
-                    time_Rt = time.time()
+                    # time_Rt = time.time()
                     top_all = top_now
                     top_all = top_all.merge(lastpTDX_DF, left_index=True, right_index=True, how='left')
                     top_all = top_all[top_all['llow'] > 0]
@@ -176,17 +176,18 @@ if __name__ == "__main__":
                         if not 'couts' in top_all.columns.values:
                             top_all['couts'] = 0
                             top_all['prev_p'] = 0
-                    for symbol in top_now.index:
-                        if 'couts' in top_now.columns.values:
-                            top_all.loc[symbol, ct.columns_now] = top_now.loc[symbol, ct.columns_now]
-                        else:
-                            # top_now.loc[symbol, 'dff'] = round(
-                            # ((float(top_now.loc[symbol, 'buy']) - float(
-                            # top_all.loc[symbol, 'lastp'])) / float(top_all.loc[symbol, 'lastp']) * 100),
-                            # 1)
-                            top_all.loc[symbol, ct.columns_now] = top_now.loc[symbol, ct.columns_now]
-                            # top_all.loc[symbol, 'buy'] = top_now.loc[symbol, 'buy']
-                # top_all = top_all[top_all.buy > 0]
+                    # for symbol in top_now.index:
+                    #     if 'couts' in top_now.columns.values:
+                    #         top_all.loc[symbol, ct.columns_now] = top_now.loc[symbol, ct.columns_now]
+                    #     else:
+                    #         # top_now.loc[symbol, 'dff'] = round(
+                    #         # ((float(top_now.loc[symbol, 'buy']) - float(
+                    #         # top_all.loc[symbol, 'lastp'])) / float(top_all.loc[symbol, 'lastp']) * 100),
+                    #         # 1)
+                    #         top_all.loc[symbol, ct.columns_now] = top_now.loc[symbol, ct.columns_now]
+                    top_all=cct.combine_dataFrame(top_all,top_now, col=None)
+
+
                 top_dif = top_all.copy()
                 if 'trade' in top_dif.columns:
                     top_dif['buy'] = (

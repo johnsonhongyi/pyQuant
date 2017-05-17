@@ -23,6 +23,7 @@ import JohhnsonUtil.johnson_cons as ct
 from JohhnsonUtil import LoggerFactory
 from JSONData.prettytable import *
 from JohhnsonUtil import commonTips as cct
+import tdx_hdf5_api as h5a
 
 try:
     from urllib.request import urlopen, Request
@@ -133,6 +134,8 @@ def _get_sina_Market_url(market='sh_a', count=None, num='1000'):
 
 def get_sina_Market_json(market='sh', showtime=True, num='1000', retry_count=3, pause=0.001):
     start_t = time.time()
+#    http://qt.gtimg.cn/q=sz000858,sh600199
+#    http://blog.csdn.net/ustbhacker/article/details/8365756
     # url="http://vip.stock.finance.sina.com.cn/quotes_service/api/json_v2.php/Market_Center.getHQNodeData?page=1&num=50&sort=changepercent&asc=0&node=sh_a&symbol="
     # SINA_REAL_PRICE_DD = '%s%s/quotes_service/api/json_v2.php/Market_Center.getHQNodeData?page=1&num=%s&sort=changepercent&asc=0&node=%s&symbol=%s'
     """
@@ -143,6 +146,18 @@ def get_sina_Market_json(market='sh', showtime=True, num='1000', retry_count=3, 
            属性：代码，名称，涨跌幅，现价，开盘价，最高价，最低价，最日收盘价，成交量，换手率
     """
     # ct._write_head()
+
+    h5_fname = 'get_sina_all_ratio'
+    h5_table = 'all'
+    h5 = h5a.load_hdf_db(h5_fname, table=h5_table)
+    if h5 is not None and not h5.empty and 'timel' in h5.columns:
+       o_time = h5[h5.time <> 0].timel
+       if len(o_time) > 0:
+           o_time = o_time[0]
+           if not cct.get_work_time() or (cct.get_now_time_int() > 935 and time.time() - o_time < ct.h5_limit_time):
+               log.info("load hdf data:%s %s %s"%(h5_fname,h5_table,len(h5)))
+               return h5
+
     if market=='all':
         url_list=[]
         # for m in ct.SINA_Market_KEY.values():
@@ -184,9 +199,14 @@ def get_sina_Market_json(market='sh', showtime=True, num='1000', retry_count=3, 
         #     newdf = _parsing_dayprice_json(i)
         #     df = df.append(newdf, ignore_index=True)
         # print len(df.index)
-        if showtime: print (
-        "Market-df:%s %s" % (format((time.time() - start_t), '.1f'), len(df))),
+
         # print type(df)
+        if 'code' in df.columns:
+            df = df.set_index('code')
+
+        h5 = h5a.write_hdf_db(h5_fname, df, table=h5_table)
+        if showtime: print ("Market-df:%s %s" % (format((time.time() - start_t), '.1f'), len(df))),
+
         return df
     else:
         if showtime:print ("no data Market-df:%s" % (format((time.time() - start_t), '.2f')))
@@ -355,16 +375,16 @@ def get_sina_all_json_dd(vol='0', type='0', num='10000', retry_count=3, pause=0.
            属性：代码，名称，涨跌幅，现价，开盘价，最高价，最低价，最日收盘价，成交量，换手率
     """
 
-#    h5_fname = 'get_sina_all_json_dd'
-#    h5_table = 'all'
-#    h5 = load_hdf_db(h5_fname, table=h5_table)
-#    if h5 is not None and not h5.empty and 'time' in h5.columns:
-#        o_time = h5[h5.time <> 0].time
-#        if len(o_time) > 0:
-#            o_time = o_time[0]
-#            if not cct.get_work_time() or (cct.get_now_time_int() > 935 and time.time() - o_time < ct.h5_limit_time):
-#                log.info("load hdf data:%s %s %s"%(h5_fname,h5_table,len(h5)))
-#                return h5
+    h5_fname = 'get_sina_all_dd'
+    h5_table = 'all'
+    h5 = h5a.load_hdf_db(h5_fname, table=h5_table)
+    if h5 is not None and not h5.empty and 'timel' in h5.columns:
+       o_time = h5[h5.time <> 0].timel
+       if len(o_time) > 0:
+           o_time = o_time[0]
+           if not cct.get_work_time() or (cct.get_now_time_int() > 935 and time.time() - o_time < ct.h5_limit_time):
+               log.info("load hdf data:%s %s %s"%(h5_fname,h5_table,len(h5)))
+               return h5
 
     # ct._write_head()
     url_list = _get_sina_json_dd_url(vol, type, num)
@@ -392,7 +412,7 @@ def get_sina_all_json_dd(vol='0', type='0', num='10000', retry_count=3, pause=0.
 
         if len(data)>0:
             df = df.append(data, ignore_index=True)
-            log.debug("dd.columns:%s" % df.columns.values)
+#            log.debug("dd.columns:%s" % df.columns.values)
             #['code' 'name' 'ticktime' 'price' 'volume' 'prev_price' 'kind']
             log.debug("get_sina_all_json_dd:%s" % df[:1])
 
@@ -400,7 +420,18 @@ def get_sina_all_json_dd(vol='0', type='0', num='10000', retry_count=3, pause=0.
             # for i in range(2, ct.PAGE_NUM[0]):
             #     newdf = _parsing_dayprice_json(i)
             #     df = df.append(newdf, ignore_index=True)
-#            h5 = write_hdf_db(h5_fname, df, table=h5_table)
+            df['couts']=df.groupby(['code'])['code'].transform('count')
+            # df=df[(df['kind'] == 'U')]
+            df=df.sort_values(by='couts',ascending=0)
+            df=df.drop_duplicates('code')
+            # df=df[df.price >df.prev_price]
+            log.info("sina-DD:%s" % df[:1])
+#            df = df.loc[:, ['code','name', 'couts', 'kind', 'prev_price']]
+#            print df.columns
+            df = df.loc[:, ['code','name', 'couts', 'kind', 'prev_price','ticktime']]
+            df.code=df.code.apply(lambda x:str(x).replace('sh','') if str(x).startswith('sh') else str(x).replace('sz',''))
+            df = df.set_index('code')
+            h5 = h5a.write_hdf_db(h5_fname, df, table=h5_table)
 
             print (" dd-df:%0.2f" % ((time.time() - start_t))),
             return df
@@ -642,23 +673,17 @@ def get_market_price_sina_dd_realTime(dp='',vol='0',type='0'):
         dp['dff']=0
         df=get_sina_all_json_dd(vol,type)
         if len(df)>10:
-            # df['couts']=0
-            df['couts']=df.groupby(['code'])['code'].transform('count')
-            # df=df[(df['kind'] == 'U')]
-            df=df.sort_values(by='couts',ascending=0)
-            df=df.drop_duplicates('code')
-            # df=df[df.price >df.prev_price]
-            log.info("sina-DD:%s" % df[:1])
-            df = df.loc[:, ['name', 'couts', 'kind', 'prev_price']]
+
             # print df[df.couts>0][:2]
-            dm=pd.merge(dp,df,on='name',how='left')
+            dm = cct.combine_dataFrame(dp,df)
+#            dm=pd.merge(dp,df,on='name',how='left')
             log.info("dmMerge:%s"%dm[:1])
             # print dm[dm.couts>0][:2]
             dm.couts=dm.couts.fillna(0)
             dm.prev_price=dm.prev_price.fillna(0.0)
             dm.couts=dm.couts.astype(int)
-            dm=dm.drop_duplicates('code')
-            dm=dm.set_index('code')
+#            dm=dm.drop_duplicates('code')
+#            dm=dm.set_index('code')
             dm.rename(columns={'prev_price': 'prev_p'}, inplace=True)
             # print dm.sort_values(by=['couts','percent','dff','ratio'],ascending=[0,0,0,1])[:2]
             # dm=dm.fillna(int(0))
@@ -686,8 +711,8 @@ def get_market_price_sina_dd_realTime(dp='',vol='0',type='0'):
 
 if __name__ == '__main__':
     import sys
-    # df = get_sina_all_json_dd('0', '3')
     log.setLevel(LoggerFactory.DEBUG)
+    df = get_sina_all_json_dd('0', '3')
     # df=get_sina_Market_json('all')
     import tushare as ts
     s_t=time.time()

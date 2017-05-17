@@ -63,6 +63,7 @@ if __name__ == "__main__":
     log = LoggerFactory.log
     args = docopt(cct.sina_doc, version='sina_cxdn')
     log_level = LoggerFactory.DEBUG if args['--debug'] else LoggerFactory.ERROR
+    log_level = LoggerFactory.INFO if args['--info'] else LoggerFactory.ERROR
     log.setLevel(log_level)    
     # log.setLevel(LoggerFactory.DEBUG)
     # handler=StderrHandler(format_string='{record.channel}: {record.message) [{record.extra[cwd]}]')
@@ -115,6 +116,7 @@ if __name__ == "__main__":
     while 1:
         try:
             # df = sina_data.Sina().all
+            time_Rt = time.time()
             top_now = tdd.getSinaAlldf(market='all', vol=ct.json_countVol, type=ct.json_countType)
 
             top_dif = top_now
@@ -122,7 +124,6 @@ if __name__ == "__main__":
             now_count = len(top_now)
             radio_t = cct.get_work_time_ratio()
             # top_now = top_now[top_now.buy > 0]
-            time_Rt = time.time()
             time_d = time.time()
             if time_d - time_s > delay_time:
                 status_change = True
@@ -132,9 +133,9 @@ if __name__ == "__main__":
                 status_change = False
             # print ("Buy>0:%s" % len(top_now[top_now['buy'] > 0])),
             if len(top_now) > 10 or cct.get_work_time():
-                time_Rt = time.time()
+                # time_Rt = time.time()
                 if len(top_all) == 0 and len(lastpTDX_DF) == 0:
-                    time_Rt = time.time()
+                    # time_Rt = time.time()
                     top_all,lastpTDX_DF = tdd.get_append_lastp_to_df(top_now, lastpTDX_DF=None, dl=duration_date,end=end_date,ptype=ptype,filter=filter, power=ct.lastPower, lastp=False)
                     log.debug("len:%s"%(len(top_all)))
                     # codelist = top_all.index.tolist()
@@ -169,26 +170,33 @@ if __name__ == "__main__":
                     top_all = top_all[top_all['llow'] > 0]
 
                 else:
+                    # time_f = time.time()
+                    log.info("start symbol code :%0.2f"%(cct.get_now_time_int()))
+                    log.info("diff co:%s"%(set(top_all.columns)-set(top_now.columns)))
                     if 'couts' in top_now.columns.values:
                         if not 'couts' in top_all.columns.values:
                             top_all['couts'] = 0
                             top_all['prev_p'] = 0
-                    for symbol in top_now.index:
-                        if 'couts' in top_now.columns.values:
-                            top_all.loc[symbol, ct.columns_now] = top_now.loc[symbol, ct.columns_now]
-                        else:
-                            # top_now.loc[symbol, 'dff'] = round(
-                            # ((float(top_now.loc[symbol, 'buy']) - float(
-                            # top_all.loc[symbol, 'lastp'])) / float(top_all.loc[symbol, 'lastp']) * 100),
-                            # 1)
-                            top_all.loc[symbol, ct.columns_now] = top_now.loc[symbol, ct.columns_now]
-                            # top_all.loc[symbol, 'buy'] = top_now.loc[symbol, 'buy']
+                    # for symbol in top_now.index:
+                    #     if 'couts' in top_now.columns.values:
+                    #         top_all.loc[symbol, ct.columns_now] = top_now.loc[symbol, ct.columns_now]
+                    #     else:
+                    #         top_all.loc[symbol, ct.columns_now] = top_now.loc[symbol, ct.columns_now]
+                    
+                    # no_index = top_all.drop([inx for inx in top_all.index  if inx not in top_now.index], axis=0)
+                    # no_index.drop([col for col in no_index.columns if col in top_now.columns], axis=1,inplace=True)
+                    # no_index = no_index.merge(top_now, left_index=True, right_index=True, how='left')
+                    # top_all = top_all.drop([inx for inx in top_all.index  if inx in top_now.index], axis=0)
+                    # top_all = pd.concat([top_all, no_index],axis=0)
+                    # log.info("for loc code :%0.2f"%(time.time()-time_Rt))
+                    # 
+                    top_all = cct.combine_dataFrame(top_all, top_now)
+
                 # top_all = top_all[top_all.buy > 0]
                 top_dif = top_all.copy()
                 log.debug('top_dif:%s'%(len(top_dif)))
                 if 'trade' in top_dif.columns:
-                    top_dif['buy'] = (
-                        map(lambda x, y: y if int(x) == 0 else x, top_dif['buy'].values, top_dif['trade'].values))
+                    top_dif['buy'] = (map(lambda x, y: y if int(x) == 0 else x, top_dif['buy'].values, top_dif['trade'].values))
 
                 #判断主升
                 # log.debug('top_dif:%s'%(len(top_dif)))

@@ -43,6 +43,7 @@ sleep_time = 6
 tdx_max_int = 10
 wcd_limit_day = 30
 h5_limit_time = 180
+diffcode = 0.2
 
 powerdiff = 'ra * fibl + rah*(abs(float(%s)-fibl))/fib +ma +kdj+rsi'
 # Duration_sort_op=['fib','op','ra','percent','ratio','dff','couts']
@@ -133,6 +134,11 @@ columns_now = [u'open', u'llastp', u'close', u'trade', u'high', u'low',\
                                            u'b3_v', u'b3', u'b4_v', u'b4', u'b5_v', u'b5', u'a1_v', u'a1', u'a2_v',\
                                            u'a2', u'a3_v', u'a3', u'a4_v', u'a4', u'a5_v', u'a5', u'percent',\
                                            u'ratio', u'dff', u'couts', u'kind', u'prev_p']
+# columns_now = [u'close', u'trade', u'high', u'low',\
+#                u'buy', u'sell', u'volume', u'b1_v', u'b1', u'b2_v', u'b2',\
+#                u'b3_v', u'b3', u'b4_v', u'b4', u'b5_v', u'b5', u'a1_v', u'a1', u'a2_v',\
+#                u'a2', u'a3_v', u'a3', u'a4_v', u'a4', u'a5_v', u'a5', u'percent',\
+#                u'ratio', u'dff', u'couts', u'kind', u'prev_p']
 
 DD_TYPE_List={'0':'5','1':'10','2':'20','3':'50','4':'100'}
 P_TYPE = {'http': 'http://', 'ftp': 'ftp://'}
