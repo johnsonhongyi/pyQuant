@@ -151,7 +151,7 @@ def get_sina_Market_json(market='sh', showtime=True, num='1000', retry_count=3, 
     h5_table = 'all'
     h5 = h5a.load_hdf_db(h5_fname, table=h5_table)
     if h5 is not None and not h5.empty and 'timel' in h5.columns:
-       o_time = h5[h5.time <> 0].timel
+       o_time = h5[h5.timel <> 0].timel
        if len(o_time) > 0:
            o_time = o_time[0]
            if not cct.get_work_time() or (cct.get_now_time_int() > 935 and time.time() - o_time < ct.h5_limit_time):
@@ -379,7 +379,7 @@ def get_sina_all_json_dd(vol='0', type='0', num='10000', retry_count=3, pause=0.
     h5_table = 'all'
     h5 = h5a.load_hdf_db(h5_fname, table=h5_table)
     if h5 is not None and not h5.empty and 'timel' in h5.columns:
-       o_time = h5[h5.time <> 0].timel
+       o_time = h5[h5.timel <> 0].timel
        if len(o_time) > 0:
            o_time = o_time[0]
            if not cct.get_work_time() or (cct.get_now_time_int() > 935 and time.time() - o_time < ct.h5_limit_time):
