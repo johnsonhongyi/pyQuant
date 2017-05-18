@@ -102,10 +102,22 @@ def get_code_file_path(code,type='f'):
 
     return file_path
 
-def get_kdate_data(code,start='',end='',ktype='D'):
+def get_kdate_data(code,start='',end='',ktype='D',index=False):
+
+    if start is None:start=''
+    if end is None:end=''
+    if code.startswith('999'):
+        index = True
+        code=str(1000000-int(code)).zfill(6)
+    elif code.startswith('399'):
+        index = True
 
     # df = ts.get_k_data(code=code, start=start, end=end, ktype=ktype, autype='qfq', index=index, retry_count=3, pause=0.001)
-    df = ts.get_k_data(code=code, start=start, end=end, ktype=ktype)
+    if start == '' and end != '' and end is not None:
+        df = ts.get_k_data(code=code, ktype=ktype,index=index)
+        df = df[df.date <= end]
+    else:
+        df = ts.get_k_data(code=code, start=start, end=end, ktype=ktype,index=index)
     if len(df) > 0:
         df.set_index('date',inplace=True)
         df.sort_index(ascending=False,inplace=True)
@@ -141,6 +153,14 @@ def get_tdx_Exp_day_to_df(code, start=None, end=None, dl=None,newdays = None,typ
     Returns:
         [type] -- [dateframe or series]
     """
+
+    # h5_fname = 'tdx_day'
+    # h5_table = 'day'+'_'+'dl'
+    # h5 = h5a.load_hdf_db(h5_fname, table=h5_table, code_l=codelist)
+    # if h5 is not None and not h5.empty:
+    #     return h5
+
+
     start=cct.day8_to_day10(start)
     end=cct.day8_to_day10(end)
     if dl is not None and dl < 70:
@@ -536,26 +556,30 @@ def get_tdx_append_now_df_api(code, start=None, end=None, type='f',df=None,dm=No
     else:
         df = df.sort_index(ascending=True)
     index_status = False
-    code_t=code
+
     if code == '999999':
-        # code_t=code
-        code = 'sh'
+        code_ts=str(1000000-int(code)).zfill(6)
         index_status = True
     elif code.startswith('399'):
         index_status = True
-        for k in INDEX_LIST.keys():
-            if INDEX_LIST[k].find(code) > 0:
-                code = k
-    if index_status:
-        df[code] = code_t
-        # code = code_t
+        code_ts=code
+#            for k in INDEX_LIST.keys():
+#                if INDEX_LIST[k].find(code) > 0:
+#                    code_ts = k
+    else:
+        index_status=False
+        code_ts = code
+
     if not power:
         return df
 
 
     today = cct.get_today()
+
     if len(df) > 0 :
         tdx_last_day = df.index[-1]
+        if tdx_last_day == today:
+            return df
     else:
         if start is not None:
             tdx_last_day = start
@@ -565,7 +589,7 @@ def get_tdx_append_now_df_api(code, start=None, end=None, type='f',df=None,dm=No
     if tdx_last_day is not None:
         duration = cct.get_today_duration(tdx_last_day)
     else:
-        duration = 1
+        duration = 2
     log.debug("duration:%s"%duration)
     log.debug("tdx_last_day:%s" % tdx_last_day)
     log.debug("duration:%s" % duration)
@@ -583,33 +607,31 @@ def get_tdx_append_now_df_api(code, start=None, end=None, type='f',df=None,dm=No
 #    if duration >= 1 and (tdx_last_day != cct.last_tddate(1) or cct.get_now_time_int() > 1530):
     if duration > 1 and (tdx_last_day != cct.last_tddate(1)):
         import urllib2
-        if index_status:
-            code_t = INDEX_LIST[code][2:]
         try:
-            ds = get_kdate_data(code, start=tdx_last_day, end=today)
+            ds = get_kdate_data(code_ts, start=tdx_last_day, end=today,index=index_status)
             ds['volume']=ds.volume.apply(lambda x: x * 100)
             # ds = ts.get_h_data('000001', start=tdx_last_day, end=today,index=index_status)
             # df.index = pd.to_datetime(df.index)
         except (IOError, EOFError, Exception,urllib2.URLError) as e:
             print "Error Duration:", e,
-            print "code:%s"%(code)
+            print "code:%s"%(code_ts)
             cct.sleep(0.1)
-            ds = ts.get_h_data(code_t, start=tdx_last_day, end=today, index=index_status)
-            df.index = pd.to_datetime(df.index)
+#            ds = ts.get_hist_data(code_ts, start=tdx_last_day, end=today, index=index_status)
+#            df.index = pd.to_datetime(df.index)
         if ds is not None and len(ds) > 1:
             if len(df) > 0:
                 lends = len(ds)
             else:
                 lends = len(ds) + 1
             ds = ds[:lends - 1]
-            if index_status:
-                if code == 'sh':
-                    code_ts = '999999'
-                else:
-                    code_ts = code_t
-                ds['code'] = int(code_ts)
-            else:
-                ds['code'] = code
+#            if index_status:
+#                if code == 'sh':
+#                    code_ts = '999999'
+#                else:
+#                    code_ts = code_t
+#                ds['code'] = int(code_ts)
+#            else:
+            ds['code'] = code
             # print ds[:1]
 #            ds['volume']=ds.volume.apply(lambda x: x * 100)
             if not 'amount' in ds.columns:
@@ -622,12 +644,15 @@ def get_tdx_append_now_df_api(code, start=None, end=None, type='f',df=None,dm=No
             ds = ds.fillna(0)
             df = df.append(ds)
             if write_tushare and (len(ds) == 1 and ds.index.values[0] != cct.get_today()) or len(ds) > 1:
-                if index_status:
-                    sta=write_tdx_tushare_to_file(code_ts,df=df)
-                else:
-                    sta=write_tdx_tushare_to_file(code,df=df)
-#            if not sta:
-#                log.warn("write %s error."%(code))
+#                if index_status:
+                sta=write_tdx_tushare_to_file(code,df=df)
+                if sta:
+                    if today == ds.index[-1]:
+                        return df
+#                else:
+#                    sta=write_tdx_tushare_to_file(code,df=df)
+
+
     if cct.get_now_time_int() > 830 and cct.get_now_time_int() < 930:
         log.debug("now > 830 and <930 return")
         df = df.sort_index(ascending=True)
@@ -646,12 +671,8 @@ def get_tdx_append_now_df_api(code, start=None, end=None, type='f',df=None,dm=No
         # if dm is None and today != df.index[-1]:
         # log.warn('today != end:%s'%(df.index[-1]))
         if index_status:
-            log.debug("code:%s code_t:%s" % (code, code_t))
-            if code_t is None:
-                code_t = INDEX_LIST[code][2:]
-
-            dm = sina_data.Sina().get_stock_code_data(code_t,index=index_status)
-            dm.code = code
+            dm = sina_data.Sina().get_stock_code_data(code,index=index_status)
+#            dm.code = code
 #            dm = dm.set_index('code')
         else:
             dm = sina_data.Sina().get_stock_code_data(code)
@@ -662,8 +683,7 @@ def get_tdx_append_now_df_api(code, start=None, end=None, type='f',df=None,dm=No
     if df is not None and len(df) >0:
         if df.index.values[-1] == today:
             if dm is not None and not isinstance(dm,Series):
-                print code
-                print dm.loc[code]
+#                print dm.loc[code]
                 dz = dm.loc[code].to_frame().T
             if index_status:
                 vol_div = 1000
@@ -692,14 +712,14 @@ def get_tdx_append_now_df_api(code, start=None, end=None, type='f',df=None,dm=No
         dm_code = (dm.loc[code, ['open', 'high', 'low', 'close', 'amount', 'vol']]).to_frame().T
         log.debug("dm_code:%s" % dm_code)
         # dm_code['amount'] = round(float(dm_code['amount']), 2)
-        if index_status:
-            if code == 'sh':
-                code_ts = '999999'
-            else:
-                code_ts = code_t
-            dm_code['code'] = code_ts
-        else:
-            dm_code['code'] = code
+#        if index_status:
+#            if code == 'sh':
+#                code_ts = '999999'
+#            else:
+#                code_ts = code_t
+#            dm_code['code'] = code_ts
+#        else:
+#            dm_code['code'] = code
         dm_code['date'] = today
         dm_code = dm_code.set_index('date')
         # log.debug("df.open:%s dm.open%s" % (df.open[-1], round(dm.open[-1], 2)))
@@ -742,15 +762,10 @@ def get_tdx_append_now_df_api(code, start=None, end=None, type='f',df=None,dm=No
         df = df.sort_index(ascending=False)
     if end is None and writedm and len(df) > 0:
         if cct.get_now_time_int() < 900 or cct.get_now_time_int() > 1505:
-            if index_status:
-                if code == 'sh':
-                    code_ts = '999999'
-                else:
-                    code_ts = code_t
-                sta=write_tdx_sina_data_to_file(code_ts,df=df)
-            else:
-                sta=write_tdx_sina_data_to_file(code,df=df)
-
+#            if index_status:
+            sta=write_tdx_sina_data_to_file(code,df=df)
+#            else:
+#                sta=write_tdx_sina_data_to_file(code,df=df)
     return df
 
 
@@ -764,18 +779,18 @@ def get_tdx_append_now_df_api_tofile(code,dm=None,newdays=1, start=None, end=Non
     else:
         df = df.sort_index(ascending=True)
     index_status = False
-    code_t=code
     if code == '999999':
-        # code_t=code
-        code = 'sh'
+        code_ts=str(1000000-int(code)).zfill(6)
         index_status = True
     elif code.startswith('399'):
         index_status = True
-        for k in INDEX_LIST.keys():
-            if INDEX_LIST[k].find(code) > 0:
-                code = k
-    if index_status:
-        df[code] = code_t
+        code_ts=code
+#            for k in INDEX_LIST.keys():
+#                if INDEX_LIST[k].find(code) > 0:
+#                    code_ts = k
+    else:
+        index_status=False
+        code_ts = code
         # code = code_t
     if not power:
         return df
@@ -784,6 +799,8 @@ def get_tdx_append_now_df_api_tofile(code,dm=None,newdays=1, start=None, end=Non
     today = cct.get_today()
     if len(df) > 0 :
         tdx_last_day = df.index[-1]
+        if tdx_last_day == today:
+            return df
     else:
         if start is not None:
             tdx_last_day = start
@@ -792,6 +809,7 @@ def get_tdx_append_now_df_api_tofile(code,dm=None,newdays=1, start=None, end=Non
 #            log.warn("code :%s start is None and DF is None"%(code))
     if tdx_last_day is not None:
         duration = cct.get_today_duration(tdx_last_day)
+
     else:
         duration = 1
     log.debug("duration:%s"%duration)
@@ -810,10 +828,8 @@ def get_tdx_append_now_df_api_tofile(code,dm=None,newdays=1, start=None, end=Non
 #    print cct.last_tddate(duration)
 #    if duration >= 1 and (tdx_last_day != cct.last_tddate(1) or cct.get_now_time_int() > 1530):
     if duration > 1 and (tdx_last_day != cct.last_tddate(1)):
-        if index_status:
-            code_t = INDEX_LIST[code][2:]
         try:
-            ds = get_kdate_data(code, start=tdx_last_day, end=today)
+            ds = get_kdate_data(code_ts, start=tdx_last_day, end=today,index=index_status)
             if ds is None:
                 return df
             ds['volume']=ds.volume.apply(lambda x: x * 100)
@@ -823,23 +839,15 @@ def get_tdx_append_now_df_api_tofile(code,dm=None,newdays=1, start=None, end=Non
             print "Error Duration:", e,
             print "code:%s"%(code)
             cct.sleep(0.1)
-            ds = ts.get_h_data(code_t, start=tdx_last_day, end=today, index=index_status)
-            df.index = pd.to_datetime(df.index)
+            # ds = ts.get_h_data(code_t, start=tdx_last_day, end=today, index=index_status)
+            # df.index = pd.to_datetime(df.index)
         if ds is not None and len(ds) >= 1:
             if len(df) > 0:
                 lends = len(ds)
             else:
                 lends = len(ds) + 1
             ds = ds[:lends - 1]
-            if index_status:
-                if code == 'sh':
-                    code_ts = '999999'
-                else:
-                    code_ts = code_t
-                ds['code'] = int(code_ts)
-            else:
-                ds['code'] = code
-            # print ds[:1]
+            ds['code'] = code
 #            ds['volume']=ds.volume.apply(lambda x: x * 100)
             if not 'amount' in ds.columns:
                 ds['amount']=map(lambda x,y,z:round((y+z)/2*x,2),ds.volume,ds.high,ds.low)
@@ -847,16 +855,18 @@ def get_tdx_append_now_df_api_tofile(code,dm=None,newdays=1, start=None, end=Non
             # ds.rename(columns={'volume': 'amount'}, inplace=True)
             ds.rename(columns={'volume': 'vol'}, inplace=True)
             ds.sort_index(ascending=True, inplace=True)
-            # log.debug("ds:%s" % ds[:1])
             ds = ds.fillna(0)
             df = df.append(ds)
             if (len(ds) == 1 and ds.index.values[0] != cct.get_today()) or len(ds) > 1:
-                if index_status:
-                    sta=write_tdx_tushare_to_file(code_ts,df=df)
+                sta=write_tdx_tushare_to_file(code,df=df)
+                if  sta:
+                    if sta:
+                        log.info("write %s OK."%(code))
+                        if today == ds.index[-1]:
+                            return df
                 else:
-                    sta=write_tdx_tushare_to_file(code,df=df)
-#            if not sta:
-#                log.warn("write %s error."%(code))
+                    log.warn("write %s error."%(code))
+
     if cct.get_now_time_int() > 900 and cct.get_now_time_int() < 930 and len(df) > 0:
         log.debug("now > 830 and <930 return")
         df = df.sort_index(ascending=True)
@@ -872,13 +882,8 @@ def get_tdx_append_now_df_api_tofile(code,dm=None,newdays=1, start=None, end=Non
         # if dm is None and today != df.index[-1]:
         # log.warn('today != end:%s'%(df.index[-1]))
         if index_status:
-            log.debug("code:%s code_t:%s" % (code, code_t))
-            if code_t is None:
-                code_t = INDEX_LIST[code][2:]
-
-            dm = sina_data.Sina().get_stock_code_data(code_t,index=index_status)
-            dm.code = code
-            dm = dm.set_index('code')
+            dm = sina_data.Sina().get_stock_code_data(code,index=index_status)
+            # dm = dm.set_index('code')
         else:
             dm = sina_data.Sina().get_stock_code_data(code)
     if len(df) !=0 and duration == 0:
@@ -916,14 +921,14 @@ def get_tdx_append_now_df_api_tofile(code,dm=None,newdays=1, start=None, end=Non
         dm_code = (dm.loc[code, ['open', 'high', 'low', 'close', 'amount', 'vol']]).to_frame().T
         log.debug("dm_code:%s" % dm_code)
         # dm_code['amount'] = round(float(dm_code['amount']), 2)
-        if index_status:
-            if code == 'sh':
-                code_ts = '999999'
-            else:
-                code_ts = code_t
-            dm_code['code'] = code_ts
-        else:
-            dm_code['code'] = code
+        # if index_status:
+        #     if code == 'sh':
+        #         code_ts = '999999'
+        #     else:
+        #         code_ts = code_t
+        #     dm_code['code'] = code_ts
+        # else:
+        #     dm_code['code'] = code
         dm_code['date'] = today
         dm_code = dm_code.set_index('date')
         # log.debug("df.open:%s dm.open%s" % (df.open[-1], round(dm.open[-1], 2)))
@@ -951,11 +956,7 @@ def get_tdx_append_now_df_api_tofile(code,dm=None,newdays=1, start=None, end=Non
         df = df.sort_index(ascending=False)
     if writedm and len(df) > 0:
         if cct.get_now_time_int() < 900 or cct.get_now_time_int() > 1505:
-            if index_status:
-                sta=write_tdx_sina_data_to_file(code_ts,df=df)
-            else:
-                sta=write_tdx_sina_data_to_file(code,df=df)
-
+            sta=write_tdx_sina_data_to_file(code,df=df)
     return df
 
 def write_tdx_tushare_to_file(code,df=None,start=None,type='f'):
@@ -1199,7 +1200,7 @@ def Write_market_all_day_mp(market='all',rewrite=False):
         df = rl.get_sina_Market_json(mk)
         df = df[df.buy > 0]
         print ("market:%s A:%s"%(mk,len(df))),
-        code_list = df.code.tolist()
+        code_list = df.index.tolist()
         dm = get_sina_data_df(code_list)
         log.info('code_list:%s' % len(code_list))
     #        write_tdx_tushare_to_file(sh_index,index_ts)
@@ -1611,19 +1612,20 @@ def getSinaAlldf(market='cyb',vol=ct.json_countVol,type=ct.json_countType,filena
 
     codelist = df.index.astype(str).tolist()
 
-    h5_fname = 'tdx_now'
 #    h5_table = market if not cct.check_chinese(market) else filename
-    h5_table = 'all'
 #    h5 = top_hdf_api(fname=h5_fname,table=h5_table,df=None)
+    h5_fname = 'tdx_now'
+    h5_table = 'all'
     h5 = h5a.load_hdf_db(h5_fname, table=h5_table, code_l=codelist)
-    if h5 is not None and not h5.empty and 'timel' in h5.columns:
-        o_time = h5[h5.timel <> 0].timel
-        if len(o_time) > 0:
-            o_time = o_time[0]
-#            print time.time() - o_time
-            if not cct.get_work_time() or (not (915 < cct.get_now_time_int() < 930) and time.time() - o_time < ct.h5_limit_time):
-                log.info("load hdf data ok:%s %s %s"%(h5_fname,h5_table,len(h5)))
-                return h5
+    if h5 is not None and not h5.empty:
+        return h5
+#        o_time = h5[h5.timel <> 0].timel
+#        if len(o_time) > 0:
+#            o_time = o_time[0]
+##            print time.time() - o_time
+#            if not cct.get_work_time() or (not (915 < cct.get_now_time_int() < 930) and time.time() - o_time < ct.h5_limit_time):
+#                log.info("load hdf data ok:%s %s %s"%(h5_fname,h5_table,len(h5)))
+#                return h5
 
     # index_status=False
     # if isinstance(codelist, list):
@@ -1672,7 +1674,8 @@ def getSinaAlldf(market='cyb',vol=ct.json_countVol,type=ct.json_countType,filena
     if  cct.get_now_time_int() > 935 or not cct.get_work_time():
         top_now = rl.get_market_price_sina_dd_realTime(dm, vol, type)
     else:
-        dm =  dm.set_index('code')
+        if 'code' in dm.columns:
+            dm =  dm.set_index('code')
         top_now = dm
         top_now['couts'] = 0
         top_now['dff'] = 0
@@ -2582,39 +2585,39 @@ def get_powerdf_to_all(top_all,powerdf):
     # p_t = powerdf.reset_index()
     # top_dif['buy'] = (map(lambda x, y: y if int(x) == 0 else x, top_dif['buy'].values, top_dif['trade'].values))
     time_s = time.time()
-    columns_list = ['ra', 'op', 'fib', 'ma5d','ma10d', 'ldate', 'ma20d', 'ma60d', 'oph', \
-                    'rah', 'fibl', 'boll', 'kdj','macd','rsi', 'ma', 'vstd', 'lvolume', 'category', 'df2']
-#    columns_list = [col for col in powerdf.columns if col in top_all.columns]
-    if not 'boll' in top_all.columns:
-        p_t = powerdf.loc[:,columns_list]
-        # top_all.drop('column_name', axis=1, inplace=True)
-        # top_all.drop([''], axis = 1, inplace = True, errors = 'ignore')
-        top_all_co = top_all.columns
-        top_all.drop([col for col in top_all_co if col in p_t], axis=1, inplace=True)
-        top_all = top_all.merge(p_t, left_index=True, right_index=True, how='left')
-        top_all = top_all.fillna(0)
-    else:
-        # p_t = powerdf.loc[:,'ra':'df2']
-        po_inx = powerdf.index
-        top_all.drop([inx for inx in powerdf.index  if inx in top_all.index], axis=0, inplace=True)
-        # p_t = powerdf.iloc[:,57:69]
-        # 'oph', u'rah', u'fibl', u'boll', u'kdj',u'macd', u'rsi', u'ma', u'vstd', u'lvolume', u'category'
-        # top_all = top_all.merge(p_t, left_index=True, right_index=True, how='left')
-        top_all = pd.concat([top_all, powerdf],axis=0)
-        # top_dd = pd.concat([top_temp[:10], top_end], axis=0)
-        # for symbol in p_t.index:
-        #     if symbol in top_all.index:
-        #         # top_all.loc[symbol, 'oph':'category'] = p_t.loc[symbol, 'oph':'category']
-        #         top_all.loc[symbol, 'ra':'df2'] = p_t.loc[symbol, 'ra':'df2']
-    if 'time' not in top_all.columns:
-#        top_all['time'] = cct.get_now_time_int()
-        top_all['time'] = time.time()
-    else:
-        top_all = top_all.fillna(0)
-        time_t = top_all[top_all.time <> 0].time[0] if len(top_all[top_all.time <> 0]) > 0 else 0
-        if time.time() - time_t > ct.power_update_time:
-            top_all['time'] = time.time()
-    print "Pta:%0.2f"%(time.time()-time_s),
+    #     columns_list = ['ra', 'op', 'fib', 'ma5d','ma10d', 'ldate', 'ma20d', 'ma60d', 'oph', \
+    #                     'rah', 'fibl', 'boll', 'kdj','macd','rsi', 'ma', 'vstd', 'lvolume', 'category', 'df2']
+    # #    columns_list = [col for col in powerdf.columns if col in top_all.columns]
+    #     if not 'boll' in top_all.columns:
+    #         p_t = powerdf.loc[:,columns_list]
+    #         # top_all.drop('column_name', axis=1, inplace=True)
+    #         # top_all.drop([''], axis = 1, inplace = True, errors = 'ignore')
+    #         top_all_co = top_all.columns
+    #         top_all.drop([col for col in top_all_co if col in p_t], axis=1, inplace=True)
+    #         top_all = top_all.merge(p_t, left_index=True, right_index=True, how='left')
+    #         top_all = top_all.fillna(0)
+    #     else:
+    #         # p_t = powerdf.loc[:,'ra':'df2']
+    #         po_inx = powerdf.index
+    #         top_all.drop([inx for inx in powerdf.index  if inx in top_all.index], axis=0, inplace=True)
+    #         # p_t = powerdf.iloc[:,57:69]
+    #         # 'oph', u'rah', u'fibl', u'boll', u'kdj',u'macd', u'rsi', u'ma', u'vstd', u'lvolume', u'category'
+    #         # top_all = top_all.merge(p_t, left_index=True, right_index=True, how='left')
+    #         top_all = pd.concat([top_all, powerdf],axis=0)
+    #         # top_dd = pd.concat([top_temp[:10], top_end], axis=0)
+    #         # for symbol in p_t.index:
+    #         #     if symbol in top_all.index:
+    #         #         # top_all.loc[symbol, 'oph':'category'] = p_t.loc[symbol, 'oph':'category']
+    #         #         top_all.loc[symbol, 'ra':'df2'] = p_t.loc[symbol, 'ra':'df2']
+    #     if 'time' not in top_all.columns:
+    # #        top_all['time'] = cct.get_now_time_int()
+    #         top_all['time'] = time.time()
+    #     else:
+    #         top_all = top_all.fillna(0)
+    #         time_t = top_all[top_all.time <> 0].time[0] if len(top_all[top_all.time <> 0]) > 0 else 0
+    #         if time.time() - time_t > ct.power_update_time:
+    #             top_all['time'] = time.time()
+    #     print "Pta:%0.2f"%(time.time()-time_s),
     return top_all
 
 
@@ -2962,8 +2965,10 @@ if __name__ == '__main__':
     # rands = np.random.rand(n)
     # print python_resample(qs, xs, rands)
     # print get_kdate_data('300534', start='2017-05-01', end='', ktype='D')
-    code='300174'
-    get_tdx_append_now_df_api(code, start=None, end=None, type='f', df=None, dm=None, dl=None, power=True, newdays=None, write_tushare=False)
+#    code='300174'
+    code='999999'
+    # get_tdx_append_now_df_api(code, start=None, end=None, type='f', df=None, dm=None, dl=None, power=True, newdays=None, write_tushare=False)
+#    get_tdx_append_now_df_api_tofile(code, dm=None, newdays=1, start=None, end=None, type='f', df=None, dl=2, power=True)
     print get_tdx_Exp_day_to_df(code,dl=30,newdays=0)[:1]
 #    print write_tdx_tushare_to_file(code)
 
@@ -3018,6 +3023,16 @@ if __name__ == '__main__':
                 # log.error("code :%s is None"%(code))
         print ("hdf5 all :%s hd:%s time:%0.2f"%(len(dfcode),len(st.keys()),time.time()-t_st))
         st.close()
+
+    market = cct.cct_raw_input("write all data [all,sh,sz,alla] :")
+    if market in  ['all','sh','sz','cyb','alla']:
+        if market != 'all':
+            Write_market_all_day_mp(market,rewrite=True)
+        else:
+            Write_market_all_day_mp(market)
+    else:
+        print "market is None "
+
     # print get_tdx_Exp_day_to_df('300546',dl=20)
     # print get_tdx_Exp_day_to_df('999999',end=None).sort_index(ascending=False).shape
     # print sina_data.Sina().get_stock_code_data('300006').set_index('code')
@@ -3046,14 +3061,6 @@ if __name__ == '__main__':
 #    dm = get_sina_data_df(code)
 #    code='603878'
 
-    market = cct.cct_raw_input("write all data [all,cyb,sh,sz,alla] :")
-    if market in  ['all','sh','sz','cyb','alla']:
-        if market != 'all':
-            Write_market_all_day_mp(market,rewrite=True)
-        else:
-            Write_market_all_day_mp(market)
-    else:
-        print "market is None "
 
 
 #    print get_tdx_append_now_df_api2('603878',dl=2,dm=dm,newdays=5)

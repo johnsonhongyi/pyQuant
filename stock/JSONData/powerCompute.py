@@ -16,6 +16,7 @@ from JohhnsonUtil import johnson_cons as ct
 from JSONData import tdx_data_Day as tdd
 from JSONData import get_macd_kdj_rsi as getab
 from JSONData import wencaiData as wcd
+from JSONData import tdx_hdf5_api as h5a
 from JohhnsonUtil import zoompan
 from JohhnsonUtil import LoggerFactory as LoggerFactory
 import time
@@ -867,7 +868,7 @@ def get_linear_model_candles(code, ptype='low', dtype='d', start=None, end=None,
     return df
 
 
-def powerCompute_df(df, dtype='d', end=None, dl=None, filter='y',talib=False,newdays=None,days=0):
+def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y',talib=False,newdays=None,days=0):
     ts=time.time()
     if isinstance(df, list):
         code_l = df
@@ -875,12 +876,22 @@ def powerCompute_df(df, dtype='d', end=None, dl=None, filter='y',talib=False,new
     else:
         code_l = df.index.tolist()
         statuslist = False
-    if not isinstance(df,list) and 'boll' in df.columns:
-            if 'time' in df.columns:
-                # if df[:1].boll.values <> 0 and time.time()- df[df.time <> 0].time[0] < ct.power_update_time:
-                if not cct.get_work_time() and len(df[df.time <> 0]) > 0 and df[:1].boll.values <> 0 and time.time() - df[df.time <> 0].time[0] < ct.power_update_time:
-                    print "PcA:%0.2f"%(time.time()-ts),
-                    return df
+
+    h5_fname='powerCompute'
+    h5_table=dtype+'_'+str(dl)+'_'+filter+'_'+'all'
+
+    h5 = h5a.load_hdf_db(h5_fname,h5_table, code_l=code_l,limit_time=1800)
+
+    if h5 is not None:
+        log.info("hdf5 data:%s"%(len(h5)))
+        return h5
+
+#    if not isinstance(df,list) and 'boll' in df.columns:
+#            if 'time' in df.columns:
+#                # if df[:1].boll.values <> 0 and time.time()- df[df.time <> 0].time[0] < ct.power_update_time:
+#                if not cct.get_work_time() and len(df[df.time <> 0]) > 0 and df[:1].boll.values <> 0 and time.time() - df[df.time <> 0].time[0] < ct.power_update_time:
+#                    print "PcA:%0.2f"%(time.time()-ts),
+#                    return df
 #            else:
 #                if len(df) > 0 and df[:1].boll.values <> 0:
 #                    print "PcA:%0.2f"%(time.time()-ts),
@@ -1041,6 +1052,8 @@ def powerCompute_df(df, dtype='d', end=None, dl=None, filter='y',talib=False,new
     df['df2'] = (map(lambda ra, fibl,rah,fib,ma,kdj,rsi:round(eval(ct.powerdiff%(ct.PowerCountdl)),1),\
                      df['ra'].values, df['fibl'].values,df['rah'].values,df['fib'].values,df['ma'].values,\
                      df['kdj'].values,df['rsi'].values))
+
+    h5 = h5a.write_hdf_db(h5_fname, df, table=h5_table)
     print "Pc:%0.2f"%(time.time()-ts),
     return df
 

@@ -301,7 +301,10 @@ if __name__ == "__main__":
                     print ("N:%s K:%s %s G:%s" % (
                         now_count, len(top_all[top_all['buy'] > 0]),
                         len(top_now[top_now['volume'] <= 0]), goldstock)),
-                    print "Rt:%0.1f dT:%s N:%s T:%s %s%%" % (float(time.time() - time_Rt), cct.get_time_to_date(time_s),cct.get_now_time(),len(top_temp),round(len(top_temp)/now_count*100,1))
+                    print "Rt:%0.1f dT:%s N:%s T:%s %s%%" % (float(time.time() - time_Rt), cct.get_time_to_date(time_s),cct.get_now_time(),len(top_temp),round(len(top_temp)/now_count*100,3))
+                    # print round(len(top_temp)/now_count*100,1)
+                    # print len(top_temp)/now_count*100
+                    
                     # top_end = stf.getBollFilter(df=top_end, boll=ct.bollFilter,duration=ct.PowerCountdl)
                     if 'op' in top_temp.columns:
                         # if ptype == 'low':
@@ -374,7 +377,7 @@ if __name__ == "__main__":
                 if int_time < ct.open_time:
                     cct.sleep(ct.sleep_time)
                 elif int_time < 930:
-                    cct.sleep((ct.open_time - int_time) * 60)
+                    cct.sleep((929 - int_time) * 60)
                     # top_all = pd.DataFrame()
                     time_s = time.time()
                 else:
@@ -412,37 +415,7 @@ if __name__ == "__main__":
                 time_s = time.time()
                 status = False
             elif st.startswith('d') or st.startswith('dt'):
-                # dl = st.split()
-                # if len(dl) == 2:
-                #     dt = dl[1]
-                # elif len(dl) == 3:
-                #     dt = dl[1]
-                #     p_t = dl[2]
-                #     if p_t.startswith('l'):
-                #         ptype = 'low'
-                #     elif p_t.startswith('h'):
-                #         ptype = 'high'
-                #     elif p_t == 'y':
-                #         filter = 'y'
-                #     elif p_t == 'n':
-                #         filter = 'n'
-                #     elif p_t == 'py':
-                #         percent_status = 'y'
-                #     elif p_t == 'pn':
-                #         percent_status = 'n'
-                #     else:
-                #         print ("arg error:%s" % p_t)
-                # elif len(dl) == 4:
-                #     dt = dl[1]
-                #     ptype = dl[2]
-                #     if ptype == 'l':
-                #         ptype = 'low'
-                #     elif ptype == 'h':
-                #         ptype = 'high'
-                #     filter = dl[3]
-                #     percent_status = dl[3]
-                # else:
-                #     dt = ''
+                
                 args = parserDuraton.parse_args(st.split()[1:])
                 if len(str(args.start)) > 0:
                     if args.end:

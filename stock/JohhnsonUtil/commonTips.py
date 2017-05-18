@@ -574,13 +574,16 @@ def testdf2(df):
 
 
 def get_today_duration(datastr,endday=None):
-    if endday:
-        today = datetime.datetime.strptime(day8_to_day10(endday), '%Y-%m-%d').date()
+    if datastr is not None and len(datastr)>6:
+        if endday:
+            today = datetime.datetime.strptime(day8_to_day10(endday), '%Y-%m-%d').date()
+        else:
+            today = datetime.date.today()
+        last_day = datetime.datetime.strptime(datastr, '%Y-%m-%d').date()
+        duration_day = int((today - last_day).days)
     else:
-        today = datetime.date.today()
-    last_day = datetime.datetime.strptime(datastr, '%Y-%m-%d').date()
-    duration_day = (today - last_day).days
-    return int(duration_day)
+        duration_day = None
+    return (duration_day)
 
 def get_now_time():
     # now = time.time()
@@ -832,9 +835,10 @@ def to_mp_run(cmd, urllist):
     return results
 
 
-def to_mp_run_async(cmd, urllist, *args):
+def to_mp_run_async(cmd, urllist,*args):
     # n_t=time.time()
     # print "mp_async:%s" % len(urllist),
+    # print "a!!!!:",status
     pool = ThreadPool(cpu_count())
 #    print cpu_count()
     # print arg
@@ -846,12 +850,17 @@ def to_mp_run_async(cmd, urllist, *args):
     # results = pool.map(cmd, urllist)
     # for code in urllist:
     # result.append(pool.apply_async(cmd,(code,)))
+    time_s = time.time()
     results = []
+    idx = 1
     for code in urllist:
         # result = pool.apply_async(cmd, (code, arg))
         # arg=(code)+','+(args)
+        # result = code
         result = pool.apply_async(cmd, (code,) + args).get()
-#            print code,
+        if  time.time() - time_s > 1:
+           print idx,code,
+           time_s = time.time()
         results.append(result)
     pool.close()
     pool.join()
@@ -1383,12 +1392,38 @@ def combine_dataFrame(maindf,subdf,col=None,append=False):
 #        if len(list(set(maindf.columns)-set()))
 #        if len(maindf) < len(subdf):
 #            maindf,subdf =subdf,maindf
-        no_index = maindf.drop([col for col in maindf.index if col in subdf.index], axis=0)
+        maindf = maindf.drop([col for col in maindf.index if col in subdf.index], axis=0)
         maindf = pd.concat([maindf, subdf],axis=0)
+        if not 'code' in maindf.columns:
+            if not maindf.index.name == 'code':
+                maindf.index.name = 'code'
         maindf.reset_index(inplace=True)
         maindf.drop_duplicates('code',inplace=True)
         maindf.set_index('code',inplace=True)
 
+    '''
+        if 'code' in maindf.columns:
+            maindf = maindf.set_index('code')
+        if 'code' in subdf.columns:
+            subdf = subdf.set_index('code')
+
+        diff_m_sub = list(set(maindf.index) - set(subdf.index))
+        same_sub = list(set(subdf.index) & set(maindf.index))
+    #    no_index = maindf.drop([inx for inx in maindf.index  if inx not in subdf.index], axis=0)
+        maindf = maindf.drop(same_sub, axis=0)
+
+        if col is None:
+            sub_col = subdf.columns
+        else:
+            sub_col = list(set(subdf.columns)-set(maindf.columns))
+
+        same_columns = list(set(subdf.columns) & set(maindf.columns))
+    #    maindf.drop([col for col in no_index.columns if col in subdf.columns], axis=1,inplace=True)
+        maindf.drop(same_columns, axis=1,inplace=True)
+        no_index = no_index.merge(subdf, left_index=True, right_index=True, how='left')
+        maindf = maindf.drop([inx for inx in maindf.index  if inx in subdf.index], axis=0)
+        maindf = pd.concat([maindf, no_index],axis=0)
+    '''
     log.info("combine df :%0.2f"%(time.time()-times))
     return maindf
 
