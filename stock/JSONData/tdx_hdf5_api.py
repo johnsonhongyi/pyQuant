@@ -14,32 +14,60 @@ from JohhnsonUtil import johnson_cons as ct
 
 log = LoggerFactory.log
 
+global RAMDISK_KEY 
+RAMDISK_KEY = 0
 class SafeHDFStore(HDFStore):
     # def __init__(self, *args, **kwargs):
     def __init__(self, *args, **kwargs):
-        probe_interval = kwargs.pop("probe_interval", 1)
+        self.probe_interval = kwargs.pop("probe_interval", 2)
         lock = cct.get_ramdisk_path(args[0],lock=True)
-        fname = cct.get_ramdisk_path(args[0])
+        baseDir=cct.ramdisk_root
+        self.fname = cct.get_ramdisk_path(args[0])
         self._lock = lock
+        self.countlock = 0
+        self.write_status = False
+        global RAMDISK_KEY
+        if not os.path.exists(baseDir):
+            if RAMDISK_KEY < 1:
+                log.error("NO RamDisk Root:%s"%(baseDir))
+                RAMDISK_KEY +=1
+        else:
+            self.write_status = True
+            self.run(self.fname)
+    def run(self,fname,**kwargs):
         while True:
             try:
                 self._flock = os.open(self._lock, os.O_CREAT |os.O_EXCL |os.O_WRONLY)
-                log.info("SafeHDF:%s lock:%s"%(lock,self._flock))
+                log.info("SafeHDF:%s lock:%s"%(self._lock,self._flock))
                 break
             # except FileExistsError:
 #            except FileExistsError as e:
-            except (IOError, EOFError, Exception) as e:
+            except (IOError, EOFError,Exception) as e:
                 # time.sleep(probe_interval)
-                # print ("Error:%s"%(e))
-                time.sleep(probe_interval)
+                print ("IOError Error:%s"%(e))
+                if self.countlock <10:
+                    time.sleep(self.probe_interval)
+                    self.countlock +=1
+                else:
+                    os.remove(self._lock)
+                    log.error("count10 remove lock")
+#            except (Exception) as e:
+#                print ("Exception Error:%s"%(e))
+#                log.info("safeHDF Except:%s"%(e))
+#                time.sleep(probe_interval)
+#                return None
+#        HDFStore.__init__(self, *args, **kwargs)
+        HDFStore.__init__(self,fname, **kwargs)
 
-        # HDFStore.__init__(self, *args, **kwargs)
-        HDFStore.__init__(self, fname, **kwargs)
+    def __enter__(self):
+        if self.write_status:
+            return self
 
     def __exit__(self, *args, **kwargs):
-        HDFStore.__exit__(self, *args, **kwargs)
-        os.close(self._flock)
-        os.remove(self._lock)
+        if self.write_status:
+            HDFStore.__exit__(self, *args, **kwargs)
+            os.close(self._flock)
+            os.remove(self._lock)
 
 # with SafeHDFStore('example.hdf') as store:
 #     # Only put inside this block the code which operates on the store
@@ -78,6 +106,12 @@ def write_hdf_db(fname,df,table='all',index=False,baseCount=500):
     df['timel'] =  time.time()
 #    write_status = False
     time_t = time.time()
+#    if not os.path.exists(cct.ramdisk_root):
+#        log.info("NO RamDisk")
+#        return False
+    global RAMDISK_KEY
+    if not RAMDISK_KEY < 1:
+        return df   
     if df is not None and not df.empty and table is not None:
         h5 = get_hdf5_file(fname,wr_mode='r')
         if h5 is not None:
@@ -170,6 +204,10 @@ def write_hdf_db(fname,df,table='all',index=False,baseCount=500):
 def load_hdf_db(fname,table='all',code_l=None,timelimit=True,index=False,limit_time=ct.h5_limit_time):
     time_t = time.time()
     df = None
+    global RAMDISK_KEY
+    # print RAMDISK_KEY
+    if not RAMDISK_KEY < 1:
+        return df
     if code_l is not None:
         h5 = get_hdf5_file(fname,wr_mode='r')
         if h5 is not None:

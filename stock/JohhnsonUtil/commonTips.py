@@ -195,7 +195,7 @@ sina_doc="""sina_Johnson.
 
 Usage:
   sina_cxdn.py
-  sina_cxdn.py --debug 
+  sina_cxdn.py --debug
   sina_cxdn.py --de <debug>
 
 Options:
@@ -854,15 +854,16 @@ def to_mp_run_async(cmd, urllist,*args):
     time_s = time.time()
     results = []
     idx = 1
+    count =int(len(urllist)/10)
     for code in urllist:
         # result = pool.apply_async(cmd, (code, arg))
         # arg=(code)+','+(args)
         # result = code
         result = pool.apply_async(cmd, (code,) + args).get()
-        # if idx < 2 time.time() - time_s > 2:
-           # print idx,code,
-           # idx+=1
-           # time_s = time.time()
+        if (count <> 0 and idx % count == 0) and time.time() - time_s > 1:
+           log.info("idx:%s code:%s"%(idx,code)),
+           idx +=1
+           time_s = time.time()
         results.append(result)
     pool.close()
     pool.join()
