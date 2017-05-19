@@ -195,14 +195,15 @@ sina_doc="""sina_Johnson.
 
 Usage:
   sina_cxdn.py
-  sina_cxdn.py --debug
-  sina_cxdn.py --info
+  sina_cxdn.py --debug 
+  sina_cxdn.py --de <debug>
 
 Options:
   -h --help     Show this screen.
-  --debug    Debug [default:False].
-  --info    info [default:False].
+  --debug       Debug [default: error].
+  --de=<debug>    [default: error].
 """
+  # --info    info [default:False].
 
 def sys_default_utf8(default_encoding='utf-8'):
     #import sys
@@ -1395,6 +1396,10 @@ def combine_dataFrame(maindf,subdf,col=None,append=False):
 #            maindf,subdf =subdf,maindf
         maindf = maindf.drop([col for col in maindf.index if col in subdf.index], axis=0)
         maindf = pd.concat([maindf, subdf],axis=0)
+        maindf = maindf.fillna(0)
+        # if 'timel' in maindf.columns:
+        #     time_list = set(maindf.timel)
+        #     log.info("times:%s"%(time_list))
         if not 'code' in maindf.columns:
             if not maindf.index.name == 'code':
                 maindf.index.name = 'code'

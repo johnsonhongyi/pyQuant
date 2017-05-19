@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # !/usr/bin/env python
-import gc
-import random
+#import gc
+#import random
 import re
 import sys
 import time
@@ -203,7 +203,7 @@ if __name__ == "__main__":
                     # top_all = pd.concat([top_all, no_index],axis=0)
                     # log.info("couts for time:%0.2f"%(time.time()-time_Rt))
                     top_all=cct.combine_dataFrame(top_all,top_now, col=None)
-                    
+
 
 
                 top_dif = top_all.copy(deep=True)

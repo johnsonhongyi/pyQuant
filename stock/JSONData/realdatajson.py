@@ -155,8 +155,8 @@ def get_sina_Market_json(market='sh', showtime=True, num='1000', retry_count=3, 
         if len(o_time) > 0:
             o_time = o_time[0]
             l_time = time.time() - o_time
-            return_hdf_status = not cct.get_work_day_status()  or (cct.get_work_day_status() and (cct.get_work_time() and l_time < ct.h5_limit_time))
-            if not cct.get_work_time() or return_hdf_status:
+            return_hdf_status = not cct.get_work_day_status()  or not cct.get_work_time() or (cct.get_work_day_status() and cct.get_work_time() and l_time < ct.h5_limit_time)
+            if return_hdf_status:
                log.info("load hdf data:%s %s %s"%(h5_fname,h5_table,len(h5)))
                return h5
 
@@ -384,7 +384,8 @@ def get_sina_all_json_dd(vol='0', type='0', num='10000', retry_count=3, pause=0.
        o_time = h5[h5.timel <> 0].timel
        if len(o_time) > 0:
            o_time = o_time[0]
-           if not cct.get_work_time() or (cct.get_now_time_int() > 935 and time.time() - o_time < ct.h5_limit_time):
+           return_hdf_status = not cct.get_work_day_status()  or not cct.get_work_time() or (cct.get_work_day_status() and cct.get_work_time() and l_time < ct.h5_limit_time)
+           if return_hdf_status:
                log.info("load hdf data:%s %s %s"%(h5_fname,h5_table,len(h5)))
                return h5
 

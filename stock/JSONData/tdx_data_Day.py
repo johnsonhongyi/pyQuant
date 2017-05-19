@@ -193,12 +193,17 @@ def get_tdx_Exp_day_to_df(code, start=None, end=None, dl=None,newdays = None,typ
         #     {'code': code, 'date': cct.get_today(), 'open': 0, 'high': 0, 'low': 0, 'close': 0, 'amount': 0,
         #      'vol': 0})
         ds = pd.DataFrame()
-        if initTdxdata == 0:
-            log.error("file_path:not exists code:%s"%(code))
-        initTdxdata += 1
-        # ds.index = '2016-01-01'
-        # ds = ds.fillna(0)
-        return ds
+
+        tmp_df = get_kdate_data(code, start='', end='', ktype='D')
+        if len(tmp_df) > 0:    
+            write_tdx_tushare_to_file(code, df=tmp_df, start=None, type='f') 
+        else:    
+            if initTdxdata == 0:
+                log.error("file_path:not exists code:%s"%(code))
+            initTdxdata += 1
+            # ds.index = '2016-01-01'
+            # ds = ds.fillna(0)
+            return ds
     else:
         # print os.path.getsize(file_path)
         if os.path.getsize(file_path) == 0:
@@ -790,8 +795,8 @@ def get_tdx_append_now_df_api_tofile(code,dm=None,newdays=1, start=None, end=Non
 #                    code_ts = k
     else:
         index_status=False
-        code_ts = code
-        # code = code_t
+        code_ts = code                   
+
     if not power:
         return df
 
@@ -806,7 +811,7 @@ def get_tdx_append_now_df_api_tofile(code,dm=None,newdays=1, start=None, end=Non
             tdx_last_day = start
         else:
             tdx_last_day = None
-#            log.warn("code :%s start is None and DF is None"%(code))
+
     if tdx_last_day is not None:
         duration = cct.get_today_duration(tdx_last_day)
 
@@ -915,6 +920,14 @@ def get_tdx_append_now_df_api_tofile(code,dm=None,newdays=1, start=None, end=Non
 
 #    if dm is not None and df is not None and not dm.empty and len(df) >0:
     if dm is not None and not dm.empty :
+        if len(dm) > 0:
+            if code in dm.index:
+                dm=dm.loc[code,:].to_frame().T
+            else:
+                dm=sina_data.Sina().get_stock_code_data(code)
+                if dm is None or len(dm) == 0:
+                    log.error("code is't find:%s"%(code))
+                    return df
         dm.rename(columns={'volume': 'vol', 'turnover': 'amount'}, inplace=True)
         # dm.rename(columns={'volume': 'amount', 'turnover': 'vol'}, inplace=True)
         c_name = dm.loc[code, ['name']].values[0]
@@ -1194,26 +1207,29 @@ def Write_market_all_day_mp(market='all',rewrite=False):
         mlist =[market]
     # if len(index_ts) > 1:
     #     print "start:%s"%(start),
-    result =[]
+    results =[]
     for mk in mlist:
         time_t = time.time()
+        # df = sina_data.Sina().market(mk)
         df = rl.get_sina_Market_json(mk)
-        df = df[df.buy > 0]
+        df = df[df.open > 0]
         print ("market:%s A:%s"%(mk,len(df))),
         code_list = df.index.tolist()
         dm = get_sina_data_df(code_list)
-        log.info('code_list:%s' % len(code_list))
+        log.info('code_list:%s df:%s' % (len(code_list),len(df)))
     #        write_tdx_tushare_to_file(sh_index,index_ts)
 #        get_tdx_append_now_df_api2(code,dl=dl,dm=dz,newdays=5)
+        # get_tdx_append_now_df_api_tofile('603113', dm=None, newdays=1, start=None, end=None, type='f', df=None, dl=2, power=True)
         results = cct.to_mp_run_async(get_tdx_append_now_df_api_tofile,code_list,dm,5)
         # for code in code_list:
         #    print "code:%s "%(code),
         #    res=get_tdx_append_now_df_api_tofile(code,dm,5)
-           # print "status:%s"%(res)
-        #            results.append(res)
+        #    print "status:%s\t"%(len(res)),
+        #    results.append(res)
         print "t:",round(time.time() - time_t,2)
-#        result.append(results)
-#    results = list(set(result))
+
+
+
 #    print "market:%s is succ result:%s"%(market,results),
 #    print "t:", time.time() - time_t,
     if market == 'all':
@@ -1616,9 +1632,13 @@ def getSinaAlldf(market='cyb',vol=ct.json_countVol,type=ct.json_countType,filena
 #    h5 = top_hdf_api(fname=h5_fname,table=h5_table,df=None)
     h5_fname = 'tdx_now'
     h5_table = 'all'
-    h5 = h5a.load_hdf_db(h5_fname, table=h5_table, code_l=codelist)
-    if h5 is not None and not h5.empty:
-        return h5
+    # h5 = h5a.load_hdf_db(h5_fname, table=h5_table, code_l=codelist)
+    # if h5 is not None and not h5.empty:
+    #     log.info("return %s %s hdf"%(h5_fname,h5_table))
+    #     return h5
+    # else:
+    #     log.info("init start %s %s hdf"%(h5_fname,h5_table))
+
 #        o_time = h5[h5.timel <> 0].timel
 #        if len(o_time) > 0:
 #            o_time = o_time[0]
@@ -1654,6 +1674,7 @@ def getSinaAlldf(market='cyb',vol=ct.json_countVol,type=ct.json_countType,filena
 #        dm=pd.merge(dm,df.loc[:,['name','ratio']],on='name',how='left')
 #        dm=dm.drop_duplicates('code')
         dm = cct.combine_dataFrame(dm,df.loc[:,['name','ratio']])
+        log.info("dm combine_df ratio:%s %s"%(len(dm),len(df))),
         dm=dm.fillna(0)
     if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 926:
         # print dm[dm.code=='000001'].b1
@@ -1682,24 +1703,7 @@ def getSinaAlldf(market='cyb',vol=ct.json_countVol,type=ct.json_countType,filena
         top_now['prev_p'] = 0
         top_now['kind'] = 0
 
-#    top_now['time'] = time.time()
-    # print top_now[:1].b1_v
-    # print len(top_now),len(dm)
-    # print top_now.loc[top_now.index == '300076',['b1_v','a1_v','trade','buy','b1','a1']]
-    # print top_now.loc[top_now.index == '300004',['b1_v','a1_v','trade','buy','b1','a1']]
-    # print top_now.loc[top_now.index == '300228',['b1_v','a1_v','trade','buy','b1','a1']]
-
-    # if initTdxdata > 0 and cct.get_now_time_int() > 916 and cct.get_now_time_int() <=926:
-    #     top_diff = top_now[(top_now.b1_v > top_now.a1_v) & (top_now.buy >= top_now.llastp * 0.99)]
-    # elif initTdxdata > 0 and cct.get_now_time_int() > 926:
-    #     top_diff = top_now[(top_now.b1_v > top_now.a1_v) & (top_now.trade >= top_now.buy) & (top_now.buy >= top_now.llastp * 0.99)]
-    # else:
-    #     initTdxdata +=1
-    #     top_diff = top_now
-
-#    top_hdf_api(fname=h5_fname,wr_mode='w',table=h5_table, df=top_now)
-#    h5 = (h5_fname, wr_mode='w',table=h5_table, code_l=None, init=False)
-    h5 = h5a.write_hdf_db(h5_fname, top_now, table=h5_table)
+#    h5 = h5a.write_hdf_db(h5_fname, top_now, table=h5_table)
     # top_hdf_api(fname='tdx',wr_mode='w', table=None, df=None)
     #
     # if 'time' in h5.columns:
@@ -2966,6 +2970,8 @@ if __name__ == '__main__':
     # print python_resample(qs, xs, rands)
     # print get_kdate_data('300534', start='2017-05-01', end='', ktype='D')
 #    code='300174'
+    # get_tdx_append_now_df_api_tofile('603113', dm=None, newdays=1, start=None, end=None, type='f', df=None, dl=2, power=True)
+#    
     code='999999'
     # get_tdx_append_now_df_api(code, start=None, end=None, type='f', df=None, dm=None, dl=None, power=True, newdays=None, write_tushare=False)
 #    get_tdx_append_now_df_api_tofile(code, dm=None, newdays=1, start=None, end=None, type='f', df=None, dl=2, power=True)

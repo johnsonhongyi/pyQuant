@@ -25,7 +25,7 @@ class StockCode:
         self.start_t = time.time()
         self.STOCK_CODE_PATH = 'stock_codes.conf'
         self.stock_code_path = self.stock_code_path()
-        if not os.path.exists(self.stock_code_path) or cct.creation_date_duration(self.stock_code_path) > 120:
+        if not os.path.exists(self.stock_code_path) or cct.creation_date_duration(self.stock_code_path) > 12:
             print ("days:%s update stock_codes.conf"%(cct.creation_date_duration(self.stock_code_path)))
             self.get_stock_codes(True)
 
@@ -48,17 +48,19 @@ class StockCode:
     # @property
     def get_stock_codes(self, realtime=False):
         """获取所有股票 ID 到 all_stock_code 目录下"""
+        # print "days:",cct.creation_date_duration(self.stock_code_path)
         if realtime:
             all_stock_codes_url = 'http://www.shdjt.com/js/lib/astock.js'
             grep_stock_codes = re.compile('~(\d+)`')
             response = requests.get(all_stock_codes_url)
             stock_codes = grep_stock_codes.findall(response.text)
-            print len(stock_codes)
+            log.info("readltime codes:%s"%(len(stock_codes)))
             with open(self.stock_code_path, 'w') as f:
                 f.write(json.dumps(dict(stock=stock_codes)))
             return list(set(stock_codes))
         else:
             with open(self.stock_code_path) as f:
+
                 self.stock_codes = json.load(f)['stock']
                 return list(set(self.stock_codes))
 
@@ -165,8 +167,9 @@ class Sina:
                 l_time = time.time() - o_time
                 sina_limit_time = ct.sina_limit_time
                 sina_time_status = (cct.get_work_day_status() and 915 < cct.get_now_time_int() < 926)
-                return_hdf_status = not cct.get_work_day_status() or (cct.get_work_day_status() and (cct.get_work_time() and l_time < sina_limit_time))
-                log.info("915:%s time:%0.2f limit:%s"%(sina_time_status,l_time,sina_limit_time))
+#                return_hdf_status = not cct.get_work_day_status() or (cct.get_work_day_status() and (cct.get_work_time() and l_time < sina_limit_time))
+                return_hdf_status = not cct.get_work_day_status()  or not cct.get_work_time() or (cct.get_work_day_status() and cct.get_work_time() and l_time < sina_limit_time)
+                log.info("915:%s sina_time:%0.2f limit:%s"%(sina_time_status,l_time,sina_limit_time))
                 if sina_time_status and l_time < 10:
                     log.info("open 915 hdf ok:%s"%(len(h5)))
                     return h5
@@ -541,9 +544,9 @@ if __name__ == "__main__":
     # df = sina.get_stock_list_data(['999999'],index=True)
     # print df
     # df = sina.get_stock_code_data('000001',index=True).set_index('code')
-    # print sina.get_stock_code_data('399006,999999',index=True)
+    print sina.get_stock_code_data('002873')
     # print sina.get_stock_code_data('600199,300334',index=False)
-
+    # print len(sina.market('sh'))
     # sys.exit(0)
     for ma in ['sh','sz','cyb','all']:
     # for ma in ['sh']:
