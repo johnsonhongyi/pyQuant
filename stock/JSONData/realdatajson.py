@@ -150,11 +150,12 @@ def get_sina_Market_json(market='sh', showtime=True, num='1000', retry_count=3, 
     h5_fname = 'get_sina_all_ratio'
     h5_table = 'all'
     h5 = h5a.load_hdf_db(h5_fname, table=h5_table)
-    if h5 is not None and not h5.empty and 'timel' in h5.columns:
+    if h5 is not None and len(h5) > 0 and 'timel' in h5.columns:
         o_time = h5[h5.timel <> 0].timel
-        return_hdf_status = not cct.get_work_day_status()  or (cct.get_work_day_status() and (cct.get_work_time() and l_time < ct.h5_limit_time))
         if len(o_time) > 0:
             o_time = o_time[0]
+            l_time = time.time() - o_time
+            return_hdf_status = not cct.get_work_day_status()  or (cct.get_work_day_status() and (cct.get_work_time() and l_time < ct.h5_limit_time))
             if not cct.get_work_time() or return_hdf_status:
                log.info("load hdf data:%s %s %s"%(h5_fname,h5_table,len(h5)))
                return h5

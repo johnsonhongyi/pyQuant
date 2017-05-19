@@ -102,10 +102,10 @@ def write_hdf_db(fname,df,table='all',index=False,baseCount=500):
 #                        if len(dif_co) > 0:
                 df=cct.combine_dataFrame(tmpdf, df, col=None,append=True)
             if h5.is_open:
-                h5.close()        
+                h5.close()
         log.info("read hdf time:%0.2f"%(time.time()-time_t))
     time_t = time.time()
-    if df is not None and not df.empty and table is not None:        
+    if df is not None and not df.empty and table is not None:
         with SafeHDFStore(fname) as h5:
             if h5 is not None:
                 if '/'+table in h5.keys():
@@ -207,10 +207,10 @@ def load_hdf_db(fname,table='all',code_l=None,timelimit=True,index=False,limit_t
                                     log.info("return_hdf_status:%s time:%0.2f"%(return_hdf_status,l_time))
                                     if  return_hdf_status:
                                         log.info("return hdf5 data:%s"%(len(h5)))
-                                        return h5
+                                        df = dd
                                     else:
                                         log.info("no return time hdf5:%s"%(len(h5)))
-                                        
+
                                 log.info('l_time:%s'%(l_time))
                         else:
                              df = dd
