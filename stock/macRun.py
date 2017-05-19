@@ -78,19 +78,19 @@ positionKey = {'sina_Market-DurationDn.py': '217, 520',
 
 cmdRun_dnup = '''cd /Users/Johnson/Documents/Quant/pyQuant/stock;
 open sina_Market-DurationDn.py;
-sleep 0.1;osascript -e 'tell application "Python Launcher" to quit';sleep 35;
+sleep 0.1;osascript -e 'tell application "Python Launcher" to quit';sleep 25;
 open singleAnalyseUtil.py;
-sleep 0.1;osascript -e 'tell application "Python Launcher" to quit';sleep 35;
+sleep 0.1;osascript -e 'tell application "Python Launcher" to quit';sleep 25;
 open sina_Monitor.py;
-sleep 0.1;osascript -e 'tell application "Python Launcher" to quit';sleep 35;
+sleep 0.1;osascript -e 'tell application "Python Launcher" to quit';sleep 25;
 open sina_Market-DurationUP.py;
-sleep 0.1;osascript -e 'tell application "Python Launcher" to quit';sleep 35;
+sleep 0.1;osascript -e 'tell application "Python Launcher" to quit';sleep 25;
 open sina_Monitor-Market-LH.py;
-sleep 0.1;osascript -e 'tell application "Python Launcher" to quit';sleep 35;
+sleep 0.1;osascript -e 'tell application "Python Launcher" to quit';sleep 25;
 open sina_Market-DurationCXDN.py;
-sleep 0.1;osascript -e 'tell application "Python Launcher" to quit';sleep 35;
+sleep 0.1;osascript -e 'tell application "Python Launcher" to quit';sleep 25;
 open sina_Market-DurationSH.py;
-sleep 0.1;osascript -e 'tell application "Python Launcher" to quit';sleep 35;
+sleep 0.1;osascript -e 'tell application "Python Launcher" to quit';sleep 25;
 open LinePower.py;
 sleep 0.1;osascript -e 'tell application "Python Launcher" to quit';sleep 15;
 open sina_Market-DurationDnUP.py;
@@ -99,46 +99,46 @@ sleep 0.1;osascript -e 'tell application "Python Launcher" to quit';sleep 15;
 
 cmdRun = '''cd /Users/Johnson/Documents/Quant/pyQuant/stock;
 open sina_Market-DurationDn.py;
-sleep 0.1;osascript -e 'tell application "Python Launcher" to quit';sleep 35;
+sleep 0.1;osascript -e 'tell application "Python Launcher" to quit';sleep 25;
 open singleAnalyseUtil.py;
-sleep 0.1;osascript -e 'tell application "Python Launcher" to quit';sleep 35;
+sleep 0.1;osascript -e 'tell application "Python Launcher" to quit';sleep 25;
 open sina_Monitor.py;
-sleep 0.1;osascript -e 'tell application "Python Launcher" to quit';sleep 35;
+sleep 0.1;osascript -e 'tell application "Python Launcher" to quit';sleep 25;
 open sina_Monitor-Market-LH.py;
 sleep 0.1;osascript -e 'tell application "Python Launcher" to quit';sleep 15;
 open sina_Market-DurationUP.py;
-sleep 0.1;osascript -e 'tell application "Python Launcher" to quit';sleep 35;
+sleep 0.1;osascript -e 'tell application "Python Launcher" to quit';sleep 25;
 open sina_Market-DurationCXDN.py;
-sleep 0.1;osascript -e 'tell application "Python Launcher" to quit';sleep 35;
+sleep 0.1;osascript -e 'tell application "Python Launcher" to quit';sleep 25;
 open sina_Market-DurationSH.py;
-sleep 0.1;osascript -e 'tell application "Python Launcher" to quit';sleep 35;
+sleep 0.1;osascript -e 'tell application "Python Launcher" to quit';sleep 25;
 open LinePower.py;
 sleep 0.1;osascript -e 'tell application "Python Launcher" to quit';sleep 15;
 '''
 
 # cmdRun = '''cd /Users/Johnson/Documents/Quant/pyQuant/stock;
 # open singleAnalyseUtil.py;
-# sleep 0.1;osascript -e 'tell application "Python Launcher" to quit';sleep 35;
+# sleep 0.1;osascript -e 'tell application "Python Launcher" to quit';sleep 25;
 # open sina_Monitor.py;
-# sleep 0.1;osascript -e 'tell application "Python Launcher" to quit';sleep 35;
+# sleep 0.1;osascript -e 'tell application "Python Launcher" to quit';sleep 25;
 # open sina_Monitor-GOLD.py;
-# sleep 0.1;osascript -e 'tell application "Python Launcher" to quit';sleep 35;
+# sleep 0.1;osascript -e 'tell application "Python Launcher" to quit';sleep 25;
 # open sina_Monitor-Market.py;
-# sleep 0.1;osascript -e 'tell application "Python Launcher" to quit';sleep 35;
+# sleep 0.1;osascript -e 'tell application "Python Launcher" to quit';sleep 25;
 # open sina_Monitor-Market-New.py;
-# sleep 0.1;osascript -e 'tell application "Python Launcher" to quit';sleep 35;
+# sleep 0.1;osascript -e 'tell application "Python Launcher" to quit';sleep 25;
 # open sina_Monitor-Market-LH.py;
-# sleep 0.1;osascript -e 'tell application "Python Launcher" to quit';sleep 35;
+# sleep 0.1;osascript -e 'tell application "Python Launcher" to quit';sleep 25;
 # open sina_Market-DurationUp.py;
-# sleep 0.1;osascript -e 'tell application "Python Launcher" to quit';sleep 35;
+# sleep 0.1;osascript -e 'tell application "Python Launcher" to quit';sleep 25;
 # open sina_Market-DurationDn.py;
-# sleep 0.1;osascript -e 'tell application "Python Launcher" to quit';sleep 35;
+# sleep 0.1;osascript -e 'tell application "Python Launcher" to quit';sleep 25;
 # open sina_Market-DurationSH.py;
-# sleep 0.1;osascript -e 'tell application "Python Launcher" to quit';sleep 35;
+# sleep 0.1;osascript -e 'tell application "Python Launcher" to quit';sleep 25;
 # open LinePower.py;
 # sleep 0.1;osascript -e 'tell application "Python Launcher" to quit';sleep 5;
 # '''
-closeLaunch ='''osascript -e 'tell application "Python Launcher" to quit';sleep 35;'''
+closeLaunch ='''osascript -e 'tell application "Python Launcher" to quit';sleep 25;'''
 
 def doScript(scriptn):
     proc = subprocess.Popen(['osascript', '-'],

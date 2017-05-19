@@ -88,7 +88,7 @@ class Sina:
         self.index_status = False
         self.hdf_name = 'sina_data'
         self.table = 'all'
-        # self.all
+        self.all
         # h5 = self.load_hdf_db(table='all', code_l=None, init=True)
         # if h5 is None:
         #     # log.info("hdf5 None")
@@ -151,7 +151,6 @@ class Sina:
     @property
     def all(self):
 
-
         self.stockcode = StockCode()
         self.stock_code_path = self.stockcode.stock_code_path
         self.stock_codes = self.stockcode.get_stock_codes()
@@ -159,9 +158,24 @@ class Sina:
         self.stock_codes = [elem for elem in self.stock_codes if elem.startswith(('6','30','00'))]
 
         h5 = h5a.load_hdf_db(self.hdf_name,self.table, code_l=self.stock_codes)
-        if h5 is not None:
-            log.info("hdf5 data:%s"%(len(h5)))
-            return h5
+        if h5 is not None and len(h5) > 0:
+            o_time = h5[h5.timel <> 0].timel
+            if len(o_time) > 0:
+                o_time = o_time[0]
+                l_time = time.time() - o_time
+                sina_limit_time = ct.sina_limit_time
+                sina_time_status = (cct.get_work_day_status() and 915 < cct.get_now_time_int() < 926)
+                return_hdf_status = not cct.get_work_day_status() or (cct.get_work_day_status() and (cct.get_work_time() and l_time < sina_limit_time))
+                log.info("915:%s time:%0.2f limit:%s"%(sina_time_status,l_time,sina_limit_time))
+                if sina_time_status and l_time < 10:
+                    log.info("open 915 hdf ok:%s"%(len(h5)))
+                    return h5
+                elif not sina_time_status and return_hdf_status:
+                    log.info("return hdf5 data:%s"%(len(h5)))
+                    return h5
+                else:
+                    log.info("no return  hdf5:%s"%(len(h5)))
+
         # self.stock_with_exchange_list = list(
             # map(lambda stock_code: ('sh%s' if stock_code.startswith(('5', '6', '9')) else 'sz%s') % stock_code,
                 # self.stock_codes))

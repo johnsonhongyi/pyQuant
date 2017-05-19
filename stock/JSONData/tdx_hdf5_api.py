@@ -73,67 +73,51 @@ def get_hdf5_file(fpath,wr_mode='r',complevel=9,complib='zlib'):
         # return store
 
 def write_hdf_db(fname,df,table='all',index=False,baseCount=500):
-    # if 'code' in df.columns:
-        # df = df.set_index('code')
-#    dd = df.copy()
     if 'code' in df.columns:
         df = df.set_index('code')
     df['timel'] =  time.time()
-#    h5=top_hdf_api(fname, table=table, df=dd,index=index)
-#def top_hdf_api(fname='tdx',table=None,df=None,index=index):
+    write_status = False
     time_t = time.time()
-#    h5 = get_hdf5_file(fname,wr_mode='r')
     if df is not None and not df.empty and table is not None:
-        with SafeHDFStore(fname) as h5:
-            if h5 is not None:
-                dd = df.dtypes.to_frame()
-                if 'object' in dd.values:
-                    dd = dd[dd == 'object'].dropna()
-                    col = dd.index.tolist()
-                df.index = df.index.astype(str)
-                df[col] = df[col].astype(str)
-                if index:
-#                    df.index = df.index.apply(lambda x:str(int(x)+700000) if x.startswith('0') else x)
-                    df.index = map((lambda x:str(1000000-int(x)) if x.startswith('0') else x),df.index)
-
-                if '/'+table in h5.keys():
-                    tmpdf = h5[table]
-                    if 'code' in tmpdf.columns:
-                        tmpdf = tmpdf.set_index('code')
-                    if 'code' in df.columns:
-                        df = df.set_index('code')
-                    diff_columns = set(df.columns) - set(tmpdf.columns)
-                    if len(diff_columns) <> 0:
-                        log.error("columns diff:%s"%(diff_columns))
+        h5 = get_hdf5_file(fname,wr_mode='r')
+        if h5 is not None:
+            dd = df.dtypes.to_frame()
+            if 'object' in dd.values:
+                dd = dd[dd == 'object'].dropna()
+                col = dd.index.tolist()
+            df.index = df.index.astype(str)
+            df[col] = df[col].astype(str)
+            if index:
+                df.index = map((lambda x:str(1000000-int(x)) if x.startswith('0') else x),df.index)
+            if '/'+table in h5.keys():
+                tmpdf = h5[table]
+                if 'code' in tmpdf.columns:
+                    tmpdf = tmpdf.set_index('code')
+                if 'code' in df.columns:
+                    df = df.set_index('code')
+                diff_columns = set(df.columns) - set(tmpdf.columns)
+                if len(diff_columns) <> 0:
+                    log.error("columns diff:%s"%(diff_columns))
 #                        dif_co = list(set(df.index) - set(tmpdf.index))
 #                        if len(dif_co) > 0:
-                    df=cct.combine_dataFrame(tmpdf, df, col=None,append=True)
+                df=cct.combine_dataFrame(tmpdf, df, col=None,append=True)
+            if h5.is_open:
+                h5.close()        
+        log.info("read hdf time:%0.2f"%(time.time()-time_t))
+    time_t = time.time()
+    if df is not None and not df.empty and table is not None:        
+        with SafeHDFStore(fname) as h5:
+            if h5 is not None:
+                if '/'+table in h5.keys():
                     h5.remove(table)
                     h5[table] = df
                 else:
                     h5[table] = df
-                return df
             else:
                 log.error("HDFile is None,Pls check:%s"%(fname))
-#    else:
-#        h5 = get_hdf5_file(fname,wr_mode='r')
-#        if table is None and df is None and h5 is not None:
-#            df = h5.copy()
-#            if h5.is_open:
-#                h5.close()
-#            return df
-#        if h5 is not None:
-#            if table is not None:
-#                if '/'+table in h5.keys():
-#                    df = h5[table]
-#                    if h5.is_open:
-#                        h5.close()
-#                    return df
-#                log.error("%s is not find %s"%(fname,table))
-#            if h5.is_open:
-#                h5.close()
-    log.info("wr hdf time:%0.2f"%(time.time()-time_t))
-    return None
+    log.info("write hdf time:%0.2f"%(time.time()-time_t))
+
+    return True
 
 #def lo_hdf_db_old(fname,table='all',code_l=None,timelimit=True,index=False):
 #    h_t = time.time()
@@ -186,15 +170,16 @@ def load_hdf_db(fname,table='all',code_l=None,timelimit=True,index=False,limit_t
                     dratio = (float(len(code_l)) - float(len(dif_co)))/float(len(code_l))
                     if dratio < 0.1 and len(dd) > 0:
                         log.info("find all:%s :%s %0.2f"%(len(code_l),len(code_l)-len(dif_co),dratio))
-                        if timelimit:
+                        if timelimit and len(dd) > 0:
                             dd = dd.loc[dif_co]
                             o_time = dd[dd.timel <> 0].timel
                             if len(o_time) > 0:
                                 o_time = o_time[0]
                                 l_time = time.time() - o_time
-                                if cct.get_work_day_status() and not cct.get_work_time() or (not (915 < cct.get_now_time_int() < 930) and l_time < limit_time):
+                                if not cct.get_work_time() or not cct.get_work_day_status() or (cct.get_work_time() and l_time < limit_time):
                                     df = dd
                                     log.info("load time hdf ok:%s"%(len(df)))
+
                             log.info('l_time:%s'%(l_time))
                         else:
                              df = dd.loc[dif_co]
@@ -212,24 +197,28 @@ def load_hdf_db(fname,table='all',code_l=None,timelimit=True,index=False,limit_t
                 if table is not None:
                     if '/'+table in h5.keys():
                         dd = h5[table]
+                        if timelimit and len(dd) > 0:
+                            if dd is not None and len(dd)>0:
+                                o_time = dd[dd.timel <> 0].timel
+                                if len(o_time) > 0:
+                                    o_time = o_time[0]
+                                    l_time = time.time() - o_time
+                                    return_hdf_status = not cct.get_work_day_status()  or (cct.get_work_day_status() and (cct.get_work_time() and l_time < ct.h5_limit_time))
+                                    log.info("return_hdf_status:%s time:%0.2f"%(return_hdf_status,l_time))
+                                    if  return_hdf_status:
+                                        log.info("return hdf5 data:%s"%(len(h5)))
+                                        return h5
+                                    else:
+                                        log.info("no return time hdf5:%s"%(len(h5)))
+                                        
+                                log.info('l_time:%s'%(l_time))
+                        else:
+                             df = dd
                     else:
                         log.error("%s is not find %s"%(fname,table))
-            if timelimit:
-                if dd is not None and len(dd)>0:
-                    o_time = dd[dd.timel <> 0].timel
-                    if len(o_time) > 0:
-                        o_time = o_time[0]
-                        l_time = time.time() - o_time
-                        if cct.get_work_day_status() and not cct.get_work_time() or (not (915 < cct.get_now_time_int() < 930) and l_time < limit_time):
-                            df = dd
-                            log.info("load time hdf ok:%s"%(len(df)))
-                    log.info('l_time:%s'%(l_time))
-            else:
-                 df = dd
-
     if h5 is not None and h5.is_open:
         h5.close()
-    log.info("read_hdf_time:%s"%(time.time()-time_t))
+    log.info("load_hdf_time:%0.2f"%(time.time()-time_t))
     return df
 
 

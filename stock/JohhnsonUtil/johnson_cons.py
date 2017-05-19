@@ -43,6 +43,7 @@ sleep_time = 6
 tdx_max_int = 10
 wcd_limit_day = 30
 h5_limit_time = 180
+sina_limit_time = 120
 diffcode = 0.2
 
 powerdiff = 'ra * fibl + rah*(abs(float(%s)-fibl))/fib +ma +kdj+rsi'

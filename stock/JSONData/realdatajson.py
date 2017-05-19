@@ -151,10 +151,11 @@ def get_sina_Market_json(market='sh', showtime=True, num='1000', retry_count=3, 
     h5_table = 'all'
     h5 = h5a.load_hdf_db(h5_fname, table=h5_table)
     if h5 is not None and not h5.empty and 'timel' in h5.columns:
-       o_time = h5[h5.timel <> 0].timel
-       if len(o_time) > 0:
-           o_time = o_time[0]
-           if not cct.get_work_time() or (cct.get_now_time_int() > 935 and time.time() - o_time < ct.h5_limit_time):
+        o_time = h5[h5.timel <> 0].timel
+        return_hdf_status = not cct.get_work_day_status()  or (cct.get_work_day_status() and (cct.get_work_time() and l_time < ct.h5_limit_time))
+        if len(o_time) > 0:
+            o_time = o_time[0]
+            if not cct.get_work_time() or return_hdf_status:
                log.info("load hdf data:%s %s %s"%(h5_fname,h5_table,len(h5)))
                return h5
 
@@ -660,7 +661,7 @@ def get_market_price_sina_dd_realTime(dp='',vol='0',type='0'):
         # log.debug("dp.volume>0:%s"%dp[:1].volume.values)
         # dp['volume']=dp['volume'].apply(lambda x:round(x/100,1))
         # dp=dp.loc[:,'trade':].astype(float)
-        log.info("DP:%s" % dp[:1])
+        log.info("DP:%s" % dp[:1].open)
 
         # if len(dp[:10][dp[:10]['buy'] > 0]) > 2 and len(dp[:10][dp[:10]['percent'] == 0]) > 2:
         #     if 'close' in dp.columns:
@@ -677,7 +678,7 @@ def get_market_price_sina_dd_realTime(dp='',vol='0',type='0'):
             # print df[df.couts>0][:2]
             dm = cct.combine_dataFrame(dp,df)
 #            dm=pd.merge(dp,df,on='name',how='left')
-            log.info("dmMerge:%s"%dm[:1])
+            log.info("dmMerge:%s"%dm.columns)
             # print dm[dm.couts>0][:2]
             dm.couts=dm.couts.fillna(0)
             dm.prev_price=dm.prev_price.fillna(0.0)

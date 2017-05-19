@@ -883,9 +883,10 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y',tali
     h5 = h5a.load_hdf_db(h5_fname,h5_table, code_l=code_l,limit_time=1800)
 
     if h5 is not None:
-        log.info("hdf5 data:%s"%(len(h5)))
+        log.info("power hdf5 data:%s"%(len(h5)))
         return h5
-
+    else:
+        log.info("init power hdf5")
 #    if not isinstance(df,list) and 'boll' in df.columns:
 #            if 'time' in df.columns:
 #                # if df[:1].boll.values <> 0 and time.time()- df[df.time <> 0].time[0] < ct.power_update_time:
@@ -940,7 +941,7 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y',tali
         start = cct.day8_to_day10(start)
         end = cct.day8_to_day10(end)
         if code in dm.index:
-            log.info("dz:%s"%(dm.loc[code]))
+            # log.info("dz:%s"%(dm.loc[code]))
             dz = dm.loc[code].to_frame().T
             # if len(dz) > 1:
             #     dz=dz.to_frame()[0].T
@@ -1054,7 +1055,7 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y',tali
                      df['kdj'].values,df['rsi'].values))
 
     h5 = h5a.write_hdf_db(h5_fname, df, table=h5_table)
-    print "Pc:%0.2f"%(time.time()-ts),
+    print "Power:%0.2f"%(time.time()-ts),
     return df
 
 

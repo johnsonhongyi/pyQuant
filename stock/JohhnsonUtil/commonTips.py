@@ -860,6 +860,7 @@ def to_mp_run_async(cmd, urllist,*args):
         result = pool.apply_async(cmd, (code,) + args).get()
         if  time.time() - time_s > 1:
            print idx,code,
+           idx+=1
            time_s = time.time()
         results.append(result)
     pool.close()
