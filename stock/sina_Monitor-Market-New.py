@@ -67,10 +67,10 @@ if __name__ == "__main__":
 
     # width, height = 132, 18
     if cct.isMac():
-        width, height = 158, 16
+        width, height = 166, 16
         cct.set_console(width, height)
     else:
-        width, height = 158, 18
+        width, height = 166, 18
         cct.set_console(width, height)
     status = False
     vol = ct.json_countVol
@@ -94,7 +94,7 @@ if __name__ == "__main__":
         try:
             # df = sina_data.Sina().all
             time_Rt = time.time()
-            top_now = tdd.getSinaAlldf(market='sz', vol=ct.json_countVol, type=ct.json_countType)
+            top_now = tdd.getSinaAlldf(market='cyb', vol=ct.json_countVol, type=ct.json_countType)
             # print top_now.loc['300208','name']
             # top_now.to_hdf("testhdf5", 'marketDD', format='table', complevel=9)
             df_count = len(top_now)
@@ -164,10 +164,10 @@ if __name__ == "__main__":
                 # top_all = top_all[top_all.percent >= 0]
 
                 # if cct.get_now_time_int() <1500:
-                top_all['dff'] = (
-                    map(lambda x, y: round((x - y) / y * 100, 1), top_all['buy'].values, top_all['lastp'].values))
 
-                top_dif = top_all
+                top_dif = top_all.copy()
+                top_dif['dff'] = (map(lambda x, y: round((x - y) / y * 100, 1), top_dif['buy'].values, top_dif['lastp'].values))
+                
                 log.info('dif1:%s' % len(top_dif))
                 if not (cct.get_now_time_int() > 915 and cct.get_now_time_int() <= 925):
                     top_dif=top_dif[top_dif.lvol > ct.LvolumeSize]
@@ -332,7 +332,7 @@ if __name__ == "__main__":
                     cct.write_to_blocknew(block_path, codew, False)
                     # sl.write_to_blocknew(all_diffpath, codew, False)
                 print "wri ok:%s" % block_path
-                cct.sleeprandom(120)
+                cct.sleeprandom(ct.duration_sleep_time/2)
 
                 # cct.sleep(2)
             else:
@@ -342,7 +342,7 @@ if __name__ == "__main__":
             print "Error", e
             import traceback
             traceback.print_exc()
-            cct.sleeprandom(120)
+            cct.sleeprandom(ct.duration_sleep_time/2)
             # raw_input("Except")
 
 

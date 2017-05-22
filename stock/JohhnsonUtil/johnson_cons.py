@@ -43,8 +43,9 @@ sleep_time = 6
 tdx_max_int = 10
 wcd_limit_day = 30
 h5_limit_time = 180
-sina_limit_time = 120
+sina_limit_time = 15
 diffcode = 0.2
+duration_sleep_time = 60
 
 powerdiff = 'ra * fibl + rah*(abs(float(%s)-fibl))/fib +ma +kdj+rsi'
 # Duration_sort_op=['fib','op','ra','percent','ratio','dff','couts']
@@ -79,8 +80,8 @@ Duration_percent_op_key=[0,0,0,0,0,1,1,1,1,1]
 # Duration_percent_op=['dff','boll','ra','percent','op','fib','fibl','ratio','volume','couts']
 # Duration_percent_op_key=[0,0,0,0,0,1,1,1,1,1]
 
-Duration_ra_op=['ra','dff','percent','op','fib','fibl','ratio','volume','couts']
-Duration_ra_op_key=[0,0,0,0,1,1,1,1,1]
+Duration_ra_op=['ra','dff','couts','percent','op','fib','fibl','ratio','volume']
+Duration_ra_op_key=[0,0,0,0,0,1,1,1,1]
 
 Duration_ra_goldop=['ra','boll','dff','percent','op','fib','fibl','ratio','volume','couts']
 Duration_ra_goldop_key=[0,0,0,0,0,1,1,1,1,1]
@@ -122,7 +123,7 @@ Duration_format_trade=['name', 'trade', 'ma5d','boll','dff','df2','percent', 'ra
 # Monitor_format_trade=['name', 'trade', 'ma5d','boll','dff', 'percent', 'ra','op', 'fib','fibl','ma','macd','rsi','kdj','volume']
 Monitor_format_trade=['name', 'trade', 'ma5d','boll','dff','df2', 'percent', 'ra','op', 'fib','ratio','ma','volume','category']
 
-Sina_Monitor_format =['name', 'trade', 'ma5d','boll','dff','percent', 'ra','op', 'fib','ratio','ma','volume','category']
+Sina_Monitor_format =['name', 'trade', 'ma5d','boll','dff','couts','percent', 'ra','op', 'fib','ratio','ma','volume','category']
 # MonitorMarket_format_buy=['name', 'buy', 'ma5d', 'boll','dff','percent', 'ra','op', 'fib','fibl','ma','macd','rsi','kdj','volume','date']
 MonitorMarket_format_buy=['name', 'buy', 'ma5d', 'boll','dff','couts','df2','percent', 'ra','op', 'ratio','ma','volume','date','category']
 # MonitorMarket_format_trade=['name', 'trade', 'ma5d', 'boll','dff','percent', 'ra','op', 'fib','fibl', 'ma','macd','rsi','volume','kdj']

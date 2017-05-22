@@ -86,11 +86,9 @@ def get_ramdisk_path(filename,lock=False):
     if filename:
         basedir = ramdisk_root.replace('/', path_sep).replace('\\',path_sep)
         if not os.path.isdir(basedir):
-            log.debug("ramdisk Root Err:%s"%(basedir))
+            log.error("ramdisk Root Err:%s"%(basedir))
             return None
-        if filename.find(basedir) >= 0:
-            log.info("file:%s"%(filename))
-            return filename
+
 
         if not os.path.exists(basedir):
             log.error("basedir not exists")
@@ -104,6 +102,10 @@ def get_ramdisk_path(filename,lock=False):
                 filename = filename.replace('h5','lock')
             else:
                 filename = filename + '.lock'
+
+        if filename.find(basedir) >= 0:
+            log.info("file:%s"%(filename))
+            return filename
 
         file_path = basedir  + path_sep + filename
         # for root in win7rootList:
@@ -1375,18 +1377,27 @@ def sort_by_value(df,column='dff',file=None,count=5,num=5,asc=0):
             write_to_blocknew(file, dd.index.tolist()[:int(count)], append=True)
         print "file:%s"%(file)
 
-def combine_dataFrame(maindf,subdf,col=None,append=False):
+def combine_dataFrame(maindf,subdf,col=None,compare=None,append=False):
     times = time.time()
+    maindf_co=maindf.columns
     if not append:
+
         if 'code' in maindf.columns:
             maindf = maindf.set_index('code')
         if 'code' in subdf.columns:
             subdf = subdf.set_index('code')
+
         no_index = maindf.drop([inx for inx in maindf.index  if inx not in subdf.index], axis=0)
-        if col is None:
-            sub_col = subdf.columns
+        if col is not None and compare is not None:
+            # if col in subdf.columns:
+            # sub_col = list(set(subdf.columns) - set([col]))
+            sub_dif_inx = list(set(subdf.index) - set(maindf.index))
+            trandf = subdf.drop(sub_dif_inx,axis=0)
+            no_index[compare]=map((lambda x,y:y-x),no_index.couts,trandf.couts)
+            # no_index[compare]=map((lambda x,y:y-x),eval("subdf.%s"%(col)),eval("no_index.%s"%(col)))
         else:
             sub_col = list(set(subdf.columns)-set())
+
         no_index.drop([col for col in no_index.columns if col in subdf.columns], axis=1,inplace=True)
         no_index = no_index.merge(subdf, left_index=True, right_index=True, how='left')
         maindf = maindf.drop([inx for inx in maindf.index  if inx in subdf.index], axis=0)
@@ -1432,6 +1443,9 @@ def combine_dataFrame(maindf,subdf,col=None,append=False):
         maindf = pd.concat([maindf, no_index],axis=0)
     '''
     log.info("combine df :%0.2f"%(time.time()-times))
+    dif_co = list(set(maindf_co)-set(maindf.columns))
+    if len(dif_co) > 0:
+        log.error("columns d:%s"%(dif_co))
     return maindf
 
 if __name__ == '__main__':

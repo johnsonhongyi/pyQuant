@@ -14,7 +14,7 @@ def getBollFilter(df=None,boll=-5,duration=ct.PowerCountdl,filter=False,ma5d=Tru
         print "dataframe is None"
         return None
     else:
-        df.loc[df.percent > 9.95,'percent']=10
+        df.loc[df.percent >= 9.9,'percent']=10
     if cct.get_now_time_int() > 915 and cct.get_now_time_int() <= 1000:
         # df = df[df.buy > df.cmean * ct.changeRatioUp ]
         df = df[df.buy > df.cmean * ct.changeRatio]

@@ -323,7 +323,7 @@ if __name__ == "__main__":
                     cct.write_to_blocknew(block_path, codew, False)
                     # cct.write_to_blocknew(all_diffpath,codew,False)
                 print "wri ok:%s" % block_path
-                cct.sleeprandom(120)
+                cct.sleeprandom(ct.duration_sleep_time/2)
 
                 # cct.sleep(5)
             elif st.lower() == 'r':
@@ -337,7 +337,7 @@ if __name__ == "__main__":
             print "Error", e
             import traceback
             traceback.print_exc()
-            cct.sleeprandom(120)
+            cct.sleeprandom(ct.duration_sleep_time/2)
             # raw_input("Except")
 
 

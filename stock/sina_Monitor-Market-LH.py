@@ -87,7 +87,7 @@ if __name__ == "__main__":
     # parsehtml(downloadpage(url_s))
     # StreamHandler(sys.stdout).push_application()
     # log = LoggerFactory.getLogger('SinaMarket')
-    pd.options.mode.chained_assignment = None
+    # pd.options.mode.chained_assignment = None
     from docopt import docopt
     log = LoggerFactory.log
     args = docopt(cct.sina_doc, version='sina_cxdn')
@@ -172,7 +172,8 @@ if __name__ == "__main__":
                     #             top_all.loc[symbol, 'buy':'low'] = top_now.loc[
                     #                 symbol, 'buy':'low']
                     top_all=cct.combine_dataFrame(top_all,top_now, col=None)
-                top_dif = top_all
+                top_dif = top_all.copy()
+                
                 top_dif=top_dif[top_dif.lvol > ct.LvolumeSize]
                 # if top_dif[:1].llow.values <> 0:
                 # if not (cct.get_now_time_int() > 915 and cct.get_now_time_int() <= 925):
@@ -333,7 +334,7 @@ if __name__ == "__main__":
                     cct.write_to_blocknew(block_path, codew, False)
                     # cct.write_to_blocknew(all_diffpath, codew, False)
                 print "wri ok:%s" % block_path
-                cct.sleeprandom(120)
+                cct.sleeprandom(ct.duration_sleep_time/2)
 
                 # cct.sleep(2)
             else:
@@ -343,7 +344,7 @@ if __name__ == "__main__":
             print "Error::", e
             import traceback
             traceback.print_exc()
-            cct.sleeprandom(120)
+            cct.sleeprandom(ct.duration_sleep_time/2)
             # raw_input("Except")
 
             # sl.get_code_search_loop()

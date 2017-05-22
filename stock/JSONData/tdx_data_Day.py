@@ -195,9 +195,9 @@ def get_tdx_Exp_day_to_df(code, start=None, end=None, dl=None,newdays = None,typ
         ds = pd.DataFrame()
 
         tmp_df = get_kdate_data(code, start='', end='', ktype='D')
-        if len(tmp_df) > 0:    
-            write_tdx_tushare_to_file(code, df=tmp_df, start=None, type='f') 
-        else:    
+        if len(tmp_df) > 0:
+            write_tdx_tushare_to_file(code, df=tmp_df, start=None, type='f')
+        else:
             if initTdxdata == 0:
                 log.error("file_path:not exists code:%s"%(code))
             initTdxdata += 1
@@ -795,7 +795,7 @@ def get_tdx_append_now_df_api_tofile(code,dm=None,newdays=1, start=None, end=Non
 #                    code_ts = k
     else:
         index_status=False
-        code_ts = code                   
+        code_ts = code
 
     if not power:
         return df
@@ -2973,7 +2973,7 @@ if __name__ == '__main__':
     #     log_level = LoggerFactory.ERROR
     log_level = LoggerFactory.DEBUG if args['--debug']  else LoggerFactory.ERROR
     # log_level = LoggerFactory.INFO if args['--info'] else LoggerFactory.ERROR
-    log.setLevel(log_level)        
+    log.setLevel(log_level)
     # print cct.get_ramdisk_path('tdx')
     # testnumba(1000)
     # n = 100
@@ -2984,24 +2984,27 @@ if __name__ == '__main__':
     # print get_kdate_data('300534', start='2017-05-01', end='', ktype='D')
 #    code='300174'
     # get_tdx_append_now_df_api_tofile('603113', dm=None, newdays=1, start=None, end=None, type='f', df=None, dl=2, power=True)
-#    
+#
     code='999999'
     # get_tdx_append_now_df_api(code, start=None, end=None, type='f', df=None, dm=None, dl=None, power=True, newdays=None, write_tushare=False)
 #    get_tdx_append_now_df_api_tofile(code, dm=None, newdays=1, start=None, end=None, type='f', df=None, dl=2, power=True)
-    print get_tdx_Exp_day_to_df(code,dl=30,newdays=0)[:1]
+#    print get_tdx_Exp_day_to_df(code,dl=30,newdays=0)[:1]
 #    print write_tdx_tushare_to_file(code)
 
-    hdf5_wri=cct.cct_raw_input("write all data to hdf[y|n]:")
-    # hdf5_wri='y'
+#    hdf5_wri=cct.cct_raw_input("write all data to hdf[y|n]:")
+    hdf5_wri='y'
+    time_s=time.time()
     if hdf5_wri == 'y':
-        df = sina_data.Sina().all
+        df = sina_data.Sina().market('sh')
         dfcode =df.index.tolist()
+        print "count:%s"%(len(dfcode))
         f_name = 'tdx_all_df_30'
         t_st=time.time()
-        st=get_hdf5_file(f_name,'w')
-        for code in dfcode[:3]:
+        dd=pd.DataFrame()
+        # st=h5a.get_hdf5_file(f_name, wr_mode='w', complevel=9, complib='zlib',mutiindx=True)
+        for code in dfcode[:5]:
         # for code in dfcode:
-            df = get_tdx_Exp_day_to_df(code,dl=60)
+            df = get_tdx_Exp_day_to_df(code,dl=30)
             # (map(lambda x, y: y if int(x) == 0 else x, top_dif['buy'].values, top_dif['trade'].values))
             # print df.index
             if len(df) > 0:
@@ -3016,10 +3019,11 @@ if __name__ == '__main__':
                 df = df.set_index(['code','date'])
                 df = df.astype(float)
                 xcode = cct.code_to_symbol(code)
-                print xcode,
+                print xcode
+                dd = pd.concat([dd, df],axis=0)
                 # st.append(xcode,df)
                 put_time = time.time()
-                st.put("df", df, format="table", append=True, data_columns=['code','date'])
+                # st.put("df", df, format="table", append=True, data_columns=['code','date'])
                 # print "t:%0.1f"%(time.time()-put_time),
                 # aa[aa.index.get_level_values('code')==333]
                 # st.select_column('df','code').unique()
@@ -3040,7 +3044,7 @@ if __name__ == '__main__':
                 # print df
                 # print df.shape
                 # log.error("code :%s is None"%(code))
-        print ("hdf5 all :%s hd:%s time:%0.2f"%(len(dfcode),len(st.keys()),time.time()-t_st))
+        print ("hdf5 all :%s hd:%s time:%0.2f"%(len(dfcode),len(st.keys()),time.time()-time_s))
         st.close()
 
     market = cct.cct_raw_input("write all data [all,sh,sz,alla] :")

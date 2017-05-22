@@ -376,13 +376,13 @@ if __name__ == "__main__":
                     # top_all = pd.DataFrame()
                     time_s = time.time()
                 else:
-                    cct.sleep(120)
+                    cct.sleep(ct.duration_sleep_time)
             elif cct.get_work_duration():
                 while 1:
-                    cct.sleep(120)
+                    cct.sleep(ct.duration_sleep_time)
                     if cct.get_work_duration():
                         print ".",
-                        cct.sleep(120)
+                        cct.sleep(ct.duration_sleep_time)
                     else:
                         # top_all = pd.DataFrame()
                         cct.sleeprandom(60)
@@ -441,7 +441,7 @@ if __name__ == "__main__":
                     cct.write_to_blocknew(block_path, codew, False)
                     # sl.write_to_blocknew(all_diffpath, codew, False)
                 print "wri ok:%s" % block_path
-                cct.sleeprandom(120)
+                cct.sleeprandom(ct.duration_sleep_time/2)
             elif st.startswith('sh'):
                 while 1:
                     input = cct.cct_raw_input("code:")
@@ -464,7 +464,7 @@ if __name__ == "__main__":
             print "Error", e
             import traceback
             traceback.print_exc()
-            cct.sleeprandom(120)
+            cct.sleeprandom(ct.duration_sleep_time/2)
 
 '''
 {symbol:"sz000001",code:"000001",name:"平安银行",trade:"0.00",pricechange:"0.000",changepercent:"0.000",buy:"12.36",sell:"12.36",settlement:"12.34",open:"0.00",high:"0.00",low:"0",volume:0,amount:0,ticktime:"09:17:55",per:7.133,pb:1.124,mktcap:17656906.355526,nmc:14566203.350486,turnoverratio:0},

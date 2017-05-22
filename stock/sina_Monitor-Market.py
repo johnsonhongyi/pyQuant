@@ -66,10 +66,10 @@ if __name__ == "__main__":
 
 
     if cct.isMac():
-        width, height = 160, 16
+        width, height = 170, 16
         cct.set_console(width, height)
     else:
-        width, height = 160, 18
+        width, height = 170, 18
         cct.set_console(width, height)
     status = False
     vol = ct.json_countVol
@@ -92,7 +92,7 @@ if __name__ == "__main__":
             # df = rl.get_sina_Market_json('all')
             # top_now = rl.get_market_price_sina_dd_realTime(df, vol, type)
             time_Rt = time.time()
-            top_now = tdd.getSinaAlldf(market='all', vol=ct.json_countVol, type=ct.json_countType)            
+            top_now = tdd.getSinaAlldf(market='cyb', vol=ct.json_countVol, type=ct.json_countType)            
             # print top_now.loc['601900',:]
             df_count = len(top_now)
             now_count = len(top_now)
@@ -114,8 +114,7 @@ if __name__ == "__main__":
                 # if len(top_now) > 10 and not top_now[:1].buy.values == 0:
                 #     top_now=top_now[top_now['percent']>=0]
                 if 'trade' in top_now.columns:
-                    top_now['buy'] = (
-                        map(lambda x, y: y if int(x) == 0 else x, top_now['buy'].values, top_now['trade'].values))
+                    top_now['buy'] = (map(lambda x, y: y if int(x) == 0 else x, top_now['buy'].values, top_now['trade'].values))
                 # time_Rt = time.time()
                 if len(top_all) == 0 and len(lastpTDX_DF) == 0:
                     time_Rt = time.time()
@@ -152,9 +151,10 @@ if __name__ == "__main__":
                 # top_all = top_all[top_all.percent >= 0]
                 
                 # if cct.get_now_time_int() < 1500:
-                top_all['dff'] = (
-                    map(lambda x, y: round((x - y) / y * 100, 1), top_all['buy'].values, top_all['lastp'].values))
-                top_dif = top_all                
+                
+                top_dif = top_all.copy()                
+                top_dif['dff'] = (map(lambda x, y: round((x - y) / y * 100, 1), top_dif['buy'].values, top_dif['lastp'].values))
+                
                 log.info('dif1:%s' % len(top_dif))
                 if cct.get_now_time_int() > 915 and cct.get_now_time_int() < ct.checkfilter_end_time:
                     top_dif=top_dif[top_dif.lvol > ct.LvolumeSize]
@@ -314,7 +314,7 @@ if __name__ == "__main__":
                     cct.write_to_blocknew(block_path, codew, False)
                     # cct.write_to_blocknew(all_diffpath, codew, False)
                 print "wri ok:%s" % block_path
-                cct.sleeprandom(120)
+                cct.sleeprandom(ct.duration_sleep_time/2)
 
             elif st.startswith('sh'):
                 code = st.split()[1]
@@ -338,7 +338,7 @@ if __name__ == "__main__":
             print "Error", e
             import traceback
             traceback.print_exc()
-            cct.sleeprandom(120)
+            cct.sleeprandom(ct.duration_sleep_time/2)
             # raw_input("Except")
 
 

@@ -1,4 +1,4 @@
-# -*- coding:utf-8 -*-
+# -*- encoding: utf-8 -*-
 import sys
 sys.path.append("..")
 
@@ -871,20 +871,29 @@ def get_linear_model_candles(code, ptype='low', dtype='d', start=None, end=None,
 def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y',talib=False,newdays=None,days=0):
     ts=time.time()
     if isinstance(df, list):
+        h5_combine_status = False
         code_l = df
         statuslist = True
     else:
         code_l = df.index.tolist()
+        h5_combine_status = True
         statuslist = False
 
     h5_fname='powerCompute'
     h5_table=dtype+'_'+str(dl)+'_'+filter+'_'+'all'
-
+    power_columns=['ra','op','category', 'ma', 'rsi', 'kdj', 'boll', 'rah', 'df2', 'fibl', 'macd', 'vstd', 'oph', 'lvolume']
+                  # ['category' 'ma' 'rsi' 'kdj' 'boll' 'rah' 'df2' 'fibl' 'macd' 'vstd' 'oph','lvolume'] 
     h5 = h5a.load_hdf_db(h5_fname,h5_table, code_l=code_l,limit_time=1800)
-
     if h5 is not None:
         log.info("power hdf5 data:%s"%(len(h5)))
-        return h5
+        if h5_combine_status:
+            df_co = df.columns
+            h5_co = h5.columns
+            status = len(set(power_columns) & set(power_columns)) - len(power_columns) == 0
+            if status:
+                h5 = h5.drop([inx for inx in h5.columns if inx not in power_columns],axis=1)
+                df = cct.combine_dataFrame(df, h5, col=None, append=False)
+        return df
     else:
         log.info("init power hdf5")
 #    if not isinstance(df,list) and 'boll' in df.columns:
@@ -1053,7 +1062,6 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y',tali
     df['df2'] = (map(lambda ra, fibl,rah,fib,ma,kdj,rsi:round(eval(ct.powerdiff%(ct.PowerCountdl)),1),\
                      df['ra'].values, df['fibl'].values,df['rah'].values,df['fib'].values,df['ma'].values,\
                      df['kdj'].values,df['rsi'].values))
-
     h5 = h5a.write_hdf_db(h5_fname, df, table=h5_table)
     print "Power:%0.2f"%(time.time()-ts),
     return df

@@ -149,6 +149,7 @@ def get_sina_Market_json(market='sh', showtime=True, num='1000', retry_count=3, 
 
     h5_fname = 'get_sina_all_ratio'
     h5_table = 'all'
+    # if market == 'all': 
     h5 = h5a.load_hdf_db(h5_fname, table=h5_table)
     if h5 is not None and len(h5) > 0 and 'timel' in h5.columns:
         o_time = h5[h5.timel <> 0].timel
@@ -157,8 +158,24 @@ def get_sina_Market_json(market='sh', showtime=True, num='1000', retry_count=3, 
             l_time = time.time() - o_time
             return_hdf_status = not cct.get_work_day_status()  or not cct.get_work_time() or (cct.get_work_day_status() and cct.get_work_time() and l_time < ct.h5_limit_time)
             if return_hdf_status:
-               log.info("load hdf data:%s %s %s"%(h5_fname,h5_table,len(h5)))
-               return h5
+                log.info("load hdf data:%s %s %s"%(h5_fname,h5_table,len(h5)))
+                dd = None
+                if market == 'all':
+                    co_inx = [inx for inx in h5.index if str(inx).startswith(('6','30','00'))]
+                elif market == 'sh':
+                    co_inx = [inx for inx in h5.index if str(inx).startswith(('6'))]
+                elif market == 'sz':
+                    co_inx = [inx for inx in h5.index if str(inx).startswith(('00'))]
+                elif market == 'cyb':
+                    co_inx = [inx for inx in h5.index if str(inx).startswith(('30'))]
+                else:
+                    log.error('market is not Find:%s'%(market))
+                dd = h5.loc[co_inx] 
+                if len(dd) > 200:
+                    log.info("return sina_ratio:%s"%(len(dd)))
+                    return dd
+    # else:
+    #     market = 'all'
 
     if market=='all':
         url_list=[]
@@ -185,7 +202,7 @@ def get_sina_Market_json(market='sh', showtime=True, num='1000', retry_count=3, 
         # df['volume']= df['volume'].apply(lambda x:x/100)
         # print df.columns
         if 'ratio' in df.columns:
-        	df['ratio']=df['ratio'].apply(lambda x:round(x,1))
+            df['ratio']=df['ratio'].apply(lambda x:round(x,1))
         df['percent']=df['percent'].apply(lambda x:round(x,1))
         df=df.drop_duplicates()
         # print df[:1]
@@ -384,6 +401,8 @@ def get_sina_all_json_dd(vol='0', type='0', num='10000', retry_count=3, pause=0.
        o_time = h5[h5.timel <> 0].timel
        if len(o_time) > 0:
            o_time = o_time[0]
+           l_time = time.time() - o_time
+
            return_hdf_status = not cct.get_work_day_status()  or not cct.get_work_time() or (cct.get_work_day_status() and cct.get_work_time() and l_time < ct.h5_limit_time)
            if return_hdf_status:
                log.info("load hdf data:%s %s %s"%(h5_fname,h5_table,len(h5)))
@@ -715,8 +734,10 @@ def get_market_price_sina_dd_realTime(dp='',vol='0',type='0'):
 if __name__ == '__main__':
     import sys
     log.setLevel(LoggerFactory.DEBUG)
-    df = get_sina_all_json_dd('0', '3')
-    # df=get_sina_Market_json('all')
+    # df = get_sina_all_json_dd('0', '3')
+    for mk in ['sz','cyb','sh']:
+        df=get_sina_Market_json(mk)
+        print "mk:",len(df)
     import tushare as ts
     s_t=time.time()
     df = ts.get_today_all()

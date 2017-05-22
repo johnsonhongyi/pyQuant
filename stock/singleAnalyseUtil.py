@@ -518,7 +518,7 @@ if __name__ == '__main__':
                 if int_time < 1000:
                     cct.sleep(60)
                 else:
-                    cct.sleep(120)
+                    cct.sleep(ct.duration_sleep_time)
             int_time = cct.get_now_time_int()
             if cct.get_work_time():
                 if int_time < 930:
@@ -619,12 +619,12 @@ if __name__ == '__main__':
             # global except_count
             except_count +=1
             if except_count < 4:
-                cct.sleeprandom(120)
+                cct.sleeprandom(ct.duration_sleep_time/2)
             else:
                 print "except_count >3"
                 sys.exit(0)
         # finally:
-        #     cct.sleeprandom(120)
+        #     cct.sleeprandom(ct.duration_sleep_time/2)
             # raw_input("Except")
             # num_input=num_input
             # print "status:",status
