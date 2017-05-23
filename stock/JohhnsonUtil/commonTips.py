@@ -1380,6 +1380,11 @@ def sort_by_value(df,column='dff',file=None,count=5,num=5,asc=0):
 def combine_dataFrame(maindf,subdf,col=None,compare=None,append=False):
     times = time.time()
     maindf_co=maindf.columns
+    if 'ticktime' in maindf.columns:
+        maindf.ticktime = maindf.ticktime.apply(lambda x:str(x).replace(':','')[:4])
+        maindf = maindf.dropna()
+        maindf.ticktime = maindf.ticktime.astype(int)
+        maindf = maindf[maindf.ticktime < get_now_time_int()+5]
     if not append:
 
         if 'code' in maindf.columns:
@@ -1418,7 +1423,7 @@ def combine_dataFrame(maindf,subdf,col=None,compare=None,append=False):
         maindf.reset_index(inplace=True)
         maindf.drop_duplicates('code',inplace=True)
         maindf.set_index('code',inplace=True)
-
+#        maindf['timel']=time.time()
     '''
         if 'code' in maindf.columns:
             maindf = maindf.set_index('code')
@@ -1444,6 +1449,7 @@ def combine_dataFrame(maindf,subdf,col=None,compare=None,append=False):
     '''
     log.info("combine df :%0.2f"%(time.time()-times))
     dif_co = list(set(maindf_co)-set(maindf.columns))
+    maindf['timel']=time.time()
     if len(dif_co) > 0:
         log.error("columns d:%s"%(dif_co))
     return maindf

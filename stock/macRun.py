@@ -138,7 +138,8 @@ sleep 0.1;osascript -e 'tell application "Python Launcher" to quit';sleep 5;
 # open LinePower.py;
 # sleep 0.1;osascript -e 'tell application "Python Launcher" to quit';sleep 5;
 # '''
-closeLaunch ='''osascript -e 'tell application "Python Launcher" to quit';sleep 1;'''
+closeLaunch ='''osascript -e 'tell application "Python Launcher" to quit';sleep 0.1;'''
+closeLaunchR ='''osascript -e 'tell application "%s" to quit';sleep 0.1;'''
 
 def doScript(scriptn):
     proc = subprocess.Popen(['osascript', '-'],
@@ -180,6 +181,7 @@ def setPosition(cmd=None, position=None):
             # position = doScript(scriptposition % ('get', str(n)))
             # print positio
         os.system(closeLaunch) 
+        os.system(closeLaunchR) 
     else:
         print "run Cmd"
         os.system(cmdRun)
@@ -188,7 +190,8 @@ def setPosition(cmd=None, position=None):
 # os.system(cmdRun)
 count = doScript(scriptcount)
 # print count
-if int(count) > 3:
+if int(count) > 30:
+    print getPosition('Johnson@bogon')
     print getPosition('singleAnalyseUtil.py')
     print getPosition('sina_Market-DurationDn.py')
     print getPosition('sina_Monitor-Market-LH.py')
@@ -197,7 +200,14 @@ if int(count) > 3:
     print getPosition('sina_Market-DurationCXDN.py')
     print getPosition('sina_Market-DurationCXUP.py')
     print getPosition('sina_Market-DurationDnUP.py')
-    # print getPosition('sina_Monitor-GOLD.py')
+    print getPosition('sina_Monitor-GOLD.py')
     print getPosition('sina_Monitor.py')
     print getPosition('LinePower.py')
+startT="Johnson@bogon"
+rootT1=("cd '/Users/Johnson/Documents/Quant/pyQuant/stock/' && '/Users/Johnson/anaconda/bin/python' -i -t  '/Users/Johnson/Documents/Quant/pyQuant/stock/macRun.py'  && echo Exit status: $? && exit 1")
+rootT=("cd '/Users/Johnson/Documents/Quant/pyQuant/stock/' &&  -i -t && echo Exit $ -cd")
+os.system(closeLaunchR%(rootT1)) 
+os.system(closeLaunchR%(rootT)) 
+os.system(closeLaunch) 
+os.system(closeLaunchR%(startT))
 setPosition(cmd=None, position=None)

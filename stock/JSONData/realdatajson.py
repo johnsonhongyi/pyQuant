@@ -149,14 +149,15 @@ def get_sina_Market_json(market='sh', showtime=True, num='1000', retry_count=3, 
 
     h5_fname = 'get_sina_all_ratio'
     h5_table = 'all'
-    # if market == 'all': 
-    h5 = h5a.load_hdf_db(h5_fname, table=h5_table)
+    # if market == 'all':
+    limit_time = 300
+    h5 = h5a.load_hdf_db(h5_fname, table=h5_table,limit_time=limit_time)
     if h5 is not None and len(h5) > 0 and 'timel' in h5.columns:
         o_time = h5[h5.timel <> 0].timel
         if len(o_time) > 0:
             o_time = o_time[0]
             l_time = time.time() - o_time
-            return_hdf_status = not cct.get_work_day_status()  or not cct.get_work_time() or (cct.get_work_day_status() and cct.get_work_time() and l_time < ct.h5_limit_time)
+            return_hdf_status = not cct.get_work_day_status()  or not cct.get_work_time() or (cct.get_work_day_status() and cct.get_work_time() and l_time < limit_time)
             if return_hdf_status:
                 log.info("load hdf data:%s %s %s"%(h5_fname,h5_table,len(h5)))
                 dd = None
@@ -170,7 +171,7 @@ def get_sina_Market_json(market='sh', showtime=True, num='1000', retry_count=3, 
                     co_inx = [inx for inx in h5.index if str(inx).startswith(('30'))]
                 else:
                     log.error('market is not Find:%s'%(market))
-                dd = h5.loc[co_inx] 
+                dd = h5.loc[co_inx]
                 if len(dd) > 200:
                     log.info("return sina_ratio:%s"%(len(dd)))
                     return dd
@@ -223,7 +224,7 @@ def get_sina_Market_json(market='sh', showtime=True, num='1000', retry_count=3, 
         if 'code' in df.columns:
             df = df.set_index('code')
 
-        h5 = h5a.write_hdf_db(h5_fname, df, table=h5_table)
+        h5 = h5a.write_hdf_db(h5_fname, df, table=h5_table,append=True)
         if showtime: print ("Market-df:%s %s" % (format((time.time() - start_t), '.1f'), len(df))),
 
         return df
@@ -396,14 +397,15 @@ def get_sina_all_json_dd(vol='0', type='0', num='10000', retry_count=3, pause=0.
 
     h5_fname = 'get_sina_all_dd'
     h5_table = 'all'
-    h5 = h5a.load_hdf_db(h5_fname, table=h5_table)
+    limit_time = 300
+    h5 = h5a.load_hdf_db(h5_fname, table=h5_table,limit_time=limit_time)
     if h5 is not None and not h5.empty and 'timel' in h5.columns:
        o_time = h5[h5.timel <> 0].timel
        if len(o_time) > 0:
            o_time = o_time[0]
            l_time = time.time() - o_time
 
-           return_hdf_status = not cct.get_work_day_status()  or not cct.get_work_time() or (cct.get_work_day_status() and cct.get_work_time() and l_time < ct.h5_limit_time)
+           return_hdf_status = not cct.get_work_day_status()  or not cct.get_work_time() or (cct.get_work_day_status() and cct.get_work_time() and l_time < limit_time)
            if return_hdf_status:
                log.info("load hdf data:%s %s %s"%(h5_fname,h5_table,len(h5)))
                return h5
@@ -453,7 +455,7 @@ def get_sina_all_json_dd(vol='0', type='0', num='10000', retry_count=3, pause=0.
             df = df.loc[:, ['code','name', 'couts', 'kind', 'prev_price','ticktime']]
             df.code=df.code.apply(lambda x:str(x).replace('sh','') if str(x).startswith('sh') else str(x).replace('sz',''))
             df = df.set_index('code')
-            h5 = h5a.write_hdf_db(h5_fname, df, table=h5_table)
+            h5 = h5a.write_hdf_db(h5_fname, df, table=h5_table,append=False)
 
             print (" dd-df:%0.2f" % ((time.time() - start_t))),
             return df
