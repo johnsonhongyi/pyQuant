@@ -124,7 +124,7 @@ def get_hdf5_file(fpath,wr_mode='r',complevel=9,complib='zlib',mutiindx=False):
 def write_hdf_db(fname,df,table='all',index=False,baseCount=500,append=False):
     if 'code' in df.columns:
         df = df.set_index('code')
-    df['timel'] =  time.time()
+#    df['timel'] =  time.time()
 #    write_status = False
     time_t = time.time()
 #    if not os.path.exists(cct.ramdisk_root):
@@ -133,14 +133,14 @@ def write_hdf_db(fname,df,table='all',index=False,baseCount=500,append=False):
     global RAMDISK_KEY
     if not RAMDISK_KEY < 1:
         return df
-    if df is not None and not df.empty and len(df) > 0:
-        dd = df.dtypes.to_frame()
-        if 'object' in dd.values:
-            dd = dd[dd == 'object'].dropna()
-            col = dd.index.tolist()
-            log.info("col:%s"%(col))
-            df[col] = df[col].astype(str)
-        df.index = df.index.astype(str)
+#    if df is not None and not df.empty and len(df) > 0:
+#        dd = df.dtypes.to_frame()
+#        if 'object' in dd.values:
+#            dd = dd[dd == 'object'].dropna()
+#            col = dd.index.tolist()
+#            log.info("col:%s"%(col))
+#            df[col] = df[col].astype(str)
+#        df.index = df.index.astype(str)
     if df is not None and not df.empty and table is not None:
         # h5 = get_hdf5_file(fname,wr_mode='r')
         tmpdf = []
@@ -169,7 +169,15 @@ def write_hdf_db(fname,df,table='all',index=False,baseCount=500,append=False):
             log.info("h5 None hdf reindex time:%0.2f"%(time.time()-time_t))
     time_t = time.time()
     if df is not None and not df.empty and table is not None:
-        # df['timel'] =  time.time()
+        df['timel'] =  time.time()
+        if df is not None and not df.empty and len(df) > 0:
+            dd = df.dtypes.to_frame()
+        if 'object' in dd.values:
+            dd = dd[dd == 'object'].dropna()
+            col = dd.index.tolist()
+            log.info("col:%s"%(col))
+            df[col] = df[col].astype(str)
+        df.index = df.index.astype(str)
         with SafeHDFStore(fname) as h5:
             df = df.fillna(0)
             if h5 is not None:
