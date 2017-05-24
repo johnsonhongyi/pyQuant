@@ -198,7 +198,7 @@ def setPosition(cmd=None, position=None):
     # print count
     if int(count) > 3:
         doScript(scriptquit)
-        for n in xrange(1, int(count)):
+        for n in xrange(1, int(count)+1):
             # print "n:%s"%(n)
             title = doScript(scriptname % ('get', str(object=n)))
             for key in positionKey:
@@ -249,7 +249,8 @@ if int(count) > 3:
 setPosition(cmd=None, position=None)
 
 getPosition('Johnson — bash',close=True)
-getPosition('Johnson — python',close=True)
+# getPosition('Johnson — python',close=True)
+getPosition('Johnson — osasc',close=True)
 
 '''
 

@@ -142,7 +142,7 @@ if __name__ == "__main__":
                 # time_Rt = time.time()
                 if len(top_all) == 0 and len(lastpTDX_DF) == 0:
                     # time_Rt = time.time()
-                    print "term:%s"%(cct.get_terminal_Position(cmd='dn.py')),
+                    print "term:%s"%(cct.get_terminal_Position(cmd='DurationDn.py')),
                     if cct.get_terminal_Position(cmd='dn.py') <=1:
                         top_all,lastpTDX_DF = tdd.get_append_lastp_to_df(top_now, lastpTDX_DF=None, dl=duration_date,end=end_date,ptype=ptype,filter=filter, power=ct.lastPower, lastp=lastp,newdays=newdays)
                     else:

@@ -1521,7 +1521,7 @@ if __name__ == '__main__':
     log.setLevel(log_level)
     s_time=time.time()
 
-    print get_terminal_Position(cmd='dn.py', position=None, close=False)
+    print get_terminal_Position(cmd='DurationDN.py', position=None, close=False)
     print get_terminal_Position(cmd='Johnson@', position=None, close=False)
     print get_terminal_Position(cmd='Johnson — bash', position=None, close=False)
     print "t:%0.2f"%(time.time()-s_time)
