@@ -496,7 +496,7 @@ def sleep(timet,catch=False):
             if int(time.time()-times) >= int(timet):
                 break
 
-            if cct.get_os_system() == 'win':     
+            if get_os_system() == 'win':     
                 time.sleep(0.1)
             else:
                 time.sleep(0.5)
