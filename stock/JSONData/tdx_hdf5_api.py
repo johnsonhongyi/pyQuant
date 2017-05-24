@@ -265,7 +265,7 @@ def load_hdf_db(fname,table='all',code_l=None,timelimit=True,index=False,limit_t
                     else:
                          df = dd.loc[dif_co]
                 else:
-                    log.info("don't find :%s"%(len(code_l)-len(dif_co)))
+                    log.error("cl:%s don't find :%s dra:%s"%(len(code_l),len(code_l)-len(dif_co),dratio))
         else:
             log.error("%s is not find %s"%(fname,table))
     else:

@@ -1079,16 +1079,19 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y',tali
         # df = getab.Get_BBANDS(df, dtype='d')
         #'volume', 'ratio', 'couts','ldate' -> 'ma','macd','rsi','kdj'
         # df = df.drop_duplicates()
-    if len(drop_cxg) >0:
-        df = df.drop(drop_cxg,axis=0)
-        log.error("Drop_cxg open!!!:%s %s"%(len(drop_cxg),drop_cxg))
     df = df.fillna(0)
     df.loc[:, 'fibl'] = df.loc[:, 'fibl'].astype(int)
     df['df2'] = (map(lambda ra, fibl,rah,fib,ma,kdj,rsi:round(eval(ct.powerdiff%(ct.PowerCountdl)),1),\
                      df['ra'].values, df['fibl'].values,df['rah'].values,df['fib'].values,df['ma'].values,\
                      df['kdj'].values,df['rsi'].values))
-    h5 = h5a.write_hdf_db(h5_fname, df, table=h5_table)
+
+    if len(drop_cxg) >0:
+        df = df.drop(drop_cxg,axis=0)
+        log.error("Drop_cxg open!!!:%s %s"%(len(drop_cxg),drop_cxg))
+    
+    h5 = h5a.write_hdf_db(h5_fname, df, table=h5_table,append=True)
     print "Power:%0.2f"%(time.time()-ts),
+
     return df
 
 
