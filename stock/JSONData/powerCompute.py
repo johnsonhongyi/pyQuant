@@ -882,7 +882,7 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y',tali
     h5_fname='powerCompute'
     h5_table=dtype+'_'+str(dl)+'_'+filter+'_'+'all'
     power_columns=['ra','op','category', 'ma', 'rsi', 'kdj', 'boll', 'rah', 'df2', 'fibl', 'macd', 'vstd', 'oph', 'lvolume']
-                  # ['category' 'ma' 'rsi' 'kdj' 'boll' 'rah' 'df2' 'fibl' 'macd' 'vstd' 'oph','lvolume'] 
+                  # ['category' 'ma' 'rsi' 'kdj' 'boll' 'rah' 'df2' 'fibl' 'macd' 'vstd' 'oph','lvolume']
     h5 = h5a.load_hdf_db(h5_fname,h5_table, code_l=code_l,limit_time=1800)
     if h5 is not None:
         log.info("power hdf5 data:%s"%(len(h5)))
@@ -928,7 +928,7 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y',tali
 #    wcdf = wcd.get_codelist_df(dm.name.tolist())
 
     wcdf_code = wcdf.index.tolist()
-
+    drop_cxg =[]
     for code in code_l:
 
         # if 'boll' in df.loc[code].index:
@@ -966,6 +966,28 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y',tali
             if len(df) > days+1 and days != 0:
                 tdx_df = tdx_df.sort_index(ascending=True)
                 tdx_df = tdx_df[:-1-days]
+            tdx_days = len(tdx_df)
+            if tdx_days < 16:
+                top_count=0
+                for day in range(len(tdx_df),0,-1):
+                    # tmpdf=pd.DataFrame(df.loc[:,column][-days-2:-1-day], columns=[column])
+                    # c_open = df.open.values[-days]
+                    c_high = tdx_df.high.values[-day]
+                    c_low = tdx_df.low.values[-day]
+#                    print c_high,c_low
+                    if int(c_high) <> 0 and c_high == c_low:
+                        top_count +=1
+                    else:
+                        if tdx_days - day < 3:
+                            top_count +=1
+                            continue
+                        else:
+                            break
+#                            log.info('code:%s c_high <> c_low:top :%s'%(code,tdx_days - day))
+                if top_count == len(tdx_df):
+                    log.error('CXG Good:%s'%(code))
+                    drop_cxg.append(code)
+                    continue
         else:
             df.loc[code, 'op'] = 0
             df.loc[code, 'ra'] = 0
@@ -1057,6 +1079,9 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y',tali
         # df = getab.Get_BBANDS(df, dtype='d')
         #'volume', 'ratio', 'couts','ldate' -> 'ma','macd','rsi','kdj'
         # df = df.drop_duplicates()
+    if len(drop_cxg) >0:
+        df = df.drop(drop_cxg,axis=0)
+        log.error("Drop_cxg open!!!:%s %s"%(len(drop_cxg),drop_cxg))
     df = df.fillna(0)
     df.loc[:, 'fibl'] = df.loc[:, 'fibl'].astype(int)
     df['df2'] = (map(lambda ra, fibl,rah,fib,ma,kdj,rsi:round(eval(ct.powerdiff%(ct.PowerCountdl)),1),\

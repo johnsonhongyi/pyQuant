@@ -62,7 +62,7 @@ if __name__ == "__main__":
     log = LoggerFactory.log
     args = docopt(cct.sina_doc, version='sina_cxdn')
     log_level = LoggerFactory.DEBUG if args['--debug'] else LoggerFactory.ERROR
-    log.setLevel(log_level)  
+    log.setLevel(log_level)
     # log.setLevel(LoggerFactory.DEBUG)
     # handler=StderrHandler(format_string='{record.channel}: {record.message) [{record.extra[cwd]}]')
     # log.level = log.debug
@@ -142,7 +142,11 @@ if __name__ == "__main__":
                 # time_Rt = time.time()
                 if len(top_all) == 0 and len(lastpTDX_DF) == 0:
                     # time_Rt = time.time()
-                    top_all,lastpTDX_DF = tdd.get_append_lastp_to_df(top_now, lastpTDX_DF=None, dl=duration_date,end=end_date,ptype=ptype,filter=filter, power=ct.lastPower, lastp=lastp,newdays=newdays)
+                    print "term:%s"%(cct.get_terminal_Position(cmd='dn.py')),
+                    if cct.get_terminal_Position(cmd='dn.py') <=1:
+                        top_all,lastpTDX_DF = tdd.get_append_lastp_to_df(top_now, lastpTDX_DF=None, dl=duration_date,end=end_date,ptype=ptype,filter=filter, power=ct.lastPower, lastp=lastp,newdays=newdays)
+                    else:
+                        top_all,lastpTDX_DF = tdd.get_append_lastp_to_df(top_now, lastpTDX_DF=None, dl=duration_date,end=end_date,ptype=ptype,filter=filter, power=ct.lastPower, lastp=lastp,newdays=newdays,checknew=True)
                     # codelist = top_all.index.tolist()
                     # log.info('toTDXlist:%s' % len(codelist))
                     # # tdxdata = tdd.get_tdx_all_day_LastDF(codelist,dt=duration_date,ptype=ptype)
@@ -247,7 +251,7 @@ if __name__ == "__main__":
                     goldstock = len(top_dif[(top_dif.buy >= top_dif.lhigh * 0.99) & (top_dif.buy >= top_dif.llastp * 0.99)])
                     ## goldstock=len(top_dif[top_dif.buy >(top_dif.high-top_dif.low)/2])
                     if ptype == 'low':
-                        top_dif = top_dif[top_dif.lvol > ct.LvolumeSize]
+#                        top_dif = top_dif[top_dif.lvol > ct.LvolumeSize]
                         if cct.get_now_time_int() > 925 and cct.get_work_time():
                             top_dif = top_dif[(top_dif.volume > ct.VolumeMinR) & (top_dif.volume < ct.VolumeMaxR)]
                         # top_dif = top_dif[top_dif.lvol > 12000]
@@ -258,7 +262,7 @@ if __name__ == "__main__":
                             top_dif = top_dif.sort_values(by=['dff', 'percent', 'ratio'], ascending=[0, 0, 1])
                     else:
                         # top_dif['dff'] = top_dif['dff'].apply(lambda x: x * 2 if x > 0 else x)
-                        top_dif = top_dif[top_dif.lvol > ct.LvolumeSize]
+#                        top_dif = top_dif[top_dif.lvol > ct.LvolumeSize]
                         top_dif['dff']=top_dif['dff'].apply(lambda x:x*2 if x < 0 else x )
                         if 'couts' in top_dif.columns.values:
                             top_dif = top_dif.sort_values(by=['dff', 'percent', 'volume', 'couts', 'ratio'],
@@ -304,7 +308,7 @@ if __name__ == "__main__":
                     print "Rt:%0.1f dT:%s N:%s T:%s %s%%" % (float(time.time() - time_Rt), cct.get_time_to_date(time_s),cct.get_now_time(),len(top_temp),round(len(top_temp)/now_count*100,3))
                     # print round(len(top_temp)/now_count*100,1)
                     # print len(top_temp)/now_count*100
-                    
+
                     # top_end = stf.getBollFilter(df=top_end, boll=ct.bollFilter,duration=ct.PowerCountdl)
                     if 'op' in top_temp.columns:
                         # if ptype == 'low':
@@ -415,7 +419,7 @@ if __name__ == "__main__":
                 time_s = time.time()
                 status = False
             elif st.startswith('d') or st.startswith('dt'):
-                
+
                 args = parserDuraton.parse_args(st.split()[1:])
                 if len(str(args.start)) > 0:
                     if args.end:

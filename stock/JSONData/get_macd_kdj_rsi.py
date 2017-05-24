@@ -28,20 +28,23 @@ def Get_Stock_List():
 
 def algoMultiDay(df,column='close',days=6,op=0):
     df = df.sort_index(ascending=True)
-    # print df[:2]
-    if len(df) < days:
-        days = len(df) - 1
-    # if len(df) < 20:
+    # print df[:2],set(df.code)
+    if len(df) < days+2:
+        days = len(df) - 2
+        # print days
+    # if len(df) < 2object0:
     #     days = int(len(df)/2)
     # elif 40 < len(df) < 60:
     #     days = 25
     # elif len(df) >= 60:
     #     days = 30
     # print days
+    # df = df.fillna(0)
     if df is not None:
         obo=0
         if column in df.columns:
-            for day in range(days,-1,-1):
+            # for day in range(days,-1,-1):
+            for day in range(days,0,-1):
                 # print day
                 tmpdf=pd.DataFrame(df.loc[:,column][-days-2:-1-day], columns=[column])
                 # print tmpdf.index
@@ -49,6 +52,7 @@ def algoMultiDay(df,column='close',days=6,op=0):
                 c_min=tmpdf.min().values
                 c_mean=tmpdf.mean().values
                 idx = -1 - day
+                # print len(df),days,idx,idx-1
                 if math.isnan(df[column][idx]) or math.isnan(df[column][idx-1]):
                     break
                 nowp = round(df[column][idx],2)
@@ -417,6 +421,12 @@ def Get_KDJ(df,dtype='d',days=5):
     if len(df) < limitCount:
         return (df,1)
     else:
+        if not 'ma5d' in df.columns:
+            #newstock 
+            df['ma5d'] = pd.rolling_mean(df.close,5)
+            df['ma10d'] = pd.rolling_mean(df.close,10)
+            df['ma20d'] = pd.rolling_mean(df.close,20)
+
         df = df.sort_index(ascending=True)
         slowk, slowd = ta.STOCH(np.array(df['high']), np.array(df['low']), np.array(df['close']), fastk_period=9, slowk_period=3, slowk_matype=0, slowd_period=3, slowd_matype=0)
 

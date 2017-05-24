@@ -135,7 +135,7 @@ sleep 0.1;osascript -e 'tell application "Python Launcher" to quit';sleep 25;
 open sina_Market-DurationSH.py;
 sleep 0.1;osascript -e 'tell application "Python Launcher" to quit';sleep 25;
 open LinePower.py;
-sleep 0.1;osascript -e 'tell application "Python Launcher" to quit';sleep 5;
+sleep 0.1;osascript -e 'tell application "Python Launcher" to quit';sleep 1;
 '''
 
 # cmdRun = '''cd /Users/Johnson/Documents/Quant/pyQuant/stock;
@@ -176,20 +176,21 @@ def doScript(scriptn):
 
 def getPosition(cmd=None, position=None,close=False):
     count = doScript(scriptcount)
-    if count > 1:
-        for n in xrange(1, int(count)):
+    if count > 0:
+        for n in xrange(1, int(count)+1):
             title = doScript(scriptname % ('get', str(object=n)))
-            # print title
-            if title.lower().find(cmd.lower()) > 0:
-                print "win:%s get_title:%s "%(n,title)
+            # if close:
+                # print "close:%s"%(title),
+            if title.lower().find(cmd.lower()) >= 0:
+                # print "win:%s get_title:%s "%(n,title)
                 # print "get:%s"%(n)
                 # position = doScript(
                     # script_set_position % ('set', str(n), positionKey[key]))
                 position=doScript(script_get_position % ('get', str(n)))
                 # position = doScript(scriptposition % ('get', str(n)))
                 if close:
+                    # print ("close:%s %s"%(n,title))
                     os.system(closeterminalw%(n))
-
                 return position
 
 def setPosition(cmd=None, position=None):
@@ -209,17 +210,21 @@ def setPosition(cmd=None, position=None):
                     # print doScript(script_get_position % ('get', str(n)))
             # position = doScript(scriptposition % ('get', str(n)))
             # print positio
-        os.system(closeLaunch) 
     else:
         print "run Cmd"
         os.system(cmdRun)
         setPosition(cmd=None, position=None)
-        getPosition('cd \'/Users/Johnson/Documents',close=True)
-        getPosition('Johnson@',close=True)
+        os.system(closeLaunch) 
+        # getPosition('Johnson@',close=True)
+        # getPosition('/Users/Johnson/Documents',close=True)
+        # getPosition('Johnson — bash',close=True)
+        # getPosition('Johnson — python',close=True)
 # count = doScript(scriptcount        
 # os.system(cmdRun)
+# getPosition('Johnson@',close=True)
+
+
 count = doScript(scriptcount)
-# print getPosition('Johnson@',close=True)
 # print count
 # count = 2
 if int(count) > 3:
@@ -238,8 +243,13 @@ if int(count) > 3:
     print getPosition('sina_Monitor-GOLD.py')
     print getPosition('sina_Monitor.py')
     print getPosition('LinePower.py')
+    getPosition('Johnson@',close=True)
+    getPosition('/Users/Johnson/Documents',close=True)
+    
 setPosition(cmd=None, position=None)
 
+getPosition('Johnson — bash',close=True)
+getPosition('Johnson — python',close=True)
 
 '''
 

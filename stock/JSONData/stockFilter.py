@@ -52,10 +52,10 @@ def getBollFilter(df=None,boll=-5,duration=ct.PowerCountdl,filter=False,ma5d=Tru
 #    print "map time:%s"%(round((time.time()-time_s),2))
     # df.loc[:, ['fibl','op']] = df.loc[:, ['fibl','op']].astype(int)
     # df.loc[:, 'fibl'] = df.loc[:, 'fibl'].astype(int)
-    if 'ma5d' in df.columns:
-        df = df[df.buy > df.ma5d * ct.changeRatio]
 
     if filter:
+        if 'ma5d' in df.columns:
+            df = df[df.buy > df.ma5d * ct.changeRatio]
         # if ma5d:
         #     # op, ra, st, days = pct.get_linear_model_status('999999', filter='y', dl=dl, ptype='low')
         #     oph, rah, sth, daysh = pct.get_linear_model_status('999999', filter='y', dl=dl, ptype='high')

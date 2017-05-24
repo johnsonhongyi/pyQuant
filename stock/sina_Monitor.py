@@ -178,9 +178,9 @@ if __name__ == "__main__":
                         top_all = top_all[top_all.low > top_all.llow * ct.changeRatio]
                         # top_all = top_all[top_all.trade > top_all.lhigh * ct.changeRatio]
 
-                    if cct.get_now_time_int() > 915 and cct.get_now_time_int() <= 926:
-                        top_all['percent'] = (map(lambda x, y: round(
-                            (x - y) / y * 100, 1) if int(y) > 0 else 0, top_all.trade, top_all.llastp))
+                    # if cct.get_now_time_int() > 915 and cct.get_now_time_int() <= 926:
+                    #     top_all['percent'] = (map(lambda x, y: round(
+                    #         (x - y) / y * 100, 1) if int(y) > 0 else 0, top_all.trade, top_all.llastp))
 
                     # top_all = top_all[top_all.prev_p >= top_all.lhigh]
                     # top_all = top_all.loc[:,

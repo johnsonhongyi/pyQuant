@@ -622,7 +622,8 @@ if __name__ == '__main__':
                 cct.sleeprandom(ct.duration_sleep_time/2)
             else:
                 print "except_count >3"
-                sys.exit(0)
+                cct.sleeprandom(ct.duration_sleep_time*2)
+                # sys.exit(0)
         # finally:
         #     cct.sleeprandom(ct.duration_sleep_time/2)
             # raw_input("Except")

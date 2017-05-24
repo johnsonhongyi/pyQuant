@@ -31,7 +31,7 @@ log = LoggerFactory.log
 # log.setLevel(LoggerFactory.ERROR)
 
 path_sep = os.path.sep
-newdaysinit = 20
+newdaysinit = 15
 changedays=0
 global initTdxdata,initTushareCsv
 initTdxdata = 0
@@ -287,8 +287,11 @@ def get_tdx_Exp_day_to_df(code, start=None, end=None, dl=None,newdays = None,typ
         return df
     elif dl is not None and int(dl) == 1:
         fileSize = os.path.getsize(file_path)
-        if fileSize < atomStockSize * newstockdayl:
-            return Series()
+        if newstockdayl <> 0 :
+            if fileSize < atomStockSize * newstockdayl:
+                return Series()
+        # else:
+            # log.info("newsday=0:%s"(code))        
         data = cct.read_last_lines(file_path, int(dl) + 3)
         data_l = data.split('\n')
         dt_list = Series()
@@ -342,12 +345,19 @@ def get_tdx_Exp_day_to_df(code, start=None, end=None, dl=None,newdays = None,typ
             if dl is None:
                 dl = 60
         else:
-            dl = int(cct.get_today_duration(start) * 5 / 7)
-            log.debug("start:%s dl:%s"%(start,dl))
+            if dl is None:
+                dl = int(cct.get_today_duration(start) * 5 / 7)
+                log.debug("start:%s dl:%s"%(start,dl))
         inxdl = int(dl) if int(dl) > 3 else int(dl) + 2
         data = cct.read_last_lines(file_path, inxdl)
         dt_list = []
         data_l = data.split('\n')
+        if newstockdayl == 0:
+            if len(data_l) < 5:
+                if write_k_data_status:
+                    write_all_kdata_to_file(code,file_path)  
+                    data = cct.read_last_lines(file_path, inxdl)
+                    data_l = data.split('\n')
         data_l.reverse()
         for line in data_l:
             a = line.split(',')
@@ -2518,7 +2528,7 @@ def get_tdx_all_day_LastDF(codeList, type=0, dt=None, ptype='close'):
         print ("TDX:%0.2f" % (time.time() - time_t)),
     return df
 
-def get_append_lastp_to_df(top_all,lastpTDX_DF=None,dl=ct.PowerCountdl,end=None,ptype='low',filter='y',power=True,lastp=False,newdays=None):
+def get_append_lastp_to_df(top_all,lastpTDX_DF=None,dl=ct.PowerCountdl,end=None,ptype='low',filter='y',power=True,lastp=False,newdays=None,checknew=False):
     codelist = top_all.index.tolist()
 #    codelist = ['603169']
     log.info('toTDXlist:%s' % len(codelist))
@@ -2528,7 +2538,6 @@ def get_append_lastp_to_df(top_all,lastpTDX_DF=None,dl=ct.PowerCountdl,end=None,
     h5_table=ptype+'_'+str(dl)+'_'+filter+'_'+'all'
 
     if lastpTDX_DF is None or len(lastpTDX_DF) == 0:
-
         # h5 = top_hdf_api(fname=h5_fname,table=market,df=None)
         h5 = h5a.load_hdf_db(h5_fname, table=h5_table, code_l=codelist,timelimit=False)
 
@@ -2542,7 +2551,22 @@ def get_append_lastp_to_df(top_all,lastpTDX_DF=None,dl=ct.PowerCountdl,end=None,
             tdxdata = h5
         else:
             # tdxdata = get_tdx_all_day_LastDF(codelist) '''only get lastp no powerCompute'''
+            print "td.",
             tdxdata = get_tdx_exp_all_LastDF_DL(codelist,dt=dl,end=end,ptype=ptype,filter=filter,power=power,lastp=lastp,newdays=newdays)
+            # if checknew:    
+            #     tdx_list = tdxdata.index.tolist()
+            #     diff_code = list(set(codelist) - set(tdx_list))
+            #     diff_code = [ co for co in diff_code if co.startswith(('6','00','30'))]
+            #     # tdx_diff = None
+            #     if len(diff_code) > 0:
+            #         # diff_sina = set(top_all.index.values) - set(diff_code)
+            #         log.error("tdx Out:%s code:%s"%(len(diff_code),diff_code[:2]))
+            #         log.debug("diff_code:%s"%(diff_code))
+            #         tdx_diff = get_tdx_exp_all_LastDF_DL(diff_code,dt=dl,end=end,ptype=ptype,filter=filter,power=power,lastp=lastp,newdays=0)
+            #         if tdx_diff is not None and len(tdx_diff) >0:
+            #             tdxdata = pd.concat([tdxdata, tdx_diff],axis=0)
+
+                        
             # tdxdata.rename(columns={'close': 'llow'}, inplace=True)
             tdxdata.rename(columns={'open': 'lopen'}, inplace=True)
             tdxdata.rename(columns={'high': 'lhigh'}, inplace=True)
@@ -2572,8 +2596,31 @@ def get_append_lastp_to_df(top_all,lastpTDX_DF=None,dl=ct.PowerCountdl,end=None,
     # data.drop('amount',axis=0,inplace=True)
     # df_now=top_all.merge(data,on='code',how='left')
     # df_now=pd.merge(top_all,data,left_index=True,right_index=True,how='left')
-    top_all = top_all.merge(
-        tdxdata, left_index=True, right_index=True, how='left')
+    # top_all = top_all.merge(
+    #     tdxdata, left_index=True, right_index=True, how='left')
+    if checknew:    
+        tdx_list = tdxdata.index.tolist()
+        diff_code = list(set(codelist) - set(tdx_list))
+        diff_code = [ co for co in diff_code if co.startswith(('6','00','30'))]
+        # tdx_diff = None
+        if len(diff_code) > 0:
+            log.error("tdx Out:%s code:%s"%(len(diff_code),diff_code[:2]))
+            log.debug("diff_code:%s"%(diff_code))
+            tdx_diff = get_tdx_exp_all_LastDF_DL(diff_code,dt=dl,end=end,ptype=ptype,filter=filter,power=power,lastp=lastp,newdays=0)
+            if tdx_diff is not None and len(tdx_diff) >0:
+                tdx_diff.rename(columns={'open': 'lopen'}, inplace=True)
+                tdx_diff.rename(columns={'high': 'lhigh'}, inplace=True)
+                tdx_diff.rename(columns={'close': 'lastp'}, inplace=True)
+                # tdxdata.rename(columns={'low': 'lastp'}, inplace=True)
+                tdx_diff.rename(columns={'low': 'llow'}, inplace=True)
+                tdx_diff.rename(columns={'vol': 'lvol'}, inplace=True)
+                tdx_diff.rename(columns={'amount': 'lamount'}, inplace=True)    
+                tdxdata = pd.concat([tdxdata, tdx_diff],axis=0)
+                # h5 = h5a.write_hdf_db(h5_fname, tdxdata, table=h5_table)
+                
+        
+    top_all =  cct.combine_dataFrame(top_all, tdxdata, col=None, compare=None, append=False)    
+        
     # log.info('Top-merge_now:%s' % (top_all[:1]))
     top_all = top_all[top_all['llow'] > 0]
 
@@ -2750,12 +2797,15 @@ def get_tdx_exp_all_LastDF_DL(codeList, dt=None,end=None,ptype='low',filter='n',
         if dl is not None and end is not None:
             dl = dl + cct.get_today_duration(end,cct.get_today())
 #            print cct.get_today_duration(end,cct.get_today())
-        results = cct.to_mp_run_async(get_tdx_exp_low_or_high_power, codeList, dt, ptype, dl,end,power,lastp,newdays)
-#        results=[]
-#        ts=time.time()
-#        for code in codeList:
-#            ts_1=time.time()
-#            results.append(get_tdx_exp_low_or_high_power(code,dt,ptype,dl,end,power,lastp,newdays))
+
+        if len(codeList) > 100:
+            results = cct.to_mp_run_async(get_tdx_exp_low_or_high_power, codeList, dt, ptype, dl,end,power,lastp,newdays)
+        else:
+            results=[]
+            ts=time.time()
+            for code in codeList:
+                ts_1=time.time()
+                results.append(get_tdx_exp_low_or_high_power(code,dt,ptype,dl,end,power,lastp,newdays))
 #            print round(time.time()-ts_1,2),
 #        print round(time.time()-ts,2),
         # print dt,ptype,dl,end
@@ -2985,10 +3035,12 @@ if __name__ == '__main__':
 #    code='300174'
     # get_tdx_append_now_df_api_tofile('603113', dm=None, newdays=1, start=None, end=None, type='f', df=None, dl=2, power=True)
 #
-    code='999999'
-    # get_tdx_append_now_df_api(code, start=None, end=None, type='f', df=None, dm=None, dl=None, power=True, newdays=None, write_tushare=False)
+    code='300651'
+    # print get_tdx_append_now_df_api(code, start=None, end=None, type='f', df=None, dm=None, dl=None, power=True, newdays=None, write_tushare=False)
 #    get_tdx_append_now_df_api_tofile(code, dm=None, newdays=1, start=None, end=None, type='f', df=None, dl=2, power=True)
-#    print get_tdx_Exp_day_to_df(code,dl=30,newdays=0)[:1]
+    df = get_tdx_Exp_day_to_df(code,dl=30,newdays=0)
+    print df
+    sys.exit(0)
 #    print write_tdx_tushare_to_file(code)
 
 #    hdf5_wri=cct.cct_raw_input("write all data to hdf[y|n]:")
@@ -3044,8 +3096,8 @@ if __name__ == '__main__':
                 # print df
                 # print df.shape
                 # log.error("code :%s is None"%(code))
-        print ("hdf5 all :%s hd:%s time:%0.2f"%(len(dfcode),len(st.keys()),time.time()-time_s))
-        st.close()
+        print ("hdf5 all :%s  time:%0.2f"%(len(dfcode),time.time()-time_s))
+        # st.close()
 
     market = cct.cct_raw_input("write all data [all,sh,sz,alla] :")
     if market in  ['all','sh','sz','cyb','alla']:

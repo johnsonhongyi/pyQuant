@@ -14,11 +14,11 @@ import pandas as pd
 import trollius as asyncio
 from trollius.coroutines import From
 
-from LoggerFactory import log
+import LoggerFactory 
 import johnson_cons as ct
 import socket
 
-# log = Log.getLogger('root')
+log = LoggerFactory.log
 
 # log.setLevel(Log.DEBUG)
 # import numba as nb
@@ -36,19 +36,20 @@ requests.adapters.DEFAULT_RETRIES = 0
 # print sys.path
 # from JSONData import tdx_data_Day as tdd
 
-# def get_os_system():
-#     os_sys = get_sys_system()
-#     os_platform = get_sys_platform()
-#     if os_sys.find('Darwin') == 0:
-#         log.info("Mac:%s" % os_platform)
-#         return 'mac'
+def get_os_system():
+    os_sys = get_sys_system()
+    os_platform = get_sys_platform()
+    if os_sys.find('Darwin') == 0:
+        log.info("Mac:%s" % os_platform)
+        return 'mac'
 
-#     elif os_sys.find('Win') == 0:
-#         log.info("Windows:%s" % os_sys)
-#         if os_platform.find('XP'):
-#             return 'win'
-#     else:
-#         return 'other'
+    elif os_sys.find('Win') == 0:
+        log.info("Windows:%s" % os_sys)
+        if os_platform.find('XP'):
+            return 'win'
+    else:
+        return 'other'
+        
 win10Lengend = r'D:\Program\gfzq'
 win10Lixin = r'C:\zd_zszq'
 win7rootAsus = r'D:\Program Files\gfzq'
@@ -56,7 +57,9 @@ win7rootXunji = r'E:\DOC\Parallels\WinTools\zd_pazq'
 win7rootList = [win10Lixin,win7rootAsus,win7rootXunji,win10Lengend]
 macroot = r'/Users/Johnson/Documents/Johnson/WinTools/zd_pazq'
 xproot = r'E:\DOC\Parallels\WinTools\zd_pazq'
-ramdisk_root = r'/Volumes/RamDisk'
+mac_ramdisk_root = r'/Volumes/RamDisk'
+win10_ramdisk_root = r'R:'
+ramdisk_rootList = [win10_ramdisk_root,mac_ramdisk_root]
 path_sep = os.path.sep
 def get_tdx_dir():
     os_sys = get_sys_system()
@@ -82,9 +85,28 @@ def get_tdx_dir():
         log.error("basedir not exists")
     return basedir
 
+def get_sys_platform():
+    return platform.platform()
+
+
+def get_sys_system():
+    return platform.system()
+
+def get_ramdisk_dir():
+    os_platform = get_sys_platform()
+    basedir = None
+    for root in ramdisk_rootList:
+        basedir = root.replace('/', path_sep).replace('\\',path_sep)
+        if os.path.exists(basedir):
+            log.info("%s : path:%s" % (os_platform,basedir))
+            break       
+    return basedir
+
+RamBaseDir = get_ramdisk_dir()
 def get_ramdisk_path(filename,lock=False):
     if filename:
-        basedir = ramdisk_root.replace('/', path_sep).replace('\\',path_sep)
+        basedir =  RamBaseDir 
+        # basedir = ramdisk_root.replace('/', path_sep).replace('\\',path_sep)
         if not os.path.isdir(basedir):
             log.error("ramdisk Root Err:%s"%(basedir))
             return None
@@ -115,6 +137,50 @@ def get_ramdisk_path(filename,lock=False):
         #         break
     return file_path
 # get_ramdisk_path('/Volumes/RamDisk/top_now.h5')
+
+import subprocess
+def cct_doScript(scriptn):
+    proc = subprocess.Popen(['osascript', '-'],
+                            stdin=subprocess.PIPE,
+                            stdout=subprocess.PIPE)
+    stdout_output = proc.communicate(scriptn)[0]
+    # print stdout_output, type(proc)
+    return stdout_output
+
+scriptcount = '''tell application "Terminal"
+    --activate
+    get the count of window
+end tell
+'''
+
+scriptname = '''tell application "Terminal"
+    --activate
+    %s the name of window %s
+end tell
+'''
+closeterminalw = '''osascript -e 'tell application "Terminal" to close windows %s' '''
+
+
+def get_terminal_Position(cmd=None, position=None,close=False):
+    count = cct_doScript(scriptcount)
+    win_count = 0
+    if get_os_system() == 'mac' and count > 0:
+        log.info("count:%s"%(count))
+        for n in xrange(1, int(count)+1):
+            title = cct_doScript(scriptname % ('get', str(object=n)))
+            log.info("count n:%s title:%s"%(n,title))
+            if close:
+                log.info("close:%s"%(title))
+            if title.lower().find(cmd.lower()) >= 0:
+                log.info("WinFind:%s get_title:%s "%(n,title))
+                win_count+=1
+                # print "get:%s"%(n)
+                # position=cct_doScript(script_get_position % ('get', str(n)))
+                if close:
+                    log.info("close:%s %s"%(n,cmd))
+                    os.system(closeterminalw%(n))
+    # get_terminal_Position(cmd='Johnson@', position=None, close=True)              
+    return win_count
 
 from numba.decorators import autojit
 def run_numba(func):
@@ -1120,14 +1186,6 @@ def write_to_blocknew(p_name, data, append=True):
         print "write to other and start:%s :%s"%(p_name,len(data))
 
 
-def get_sys_platform():
-    return platform.platform()
-
-
-def get_sys_system():
-    return platform.system()
-
-
 def get_run_path():
     path = os.getcwd()
     alist = path.split('stock')
@@ -1456,6 +1514,18 @@ def combine_dataFrame(maindf,subdf,col=None,compare=None,append=False):
 
 if __name__ == '__main__':
     # print get_run_path()
+    from docopt import docopt
+    # log = LoggerFactory.log
+    args = docopt(sina_doc, version='sina_cxdn')
+    log_level = LoggerFactory.DEBUG if args['--debug'] else LoggerFactory.ERROR
+    log.setLevel(log_level)
+    s_time=time.time()
+
+    print get_terminal_Position(cmd='dn.py', position=None, close=False)
+    print get_terminal_Position(cmd='Johnson@', position=None, close=False)
+    print get_terminal_Position(cmd='Johnson — bash', position=None, close=False)
+    print "t:%0.2f"%(time.time()-s_time)
+    print get_ramdisk_path('a', lock=False)
     # print get_work_time_ratio()
     # print typeday8_to_day10(None)
     # write_to_blocknew('abc', ['300380','601998'], append=True)
@@ -1467,10 +1537,11 @@ if __name__ == '__main__':
     # print get_rzrq_code()[:3]
     # times =1483686638.0
     # print get_time_to_date(times, format='%Y-%m-%d')
-    for x in range(1,120,5):
-        times=time.time()
-        print sleep(x)
-        print time.time()-times
+    
+    # for x in range(1,120,5):
+    #     times=time.time()
+    #     print sleep(x)
+    #     print time.time()-times
     print get_work_time_ratio()
     print getCoding(u'啊中国'.encode("utf16"))
     print get_today_duration('2017-01-06')

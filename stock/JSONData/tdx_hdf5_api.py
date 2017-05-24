@@ -17,12 +17,13 @@ log = LoggerFactory.log
 
 global RAMDISK_KEY
 RAMDISK_KEY = 0
+BaseDir=cct.get_ramdisk_dir()
 class SafeHDFStore(HDFStore):
     # def __init__(self, *args, **kwargs):
     def __init__(self, *args, **kwargs):
         self.probe_interval = kwargs.pop("probe_interval", 2)
         lock = cct.get_ramdisk_path(args[0],lock=True)
-        baseDir=cct.ramdisk_root
+        baseDir=BaseDir
         self.fname = cct.get_ramdisk_path(args[0])
         self._lock = lock
         self.countlock = 0
@@ -127,7 +128,7 @@ def write_hdf_db(fname,df,table='all',index=False,baseCount=500,append=False):
 #    df['timel'] =  time.time()
 #    write_status = False
     time_t = time.time()
-#    if not os.path.exists(cct.ramdisk_root):
+#    if not os.path.exists(cct.get_ramdisk_dir()):
 #        log.info("NO RamDisk")
 #        return False
     global RAMDISK_KEY

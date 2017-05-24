@@ -49,7 +49,11 @@ def format_for_print(df):
     table = PrettyTable([''] + list(df.columns))
     for row in df.itertuples():
         table.add_row(row)
-    return str(table)
+
+    if cct.get_os_system() == 'win':   
+        return str(table).encode('gbk')
+    else:
+        return str(table)
 
 
 def format_for_print2(df):
