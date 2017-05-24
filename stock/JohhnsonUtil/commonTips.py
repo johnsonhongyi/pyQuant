@@ -138,14 +138,6 @@ def get_ramdisk_path(filename,lock=False):
     return file_path
 # get_ramdisk_path('/Volumes/RamDisk/top_now.h5')
 
-import subprocess
-def cct_doScript(scriptn):
-    proc = subprocess.Popen(['osascript', '-'],
-                            stdin=subprocess.PIPE,
-                            stdout=subprocess.PIPE)
-    stdout_output = proc.communicate(scriptn)[0]
-    # print stdout_output, type(proc)
-    return stdout_output
 
 scriptcount = '''tell application "Terminal"
     --activate
@@ -162,23 +154,32 @@ closeterminalw = '''osascript -e 'tell application "Terminal" to close windows %
 
 
 def get_terminal_Position(cmd=None, position=None,close=False):
-    count = cct_doScript(scriptcount)
     win_count = 0
-    if get_os_system() == 'mac' and count > 0:
-        log.info("count:%s"%(count))
-        for n in xrange(1, int(count)+1):
-            title = cct_doScript(scriptname % ('get', str(object=n)))
-            log.info("count n:%s title:%s"%(n,title))
-            if close:
-                log.info("close:%s"%(title))
-            if title.lower().find(cmd.lower()) >= 0:
-                log.info("WinFind:%s get_title:%s "%(n,title))
-                win_count+=1
-                # print "get:%s"%(n)
-                # position=cct_doScript(script_get_position % ('get', str(n)))
+    if get_os_system() == 'mac' :
+        import subprocess
+        def cct_doScript(scriptn):
+            proc = subprocess.Popen(['osascript', '-'],
+                                    stdin=subprocess.PIPE,
+                                    stdout=subprocess.PIPE)
+            stdout_output = proc.communicate(scriptn)[0]
+            # print stdout_output, type(proc)
+            return stdout_output
+        count = cct_doScript(scriptcount)
+        if count > 0:
+            log.info("count:%s"%(count))
+            for n in xrange(1, int(count)+1):
+                title = cct_doScript(scriptname % ('get', str(object=n)))
+                log.info("count n:%s title:%s"%(n,title))
                 if close:
-                    log.info("close:%s %s"%(n,cmd))
-                    os.system(closeterminalw%(n))
+                    log.info("close:%s"%(title))
+                if title.lower().find(cmd.lower()) >= 0:
+                    log.info("WinFind:%s get_title:%s "%(n,title))
+                    win_count+=1
+                    # print "get:%s"%(n)
+                    # position=cct_doScript(script_get_position % ('get', str(n)))
+                    if close:
+                        log.info("close:%s %s"%(n,cmd))
+                        os.system(closeterminalw%(n))
     # get_terminal_Position(cmd='Johnson@', position=None, close=True)              
     return win_count
 
