@@ -199,6 +199,8 @@ class PrettyTable(object):
         if not isinstance(value, basestring):
             value = str(value)
         if not isinstance(value, unicode):
+            if cct.get_os_system() == 'win': 
+                value = value.encode('gbk')
             value = unicode(value, self.encoding, "strict")
         return value
 

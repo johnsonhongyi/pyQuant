@@ -488,13 +488,17 @@ def cct_eval(cmd):
         st = ''
         print e
     return st
-def sleep(timet,catch=True):
+def sleep(timet,catch=False):
     times=time.time()
     try:
         for _ in range(int(timet)*2):
             if int(time.time()-times) >= int(timet):
                 break
-            time.sleep(0.5)
+
+            if cct.get_os_system() == 'win':     
+                time.sleep(0.1)
+            else:
+                time.sleep(0.5)
     except (KeyboardInterrupt) as e:
         # raise KeyboardInterrupt("CTRL-C!")
         # print "Catch KeyboardInterrupt"
@@ -507,7 +511,7 @@ def sleep(timet,catch=True):
 def sleeprandom(timet):
     now_t = get_now_time_int()
     if now_t > 915 and now_t < 926:
-        sleeptime=random.randint(10/3, 10)
+        sleeptime=random.randint(10/3, 5)
     else:
         sleeptime=random.randint(timet/3, timet)
     print "Error2sleep:%s"%(sleeptime)

@@ -50,10 +50,7 @@ def format_for_print(df):
     for row in df.itertuples():
         table.add_row(row)
 
-    if cct.get_os_system() == 'win':   
-        return str(table).encode('gbk')
-    else:
-        return str(table)
+    return str(table).encode('gbk')
 
 
 def format_for_print2(df):
