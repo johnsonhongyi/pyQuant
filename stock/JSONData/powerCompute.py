@@ -867,6 +867,9 @@ def get_linear_model_candles(code, ptype='low', dtype='d', start=None, end=None,
     plt.show(block=False)
     return df
 
+global Power_CXG_Error,drop_cxg
+Power_CXG_Error = 0
+drop_cxg = []
 
 def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y',talib=False,newdays=None,days=0):
     ts=time.time()
@@ -879,21 +882,38 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y',tali
         h5_combine_status = True
         statuslist = False
 
+    global Power_CXG_Error,drop_cxg
+#    drop_cxg
+
     h5_fname='powerCompute'
     h5_table=dtype+'_'+str(dl)+'_'+filter+'_'+'all'
     power_columns=['ra','op','category', 'ma', 'rsi', 'kdj', 'boll', 'rah', 'df2', 'fibl', 'macd', 'vstd', 'oph', 'lvolume']
-                  # ['category' 'ma' 'rsi' 'kdj' 'boll' 'rah' 'df2' 'fibl' 'macd' 'vstd' 'oph','lvolume']
+                  # [['ma' ,'rsi' ,'kdj' ,'boll', 'ra','rah', 'df2' ,'fibl','fib' ,'macd' ,'oph']]
+                  # [['ma' ,'rsi' ,'kdj' ,'boll', 'ra',rah', 'df2' ,'fibl','fib' ,'macd' ,'vstd', 'oph']]
     h5 = h5a.load_hdf_db(h5_fname,h5_table, code_l=code_l,limit_time=1800)
     if h5 is not None:
         log.info("power hdf5 data:%s"%(len(h5)))
         if h5_combine_status:
-            df_co = df.columns
-            h5_co = h5.columns
-            status = len(set(power_columns) & set(power_columns)) - len(power_columns) == 0
-            if status:
-                h5 = h5.drop([inx for inx in h5.columns if inx not in power_columns],axis=1)
-                df = cct.combine_dataFrame(df, h5, col=None, append=False)
-        return df
+#            df_co = df.columns
+#            h5_co = h5.columns
+#            status = len(set(power_columns) & set(df_co)) - len(power_columns) == 0
+#            if status:
+#                h5 = h5.drop([inx for inx in h5.columns if inx not in power_columns],axis=1)
+            code_l = list(set(df.index) - set(h5.index))
+            df = cct.combine_dataFrame(df, h5, col=None)
+            if len(code_l) == 0:
+                return df
+            else:
+                if not len(drop_cxg) == 0:
+                    temp_l = list(set(code_l) - set(drop_cxg))
+                    drop_t = [ co for co in drop_cxg if co in df.index]
+                    if len(temp_l) <> 0:
+                        code_l = temp_l
+                        # drop_cxg = []
+                    else:
+                        df = df.drop(drop_t,axis=0)
+                        return df
+            log.info("add power hdf5:%s"%(len(code_l)))
     else:
         log.info("init power hdf5")
 #    if not isinstance(df,list) and 'boll' in df.columns:
@@ -918,178 +938,192 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y',tali
     #             diff_code = [x for x in set(dm.index) - (set(dm.index) & set(df.code.values))]
     #             dm.drop([col for col in dm.index if col not in diff_code], axis=0, inplace=True)
 
-    dm = tdd.get_sina_data_df(code_l)
-    if statuslist:
-        df = dm
 
-#    cname = ",".join(x for x in dm.name)
-    dmname = dm.name
-    wcdf = wcd.get_wencai_data(dmname,'wencai')
-#    wcdf = wcd.get_codelist_df(dm.name.tolist())
 
-    wcdf_code = wcdf.index.tolist()
-    drop_cxg =[]
-    for code in code_l:
-
-        # if 'boll' in df.loc[code].index:
-        #     if 'time' in df.columns and len(df[df.time <> 0]) > 0 and df[:1].boll.values <> 0 and time.time() - df[df.time <> 0].time[0] < ct.power_update_time:
-        #         continue
-            # elif df.loc[code].boll <> 0:
-            #     continue
-
+    if len(code_l) > 0:
+        dm = tdd.get_sina_data_df(code_l)
         if statuslist:
-            start = None
-        else:
-            if dl is None:
-                start = df.loc[code, 'date']
-                start = cct.day8_to_day10(start)
-                # filter = 'y'
-                # print start
-            else:
+            df = dm
+
+    #    cname = ",".join(x for x in dm.name)
+        dmname = dm.name
+        wcdf = wcd.get_wencai_data(dmname,'wencai')
+    #    wcdf = wcd.get_codelist_df(dm.name.tolist())
+
+        wcdf_code = wcdf.index.tolist()
+
+        for code in code_l:
+
+            # if 'boll' in df.loc[code].index:
+            #     if 'time' in df.columns and len(df[df.time <> 0]) > 0 and df[:1].boll.values <> 0 and time.time() - df[df.time <> 0].time[0] < ct.power_update_time:
+            #         continue
+                # elif df.loc[code].boll <> 0:
+                #     continue
+
+            if statuslist:
                 start = None
-        start = cct.day8_to_day10(start)
-        end = cct.day8_to_day10(end)
-        if code in dm.index:
-            # log.info("dz:%s"%(dm.loc[code]))
-            dz = dm.loc[code].to_frame().T
-            # if len(dz) > 1:
-            #     dz=dz.to_frame()[0].T
-            # else:
-            #     dz=dz.to_frame().T
-        else:
-            dz = tdd.get_sina_data_df(code)
+            else:
+                if dl is None:
+                    start = df.loc[code, 'date']
+                    start = cct.day8_to_day10(start)
+                    # filter = 'y'
+                    # print start
+                else:
+                    start = None
+            start = cct.day8_to_day10(start)
+            end = cct.day8_to_day10(end)
+            if code in dm.index:
+                # log.info("dz:%s"%(dm.loc[code]))
+                dz = dm.loc[code].to_frame().T
+                # if len(dz) > 1:
+                #     dz=dz.to_frame()[0].T
+                # else:
+                #     dz=dz.to_frame().T
+            else:
+                dz = tdd.get_sina_data_df(code)
 
-        if len(dz) > 0 and (dz.buy.values > 0 or dz.sell.values > 0):
-            tdx_df = tdd.get_tdx_append_now_df_api(code, start=start, end=end, type='f', df=None, dm=dz, dl=dl*2,newdays=newdays)
-            # print tdx_df
-            tdx_df=tdx_df.fillna(0)
-            if len(df) > days+1 and days != 0:
-                tdx_df = tdx_df.sort_index(ascending=True)
-                tdx_df = tdx_df[:-1-days]
-            tdx_days = len(tdx_df)
-            if tdx_days < 16:
-                top_count=0
-                for day in range(len(tdx_df),0,-1):
-                    # tmpdf=pd.DataFrame(df.loc[:,column][-days-2:-1-day], columns=[column])
-                    # c_open = df.open.values[-days]
-                    c_high = tdx_df.high.values[-day]
-                    c_low = tdx_df.low.values[-day]
-#                    print c_high,c_low
-                    if int(c_high) <> 0 and c_high == c_low:
-                        top_count +=1
-                    else:
-                        if tdx_days - day < 3:
+            if len(dz) > 0 and (dz.buy.values > 0 or dz.sell.values > 0):
+                tdx_df = tdd.get_tdx_append_now_df_api(code, start=start, end=end, type='f', df=None, dm=dz, dl=dl*2,newdays=newdays)
+                # print tdx_df
+                tdx_df=tdx_df.fillna(0)
+                if len(df) > days+1 and days != 0:
+                    tdx_df = tdx_df.sort_index(ascending=True)
+                    tdx_df = tdx_df[:-1-days]
+                tdx_days = len(tdx_df)
+                if tdx_days < 16:
+                    top_count=0
+                    for day in range(len(tdx_df),0,-1):
+                        # tmpdf=pd.DataFrame(df.loc[:,column][-days-2:-1-day], columns=[column])
+                        # c_open = df.open.values[-days]
+                        c_high = tdx_df.high.values[-day]
+                        c_low = tdx_df.low.values[-day]
+    #                    print c_high,c_low
+                        if int(c_high) <> 0 and c_high == c_low:
                             top_count +=1
-                            continue
                         else:
-                            break
-#                            log.info('code:%s c_high <> c_low:top :%s'%(code,tdx_days - day))
-                if top_count == len(tdx_df):
-                    log.error('CXG Good:%s'%(code))
-                    drop_cxg.append(code)
-                    continue
-        else:
-            df.loc[code, 'op'] = 0
-            df.loc[code, 'ra'] = 0
-            df.loc[code, 'fib'] = 0
-            df.loc[code, 'fibl'] = 0
-            df.loc[code, 'ldate'] = 0
-            df.loc[code, 'boll'] = 0
-            df.loc[code, 'kdj'] = 0
-            df.loc[code, 'macd'] = 0
-            df.loc[code, 'rsi'] = 0
-            df.loc[code, 'ma'] = 0
-            df.loc[code, 'oph'] = 0
-            df.loc[code, 'rah'] = 0
-            df=df.fillna(0)
-            continue
-#        tdx_df = tdd.get_tdx_power_now_df(code, start=start, end=end, type='f', df=None, dm=dz, dl=dl*2)
-        opc = 0
-        stl = ''
-        rac = 0
-        # fib = []
-        fibl = 0
-        fib = 0
-        if len(tdx_df) < 2:
-            continue
-        # sep = '|'
-        for ptype in ['low', 'high']:
-            op, ra, st, daysData  = get_linear_model_status(
-                code, df=tdx_df, dtype=dtype, start=start, end=end, dl=dl, filter=filter, ptype=ptype)
+                            if tdx_days - day < 3:
+                                top_count +=1
+                                continue
+                            else:
+                                break
+    #                            log.info('code:%s c_high <> c_low:top :%s'%(code,tdx_days - day))
 
-            # opc += op
-            # rac += ra
-
-            if ptype == 'low':
-                ral = ra
-                opl = op
-                stl = st
-                # fibl = str(daysData[0])
-                fibl = int(daysData[0])
+                    if Power_CXG_Error < 2 and top_count == len(tdx_df):
+                        log.error('CXG Good:%s'%(code))
+                        drop_cxg.append(code)
+                        continue
             else:
-                oph = op
-                rah = ra
-                # fib = str(daysData[0])
-                fib = int(daysData[0])
-        # fibl = sep.join(fib)
+                df.loc[code, 'op'] = 0
+                df.loc[code, 'ra'] = 0
+                df.loc[code, 'fib'] = 0
+                df.loc[code, 'fibl'] = 0
+                df.loc[code, 'ldate'] = 0
+                df.loc[code, 'boll'] = 0
+                df.loc[code, 'kdj'] = 0
+                df.loc[code, 'macd'] = 0
+                df.loc[code, 'rsi'] = 0
+                df.loc[code, 'ma'] = 0
+                df.loc[code, 'oph'] = 0
+                df.loc[code, 'rah'] = 0
+                df=df.fillna(0)
+                continue
+    #        tdx_df = tdd.get_tdx_power_now_df(code, start=start, end=end, type='f', df=None, dm=dz, dl=dl*2)
+            opc = 0
+            stl = ''
+            rac = 0
+            # fib = []
+            fibl = 0
+            fib = 0
+            if len(tdx_df) < 2:
+                continue
+            # sep = '|'
+            for ptype in ['low', 'high']:
+                op, ra, st, daysData  = get_linear_model_status(
+                    code, df=tdx_df, dtype=dtype, start=start, end=end, dl=dl, filter=filter, ptype=ptype)
 
-        tdx_df,operation = getab.Get_BBANDS(tdx_df, dtype='d')
-        # opc +=operation
-        # if opc > 21:
-        #     opc = 21
-        # log.debug( "opc:%s op:%s"%(opc,operation))
+                # opc += op
+                # rac += ra
 
-        # df.loc[code,'ma5'] = daysData[1].ma5d[0]
-        # print tdx_df[:1].ma5d[0],daysData[1].ma5d[0]
-        if len(tdx_df) > 0 and 'ma5d' in tdx_df.columns:
-            if tdx_df[:1].ma5d[0] is not None and tdx_df[:1].ma5d[0] != 0:
-                df.loc[code,'ma5d'] = round(float(tdx_df[:1].ma5d[0]),2)
-            if tdx_df[:1].ma10d[0] is not None and tdx_df[:1].ma10d[0] != 0:
-                df.loc[code,'ma10d'] = round(float(tdx_df[:1].ma10d[0]),2)
-        df.loc[code, 'op'] = opl
-        df.loc[code, 'ra'] = ral
-        df.loc[code, 'oph'] = oph
-        df.loc[code, 'rah'] = rah
-        df.loc[code, 'fib'] = fib
-        df.loc[code, 'fibl'] = fibl
-        # df.fibl.astype(float)
-        df.loc[code, 'ldate'] = stl
-        df.loc[code, 'boll'] = operation
+                if ptype == 'low':
+                    ral = ra
+                    opl = op
+                    stl = st
+                    # fibl = str(daysData[0])
+                    fibl = int(daysData[0])
+                else:
+                    oph = op
+                    rah = ra
+                    # fib = str(daysData[0])
+                    fib = int(daysData[0])
+            # fibl = sep.join(fib)
 
-        tdx_df,opkdj = getab.Get_KDJ(tdx_df, dtype='d')
-        tdx_df,opmacd = getab.Get_MACD_OP(tdx_df, dtype='d')
-        tdx_df,oprsi = getab.Get_RSI(tdx_df, dtype='d')
-        opma = getab.algoMultiDay(tdx_df)
-        volstd = getab.powerStd(code=code, df=tdx_df, ptype='vol')
-        df.loc[code, 'kdj'] = opkdj
-        df.loc[code, 'macd'] = opmacd
-        df.loc[code, 'rsi'] = oprsi
-        df.loc[code, 'ma'] = opma
-        df.loc[code, 'vstd'] = volstd
-        df.loc[code, 'lvolume'] = tdx_df.vol[1]
+            tdx_df,operation = getab.Get_BBANDS(tdx_df, dtype='d')
+            # opc +=operation
+            # if opc > 21:
+            #     opc = 21
+            # log.debug( "opc:%s op:%s"%(opc,operation))
 
-        if len(wcdf[wcdf.index == code]) > 0:
-            if code in wcdf_code:
-                df.loc[code,'category'] = wcdf.loc[code,'category']
+            # df.loc[code,'ma5'] = daysData[1].ma5d[0]
+            # print tdx_df[:1].ma5d[0],daysData[1].ma5d[0]
+            if len(tdx_df) > 0 and 'ma5d' in tdx_df.columns:
+                if tdx_df[:1].ma5d[0] is not None and tdx_df[:1].ma5d[0] != 0:
+                    df.loc[code,'ma5d'] = round(float(tdx_df[:1].ma5d[0]),2)
+                if tdx_df[:1].ma10d[0] is not None and tdx_df[:1].ma10d[0] != 0:
+                    df.loc[code,'ma10d'] = round(float(tdx_df[:1].ma10d[0]),2)
+            df.loc[code, 'op'] = opl
+            df.loc[code, 'ra'] = ral
+            df.loc[code, 'oph'] = oph
+            df.loc[code, 'rah'] = rah
+            df.loc[code, 'fib'] = fib
+            df.loc[code, 'fibl'] = fibl
+            # df.fibl.astype(float)
+            df.loc[code, 'ldate'] = stl
+            df.loc[code, 'boll'] = operation
+
+            tdx_df,opkdj = getab.Get_KDJ(tdx_df, dtype='d')
+            tdx_df,opmacd = getab.Get_MACD_OP(tdx_df, dtype='d')
+            tdx_df,oprsi = getab.Get_RSI(tdx_df, dtype='d')
+            opma = getab.algoMultiDay(tdx_df)
+            volstd = getab.powerStd(code=code, df=tdx_df, ptype='vol')
+            df.loc[code, 'kdj'] = opkdj
+            df.loc[code, 'macd'] = opmacd
+            df.loc[code, 'rsi'] = oprsi
+            df.loc[code, 'ma'] = opma
+            df.loc[code, 'vstd'] = volstd
+            df.loc[code, 'lvolume'] = tdx_df.vol[1]
+
+            if len(wcdf[wcdf.index == code]) > 0:
+                if code in wcdf_code:
+                    df.loc[code,'category'] = wcdf.loc[code,'category']
+                else:
+                    log.warn("code not in wcdf:%s"%(code))
             else:
-                log.warn("code not in wcdf:%s"%(code))
-        else:
-            df.loc[code,'category'] = 0
-        df=df.fillna(0)
-        # df = getab.Get_BBANDS(df, dtype='d')
-        #'volume', 'ratio', 'couts','ldate' -> 'ma','macd','rsi','kdj'
-        # df = df.drop_duplicates()
-    df = df.fillna(0)
-    df.loc[:, 'fibl'] = df.loc[:, 'fibl'].astype(int)
-    df['df2'] = (map(lambda ra, fibl,rah,fib,ma,kdj,rsi:round(eval(ct.powerdiff%(ct.PowerCountdl)),1),\
-                     df['ra'].values, df['fibl'].values,df['rah'].values,df['fib'].values,df['ma'].values,\
-                     df['kdj'].values,df['rsi'].values))
+                df.loc[code,'category'] = 0
+            # df = getab.Get_BBANDS(df, dtype='d')
+            #'volume', 'ratio', 'couts','ldate' -> 'ma','macd','rsi','kdj'
+            # df = df.drop_duplicates()
+        df = df.fillna(0)
+        df.loc[:, 'fibl'] = df.loc[:, 'fibl'].astype(int)
+        # df['df2'] = (map(lambda ra, fibl,rah,fib,ma,kdj,rsi:round(eval(ct.powerdiff%(ct.PowerCountdl)),1),\
+        #                  df['ra'].values, df['fibl'].values,df['rah'].values,df['fib'].values,df['ma'].values,\
+        #                  df['kdj'].values,df['rsi'].values))
+        df['df2'] = (map(lambda ra, fibl,rah,fib,ma,kdj,rsi:int(eval(ct.powerdiff%(dl))),\
+                 df['ra'].values, df['fibl'].values,df['rah'].values,df['fib'].values,df['ma'].values,\
+                 df['kdj'].values,df['rsi'].values))
+        # df = df.replace(np.inf,0)
+        # df = df.replace(-np.inf,0)
+        # df = df.fillna(0)
 
     if len(drop_cxg) >0:
-        df = df.drop(drop_cxg,axis=0)
-        log.error("Drop_cxg open!!!:%s %s"%(len(drop_cxg),drop_cxg))
-    
+        drop_t = [ co for co in drop_cxg if co in df.index]
+        Power_CXG_Error += 1
+        df = df.drop(drop_t,axis=0)
+        log.error("Drop_cxg open!!! drop_t:%s %s"%(drop_t,drop_cxg))
+
+
+
     h5 = h5a.write_hdf_db(h5_fname, df, table=h5_table,append=True)
+
     print "Power:%0.2f"%(time.time()-ts),
 
     return df

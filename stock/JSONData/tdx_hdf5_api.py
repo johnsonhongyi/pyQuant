@@ -15,8 +15,9 @@ import random
 
 log = LoggerFactory.log
 
-global RAMDISK_KEY
+global RAMDISK_KEY,INIT_LOG_Error
 RAMDISK_KEY = 0
+INIT_LOG_Error = 0
 BaseDir=cct.get_ramdisk_dir()
 class SafeHDFStore(HDFStore):
     # def __init__(self, *args, **kwargs):
@@ -52,7 +53,7 @@ class SafeHDFStore(HDFStore):
                     # time.sleep(random.randint(0,5))
                     self.countlock +=1
                 else:
-                    os.remove(self._lock)
+#                    os.remove(self._lock)
                     log.error("count10 remove lock")
 #            except (Exception) as e:
 #                print ("Exception Error:%s"%(e))
@@ -231,7 +232,7 @@ def write_hdf_db(fname,df,table='all',index=False,baseCount=500,append=False):
 
 def load_hdf_db(fname,table='all',code_l=None,timelimit=True,index=False,limit_time=ct.h5_limit_time):
     time_t = time.time()
-    global RAMDISK_KEY
+    global RAMDISK_KEY,INIT_LOG_Error
     if not RAMDISK_KEY < 1:
         return None
     df = None
@@ -265,7 +266,9 @@ def load_hdf_db(fname,table='all',code_l=None,timelimit=True,index=False,limit_t
                     else:
                          df = dd.loc[dif_co]
                 else:
-                    log.error("cl:%s don't find :%s dra:%s"%(len(code_l),len(code_l)-len(dif_co),dratio))
+                    if INIT_LOG_Error < 3:
+                        INIT_LOG_Error +=1
+                        log.error("cl:%s don't find :%s dra:%0.2f"%(len(code_l),len(code_l)-len(dif_co),dratio))
         else:
             log.error("%s is not find %s"%(fname,table))
     else:

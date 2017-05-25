@@ -481,6 +481,7 @@ if __name__ == '__main__':
     fibc = 3
     fibl = fibonacciCount(['999999', '399001', '399006'], dl=dl)
     percentDuration=2
+    cct.get_terminal_Position(position=sys.argv[0])
     while 1:
         try:
             if not status:

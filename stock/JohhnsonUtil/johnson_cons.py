@@ -21,7 +21,7 @@ DD_VOL_List={'0':'40000','1':'100000','2':'100000','3':'200000','4':'1000000'}
 LvolumeSize = 12500
 VolumeMaxR=50
 VolumeMinR=1.5
-PowerCount = 120
+PowerCount = 200
 PowerCountdl = 21
 power_update_time = 900
 writeCount = 4
@@ -47,7 +47,27 @@ sina_limit_time = 15
 diffcode = 0.2
 duration_sleep_time = 60
 
-powerdiff = 'ra * fibl + rah*(abs(float(%s)-fibl))/fib +ma +kdj+rsi'
+# powerdiff = 'ra * fibl + rah*(abs(float(%s)-fibl))/fib +ma +kdj+rsi'
+'''
+            ma  rsi  kdj  boll    ra   rah    df2  fibl  fib  macd  oph
+code                                                                   
+601318  150.11   -2  -15    11  0.78 -2.05  110.5    21    2    -3   -6
+002054  210.00   -4    1    21  0.76   10  423.0    21    1    -4   11
+600036  169.11    0   -2    21  1.14   10  384.2    15    1    -2   12
+002350   91.11   -4    2    31  7.67   10  381.1    12    1    -1   12
+603169  169.11    0   -2    11  0.63   10  378.5    18    1    -1    9
+300140  110.61   -2    6    31  5.54   10  375.6    11    1     0   12
+002545  170.61   -2   -1    21  0.64   10  374.6    11    1    -3   12
+000703  151.61   -2   -4    11  1.51   10  362.2    11    1     0   12
+002392  160.50   -4   -2    16  0.69   10  362.1    11    1    -2   11
+600756  140.61   -2  -12    11  2.05   10  349.2    11    1     0    9
+601318  130.61   -2    7    21  0.78   10  352.0    21    1    -2   12
+601318  150.11   -2  -15    11  0.78 -2.05  110.5    21    2    -3   -6
+'''
+
+# ra*fibl*(int(%d)-fib)/100
+# powerdiff = '(rah(int(%s) - fibl) + ra*(fibl) +ma +kdj+rsi'
+powerdiff = 'ra*fibl*(int(%d)-fib)/10 +ma +kdj+rsi'
 # Duration_sort_op=['fib','op','ra','percent','ratio','dff','couts']
 # Duration_sort_op=['fib','op','dff','fibl','ra','percent','ratio','volume','couts']
 # Duration_sort_op_key=[1,0,0,1,0,0,1,1,1]
@@ -60,8 +80,9 @@ Duration_percentdn_percent_key=[0,0,0,1,1,0,1,1,1]
 Duration_percentdn_percentra=['percent','ra','dff','op','fib','fibl','ratio','volume','couts']
 Duration_percentdn_percentra_key=[0,0,0,0,1,1,1,1,1]
 
-Duration_percentdn_op=['dff','percent','op','fib','fibl','ra','ratio','volume','couts']
-Duration_percentdn_op_key=[0,0,0,1,1,0,1,1,1]
+# Duration_percentdn_op=['dff','percent','op','fib','fibl','ra','ratio','volume','couts']
+Duration_percentdn_op=['df2','dff','percent','op','fib','fibl','ra','ratio','volume','couts']
+Duration_percentdn_op_key=[0,0,0,0,1,1,0,1,1,1]
 
 # Duration_percentdn_ra=['ra','percent','dff','op','fib','fibl','ratio','volume','couts']
 # Duration_percentdn_ra_key=[0,0,0,0,1,1,1,1,1]
@@ -74,7 +95,8 @@ Duration_percentdn_opra=['op','ra','percent','dff','fib','fibl','ratio','volume'
 Duration_percentdn_opra_key=[0,0,0,0,1,1,1,1,1]
 # Duration_percent_op=['dff','percent','op','fib','fibl','ra','ratio','volume','couts']
 # Duration_percent_op_key=[0,0,0,1,1,0,1,1,1]
-Duration_percent_op=['dff','boll','ra','percent','op','fib','fibl','ratio','volume','couts']
+# Duration_percent_op=['dff','boll','ra','percent','op','fib','fibl','ratio','volume','couts']
+Duration_percent_op=['df2','dff','ra','percent','op','fib','fibl','ratio','volume','couts']
 Duration_percent_op_key=[0,0,0,0,0,1,1,1,1,1]
 
 # Duration_percent_op=['dff','boll','ra','percent','op','fib','fibl','ratio','volume','couts']

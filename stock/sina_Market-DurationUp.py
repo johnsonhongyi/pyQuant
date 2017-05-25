@@ -142,6 +142,8 @@ if __name__ == "__main__":
             if len(top_now) > 10 or cct.get_work_time():
                 # time_Rt = time.time()
                 if len(top_all) == 0 and len(lastpTDX_DF) == 0:
+                    cct.get_terminal_Position(position=sys.argv[0])
+
                     # time_Rt = time.time()
                     top_all,lastpTDX_DF = tdd.get_append_lastp_to_df(top_now, lastpTDX_DF=None, dl=duration_date,end=end_date,ptype=ptype,filter=filter, power=ct.lastPower, lastp=False)
                     log.debug("len:%s"%(len(top_all)))
@@ -337,11 +339,11 @@ if __name__ == "__main__":
                         # top_temp = top_temp.sort_values(by=['op','ldate','ra','dff', 'percent', 'ratio'], ascending=[0,0,0,0, 0, 1])[:10]
                         # if (cct.get_now_time_int() > ct.checkfilter_end_timeDu and int(duration_date) > int(ct.duration_date_sort)) or int(duration_date) < 6:
                         if cct.get_now_time_int() > ct.checkfilter_end_timeDu and (int(duration_date) > int(ct.duration_date_sort) or int(duration_date) < 6):
-                            top_temp = top_temp.sort_values(by=ct.Duration_percent_op,
-                                        ascending=ct.Duration_percent_op_key)
+                            top_temp = top_temp.sort_values(by=ct.Duration_percent_op,ascending=ct.Duration_percent_op_key)
                         else:
-                            top_temp = top_temp.sort_values(by=ct.Duration_percentdn_ra,
-                                        ascending=ct.Duration_percentdn_ra_key)
+                            top_temp = top_temp.sort_values(by=ct.Duration_percent_op,ascending=ct.Duration_percent_op_key)
+                            # top_temp = top_temp.sort_values(by=ct.Duration_percentdn_ra,
+                                        # ascending=ct.Duration_percentdn_ra_key)
 
                     if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935:
                         # top_temp = top_temp[ (top_temp['ma5d'] > top_temp['ma10d']) & (top_temp['buy'] > top_temp['ma10d']) ][:10]

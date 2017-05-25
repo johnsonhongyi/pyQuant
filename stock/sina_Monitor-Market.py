@@ -117,6 +117,8 @@ if __name__ == "__main__":
                     top_now['buy'] = (map(lambda x, y: y if int(x) == 0 else x, top_now['buy'].values, top_now['trade'].values))
                 # time_Rt = time.time()
                 if len(top_all) == 0 and len(lastpTDX_DF) == 0:
+                    cct.get_terminal_Position(position=sys.argv[0])
+
                     time_Rt = time.time()
                     top_all,lastpTDX_DF = tdd.get_append_lastp_to_df(top_now)
                 elif len(top_all) == 0 and len(lastpTDX_DF) > 0:

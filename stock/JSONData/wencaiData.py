@@ -278,7 +278,8 @@ def get_wencai_data(dm,market='wencai',days=120):
         df = get_wencai_Market_url(dm.name)
     if 'code' in df.columns:
         df = df.set_index('code')
-    df = df.drop_duplicates()
+    if len(df) > 1:
+        df = df.drop_duplicates()
     return df
 
 def get_wencai_filepath(market):

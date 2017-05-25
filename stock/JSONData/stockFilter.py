@@ -7,7 +7,7 @@ import JohhnsonUtil.johnson_cons as ct
 from JSONData import powerCompute as pct
 import pandas as pd
 import time
-def getBollFilter(df=None,boll=-5,duration=ct.PowerCountdl,filter=False,ma5d=True,dl=14,percent=False):
+def getBollFilter(df=None,boll=-5,duration=ct.PowerCountdl,filter=True,ma5d=True,dl=14,percent=False):
     #return boll > int
 
     if df is None:
@@ -53,9 +53,10 @@ def getBollFilter(df=None,boll=-5,duration=ct.PowerCountdl,filter=False,ma5d=Tru
     # df.loc[:, ['fibl','op']] = df.loc[:, ['fibl','op']].astype(int)
     # df.loc[:, 'fibl'] = df.loc[:, 'fibl'].astype(int)
 
+    if 'ma5d' in df.columns:
+        df = df[df.buy > df.ma5d * ct.changeRatio]
+    
     if filter:
-        if 'ma5d' in df.columns:
-            df = df[df.buy > df.ma5d * ct.changeRatio]
         # if ma5d:
         #     # op, ra, st, days = pct.get_linear_model_status('999999', filter='y', dl=dl, ptype='low')
         #     oph, rah, sth, daysh = pct.get_linear_model_status('999999', filter='y', dl=dl, ptype='high')
@@ -66,7 +67,7 @@ def getBollFilter(df=None,boll=-5,duration=ct.PowerCountdl,filter=False,ma5d=Tru
         #         df = df[ ((df.ma5d * ct.changeRatio < df.low) & (df.low < df.ma5d * (2 - ct.changeRatio))) | ((df.percent > 1) & (df.volume > 3))]
         if 'vstd' in df.columns:
             # df = df[(df.lvol * df.volume > (df.vstd + df.lvol)) | ((df.percent > -5) & (df.hv/df.lv > 3))]
-            df = df[(df.lvol * df.volume > (df.vstd + df.lvol)) | ((df.percent > -5) & (df.hv/df.lv > 1.5))]
+            df = df[(df.lvol * df.volume > (df.vstd + df.lvol)) | ((df.percent > -5) & (df.hv/df.lv > 1.2))]
                     # [dd.lvol * dd.volume > (dd.vstd + dd.lvol) | dd.lvol * dd.volume >(dd.ldvolume + dd.vstd]
         if percent:
             if  cct.get_now_time_int() > 920 and cct.get_now_time_int() <= 1400:

@@ -115,6 +115,8 @@ if __name__ == "__main__":
                     top_now = top_now[top_now['percent'] >= 0]
 
                 if len(top_all) == 0 and len(lastpTDX_DF) == 0:
+                    cct.get_terminal_Position(position=sys.argv[0])
+
                     time_Rt = time.time()
                     top_all, lastpTDX_DF = tdd.get_append_lastp_to_df(top_now)
                 elif len(top_all) == 0 and len(lastpTDX_DF) > 0:

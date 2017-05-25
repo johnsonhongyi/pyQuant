@@ -2,6 +2,8 @@
 # !/usr/bin/env python
 import subprocess
 import os,time
+from JohhnsonUtil import commonTips as cct
+
 script = '''tell application "System Events"
     activate
     display dialog "Hello Cocoa!" with title "Sample Cocoa Dialog" default button 2
@@ -88,15 +90,18 @@ osascript -e
 #                'singleAnalyseUtil.py': '583, 22',
 #                'LinePower.py':'40, 497',}
 
-positionKey = {'sina_Market-DurationDn.py': '217, 520',
-               'sina_Market-DurationCXDN': '8, 52',
-               'sina_Market-DurationSH.py': '-23, 539',
-               'sina_Market-DurationUP.py': '-19, 111',
-               'sina_Monitor-Market-LH.py': '184, 239',
-               'sina_Monitor-Market.py': '19, 179',
-               'sina_Monitor.py': '39, 22',
-               'singleAnalyseUtil.py': '620, 22',
-               'LinePower.py':'40, 497',}
+# positionKey = {'sina_Market-DurationDn.py': '217, 520',
+#                'sina_Market-DurationCXDN': '8, 52',
+#                'sina_Market-DurationSH.py': '-23, 539',
+#                'sina_Market-DurationUP.py': '-19, 111',
+#                'sina_Monitor-Market-LH.py': '184, 239',
+#                'sina_Monitor-Market.py': '19, 179',
+#                'sina_Monitor.py': '39, 22',
+#                'singleAnalyseUtil.py': '620, 22',
+#                'LinePower.py':'40, 497',}
+               
+positionKey = cct.terminal_positionKey
+
 
 cmdRun_dnup = '''cd /Users/Johnson/Documents/Quant/pyQuant/stock;
 open sina_Market-DurationDn.py;
@@ -135,7 +140,7 @@ sleep 0.1;osascript -e 'tell application "Python Launcher" to quit';sleep 25;
 open sina_Market-DurationSH.py;
 sleep 0.1;osascript -e 'tell application "Python Launcher" to quit';sleep 25;
 open LinePower.py;
-sleep 0.1;osascript -e 'tell application "Python Launcher" to quit';sleep 1;
+sleep 0.1;osascript -e 'tell application "Python Launcher" to quit';sleep 5;
 '''
 
 # cmdRun = '''cd /Users/Johnson/Documents/Quant/pyQuant/stock;

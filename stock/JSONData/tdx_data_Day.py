@@ -291,7 +291,7 @@ def get_tdx_Exp_day_to_df(code, start=None, end=None, dl=None,newdays = None,typ
             if fileSize < atomStockSize * newstockdayl:
                 return Series()
         # else:
-            # log.info("newsday=0:%s"(code))        
+            # log.info("newsday=0:%s"(code))
         data = cct.read_last_lines(file_path, int(dl) + 3)
         data_l = data.split('\n')
         dt_list = Series()
@@ -355,7 +355,7 @@ def get_tdx_Exp_day_to_df(code, start=None, end=None, dl=None,newdays = None,typ
         if newstockdayl == 0:
             if len(data_l) < 5:
                 if write_k_data_status:
-                    write_all_kdata_to_file(code,file_path)  
+                    write_all_kdata_to_file(code,file_path)
                     data = cct.read_last_lines(file_path, inxdl)
                     data_l = data.split('\n')
         data_l.reverse()
@@ -412,10 +412,11 @@ def get_tdx_Exp_day_to_df(code, start=None, end=None, dl=None,newdays = None,typ
             df['cmean'] = round(df.close[-tdx_max_int:max_int_end].mean(),2)
             df['hv'] = df.vol[-tdx_max_int:max_int_end].max()
             df['lv'] = df.vol[-tdx_max_int:max_int_end].min()
-            if df.close[-5:].max() > df.open[-5:].min() * 1.6:
+            dratio = (dl - len(df))/float(dl)
+            if dratio < 0.2 and  df.close[-5:].max() > df.open[-5:].min() * 1.6:
 
                 # if initTdxdata < 3:
-                log.error("%s st:%s dl:%s outdata!"%(code,start,dl))
+                log.error("%s start:%s df:%s dl:%s outdata!"%(code,start,len(df),dl))
                 initTdxdata +=1
                 if write_k_data_status:
                     write_all_kdata_to_file(code,file_path)
@@ -2553,7 +2554,7 @@ def get_append_lastp_to_df(top_all,lastpTDX_DF=None,dl=ct.PowerCountdl,end=None,
             # tdxdata = get_tdx_all_day_LastDF(codelist) '''only get lastp no powerCompute'''
             print "td.",
             tdxdata = get_tdx_exp_all_LastDF_DL(codelist,dt=dl,end=end,ptype=ptype,filter=filter,power=power,lastp=lastp,newdays=newdays)
-            # if checknew:    
+            # if checknew:
             #     tdx_list = tdxdata.index.tolist()
             #     diff_code = list(set(codelist) - set(tdx_list))
             #     diff_code = [ co for co in diff_code if co.startswith(('6','00','30'))]
@@ -2566,7 +2567,7 @@ def get_append_lastp_to_df(top_all,lastpTDX_DF=None,dl=ct.PowerCountdl,end=None,
             #         if tdx_diff is not None and len(tdx_diff) >0:
             #             tdxdata = pd.concat([tdxdata, tdx_diff],axis=0)
 
-                        
+
             # tdxdata.rename(columns={'close': 'llow'}, inplace=True)
             tdxdata.rename(columns={'open': 'lopen'}, inplace=True)
             tdxdata.rename(columns={'high': 'lhigh'}, inplace=True)
@@ -2598,7 +2599,7 @@ def get_append_lastp_to_df(top_all,lastpTDX_DF=None,dl=ct.PowerCountdl,end=None,
     # df_now=pd.merge(top_all,data,left_index=True,right_index=True,how='left')
     # top_all = top_all.merge(
     #     tdxdata, left_index=True, right_index=True, how='left')
-    if checknew:    
+    if checknew:
         tdx_list = tdxdata.index.tolist()
         diff_code = list(set(codelist) - set(tdx_list))
         diff_code = [ co for co in diff_code if co.startswith(('6','00','30'))]
@@ -2614,13 +2615,13 @@ def get_append_lastp_to_df(top_all,lastpTDX_DF=None,dl=ct.PowerCountdl,end=None,
                 # tdxdata.rename(columns={'low': 'lastp'}, inplace=True)
                 tdx_diff.rename(columns={'low': 'llow'}, inplace=True)
                 tdx_diff.rename(columns={'vol': 'lvol'}, inplace=True)
-                tdx_diff.rename(columns={'amount': 'lamount'}, inplace=True)    
+                tdx_diff.rename(columns={'amount': 'lamount'}, inplace=True)
                 tdxdata = pd.concat([tdxdata, tdx_diff],axis=0)
                 # h5 = h5a.write_hdf_db(h5_fname, tdxdata, table=h5_table)
-                
-        
-    top_all =  cct.combine_dataFrame(top_all, tdxdata, col=None, compare=None, append=False)    
-        
+
+
+    top_all =  cct.combine_dataFrame(top_all, tdxdata, col=None, compare=None, append=False)
+
     # log.info('Top-merge_now:%s' % (top_all[:1]))
     top_all = top_all[top_all['llow'] > 0]
 

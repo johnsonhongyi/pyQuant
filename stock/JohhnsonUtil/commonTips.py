@@ -40,11 +40,11 @@ def get_os_system():
     os_sys = get_sys_system()
     os_platform = get_sys_platform()
     if os_sys.find('Darwin') == 0:
-        log.info("Mac:%s" % os_platform)
+        # log.info("Mac:%s" % os_platform)
         return 'mac'
 
     elif os_sys.find('Win') == 0:
-        log.info("Windows:%s" % os_sys)
+        # log.info("Windows:%s" % os_sys)
         if os_platform.find('XP'):
             return 'win'
     else:
@@ -150,8 +150,26 @@ scriptname = '''tell application "Terminal"
     %s the name of window %s
 end tell
 '''
+
+terminal_positionKey = {'sina_Market-DurationDn.py': '217, 520',
+               'sina_Market-DurationCXDN.py': '8, 52',
+               'sina_Market-DurationSH.py': '-23, 539',
+               'sina_Market-DurationUP.py': '-19, 111',
+               'sina_Monitor-Market-LH.py': '184, 239',
+               'sina_Monitor-Market.py': '19, 179',
+               'sina_Monitor.py': '39, 22',
+               'singleAnalyseUtil.py': '620, 22',
+               'LinePower.py':'40, 497',}
+
+script_set_position = '''tell application "Terminal"
+    --activate
+    %s position of window %s to {%s}
+end tell
+'''
+
 closeterminalw = '''osascript -e 'tell application "Terminal" to close windows %s' '''
 
+scriptquit = '''tell application "Python Launcher" to quit'''
 
 def get_terminal_Position(cmd=None, position=None,close=False):
     win_count = 0
@@ -164,24 +182,48 @@ def get_terminal_Position(cmd=None, position=None,close=False):
             stdout_output = proc.communicate(scriptn)[0]
             # print stdout_output, type(proc)
             return stdout_output
+
+        if cmd is not None and cmd.find("Python Launcher") >= 0:
+            cct_doScript(cmd)
+            return win_count
+
         count = cct_doScript(scriptcount)
-        if count > 0:
-            log.info("count:%s"%(count))
-            for n in xrange(1, int(count)+1):
-                title = cct_doScript(scriptname % ('get', str(object=n)))
-                log.info("count n:%s title:%s"%(n,title))
-                if close:
-                    log.info("close:%s"%(title))
-                if title.lower().find(cmd.lower()) >= 0:
-                    log.info("WinFind:%s get_title:%s "%(n,title))
-                    win_count+=1
-                    # print "get:%s"%(n)
-                    # position=cct_doScript(script_get_position % ('get', str(n)))
+        if position is None:
+            if count > 0 and cmd is not None:
+                log.info("count:%s"%(count))
+                for n in xrange(1, int(count)+1):
+                    title = cct_doScript(scriptname % ('get', str(object=n)))
+                    log.info("count n:%s title:%s"%(n,title))
                     if close:
-                        log.info("close:%s %s"%(n,cmd))
-                        os.system(closeterminalw%(n))
-    # get_terminal_Position(cmd='Johnson@', position=None, close=True)              
+                        log.info("close:%s"%(title))
+                    if title.lower().find(cmd.lower()) >= 0:
+                        log.info("WinFind:%s get_title:%s "%(n,title))
+                        win_count+=1
+                        # print "get:%s"%(n)
+                        # position=cct_doScript(script_get_position % ('get', str(n)))
+                        if close:
+                            log.info("close:%s %s"%(n,cmd))
+                            os.system(closeterminalw%(n))
+        else:
+            # sleep(1, catch=True)
+            position = position.split(os.sep)[-1]
+            if int(count) > 0:
+                if position in terminal_positionKey.keys():
+                    log.info("count:%s"%(count))
+                    for n in xrange(1, int(count)+1):
+                        title = cct_doScript(scriptname % ('get', str(object=n)))
+                        if title.lower().find(position.lower()) > 0:
+                            log.info("title:%s po:%s"%(title, terminal_positionKey[position]))
+                            position = cct_doScript(script_set_position % ('set', str(n),terminal_positionKey[position]))
+                else:
+                    log.info("Keys not position:%s"%(position))
     return win_count
+
+
+
+get_terminal_Position(cmd=scriptquit, position=None, close=False)
+get_terminal_Position('Johnson — bash',close=True)
+log.info("close Python Launcher")
 
 from numba.decorators import autojit
 def run_numba(func):
@@ -489,17 +531,13 @@ def cct_eval(cmd):
         st = ''
         print e
     return st
-def sleep(timet,catch=False):
+def sleep(timet,catch=True):
     times=time.time()
     try:
         for _ in range(int(timet)*2):
             if int(time.time()-times) >= int(timet):
                 break
-
-            if get_os_system() == 'win':     
-                time.sleep(0.1)
-            else:
-                time.sleep(0.5)
+            time.sleep(0.5)
     except (KeyboardInterrupt) as e:
         # raise KeyboardInterrupt("CTRL-C!")
         # print "Catch KeyboardInterrupt"
@@ -798,7 +836,7 @@ def get_url_data_R(url):
     return data
 
 
-def get_url_data(url,retry_count=3,pause=0.05):
+def get_url_data(url,retry_count=5,pause=0.05):
 #    headers = {'User-Agent':'Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.6) Gecko/20091201 Firefox/3.5.6'}
     headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.2; rv:16.0) Gecko/20100101 Firefox/16.0',
                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
@@ -823,9 +861,10 @@ def get_url_data(url,retry_count=3,pause=0.05):
             return data.text
     #     else:
     #         return df
+        sleeprandom(10)
     print "url:%s"%(url)
-    sleeprandom(10)
-    raise IOError(ct.NETWORK_URL_ERROR_MSG)
+    return ''
+    # raise IOError(ct.NETWORK_URL_ERROR_MSG)
 
 def get_div_list(ls, n):
     # if isinstance(codeList, list) or isinstance(codeList, set) or
@@ -1518,14 +1557,13 @@ def combine_dataFrame(maindf,subdf,col=None,compare=None,append=False):
     return maindf
 
 if __name__ == '__main__':
-    # print get_run_path()
+    print get_run_path()
     from docopt import docopt
     # log = LoggerFactory.log
     args = docopt(sina_doc, version='sina_cxdn')
     log_level = LoggerFactory.DEBUG if args['--debug'] else LoggerFactory.ERROR
     log.setLevel(log_level)
     s_time=time.time()
-
     print get_terminal_Position(cmd='DurationDN.py', position=None, close=False)
     print get_terminal_Position(cmd='Johnson@', position=None, close=False)
     print get_terminal_Position(cmd='Johnson — bash', position=None, close=False)
