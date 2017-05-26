@@ -1593,6 +1593,7 @@ def getSinaJsondf(market='cyb',vol=ct.json_countVol,type=ct.json_countType):
     return top_now
 
 def getSinaAlldf(market='cyb',vol=ct.json_countVol,type=ct.json_countType,filename='mnbk',table='top_now'):
+    market_all = False
     if market == 'rzrq':
         df = cct.get_rzrq_code()
     elif market == 'cx':
@@ -1616,6 +1617,7 @@ def getSinaAlldf(market='cyb',vol=ct.json_countVol,type=ct.json_countType,filena
         # df = sina_data.Sina().market(market)
     elif market in ['all']:
         df = sina_data.Sina().all
+        market_all = True
     else:
         df = wcd.get_wcbk_df(filter=market,market=filename,perpage=1000,days=ct.wcd_limit_day)
         if 'code' in df.columns:
@@ -1661,7 +1663,10 @@ def getSinaAlldf(market='cyb',vol=ct.json_countVol,type=ct.json_countType,filena
     # index_status=False
     # if isinstance(codelist, list):
     time_s=time.time()
-    dm = sina_data.Sina().get_stock_list_data(codelist)
+    if not market_all:
+        dm = sina_data.Sina().get_stock_list_data(codelist)
+    else:
+        dm = df
     # if cct.get_work_time() or (cct.get_now_time_int() > 915) :
     dm['percent'] = map(lambda x,y: round((x-y)/y*100, 1), dm.close.values,dm.llastp.values)
     log.info("dm percent:%s"%(dm[:1]))
@@ -1681,7 +1686,7 @@ def getSinaAlldf(market='cyb',vol=ct.json_countVol,type=ct.json_countType,filena
         dm['ratio'] = 0
     else:
         if len(dm) <> len(df):
-            log.info("code:%s %s"%(len(dm),len(df))),
+            log.info("code:%s %s diff:%s"%(len(dm),len(df),len(dm)-len(df))),
 #        dm=pd.merge(dm,df.loc[:,['name','ratio']],on='name',how='left')
 #        dm=dm.drop_duplicates('code')
         dm = cct.combine_dataFrame(dm,df.loc[:,['name','ratio']])
@@ -3039,9 +3044,9 @@ if __name__ == '__main__':
     code='300651'
     # print get_tdx_append_now_df_api(code, start=None, end=None, type='f', df=None, dm=None, dl=None, power=True, newdays=None, write_tushare=False)
 #    get_tdx_append_now_df_api_tofile(code, dm=None, newdays=1, start=None, end=None, type='f', df=None, dl=2, power=True)
-    df = get_tdx_Exp_day_to_df(code,dl=30,newdays=0)
-    print df
-    sys.exit(0)
+    # print get_tdx_Exp_day_to_df(code,dl=30,newdays=0)[:2]
+    # print df
+    # sys.exit(0)
 #    print write_tdx_tushare_to_file(code)
 
 #    hdf5_wri=cct.cct_raw_input("write all data to hdf[y|n]:")
@@ -3050,14 +3055,19 @@ if __name__ == '__main__':
     if hdf5_wri == 'y':
         df = sina_data.Sina().market('sh')
         dfcode =df.index.tolist()
+        # print dfcode[:5]
         print "count:%s"%(len(dfcode))
-        f_name = 'tdx_all_df_30'
+        # f_name = 'tdx_all_df_30'
         t_st=time.time()
         dd=pd.DataFrame()
         # st=h5a.get_hdf5_file(f_name, wr_mode='w', complevel=9, complib='zlib',mutiindx=True)
-        for code in dfcode[:5]:
+        h5_fname = 'tdx_df'
+        dl=30
+        h5_table = 'all'+'_'+str(dl)
+        for code in dfcode[:50]:
         # for code in dfcode:
-            df = get_tdx_Exp_day_to_df(code,dl=30)
+            df = get_tdx_Exp_day_to_df(code,dl=dl)
+            # print df
             # (map(lambda x, y: y if int(x) == 0 else x, top_dif['buy'].values, top_dif['trade'].values))
             # print df.index
             if len(df) > 0:
@@ -3071,9 +3081,9 @@ if __name__ == '__main__':
                 df = df.reset_index()
                 df = df.set_index(['code','date'])
                 df = df.astype(float)
-                xcode = cct.code_to_symbol(code)
-                print xcode
+                # xcode = cct.code_to_symbol(code)
                 dd = pd.concat([dd, df],axis=0)
+                print ".",len(dd)
                 # st.append(xcode,df)
                 put_time = time.time()
                 # st.put("df", df, format="table", append=True, data_columns=['code','date'])
@@ -3097,6 +3107,8 @@ if __name__ == '__main__':
                 # print df
                 # print df.shape
                 # log.error("code :%s is None"%(code))
+                # 
+        h5a.write_hdf_db(h5_fname, dd, table=h5_table, index=False, baseCount=500, append=False)
         print ("hdf5 all :%s  time:%0.2f"%(len(dfcode),time.time()-time_s))
         # st.close()
 

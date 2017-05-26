@@ -1482,6 +1482,8 @@ def sort_by_value(df,column='dff',file=None,count=5,num=5,asc=0):
 def combine_dataFrame(maindf,subdf,col=None,compare=None,append=False):
     times = time.time()
     maindf_co=maindf.columns
+    maindf = maindf.fillna(0)
+    subdf = subdf.fillna(0)
 #    if 'ticktime' in maindf.columns:
 #        maindf = maindf.dropna()
 #        maindf.ticktime = maindf.ticktime.apply(lambda x:str(x).replace(':','')[:4] if len(str(x))==8 else x)
@@ -1498,14 +1500,17 @@ def combine_dataFrame(maindf,subdf,col=None,compare=None,append=False):
         if col is not None and compare is not None:
             # if col in subdf.columns:
             # sub_col = list(set(subdf.columns) - set([col]))
-            sub_dif_inx = list(set(subdf.index) - set(maindf.index))
-            trandf = subdf.drop(sub_dif_inx,axis=0)
-            no_index[compare]=map((lambda x,y:y-x),no_index.couts,trandf.couts)
+            
+            # sub_dif_inx = list(set(subdf.index) - set(maindf.index))
+            # trandf = subdf.drop(sub_dif_inx,axis=0)
+            # no_index[compare]=map((lambda x,y:y-x),no_index.couts,trandf.couts)
+            pass
             # no_index[compare]=map((lambda x,y:y-x),eval("subdf.%s"%(col)),eval("no_index.%s"%(col)))
         else:
             sub_col = list(set(subdf.columns)-set())
 
-        no_index.drop([col for col in no_index.columns if col in subdf.columns], axis=1,inplace=True)
+        drop_sub_col=[col for col in no_index.columns if col in subdf.columns]
+        no_index = no_index.drop(drop_sub_col, axis=1)
         no_index = no_index.merge(subdf, left_index=True, right_index=True, how='left')
         maindf = maindf.drop([inx for inx in maindf.index  if inx in subdf.index], axis=0)
         maindf = pd.concat([maindf, no_index],axis=0)
@@ -1515,7 +1520,6 @@ def combine_dataFrame(maindf,subdf,col=None,compare=None,append=False):
 #            maindf,subdf =subdf,maindf
         maindf = maindf.drop([col for col in maindf.index if col in subdf.index], axis=0)
         maindf = pd.concat([maindf, subdf],axis=0)
-        maindf = maindf.fillna(0)
         # if 'timel' in maindf.columns:
         #     time_list = set(maindf.timel)
         #     log.info("times:%s"%(time_list))

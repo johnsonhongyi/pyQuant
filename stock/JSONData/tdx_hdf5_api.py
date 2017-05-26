@@ -123,7 +123,7 @@ def get_hdf5_file(fpath,wr_mode='r',complevel=9,complib='zlib',mutiindx=False):
         # store.select("Year2015", where=['dt<Timestamp("2015-01-07")','code=="000570"'])
         # return store
 
-def write_hdf_db(fname,df,table='all',index=False,baseCount=500,append=False):
+def write_hdf_db(fname,df,table='all',index=False,baseCount=500,append=False,MultiIndex=False):
     if 'code' in df.columns:
         df = df.set_index('code')
 #    df['timel'] =  time.time()
@@ -150,36 +150,61 @@ def write_hdf_db(fname,df,table='all',index=False,baseCount=500,append=False):
             if store is not None:
                 if '/'+table in store.keys():
                     tmpdf = store[table]
-        if index:
-            df.index = map((lambda x:str(1000000-int(x)) if x.startswith('0') else x),df.index)
-        if tmpdf is not None and len(tmpdf) > 0:
-            if 'code' in tmpdf.columns:
-                tmpdf = tmpdf.set_index('code')
-            if 'code' in df.columns:
-                df = df.set_index('code')
-            diff_columns = set(df.columns) - set(tmpdf.columns)
-            if len(diff_columns) <> 0:
-                log.error("columns diff:%s"%(diff_columns))
-#                        dif_co = list(set(df.index) - set(tmpdf.index))
-#                        if len(dif_co) > 0:
-            df=cct.combine_dataFrame(tmpdf, df, col=None,append=append)
-#            df=cct.combine_dataFrame(tmpdf, df, col=None,append=False)
-            log.info("read hdf time:%0.2f"%(time.time()-time_t))
+        if not MultiIndex:            
+            if index:
+                df.index = map((lambda x:str(1000000-int(x)) if x.startswith('0') else x),df.index)
+            if tmpdf is not None and len(tmpdf) > 0:
+                if 'code' in tmpdf.columns:
+                    tmpdf = tmpdf.set_index('code')
+                if 'code' in df.columns:
+                    df = df.set_index('code')
+                diff_columns = set(df.columns) - set(tmpdf.columns)
+                if len(diff_columns) <> 0:
+                    log.error("columns diff:%s"%(diff_columns))
+    #                        dif_co = list(set(df.index) - set(tmpdf.index))
+    #                        if len(dif_co) > 0:
+                df=cct.combine_dataFrame(tmpdf, df, col=None,append=append)
+    #            df=cct.combine_dataFrame(tmpdf, df, col=None,append=False)
+                log.info("read hdf time:%0.2f"%(time.time()-time_t))
+            else:
+                # if index:
+                    # df.index = map((lambda x:str(1000000-int(x)) if x.startswith('0') else x),df.index)
+                log.info("h5 None hdf reindex time:%0.2f"%(time.time()-time_t))
         else:
-            # if index:
-                # df.index = map((lambda x:str(1000000-int(x)) if x.startswith('0') else x),df.index)
-            log.info("h5 None hdf reindex time:%0.2f"%(time.time()-time_t))
+            # df.loc[(df.index.get_level_values('code')== 600004)]
+            # df.loc[(600004,20170414),:]
+            # df.xs(20170425,level='date')
+            # df.index.get_level_values('code').unique() 
+            # df.index.get_loc(600006)
+            # slice(58, 87, None)
+            # df.index.get_loc_level(600006)
+            # da.swaplevel(0, 1, axis=0).loc['2017-05-25']
+            # da.reorder_levels([1,0], axis=0)
+            # da.sort_index(level=0, axis=0,ascending=False
+            # setting: dfm.index.is_lexsorted() dfm = dfm.sort_index()  da.loc[('000001','2017-05-12'):('000005','2017-05-25')]
+            # da.groupby(level=1).mean()
+            # da.index.get_loc('000005')     da.iloc[slice(22,33,None)]
+            # mask = totals['dirty']+totals['swap'] > 1e7     result = mask.loc[mask]
+            multi_code = tmpdf.index.get_level_values('code').unique().tolist() 
+            df_code = df.index.tolist()
+            diff_code = set(df_code) - set(multi_code)
+            # da.drop(('000001','2017-05-11'))
+            pass
+
     time_t = time.time()
     if df is not None and not df.empty and table is not None:
         df['timel'] =  time.time()
         if df is not None and not df.empty and len(df) > 0:
             dd = df.dtypes.to_frame()
-        if 'object' in dd.values:
-            dd = dd[dd == 'object'].dropna()
-            col = dd.index.tolist()
-            log.info("col:%s"%(col))
-            df[col] = df[col].astype(str)
-        df.index = df.index.astype(str)
+
+        if not MultiIndex:
+            if 'object' in dd.values:
+                dd = dd[dd == 'object'].dropna()
+                col = dd.index.tolist()
+                log.info("col:%s"%(col))
+                df[col] = df[col].astype(str)
+            df.index = df.index.astype(str)
+            
         with SafeHDFStore(fname) as h5:
             df = df.fillna(0)
             if h5 is not None:
@@ -268,7 +293,7 @@ def load_hdf_db(fname,table='all',code_l=None,timelimit=True,index=False,limit_t
                 else:
                     if INIT_LOG_Error < 3:
                         INIT_LOG_Error +=1
-                        log.error("cl:%s don't find :%s dra:%0.2f"%(len(code_l),len(code_l)-len(dif_co),dratio))
+                        log.error("cl:%s h5:%s don't find:%s dra:%0.2f"%(len(code_l),len(dd),len(code_l)-len(dif_co),dratio))
         else:
             log.error("%s is not find %s"%(fname,table))
     else:
@@ -400,6 +425,6 @@ if __name__ == "__main__":
 
     import tushare as ts
     df=ts.get_k_data('300334',start='2017-04-01')
-    with SafeHDFStore('example.h5') as store:
+    # with SafeHDFStore('example.h5') as store:
         # Only put inside this block the code which operates on the store
-        store['result'] = df
+        # store['result'] = df

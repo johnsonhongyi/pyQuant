@@ -55,7 +55,7 @@ def evalcmd(dir_mo):
                     print eval(cmd)
                 print ''
             except Exception, e:
-                print e 
+                print e
                 # evalcmd(dir_mo)
                 # break
 
@@ -64,10 +64,10 @@ if __name__ == "__main__":
     log = LoggerFactory.getLogger('SinaMarket')
     # log.setLevel(LoggerFactory.DEBUG)
     if cct.isMac():
-        width, height = 155, 16
+        width, height = 162, 16
         cct.set_console(width, height)
     else:
-        width, height = 155, 18
+        width, height = 162, 18
         cct.set_console(width, height)
 
     # cct.set_console(width, height)
@@ -110,9 +110,9 @@ if __name__ == "__main__":
             else:
                 status_change = False
             if len(top_now) > 10 and len(top_now.columns) > 4:
-                top_now = top_now[top_now.trade >= top_now.high * 0.98]
-                if 'percent' in top_now.columns.values:
-                    top_now = top_now[top_now['percent'] >= 0]
+               # top_now = top_now[top_now.trade >= top_now.high * 0.98]
+               # if 'percent' in top_now.columns.values:
+                   # top_now = top_now[top_now['percent'] >= 0]
 
                 if len(top_all) == 0 and len(lastpTDX_DF) == 0:
                     cct.get_terminal_Position(position=sys.argv[0])
@@ -144,7 +144,7 @@ if __name__ == "__main__":
                     #     else:
                     #         top_all.append(top_now.loc[symbol])
                     top_all=cct.combine_dataFrame(top_all,top_now, col='couts',compare='dff')
-                
+
 
                 # top_all=top_all.sort_values(by=['dff','percent','couts'],ascending=[0,0,1])
                 # top_all=top_all.sort_values(by=['dff','ratio','percent','couts'],ascending=[0,1,0,1])
@@ -204,23 +204,25 @@ if __name__ == "__main__":
 
                 if len(top_all[top_all.dff>0]) == 0:
                     top_all['dff'] = (map(lambda x, y: round((x - y) / y * 100, 1), top_all['buy'].values, top_all['lastp'].values))
-                
+
                 top_temp = top_all[:ct.PowerCount].copy()
                 top_temp = pct.powerCompute_df(top_temp, dl=ct.PowerCountdl)
                 goldstock = len(top_all[(top_all.buy >= top_all.lhigh * 0.99) & (top_all.buy >= top_all.llastp * 0.99)])
 
                 top_all = tdd.get_powerdf_to_all(top_all,top_temp)
 
-                top_temp = stf.getBollFilter(df=top_temp, boll=ct.bollFilter,duration=ct.PowerCountdl)
+                top_temp = stf.getBollFilter(df=top_temp, boll=ct.bollFilter,duration=ct.PowerCountdl,filter=False)
                 print "G:%s Rt:%0.1f dT:%s N:%s T:%s" % (goldstock, float(time.time() - time_Rt), cct.get_time_to_date(time_s),cct.get_now_time(),len(top_temp))
                 if 'op' in top_temp.columns:
                     # top_temp = top_temp.sort_values(by=['ra','percent','couts'],ascending=[0, 0,0])
-                    
+
                     # top_temp = top_temp.sort_values(by=ct.Monitor_sort_op,
                                                     # ascending=ct.Monitor_sort_op_key)
 
-                    top_temp = top_temp.sort_values(by=ct.Duration_percent_op,
-                                        ascending=ct.Duration_percent_op_key)
+                    # top_temp = top_temp.sort_values(by=ct.Duration_percent_op,
+                                        # ascending=ct.Duration_percent_op_key)
+                    top_temp = top_temp.sort_values(by=ct.Monitor_sort_count,
+                                        ascending=ct.Monitor_sort_count_key)
 
                     # top_temp = top_temp.sort_values(by=['op','ra','dff', 'percent', 'ratio'], ascending=[0,0,0, 0, 1])
                 # if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935:

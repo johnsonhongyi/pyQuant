@@ -15,13 +15,46 @@ def getBollFilter(df=None,boll=-5,duration=ct.PowerCountdl,filter=True,ma5d=True
         return None
     else:
         df.loc[df.percent >= 9.9,'percent']=10
-    if cct.get_now_time_int() > 915 and cct.get_now_time_int() <= 1000:
-        # df = df[df.buy > df.cmean * ct.changeRatioUp ]
-        df = df[df.buy > df.cmean * ct.changeRatio]
-    elif cct.get_now_time_int() > 1000 and cct.get_now_time_int() <= 1445:
-        df = df[df.buy > df.cmean]
-    else:
-        df = df[df.buy > df.cmean]
+
+
+    if 'ma5d' in df.columns:
+        df = df[df.buy > df.ma5d * ct.changeRatio]
+    
+    if filter:
+
+        if cct.get_now_time_int() > 915 and cct.get_now_time_int() <= 1000:
+            # df = df[df.buy > df.cmean * ct.changeRatioUp ]
+            df = df[df.buy > df.hmax * ct.changeRatio]
+            
+        elif cct.get_now_time_int() > 1000 and cct.get_now_time_int() <= 1430:
+            df = df[df.buy > df.cmean]
+        else:
+            df = df[df.buy > df.hmax]
+
+        # if ma5d:
+        #     # op, ra, st, days = pct.get_linear_model_status('999999', filter='y', dl=dl, ptype='low')
+        #     oph, rah, sth, daysh = pct.get_linear_model_status('999999', filter='y', dl=dl, ptype='high')
+        #     # fibl = str(days[0])
+        #     fibh = str(daysh[0])
+        #     # if 1 < fibl < dl / 2 and fibh > dl / 3:
+        #     if fibh > dl / 3:
+        #         df = df[ ((df.ma5d * ct.changeRatio < df.low) & (df.low < df.ma5d * (2 - ct.changeRatio))) | ((df.percent > 1) & (df.volume > 3))]
+        if 'vstd' in df.columns:
+            # df = df[(df.lvol * df.volume > (df.vstd + df.lvol)) | ((df.percent > -5) & (df.hv/df.lv > 3))]
+            df = df[(df.lvol * df.volume > (df.vstd + df.lvol)) | ((df.percent > -6) & (df.hv/df.lv > 1.2))]
+                    # [dd.lvol * dd.volume > (dd.vstd + dd.lvol) | dd.lvol * dd.volume >(dd.ldvolume + dd.vstd]
+        if percent:
+            if  cct.get_now_time_int() > 920 and cct.get_now_time_int() <= 1400:
+                # df = df[((df.fibl < int(duration / 1.5)) &  (df.volume > 2.5 * cct.get_work_time_ratio() )) | (df.percent > 3)]
+                df = df[ (df.volume > 2.5 * cct.get_work_time_ratio()) | (df.percent > 3)]
+            if cct.get_now_time_int() > 926 or cct.get_now_time_int() < 900:
+                df = df[df.percent > 1 ]
+                # df = df[df.oph > 10]
+        if 'boll' in df.columns:
+            return df[df.boll >= boll]
+
+    return df
+         
         # df = df[df.buy > df.cmean * ct.changeRatio]
     # else:
     #     df = df[df.buy > df.lmin]
@@ -53,41 +86,11 @@ def getBollFilter(df=None,boll=-5,duration=ct.PowerCountdl,filter=True,ma5d=True
     # df.loc[:, ['fibl','op']] = df.loc[:, ['fibl','op']].astype(int)
     # df.loc[:, 'fibl'] = df.loc[:, 'fibl'].astype(int)
 
-    if 'ma5d' in df.columns:
-        df = df[df.buy > df.ma5d * ct.changeRatio]
-    
-    if filter:
-        # if ma5d:
-        #     # op, ra, st, days = pct.get_linear_model_status('999999', filter='y', dl=dl, ptype='low')
-        #     oph, rah, sth, daysh = pct.get_linear_model_status('999999', filter='y', dl=dl, ptype='high')
-        #     # fibl = str(days[0])
-        #     fibh = str(daysh[0])
-        #     # if 1 < fibl < dl / 2 and fibh > dl / 3:
-        #     if fibh > dl / 3:
-        #         df = df[ ((df.ma5d * ct.changeRatio < df.low) & (df.low < df.ma5d * (2 - ct.changeRatio))) | ((df.percent > 1) & (df.volume > 3))]
-        if 'vstd' in df.columns:
-            # df = df[(df.lvol * df.volume > (df.vstd + df.lvol)) | ((df.percent > -5) & (df.hv/df.lv > 3))]
-            df = df[(df.lvol * df.volume > (df.vstd + df.lvol)) | ((df.percent > -5) & (df.hv/df.lv > 1.2))]
-                    # [dd.lvol * dd.volume > (dd.vstd + dd.lvol) | dd.lvol * dd.volume >(dd.ldvolume + dd.vstd]
-        if percent:
-            if  cct.get_now_time_int() > 920 and cct.get_now_time_int() <= 1400:
-                # df = df[((df.fibl < int(duration / 1.5)) &  (df.volume > 2.5 * cct.get_work_time_ratio() )) | (df.percent > 3)]
-                df = df[ (df.volume > 2.5 * cct.get_work_time_ratio()) | (df.percent > 3)]
-            if cct.get_now_time_int() > 926 or cct.get_now_time_int() < 900:
-                df = df[df.percent > 1 ]
-                # df = df[df.oph > 10]
-
     # elif filter and cct.get_now_time_int() > 1015 and cct.get_now_time_int() <= 1445:
     #     df = df[((df.fibl < int(duration / 1.5)) &  (df.volume > 3)) | (df.percent > 3)]
         # print df
     # if 'ra' in df.columns and 'op' in df.columns:
     #     df = df[ (df.ma > 0 ) & (df.diff > 1) & (df.ra > 1) & (df.op >= 5) ]
-        if 'boll' in df.columns:
-            return df[df.boll >= boll]
-        # else:
-        #     print "boll not in columns"
-        #     df['boll'] = 0
-    return df
 
 def WriteCountFilter(df,op='op',writecount=ct.writeCount,end=None,duration=10):
     codel = []

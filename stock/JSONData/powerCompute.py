@@ -898,7 +898,7 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y',tali
 #            h5_co = h5.columns
 #            status = len(set(power_columns) & set(df_co)) - len(power_columns) == 0
 #            if status:
-#                h5 = h5.drop([inx for inx in h5.columns if inx not in power_columns],axis=1)
+            h5 = h5.drop([inx for inx in h5.columns if inx not in power_columns],axis=1)
             code_l = list(set(df.index) - set(h5.index))
             df = cct.combine_dataFrame(df, h5, col=None)
             if len(code_l) == 0:
@@ -1116,9 +1116,11 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y',tali
 
     if len(drop_cxg) >0:
         drop_t = [ co for co in drop_cxg if co in df.index]
-        Power_CXG_Error += 1
-        df = df.drop(drop_t,axis=0)
-        log.error("Drop_cxg open!!! drop_t:%s %s"%(drop_t,drop_cxg))
+        if len(drop_t) > 0:
+            Power_CXG_Error += 1
+            df = df.drop(drop_t,axis=0)
+            if Power_CXG_Error < 2:
+                log.error("Drop_cxg open!!! drop_t:%s %s"%(drop_t,drop_cxg))
 
 
 
