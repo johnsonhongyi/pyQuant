@@ -113,6 +113,7 @@ if __name__ == "__main__":
     # all_diffpath = tdd.get_tdx_dir_blocknew() + '062.blk'
     parser = cct.MoniterArgmain()
     parserDuraton = cct.DurationArgmain()
+    market_sort_value = ct.Market_sort_idx['1']
     while 1:
         try:
             '''
@@ -309,40 +310,12 @@ if __name__ == "__main__":
                     print "Rt:%0.1f dT:%s N:%s T:%s %s%%" % (float(time.time() - time_Rt), cct.get_time_to_date(time_s),cct.get_now_time(),len(top_temp),round(len(top_temp)/now_count*100,1))
                     # top_end = stf.getBollFilter(df=top_end, boll=ct.bollFilter,duration=ct.PowerCountdl)
                     if 'op' in top_temp.columns:
-                        # if ptype == 'low':
-                        #     top_temp = top_temp.sort_values(by=ct.Duration_sort_op,
-                        #                 ascending=ct.Duration_sort_op_key)
-                        # else:
-                        #     top_temp = top_temp.sort_values(by=ct.Duration_sort_high_op,
-                        #                 ascending=ct.Duration_sort_high_op_key)
-                        # top_temp=top_temp[top_temp.op >12]
-                        # top_temp = top_temp.sort_values(by=['ra', 'op'],ascending=[0, 0])[:10]
-
-
-                        # top_temp = top_temp.sort_values(by=['dff', 'op', 'ra', 'percent', 'ratio'],
-                        #                                 ascending=[0, 0, 0, 0, 1])[:10]
-
-                        # top_temp = top_temp.sort_values(by=['op', 'ra', 'dff', 'percent', 'ratio'],
-                        #                                 ascending=[0, 0, 0, 0, 1])[:10]
-                        # top_temp = top_temp.sort_values(by=['op','ldate','ra','dff', 'percent', 'ratio'], ascending=[0,0,0,0, 0, 1])[:10]
-
-                        # if cct.get_now_time_int() > 945 and int(duration_date * 1.5)  > ct.duration_date_sort:
                         if cct.get_now_time_int() > ct.checkfilter_end_timeDu and (int(duration_date) > int(ct.duration_date_sort) or int(duration_date) < ct.duration_diff):
-                            top_temp = top_temp.sort_values(by=ct.Duration_percent_op,
-                                        ascending=ct.Duration_percent_op_key)
-                            # top_temp = top_temp.sort_values(by=ct.Duration_percentdn_percentra,
-                                        # ascending=ct.Duration_percentdn_percentra_key)
-                            # top_temp = top_temp.sort_values(by=ct.Duration_percentdn_percent,
-                                        # ascending=ct.Duration_percentdn_percent_key)
+                            top_temp = top_temp.sort_values(by=eval(market_sort_value),
+                                        ascending=eval(market_sort_value+'_key'))
                         else:
-                            # top_temp = top_temp.sort_values(by=ct.Duration_percentdn_percent,
-                                        # ascending=ct.Duration_percentdn_percent_key)
-                            # top_temp = top_temp.sort_values(by=ct.Duration_percentdn_ra,
-                            #             ascending=ct.Duration_percentdn_ra_key)
-                            # top_temp = top_temp.sort_values(by=ct.Duration_percentdn_percentra,
-                            #             ascending=ct.Duration_percentdn_percentra_key)
-                            top_temp = top_temp.sort_values(by=ct.Duration_percent_op,
-                                        ascending=ct.Duration_percent_op_key)
+                            top_temp = top_temp.sort_values(by=eval(market_sort_value),
+                                        ascending=eval(market_sort_value+'_key'))
 
                     if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935:
                         # top_temp = top_temp[top_temp['buy'] > top_temp['ma10d']]
@@ -403,9 +376,17 @@ if __name__ == "__main__":
             else:
                 raise KeyboardInterrupt("StopTime")
         except (KeyboardInterrupt) as e:
-            st = cct.cct_raw_input("status:[go(g),clear(c),[d 20150101 [l|h]|[y|n|pn|py],quit(q),W(a),sh]:")
+            st = cct.cct_raw_input(ct.RawMenuArgmain()%(market_sort_value))
+
             if len(st) == 0:
                 status = False
+            elif len(st) == 1 and st.isdigit():
+                if st in ct.Market_sort_idx.keys():
+                    market_sort_value = ct.Market_sort_idx[st]
+                else:
+                    log.error("market_sort key error:%s"%(st))
+                    cct.sleeprandom(5)
+
             elif st.lower() == 'r':
                 dir_mo = eval(cct.eval_rule)
                 evalcmd(dir_mo)

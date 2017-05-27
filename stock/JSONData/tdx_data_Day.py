@@ -2590,7 +2590,7 @@ def get_append_lastp_to_df(top_all,lastpTDX_DF=None,dl=ct.PowerCountdl,end=None,
     #            #     :, ['llow', 'lhigh', 'lastp', 'lvol', 'date']]
 
             # h5 = top_hdf_api(fname=h5_fname,wr_mode='w',table=market,df=tdxdata)
-            h5 = h5a.write_hdf_db(h5_fname, tdxdata, table=h5_table)
+            h5 = h5a.write_hdf_db(h5_fname, tdxdata, table=h5_table,append=True)
 
 
         log.debug("TDX Col:%s" % tdxdata.columns.values)

@@ -68,66 +68,61 @@ code
 # ra*fibl*(int(%d)-fib)/100
 # powerdiff = '(rah(int(%s) - fibl) + ra*(fibl) +ma +kdj+rsi'
 powerdiff = 'int(ra)*int(fibl)*(int(%s)-int(fib))/10 +float(ma) +float(kdj)+float(rsi)'
-# Duration_sort_op=['fib','op','ra','percent','ratio','dff','couts']
-# Duration_sort_op=['fib','op','dff','fibl','ra','percent','ratio','volume','couts']
-# Duration_sort_op_key=[1,0,0,1,0,0,1,1,1]
-Duration_sort_op=['dff','op','fib','fibl','ra','percent','ratio','volume','couts']
-Duration_sort_op_key=[0,0,1,1,0,0,1,1,1]
 
-# Duration_percentdn_percent=['percent','dff','op','fib','fibl','ra','ratio','volume','couts']
-Duration_percentdn_percent=['dff','df2','percent','op','fib','fibl','ra','ratio','volume','couts']
-Duration_percentdn_percent_key=[0,0,0,0,1,1,0,1,1,1]
+Duration_sort_per_ratio=['percent','ratio','op','fib','fibl','ra','percent','volume','couts']
+Duration_sort_per_ratio_key=[0,1,0,1,1,0,0,1,1]
 
-Duration_percentdn_percentra=['percent','ra','dff','op','fib','fibl','ratio','volume','couts']
-Duration_percentdn_percentra_key=[0,0,0,0,1,1,1,1,1]
+Duration_percent_dff=['percent','dff','df2','op','fib','fibl','ra','ratio','volume','couts']
+Duration_percent_dff_key=[0,0,0,0,1,1,0,1,1,1]
 
-# Duration_percentdn_op=['dff','percent','op','fib','fibl','ra','ratio','volume','couts']
-Duration_percentdn_op=['df2','dff','percent','op','fib','fibl','ra','ratio','volume','couts']
-Duration_percentdn_op_key=[0,0,0,0,1,1,0,1,1,1]
+Duration_percent_vol=['percent','volume','dff','df2','op','fib','fibl','ra','ratio','couts']
+Duration_percent_vol_key=[0,0,0,0,0,1,1,0,1,1]
 
-# Duration_percentdn_ra=['ra','percent','dff','op','fib','fibl','ratio','volume','couts']
-# Duration_percentdn_ra_key=[0,0,0,0,1,1,1,1,1]
-# Duration_percentdn_ra=['dff','ra','percent','op','fib','fibl','ratio','volume','couts']
-Duration_percentdn_ra=['ra','dff','percent','op','fib','fibl','ratio','volume','couts']
-Duration_percentdn_ra_key=[0,0,0,0,1,1,1,1,1]
+# Duration_percent_per_ra=['percent','ra','dff','op','fib','fibl','ratio','volume','couts']
+# Duration_percent_per_ra_key=[0,0,0,0,1,1,1,1,1]
 
+Duration_percent_df2dff=['df2','dff','percent','op','fib','fibl','ra','ratio','volume','couts']
+Duration_percent_df2dff_key=[0,0,0,0,1,1,0,1,1,1]
 
-Duration_percentdn_opra=['op','ra','percent','dff','fib','fibl','ratio','volume','couts']
-Duration_percentdn_opra_key=[0,0,0,0,1,1,1,1,1]
-# Duration_percent_op=['dff','percent','op','fib','fibl','ra','ratio','volume','couts']
-# Duration_percent_op_key=[0,0,0,1,1,0,1,1,1]
-# Duration_percent_op=['dff','boll','ra','percent','op','fib','fibl','ratio','volume','couts']
-Duration_percent_op=['df2','dff','ra','percent','op','fib','fibl','ratio','volume','couts']
-Duration_percent_op_key=[0,0,0,0,0,1,1,1,1,1]
+Duration_percent_opra=['op','ra','percent','dff','fib','fibl','ratio','volume','couts']
+Duration_percent_opra_key=[0,0,0,0,1,1,1,1,1]
 
-# Duration_percent_op=['dff','boll','ra','percent','op','fib','fibl','ratio','volume','couts']
-# Duration_percent_op_key=[0,0,0,0,0,1,1,1,1,1]
+Duration_dff_percent=['dff','percent','df2','ra','op','fib','fibl','ratio','volume','couts']
+Duration_dff_percent_key=[0,0,0,0,0,1,1,1,1,1]
 
 Duration_ra_op=['ra','dff','couts','percent','op','fib','fibl','ratio','volume']
 Duration_ra_op_key=[0,0,0,0,0,1,1,1,1]
 
-Duration_ra_goldop=['ra','boll','dff','percent','op','fib','fibl','ratio','volume','couts']
-Duration_ra_goldop_key=[0,0,0,0,0,1,1,1,1,1]
+# Duration_ra_goldop=['ra','boll','dff','percent','op','fib','fibl','ratio','volume','couts']
+# Duration_ra_goldop_key=[0,0,0,0,0,1,1,1,1,1]
 
-# Duration_sort_high_op=['date','dff','fib','op','fibl','ra','percent','ratio','volume','couts']
 Duration_sort_high_op=['dff','date','fib','op','fibl','ra','percent','ratio','volume','couts']
 Duration_sort_high_op_key=[0,1,1,0,1,0,0,1,1,1]
 
-
-
 Monitor_sort_count=[ 'couts', 'percent','dff', 'ratio','volume']
 Monitor_sort_count_key=[ 0, 0,0,0, 0]
+
 Monitor_sort_op=['fib','fibl','op','dff','percent',  'ra' , 'ratio']
 Monitor_sort_op_key=[ 1, 1,0,0, 0, 0, 1]
 
 
-MonitorMarket_sort_count=['dff', 'percent', 'volume', 'couts', 'ratio']
+# MonitorMarket_sort_count=['dff', 'percent', 'volume', 'couts', 'ratio']
 # MonitorMarket_sort_op=['fib','dff', 'op', 'ra', 'percent', 'ratio']
                     #[1,0, 0, 0, 0, 1]
 # MonitorMarket_sort_op=['fib','op','dff','fibl','ra','percent','ratio','volume','couts']
 # MonitorMarket_sort_op_key=[1,0,0,1,0,0,1,1,1]
 MonitorMarket_sort_op=['dff','fib','fibl','op','ra','percent','ratio','volume','couts']
 MonitorMarket_sort_op_key=[0,0,1,0,0,0,1,1,1]
+
+def RawMenuArgmain():
+    raw = 'status:[go(g),clear(c),[d 20150101 [l|h]|[y|n|pn|py],quit(q),W(a),sh]:'
+    raw_input_menu=raw+"\n\tNow : %s"+"\n\t1:Sort By Percent\t2:Sort By DFF\t3:Sort By per_vol\t\n\t4:Sort By df2 \t\t5:Sort by Count 6:Sort by per_ratio\nplease input:"
+    return raw_input_menu
+
+# "Sort By Percent\t3:Sort By DFF\n\t2:Sort By OP\t\t4:Sort By Ra\nplease input:"
+
+Market_sort_idx={'1':'ct.Duration_percent_dff','2':'ct.Duration_dff_percent','3':'ct.Duration_percent_vol',\
+                '4':'ct.Duration_percent_df2dff','5':'ct.Monitor_sort_count','6':'ct.Duration_sort_per_ratio'}
 
 #edit 1031
 # Duration_format_buy=['name', 'buy', 'ma5d','boll','dff', 'percent','ra','op', 'fib','fibl','volume', 'ratio', 'couts','ldate', 'date']

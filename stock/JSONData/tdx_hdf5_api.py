@@ -293,7 +293,7 @@ def load_hdf_db(fname,table='all',code_l=None,timelimit=True,index=False,limit_t
                 else:
                     if INIT_LOG_Error < 3:
                         INIT_LOG_Error +=1
-                        log.error("cl:%s h5:%s don't find:%s dra:%0.2f"%(len(code_l),len(dd),len(code_l)-len(dif_co),dratio))
+                        log.error("fn:%s cl:%s h5:%s don't find:%s dra:%0.2f"%(fname,len(code_l),len(dd),len(code_l)-len(dif_co),dratio))
         else:
             log.error("%s is not find %s"%(fname,table))
     else:

@@ -89,6 +89,7 @@ if __name__ == "__main__":
     blkname = '064.blk'
     block_path = tdd.get_tdx_dir_blocknew() + blkname
     lastpTDX_DF = pd.DataFrame()
+    market_sort_value = ct.Market_sort_idx['5']
     while 1:
         try:
             # df = rl.get_sina_all_json_dd(vol, type)
@@ -282,10 +283,17 @@ if __name__ == "__main__":
             # if success > 3:
             #     raw_input("Except")
             # st=raw_input("status:[go(g),clear(c),quit(q,e)]:")
-            st = cct.cct_raw_input("status:[go(g),clear(c),quit(q,e),W(w),Wa(a)]:")
+            st = cct.cct_raw_input(ct.RawMenuArgmain()%(market_sort_value))
 
             if len(st) == 0:
                 status = False
+            elif len(st) == 1 and st.isdigit():
+                if st in ct.Market_sort_idx.keys():
+                    market_sort_value = ct.Market_sort_idx[st]
+                else:
+                    log.error("market_sort key error:%s"%(st))
+                    cct.sleeprandom(5)
+
             elif st.lower() == 'g' or st.lower() == 'go':
                 status = True
             elif st.lower() == 'clear' or st.lower() == 'c':

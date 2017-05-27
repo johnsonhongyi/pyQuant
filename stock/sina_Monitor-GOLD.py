@@ -305,7 +305,8 @@ if __name__ == "__main__":
             # cct.sleep(1)
             # if success > 3:
             # st=raw_input("status:[go(g),clear(c),quit(q,e)]:")
-            st = cct.cct_raw_input("status:[go(g),clear(c),quit(q,e),W(w),Wa(a)]:")
+            st = cct.cct_raw_input(ct.RawMenuArgmain()%(market_sort_value))
+
 
             if len(st) == 0:
                 # top_all=pd.DataFrame()

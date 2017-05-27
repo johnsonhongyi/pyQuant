@@ -88,6 +88,8 @@ if __name__ == "__main__":
     block_path = tdd.get_tdx_dir_blocknew() + blkname
     lastpTDX_DF = pd.DataFrame()
     status_change = False
+    market_sort_value = ct.Market_sort_idx['2']
+    
     # initTdx = True
     # all_diffpath = tdd.get_tdx_dir_blocknew() + '062.blk'
     while 1:
@@ -247,16 +249,8 @@ if __name__ == "__main__":
                     print "Rt:%0.1f dT:%s N:%s T:%s %s%%" % (float(time.time() - time_Rt), cct.get_time_to_date(time_s),cct.get_now_time(),len(top_temp),round(len(top_temp)/now_count*100,1))
                     if 'op' in top_temp.columns:
 
-                        # top_temp = top_temp.sort_values(by=['ra', 'op','percent'],ascending=[0, 0,0])
-
-                        # top_temp = top_temp.sort_values(by=ct.MonitorMarket_sort_op,
-                                                        # ascending=ct.MonitorMarket_sort_op_key)
-                        top_temp = top_temp.sort_values(by=ct.Duration_percent_op,
-                                        ascending=ct.Duration_percent_op_key)
-                        # top_temp = top_temp.sort_values(by=['op','ra','dff', 'percent', 'ratio'], ascending=[0,0,0, 0, 1])
-                    # if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935:
-                    #     top_temp = top_temp.loc[:,ct.MonitorMarket_format_buy]
-                    # else:
+                        top_temp = top_temp.sort_values(by=eval(market_sort_value),
+                                        ascending=eval(market_sort_value+'_key'))
                     #     top_temp = top_temp.loc[:,ct.MonitorMarket_format_buy]
                     print rl.format_for_print(top_temp.loc[:,ct.MonitorMarket_format_buy][:10])
                     # print rl.format_for_print(top_dif[:10])
@@ -308,9 +302,17 @@ if __name__ == "__main__":
             # if success > 3:
             #     raw_input("Except")
             #     sys.exit(0)
-            st = cct.cct_raw_input("status:[go(g),clear(c),quit(q,e),W(w),Wa(a)]:")
+            st = cct.cct_raw_input(ct.RawMenuArgmain()%(market_sort_value))
+
             if len(st) == 0:
                 status = False
+            elif len(st) == 1 and st.isdigit():
+                if st in ct.Market_sort_idx.keys():
+                    market_sort_value = ct.Market_sort_idx[st]
+                else:
+                    log.error("market_sort key error:%s"%(st))
+                    cct.sleeprandom(5)
+
             elif st.lower() == 'r':
                 dir_mo = eval(cct.eval_rule)
                 evalcmd(dir_mo)

@@ -120,6 +120,7 @@ if __name__ == "__main__":
     duration_date = ct.duration_date
     end_date = cct.last_tddate(days=3)
     # all_diffpath = tdd.get_tdx_dir_blocknew() + '062.blk'
+    market_sort_value = ct.Market_sort_idx['2']
     while 1:
         try:
             # top_now = tdd.getSinaAlldf(market='sh', vol=ct.json_countVol, type=ct.json_countType)
@@ -205,7 +206,7 @@ if __name__ == "__main__":
                         # top_dif['percent']= (map(lambda x, y: round((x-y)/y*100,1) if int(y) > 0 else 0, top_dif.buy, top_dif.llastp))
 
                     if 'couts' in top_dif.columns.values:
-                        top_dif = top_dif.sort_values(by=ct.MonitorMarket_sort_count,ascending=[0, 0, 0, 1, 0])
+                        top_dif = top_dif.sort_values(by=ct.Monitor_sort_count,ascending=[0, 0, 0, 1, 0])
                     else:
                         # print "Good Morning!!!"
                         top_dif = top_dif.sort_values(
@@ -230,25 +231,12 @@ if __name__ == "__main__":
                     print "Rt:%0.1f dT:%s N:%s T:%s %s%%" % (float(time.time() - time_Rt), cct.get_time_to_date(time_s),cct.get_now_time(),len(top_temp),round(len(top_temp)/now_count*100,1))
                     if 'op' in top_temp.columns:
 
-                        # top_temp = top_temp.sort_values(by=['ra', 'op','percent'],ascending=[0, 0,0])
-
-                        # top_temp = top_temp.sort_values(by=ct.MonitorMarket_sort_op,
-                                        # ascending=ct.MonitorMarket_sort_op_key)
                         if duration_date > ct.duration_date_sort:
-                            top_temp = top_temp.sort_values(by=ct.Duration_percent_op,
-                                        ascending=ct.Duration_percent_op_key)
+                            top_temp = top_temp.sort_values(by=eval(market_sort_value),
+                                        ascending=eval(market_sort_value+'_key'))
                         else:
-                            top_temp = top_temp.sort_values(by=ct.Duration_percentdn_percent,
-                                        ascending=ct.Duration_percentdn_percent_key)
-                            # top_temp = top_temp.sort_values(by=ct.Duration_percentdn_op,
-                            #             ascending=ct.Duration_percentdn_op_key)
-                            # top_temp = top_temp.sort_values(by=ct.Duration_percentdn_ra,
-                            #             ascending=ct.Duration_percentdn_ra_key)
-
-                        # top_temp = top_temp.sort_values(by=ct.Duration_percent_op,
-                        #                 ascending=ct.Duration_percent_op_key)
-
-                        # top_temp = top_temp.sort_values(by=['op','ra','dff', 'percent', 'ratio'], ascending=[0,0,0, 0, 1])
+                            top_temp = top_temp.sort_values(by=eval(market_sort_value),
+                                        ascending=eval(market_sort_value+'_key'))
                     # if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935:
                     #     # top_temp = top_temp[ (top_temp['ma5d'] > top_temp['ma10d']) & (top_temp['buy'] > top_temp['ma10d']) ]
                     #     top_temp = top_temp.loc[:,ct.MonitorMarket_format_buy]
@@ -307,9 +295,17 @@ if __name__ == "__main__":
             # if success > 3:
             #     raw_input("Except")
             #     sys.exit(0)
-            st = cct.cct_raw_input("status:[go(g),clear(c),quit(q,e),W(w),Wa(a)]:")
+            st = cct.cct_raw_input(ct.RawMenuArgmain()%(market_sort_value))
+
             if len(st) == 0:
                 status = False
+            elif len(st) == 1 and st.isdigit():
+                if st in ct.Market_sort_idx.keys():
+                    market_sort_value = ct.Market_sort_idx[st]
+                else:
+                    log.error("market_sort key error:%s"%(st))
+                    cct.sleeprandom(5)
+
             elif st.lower() == 'r':
                 dir_mo = eval(cct.eval_rule)
                 evalcmd(dir_mo)

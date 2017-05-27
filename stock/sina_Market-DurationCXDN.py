@@ -129,6 +129,7 @@ if __name__ == "__main__":
     # all_diffpath = tdd.get_tdx_dir_blocknew() + '062.blk'
     parser = cct.MoniterArgmain()
     parserDuraton = cct.DurationArgmain()
+    market_sort_value = ct.Market_sort_idx['2']
     while 1:
         try:
             '''
@@ -164,51 +165,19 @@ if __name__ == "__main__":
 
                     time_Rt = time.time()
                     top_all,lastpTDX_DF = tdd.get_append_lastp_to_df(top_now, lastpTDX_DF=None, dl=duration_date,end=end_date,ptype=ptype,filter=filter, power=False, lastp=False,newdays=newdays)
-                    # codelist = top_all.index.tolist()
-                    # log.info('toTDXlist:%s' % len(codelist))
-                    # # tdxdata = tdd.get_tdx_all_day_LastDF(codelist,dt=duration_date,ptype=ptype)
-                    # # print "duration_date:%s ptype=%s filter:%s"%(duration_date, ptype,filter)
-                    # # tdxdata = tdd.get_tdx_exp_all_LastDF(codelist, dt=duration_date, end=end_date, ptype=ptype,filter=filter)
-                    # tdxdata = tdd.get_tdx_exp_all_LastDF_DL(codelist, dt=duration_date, end=end_date, ptype=ptype,filter=filter,power=power)
-                    # log.debug("TdxLastP: %s %s" % (len(tdxdata), tdxdata.columns.values))
-                    # tdxdata.rename(columns={'low': 'llow'}, inplace=True)
-                    # tdxdata.rename(columns={'high': 'lhigh'}, inplace=True)
-                    # tdxdata.rename(columns={'close': 'lastp'}, inplace=True)
-                    # tdxdata.rename(columns={'vol': 'lvol'}, inplace=True)
-                    # if power:
-                    #     tdxdata = tdxdata.loc[:, ['llow', 'lhigh', 'lastp', 'lvol', 'date','ra','op','fib','ldate']]
-                    #     # print len(tdxdata[tdxdata.op >12]),
-                    # else:
-                    #     tdxdata = tdxdata.loc[:, ['llow', 'lhigh', 'lastp', 'lvol', 'date']]
-                    # log.debug("TDX Col:%s" % tdxdata.columns.values)
-                    # top_all = top_all.merge(tdxdata, left_index=True, right_index=True, how='left')
-                    # lastpTDX_DF = tdxdata
-                    # log.info('Top-merge_now:%s' % (top_all[:1]))
-                    # top_all = top_all[top_all['llow'] > 0]
+                    
                 elif len(top_all) == 0 and len(lastpTDX_DF) > 0:
                     time_Rt = time.time()
                     top_all = top_now
                     top_all = top_all.merge(lastpTDX_DF, left_index=True, right_index=True, how='left')
                     top_all = top_all[top_all['llow'] > 0]
-                    # log.info('Top-merge_now:%s' % (top_all[:1]))
 
                 else:
                     if 'couts' in top_now.columns.values:
                         if not 'couts' in top_all.columns.values:
                             top_all['couts'] = 0
                             top_all['prev_p'] = 0
-                    # for symbol in top_now.index:
-                    #     if 'couts' in top_now.columns.values:
-                    #         top_all.loc[symbol, ct.columns_now] = top_now.loc[symbol, ct.columns_now]
-                    #     else:
-                    #         top_all.loc[symbol, ct.columns_now] = top_now.loc[symbol, ct.columns_now]
-                    # org_all = top_all.copy()
-                    # no_index = top_all.drop([inx for inx in top_all.index  if inx not in top_now.index], axis=0)
-                    # no_index.drop([col for col in no_index.columns if col in top_now.columns], axis=1,inplace=True)
-                    # no_index = no_index.merge(top_now, left_index=True, right_index=True, how='left')
-                    # top_all = top_all.drop([inx for inx in top_all.index  if inx in top_now.index], axis=0)
-                    # top_all = pd.concat([top_all, no_index],axis=0)
-                    # log.info("couts for time:%0.2f"%(time.time()-time_Rt))
+
                     top_all=cct.combine_dataFrame(top_all,top_now, col=None)
 
 
@@ -350,17 +319,11 @@ if __name__ == "__main__":
 
                         # if (cct.get_now_time_int() > ct.checkfilter_end_timeDu and int(duration_date) > int(ct.duration_date_sort)) or int(duration_date) < 6:
                         if cct.get_now_time_int() > ct.checkfilter_end_timeDu and (int(duration_date) > int(ct.duration_date_sort) or int(duration_date) < ct.duration_diff):
-                            top_temp = top_temp.sort_values(by=ct.Duration_percent_op,
-                                        ascending=ct.Duration_percent_op_key)
+                            top_temp = top_temp.sort_values(by=eval(market_sort_value),
+                                        ascending=eval(market_sort_value+'_key'))
                         else:
-                            top_temp = top_temp.sort_values(by=ct.Duration_percent_op,
-                                        ascending=ct.Duration_percent_op_key)
-                            # top_temp = top_temp.sort_values(by=ct.Duration_percentdn_percent,
-                                        # ascending=ct.Duration_percentdn_percent_key)
-                            # top_temp = top_temp.sort_values(by=ct.Duration_percentdn_ra,
-                                        # ascending=ct.Duration_percentdn_ra_key)
-                            # top_temp = top_temp.sort_values(by=ct.Duration_percentdn_op,
-                                        # ascending=ct.Duration_percentdn_op_key)
+                            top_temp = top_temp.sort_values(by=eval(market_sort_value),
+                                        ascending=eval(market_sort_value+'_key'))
 
                     if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935:
                         # top_temp = top_temp[top_temp['buy'] > top_temp['ma10d']]
@@ -421,9 +384,16 @@ if __name__ == "__main__":
             else:
                 raise KeyboardInterrupt("StopTime")
         except (KeyboardInterrupt) as e:
-            st = cct.cct_raw_input("status:[go(g),clear(c),[d 20150101 [l|h]|[y|n|pn|py],quit(q),W(a),sh]:")
+            # st = cct.cct_raw_input("status:[go(g),clear(c),[d 20150101 [l|h]|[y|n|pn|py],quit(q),W(a),sh]:")
+            st = cct.cct_raw_input(ct.RawMenuArgmain()%(market_sort_value))
             if len(st) == 0:
                 status = False
+            elif len(st) == 1 and st.isdigit():
+                if st in ct.Market_sort_idx.keys():
+                    market_sort_value = ct.Market_sort_idx[st]
+                else:
+                    log.error("market_sort key error:%s"%(st))
+                    cct.sleeprandom(5)
             elif st.lower() == 'r':
                 dir_mo = eval(cct.eval_rule)
                 evalcmd(dir_mo)

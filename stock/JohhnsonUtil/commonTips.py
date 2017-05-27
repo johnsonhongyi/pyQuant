@@ -738,7 +738,7 @@ def get_work_hdf_status():
 def get_work_duration():
     int_time = get_now_time_int()
     # now_t = int(now_t)
-    if get_work_day_status() and (int_time > 800 and int_time < 915) or (int_time > 1130 and int_time < 1300):
+    if get_work_day_status() and ( (800 < int_time < 915) or (1130 < int_time < 1300)):
     # if (int_time > 830 and int_time < 915) or (int_time > 1130 and int_time < 1300) or (int_time > 1500 and int_time < 1510):
         # return False
         return True
@@ -1393,6 +1393,11 @@ def DurationArgmain():
                         help='filter low')
     return parser
 
+# def RawMenuArgmain():
+#     raw = 'status:[go(g),clear(c),[d 20150101 [l|h]|[y|n|pn|py],quit(q),W(a),sh]:'
+#     raw_input_menu=raw+"\n\tNow : %s"+"\n\t1:Sort By Percent\t2:Sort By DFF\t3:Sort By OPRa\t\n\t4:Sort By Ra \t\t5:Sort by Counts\nplease input:"
+#     return raw_input_menu
+
 def LineArgmain():
     # from ConfigParser import ConfigParser
     # import shlex
@@ -1568,6 +1573,7 @@ if __name__ == '__main__':
     log_level = LoggerFactory.DEBUG if args['--debug'] else LoggerFactory.ERROR
     log.setLevel(log_level)
     s_time=time.time()
+    print get_work_day_status()
     print get_terminal_Position(cmd='DurationDN.py', position=None, close=False)
     print get_terminal_Position(cmd='Johnson@', position=None, close=False)
     print get_terminal_Position(cmd='Johnson — bash', position=None, close=False)
@@ -1577,7 +1583,6 @@ if __name__ == '__main__':
     # print typeday8_to_day10(None)
     # write_to_blocknew('abc', ['300380','601998'], append=True)
     print get_now_time_int()
-    print get_work_day_status()
     print get_work_duration()
     print get_today_duration('2017-01-01','20170504')
     # print get_tushare_market(market='captops', renew=True,days=10).shape
