@@ -1182,7 +1182,7 @@ def write_to_blocknew(p_name, data, append=True):
                     raw = (i) + '\r\n'
                     fout.write(raw)
 
-        # x=0
+        counts=0
         for i in data:
             # print type(i)
             # if append and len(flist) > 0:
@@ -1192,10 +1192,13 @@ def write_to_blocknew(p_name, data, append=True):
             # else:
             raw = code_to_tdxblk(i) + '\r\n'
             if len(raw) > 8 and not raw in flist:
+                counts +=1
                 fout.write(raw)
                 # raw = pack('IfffffII', t, i[2], i[3], i[4], i[5], i[6], i[7], i[8])
         fout.flush()
         fout.close()
+        print "write to %s:%s"%(p_name,counts)
+
     blockNew= get_tdx_dir_blocknew() + 'zxg.blk'
     blockNewStart = get_tdx_dir_blocknew() + '066.blk'
     # writeBlocknew(blockNew, data)
@@ -1212,22 +1215,22 @@ def write_to_blocknew(p_name, data, append=True):
         writeBlocknew(p_name, data, append)
         writeBlocknew(blockNew, data)
         writeBlocknew(blockNewStart, data,append)
-        print "write to zxg and 066:%s:%s"%(p_name,len(data))
+        # print "write to zxg and 066:%s:%s"%(p_name,len(data))
     elif p_name.find('065.blk') > 0:
         writeBlocknew(p_name, data, append)
         writeBlocknew(blockNew,data,append)
         writeBlocknew(blockNewStart, data,append)
-        print "write to %s:%s"%(p_name,len(data))
+        # print "write to %s:%s"%(p_name,len(data))
     elif p_name.find('068.blk')  > 0 or p_name.find('069.blk') > 0:
 
         writeBlocknew(p_name, data, append)
-        print "write to %s:%s"%(p_name,len(data))
+        # print "write to %s:%s"%(p_name,len(data))
     else:
         writeBlocknew(p_name, data, append)
         writeBlocknew(blockNew, data)
         # writeBlocknew(blockNewStart, data[:ct.writeCount - 1])
         writeBlocknew(blockNewStart, data,append)
-        print "write to other and start:%s :%s"%(p_name,len(data))
+        # print "write to other and start:%s :%s"%(p_name,len(data))
 
 
 def get_run_path():
