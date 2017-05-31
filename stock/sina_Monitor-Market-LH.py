@@ -125,7 +125,8 @@ if __name__ == "__main__":
         try:
             # top_now = tdd.getSinaAlldf(market='sh', vol=ct.json_countVol, type=ct.json_countType)
             time_Rt = time.time()
-            top_now = tdd.getSinaAlldf(market='次新股',filename='cxg', vol=ct.json_countVol, type=ct.json_countType)
+            # top_now = tdd.getSinaAlldf(market='次新股',filename='cxg', vol=ct.json_countVol, type=ct.json_countType)
+            top_now = tdd.getSinaAlldf(market='cyb',filename=None, vol=ct.json_countVol, type=ct.json_countType)
             # print top_now.loc['300208','name']
             df_count = len(top_now)
             now_count = len(top_now)
@@ -151,10 +152,14 @@ if __name__ == "__main__":
                     top_now['buy'] = (map(lambda x, y: y if int(x) == 0 else x, top_now['buy'].values, top_now['trade'].values))
 
                 if len(top_all) == 0 and len(lastpTDX_DF) == 0:
-                    cct.get_terminal_Position(position=sys.argv[0])
-
+                    terminal_count = cct.get_terminal_Position(position=sys.argv[0])
+                    print "term:%s"%(terminal_count),
+                    if terminal_count >1:
+                        top_all,lastpTDX_DF = tdd.get_append_lastp_to_df(top_now, lastpTDX_DF=None, dl=duration_date)
+                    else:
+                        top_all,lastpTDX_DF = tdd.get_append_lastp_to_df(top_now, lastpTDX_DF=None, dl=duration_date,checknew=True)
                     # time_Rt = time.time()
-                    top_all,lastpTDX_DF = tdd.get_append_lastp_to_df(top_now,end=end_date,dl=duration_date)
+                    # top_all,lastpTDX_DF = tdd.get_append_lastp_to_df(top_now,end=end_date,dl=duration_date)
                 elif len(top_all) == 0 and len(lastpTDX_DF) > 0:
                     # time_Rt = time.time()
                     top_all = tdd.get_append_lastp_to_df(top_now,lastpTDX_DF)

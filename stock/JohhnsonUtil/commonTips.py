@@ -207,6 +207,7 @@ def get_terminal_Position(cmd=None, position=None,close=False):
         else:
             # sleep(1, catch=True)
             position = position.split(os.sep)[-1]
+            log.info("position Argv:%s"%(position))
             if int(count) > 0:
                 if position in terminal_positionKey.keys():
                     log.info("count:%s"%(count))
@@ -1197,7 +1198,8 @@ def write_to_blocknew(p_name, data, append=True):
                 # raw = pack('IfffffII', t, i[2], i[3], i[4], i[5], i[6], i[7], i[8])
         fout.flush()
         fout.close()
-        print "write to %s:%s"%(p_name,counts)
+        if p_name.find('066.blk') >= 0:
+            print "write to %s:%s"%(p_name,counts)
 
     blockNew= get_tdx_dir_blocknew() + 'zxg.blk'
     blockNewStart = get_tdx_dir_blocknew() + '066.blk'
