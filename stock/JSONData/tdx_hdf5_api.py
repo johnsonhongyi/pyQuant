@@ -12,7 +12,7 @@ from JohhnsonUtil import LoggerFactory
 from JohhnsonUtil import commonTips as cct
 from JohhnsonUtil import johnson_cons as ct
 import random
-
+import subprocess
 log = LoggerFactory.log
 
 global RAMDISK_KEY,INIT_LOG_Error
@@ -29,6 +29,11 @@ class SafeHDFStore(HDFStore):
         self._lock = lock
         self.countlock = 0
         self.write_status = False
+        self.complevel=9
+        self.complib='zlib'
+        self.temp_file = self.fname+'_tmp'
+        self.ptrepack_cmds="ptrepack --chunkshape=auto --propindexes --complevel=9 --complib=blosc %s %s"
+        self.big_H5_Size = 30
         global RAMDISK_KEY
         if not os.path.exists(baseDir):
             if RAMDISK_KEY < 1:
@@ -37,6 +42,10 @@ class SafeHDFStore(HDFStore):
         else:
             self.write_status = True
             self.run(self.fname)
+        # ptrepack --chunkshape=auto --propindexes --complevel=9 --complib=blosc in.h5 out.h5
+        # subprocess.call(["ptrepack", "-o", "--chunkshape=auto", "--propindexes", --complevel=9,", ",--complib=blosc,infilename, outfilename])
+        # os.system()
+
     def run(self,fname,**kwargs):
         while True:
             try:
@@ -61,7 +70,9 @@ class SafeHDFStore(HDFStore):
 #                time.sleep(probe_interval)
 #                return None
 #        HDFStore.__init__(self, *args, **kwargs)
-        HDFStore.__init__(self,fname, **kwargs)
+        HDFStore.__init__(self,fname,format="table",complevel=self.complevel,complib=self.complib, **kwargs)
+        # HDFStore.__init__(self,fname,format="table",complevel=self.complevel,complib=self.complib, **kwargs)
+        # ptrepack --complib=zlib --complevel 9 --overwrite sina_data.h5 out.h5
 
     def __enter__(self):
         if self.write_status:
@@ -71,6 +82,17 @@ class SafeHDFStore(HDFStore):
         if self.write_status:
             HDFStore.__exit__(self, *args, **kwargs)
             os.close(self._flock)
+            h5_size = os.path.getsize(self.fname)/1000/1000
+            if h5_size > self.big_H5_Size:
+                log.info("h5_size:%sM"%(h5_size))
+                os.rename(self.fname, self.temp_file)
+                p = subprocess.Popen(self.ptrepack_cmds%(self.temp_file,self.fname), shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+                p.wait()
+                if p.returncode != 0:
+                    log.error("ptrepack hdf Error.:%s"%(self.fname) )
+                    # return -1
+                else:
+                    os.remove(self.temp_file)
             os.remove(self._lock)
 
 # with SafeHDFStore('example.hdf') as store:
@@ -150,7 +172,7 @@ def write_hdf_db(fname,df,table='all',index=False,baseCount=500,append=False,Mul
             if store is not None:
                 if '/'+table in store.keys():
                     tmpdf = store[table]
-        if not MultiIndex:            
+        if not MultiIndex:
             if index:
                 df.index = map((lambda x:str(1000000-int(x)) if x.startswith('0') else x),df.index)
             if tmpdf is not None and len(tmpdf) > 0:
@@ -174,7 +196,7 @@ def write_hdf_db(fname,df,table='all',index=False,baseCount=500,append=False,Mul
             # df.loc[(df.index.get_level_values('code')== 600004)]
             # df.loc[(600004,20170414),:]
             # df.xs(20170425,level='date')
-            # df.index.get_level_values('code').unique() 
+            # df.index.get_level_values('code').unique()
             # df.index.get_loc(600006)
             # slice(58, 87, None)
             # df.index.get_loc_level(600006)
@@ -185,7 +207,7 @@ def write_hdf_db(fname,df,table='all',index=False,baseCount=500,append=False,Mul
             # da.groupby(level=1).mean()
             # da.index.get_loc('000005')     da.iloc[slice(22,33,None)]
             # mask = totals['dirty']+totals['swap'] > 1e7     result = mask.loc[mask]
-            multi_code = tmpdf.index.get_level_values('code').unique().tolist() 
+            multi_code = tmpdf.index.get_level_values('code').unique().tolist()
             df_code = df.index.tolist()
             diff_code = set(df_code) - set(multi_code)
             # da.drop(('000001','2017-05-11'))
@@ -204,7 +226,7 @@ def write_hdf_db(fname,df,table='all',index=False,baseCount=500,append=False,Mul
                 log.info("col:%s"%(col))
                 df[col] = df[col].astype(str)
             df.index = df.index.astype(str)
-            
+
         with SafeHDFStore(fname) as h5:
             df = df.fillna(0)
             if h5 is not None:
