@@ -297,7 +297,7 @@ def load_hdf_db(fname,table='all',code_l=None,timelimit=True,index=False,limit_t
                     code_l = map((lambda x:str(1000000-int(x)) if x.startswith('0') else x),code_l)
                 dif_co = list(set(dd.index) & set(code_l))
                 dratio = (float(len(code_l)) - float(len(dif_co)))/float(len(code_l))
-                if dratio < 0.1 and len(dd) > 0:
+                if dratio < 0.1 or len(dd) > 3100:
                     log.info("find all:%s :%s %0.2f"%(len(code_l),len(code_l)-len(dif_co),dratio))
                     if timelimit and len(dd) > 0:
                         dd = dd.loc[dif_co]
@@ -315,9 +315,9 @@ def load_hdf_db(fname,table='all',code_l=None,timelimit=True,index=False,limit_t
                     else:
                          df = dd.loc[dif_co]
                 else:
-                    if INIT_LOG_Error < 3:
+                    if INIT_LOG_Error < 5:
                         INIT_LOG_Error +=1
-                        log.error("fn:%s cl:%s h5:%s don't find:%s dra:%0.2f"%(fname,len(code_l),len(dd),len(code_l)-len(dif_co),dratio))
+                        log.error("fn:%s cl:%s h5:%s don't find:%s dra:%0.2f log_err:%s"%(fname,len(code_l),len(dd),len(code_l)-len(dif_co),dratio,INIT_LOG_Error))
         else:
             log.error("%s is not find %s"%(fname,table))
     else:

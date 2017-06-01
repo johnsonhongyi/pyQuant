@@ -283,7 +283,7 @@ SINA_Total_Columns = ['code', 'name', 'open', 'close','now', 'trade', 'high', 'l
                       'turnover', 'b1_v', 'b1', 'b2_v', 'b2', 'b3_v',
                       'b3', 'b4_v', 'b4', 'b5_v', 'b5', 'a1_v',
                       'a1', 'a2_v', 'a2', 'a3_v', 'a3', 'a4_v',
-                      'a4', 'a5_v', 'a5']
+                      'a4', 'a5_v', 'a5','dt','ticktime']
 
 SINA_DD_Clean_Count_Columns = ['name', 'percent', 'dff', 'couts', 'trade', 'high', 'open', 'low', 'ratio', 'volume',
                                'prev_price']

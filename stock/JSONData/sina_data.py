@@ -19,15 +19,20 @@ from trollius.coroutines import From
 log = LoggerFactory.log
 # log.setLevel(LoggerFactory.DEBUG)
 import tdx_hdf5_api as h5a
+from JSONData import realdatajson as rl
 
 class StockCode:
     def __init__(self):
         self.start_t = time.time()
         self.STOCK_CODE_PATH = 'stock_codes.conf'
         self.stock_code_path = self.stock_code_path()
-        if not os.path.exists(self.stock_code_path) or cct.creation_date_duration(self.stock_code_path) > 12:
-            print ("days:%s update stock_codes.conf"%(cct.creation_date_duration(self.stock_code_path)))
-            self.get_stock_codes(True)
+        # print os.path.getsize(self.stock_code_path)
+        if not os.path.exists(self.stock_code_path) or os.path.getsize(self.stock_code_path) < 500:
+            stock_codes = self.get_stock_codes(True)
+            print ("create:%s counts:%s"%(self.stock_code_path,len(stock_codes)))
+        if cct.creation_date_duration(self.stock_code_path) > 10:
+            stock_codes=self.get_stock_codes(True)
+            print ("days:%s %s update stock_codes.conf"%(cct.creation_date_duration(self.stock_code_path),len(stock_codes)))
 
         self.stock_codes = None
 
@@ -39,28 +44,32 @@ class StockCode:
         all_stock_codes_url = 'http://www.shdjt.com/js/lib/astock.js'
         grep_stock_codes = re.compile('~(\d+)`')
         response = requests.get(all_stock_codes_url)
-        all_stock_codes = grep_stock_codes.findall(response.text)
-        # print len(all_stock_codes)
-
+        stock_codes = grep_stock_codes.findall(response.text)
+        stock_codes = [elem for elem in stock_codes if elem.startswith(('6','30','00'))]
+        # df=rl.get_sina_Market_json('all')
+        # stock_codes = df.index.tolist()
         with open(self.stock_code_path, 'w') as f:
-            f.write(json.dumps(dict(stock=all_stock_codes)))
-
+            f.write(json.dumps(dict(stock=stock_codes)))
+        return stock_codes
     # @property
     def get_stock_codes(self, realtime=False):
         """获取所有股票 ID 到 all_stock_code 目录下"""
         # print "days:",cct.creation_date_duration(self.stock_code_path)
         if realtime:
-            all_stock_codes_url = 'http://www.shdjt.com/js/lib/astock.js'
-            grep_stock_codes = re.compile('~(\d+)`')
-            response = requests.get(all_stock_codes_url)
-            stock_codes = grep_stock_codes.findall(response.text)
+            # all_stock_codes_url = 'http://www.shdjt.com/js/lib/astock.js'
+            # grep_stock_codes = re.compile('~(\d+)`')
+            # response = requests.get(all_stock_codes_url)
+            # stock_codes = grep_stock_codes.findall(response.text)
+            # stock_codes = [elem for elem in stock_codes if elem.startswith(('6','30','00'))]
+            # df=rl.get_sina_Market_json('all')
+            # stock_codes = df.index.tolist()
+            stock_codes = self.update_stock_codes()
             log.info("readltime codes:%s"%(len(stock_codes)))
-            with open(self.stock_code_path, 'w') as f:
-                f.write(json.dumps(dict(stock=stock_codes)))
-            return list(set(stock_codes))
-        else:
+            # with open(self.stock_code_path, 'w') as f:
+                # f.write(json.dumps(dict(stock=stock_codes)))
+            return stock_codes
+        # else:
             with open(self.stock_code_path) as f:
-
                 self.stock_codes = json.load(f)['stock']
                 return list(set(self.stock_codes))
 
@@ -75,7 +84,10 @@ class Sina:
         # self.grep_stock_detail = re.compile(r'(\d+)=([^\S][^,]+?)%s' %
         # (r',([\.\d]+)' * 29,))   #\n特例A (4)
         self.grep_stock_detail = re.compile(
-            r'(\d+)=([^\n][^,]+.)%s' % (r',([\.\d]+)' * 29,))  # 去除\n特例A(3356)
+            r'(\d+)=([^\n][^,]+.)%s%s' % (r',([\.\d]+)' * 29,r',(\d{4}-\d{2}-\d{2}),(\d{2}:\d{2}:\d{2})'))  
+            # r'(\d+)=([^\n][^,]+.)%s' % (r',([\.\d]+)' * 29,))  
+
+        # 去除\n特例A(3356)
         # self.grep_stock_detail = re.compile(r'(00\d{4}|30\d{4}|60\d{4})=([^\n][^,]+.)%s' % (r',([\.\d]+)' * 29,))   #去除\n特例A(股票2432)
         # ^(?!64)\d+$
         # self.grep_stock_detail = re.compile(r'([0][^0]\d+.)=([^\n][^,]+.)%s'
@@ -157,9 +169,11 @@ class Sina:
         self.stock_code_path = self.stockcode.stock_code_path
         self.stock_codes = self.stockcode.get_stock_codes()
         self.load_stock_codes()
+        # print "stocks:",len(self.stock_codes)
         self.stock_codes = [elem for elem in self.stock_codes if elem.startswith(('6','30','00'))]
 
         h5 = h5a.load_hdf_db(self.hdf_name,self.table, code_l=self.stock_codes)
+        # print "stocks:",len(self.stock_codes)
         if h5 is not None and len(h5) > 0:
             o_time = h5[h5.timel <> 0].timel
             if len(o_time) > 0:
@@ -273,7 +287,7 @@ class Sina:
             #     print i
             #     a += i
             #     print a
-            print ('all:%s' % len(self.stock_codes)),
+            # print ('all:%s' % len(self.stock_codes)),
             # log.error('all:%s req:%s' %
             #           (len(self.stock_list), len(self.stock_list)))
             return self.get_stock_data()
@@ -451,6 +465,7 @@ class Sina:
         for stock_match_object in result:
             stock = stock_match_object.groups()
             # print stock
+            # print stock
             # fn=(lambda x:x)
             # list.append(map(fn,stock))
             # df = pd.DataFrame(list,columns=ct.SINA_Total_Columns)
@@ -487,7 +502,9 @@ class Sina:
                  'a4_v': int(stock[27]),
                  'a4': float(stock[28]),
                  'a5_v': int(stock[29]),
-                 'a5': float(stock[30])})
+                 'a5': float(stock[30]),
+                 'dt': (stock[31]),
+                 'ticktime': (stock[32])})
 #        print list_s
         # df = pd.DataFrame.from_dict(stock_dict,columns=ct.SINA_Total_Columns)
         df = pd.DataFrame(list_s, columns=ct.SINA_Total_Columns)
@@ -550,15 +567,13 @@ if __name__ == "__main__":
     # sys.exit(0)
     for ma in ['sh','sz','cyb','all']:
     # for ma in ['sh']:
-        print ma,
         df = Sina().market(ma)
         # print len(sina.all)
-        print len(df)
+        print "market:%s %s"%(ma,len(df))
         # print df[df.code == '600581']
         # print sina.get_stock_code_data('999999',index=True)
         # df = sina.get_stock_list_data(['600629', '000507']).set_index('code')
         # df = sina.get_stock_code_data('002775',index=False).set_index('code')
-        print len(df)
     # print df.loc['300380']
     # list=['000001','399001','399006','399005']
     # df=sina.get_stock_list_data(list)
