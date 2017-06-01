@@ -1213,7 +1213,7 @@ def Write_market_all_day_mp(market='all',rewrite=False):
     # start=dd.date
     # index_ts = get_kdate_data('sh',start=start)
     if market == 'all':
-        mlist = ['sh','sz']
+        mlist = ['sh','sz','cyb']
     else:
         mlist =[market]
     # if len(index_ts) > 1:
@@ -1221,7 +1221,7 @@ def Write_market_all_day_mp(market='all',rewrite=False):
     results =[]
     for mk in mlist:
         time_t = time.time()
-        # df = sina_data.Sina().market(mk)
+        df = sina_data.Sina().market(mk)
         df = rl.get_sina_Market_json(mk)
         df = df[df.open > 0]
         print ("market:%s A:%s"%(mk,len(df))),
@@ -3049,8 +3049,8 @@ if __name__ == '__main__':
     # sys.exit(0)
 #    print write_tdx_tushare_to_file(code)
 
-#    hdf5_wri=cct.cct_raw_input("write all data to hdf[y|n]:")
-    hdf5_wri='y'
+    hdf5_wri=cct.cct_raw_input("write all data to hdf[y|n]:")
+    # hdf5_wri='y'
     time_s=time.time()
     if hdf5_wri == 'y':
         df = sina_data.Sina().market('sh')
@@ -3112,7 +3112,7 @@ if __name__ == '__main__':
         print ("hdf5 all :%s  time:%0.2f"%(len(dfcode),time.time()-time_s))
         # st.close()
 
-    market = cct.cct_raw_input("write all data [all,sh,sz,alla] :")
+    market = cct.cct_raw_input("write all data [all,sh,sz,cyb,alla] :")
     if market in  ['all','sh','sz','cyb','alla']:
         if market != 'all':
             Write_market_all_day_mp(market,rewrite=True)

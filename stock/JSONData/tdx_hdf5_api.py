@@ -57,7 +57,7 @@ class SafeHDFStore(HDFStore):
             except (IOError, EOFError,Exception) as e:
                 # time.sleep(probe_interval)
                 log.error("IOError Error:%s"%(e))
-                if self.countlock < 10:
+                if self.countlock <= 10:
                     time.sleep(random.randint(1, 3))
                     # time.sleep(random.randint(0,5))
                     self.countlock +=1
