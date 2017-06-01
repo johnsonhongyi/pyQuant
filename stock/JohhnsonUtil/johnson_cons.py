@@ -43,6 +43,7 @@ sleep_time = 6
 tdx_max_int = 10
 wcd_limit_day = 30
 h5_limit_time = 180
+big_H5_Size = 10
 sina_limit_time = 15
 diffcode = 0.2
 duration_sleep_time = 60
@@ -97,7 +98,7 @@ Duration_ra_op_key=[0,0,0,0,0,1,1,1,1]
 # Duration_ra_goldop_key=[0,0,0,0,0,1,1,1,1,1]
 
 Duration_sort_high_op=['dff','date','fib','op','fibl','ra','percent','ratio','volume','couts']
-Duration_sort_high_op_key=[0,1,1,0,1,0,0,1,1,1]
+Duration_sort_high_op_key = [0,1,1,0,1,0,0,1,1,1]
 
 Monitor_sort_count=[ 'couts', 'percent','dff', 'ratio','volume']
 Monitor_sort_count_key=[ 0, 0,0,0, 0]

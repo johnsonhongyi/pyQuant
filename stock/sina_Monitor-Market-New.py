@@ -87,11 +87,11 @@ if __name__ == "__main__":
     blkname = '069.blk'
     block_path = tdd.get_tdx_dir_blocknew() + blkname
     lastpTDX_DF = pd.DataFrame()
-    status_change = False
-    market_sort_value = ct.Market_sort_idx['2']
-    
     # initTdx = True
     # all_diffpath = tdd.get_tdx_dir_blocknew() + '062.blk'
+    status_change = False
+    market_sort_value = ct.Market_sort_idx['2']
+    market_sort_value_key = eval(market_sort_value+'_key')
     while 1:
         try:
             # df = sina_data.Sina().all
@@ -250,7 +250,7 @@ if __name__ == "__main__":
                     if 'op' in top_temp.columns:
 
                         top_temp = top_temp.sort_values(by=eval(market_sort_value),
-                                        ascending=eval(market_sort_value+'_key'))
+                                        ascending=market_sort_value_key)
                     #     top_temp = top_temp.loc[:,ct.MonitorMarket_format_buy]
                     print rl.format_for_print(top_temp.loc[:,ct.MonitorMarket_format_buy][:10])
                     # print rl.format_for_print(top_dif[:10])
@@ -306,9 +306,14 @@ if __name__ == "__main__":
 
             if len(st) == 0:
                 status = False
-            elif len(st) == 1 and st.isdigit():
+            elif len(st.split()[0]) == 1 and st.split()[0].isdigit():
+                st_l=st.split()
+                st = st_l[0]
                 if st in ct.Market_sort_idx.keys():
                     market_sort_value = ct.Market_sort_idx[st]
+                    market_sort_value_key = eval(market_sort_value+'_key')
+                    if len(st_l) > 1 and st_l[1]=='f':
+                       market_sort_value_key = [ key^1 for key in market_sort_value_key]                         
                 else:
                     log.error("market_sort key error:%s"%(st))
                     cct.sleeprandom(5)
@@ -339,9 +344,10 @@ if __name__ == "__main__":
                 cct.sleeprandom(ct.duration_sleep_time/2)
 
                 # cct.sleep(2)
+            elif st.startswith('q') or st.startswith('e'):
+                print "exit:%s"%(st)
             else:
                 print "input error:%s"%(st)
-                sys.exit(0)
         except (IOError, EOFError, Exception) as e:
             print "Error", e
             import traceback

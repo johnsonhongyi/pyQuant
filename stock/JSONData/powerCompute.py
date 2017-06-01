@@ -991,27 +991,32 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y',tali
                     tdx_df = tdx_df[:-1-days]
                 tdx_days = len(tdx_df)
                 if tdx_days < 16:
-                    top_count=0
-                    for day in range(len(tdx_df),0,-1):
-                        # tmpdf=pd.DataFrame(df.loc[:,column][-days-2:-1-day], columns=[column])
-                        # c_open = df.open.values[-days]
-                        c_high = tdx_df.high.values[-day]
-                        c_low = tdx_df.low.values[-day]
-    #                    print c_high,c_low
-                        if int(c_high) <> 0 and c_high == c_low:
-                            top_count +=1
-                        else:
-                            if tdx_days - day < 3:
+                    if tdx_days > 6:
+                        top_count=0
+                        for day in range(len(tdx_df),0,-1):
+                            # tmpdf=pd.DataFrame(df.loc[:,column][-days-2:-1-day], columns=[column])
+                            # c_open = df.open.values[-days]
+                            c_high = tdx_df.high.values[-day]
+                            c_low = tdx_df.low.values[-day]
+        #                    print c_high,c_low
+                            if int(c_high) <> 0 and c_high == c_low:
                                 top_count +=1
-                                continue
                             else:
-                                break
-    #                            log.info('code:%s c_high <> c_low:top :%s'%(code,tdx_days - day))
+                                if tdx_days - day < 3:
+                                    top_count +=1
+                                    continue
+                                else:
+                                    break
+        #                            log.info('code:%s c_high <> c_low:top :%s'%(code,tdx_days - day))
+                    else:
+                        top_count = len(tdx_df)
 
-                    if Power_CXG_Error < 2 and top_count == len(tdx_df):
-                        log.error('CXG Good:%s'%(code))
+                    if top_count == len(tdx_df):
                         drop_cxg.append(code)
+                        if Power_CXG_Error < 2:
+                            log.error('CXG Good:%s'%(code))
                         continue
+
             else:
                 df.loc[code, 'op'] = 0
                 df.loc[code, 'ra'] = 0

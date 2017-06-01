@@ -121,6 +121,7 @@ if __name__ == "__main__":
     end_date = cct.last_tddate(days=3)
     # all_diffpath = tdd.get_tdx_dir_blocknew() + '062.blk'
     market_sort_value = ct.Market_sort_idx['2']
+    market_sort_value_key = eval(market_sort_value+'_key')
     while 1:
         try:
             # top_now = tdd.getSinaAlldf(market='sh', vol=ct.json_countVol, type=ct.json_countType)
@@ -238,10 +239,10 @@ if __name__ == "__main__":
 
                         if duration_date > ct.duration_date_sort:
                             top_temp = top_temp.sort_values(by=eval(market_sort_value),
-                                        ascending=eval(market_sort_value+'_key'))
+                                        ascending=market_sort_value_key)
                         else:
                             top_temp = top_temp.sort_values(by=eval(market_sort_value),
-                                        ascending=eval(market_sort_value+'_key'))
+                                        ascending=market_sort_value_key)
                     # if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935:
                     #     # top_temp = top_temp[ (top_temp['ma5d'] > top_temp['ma10d']) & (top_temp['buy'] > top_temp['ma10d']) ]
                     #     top_temp = top_temp.loc[:,ct.MonitorMarket_format_buy]
@@ -304,9 +305,14 @@ if __name__ == "__main__":
 
             if len(st) == 0:
                 status = False
-            elif len(st) == 1 and st.isdigit():
+            elif len(st.split()[0]) == 1 and st.split()[0].isdigit():
+                st_l=st.split()
+                st = st_l[0]
                 if st in ct.Market_sort_idx.keys():
                     market_sort_value = ct.Market_sort_idx[st]
+                    market_sort_value_key = eval(market_sort_value+'_key')
+                    if len(st_l) > 1 and st_l[1]=='f':
+                       market_sort_value_key = [ key^1 for key in market_sort_value_key]                         
                 else:
                     log.error("market_sort key error:%s"%(st))
                     cct.sleeprandom(5)
@@ -340,9 +346,10 @@ if __name__ == "__main__":
                 cct.sleeprandom(ct.duration_sleep_time/2)
 
                 # cct.sleep(2)
+            elif st.startswith('q') or st.startswith('e'):
+                print "exit:%s"%(st)
             else:
                 print "input error:%s"%(st)
-                sys.exit(0)
         except (IOError, EOFError, Exception) as e:
             print "Error::", e
             import traceback

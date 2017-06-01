@@ -447,7 +447,9 @@ def get_sina_all_json_dd(vol='0', type='0', num='10000', retry_count=3, pause=0.
             df['couts']=df.groupby(['code'])['code'].transform('count')
             # df=df[(df['kind'] == 'U')]
             df=df.sort_values(by='couts',ascending=0)
+            time_drop=time.time()
             df=df.drop_duplicates('code')
+            print "djdf:%0.1f"%(time.time()-time_drop),
             # df=df[df.price >df.prev_price]
             log.info("sina-DD:%s" % df[:1])
 #            df = df.loc[:, ['code','name', 'couts', 'kind', 'prev_price']]
@@ -535,7 +537,9 @@ def get_sina_dd_count_price_realTime(df='',table='all',vol='0',type='0'):
         df['couts']=df.groupby(['code'])['code'].transform('count')
         # df=df[(df['kind'] == 'U')]
         df=df.sort_values(by='couts',ascending=0)
+        time_drop=time.time()
         df=df.drop_duplicates('code')
+        print "ddf:%0.1f"%(time.time()-time_drop),
         # df=df[df.price >df.prev_price]
         df = df.loc[:, ['code', 'name', 'couts', 'prev_price']]
         log.info("df.market:%s" % df[:1])
@@ -549,7 +553,9 @@ def get_sina_dd_count_price_realTime(df='',table='all',vol='0',type='0'):
         log.info("dp.market:%s" % dp[:1])
         if len(dp)>10:
             dp=dp.dropna('index')
+            time_drop=time.time()
             dp=dp.drop_duplicates('code')
+            print "ddp:%0.1f"%(time.time()-time_drop),
             log.info("dp to dm.market:%s" % dp[:1])
             dm=pd.merge(df,dp,on='name',how='left')
             # dm=dm.drop_duplicates('code')

@@ -41,7 +41,7 @@ def getBollFilter(df=None,boll=-5,duration=ct.PowerCountdl,filter=True,ma5d=True
         #         df = df[ ((df.ma5d * ct.changeRatio < df.low) & (df.low < df.ma5d * (2 - ct.changeRatio))) | ((df.percent > 1) & (df.volume > 3))]
         if 'vstd' in df.columns:
             # df = df[(df.lvol * df.volume > (df.vstd + df.lvol)) | ((df.percent > -5) & (df.hv/df.lv > 3))]
-            df = df[(df.lvol * df.volume > (df.vstd + df.lvol)) | ((df.percent > -6) & (df.hv/df.lv > 1.2))]
+            df = df[(df.lvol * df.volume > (df.vstd + df.lvol)) | ((df.percent > -10) & (df.hv/df.lv > 1.2))]
                     # [dd.lvol * dd.volume > (dd.vstd + dd.lvol) | dd.lvol * dd.volume >(dd.ldvolume + dd.vstd]
         if percent:
             if  cct.get_now_time_int() > 920 and cct.get_now_time_int() <= 1400:

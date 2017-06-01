@@ -353,7 +353,7 @@ def get_tdx_Exp_day_to_df(code, start=None, end=None, dl=None,newdays = None,typ
         dt_list = []
         data_l = data.split('\n')
         if newstockdayl == 0:
-            if len(data_l) < 5:
+            if len(data_l) < 2:
                 if write_k_data_status:
                     write_all_kdata_to_file(code,file_path)
                     data = cct.read_last_lines(file_path, inxdl)
@@ -1730,7 +1730,7 @@ def getSinaAlldf(market='cyb',vol=ct.json_countVol,type=ct.json_countType,filena
     #         if time.time() - o_time < h5_limit_time:
     #             top_now = h5
     #             return h5
-    print "b1>%s:%s:%s"%(initTdxdata,len(top_now),round(time.time()-time_s,1)),
+    print "init:%s b1>:%s t:%s"%(initTdxdata,len(top_now),round(time.time()-time_s,1)),
     return top_now
 
 '''
@@ -3107,7 +3107,7 @@ if __name__ == '__main__':
                 # print df
                 # print df.shape
                 # log.error("code :%s is None"%(code))
-                # 
+                #
         h5a.write_hdf_db(h5_fname, dd, table=h5_table, index=False, baseCount=500, append=False)
         print ("hdf5 all :%s  time:%0.2f"%(len(dfcode),time.time()-time_s))
         # st.close()

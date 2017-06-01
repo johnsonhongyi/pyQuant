@@ -163,8 +163,9 @@ def get_dfcfw_fund_HGT(url=ct.DFCFW_FUND_FLOW_HGT):
 def get_dfcfw_fund_SHSZ(url=ct.DFCFW_ZS_SHSZ):
 #    sina = Sina()
     dd = Sina().get_stock_code_data('999999,399001',index=True)
-    sh =  dd[dd.index == '000001']
-    sz = dd[dd.index == '399001']   
+#    sh =  dd[dd.index == '000001']
+    sh =  dd[dd.index == '999999']
+    sz = dd[dd.index == '399001']
     if len(sh) == 0 or len(sz) == 0:
         data = cct.get_url_data_R(url)
         log.info("url:%s"%(url))
@@ -281,7 +282,7 @@ def get_dfcfw_rzrq_SHSZ(url=ct.DFCFW_RZRQ_SHSZ):
         da = 0
         i = 0
         while rzrq_status:
-            for x in range(1, 20):
+            for x in range(days, 20):
                 yestoday = cct.last_tddate(x).replace('-', '/')
                 data2 = get_tzrq(url, yestoday)
                 log.info("yestoday:%s data:%s" % (yestoday, data2))
@@ -289,8 +290,8 @@ def get_dfcfw_rzrq_SHSZ(url=ct.DFCFW_RZRQ_SHSZ):
                     i += 1
                     # if da ==days and days==0:
                     # i +=1
-                    if i >= days:
-                        break
+#                    if i >= days-1:
+                    break
                     # elif da > days:
                         # break
                 # else:    da+=1
@@ -441,7 +442,9 @@ if __name__ == "__main__":
     # print ff
     #
     # pp=get_dfcfw_fund_HGT(ct.DFCFW_FUND_FLOW_HGT)
+#    print get_dfcfw_rzrq_SHSZ(url=ct.DFCFW_RZRQ_SHSZ)
     print get_dfcfw_fund_SHSZ()
+    sys.exit(0)
     # for x in pp.keys():
     # print pp[x]
     #get_dfcfw_fund_HGT
@@ -451,7 +454,6 @@ if __name__ == "__main__":
     print get_dfcfw_fund_flow('all')
     # print dd
     # print get_dfcfw_fund_SHSZ()
-    # print get_dfcfw_rzrq_SHSZ(url=ct.DFCFW_RZRQ_SHSZ)
     # print df
 
     # get_lhb_dd()

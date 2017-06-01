@@ -33,7 +33,7 @@ class SafeHDFStore(HDFStore):
         self.complib='zlib'
         self.temp_file = self.fname+'_tmp'
         self.ptrepack_cmds="ptrepack --chunkshape=auto --propindexes --complevel=9 --complib=blosc %s %s"
-        self.big_H5_Size = 30
+        self.big_H5_Size = ct.big_H5_Size
         global RAMDISK_KEY
         if not os.path.exists(baseDir):
             if RAMDISK_KEY < 1:
@@ -70,7 +70,7 @@ class SafeHDFStore(HDFStore):
 #                time.sleep(probe_interval)
 #                return None
 #        HDFStore.__init__(self, *args, **kwargs)
-        HDFStore.__init__(self,fname,format="table",complevel=self.complevel,complib=self.complib, **kwargs)
+        HDFStore.__init__(self,fname,complevel=self.complevel,complib=self.complib, **kwargs)
         # HDFStore.__init__(self,fname,format="table",complevel=self.complevel,complib=self.complib, **kwargs)
         # ptrepack --complib=zlib --complevel 9 --overwrite sina_data.h5 out.h5
 
@@ -145,10 +145,9 @@ def get_hdf5_file(fpath,wr_mode='r',complevel=9,complib='zlib',mutiindx=False):
         # store.select("Year2015", where=['dt<Timestamp("2015-01-07")','code=="000570"'])
         # return store
 
-def write_hdf_db(fname,df,table='all',index=False,baseCount=500,append=False,MultiIndex=False):
+def write_hdf_db(fname,df,table='all',index=False,baseCount=500,append=True,MultiIndex=False):
     if 'code' in df.columns:
         df = df.set_index('code')
-#    df['timel'] =  time.time()
 #    write_status = False
     time_t = time.time()
 #    if not os.path.exists(cct.get_ramdisk_dir()):
@@ -165,6 +164,7 @@ def write_hdf_db(fname,df,table='all',index=False,baseCount=500,append=False,Mul
 #            log.info("col:%s"%(col))
 #            df[col] = df[col].astype(str)
 #        df.index = df.index.astype(str)
+    df['timel'] =  time.time()  
     if df is not None and not df.empty and table is not None:
         # h5 = get_hdf5_file(fname,wr_mode='r')
         tmpdf = []
@@ -185,6 +185,7 @@ def write_hdf_db(fname,df,table='all',index=False,baseCount=500,append=False,Mul
                     log.error("columns diff:%s"%(diff_columns))
     #                        dif_co = list(set(df.index) - set(tmpdf.index))
     #                        if len(dif_co) > 0:
+                df['timel'] =  time.time()
                 df=cct.combine_dataFrame(tmpdf, df, col=None,append=append)
     #            df=cct.combine_dataFrame(tmpdf, df, col=None,append=False)
                 log.info("read hdf time:%0.2f"%(time.time()-time_t))
@@ -215,7 +216,7 @@ def write_hdf_db(fname,df,table='all',index=False,baseCount=500,append=False,Mul
 
     time_t = time.time()
     if df is not None and not df.empty and table is not None:
-        df['timel'] =  time.time()
+#        df['timel'] =  time.time()
         if df is not None and not df.empty and len(df) > 0:
             dd = df.dtypes.to_frame()
 

@@ -599,9 +599,10 @@ if __name__ == '__main__':
             elif st.lower() == 'r':
                 dir_mo = eval(cct.eval_rule)
                 evalcmd(dir_mo)
+            elif st.startswith('q') or st.startswith('e'):
+                print "exit:%s"%(st)
             else:
                 print "input error:%s"%(st)
-                sys.exit(0)
                 # cct.sleep(0.5)
                 # if success > 3:
                 #     raw_input("Except")

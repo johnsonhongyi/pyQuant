@@ -114,17 +114,17 @@ if __name__ == "__main__":
     parser=cct.MoniterArgmain()
     parserDuraton=cct.DurationArgmain()
     market_sort_value = ct.Market_sort_idx['1']
-
+    market_sort_value_key = eval(market_sort_value+'_key')
     while 1:
         try:
             # df = sina_data.Sina().all
             # top_now = tdd.getSinaAlldf(market='cx', vol=ct.json_countVol, type=ct.json_countType)
-            # top_now = tdd.getSinaAlldf(market='æ¬¡æ–°è‚¡',filename='cxg', vol=ct.json_countVol, type=ct.json_countType)
+            # top_now = tdd.getSinaAlldf(market='´ÎÐÂ¹É',filename='cxg', vol=ct.json_countVol, type=ct.json_countType)
             time_Rt = time.time()
-            top_now = tdd.getSinaAlldf(market='é›„å®‰ç‰¹åŒº',filename='xatq', vol=ct.json_countVol, type=ct.json_countType)
-            # top_now = tdd.getSinaAlldf(market=u'æ–°è‚¡ä¸Žæ¬¡æ–°è‚¡',filename='cxg', vol=ct.json_countVol, type=ct.json_countType)
+            top_now = tdd.getSinaAlldf(market='ÐÛ°²ÌØÇø',filename='xatq', vol=ct.json_countVol, type=ct.json_countType)
+            # top_now = tdd.getSinaAlldf(market=u'ÐÂ¹ÉÓë´ÎÐÂ¹É',filename='cxg', vol=ct.json_countVol, type=ct.json_countType)
             
-            # top_now = tdd.getSinaAlldf(market='æ··æ”¹', filename='mnbk',vol=ct.json_countVol, type=ct.json_countType)
+            # top_now = tdd.getSinaAlldf(market='»ì¸Ä', filename='mnbk',vol=ct.json_countVol, type=ct.json_countType)
 
             # top_dif = top_now
             # top_now.to_hdf("testhdf5", 'marketDD', format='table', complevel=9)
@@ -201,7 +201,7 @@ if __name__ == "__main__":
                     top_dif['buy'] = (
                         map(lambda x, y: y if int(x) == 0 else x, top_dif['buy'].values, top_dif['trade'].values))
 
-                #åˆ¤æ–­ä¸»å‡
+                #ÅÐ¶ÏÖ÷Éý
                 # log.debug('top_dif:%s'%(len(top_dif)))
                 if ct.checkfilter and cct.get_now_time_int() > 915 and cct.get_now_time_int() < ct.checkfilter_end_timeDu:
                     top_dif = top_dif[top_dif.low > top_dif.llow * ct.changeRatio]
@@ -320,10 +320,10 @@ if __name__ == "__main__":
                     if 'op' in top_temp.columns:
                         if cct.get_now_time_int() > ct.checkfilter_end_timeDu and (int(duration_date) > int(ct.duration_date_sort) or int(duration_date) < ct.duration_diff):
                             top_temp = top_temp.sort_values(by=eval(market_sort_value),
-                                        ascending=eval(market_sort_value+'_key'))
+                                        ascending=market_sort_value_key)
                         else:
                             top_temp = top_temp.sort_values(by=eval(market_sort_value),
-                                        ascending=eval(market_sort_value+'_key'))
+                                        ascending=market_sort_value_key)
 
                     if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935:
                         # top_temp = top_temp[ (top_temp['ma5d'] > top_temp['ma10d']) & (top_temp['buy'] > top_temp['ma10d']) ][:10]
@@ -391,9 +391,14 @@ if __name__ == "__main__":
 
             if len(st) == 0:
                 status = False
-            elif len(st) == 1 and st.isdigit():
+            elif len(st.split()[0]) == 1 and st.split()[0].isdigit():
+                st_l=st.split()
+                st = st_l[0]
                 if st in ct.Market_sort_idx.keys():
                     market_sort_value = ct.Market_sort_idx[st]
+                    market_sort_value_key = eval(market_sort_value+'_key')
+                    if len(st_l) > 1 and st_l[1]=='f':
+                       market_sort_value_key = [ key^1 for key in market_sort_value_key]                         
                 else:
                     log.error("market_sort key error:%s"%(st))
                     cct.sleeprandom(5)
@@ -455,9 +460,10 @@ if __name__ == "__main__":
                         break
                     else:
                         pass
+            elif st.startswith('q') or st.startswith('e'):
+                print "exit:%s"%(st)
             else:
                 print "input error:%s"%(st)
-                sys.exit(0)
         except (IOError, EOFError, Exception) as e:
             print "Error", e
             import traceback
@@ -465,8 +471,8 @@ if __name__ == "__main__":
             cct.sleeprandom(ct.duration_sleep_time/2)
 
 '''
-{symbol:"sz000001",code:"000001",name:"å¹³å®‰é“¶è¡Œ",trade:"0.00",pricechange:"0.000",changepercent:"0.000",buy:"12.36",sell:"12.36",settlement:"12.34",open:"0.00",high:"0.00",low:"0",volume:0,amount:0,ticktime:"09:17:55",per:7.133,pb:1.124,mktcap:17656906.355526,nmc:14566203.350486,turnoverratio:0},
-{symbol:"sz000002",code:"000002",name:"ä¸‡  ç§‘ï¼¡",trade:"0.00",pricechange:"0.000",changepercent:"0.000",buy:"0.00",sell:"0.00",settlement:"24.43",open:"0.00",high:"0.00",low:"0",volume:0,amount:0,ticktime:"09:17:55",per:17.084,pb:3.035,mktcap:26996432.575,nmc:23746405.928119,turnoverratio:0},
+{symbol:"sz000001",code:"000001",name:"Æ½°²ÒøÐÐ",trade:"0.00",pricechange:"0.000",changepercent:"0.000",buy:"12.36",sell:"12.36",settlement:"12.34",open:"0.00",high:"0.00",low:"0",volume:0,amount:0,ticktime:"09:17:55",per:7.133,pb:1.124,mktcap:17656906.355526,nmc:14566203.350486,turnoverratio:0},
+{symbol:"sz000002",code:"000002",name:"Íò  ¿Æ£Á",trade:"0.00",pricechange:"0.000",changepercent:"0.000",buy:"0.00",sell:"0.00",settlement:"24.43",open:"0.00",high:"0.00",low:"0",volume:0,amount:0,ticktime:"09:17:55",per:17.084,pb:3.035,mktcap:26996432.575,nmc:23746405.928119,turnoverratio:0},
 
 python -m cProfile -s cumulative timing_functions.py
 http://www.jb51.net/article/63244.htm
