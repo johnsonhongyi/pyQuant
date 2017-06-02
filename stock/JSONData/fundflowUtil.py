@@ -165,6 +165,8 @@ def get_dfcfw_fund_SHSZ(url=ct.DFCFW_ZS_SHSZ):
     dd = Sina().get_stock_code_data('999999,399001',index=True)
 #    sh =  dd[dd.index == '000001']
     sh =  dd[dd.index == '999999']
+    if len(sh) >0 and not sh.name.values[0] == '上证指数':
+        log.error('sh data is error')
     sz = dd[dd.index == '399001']
     if len(sh) == 0 or len(sz) == 0:
         data = cct.get_url_data_R(url,timeout=15)
@@ -441,8 +443,8 @@ if __name__ == "__main__":
     # print "%.1f" % (float(ff['zzb']))
     # print ff
     #
-    # pp=get_dfcfw_fund_HGT(ct.DFCFW_FUND_FLOW_HGT)
-#    print get_dfcfw_rzrq_SHSZ(url=ct.DFCFW_RZRQ_SHSZ)
+#    pp=get_dfcfw_fund_HGT(ct.DFCFW_FUND_FLOW_HGT)
+    # print get_dfcfw_rzrq_SHSZ(url=ct.DFCFW_RZRQ_SHSZ)
     print get_dfcfw_fund_SHSZ()
     sys.exit(0)
     # for x in pp.keys():

@@ -894,7 +894,7 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y',tali
     if h5 is not None:
         log.info("power hdf5 data:%s"%(len(h5)))
         if h5_combine_status:
-        # if (not (925 < cct.get_now_time_int() < 935) or not cct.get_work_day_status())  and h5_combine_status:
+        # if (not (915 < cct.get_now_time_int() < 935) or not cct.get_work_day_status())  and h5_combine_status:
 #            df_co = df.columns
 #            h5_co = h5.columns
 #            status = len(set(power_columns) & set(df_co)) - len(power_columns) == 0
@@ -905,7 +905,7 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y',tali
             if len(code_l) == 0:
                 return df
             else:
-                if not len(drop_cxg) == 0:
+                if len(drop_cxg) <> 0 and (not 915 < cct.get_now_time_int() < 932 or not cct.get_work_day_status()):
                     temp_l = list(set(code_l) - set(drop_cxg))
                     drop_t = [ co for co in drop_cxg if co in df.index]
                     if len(temp_l) <> 0:

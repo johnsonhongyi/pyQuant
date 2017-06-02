@@ -1579,11 +1579,11 @@ def get_tdx_power_now_df(code, start=None, end=None, type='f',df=None,dm=None,dl
     return df
 
 def get_sina_data_df(code):
-    index_status=False
+    # index_status=False
     if isinstance(code, list):
         dm = sina_data.Sina().get_stock_list_data(code)
     else:
-        dm = sina_data.Sina().get_stock_code_data(code,index=index_status)
+        dm = sina_data.Sina().get_stock_code_data(code)
     return dm
 
 
