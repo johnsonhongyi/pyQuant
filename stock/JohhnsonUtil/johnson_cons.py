@@ -32,7 +32,7 @@ duration_diff = 6
 duration_date_l = 10
 duration_date_sort = 21
 lastdays = 4
-bollFilter = -5
+bollFilter = -10
 writeblockbakNum = 12
 checkfilter = True
 lastPower = False
@@ -68,7 +68,7 @@ code
 
 # ra*fibl*(int(%d)-fib)/100
 # powerdiff = '(rah(int(%s) - fibl) + ra*(fibl) +ma +kdj+rsi'
-powerdiff = 'int(ra)*int(fibl)*(int(%s)-int(fib))/10 +float(ma) +float(kdj)+float(rsi)'
+powerdiff = 'float(ra)*float(fibl)*(float(%s)-float(fib))/10 +float(ma) +float(kdj)+float(rsi)'
 
 Duration_sort_per_ratio=['percent','ratio','op','fib','fibl','ra','percent','volume','couts']
 Duration_sort_per_ratio_key=[0,1,0,1,1,0,0,1,1]

@@ -29,7 +29,7 @@ def getBollFilter(df=None,boll=-5,duration=ct.PowerCountdl,filter=True,ma5d=True
         elif cct.get_now_time_int() > 1000 and cct.get_now_time_int() <= 1430:
             df = df[df.buy > df.cmean]
         else:
-            df = df[df.buy > df.hmax]
+            df = df[df.buy > df.hmax * ct.changeRatio]
 
         # if ma5d:
         #     # op, ra, st, days = pct.get_linear_model_status('999999', filter='y', dl=dl, ptype='low')

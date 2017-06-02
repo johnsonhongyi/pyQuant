@@ -81,7 +81,7 @@ def get_dfcfw_fund_flow(market):
             indexcode = ct.SINA_Market_KEY_TO_DFCFW_New[market]
         url = ct.DFCFW_FUND_FLOW_URL_New % indexcode
         log.info("url:%s"%(url))
-    data = cct.get_url_data_R(url).split('=')
+    data = cct.get_url_data_R(url,timeout=20).split('=')
     # vollist=re.findall('{data:(\d+)',code)
     # vol_l = []
     if len(data) > 1:
@@ -113,7 +113,7 @@ def get_dfcfw_fund_flow(market):
             log.error("Fund_f NO Url:%s" % url)
         if not single:
             url = ct.SINA_JSON_API_URL % ct.INDEX_LIST[indexall[i]]
-            data = cct.get_url_data_R(url)
+            data = cct.get_url_data_R(url,timeout=20)
             vol_l = re.findall('\"([\d\D]+?)\"', data)
             if len(vol_l) == 1:
                 data = vol_l[0].split(',')
@@ -137,7 +137,7 @@ def get_dfcfw_fund_flow(market):
                 # 215722046, 207426675004
     return dk
 def get_dfcfw_fund_HGT(url=ct.DFCFW_FUND_FLOW_HGT):
-    data = cct.get_url_data_R(url)
+    data = cct.get_url_data_R(url,timeout=15)
     "http://nufm.dfcfw.com/EM_Finance2014NumericApplication/JS.aspx?type=CT&cmd=P.%28x%29,%28x%29,%28x%29|0000011|3990012|3990012,0000011,HSI5,BK07071,MK01461,MK01441,BK08041&sty=SHSTD|SZSTD|FCSHSTR&st=z&sr=&p=&ps=&cb=&js=var%20muXWEC=%28{data:[%28x%29]}%29&token=1942f5da9b46b069953c873404aad4b5"
     log.info("url:%s" % url)
     # vollist=re.findall('{data:(\d+)',code)
@@ -167,7 +167,7 @@ def get_dfcfw_fund_SHSZ(url=ct.DFCFW_ZS_SHSZ):
     sh =  dd[dd.index == '999999']
     sz = dd[dd.index == '399001']
     if len(sh) == 0 or len(sz) == 0:
-        data = cct.get_url_data_R(url)
+        data = cct.get_url_data_R(url,timeout=15)
         log.info("url:%s"%(url))
         # vollist=re.findall('{data:(\d+)',code)
         vol_l = re.findall('\"([\d\D]+?)\"', data)

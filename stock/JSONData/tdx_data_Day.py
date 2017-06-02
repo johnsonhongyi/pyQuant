@@ -659,7 +659,7 @@ def get_tdx_append_now_df_api(code, start=None, end=None, type='f',df=None,dm=No
             # log.debug("ds:%s" % ds[:1])
             ds = ds.fillna(0)
             df = df.append(ds)
-            if write_tushare and (len(ds) == 1 and ds.index.values[0] != cct.get_today()) or len(ds) > 1:
+            if write_tushare and ((len(ds) == 1 and ds.index.values[0] != cct.get_today()) or len(ds) > 1):
 #                if index_status:
                 sta=write_tdx_tushare_to_file(code,df=df)
                 if sta:
@@ -680,7 +680,7 @@ def get_tdx_append_now_df_api(code, start=None, end=None, type='f',df=None,dm=No
         df = df.sort_index(ascending=False)
         return df
     else:
-        if not write_tushare and cct.get_work_time() and cct.get_now_time_int() < 1505:
+        if dm is None and not write_tushare and cct.get_work_time() and cct.get_now_time_int() < 1505:
             return df
 #    print df.index.values,code
     if dm is None and end is None:
@@ -785,7 +785,7 @@ def get_tdx_append_now_df_api(code, start=None, end=None, type='f',df=None,dm=No
     return df
 
 
-def get_tdx_append_now_df_api_tofile(code,dm=None,newdays=1, start=None, end=None, type='f',df=None,dl=2,power=True):
+def get_tdx_append_now_df_api_tofile(code,dm=None,newdays=0, start=None, end=None, type='f',df=None,dl=2,power=True):
 
     start=cct.day8_to_day10(start)
     end=cct.day8_to_day10(end)
@@ -1001,7 +1001,7 @@ def write_tdx_tushare_to_file(code,df=None,start=None,type='f'):
         if df is None:
             if lastd == cct.last_tddate(1):
                 return False
-            df = get_tdx_append_now_df_api(code,start=start,write_tushare=False)
+            df = get_tdx_append_now_df_api(code,start=start,write_tushare=False,newdays=0)
 
     if len(df) == 0:
         return False

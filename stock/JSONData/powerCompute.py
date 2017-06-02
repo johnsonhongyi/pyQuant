@@ -894,6 +894,7 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y',tali
     if h5 is not None:
         log.info("power hdf5 data:%s"%(len(h5)))
         if h5_combine_status:
+        # if (not (925 < cct.get_now_time_int() < 935) or not cct.get_work_day_status())  and h5_combine_status:
 #            df_co = df.columns
 #            h5_co = h5.columns
 #            status = len(set(power_columns) & set(df_co)) - len(power_columns) == 0
@@ -983,17 +984,18 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y',tali
                 dz = tdd.get_sina_data_df(code)
 
             if len(dz) > 0 and (dz.buy.values > 0 or dz.sell.values > 0):
-                tdx_df = tdd.get_tdx_append_now_df_api(code, start=start, end=end, type='f', df=None, dm=dz, dl=dl*2,newdays=newdays)
+                tdx_df = tdd.get_tdx_append_now_df_api(code, start=start, end=end, type='f', df=None, dm=dz, dl=dl*2,newdays=5)
                 # print tdx_df
                 tdx_df=tdx_df.fillna(0)
+                tdx_df = tdx_df.sort_index(ascending=True)
                 if len(df) > days+1 and days != 0:
-                    tdx_df = tdx_df.sort_index(ascending=True)
                     tdx_df = tdx_df[:-1-days]
                 tdx_days = len(tdx_df)
                 if tdx_days < 16:
                     if tdx_days > 6:
                         top_count=0
                         for day in range(len(tdx_df),0,-1):
+#                        for day in range(len(tdx_df)):
                             # tmpdf=pd.DataFrame(df.loc[:,column][-days-2:-1-day], columns=[column])
                             # c_open = df.open.values[-days]
                             c_high = tdx_df.high.values[-day]
@@ -1002,11 +1004,19 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y',tali
                             if int(c_high) <> 0 and c_high == c_low:
                                 top_count +=1
                             else:
-                                if tdx_days - day < 3:
-                                    top_count +=1
-                                    continue
+                                if day == 1 and (915 < cct.get_now_time_int() < 932 and  cct.get_work_day_status()):
+#                                if day == 1 and cct.get_work_day_status():
+                                    c_buy = dz.buy.values[-1]
+                                    c_close_l = tdx_df.close.values[-2]
+                                    c_percent = round((c_buy - c_close_l)/c_close_l*100,2)
+                                    if 0 < c_percent < 9.9:
+                                        break
                                 else:
-                                    break
+                                    if tdx_days - day < 3:
+                                        top_count +=1
+                                        continue
+                                    else:
+                                        break
         #                            log.info('code:%s c_high <> c_low:top :%s'%(code,tdx_days - day))
                     else:
                         top_count = len(tdx_df)
@@ -1097,13 +1107,14 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y',tali
             df.loc[code, 'vstd'] = volstd
             df.loc[code, 'lvolume'] = tdx_df.vol[1]
 
-            if len(wcdf[wcdf.index == code]) > 0:
-                if code in wcdf_code:
-                    df.loc[code,'category'] = wcdf.loc[code,'category']
-                else:
-                    log.warn("code not in wcdf:%s"%(code))
+            # if len(wcdf[wcdf.index == code]) > 0:
+            if code in wcdf_code:
+                df.loc[code,'category'] = wcdf.loc[code,'category']
             else:
-                df.loc[code,'category'] = 0
+                log.warn("code not in wcdf:%s"%(code))
+            # else:
+                # df.loc[code,'category'] = 0
+                
             # df = getab.Get_BBANDS(df, dtype='d')
             #'volume', 'ratio', 'couts','ldate' -> 'ma','macd','rsi','kdj'
             # df = df.drop_duplicates()

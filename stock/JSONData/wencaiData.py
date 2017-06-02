@@ -24,7 +24,8 @@ from JohhnsonUtil import commonTips as cct
 # except ImportError:
 #     from urllib2 import urlopen, Request
 
-log=LoggerFactory.getLogger('wencaiData')
+# log=LoggerFactory.getLogger('wencaiData')
+log=LoggerFactory.log
 
 
 def post_login(root='http://upass.10jqka.com.cn/login',url=None):
@@ -79,13 +80,15 @@ def post_login(root='http://upass.10jqka.com.cn/login',url=None):
     # print info
     # get_wencai_Market_url(url=None)
 
-global null
+global null,wencai_count
 null = None
+wencai_count = 0
+
 def get_wencai_Market_url(filter='国企改革',perpage=1,url=None,):
     urllist = []
-    global null
+    global null,wencai_count
     df = pd.DataFrame()
-    if url == None:
+    if url == None and wencai_count < 1:
         time_s = time.time()
         wencairoot = 'http://www.iwencai.com/stockpick/search?typed=0&preParams=&ts=1&f=1&qs=result_original&selfsectsn=&querytype=&searchfilter=&tid=stockpick&w=%s'
         url = wencairoot%(filter)
@@ -96,6 +99,7 @@ def get_wencai_Market_url(filter='国企改革',perpage=1,url=None,):
         cache_ends = "[%22%22,%22%22,%22onTable%22,%22onTable%22,%22onTable%22,%22onTable%22,%22onTable%22,%22onTable%22,%22onTable%22,%22onTable%22]"
         data = cct.get_url_data(url,retry_count=1)
         if len(re.findall('系统判断您访问次数过多'.decode('utf8'),data)):
+            wencai_count+=1
             log.error("acces deny:%s"%('系统判断您访问次数过多'))
             return df
         # print data
@@ -245,6 +249,7 @@ def get_codelist_df(codelist):
 
 def get_wencai_data(dm,market='wencai',days=120):
 #    if isinstance(codelist,list):
+    global wencai_count
     if len(dm) > 1:
         # code_l = []
         # wcd_o = get_write_wencai_market_to_csv(market=market)
@@ -258,21 +263,29 @@ def get_wencai_data(dm,market='wencai',days=120):
         if len(df) > 0:
 #            if  set(codelist) <= set(df.name.values):
 #            if  set(dm.index) <= set(df.code.values) :
-            if  len(dm) - len(set(dm.index) & set(df.index.values)) < 10 :
+#            if  len(dm) - len(set(dm.index) & set(df.index.values)) < 10 :
+            dratio = cct.get_diff_dratio(df.index,dm.index)
+            if dratio < 0.1:
                 if 'code' in df.columns:
                     df = df.set_index('code')
                     df = df.drop_duplicates()
                 return df
             else:
                 # diffcode = map( lambda x: x,set(dm.index) - (set(dm.index) & set(df.code.values)))
-                diff_code = [x for x in set(dm.index) - (set(dm.index) & set(df.index.values))]
-                dm.drop([col for col in dm.index if col not in diff_code], axis=0, inplace=True)
+                    diff_code = [x for x in set(dm.index) - (set(dm.index) & set(df.index.values))]
+                    dm.drop([col for col in dm.index if col not in diff_code], axis=0, inplace=True)
+
                 # for x in diff_code:
                 #     if not x in df.code.values:
                 #         print x,dm[x],
-        wcd_d = get_codelist_df(dm.tolist())
-        if len(wcd_d) > 0:
-            df = get_write_wencai_market_to_csv(wcd_d,market=market,renew=True,days=days)
+        
+        if wencai_count < 3:
+            wcd_d = get_codelist_df(dm.tolist())
+            log.error("dratio:%s diff:%s dm:%s err:%s"%(dratio,len(diff_code),len(dm),wencai_count))
+            if len(wcd_d) > 0:
+                df = get_write_wencai_market_to_csv(wcd_d,market=market,renew=True,days=days)
+        # else:
+            # dm['category'] = 0 
 
     else:
         df = get_wencai_Market_url(dm.name)

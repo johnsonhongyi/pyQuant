@@ -14,7 +14,7 @@ import pandas as pd
 import trollius as asyncio
 from trollius.coroutines import From
 
-import LoggerFactory 
+import LoggerFactory
 import johnson_cons as ct
 import socket
 
@@ -49,7 +49,7 @@ def get_os_system():
             return 'win'
     else:
         return 'other'
-        
+
 win10Lengend = r'D:\Program\gfzq'
 win10Lixin = r'C:\zd_zszq'
 win7rootAsus = r'D:\Program Files\gfzq'
@@ -99,13 +99,13 @@ def get_ramdisk_dir():
         basedir = root.replace('/', path_sep).replace('\\',path_sep)
         if os.path.exists(basedir):
             log.info("%s : path:%s" % (os_platform,basedir))
-            break       
+            break
     return basedir
 
 RamBaseDir = get_ramdisk_dir()
 def get_ramdisk_path(filename,lock=False):
     if filename:
-        basedir =  RamBaseDir 
+        basedir =  RamBaseDir
         # basedir = ramdisk_root.replace('/', path_sep).replace('\\',path_sep)
         if not os.path.isdir(basedir):
             log.error("ramdisk Root Err:%s"%(basedir))
@@ -816,14 +816,14 @@ def get_work_time_ratio():
     return ratio_t
 
 
-def get_url_data_R(url):
+def get_url_data_R(url,timeout=10):
     # headers = {'User-Agent':'Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.6) Gecko/20091201 Firefox/3.5.6'}
     headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.2; rv:16.0) Gecko/20100101 Firefox/16.0',
                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
                'Connection': 'keep-alive'}
     req = Request(url, headers=headers)
     try:
-        fp = urlopen(req, timeout=10)
+        fp = urlopen(req, timeout=timeout)
         data = fp.read()
         fp.close()
     # except (HTTPError, URLError) as error:
@@ -837,7 +837,7 @@ def get_url_data_R(url):
     return data
 
 
-def get_url_data(url,retry_count=5,pause=0.05):
+def get_url_data(url,retry_count=5,pause=0.05,timeout=10):
 #    headers = {'User-Agent':'Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.6) Gecko/20091201 Firefox/3.5.6'}
     headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.2; rv:16.0) Gecko/20100101 Firefox/16.0',
                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
@@ -846,7 +846,7 @@ def get_url_data(url,retry_count=5,pause=0.05):
     for _ in range(retry_count):
         time.sleep(pause)
         try:
-            data = requests.get(url, headers=headers, timeout=10)
+            data = requests.get(url, headers=headers, timeout=timeout)
         except (socket.timeout,socket.error) as e:
             data = ''
             log.error('socket timed out - URL %s', url)
@@ -1489,6 +1489,12 @@ def sort_by_value(df,column='dff',file=None,count=5,num=5,asc=0):
             write_to_blocknew(file, dd.index.tolist()[:int(count)], append=True)
         print "file:%s"%(file)
 
+def get_diff_dratio(mainlist,sublist):
+    dif_co = list(set(mainlist) & set(sublist))
+    dratio = round((float(len(sublist)) - float(len(dif_co)))/float(len(sublist)),2)
+    log.info("dratio all:%s :%s %0.2f"%(len(sublist),len(sublist)-len(dif_co),dratio))
+    return dratio
+
 def combine_dataFrame(maindf,subdf,col=None,compare=None,append=False):
     times = time.time()
     maindf_co=maindf.columns
@@ -1510,7 +1516,7 @@ def combine_dataFrame(maindf,subdf,col=None,compare=None,append=False):
         if col is not None and compare is not None:
             # if col in subdf.columns:
             # sub_col = list(set(subdf.columns) - set([col]))
-            
+
             # sub_dif_inx = list(set(subdf.index) - set(maindf.index))
             # trandf = subdf.drop(sub_dif_inx,axis=0)
             # no_index[compare]=map((lambda x,y:y-x),no_index.couts,trandf.couts)
@@ -1594,7 +1600,7 @@ if __name__ == '__main__':
     # print get_rzrq_code()[:3]
     # times =1483686638.0
     # print get_time_to_date(times, format='%Y-%m-%d')
-    
+
     # for x in range(1,120,5):
     #     times=time.time()
     #     print sleep(x)
