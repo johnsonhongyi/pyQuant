@@ -718,8 +718,8 @@ def get_work_time():
     if not get_work_day_status():
         return False
     if (now_t > 1130 and now_t < 1300) or now_t < 915 or now_t > 1502:
-        # return False
-        return True
+        return False
+        # return True
     else:
         # if now_t > 1300 and now_t <1302:
             # sleep(random.randint(5, 120))
