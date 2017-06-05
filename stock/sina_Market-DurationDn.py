@@ -113,7 +113,7 @@ if __name__ == "__main__":
     # all_diffpath = tdd.get_tdx_dir_blocknew() + '062.blk'
     parser = cct.MoniterArgmain()
     parserDuraton = cct.DurationArgmain()
-    market_sort_value = ct.Market_sort_idx['1']
+    market_sort_value = ct.Market_sort_idx['3']
     market_sort_value_key = eval(market_sort_value+'_key')
     while 1:
         try:

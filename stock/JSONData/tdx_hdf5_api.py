@@ -165,7 +165,7 @@ def write_hdf_db(fname,df,table='all',index=False,baseCount=500,append=True,Mult
 #            log.info("col:%s"%(col))
 #            df[col] = df[col].astype(str)
 #        df.index = df.index.astype(str)
-    df['timel'] =  time.time()  
+    df['timel'] =  time.time()
     if df is not None and not df.empty and table is not None:
         # h5 = get_hdf5_file(fname,wr_mode='r')
         tmpdf = []
@@ -175,6 +175,7 @@ def write_hdf_db(fname,df,table='all',index=False,baseCount=500,append=True,Mult
                     tmpdf = store[table]
         if not MultiIndex:
             if index:
+                # log.error("debug index:%s %s %s"%(df,index,len(df)))
                 df.index = map((lambda x:str(1000000-int(x)) if x.startswith('0') else x),df.index)
             if tmpdf is not None and len(tmpdf) > 0:
                 if 'code' in tmpdf.columns:
@@ -186,8 +187,11 @@ def write_hdf_db(fname,df,table='all',index=False,baseCount=500,append=True,Mult
                     log.error("columns diff:%s"%(diff_columns))
     #                        dif_co = list(set(df.index) - set(tmpdf.index))
     #                        if len(dif_co) > 0:
-                df['timel'] =  time.time()
+#                if append:
+#                    df['timel'] =  time.time()
                 df=cct.combine_dataFrame(tmpdf, df, col=None,append=append)
+                if not append:
+                    df['timel'] =  time.time()
     #            df=cct.combine_dataFrame(tmpdf, df, col=None,append=False)
                 log.info("read hdf time:%0.2f"%(time.time()-time_t))
             else:
@@ -302,10 +306,10 @@ def load_hdf_db(fname,table='all',code_l=None,timelimit=True,index=False,limit_t
                     if timelimit and len(dd) > 0:
                         dd = dd.loc[dif_co]
                         o_time = dd[dd.timel <> 0].timel
-                        if len(o_time) > 0:
+                        if len(dd) > 0 and len(o_time) > 0:
                             o_time = o_time[0]
                             l_time = time.time() - o_time
-                            return_hdf_status = not cct.get_work_day_status()  or not cct.get_work_time() or (cct.get_work_day_status() and cct.get_work_time() and l_time < limit_time)
+                            return_hdf_status = not cct.get_work_time() or (cct.get_work_time() and l_time < limit_time)
 #                                if not cct.get_work_time() or not cct.get_work_day_status() or (cct.get_work_time() and l_time < limit_time):
                             if return_hdf_status:
                                 df = dd
@@ -335,7 +339,7 @@ def load_hdf_db(fname,table='all',code_l=None,timelimit=True,index=False,limit_t
                             o_time = o_time[0]
                             l_time = time.time() - o_time
 #                                    return_hdf_status = not cct.get_work_day_status()  or not cct.get_work_time() or (cct.get_work_day_status() and (cct.get_work_time() and l_time < limit_time))
-                            return_hdf_status = not cct.get_work_day_status()  or not cct.get_work_time() or (cct.get_work_day_status() and cct.get_work_time() and l_time < limit_time)
+                            return_hdf_status = not cct.get_work_time() or (cct.get_work_time() and l_time < limit_time)
                             log.info("return_hdf_status:%s time:%0.2f"%(return_hdf_status,l_time))
                             if  return_hdf_status:
                                 log.info("return hdf5 data:%s"%(len(dd)))

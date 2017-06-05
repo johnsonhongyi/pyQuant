@@ -84,8 +84,8 @@ class Sina:
         # self.grep_stock_detail = re.compile(r'(\d+)=([^\S][^,]+?)%s' %
         # (r',([\.\d]+)' * 29,))   #\n特例A (4)
         self.grep_stock_detail = re.compile(
-            r'(\d+)=([^\n][^,]+.)%s%s' % (r',([\.\d]+)' * 29,r',(\d{4}-\d{2}-\d{2}),(\d{2}:\d{2}:\d{2})'))  
-            # r'(\d+)=([^\n][^,]+.)%s' % (r',([\.\d]+)' * 29,))  
+            r'(\d+)=([^\n][^,]+.)%s%s' % (r',([\.\d]+)' * 29,r',(\d{4}-\d{2}-\d{2}),(\d{2}:\d{2}:\d{2})'))
+            # r'(\d+)=([^\n][^,]+.)%s' % (r',([\.\d]+)' * 29,))
 
         # 去除\n特例A(3356)
         # self.grep_stock_detail = re.compile(r'(00\d{4}|30\d{4}|60\d{4})=([^\n][^,]+.)%s' % (r',([\.\d]+)' * 29,))   #去除\n特例A(股票2432)
@@ -102,7 +102,7 @@ class Sina:
 #        self.index_status = False
         self.hdf_name = 'sina_data'
         self.table = 'all'
-        self.all
+        # self.all
         # h5 = self.load_hdf_db(table='all', code_l=None, init=True)
         # if h5 is None:
         #     # log.info("hdf5 None")
@@ -182,7 +182,7 @@ class Sina:
                 sina_limit_time = ct.sina_limit_time
                 sina_time_status = (cct.get_work_day_status() and 915 < cct.get_now_time_int() < 926)
 #                return_hdf_status = not cct.get_work_day_status() or (cct.get_work_day_status() and (cct.get_work_time() and l_time < sina_limit_time))
-                return_hdf_status = not cct.get_work_day_status()  or not cct.get_work_time() or (cct.get_work_day_status() and cct.get_work_time() and l_time < sina_limit_time)
+                return_hdf_status = not cct.get_work_time() or (cct.get_work_time() and l_time < sina_limit_time)
                 log.info("915:%s sina_time:%0.2f limit:%s"%(sina_time_status,l_time,sina_limit_time))
                 if sina_time_status and l_time < 10:
                     log.info("open 915 hdf ok:%s"%(len(h5)))
@@ -389,7 +389,7 @@ class Sina:
 #            if h5 is not None:
 #                log.info("not index hdf5 data:%s"%(len(h5)))
 #                return h5
-
+        self.stock_data = []
         self.url = self.sina_stock_api + ','.join(self.stock_codes)
         log.info("stock_list:%s" % self.url[:20])
         response = requests.get(self.url)
@@ -523,7 +523,8 @@ class Sina:
             df['close']=df['buy']
             df['low']=df['buy']
         else:
-            df.rename(columns={'now': 'close'}, inplace=True)
+            # df.rename(columns={'now': 'close'}, inplace=True)
+            df['close'] = df['now']
         df = df.drop_duplicates('code')
         # df = df.loc[:, ct.SINA_Total_Columns_Clean]
         # df = df.loc[:, ct.SINA_Total_Columns]
@@ -561,7 +562,9 @@ if __name__ == "__main__":
     # df = sina.get_stock_list_data(['999999'],index=True)
     # print df
     # df = sina.get_stock_code_data('000001',index=True).set_index('code')
-    print sina.get_stock_code_data('002873')
+    df= sina.get_stock_code_data('999999,399001',index=True)
+    print df
+#    print sina.get_stock_code_data('002873')
     # print sina.get_stock_code_data('600199,300334',index=False)
     # print len(sina.market('sh'))
     # sys.exit(0)

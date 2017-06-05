@@ -132,7 +132,7 @@ def _get_sina_Market_url(market='sh_a', count=None, num='1000'):
     return urllist
 
 
-def get_sina_Market_json(market='sh', showtime=True, num='1000', retry_count=3, pause=0.001):
+def get_sina_Market_json(market='all', showtime=True, num='1000', retry_count=3, pause=0.001):
     start_t = time.time()
 #    http://qt.gtimg.cn/q=sz000858,sh600199
 #    http://blog.csdn.net/ustbhacker/article/details/8365756
@@ -150,14 +150,15 @@ def get_sina_Market_json(market='sh', showtime=True, num='1000', retry_count=3, 
     h5_fname = 'get_sina_all_ratio'
     h5_table = 'all'
     # if market == 'all':
-    limit_time = 300
+    limit_time = ct.sina_dd_limit_time
     h5 = h5a.load_hdf_db(h5_fname, table=h5_table,limit_time=limit_time)
     if h5 is not None and len(h5) > 0 and 'timel' in h5.columns:
         o_time = h5[h5.timel <> 0].timel
         if len(o_time) > 0:
             o_time = o_time[0]
             l_time = time.time() - o_time
-            return_hdf_status = not cct.get_work_day_status()  or not cct.get_work_time() or (cct.get_work_day_status() and cct.get_work_time() and l_time < limit_time)
+            # return_hdf_status = not cct.get_work_day_status()  or not cct.get_work_time() or (cct.get_work_day_status() and cct.get_work_time() and l_time < limit_time)
+            return_hdf_status = not cct.get_work_time() or (cct.get_work_time() and l_time < limit_time)
             if return_hdf_status:
                 log.info("load hdf data:%s %s %s"%(h5_fname,h5_table,len(h5)))
                 dd = None
@@ -223,8 +224,11 @@ def get_sina_Market_json(market='sh', showtime=True, num='1000', retry_count=3, 
         # print type(df)
         if 'code' in df.columns:
             df = df.set_index('code')
-
-        h5 = h5a.write_hdf_db(h5_fname, df, table=h5_table,append=True)
+        if market == 'all':
+            append_status = False
+        else:
+            append_status = True
+        h5 = h5a.write_hdf_db(h5_fname, df, table=h5_table,append=append_status)
         if showtime: print ("Market-df:%s %s" % (format((time.time() - start_t), '.1f'), len(df))),
 
         return df
@@ -397,7 +401,7 @@ def get_sina_all_json_dd(vol='0', type='0', num='10000', retry_count=3, pause=0.
 
     h5_fname = 'get_sina_all_dd'
     h5_table = 'all'
-    limit_time = 300
+    limit_time = ct.sina_dd_limit_time
     h5 = h5a.load_hdf_db(h5_fname, table=h5_table,limit_time=limit_time)
     if h5 is not None and not h5.empty and 'timel' in h5.columns:
        o_time = h5[h5.timel <> 0].timel
@@ -405,7 +409,7 @@ def get_sina_all_json_dd(vol='0', type='0', num='10000', retry_count=3, pause=0.
            o_time = o_time[0]
            l_time = time.time() - o_time
 
-           return_hdf_status = not cct.get_work_day_status()  or not cct.get_work_time() or (cct.get_work_day_status() and cct.get_work_time() and l_time < limit_time)
+           return_hdf_status = not cct.get_work_time() or (cct.get_work_time() and l_time < limit_time)
            if return_hdf_status:
                log.info("load hdf data:%s %s %s"%(h5_fname,h5_table,len(h5)))
                return h5

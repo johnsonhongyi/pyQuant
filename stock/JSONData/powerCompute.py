@@ -1131,6 +1131,7 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y',tali
         # df = df.fillna(0)
 
     if len(drop_cxg) >0:
+        drop_cxg = list(set(drop_cxg))
         drop_t = [ co for co in drop_cxg if co in df.index]
         if len(drop_t) > 0:
             Power_CXG_Error += 1

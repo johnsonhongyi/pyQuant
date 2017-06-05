@@ -30,7 +30,7 @@ def parseArgmain():
                             help='dl default=30')
         parser.add_argument('-dl', action="store", dest="days", type=int, default=0,
                             help='days')
-        parser.add_argument('-m', action="store", dest="mpl", type=str, default='n',
+        parser.add_argument('-m', action="store", dest="mpl", type=str, default='y',
                             help='mpl show')
         parser.add_argument('-i', action="store", dest="line", type=str, choices=['y', 'n'], default='y',
                         help='LineHis show')

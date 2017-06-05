@@ -45,6 +45,7 @@ wcd_limit_day = 30
 h5_limit_time = 180
 big_H5_Size = 10
 sina_limit_time = 15
+sina_dd_limit_time = 300
 diffcode = 0.2
 duration_sleep_time = 60
 

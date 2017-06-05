@@ -719,7 +719,7 @@ def get_work_time():
         return False
     if (now_t > 1130 and now_t < 1300) or now_t < 915 or now_t > 1502:
         # return False
-        return False
+        return True
     else:
         # if now_t > 1300 and now_t <1302:
             # sleep(random.randint(5, 120))
@@ -1498,6 +1498,7 @@ def get_diff_dratio(mainlist,sublist):
 def combine_dataFrame(maindf,subdf,col=None,compare=None,append=False):
     times = time.time()
     maindf_co=maindf.columns
+    subdf_co = subdf.columns
     maindf = maindf.fillna(0)
     subdf = subdf.fillna(0)
 #    if 'ticktime' in maindf.columns:
@@ -1570,10 +1571,10 @@ def combine_dataFrame(maindf,subdf,col=None,compare=None,append=False):
         maindf = pd.concat([maindf, no_index],axis=0)
     '''
     log.info("combine df :%0.2f"%(time.time()-times))
-    dif_co = list(set(maindf_co)-set(maindf.columns))
-#    maindf['timel']=time.time()
-    if len(dif_co) > 0:
-        log.error("columns d:%s"%(dif_co))
+    if append:
+        dif_co = list(set(maindf_co)-set(subdf_co))
+        if len(dif_co) > 0:
+            log.error("columns col:%s %s"%(dif_co,eval(("maindf.%s")%(dif_co[0]))[1]))
     return maindf
 
 if __name__ == '__main__':
