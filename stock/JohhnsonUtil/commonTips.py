@@ -35,6 +35,34 @@ requests.adapters.DEFAULT_RETRIES = 0
 # sys.path.append("..")
 # print sys.path
 # from JSONData import tdx_data_Day as tdd
+global initGlobalValue
+initGlobalValue=0
+class GlobalValues:
+    # -*- coding: utf-8 -*-
+    def __init__(self):
+        global initGlobalValue
+        if initGlobalValue == 0:
+            self._init_()
+            initGlobalValue +=1
+
+    def _init_(self):#初始化
+        global _global_dict
+        _global_dict = {}
+
+
+    def setkey(self,key,value):
+        # """ 定义一个全局变量 """
+        _global_dict[key] = value
+
+
+    def getkey(self,key,defValue=None):
+    # 　　""" 获得一个全局变量,不存在则返回默认值 """
+        try:
+            return _global_dict[key]
+        except KeyError:
+            return defValue
+
+
 
 def get_os_system():
     os_sys = get_sys_system()
@@ -1578,6 +1606,10 @@ def combine_dataFrame(maindf,subdf,col=None,compare=None,append=False):
     return maindf
 
 if __name__ == '__main__':
+    GlobalValues()
+    # GlobalValues()._init()
+    GlobalValues().setkey('key', 'value')
+    print GlobalValues().getkey('key', defValue=None)
     print get_run_path()
     from docopt import docopt
     # log = LoggerFactory.log

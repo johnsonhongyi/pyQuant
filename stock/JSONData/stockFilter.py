@@ -6,15 +6,24 @@ from JohhnsonUtil import commonTips as cct
 import JohhnsonUtil.johnson_cons as ct
 from JSONData import powerCompute as pct
 import pandas as pd
+from JohhnsonUtil import LoggerFactory 
+log = LoggerFactory.log
 import time
 def getBollFilter(df=None,boll=-5,duration=ct.PowerCountdl,filter=True,ma5d=True,dl=14,percent=False):
-    #return boll > int
 
+    # drop_cxg = cct.GlobalValues().getkey('dropcxg')
+    # if len(drop_cxg) >0:
+        # log.info("stf drop_cxg:%s"%(len(drop_cxg)))
+        # drop_cxg = list(set(drop_cxg))
+        # drop_t = [ co for co in drop_cxg if co in df.index]
+        # if len(drop_t) > 0:
+            # df = df.drop(drop_t,axis=0)
+            # log.error("stf drop_cxg:%s"%(len(drop_t)))
     if df is None:
         print "dataframe is None"
         return None
     else:
-        df.loc[df.percent >= 9.9,'percent']=10
+        df.loc[df.percent >= 9.95,'percent']=10
 
 
     if 'ma5d' in df.columns:

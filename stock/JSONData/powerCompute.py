@@ -906,6 +906,7 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y',tali
                 return df
             else:
                 if len(drop_cxg) <> 0 and (not 915 < cct.get_now_time_int() < 932 or not cct.get_work_day_status()):
+                    log.info("drop_cxg <> 0 and not 915-932")
                     temp_l = list(set(code_l) - set(drop_cxg))
                     drop_t = [ co for co in drop_cxg if co in df.index]
                     if len(temp_l) <> 0:
@@ -1136,10 +1137,12 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y',tali
         if len(drop_t) > 0:
             Power_CXG_Error += 1
             df = df.drop(drop_t,axis=0)
+            # cct.GlobalValues()
+            # cct.GlobalValues().setkey('dropcxg',drop_cxg)
             if Power_CXG_Error < 2:
-                log.error("Drop_cxg open!!! drop_t:%s %s"%(drop_t,drop_cxg))
+                log.error("Drop_cxg open!!! drop_t:%s %s"%(drop_t,len(drop_cxg)))
 
-
+    # print "global:%s"%(cct.GlobalValues().getkey('dropcxg'))
 
     h5 = h5a.write_hdf_db(h5_fname, df, table=h5_table,append=True)
 
