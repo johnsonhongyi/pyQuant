@@ -27,9 +27,10 @@ power_update_time = 900
 writeCount = 4
 changeRatio = 0.975
 changeRatioUp = 1.03
-duration_date = 10
+# duration_date = 10
 duration_diff = 6
-duration_date_l = 10
+duration_date_l = 30
+duration_date_up = 60
 duration_date_sort = 21
 lastdays = 4
 bollFilter = -10
@@ -43,9 +44,9 @@ sleep_time = 6
 tdx_max_int = 10
 wcd_limit_day = 30
 h5_limit_time = 180
-big_H5_Size = 10
+big_H5_Size = 8
 sina_limit_time = 15
-sina_dd_limit_time = 300
+sina_dd_limit_time = 360
 diffcode = 0.2
 duration_sleep_time = 60
 
@@ -92,10 +93,10 @@ Duration_percent_opra_key=[0,0,0,0,1,1,1,1,1]
 Duration_dff_percent=['dff','percent','df2','ra','op','fib','fibl','ratio','volume','couts']
 Duration_dff_percent_key=[0,0,0,0,0,1,1,1,1,1]
 
-Duration_ra_op=['ra','dff','couts','percent','op','fib','fibl','ratio','volume']
-Duration_ra_op_key=[0,0,0,0,0,1,1,1,1]
+Duration_ra_dff=['ra','dff','couts','percent','op','fib','fibl','ratio','volume']
+Duration_ra_dff_key=[0,0,0,0,0,1,1,1,1]
 
-# Duration_ra_goldop=['ra','boll','dff','percent','op','fib','fibl','ratio','volume','couts']
+# Duration_ra_goldop=['ra','percent','dff','boll','op','fib','fibl','ratio','volume','couts']
 # Duration_ra_goldop_key=[0,0,0,0,0,1,1,1,1,1]
 
 Duration_sort_high_op=['dff','date','fib','op','fibl','ra','percent','ratio','volume','couts']
@@ -118,13 +119,13 @@ MonitorMarket_sort_op_key=[0,0,1,0,0,0,1,1,1]
 
 def RawMenuArgmain():
     raw = 'status:[go(g),clear(c),[d 20150101 [l|h]|[y|n|pn|py],quit(q),W(a),sh]:'
-    raw_input_menu=raw+"\n\tNow : %s"+"\n\t1:Sort By Percent\t2:Sort By DFF\t3:Sort By per_vol\t\n\t4:Sort By df2 \t\t5:Sort by Count 6:Sort by per_ratio\nplease input:"
+    raw_input_menu=raw+"\n\tNow : %s"+"\n\t1:Sort By Percent\t2:Sort By DFF\t3:Sort By Ra_dff\t4:Sort By df2\t\n\t4:Sort By per_vol\t5:Sort by Count 6:Sort by per_ratio\nplease input:"
     return raw_input_menu
 
 # "Sort By Percent\t3:Sort By DFF\n\t2:Sort By OP\t\t4:Sort By Ra\nplease input:"
 
-Market_sort_idx={'1':'ct.Duration_percent_dff','2':'ct.Duration_dff_percent','3':'ct.Duration_percent_vol',\
-                '4':'ct.Duration_percent_df2dff','5':'ct.Monitor_sort_count','6':'ct.Duration_sort_per_ratio'}
+Market_sort_idx={'1':'ct.Duration_percent_dff','2':'ct.Duration_dff_percent','3':'ct.Duration_ra_dff','4':'ct.Duration_percent_df2dff',\
+                '5':'ct.Duration_percent_vol','6':'ct.Monitor_sort_count','7':'ct.Duration_sort_per_ratio'}
 
 #edit 1031
 # Duration_format_buy=['name', 'buy', 'ma5d','boll','dff', 'percent','ra','op', 'fib','fibl','volume', 'ratio', 'couts','ldate', 'date']

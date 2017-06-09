@@ -94,7 +94,7 @@ if __name__ == "__main__":
             # df = rl.get_sina_Market_json('all')
             # top_now = rl.get_market_price_sina_dd_realTime(df, vol, type)
             time_Rt = time.time()
-            top_now = tdd.getSinaAlldf(market='cyb', vol=ct.json_countVol, type=ct.json_countType)            
+            top_now = tdd.getSinaAlldf(market='cyb', vol=ct.json_countVol, vtype=ct.json_countType)            
             # print top_now.loc['601900',:]
             df_count = len(top_now)
             now_count = len(top_now)
@@ -209,7 +209,7 @@ if __name__ == "__main__":
 
 
                 if 'couts' in top_dif.columns.values:
-                    top_dif = top_dif.sort_values(by=ct.MonitorMarket_sort_count,
+                    top_dif = top_dif.sort_values(by=ct.Monitor_sort_count,
                                                   ascending=[0, 0, 0, 1, 1])
                 else:
                     # print "Good Morning!!!"

@@ -117,17 +117,17 @@ if __name__ == "__main__":
     blkname = '063.blk'
     block_path = tdd.get_tdx_dir_blocknew() + blkname
     lastpTDX_DF = pd.DataFrame()
-    duration_date = ct.duration_date
+    duration_date = ct.duration_date_l
     end_date = cct.last_tddate(days=3)
     # all_diffpath = tdd.get_tdx_dir_blocknew() + '062.blk'
     market_sort_value = ct.Market_sort_idx['2']
     market_sort_value_key = eval(market_sort_value+'_key')
     while 1:
         try:
-            # top_now = tdd.getSinaAlldf(market='sh', vol=ct.json_countVol, type=ct.json_countType)
+            # top_now = tdd.getSinaAlldf(market='sh', vol=ct.json_countVol, vtype=ct.json_countType)
             time_Rt = time.time()
-            # top_now = tdd.getSinaAlldf(market='次新股',filename='cxg', vol=ct.json_countVol, type=ct.json_countType)
-            top_now = tdd.getSinaAlldf(market='cyb',filename=None, vol=ct.json_countVol, type=ct.json_countType)
+            # top_now = tdd.getSinaAlldf(market='次新股',filename='cxg', vol=ct.json_countVol, vtype=ct.json_countType)
+            top_now = tdd.getSinaAlldf(market='cyb',filename=None, vol=ct.json_countVol, vtype=ct.json_countType)
             # print top_now.loc['300208','name']
             df_count = len(top_now)
             now_count = len(top_now)

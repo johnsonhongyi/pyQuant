@@ -102,7 +102,7 @@ if __name__ == "__main__":
 
             time_Rt = time.time()
             top_now = tdd.getSinaAlldf(
-                market='all', vol=ct.json_countVol, type=ct.json_countType)
+                market='all', vol=ct.json_countVol, vtype=ct.json_countType)
             time_d = time.time()
             if time_d - time_s > delay_time:
                 status_change = True

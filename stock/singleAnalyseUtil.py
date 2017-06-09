@@ -15,6 +15,7 @@ from JSONData import realdatajson as rd
 from JSONData import powerCompute as pct
 from JSONData import get_macd_kdj_rsi as getab
 from JSONData import tdx_data_Day as tdd
+from JSONData import sina_data
 import JohhnsonUtil.emacount as ema
 from JohhnsonUtil import LoggerFactory
 # log = LoggerFactory.getLogger("SingleSAU")
@@ -306,10 +307,14 @@ def get_hot_countNew(changepercent, rzrq,fibl=None,fibc=10):
 
     for market in indexKeys:
         # market = ct.SINA_Market_KEY()
-        df = rd.get_sina_Market_json(market, False)
+#        df = rd.get_sina_Market_json(market, False)
+        df = sina_data.Sina().market(market)
         # count=len(df.index)
         log.info("market:%s" % df[:1])
         df = df.dropna()
+        if 'percent' not in df.columns:
+            df['percent'] = map(lambda x,y: round((x-y)/y*100, 1), df.close.values,df.llastp.values)
+
         if 'percent' in df.columns.values:
             # and len(df[:20][df[:20]['percent']>0])>3:
             # if 'code' in df.columns:
@@ -351,7 +356,7 @@ def get_hot_countNew(changepercent, rzrq,fibl=None,fibc=10):
             print(u"%s %s%s" % (f_print(4, ff['close']), f_print(1, '!' if ff['open'] > ff[
                 'lastp'] else '?'), f_print(2, '!!' if ff['close'] > ff['lastp'] else '??')))
         allTop = allTop.append(df, ignore_index=True)
-
+#        allTop = allTop.drop_duplicates()
     df = allTop
     count = len(df.index)
     top = df[df['percent'] > changepercent]

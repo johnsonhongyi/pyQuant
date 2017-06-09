@@ -264,8 +264,15 @@ def get_wencai_data(dm,market='wencai',days=120):
 #            if  set(codelist) <= set(df.name.values):
 #            if  set(dm.index) <= set(df.code.values) :
 #            if  len(dm) - len(set(dm.index) & set(df.index.values)) < 10 :
+            # drop_cxg = cct.GlobalValues().getkey('dropcxg')
+            wencai_drop = cct.GlobalValues().getkey('wencai_drop')
+            if wencai_drop is not None and len(wencai_drop) > 1:
+                return_status = True
+            else:
+                return_status = False
+
             dratio = cct.get_diff_dratio(df.index,dm.index)
-            if dratio < 0.1:
+            if return_status or dratio < 0.1:
                 if 'code' in df.columns:
                     df = df.set_index('code')
                     df = df.drop_duplicates()
@@ -275,6 +282,8 @@ def get_wencai_data(dm,market='wencai',days=120):
                     diff_code = [x for x in set(dm.index) - (set(dm.index) & set(df.index.values))]
                     dm.drop([col for col in dm.index if col not in diff_code], axis=0, inplace=True)
 
+
+    # if len(drop_cxg) >0:
                 # for x in diff_code:
                 #     if not x in df.code.values:
                 #         print x,dm[x],

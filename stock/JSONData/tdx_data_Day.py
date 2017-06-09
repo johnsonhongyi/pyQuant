@@ -1587,12 +1587,12 @@ def get_sina_data_df(code):
     return dm
 
 
-def getSinaJsondf(market='cyb',vol=ct.json_countVol,type=ct.json_countType):
+def getSinaJsondf(market='cyb',vol=ct.json_countVol,vtype=ct.json_countType):
     df = rl.get_sina_Market_json(market)
-    top_now = rl.get_market_price_sina_dd_realTime(df, vol, type)
+    top_now = rl.get_market_price_sina_dd_realTime(df, vol, vtype)
     return top_now
 
-def getSinaAlldf(market='cyb',vol=ct.json_countVol,type=ct.json_countType,filename='mnbk',table='top_now'):
+def getSinaAlldf(market='cyb',vol=ct.json_countVol,vtype=ct.json_countType,filename='mnbk',table='top_now'):
     market_all = False
     if market == 'rzrq':
         df = cct.get_rzrq_code()
@@ -1635,9 +1635,14 @@ def getSinaAlldf(market='cyb',vol=ct.json_countVol,type=ct.json_countType,filena
 #        codelist = df.code.tolist()
 #        df = df.set_index('code')
         log.error("get_sina_Market_json %s : %s"%(market,len(df)))
-    if cct.get_now_time_int() > 915:
-        if 'buy' in df.columns:
-            df = df[(df.buy > 0)]
+#    if cct.get_now_time_int() > 915:
+#        if cct.get_now_time_int() > 930:
+#            if 'open' in df.columns:
+#                df = df[(df.open > 0)]
+#        else:
+#            if 'buy' in df.columns:
+#                df = df[(df.buy > 0)]
+
 
     codelist = df.index.astype(str).tolist()
 
@@ -1692,6 +1697,7 @@ def getSinaAlldf(market='cyb',vol=ct.json_countVol,type=ct.json_countType,filena
         dm = cct.combine_dataFrame(dm,df.loc[:,['name','ratio']])
         log.info("dm combine_df ratio:%s %s"%(len(dm),len(df))),
         dm=dm.fillna(0)
+
     if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 926:
         # print dm[dm.code=='000001'].b1
         # print dm[dm.code=='000001'].a1
@@ -1701,15 +1707,10 @@ def getSinaAlldf(market='cyb',vol=ct.json_countVol,type=ct.json_countType,filena
         dm['volume'] = map(lambda x: x, dm.b1_v.values)
         # print dm[dm.code=='000001'].volume
     else:
-        dm = dm[dm.trade > 0]
-    # print dz[:1].ratio
-    # dm['ratio'] = map(lambda x: round(df[df.code == x].ratio, 1) if len(df[df.code == x].ratio) > 0 else 0, dm['code'].values)
-    # print len(dm)
-    # dm = dz
-    # print dm.ratio[0],dm.name[0]
-    # print time.time()-time_s
+        dm = dm[dm.open > 0]
+
     if  cct.get_now_time_int() > 935 or not cct.get_work_time():
-        top_now = rl.get_market_price_sina_dd_realTime(dm, vol, type)
+        top_now = rl.get_market_price_sina_dd_realTime(dm, vol, vtype)
     else:
         if 'code' in dm.columns:
             dm =  dm.set_index('code')
@@ -2950,7 +2951,7 @@ def usage(p=None):
         else:
             dt = int(dt)+changedays
         # print dt
-        # top_now = rl.get_market_price_sina_dd_realTime(df, vol, type)
+        # top_now = rl.get_market_price_sina_dd_realTime(df, vol, vtype)
         # get_tdx_exp_all_LastDF_DL(codelist,dt=duration_date,ptype=ptype)
         split_t = timeit.timeit(lambda : get_tdx_exp_all_LastDF_DL(codelist,dt=duration_date,ptype=ptype), number=run)
         # split_t = timeit.timeit(lambda : get_tdx_all_day_LastDF(codelist,dt=duration_date,ptype=ptype), number=run)
@@ -3011,7 +3012,7 @@ def testnumba(number=500):
 
 
 
-# top_now=getSinaAlldf(market='rzrq', vol=ct.json_countVol, type=ct.json_countType)
+# top_now=getSinaAlldf(market='rzrq', vol=ct.json_countVol, vtype=ct.json_countType)
 # top_hdf_api('tdx', df=top_now, table=None)
 #get_tdx_Exp_day_to_df('603859',dl=20)
 if __name__ == '__main__':

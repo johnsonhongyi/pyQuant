@@ -105,6 +105,7 @@ def _parsing_Market_price_json(url):
 
 
 def _get_sina_Market_url(market='sh_a', count=None, num='1000'):
+    num = str(num)
     if count == None:
         url = ct.JSON_Market_Center_CountURL % (market)
         # print url
@@ -132,7 +133,7 @@ def _get_sina_Market_url(market='sh_a', count=None, num='1000'):
     return urllist
 
 
-def get_sina_Market_json(market='all', showtime=True, num='1000', retry_count=3, pause=0.001):
+def get_sina_Market_json(market='all', showtime=True, num='100', retry_count=3, pause=0.001):
     start_t = time.time()
 #    http://qt.gtimg.cn/q=sz000858,sh600199
 #    http://blog.csdn.net/ustbhacker/article/details/8365756
@@ -148,12 +149,17 @@ def get_sina_Market_json(market='all', showtime=True, num='1000', retry_count=3,
     # ct._write_head()
 
     h5_fname = 'get_sina_all_ratio'
-    h5_table = 'all'
+    # h5_table = 'all'
+    h5_table = 'all'+'_'+str(num)
+
     # if market == 'all':
     limit_time = ct.sina_dd_limit_time
     h5 = h5a.load_hdf_db(h5_fname, table=h5_table,limit_time=limit_time)
     if h5 is not None and len(h5) > 0 and 'timel' in h5.columns:
         o_time = h5[h5.timel <> 0].timel
+        if len(h5) < 500:
+            log.error("h5 not full data")
+            o_time = []
         if len(o_time) > 0:
             o_time = o_time[0]
             l_time = time.time() - o_time
@@ -173,17 +179,16 @@ def get_sina_Market_json(market='all', showtime=True, num='1000', retry_count=3,
                 else:
                     log.error('market is not Find:%s'%(market))
                 dd = h5.loc[co_inx]
-                if len(dd) > 200:
+                if len(dd) > 100:
                     log.info("return sina_ratio:%s"%(len(dd)))
                     return dd
     # else:
-    #     market = 'all'
 
+#    market = 'all'
     if market=='all':
         url_list=[]
         # for m in ct.SINA_Market_KEY.values():
         for m in ['sh_a','sz_a']:
-
             list=_get_sina_Market_url(m, num=num)
             for l in list:url_list.append(l)
         # print url_list
@@ -206,7 +211,10 @@ def get_sina_Market_json(market='all', showtime=True, num='1000', retry_count=3,
         if 'ratio' in df.columns:
             df['ratio']=df['ratio'].apply(lambda x:round(x,1))
         df['percent']=df['percent'].apply(lambda x:round(x,1))
-        df=df.drop_duplicates()
+#        if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 926:
+#            df = df[(df.buy > 0)]
+#        else:
+#            df = df[(df.trade > 0)]
         # print df[:1]
     # for url in url_list:
     #     # print url
@@ -215,7 +223,7 @@ def get_sina_Market_json(market='all', showtime=True, num='1000', retry_count=3,
     #     df = df.append(data, ignore_index=True)
     #     # break
 
-    if df is not None:
+    if df is not None and len(df) > 0:
         # for i in range(2, ct.PAGE_NUM[0]):
         #     newdf = _parsing_dayprice_json(i)
         #     df = df.append(newdf, ignore_index=True)
@@ -228,6 +236,8 @@ def get_sina_Market_json(market='all', showtime=True, num='1000', retry_count=3,
             append_status = False
         else:
             append_status = True
+
+        df=df.drop_duplicates()
         h5 = h5a.write_hdf_db(h5_fname, df, table=h5_table,append=append_status)
         if showtime: print ("Market-df:%s %s" % (format((time.time() - start_t), '.1f'), len(df))),
 
@@ -295,6 +305,9 @@ def sina_json_Big_Count(vol='1', type='0', num='10000'):
 
 def _get_sina_json_dd_url(vol='0', type='0', num='10000', count=None):
     urllist = []
+    vol = str(vol)
+    type = str(type)
+    num = str(num)
     if count == None:
         url = ct.JSON_DD_CountURL % (ct.DD_VOL_List[vol], type)
         log.info("_json_dd_url:%s"%url)
@@ -400,7 +413,7 @@ def get_sina_all_json_dd(vol='0', type='0', num='10000', retry_count=3, pause=0.
     """
 
     h5_fname = 'get_sina_all_dd'
-    h5_table = 'all'
+    h5_table = 'all'+'_'+ct.DD_VOL_List[str(vol)]+'_'+str(num)
     limit_time = ct.sina_dd_limit_time
     h5 = h5a.load_hdf_db(h5_fname, table=h5_table,limit_time=limit_time)
     if h5 is not None and not h5.empty and 'timel' in h5.columns:
@@ -460,9 +473,10 @@ def get_sina_all_json_dd(vol='0', type='0', num='10000', retry_count=3, pause=0.
 #            print df.columns
             df = df.loc[:, ['code','name', 'couts', 'kind', 'prev_price','ticktime']]
             df.code=df.code.apply(lambda x:str(x).replace('sh','') if str(x).startswith('sh') else str(x).replace('sz',''))
-            df = df.set_index('code')
-            h5 = h5a.write_hdf_db(h5_fname, df, table=h5_table,append=False)
-
+            if len(df) > 0:
+                df = df.set_index('code')
+                h5 = h5a.write_hdf_db(h5_fname, df, table=h5_table,append=False)
+                log.info("get_sina_all_json_dd:%s"%(len(df)))
             print (" dd-df:%0.2f" % ((time.time() - start_t))),
             return df
         else:
@@ -533,6 +547,9 @@ def get_sina_dd_count_price_realTime(df='',table='all',vol='0',type='0'):
     '''
     input df count and merge price to df
     '''
+#    if table <> 'all':
+#        log.error("check market is not all")
+
     if len(df)==0:
         # df = get_sina_all_json_dd('0')
         df = get_sina_all_json_dd(vol,type)
@@ -710,6 +727,7 @@ def get_market_price_sina_dd_realTime(dp='',vol='0',type='0'):
 
             # print df[df.couts>0][:2]
             dm = cct.combine_dataFrame(dp,df)
+            log.info("top_now:main:%s subobject:%s dm:%s "%(len(dp),len(df),len(dm)))
 #            dm=pd.merge(dp,df,on='name',how='left')
             log.info("dmMerge:%s"%dm.columns)
             # print dm[dm.couts>0][:2]
@@ -745,11 +763,15 @@ def get_market_price_sina_dd_realTime(dp='',vol='0',type='0'):
 
 if __name__ == '__main__':
     import sys
-    log.setLevel(LoggerFactory.DEBUG)
+    # log.setLevel(LoggerFactory.DEBUG)
     # df = get_sina_all_json_dd('0', '3')
+    # df = get_market_price_sina_dd_realTime(dp='', vol='1', type='0')
+    # print df
+    # df = get_sina_all_json_dd(1,0,num=10000)
+    # print len(df)
     for mk in ['sz','cyb','sh']:
-        df=get_sina_Market_json(mk)
-        print "mk:",len(df)
+        df=get_sina_Market_json(mk,num=100)
+        print "mk:\t",len(df)
     import tushare as ts
     s_t=time.time()
     df = ts.get_today_all()

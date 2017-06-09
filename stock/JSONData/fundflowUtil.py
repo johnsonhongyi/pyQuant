@@ -445,7 +445,9 @@ if __name__ == "__main__":
     #
 #    pp=get_dfcfw_fund_HGT(ct.DFCFW_FUND_FLOW_HGT)
     # print get_dfcfw_rzrq_SHSZ(url=ct.DFCFW_RZRQ_SHSZ)
-    print get_dfcfw_fund_SHSZ()
+    indexKeys = [ 'sh','sz', 'cyb']
+    ffindex = ffu.get_dfcfw_fund_flow('all')
+    # print get_dfcfw_fund_SHSZ()
     sys.exit(0)
     # for x in pp.keys():
     # print pp[x]

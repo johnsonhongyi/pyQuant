@@ -1523,7 +1523,7 @@ def get_diff_dratio(mainlist,sublist):
     log.info("dratio all:%s :%s %0.2f"%(len(sublist),len(sublist)-len(dif_co),dratio))
     return dratio
 
-def combine_dataFrame(maindf,subdf,col=None,compare=None,append=False):
+def combine_dataFrame(maindf,subdf,col=None,compare=None,append=False,clean=True):
     times = time.time()
     maindf_co=maindf.columns
     subdf_co = subdf.columns
@@ -1542,6 +1542,7 @@ def combine_dataFrame(maindf,subdf,col=None,compare=None,append=False):
             subdf = subdf.set_index('code')
 
         no_index = maindf.drop([inx for inx in maindf.index  if inx not in subdf.index], axis=0)
+#        no_index = maindf.loc[subdf.index]
         if col is not None and compare is not None:
             # if col in subdf.columns:
             # sub_col = list(set(subdf.columns) - set([col]))

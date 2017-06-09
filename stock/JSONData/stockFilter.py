@@ -1,5 +1,4 @@
 # -*- coding:utf-8 -*-
-# -*- coding:utf-8 -*-
 import sys
 sys.path.append("..")
 from JohhnsonUtil import commonTips as cct

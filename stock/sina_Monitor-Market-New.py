@@ -96,7 +96,7 @@ if __name__ == "__main__":
         try:
             # df = sina_data.Sina().all
             time_Rt = time.time()
-            top_now = tdd.getSinaAlldf(market='cyb', vol=ct.json_countVol, type=ct.json_countType)
+            top_now = tdd.getSinaAlldf(market='cyb', vol=ct.json_countVol, vtype=ct.json_countType)
             # print top_now.loc['300208','name']
             # top_now.to_hdf("testhdf5", 'marketDD', format='table', complevel=9)
             df_count = len(top_now)
@@ -226,7 +226,7 @@ if __name__ == "__main__":
                 else:
 
                     if 'couts' in top_dif.columns.values:
-                        top_dif = top_dif.sort_values(by=ct.MonitorMarket_sort_count, ascending=[0, 0, 0, 1, 1])
+                        top_dif = top_dif.sort_values(by=ct.Monitor_sort_count, ascending=[0, 0, 0, 1, 1])
                     else:
                         # print "Good Morning!!!"
                         top_dif = top_dif.sort_values(by=['dff', 'percent', 'ratio'], ascending=[0, 0, 1])

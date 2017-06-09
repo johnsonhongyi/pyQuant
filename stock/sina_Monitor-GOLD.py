@@ -136,11 +136,14 @@ if __name__ == "__main__":
     blkname = '065.blk'
     block_path = tdd.get_tdx_dir_blocknew() + blkname
     lastpTDX_DF = pd.DataFrame()
-    # all_diffpath = tdd.get_tdx_dir_blocknew() + '062.blk'
+    parser=cct.MoniterArgmain()
+    parserDuraton=cct.DurationArgmain()
+    market_sort_value = ct.Market_sort_idx['1']
+    market_sort_value_key = eval(market_sort_value+'_key')
     while 1:
         try:
             time_Rt = time.time()
-            top_now = tdd.getSinaAlldf(market='captops', vol=ct.json_countVol, type=ct.json_countType)
+            top_now = tdd.getSinaAlldf(market='captops', vol=ct.json_countVol, vtype=ct.json_countType)
             # print top_now
             # print top_now.columns
             time_d = time.time()
@@ -248,8 +251,8 @@ if __name__ == "__main__":
                                     # ascending=ct.Duration_percentdn_ra_key)
                     # top_temp = top_temp.sort_values(by=ct.Duration_percent_op,
                     #                 ascending=ct.Duration_percent_op_key)                                    
-                    top_temp = top_temp.sort_values(by=ct.Duration_ra_goldop,
-                                    ascending=ct.Duration_ra_goldop_key)
+                    top_temp = top_temp.sort_values(by=eval(market_sort_value),
+                                        ascending=market_sort_value_key)
                     # top_temp = top_temp.sort_values(by=['op','ra','dff', 'percent', 'ratio'], ascending=[0,0,0, 0, 1])                
                 # if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935:
                 #     top_temp = top_temp.loc[:,ct.Monitor_format_trade]
@@ -309,8 +312,36 @@ if __name__ == "__main__":
 
 
             if len(st) == 0:
-                # top_all=pd.DataFrame()
                 status = False
+            elif len(st.split()[0]) == 1 and st.split()[0].isdigit():
+                st_l=st.split()
+                st = st_l[0]
+                if st in ct.Market_sort_idx.keys():
+                    market_sort_value = ct.Market_sort_idx[st]
+                    market_sort_value_key = eval(market_sort_value+'_key')
+                    if len(st_l) > 1 and st_l[1]=='f':
+                       market_sort_value_key = [ key^1 for key in market_sort_value_key]                         
+                else:
+                    log.error("market_sort key error:%s"%(st))
+                    cct.sleeprandom(5)
+
+            # elif st.startswith('d') or st.startswith('dt'):
+            #     # dl = st.split()
+            #     args = parserDuraton.parse_args(st.split()[1:])
+            #     if len(str(args.start)) > 0:
+            #         end_date=args.end
+            #         duration_date=args.start
+            #         if len(str(duration_date)) < 4:
+            #             du_date = tdd.get_duration_Index_date('999999',dl=int(duration_date))
+            #             # print duration_date
+            #             ct.PowerCountdl = duration_date
+            #         set_duration_console(du_date)
+            #         time_s = time.time()
+            #         status = False
+            #         top_all = pd.DataFrame()
+            #         lastpTDX_DF = pd.DataFrame()            
+
+
             elif st.lower() == 'g' or st.lower() == 'go':
                 status = True
             elif st.lower() == 'clear' or st.lower() == 'c':

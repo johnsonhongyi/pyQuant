@@ -100,8 +100,8 @@ if __name__ == "__main__":
     ptype='low'
     # op, ra, duration_date, days = pct.get_linear_model_status('999999', filter='y', dl=dl, ptype=ptype, days=1)
     # duration_date = int(ct.duration_date * 1.5)
-    # duration_date = ct.duration_date_l
-    duration_date = 10
+    duration_date = ct.duration_date_up
+    # duration_date = 10
 #    duration_date = 120
     # duration_date = 300
     du_date = duration_date
@@ -126,7 +126,7 @@ if __name__ == "__main__":
         try:
             # df = sina_data.Sina().all
             time_Rt = time.time()
-            top_now = tdd.getSinaAlldf(market='all', vol=ct.json_countVol, type=ct.json_countType)
+            top_now = tdd.getSinaAlldf(market='all', vol=ct.json_countVol, vtype=ct.json_countType)
 
             top_dif = top_now
             # top_now.to_hdf("testhdf5", 'marketDD', format='table', complevel=9)

@@ -867,9 +867,10 @@ def get_linear_model_candles(code, ptype='low', dtype='d', start=None, end=None,
     plt.show(block=False)
     return df
 
-global Power_CXG_Error,drop_cxg
+global Power_CXG_Error,drop_cxg,wencai_drop
 Power_CXG_Error = 0
 drop_cxg = []
+wencai_drop = []
 
 def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y',talib=False,newdays=None,days=0):
     ts=time.time()
@@ -882,7 +883,7 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y',tali
         h5_combine_status = True
         statuslist = False
 
-    global Power_CXG_Error,drop_cxg
+    global Power_CXG_Error,drop_cxg,wencai_drop
 #    drop_cxg
 
     h5_fname='powerCompute'
@@ -950,8 +951,6 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y',tali
     #    cname = ",".join(x for x in dm.name)
         dmname = dm.name
         wcdf = wcd.get_wencai_data(dmname,'wencai')
-    #    wcdf = wcd.get_codelist_df(dm.name.tolist())
-
         wcdf_code = wcdf.index.tolist()
 
         for code in code_l:
@@ -1112,10 +1111,11 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y',tali
             if code in wcdf_code:
                 df.loc[code,'category'] = wcdf.loc[code,'category']
             else:
+                wencai_drop.append(code)
                 log.warn("code not in wcdf:%s"%(code))
             # else:
                 # df.loc[code,'category'] = 0
-                
+
             # df = getab.Get_BBANDS(df, dtype='d')
             #'volume', 'ratio', 'couts','ldate' -> 'ma','macd','rsi','kdj'
             # df = df.drop_duplicates()
@@ -1137,10 +1137,14 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y',tali
         if len(drop_t) > 0:
             Power_CXG_Error += 1
             df = df.drop(drop_t,axis=0)
-            # cct.GlobalValues()
-            # cct.GlobalValues().setkey('dropcxg',drop_cxg)
+            cct.GlobalValues()
+            cct.GlobalValues().setkey('dropcxg',drop_cxg)
+            cct.GlobalValues().setkey('Power_CXG_Error',Power_CXG_Error)
+            
             if Power_CXG_Error < 2:
                 log.error("Drop_cxg open!!! drop_t:%s %s"%(drop_t,len(drop_cxg)))
+    if len(wencai_drop) > 0:
+        cct.GlobalValues().setkey('wencai_drop',wencai_drop)
 
     # print "global:%s"%(cct.GlobalValues().getkey('dropcxg'))
 

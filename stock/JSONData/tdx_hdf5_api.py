@@ -14,7 +14,7 @@ from JohhnsonUtil import johnson_cons as ct
 import random
 import subprocess
 log = LoggerFactory.log
-
+import gc
 global RAMDISK_KEY,INIT_LOG_Error
 RAMDISK_KEY = 0
 INIT_LOG_Error = 0
@@ -46,7 +46,7 @@ class SafeHDFStore(HDFStore):
         # subprocess.call(["ptrepack", "-o", "--chunkshape=auto", "--propindexes", --complevel=9,", ",--complib=blosc,infilename, outfilename])
         # os.system()
 
-    def run(self,fname,**kwargs):
+    def run(self,fname,*args,**kwargs):
         while True:
             try:
                 self._flock = os.open(self._lock, os.O_CREAT |os.O_EXCL |os.O_WRONLY)
@@ -70,8 +70,8 @@ class SafeHDFStore(HDFStore):
 #                log.info("safeHDF Except:%s"%(e))
 #                time.sleep(probe_interval)
 #                return None
-#        HDFStore.__init__(self, *args, **kwargs)
-        HDFStore.__init__(self,fname,complevel=self.complevel,complib=self.complib, **kwargs)
+        HDFStore.__init__(self,fname,*args, **kwargs)
+        # HDFStore.__init__(self,fname,complevel=self.complevel,complib=self.complib, **kwargs)
         # HDFStore.__init__(self,fname,format="table",complevel=self.complevel,complib=self.complib, **kwargs)
         # ptrepack --complib=zlib --complevel 9 --overwrite sina_data.h5 out.h5
 
@@ -95,7 +95,7 @@ class SafeHDFStore(HDFStore):
                 else:
                     os.remove(self.temp_file)
             os.remove(self._lock)
-
+            gc.collect()
 # with SafeHDFStore('example.hdf') as store:
 #     # Only put inside this block the code which operates on the store
 #     store['result'] = result
@@ -113,7 +113,8 @@ def get_hdf5_file(fpath,wr_mode='r',complevel=9,complib='zlib',mutiindx=False):
 
     if os.path.exists(fpath):
         if wr_mode == 'w':
-            store=pd.HDFStore(fpath,complevel=None, complib=None, fletcher32=False)
+            # store=pd.HDFStore(fpath,complevel=None, complib=None, fletcher32=False)
+            store=pd.HDFStore(fpath)
         else:
             lock = cct.get_ramdisk_path(fpath,lock=True)
             while True:
@@ -129,12 +130,14 @@ def get_hdf5_file(fpath,wr_mode='r',complevel=9,complib='zlib',mutiindx=False):
                     log.error("IOError READ ERROR:%s"%(e))
                     time.sleep(random.random())
 
-            store=pd.HDFStore(fpath, mode=wr_mode, complevel=None, complib=None, fletcher32=False)
+            store=pd.HDFStore(fpath, mode=wr_mode)
+            # store=pd.HDFStore(fpath, mode=wr_mode, complevel=None, complib=None, fletcher32=False)
             os.remove(lock)
 #            store = SafeHDFStore(fpath)
     else:
         if mutiindx:
-            store = pd.HDFStore(fpath,complevel=9,complib='zlib')
+            store = pd.HDFStore(fpath)
+            # store = pd.HDFStore(fpath,complevel=9,complib='zlib')
         else:
             return None
         # store = pd.HDFStore(fpath, mode=wr_mode,complevel=9,complib='zlib')
