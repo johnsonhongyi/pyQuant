@@ -119,7 +119,7 @@ MonitorMarket_sort_op_key=[0,0,1,0,0,0,1,1,1]
 
 def RawMenuArgmain():
     raw = 'status:[go(g),clear(c),[d 20150101 [l|h]|[y|n|pn|py],quit(q),W(a),sh]:'
-    raw_input_menu=raw+"\n\tNow : %s"+"\n\t1:Sort By Percent\t2:Sort By DFF\t3:Sort By Ra_dff\t4:Sort By df2\t\n\t4:Sort By per_vol\t5:Sort by Count 6:Sort by per_ratio\nplease input:"
+    raw_input_menu=raw+"\n\tNow : %s"+"\n\t1:Sort By Percent\t2:Sort By DFF\t3:Sort By Ra_dff\t4:Sort By df2\t\n\t5:Sort By per_vol\t6:Sort by Count 7:Sort by per_ratio\nplease input:"
     return raw_input_menu
 
 # "Sort By Percent\t3:Sort By DFF\n\t2:Sort By OP\t\t4:Sort By Ra\nplease input:"
