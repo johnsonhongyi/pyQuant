@@ -105,7 +105,7 @@ positionKey = cct.terminal_positionKey
 
 cmdRun_dnup = '''cd /Users/Johnson/Documents/Quant/pyQuant/stock;
 open sina_Market-DurationDn.py;
-sleep 0.1;osascript -e 'tell application "Python Launcher" to quit';sleep 25;
+sleep 0.1;osascript -e 'tell application "Python Launcher" to quit';sleep 45;
 open singleAnalyseUtil.py;
 sleep 0.1;osascript -e 'tell application "Python Launcher" to quit';sleep 25;
 open sina_Monitor.py;

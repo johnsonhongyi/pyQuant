@@ -31,7 +31,6 @@ class SafeHDFStore(HDFStore):
         self.write_status = False
         self.complevel=9
         self.complib='zlib'
-        self.temp_file = self.fname+'_tmp'
         self.ptrepack_cmds="ptrepack --chunkshape=auto --propindexes --complevel=9 --complib=blosc %s %s"
         self.big_H5_Size = ct.big_H5_Size
         global RAMDISK_KEY
@@ -40,6 +39,7 @@ class SafeHDFStore(HDFStore):
                 log.error("NO RamDisk Root:%s"%(baseDir))
                 RAMDISK_KEY +=1
         else:
+            self.temp_file = self.fname+'_tmp'
             self.write_status = True
             self.run(self.fname)
         # ptrepack --chunkshape=auto --propindexes --complevel=9 --complib=blosc in.h5 out.h5

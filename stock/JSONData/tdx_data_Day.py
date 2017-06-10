@@ -723,9 +723,18 @@ def get_tdx_append_now_df_api(code, start=None, end=None, type='f',df=None,dm=No
     if dm is not None and df is not None and not dm.empty and len(df) >0:
         dm.rename(columns={'volume': 'vol', 'turnover': 'amount'}, inplace=True)
         # dm.rename(columns={'volume': 'amount', 'turnover': 'vol'}, inplace=True)
-        c_name = dm.loc[code, ['name']].values[0]
+        if code not in dm.index:
+            if index_status:
+                if code == '999999':
+                    c_name = dm.loc[code_ts, ['name']].values[0]
+                    dm_code = (dm.loc[code_ts, ['open', 'high', 'low', 'close', 'amount', 'vol']]).to_frame().T
+                    log.error("dm index_status:%s %s %s"%(code,code_ts,c_name))
+            else:
+                log.error("code not in index:%s %s"%(code,code_ts))
+        else:
+            c_name = dm.loc[code, ['name']].values[0]
+            dm_code = (dm.loc[code, ['open', 'high', 'low', 'close', 'amount', 'vol']]).to_frame().T
 #        dm_code = (dm.loc[:, ['open', 'high', 'low', 'close', 'amount', 'vol']])
-        dm_code = (dm.loc[code, ['open', 'high', 'low', 'close', 'amount', 'vol']]).to_frame().T
         log.debug("dm_code:%s" % dm_code)
         # dm_code['amount'] = round(float(dm_code['amount']), 2)
 #        if index_status:
