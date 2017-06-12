@@ -57,8 +57,9 @@ def get_ts_start_date(stock, datelen, type=None):
     # if day_t in df.index:
     #     # print "daynow"
     #     df=df.drop(day_t)
-    if df.empty:
+    if df is None or df.empty:
         print ("data err,pls check dataframe")
+        return date.today().strftime('%Y-%m-%d')
     else:
         # print df['open'].count()
         if df['open'].count() < datelen:

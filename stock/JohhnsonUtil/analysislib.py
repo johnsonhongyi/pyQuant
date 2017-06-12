@@ -62,7 +62,7 @@ def Get_MACD_Cross(df):
     else:
         operate = operate - 1
 
-    # name   | counts | diff | trade |  high | percent |  open |  ratio
+    # name   | couts | diff | trade |  high | percent |  open |  ratio
     # name  trade   buy  percent  open  high   low    volume  ticktime ratio
     # 'name', 'trade', 'buy', 'percent', 'open', 'high', 'low', 'volume', 'ticktime', 'ratio']
 

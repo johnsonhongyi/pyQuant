@@ -10,7 +10,8 @@ import sys
 sys.path.append("..")
 from JohhnsonUtil import LoggerFactory as LoggerFactory
 
-log = LoggerFactory.getLogger('LongSklearn')
+# log = LoggerFactory.getLogger('LongSklearn')
+log = LoggerFactory.log
 # log.setLevel(LoggerFactory.DEBUG)
 from JSONData import tdx_data_Day as tdd
 from JohhnsonUtil import zoompan

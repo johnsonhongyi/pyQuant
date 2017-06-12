@@ -8,7 +8,7 @@ import pandas as pd
 import tables
 #import pandas.io.pytables
 code='601608'
-# df=ts.get_hist_data('601608')
+# df=get_kdate_data('601608')
 df= ts.get_today_ticks('601608')
 # .sort_index(ascending=True).dropna()
 print df[:1]
@@ -26,6 +26,18 @@ print dd[:5]
 
 import sys
 sys.exit(0)
+
+
+#write
+store=pd.HDFStore("./data/Minutes.h5","a", complevel=9, complib='zlib')
+store.put("Year2015", dfMinutes, format="table", append=True, data_columns=['dt','code'])
+# read
+store=pd.HDFStore("./data/Minutes.h5","r")
+store.select("Year2015", where=['dt<Timestamp("2015-01-07")','code=="000570"'])
+
+df_tl.to_hdf('STORAGE2.h5','table',append=True,mode='w',data_columns=['A'])
+
+pd.read_hdf('STORAGE2.h5','table',where='A>2')
 
 
 '''
@@ -53,8 +65,8 @@ tst = f.create_ts('/',code,prices)
 # end = datetime(2014,5,2)
 
 # euro = web.DataReader("DEXUSEU", "fred", start, end)
-# euro = ts.get_hist_data(code).loc[:,['open','high','close']].sort_index(ascending=True).dropna()
-# df = ts.get_hist_data(code).loc[:,['open']].sort_index(ascending=True).dropna()
+# euro = get_kdate_data(code).loc[:,['open','high','close']].sort_index(ascending=True).dropna()
+# df = get_kdate_data(code).loc[:,['open']].sort_index(ascending=True).dropna()
 # print df[:1]
 df = ts.get_today_ticks('601608').loc[:,['time','price']]
 today=cct.get_today()

@@ -139,6 +139,7 @@ class PrettyTable(object):
         self._valign = {}
         self._max_width = {}
         self._rows = []
+        self.system = cct.get_os_system()
         if field_names:
             self.field_names = field_names
         else:
@@ -199,6 +200,8 @@ class PrettyTable(object):
         if not isinstance(value, basestring):
             value = str(value)
         if not isinstance(value, unicode):
+            if  self.system== 'win': 
+                value = value.encode('gbk')
             value = unicode(value, self.encoding, "strict")
         return value
 

@@ -7,15 +7,17 @@ import datetime
 import getopt
 import glob
 import os
+import sys
 import re
 import string
 import zipfile
-from   struct import *
+from struct import *
 
 # from readths2 import *
 # 2010-09-02 by wanghp
 
-basedir = r'/Users/Johnson/Documents/Johnson/WinTools/zd_pazq/T0002'  # 如果你的安装路径不同,请改这里
+# 如果你的安装路径不同,请改这里
+basedir = r'/Users/Johnson/Documents/Johnson/WinTools/zd_pazq/T0002'
 
 exp_dir = basedir + r'\T0002\export'
 blocknew = 'Z:\Documents\Johnson\WinTools\zd_pazq\T0002\blocknew'
@@ -41,7 +43,8 @@ def readfbtxt(p_lines, p_name):
     shortname = os.path.split(p_name)[1]
     shortname = os.path.splitext(shortname)[0]
     sDay, stkID = shortname.split('-')
-    if len(sDay) != 8: return data
+    if len(sDay) != 8:
+        return data
     stky = int(sDay[0:4])
     stkm = int(sDay[4:6])
     stkd = int(sDay[6:8])
@@ -49,7 +52,8 @@ def readfbtxt(p_lines, p_name):
 
     for l in p_lines:
         line_no += 1
-        if line_no <= 3: continue
+        if line_no <= 3:
+            continue
         l = l.strip()
         t = re.split('\s+', l)
         k = datetime.datetime(stky, stkm, stkd, int(t[0][0:2]), int(t[0][3:5]))
@@ -98,7 +102,8 @@ def fbtxt2lc1(p_data):
         lend = len(data)
         j = lend - 1
         while j >= 0:
-            if data[j][1] == t: break
+            if data[j][1] == t:
+                break
             j -= 1
         if j < 0:  # 没有找到该时间
             data.append([i[0], t, p, p, p, p, i[3], i[4]])
@@ -128,7 +133,8 @@ def which5min(dt):
     if type(dt) == datetime.datetime:
         t = datetime.time(dt.hour, dt.minute, dt.second)
 
-    if t < datetime.time(9, 30): return None
+    if t < datetime.time(9, 30):
+        return None
     if t < datetime.time(9, 35):
         ret = datetime.time(9, 35)
     elif t < datetime.time(9, 40):
@@ -242,7 +248,8 @@ def which5min(dt):
 #############################################################
 def lc1tolc5(p_data):
     """1分钟数据转化为5分钟数据 """
-    if len(p_data) <= 0: return None
+    if len(p_data) <= 0:
+        return None
     data = []
     for i in p_data:
         t = which5min(i[1])  # 找对应5分钟的区段
@@ -251,7 +258,8 @@ def lc1tolc5(p_data):
         lend = len(data)
         j = lend - 1
         while j >= 0:
-            if data[j][1] == t: break
+            if data[j][1] == t:
+                break
             j -= 1
         if j < 0:  # 没有找到该时间
             data.append([i[0], t, i[2], i[3], i[4], i[5], i[6], i[7]])
@@ -286,7 +294,8 @@ def readlc5(p_name):
     data = []
     while 1:
         raw = f.read(4 * 8)
-        if len(raw) <= 0: break
+        if len(raw) <= 0:
+            break
         t = unpack('IfffffII', raw)
         mins = (t[0] >> 16) & 0xffff
         mds = t[0] & 0xffff
@@ -295,10 +304,11 @@ def readlc5(p_name):
         hour = int(mins / 60)
         minute = mins % 60
         # datet = "d-d d:d" % (month,day,hour,minute)
-        data.append((stkID, (month, day, hour, minute), t[1], t[2], t[3], t[4], t[5], t[6], t[7]))
+        data.append((stkID, (month, day, hour, minute), t[
+                    1], t[2], t[3], t[4], t[5], t[6], t[7]))
         # print datet,t[1],t[2],t[3],t[4],t[5],t[6],t[7]
         icnt += 1
-    ## end while
+    # end while
     f.close()
     return data
 
@@ -317,7 +327,7 @@ def writelc5(p_name, data, addwrite=True):
         t = i[1][0] * 100 + i[1][1] + ((i[1][2] * 60 + i[1][3]) << 16)
         raw = pack('IfffffII', t, i[2], i[3], i[4], i[5], i[6], i[7], i[8])
         fout.write(raw)
-    ## end for
+    # end for
     fout.close()
 
 
@@ -382,18 +392,22 @@ def fill_stkdict():
     global stkdict
     lsh = os.listdir(day_dir_sh)
     for l in lsh:
-        if len(l) <= 4: continue
+        if len(l) <= 4:
+            continue
         l = string.lower(l)
-        if l[-3:] != 'day': continue
+        if l[-3:] != 'day':
+            continue
         n = os.path.splitext(l)[0]
         if n[0:2] == 'sh' or n[0:2] == 'sz':
             n = n[2:]
         stkdict[n] = 'sh'
     lsz = os.listdir(day_dir_sz)
     for l in lsz:
-        if len(l) <= 4: continue
+        if len(l) <= 4:
+            continue
         l = string.lower(l)
-        if l[-3:] != 'day': continue
+        if l[-3:] != 'day':
+            continue
         n = os.path.splitext(l)[0]
         if n[0:2] == 'sh' or n[0:2] == 'sz':
             n = n[2:]
@@ -402,7 +416,8 @@ def fill_stkdict():
 
 def getMarketByID(id):
     global stkdict
-    if len(stkdict) == 0: fill_stkdict()
+    if len(stkdict) == 0:
+        fill_stkdict()
     return stkdict.setdefault(id, '')
 
 
@@ -420,15 +435,17 @@ lctype  要转化生成的分钟类型 lc5 表示5分钟 lc1 表示1分钟 lc0表示分笔的
 addfile True表示追加文件 False 表示覆盖
     """
     data1 = readfbtxt(p_lines, p_name)
-    if len(data1) == 0: return
+    if len(data1) == 0:
+        return
     data2 = fbtxt2lc1(data1)
     data3 = lc1tolc5(data2)
 
-    ## lc5 5分钟文件
+    # lc5 5分钟文件
     if 'lc5' in lctype:
         data = []
         for i in data3:
-            data.append([i[0], (i[1].month, i[1].day, i[1].hour, i[1].minute), i[2], i[3], i[4], i[5], i[6], i[7], 0])
+            data.append([i[0], (i[1].month, i[1].day, i[1].hour, i[1].minute), i[
+                        2], i[3], i[4], i[5], i[6], i[7], 0])
         if len(data) == 0:
             sys.stderr.write('Error:no data in data\n')
             sys.exit(1)
@@ -449,7 +466,8 @@ addfile True表示追加文件 False 表示覆盖
     if 'lc1' in lctype:
         data = []
         for i in data2:
-            data.append([i[0], (i[1].month, i[1].day, i[1].hour, i[1].minute), i[2], i[3], i[4], i[5], i[6], i[7], 0])
+            data.append([i[0], (i[1].month, i[1].day, i[1].hour, i[1].minute), i[
+                        2], i[3], i[4], i[5], i[6], i[7], 0])
         if len(data) == 0:
             sys.stderr.write('Error:no data in data\n')
             sys.exit(1)
@@ -473,7 +491,8 @@ addfile True表示追加文件 False 表示覆盖
         data0 = fbtxt2lc0(data1)
         data = []
         for i in data0:
-            data.append([i[0], (i[1].month, i[1].day, i[1].hour, i[1].minute), i[2], i[3], i[4], i[5], i[6], i[7], 0])
+            data.append([i[0], (i[1].month, i[1].day, i[1].hour, i[1].minute), i[
+                        2], i[3], i[4], i[5], i[6], i[7], 0])
         if len(data) == 0:
             sys.stderr.write('Error:no data in data\n')
             sys.exit(1)
@@ -511,9 +530,9 @@ def convert(p_stkid, p_type='txt', filterfunc=None):
                 sys.stderr.write('No data in %s\n' % fname)
                 continue
             if l_i == 0:
-                writelcfiles(doc_lines, fname, 'lc5lc1', False)  ##over write
+                writelcfiles(doc_lines, fname, 'lc5lc1', False)  # over write
             else:
-                writelcfiles(doc_lines, fname, 'lc5lc1', True)  ##add write
+                writelcfiles(doc_lines, fname, 'lc5lc1', True)  # add write
             l_i += 1
             # endfor
 
@@ -535,9 +554,9 @@ def convert(p_stkid, p_type='txt', filterfunc=None):
             doc = fzip.read(fname)
             doc_lines = StringIO.StringIO(doc).readlines()
             if l_i == 0:
-                writelcfiles(doc_lines, fname, 'lc5lc1', False)  ##over write
+                writelcfiles(doc_lines, fname, 'lc5lc1', False)  # over write
             else:
-                writelcfiles(doc_lines, fname, 'lc5lc1', True)  ##add write
+                writelcfiles(doc_lines, fname, 'lc5lc1', True)  # add write
             l_i += 1
             # endfor
             # endif.
@@ -589,7 +608,6 @@ if __name__ == '__main__':
     except:
         pass
 
-
     # 过滤函数
     def filfunc(x):
         if l_from == None and l_to == None:
@@ -601,7 +619,6 @@ if __name__ == '__main__':
             return ymd >= l_from
         else:
             return ymd <= l_to
-
 
     if l_type == 'txt':  # 从一般txt 文件
         convert(stkid, 'txt', filfunc)

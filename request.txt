@@ -1,0 +1,3 @@
+tushare
+trollius
+TA-Lib
