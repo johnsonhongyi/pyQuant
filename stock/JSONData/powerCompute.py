@@ -1009,7 +1009,8 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y',tali
                                     c_buy = dz.buy.values[-1]
                                     c_close_l = tdx_df.close.values[-2]
                                     c_percent = round((c_buy - c_close_l)/c_close_l*100,2)
-                                    if 0 < c_percent < 9.9:
+                                    # if 0 < c_percent < 9.9:
+                                    if 0 < c_percent:
                                         break
                                 else:
                                     if tdx_days - day < 3:
