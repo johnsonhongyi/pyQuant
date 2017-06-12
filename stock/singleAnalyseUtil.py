@@ -312,6 +312,7 @@ def get_hot_countNew(changepercent, rzrq,fibl=None,fibc=10):
         # count=len(df.index)
         log.info("market:%s" % df[:1])
         df = df.dropna()
+        df = df[df.close > 0]
         if 'percent' not in df.columns:
             df['percent'] = map(lambda x,y: round((x-y)/y*100, 1), df.close.values,df.llastp.values)
 
@@ -356,7 +357,7 @@ def get_hot_countNew(changepercent, rzrq,fibl=None,fibc=10):
             print(u"%s %s%s" % (f_print(4, ff['close']), f_print(1, '!' if ff['open'] > ff[
                 'lastp'] else '?'), f_print(2, '!!' if ff['close'] > ff['lastp'] else '??')))
         allTop = allTop.append(df, ignore_index=True)
-#        allTop = allTop.drop_duplicates()
+        allTop = allTop.drop_duplicates()
     df = allTop
     count = len(df.index)
     top = df[df['percent'] > changepercent]

@@ -525,6 +525,8 @@ class Sina:
         else:
             # df.rename(columns={'now': 'close'}, inplace=True)
             df['close'] = df['now']
+
+        # df = 
         df = df.drop_duplicates('code')
         # df = df.loc[:, ct.SINA_Total_Columns_Clean]
         # df = df.loc[:, ct.SINA_Total_Columns]
@@ -562,7 +564,8 @@ if __name__ == "__main__":
     # df = sina.get_stock_list_data(['999999'],index=True)
     # print df
     # df = sina.get_stock_code_data('000001',index=True).set_index('code')
-    df= sina.get_stock_code_data('999999,399001',index=True)
+    # df= sina.get_stock_code_data('999999,399001',index=True)
+    df = sina.get_stock_code_data('600785')
     print df
 #    print sina.get_stock_code_data('002873')
     # print sina.get_stock_code_data('600199,300334',index=False)

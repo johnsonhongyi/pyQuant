@@ -367,6 +367,8 @@ def load_hdf_db(fname,table='all',code_l=None,timelimit=True,index=False,limit_t
                 log.info("load hdf times:%s"%(time_list))
 
     log.info("load_hdf_time:%0.2f"%(time.time()-time_t))
+    # if df is not None and len(df) > 1:
+        # df = df.drop_duplicates()
     return df
 
 # def load_hdf_db_old_outdate(fname,table='all',code_l=None,timelimit=True,index=False,limit_time=ct.h5_limit_time):
