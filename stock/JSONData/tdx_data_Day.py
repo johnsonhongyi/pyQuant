@@ -10,12 +10,7 @@ from struct import *
 import numpy as np
 import pandas as pd
 from pandas import Series
-<<<<<<< HEAD
-import sys
-sys.path.append("..")
-=======
 from JSONData import tdx_hdf5_api as h5a
->>>>>>> PowerCompute
 from JSONData import realdatajson as rl
 from JSONData import wencaiData as wcd
 from JohhnsonUtil import LoggerFactory
