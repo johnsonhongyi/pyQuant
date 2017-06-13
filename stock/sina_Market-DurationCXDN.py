@@ -331,7 +331,7 @@ if __name__ == "__main__":
                         # top_temp = top_temp[top_temp['ma5d'] > top_temp['ma10d']][:10]
                         # top_temp = top_temp[ (top_temp['ma5d'] > top_temp['ma10d']) & (top_temp['buy'] > top_temp['ma10d']) ][:10]
                         top_dd = pd.concat([top_temp[:10], top_end], axis=0)
-                        top_dd = top_dd.drop_duplicates()
+                        # top_dd = top_dd.drop_duplicates()
                         top_dd = top_dd.loc[:,ct.Duration_format_buy]
                     else:
                         # top_temp = top_temp[top_temp['trade'] > top_temp['ma10d']]
@@ -339,7 +339,7 @@ if __name__ == "__main__":
                         # top_temp = top_temp[ (top_temp['ma5d'] > top_temp['ma10d']) & (top_temp['trade'] > top_temp['ma10d']) ][:10]
 
                         top_dd = pd.concat([top_temp[:10], top_end], axis=0)
-                        top_dd = top_dd.drop_duplicates()
+                        # top_dd = top_dd.drop_duplicates()
                         top_dd = top_dd.loc[:,ct.Duration_format_trade]
 
                     print rl.format_for_print(top_dd)

@@ -1599,7 +1599,7 @@ def combine_dataFrame(maindf,subdf,col=None,compare=None,append=False,clean=True
         maindf = maindf.drop([inx for inx in maindf.index  if inx in subdf.index], axis=0)
         maindf = pd.concat([maindf, no_index],axis=0)
     '''
-    maindf = maindf.drop_duplicates()
+    # maindf = maindf.drop_duplicates()
     log.info("combine df :%0.2f"%(time.time()-times))
     if append:
         dif_co = list(set(maindf_co)-set(subdf_co))

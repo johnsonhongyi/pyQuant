@@ -517,7 +517,7 @@ class Sina:
 #            df.rename(columns={'buy': 'close'}, inplace=True)
             df['close']=df['buy']
             df['low']=df['buy']
-        elif (cct.get_now_time_int() > 830 and cct.get_now_time_int() < 915):
+        elif (cct.get_now_time_int() > 830 and cct.get_now_time_int() <= 915):
 #            df.rename(columns={'buy': 'close'}, inplace=True)
             df['buy']=df['llastp']
             df['close']=df['buy']
@@ -565,7 +565,7 @@ if __name__ == "__main__":
     # print df
     # df = sina.get_stock_code_data('000001',index=True).set_index('code')
     # df= sina.get_stock_code_data('999999,399001',index=True)
-    df = sina.get_stock_code_data('600785')
+    df = sina.get_stock_code_data('002330')
     print df
 #    print sina.get_stock_code_data('002873')
     # print sina.get_stock_code_data('600199,300334',index=False)

@@ -1687,13 +1687,25 @@ def getSinaAlldf(market='cyb',vol=ct.json_countVol,vtype=ct.json_countType,filen
     # dm['volume'] = map(lambda x: round(x / 100, 1), dm.volume.values)
     dm['trade'] = dm['close']
 
+    if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 926:
+        # print dm[dm.code=='000001'].b1
+        # print dm[dm.code=='000001'].a1
+        # print dm[dm.code=='000001'].a1_v
+        # print dm[dm.code=='000001'].b1_v
+        dm = dm[(dm.b1 > 0) | (dm.a1 > 0 )]
+        dm['volume'] = map(lambda x: x, dm.b1_v.values)
+        # print dm[dm.code=='000001'].volume
+    else:
+        # dm = dm[dm.open > 0]
+        dm = dm[(dm.b1 > 0) | (dm.a1 > 0 )]
+        
     # print dm[dm.code == '002474'].volume
     # print 'ratio' in dm.columns
     # print time.time()-time_s
     if cct.get_now_time_int() > 932 and market not in ['sh','sz','cyb']:
         dd = rl.get_sina_Market_json('all')
 #        dd = dd.set_index('code')
-        dd.drop([inx for inx in dd.index  if inx not in df.index], axis=0, inplace=True)
+        dd.drop([inx for inx in dd.index  if inx not in dm.index], axis=0, inplace=True)
         df = dd
     if len(df) < 10 or len(dm) < 10:
         log.error("len(df):%s dm:%s"%(len(df),len(dm)))
@@ -1707,16 +1719,7 @@ def getSinaAlldf(market='cyb',vol=ct.json_countVol,vtype=ct.json_countType,filen
         log.info("dm combine_df ratio:%s %s"%(len(dm),len(df))),
         dm=dm.fillna(0)
 
-    if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 926:
-        # print dm[dm.code=='000001'].b1
-        # print dm[dm.code=='000001'].a1
-        # print dm[dm.code=='000001'].a1_v
-        # print dm[dm.code=='000001'].b1_v
-        dm = dm[(dm.buy > 0)]
-        dm['volume'] = map(lambda x: x, dm.b1_v.values)
-        # print dm[dm.code=='000001'].volume
-    else:
-        dm = dm[dm.open > 0]
+
 
     if  cct.get_now_time_int() > 935 or not cct.get_work_time():
         top_now = rl.get_market_price_sina_dd_realTime(dm, vol, vtype)
