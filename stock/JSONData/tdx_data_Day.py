@@ -562,7 +562,7 @@ INDEX_LIST = {'sh': 'sh000001', 'sz': 'sz399001', 'hs300': 'sz399300',
 #         # print df
 #     # return df
 
-def get_tdx_append_now_df_api(code, start=None, end=None, type='f',df=None,dm=None,dl=None,power=True,newdays=None,write_tushare=False):
+def get_tdx_append_now_df_api(code, start=None, end=None, type='f',df=None,dm=None,dl=None,power=True,newdays=None,write_tushare=False,writedm=False):
 
     start=cct.day8_to_day10(start)
     end=cct.day8_to_day10(end)
@@ -623,6 +623,7 @@ def get_tdx_append_now_df_api(code, start=None, end=None, type='f',df=None,dm=No
 #    if duration >= 1 and (tdx_last_day != cct.last_tddate(1) or cct.get_now_time_int() > 1530):
     if duration > 1 and (tdx_last_day != cct.last_tddate(1)):
         import urllib2
+        ds = None
         try:
             ds = get_kdate_data(code_ts, start=tdx_last_day, end=today,index=index_status)
             ds['volume']=ds.volume.apply(lambda x: x * 100)
@@ -639,7 +640,6 @@ def get_tdx_append_now_df_api(code, start=None, end=None, type='f',df=None,dm=No
                 lends = len(ds)
             else:
                 lends = len(ds) + 1
-            ds = ds[:lends - 1]
 #            if index_status:
 #                if code == 'sh':
 #                    code_ts = '999999'
@@ -648,6 +648,7 @@ def get_tdx_append_now_df_api(code, start=None, end=None, type='f',df=None,dm=No
 #                ds['code'] = int(code_ts)
 #            else:
             ds['code'] = code
+            ds = ds[:lends - 1]
             # print ds[:1]
 #            ds['volume']=ds.volume.apply(lambda x: x * 100)
             if not 'amount' in ds.columns:
@@ -679,9 +680,10 @@ def get_tdx_append_now_df_api(code, start=None, end=None, type='f',df=None,dm=No
         df=df.fillna(0)
         df = df.sort_index(ascending=False)
         return df
-    else:
-        if dm is None and not write_tushare and cct.get_work_time() and cct.get_now_time_int() < 1505:
-            return df
+    # else:
+    #     # if dm is None and not write_tushare and cct.get_work_time() and cct.get_now_time_int() < 1505:
+    #     if dm is None and not write_tushare and cct.get_work_time() and cct.get_now_time_int() < 1505:
+    #         return df
 #    print df.index.values,code
     if dm is None and end is None:
         # if dm is None and today != df.index[-1]:
@@ -692,10 +694,12 @@ def get_tdx_append_now_df_api(code, start=None, end=None, type='f',df=None,dm=No
 #            dm = dm.set_index('code')
         else:
             dm = sina_data.Sina().get_stock_code_data(code)
-    if duration == 0:
-        writedm = False
-    else:
-        writedm = True
+
+    # if duration == 0:
+    #     writedm = False
+    # else:
+    #     writedm = True
+    # writedm = False
     if df is not None and len(df) >0:
         if df.index.values[-1] == today:
             if dm is not None and not isinstance(dm,Series):
@@ -717,8 +721,8 @@ def get_tdx_append_now_df_api(code, start=None, end=None, type='f',df=None,dm=No
             else:
                 writedm = True
 
-    if not writedm and cct.get_now_time_int() > 1530 or cct.get_now_time_int() < 925:
-        return df
+    # if not writedm and cct.get_now_time_int() > 1530 or cct.get_now_time_int() < 925:
+    #     return df
 
     if dm is not None and df is not None and not dm.empty and len(df) >0:
         dm.rename(columns={'volume': 'vol', 'turnover': 'amount'}, inplace=True)
@@ -1683,7 +1687,7 @@ def getSinaAlldf(market='cyb',vol=ct.json_countVol,vtype=ct.json_countType,filen
         dm = df
     # if cct.get_work_time() or (cct.get_now_time_int() > 915) :
     dm['percent'] = map(lambda x,y: round((x-y)/y*100, 1), dm.close.values,dm.llastp.values)
-    log.info("dm percent:%s"%(dm[:1]))
+    log.debug("dm percent:%s"%(dm[:1]))
     # dm['volume'] = map(lambda x: round(x / 100, 1), dm.volume.values)
     dm['trade'] = dm['close']
 
@@ -1692,13 +1696,15 @@ def getSinaAlldf(market='cyb',vol=ct.json_countVol,vtype=ct.json_countType,filen
         # print dm[dm.code=='000001'].a1
         # print dm[dm.code=='000001'].a1_v
         # print dm[dm.code=='000001'].b1_v
-        dm = dm[(dm.b1 > 0) | (dm.a1 > 0 )]
         dm['volume'] = map(lambda x: x, dm.b1_v.values)
+        dm = dm[(dm.b1 > 0) | (dm.a1 > 0 )]
         # print dm[dm.code=='000001'].volume
-    else:
+    elif cct.get_now_time_int() > 926:
         # dm = dm[dm.open > 0]
         dm = dm[(dm.b1 > 0) | (dm.a1 > 0 )]
-        
+    else:
+        dm = dm[dm.buy > 0]
+
     # print dm[dm.code == '002474'].volume
     # print 'ratio' in dm.columns
     # print time.time()-time_s
@@ -2032,7 +2038,7 @@ def get_duration_date(code, ptype='low', dt=None, df=None, dl=None):
     return lowdate
 
 
-def get_duration_price_date(code, ptype='low', dt=None, df=None, dl=None, end=None, vtype=None, filter=True,
+def get_duration_price_date(code=None, ptype='low', dt=None, df=None, dl=None, end=None, vtype=None, filter=True,
                             power=False):
     # if code == "600760":
         # log.setLevel(LoggerFactory.DEBUG)
@@ -2042,7 +2048,7 @@ def get_duration_price_date(code, ptype='low', dt=None, df=None, dl=None, end=No
     #     log.setLevel(LoggerFactory.DEBUG)
     # else:
     #     log.setLevel(LoggerFactory.ERROR)
-    if df is None:
+    if df is None and code is not None:
         # df = get_tdx_day_to_df(code).sort_index(ascending=False)
         if power:
             df = get_tdx_append_now_df_api(code, start=dt,end=end,dl=dl).sort_index(ascending=False)
@@ -2643,6 +2649,9 @@ def get_append_lastp_to_df(top_all,lastpTDX_DF=None,dl=ct.PowerCountdl,end=None,
     # log.info('Top-merge_now:%s' % (top_all[:1]))
     top_all = top_all[top_all['llow'] > 0]
 
+    if 'llastp' not in top_all.columns:
+        log.error("why not llastp in topall:%s"%(top_all.columns))
+
 
     if lastpTDX_DF is None:
         return top_all,tdxdata
@@ -3034,15 +3043,15 @@ if __name__ == '__main__':
     log = LoggerFactory.log
     args = docopt(cct.sina_doc, version='sina_cxdn')
     # print args,args['--debug']
-    # if args['--debug'] == 'debug':
-    #     log_level = LoggerFactory.DEBUG
-    # elif args['--debug'] == 'info':
-    #     log_level = LoggerFactory.INFO
-    # else:
-    #     log_level = LoggerFactory.ERROR
-    log_level = LoggerFactory.DEBUG if args['--debug']  else LoggerFactory.ERROR
-    # log_level = LoggerFactory.INFO if args['--info'] else LoggerFactory.ERROR
+    if args['--debug'] == 'debug':
+        log_level = LoggerFactory.DEBUG
+    elif args['--debug'] == 'info':
+        log_level = LoggerFactory.INFO
+    else:
+        log_level = LoggerFactory.ERROR
+    # log_level = LoggerFactory.DEBUG if args['--debug']  else LoggerFactory.ERROR
     log.setLevel(log_level)
+      
     # print cct.get_ramdisk_path('tdx')
     # testnumba(1000)
     # n = 100
@@ -3054,8 +3063,8 @@ if __name__ == '__main__':
 #    code='300174'
     # get_tdx_append_now_df_api_tofile('603113', dm=None, newdays=1, start=None, end=None, type='f', df=None, dl=2, power=True)
 #
-    code='300651'
-    # print get_tdx_append_now_df_api(code, start=None, end=None, type='f', df=None, dm=None, dl=None, power=True, newdays=None, write_tushare=False)
+    code='600212'
+    print get_tdx_append_now_df_api(code, start=None, end=None, type='f', df=None, dm=None, dl=5, power=True, newdays=None, write_tushare=False)
 #    get_tdx_append_now_df_api_tofile(code, dm=None, newdays=1, start=None, end=None, type='f', df=None, dl=2, power=True)
     # print get_tdx_Exp_day_to_df(code,dl=30,newdays=0)[:2]
     # print df

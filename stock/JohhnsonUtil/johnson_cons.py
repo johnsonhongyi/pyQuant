@@ -32,7 +32,7 @@ duration_diff = 6
 duration_date_l = 10
 duration_date_up = 60
 duration_date_sort = 21
-lastdays = 2
+lastdays = 3
 bollFilter = -10
 writeblockbakNum = 12
 checkfilter = True
@@ -46,9 +46,10 @@ wcd_limit_day = 30
 h5_limit_time = 180
 big_H5_Size = 8
 sina_limit_time = 15
+h5_time_l_count = 7
 sina_dd_limit_time = 360
 diffcode = 0.2
-duration_sleep_time = 60
+duration_sleep_time = 30
 
 # powerdiff = 'ra * fibl + rah*(abs(float(%s)-fibl))/fib +ma +kdj+rsi'
 '''
@@ -123,13 +124,13 @@ MonitorMarket_sort_op_key=[0,0,1,0,0,0,1,1,1]
 
 def RawMenuArgmain():
     raw = 'status:[go(g),clear(c),[d 20150101 [l|h]|[y|n|pn|py],quit(q),W(a),sh]:'
-    raw_input_menu=raw+"\n\tNow : %s"+"\n\t1:Sort By Percent\t2:Sort By DFF\t3:Sort By Ra_dff\t4:Sort By df2\t\n\t5:Sort Ma dff\t6:Sort by Count 7:Sort by per_ratio\t8:Sort By per_vol\nplease input:"
+    raw_input_menu=raw+"\n\tNow : %s"+"\n\t1:Sort By Percent\t2:Sort By DFF\t3:Sort By Ra_dff\t4:Sort By df2\t\n\t5:Sort Ma dff\t\t6:Sort by Count 7:Sort by per_ratio\t8:Sort By per_vol\nplease input:"
     return raw_input_menu
 
 # "Sort By Percent\t3:Sort By DFF\n\t2:Sort By OP\t\t4:Sort By Ra\nplease input:"
 
 Market_sort_idx={'1':'ct.Duration_percent_dff','2':'ct.Duration_dff_percent','3':'ct.Duration_ra_dff','4':'ct.Duration_percent_df2dff',\
-                '5':'ct.Duration_sort_ma','6':'ct.Monitor_sort_count','7':'ct.Duration_sort_per_ratio','8':'ct.ct.Duration_percent_vol'}
+                '5':'ct.Duration_sort_ma','6':'ct.Monitor_sort_count','7':'ct.Duration_sort_per_ratio','8':'ct.Duration_percent_vol'}
 
 #edit 1031
 # Duration_format_buy=['name', 'buy', 'ma5d','boll','dff', 'percent','ra','op', 'fib','fibl','volume', 'ratio', 'couts','ldate', 'date']

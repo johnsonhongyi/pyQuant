@@ -61,8 +61,16 @@ if __name__ == "__main__":
     from docopt import docopt
     log = LoggerFactory.log
     args = docopt(cct.sina_doc, version='sina_cxdn')
-    log_level = LoggerFactory.DEBUG if args['--debug'] else LoggerFactory.ERROR
+    # print args,args['--debug']
+    if args['--debug'] == 'debug':
+        log_level = LoggerFactory.DEBUG
+    elif args['--debug'] == 'info':
+        log_level = LoggerFactory.INFO
+    else:
+        log_level = LoggerFactory.ERROR
+    # log_level = LoggerFactory.DEBUG if args['--debug']  else LoggerFactory.ERROR
     log.setLevel(log_level)
+    
     # log.setLevel(LoggerFactory.DEBUG)
     # handler=StderrHandler(format_string='{record.channel}: {record.message) [{record.extra[cwd]}]')
     # log.level = log.debug
@@ -113,7 +121,7 @@ if __name__ == "__main__":
     # all_diffpath = tdd.get_tdx_dir_blocknew() + '062.blk'
     parser = cct.MoniterArgmain()
     parserDuraton = cct.DurationArgmain()
-    market_sort_value = ct.Market_sort_idx['3']
+    market_sort_value = ct.Market_sort_idx['2']
     market_sort_value_key = eval(market_sort_value+'_key')
     while 1:
         try:

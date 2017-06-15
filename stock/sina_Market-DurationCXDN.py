@@ -70,15 +70,15 @@ if __name__ == "__main__":
     log = LoggerFactory.log
     args = docopt(cct.sina_doc, version='sina_cxdn')
     # print args,args['--debug']
-    # if args['--debug'] == 'debug':
-    #     log_level = LoggerFactory.DEBUG
-    # elif args['--debug'] == 'info':
-    #     log_level = LoggerFactory.INFO
-    # else:
-    #     log_level = LoggerFactory.ERROR
-    log_level = LoggerFactory.DEBUG if args['--debug']  else LoggerFactory.ERROR
-    # log_level = LoggerFactory.INFO if args['--info'] else LoggerFactory.ERROR
-    log.setLevel(log_level)    
+    if args['--debug'] == 'debug':
+        log_level = LoggerFactory.DEBUG
+    elif args['--debug'] == 'info':
+        log_level = LoggerFactory.INFO
+    else:
+        log_level = LoggerFactory.ERROR
+    # log_level = LoggerFactory.DEBUG if args['--debug']  else LoggerFactory.ERROR
+    log.setLevel(log_level)
+        
     # if log_level == LoggerFactory.DEBUG:
     # handler=StderrHandler(format_string='{record.channel}: {record.message) [{record.extra[cwd]}]')
     # log.level = log.debug
@@ -183,7 +183,7 @@ if __name__ == "__main__":
 
 
 
-                top_dif = top_all.copy(deep=True)
+                top_dif = top_all.copy()
                 if 'trade' in top_dif.columns:
                     top_dif['buy'] = (map(lambda x, y: y if int(x) == 0 else x, top_dif['buy'].values, top_dif['trade'].values))
                 if ct.checkfilter and  cct.get_now_time_int() > 915 and cct.get_now_time_int() < ct.checkfilter_end_timeDu:

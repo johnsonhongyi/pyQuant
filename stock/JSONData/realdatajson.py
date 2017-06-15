@@ -729,7 +729,7 @@ def get_market_price_sina_dd_realTime(dp='',vol='0',type='0'):
             dm = cct.combine_dataFrame(dp,df)
             log.info("top_now:main:%s subobject:%s dm:%s "%(len(dp),len(df),len(dm)))
 #            dm=pd.merge(dp,df,on='name',how='left')
-            log.info("dmMerge:%s"%dm.columns)
+            log.debug("dmMerge:%s"%dm.columns)
             # print dm[dm.couts>0][:2]
             dm.couts=dm.couts.fillna(0)
             dm.prev_price=dm.prev_price.fillna(0.0)

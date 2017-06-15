@@ -89,7 +89,7 @@ if __name__ == "__main__":
     blkname = '064.blk'
     block_path = tdd.get_tdx_dir_blocknew() + blkname
     lastpTDX_DF = pd.DataFrame()
-    market_sort_value = ct.Market_sort_idx['5']
+    market_sort_value = ct.Market_sort_idx['6']
     market_sort_value_key = eval(market_sort_value+'_key')
     while 1:
         try:
@@ -197,7 +197,7 @@ if __name__ == "__main__":
                     by=ct.Monitor_sort_count, ascending=[0, 0, 0, 0, 1])
                 # top_all = top_all.sort_values(by=['dff', 'couts', 'volume', 'ratio'], ascending=[0, 0, 0, 1])
                 # top_all=top_all.sort_values(by=['percent','dff','couts','ratio'],ascending=[0,0,1,1])
-                if cct.get_now_time_int() > 930 and 'lastp' in top_all.columns:
+                if cct.get_now_time_int() > 930 and 'llastp' in top_all.columns:
 
                     top_all = top_all[top_all.trade >= top_all.llastp * ct.changeRatio]
 

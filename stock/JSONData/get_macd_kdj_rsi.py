@@ -26,6 +26,112 @@ def Get_Stock_List():
 #     print (df)
     return df
 
+def algoMultiDay_trends(df,column='close',days=6,op=0,filter=True):
+    df = df.sort_index(ascending=True)
+    # print df[:2],set(df.code)
+    if filter:
+        dt = tdd.get_duration_price_date(ptype='low',df=df,filter=True)
+        df = df[df.index >= dt ]
+        days = len(df)
+        idx_status = False
+    else:
+        idx_status = True
+        if len(df) < days+2:
+            # days = len(df) - 2
+            days = len(df)
+    if df is not None and len(df) > 1:
+        obo=0
+        if column in df.columns:
+            close_df=pd.DataFrame(df.loc[:,column], columns=[column])
+            for day in range(days,1,-1):
+                print day
+                if idx_status:
+                    tmpdf=close_df[-days-2:-1-day]
+                    idx = -1 - day
+                    idxl = idx - 1
+                else:
+                    # if day == 1:
+                    #     tmpdf=close_df[-days:]
+                    # else:
+                    #     tmpdf=close_df[-days:-day]
+                    tmpdf=close_df[-days:-day]
+                    idx = -day
+                    idxl = idx - 1 if abs(idx-1) < len(df) else idx
+                    
+                c_max=tmpdf.max().values
+                c_min=tmpdf.min().values
+                c_mean=tmpdf.mean().values
+                # print len(df),days,idx,idx-1
+                if math.isnan(df[column][idx]) or math.isnan(df[column][idxl]):
+                    break
+                nowp = round(df[column][idx],2)
+                lowp = round(df['low'][idx],2)
+                highp = round(df['high'][idx],2)
+                openp = round(df['open'][idx],2)
+                lastp = round(df[column][idxl],2)
+                # if nowp >= c_max and day == 0:
+                # print (code,day,idx,idxl,tmpdf.index.values,nowp,c_max)
+                if not math.isnan(c_max) and nowp >= c_max:
+                    if openp > lowp*ct.changeRatio and nowp == highp and lowp > lastp:
+                        if obo < 2:
+                            obo +=1
+                            op+=100
+                        else:
+                            op+=10
+                    # print obo,df.index[idx],df.index[idx-1]
+                    
+                # elif nowp > c_mean:
+                #     if nowp > df['high'][idxl]:
+                #         op+=2
+                #     elif nowp > lastp:
+                #         op+=1
+                #     else:
+                #         op+=0.5
+
+#                elif nowp < c_min:
+#                    op +=-1000
+##                    obo = -1
+#                elif nowp < c_mean:
+#                    if obo > 0:
+#                        op +=-100
+#                    else:
+#                        op +=-1
+                else:
+                    print nowp,lastp,df.index[idx],df.index[idxl],tmpdf.index
+                    if nowp > lastp:
+                        op +=1
+                        if df['high'][idx] > df['high'][idxl]:
+                            op+=5
+                            if df['low'][idx] > df['low'][idxl]:
+                                op+=3
+                        else:
+                            if lowp > lastp:
+                                op-=2.3
+                            else:
+                                op-=5.3
+
+#                        if df['open'][idx] > df['close'][idxl] and df['close'][idx] > df['close'][idxl]:
+#                            op+=1
+#                        if df['open'][idx] < df['low'][idxl] and df['close'][idx] <= c_min:
+#                            op-=10
+                    else:
+                        if obo > 2:
+                            op += -100.3
+                            log.error("code:%s obo down:-100.3 obo:%s"%(code,obo))
+                            obo +=1
+                        else:
+                            if nowp <= lowp*ct.changeRatioUp:
+                                op += -55.3
+                                log.error("code:%s obo down:-55.3 obo:%s"%(code,obo))
+                            else:
+                                op += -50.3
+                                log.error("code:%s obo down:-50.3 obo:%s"%(code,obo))
+#        if obo >0:
+#            op +=10.11
+#        else:
+#            op +=-days
+    return op
+
 def algoMultiDay(df,column='close',days=6,op=0):
     df = df.sort_index(ascending=True)
     # print df[:2],set(df.code)
@@ -196,7 +302,7 @@ def Get_BBANDS_algo(df):
 def Get_BBANDS(df,dtype='d',days=5):
     log.debug("BBANDS:%s"%(len(df)))
     if len(df) < limitCount:
-        return (df,1)
+        return (df,20)
     df = df.sort_index(ascending=True)
     upperband,middleband,lowerband=ta.BBANDS(np.array(df['close']),timeperiod=20,nbdevdn=2,matype=0)
     df['upbb%s'%dtype] = pd.Series(upperband,index=df.index)
@@ -422,7 +528,7 @@ def Get_KDJ(df,dtype='d',days=5):
         return (df,1)
     else:
         if not 'ma5d' in df.columns:
-            #newstock 
+            #newstock
             df['ma5d'] = pd.rolling_mean(df.close,5)
             df['ma10d'] = pd.rolling_mean(df.close,10)
             df['ma20d'] = pd.rolling_mean(df.close,20)
@@ -628,10 +734,15 @@ if __name__ == '__main__':
     import sys
     # print powerStd('600208',ptype='vol')
     code = '600744'
+    # codel=['000737','002695','601555','002486','600321','002437','399006','999999']
+    codel=['300661','600212','300153','603580']
+    # codel=['600212']
+    # ,'999999']
     dl=21
-    df=tdd.get_tdx_append_now_df_api(code,dl=dl).sort_index(ascending=True)
-    print algoMultiDay(df, column='close')
-    codel=['000737','002695','601555','002486','600321','002437','399006','999999']
+    for code in codel:
+        df=tdd.get_tdx_append_now_df_api(code,dl=dl).sort_index(ascending=True)
+    # print algoMultiDay(df, column='close')
+        print "code:%s : %s"%(code,algoMultiDay_trends(df, column='close'))
 #    code='600321'
 #    code:002732 boll: 45 ma: 6.0  macd:-1 RSI:0 kdj: 3 time:0.0241
 #    code:002623 boll: 41 ma: 10.0  macd:-5 RSI:4 kdj: -1 time:0.0216

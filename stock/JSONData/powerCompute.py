@@ -891,7 +891,7 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y',tali
     power_columns=['ra','op','category', 'ma', 'rsi', 'kdj', 'boll', 'rah', 'df2', 'fibl', 'macd', 'vstd', 'oph', 'lvolume']
                   # [['ma' ,'rsi' ,'kdj' ,'boll', 'ra','rah', 'df2' ,'fibl','fib' ,'macd' ,'oph']]
                   # [['ma' ,'rsi' ,'kdj' ,'boll', 'ra',rah', 'df2' ,'fibl','fib' ,'macd' ,'vstd', 'oph']]
-    h5 = h5a.load_hdf_db(h5_fname,h5_table, code_l=code_l,limit_time=1800)
+    h5 = h5a.load_hdf_db(h5_fname,h5_table, code_l=code_l,limit_time=1200)
     if h5 is not None:
         log.info("power hdf5 data:%s"%(len(h5)))
         if h5_combine_status:
@@ -900,14 +900,16 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y',tali
 #            h5_co = h5.columns
 #            status = len(set(power_columns) & set(df_co)) - len(power_columns) == 0
 #            if status:
+
             h5 = h5.drop([inx for inx in h5.columns if inx not in power_columns],axis=1)
             code_l = list(set(df.index) - set(h5.index))
             df = cct.combine_dataFrame(df, h5, col=None)
             if len(code_l) == 0:
+                log.info("return df:%s h5:%s diff 0:%s"%(len(df),len(h5),len(code_l)))
                 return df
             else:
-                if len(drop_cxg) <> 0 and (not 915 < cct.get_now_time_int() < 932 or not cct.get_work_day_status()):
-                    log.info("drop_cxg <> 0 and not 915-932")
+                if len(drop_cxg) <> 0 and ((not (915 < cct.get_now_time_int() < 932)) or not cct.get_work_day_status()):
+                    log.info("code_l not none:%s and drop_cxg <> 0 and not 915-932"%(code_l))
                     temp_l = list(set(code_l) - set(drop_cxg))
                     drop_t = [ co for co in drop_cxg if co in df.index]
                     if len(temp_l) <> 0:
@@ -915,10 +917,13 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y',tali
                         # drop_cxg = []
                     else:
                         df = df.drop(drop_t,axis=0)
+                        log.info("return2 drop(drop_t):%s drop_t:%s diff 0:%s"%(len(df),len(drop_cxg),len(drop_t)))
                         return df
-            log.info("add power hdf5:%s"%(len(code_l)))
+            log.info("add power hdf5 code_l:%s"%(len(code_l)))
     else:
-        log.info("init power hdf5")
+#        log.info("init power hdf5")
+        if len(code_l) > 50:
+            print("intP:"),
 #    if not isinstance(df,list) and 'boll' in df.columns:
 #            if 'time' in df.columns:
 #                # if df[:1].boll.values <> 0 and time.time()- df[df.time <> 0].time[0] < ct.power_update_time:
@@ -989,7 +994,9 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y',tali
                 tdx_df=tdx_df.fillna(0)
                 tdx_df = tdx_df.sort_index(ascending=True)
                 if len(df) > days+1 and days != 0:
-                    tdx_df = tdx_df[:-1-days]
+                    print len(tdx_df)
+                    tdx_df = tdx_df[:-days]
+                    print len(tdx_df)
                 tdx_days = len(tdx_df)
                 if tdx_days < 16:
                     if tdx_days > 6:
@@ -1099,6 +1106,7 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y',tali
             tdx_df,opkdj = getab.Get_KDJ(tdx_df, dtype='d')
             tdx_df,opmacd = getab.Get_MACD_OP(tdx_df, dtype='d')
             tdx_df,oprsi = getab.Get_RSI(tdx_df, dtype='d')
+            # opma = getab.algoMultiDay_trends(tdx_df)
             opma = getab.algoMultiDay(tdx_df)
             volstd = getab.powerStd(code=code, df=tdx_df, ptype='vol')
             df.loc[code, 'kdj'] = opkdj
@@ -1141,7 +1149,7 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y',tali
             cct.GlobalValues()
             cct.GlobalValues().setkey('dropcxg',drop_cxg)
             cct.GlobalValues().setkey('Power_CXG_Error',Power_CXG_Error)
-            
+
             if Power_CXG_Error < 2:
                 log.error("Drop_cxg open!!! drop_t:%s %s"%(drop_t,len(drop_cxg)))
     if len(wencai_drop) > 0:
@@ -1151,7 +1159,7 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y',tali
 
     h5 = h5a.write_hdf_db(h5_fname, df, table=h5_table,append=True)
 
-    print "Power:%0.2f"%(time.time()-ts),
+    print "Power:%s:%0.2f"%(len(code_l),time.time()-ts),
 
     return df
 
@@ -1206,7 +1214,7 @@ if __name__ == "__main__":
 
     # import sina_data
     # codelist = sina_data.Sina().market('cyb').code.tolist()
-    print powerCompute_df(['000788','000938','002171'], dtype='d',end=None, dl=ct.PowerCountdl, talib=True,filter='y')
+    print powerCompute_df(['000025','300506','002171'],days=1, dtype='d',end=None, dl=ct.PowerCountdl, talib=True,filter='y')
     # powerCompute_df(codelist, dtype='d',end=None, dl=ct.PowerCountdl, talib=True,filter='y')
 
     # # print powerCompute_df(['601198', '002791', '000503'], dtype='d', end=None, dl=30, filter='y')

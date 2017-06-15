@@ -335,6 +335,17 @@ sina_doc="""sina_Johnson.
 
 Usage:
   sina_cxdn.py
+  sina_cxdn.py --debug <info>
+
+Options:
+  -h --help     Show this screen.
+  --debug <info>    [default: error].
+"""
+
+sina_doc_old="""sina_Johnson.
+
+Usage:
+  sina_cxdn.py
   sina_cxdn.py --debug
   sina_cxdn.py --de <debug>
 
@@ -1614,10 +1625,18 @@ if __name__ == '__main__':
     print GlobalValues().getkey('key', defValue=None)
     print get_run_path()
     from docopt import docopt
-    # log = LoggerFactory.log
-    args = docopt(sina_doc, version='sina_cxdn')
-    log_level = LoggerFactory.DEBUG if args['--debug'] else LoggerFactory.ERROR
+    log = LoggerFactory.log
+    args = docopt(cct.sina_doc, version='sina_cxdn')
+    # print args,args['--debug']
+    if args['--debug'] == 'debug':
+        log_level = LoggerFactory.DEBUG
+    elif args['--debug'] == 'info':
+        log_level = LoggerFactory.INFO
+    else:
+        log_level = LoggerFactory.ERROR
+    # log_level = LoggerFactory.DEBUG if args['--debug']  else LoggerFactory.ERROR
     log.setLevel(log_level)
+        
     s_time=time.time()
     print get_work_day_status()
     print get_terminal_Position(cmd='DurationDN.py', position=None, close=False)

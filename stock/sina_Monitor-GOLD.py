@@ -110,8 +110,16 @@ if __name__ == "__main__":
     from docopt import docopt
     log = LoggerFactory.log
     args = docopt(cct.sina_doc, version='sina_cxdn')
-    log_level = LoggerFactory.DEBUG if args['--debug'] else LoggerFactory.ERROR
-    log.setLevel(log_level)  
+    # print args,args['--debug']
+    if args['--debug'] == 'debug':
+        log_level = LoggerFactory.DEBUG
+    elif args['--debug'] == 'info':
+        log_level = LoggerFactory.INFO
+    else:
+        log_level = LoggerFactory.ERROR
+    # log_level = LoggerFactory.DEBUG if args['--debug']  else LoggerFactory.ERROR
+    log.setLevel(log_level)
+    
     # width, height = 132, 18
     if cct.isMac():
         width, height = 155, 16

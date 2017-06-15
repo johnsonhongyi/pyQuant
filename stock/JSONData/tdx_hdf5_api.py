@@ -192,8 +192,21 @@ def write_hdf_db(fname,df,table='all',index=False,baseCount=500,append=True,Mult
     #                        if len(dif_co) > 0:
 #                if append:
 #                    df['timel'] =  time.time()
+                df['timel'] =  time.time()
+                df_code=df.index.tolist()
+
                 df=cct.combine_dataFrame(tmpdf, df, col=None,append=append)
-                if not append:
+
+                if fname == 'powerCompute':
+                    dif_co = list(set(tmpdf.index) & set(df_code))
+                    dd=tmpdf.loc[dif_co]
+                    o_time = sorted(set(dd.timel.tolist()))
+
+                    if len(o_time) > ct.h5_time_l_count:
+                        df['timel'] =  time.time()
+                        log.error("o_time l:%s %s"%(len(o_time),[time.time()-t_x for t_x in o_time[:3]]))
+
+                elif not append :
                     df['timel'] =  time.time()
     #            df=cct.combine_dataFrame(tmpdf, df, col=None,append=False)
                 log.info("read hdf time:%0.2f"%(time.time()-time_t))
@@ -304,25 +317,33 @@ def load_hdf_db(fname,table='all',code_l=None,timelimit=True,index=False,limit_t
                     code_l = map((lambda x:str(1000000-int(x)) if x.startswith('0') else x),code_l)
                 dif_co = list(set(dd.index) & set(code_l))
                 dratio = (float(len(code_l)) - float(len(dif_co)))/float(len(code_l))
-                if dratio < 0.1 or len(dd) > 3100:
+                # if dratio < 0.1 or len(dd) > 3100:
+                if dratio < 0.12:
                     log.info("find all:%s :%s %0.2f"%(len(code_l),len(code_l)-len(dif_co),dratio))
                     if timelimit and len(dd) > 0:
                         dd = dd.loc[dif_co]
-                        o_time = dd[dd.timel <> 0].timel
-                        if len(dd) > 0 and len(o_time) > 0:
-                            o_time = o_time[0]
-                            l_time = time.time() - o_time
-                            return_hdf_status = not cct.get_work_time() or (cct.get_work_time() and l_time < limit_time)
+                        o_time = dd[dd.timel <> 0].timel.tolist()
+#                        if fname == 'powerCompute':
+#                            o_time = sorted(set(o_time),reverse=True)
+#                        else:
+                        o_time = sorted(set(o_time),reverse=False)
+
+                        if len(dd) > 0 and 0 < len(o_time) <= ct.h5_time_l_count:
+                            l_time = o_time[0]
+                            l_time = time.time() - l_time
+                            return_hdf_status = (not cct.get_work_time()) or (cct.get_work_time() and l_time < limit_time)
 #                                if not cct.get_work_time() or not cct.get_work_day_status() or (cct.get_work_time() and l_time < limit_time):
                             if return_hdf_status:
                                 df = dd
-                                log.info("load %s time hdf ok:%s"%(fname,len(df)))
+                                log.info("return hdf: %s timel:%s l_t:%s hdf ok:%s"%(fname,len(o_time),l_time,len(df)))
+                        else:
+                            log.error("o_time l:%s %s"%(len(o_time),[time.time()-t_x for t_x in o_time[:3]]))
+                        log.info('fname:%s l_time:%s'%(fname,[time.time()-t_x for t_x in o_time]))
 
-                        log.info('fname:%s l_time:None'%(fname))
                     else:
                          df = dd.loc[dif_co]
                 else:
-                    if INIT_LOG_Error < 5:
+                    if len(code_l) > ct.h5_time_l_count*10 and INIT_LOG_Error < 5:
                         # INIT_LOG_Error +=1
                         log.error("fn:%s cl:%s h5:%s don't find:%s dra:%0.2f log_err:%s"%(fname,len(code_l),len(dd),len(code_l)-len(dif_co),dratio,INIT_LOG_Error))
         else:
@@ -337,19 +358,20 @@ def load_hdf_db(fname,table='all',code_l=None,timelimit=True,index=False,limit_t
             if dd is not None and len(dd) > 0:
                 if timelimit:
                     if dd is not None and len(dd)>0:
-                        o_time = dd[dd.timel <> 0].timel
+                        o_time = dd[dd.timel <> 0].timel.tolist()
+                        o_time = sorted(set(o_time))
                         if len(o_time) > 0:
-                            o_time = o_time[0]
-                            l_time = time.time() - o_time
+                            l_time = o_time[0]
+                            l_time = time.time() - l_time
 #                                    return_hdf_status = not cct.get_work_day_status()  or not cct.get_work_time() or (cct.get_work_day_status() and (cct.get_work_time() and l_time < limit_time))
                             return_hdf_status = not cct.get_work_time() or (cct.get_work_time() and l_time < limit_time)
                             log.info("return_hdf_status:%s time:%0.2f"%(return_hdf_status,l_time))
                             if  return_hdf_status:
-                                log.info("return hdf5 data:%s"%(len(dd)))
+                                log.info("return hdf5 data:%s o_time:%s"%(len(dd),len(o_time)))
                                 df = dd
                             else:
                                 log.info("no return time hdf5:%s"%(len(dd)))
-                        log.info('fname:%s l_time:None'%(fname))
+                        log.info('fname:%s l_time:%s'%(fname,[time.time()-t_x for t_x in o_time]))
                 else:
                      df = dd
             else:
@@ -361,10 +383,12 @@ def load_hdf_db(fname,table='all',code_l=None,timelimit=True,index=False,limit_t
         df = df.fillna(0)
         if 'timel' in df.columns:
             time_list = df.timel.tolist()
-            time_list = sorted(set(time_list),key = time_list.index)
+            # time_list = sorted(set(time_list),key = time_list.index)
+            time_list = sorted(set(time_list))
+            # log.info("test:%s"%(sorted(set(time_list),key = time_list.index)))
             if time_list is not None and len(time_list) > 0:
                 df['timel'] = time_list[0]
-                log.info("load hdf times:%s"%(time_list))
+                log.info("load hdf times:%s"%([time.time()-t_x for t_x in time_list]))
 
     log.info("load_hdf_time:%0.2f"%(time.time()-time_t))
     # if df is not None and len(df) > 1:
