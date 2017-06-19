@@ -299,7 +299,7 @@ def write_hdf_db(fname,df,table='all',index=False,baseCount=500,append=True,Mult
 #            return h5
 #    return None
 
-def load_hdf_db(fname,table='all',code_l=None,timelimit=True,index=False,limit_time=ct.h5_limit_time):
+def load_hdf_db(fname,table='all',code_l=None,timelimit=True,index=False,limit_time=ct.h5_limit_time,dratio_limit=0.12):
     time_t = time.time()
     global RAMDISK_KEY,INIT_LOG_Error
     if not RAMDISK_KEY < 1:
@@ -318,7 +318,7 @@ def load_hdf_db(fname,table='all',code_l=None,timelimit=True,index=False,limit_t
                 dif_co = list(set(dd.index) & set(code_l))
                 dratio = (float(len(code_l)) - float(len(dif_co)))/float(len(code_l))
                 # if dratio < 0.1 or len(dd) > 3100:
-                if dratio < 0.12:
+                if dratio < dratio_limit:
                     log.info("find all:%s :%s %0.2f"%(len(code_l),len(code_l)-len(dif_co),dratio))
                     if timelimit and len(dd) > 0:
                         dd = dd.loc[dif_co]
@@ -344,7 +344,7 @@ def load_hdf_db(fname,table='all',code_l=None,timelimit=True,index=False,limit_t
                          df = dd.loc[dif_co]
                 else:
                     if len(code_l) > ct.h5_time_l_count*10 and INIT_LOG_Error < 5:
-                        # INIT_LOG_Error +=1
+                        INIT_LOG_Error +=1
                         log.error("fn:%s cl:%s h5:%s don't find:%s dra:%0.2f log_err:%s"%(fname,len(code_l),len(dd),len(code_l)-len(dif_co),dratio,INIT_LOG_Error))
         else:
             log.error("%s is not find %s"%(fname,table))

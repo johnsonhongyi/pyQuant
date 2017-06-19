@@ -871,6 +871,8 @@ def get_url_data_R(url,timeout=10):
     # print data.encoding
         data = ''
         log.error('socket timed out - URL %s', url)
+    except Exception as e:
+        log.error('Exception - URL %s', url)
     else:
         log.info('Access successful.')
     return data
@@ -890,7 +892,8 @@ def get_url_data(url,retry_count=5,pause=0.05,timeout=10):
             data = ''
             log.error('socket timed out - URL %s', url)
         except Exception as e:
-                print(e)
+            log.error('Exception - URL %s', url)
+            print(e)
         else:
             log.info('Access successful.')
         # print data.text

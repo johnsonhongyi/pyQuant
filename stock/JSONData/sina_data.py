@@ -45,7 +45,7 @@ class StockCode:
         grep_stock_codes = re.compile('~(\d+)`')
         response = requests.get(all_stock_codes_url)
         stock_codes = grep_stock_codes.findall(response.text)
-        stock_codes = [elem for elem in stock_codes if elem.startswith(('6','30','00'))]
+        stock_codes = list(set([elem for elem in stock_codes if elem.startswith(('6','30','00'))]))
         # df=rl.get_sina_Market_json('all')
         # stock_codes = df.index.tolist()
         with open(self.stock_code_path, 'w') as f:
@@ -68,10 +68,10 @@ class StockCode:
             # with open(self.stock_code_path, 'w') as f:
                 # f.write(json.dumps(dict(stock=stock_codes)))
             return stock_codes
-        # else:
+        else:
             with open(self.stock_code_path) as f:
                 self.stock_codes = json.load(f)['stock']
-                return list(set(self.stock_codes))
+                return self.stock_codes
 
 
 # -*- encoding: utf-8 -*-
@@ -115,7 +115,7 @@ class Sina:
 
     def load_stock_codes(self):
         with open(self.stock_code_path) as f:
-            self.stock_codes = json.load(f)['stock']
+            self.stock_codes = list(set(json.load(f)['stock']))
 
     # def get_stocks_by_range(self, index):
     #
@@ -526,7 +526,7 @@ class Sina:
             # df.rename(columns={'now': 'close'}, inplace=True)
             df['close'] = df['now']
 
-        # df = 
+        # df =
         df = df.drop_duplicates('code')
         # df = df.loc[:, ct.SINA_Total_Columns_Clean]
         # df = df.loc[:, ct.SINA_Total_Columns]
@@ -564,7 +564,7 @@ if __name__ == "__main__":
         log_level = LoggerFactory.ERROR
     # log_level = LoggerFactory.DEBUG if args['--debug']  else LoggerFactory.ERROR
     log.setLevel(log_level)
-      
+
     # log.setLevel(LoggerFactory.DEBUG)
     sina = Sina()
     # print len(df)
@@ -573,8 +573,8 @@ if __name__ == "__main__":
     # print df
     # df = sina.get_stock_code_data('000001',index=True).set_index('code')
     # df= sina.get_stock_code_data('999999,399001',index=True)
-    df = sina.get_stock_code_data('002330')
-    print df
+    df = sina.get_stock_code_data('000026')
+    print df.T
 #    print sina.get_stock_code_data('002873')
     # print sina.get_stock_code_data('600199,300334',index=False)
     # print len(sina.market('sh'))

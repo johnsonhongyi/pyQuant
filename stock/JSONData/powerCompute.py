@@ -1106,7 +1106,7 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y',tali
             tdx_df,opkdj = getab.Get_KDJ(tdx_df, dtype='d')
             tdx_df,opmacd = getab.Get_MACD_OP(tdx_df, dtype='d')
             tdx_df,oprsi = getab.Get_RSI(tdx_df, dtype='d')
-            # opma = getab.algoMultiDay_trends(tdx_df)
+            # opma = getab.algoMultiDay_trends(tdx_df
             opma = getab.algoMultiDay(tdx_df)
             volstd = getab.powerStd(code=code, df=tdx_df, ptype='vol')
             df.loc[code, 'kdj'] = opkdj
