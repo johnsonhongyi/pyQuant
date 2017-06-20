@@ -79,12 +79,12 @@ Duration_sort_per_ratio = ['percent', 'ratio', 'op',
 Duration_sort_per_ratio_key = [0, 1, 0, 1, 1, 0, 0, 1, 1]
 
 
-Duration_sort_per1d = ['per1d','per3d','percent', 'ratio', 'op',
+Duration_sort_per1d = ['per1d','percent','per3d', 'ratio', 'op',
                            'fib', 'fibl', 'ra', 'percent', 'volume', 'couts']
 Duration_sort_per1d_key = [0,0,0, 1, 0, 1, 1, 0, 0, 1, 1]
 
 
-Duration_sort_per3d = ['per3d','per1d','percent', 'ratio', 'op',
+Duration_sort_per3d = ['per3d','percent','per1d', 'ratio', 'op',
                            'fib', 'fibl', 'ra', 'percent', 'volume', 'couts']
 Duration_sort_per3d_key = [0,0,0, 1, 0, 1, 1, 0, 0, 1, 1]
 
