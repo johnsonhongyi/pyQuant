@@ -1080,7 +1080,7 @@ def write_tdx_tushare_to_file(code, df=None, start=None, type='f'):
     limitpo = fsize if fsize < 150 else 150
 
     if not os.path.exists(file_path) or os.path.getsize(file_path) < limitpo:
-        #        log.warn("not path:%s"%(file_path))
+        log.warn("not path:%s"%(file_path))
         return False
 
 #    else:
@@ -1112,7 +1112,10 @@ def write_tdx_tushare_to_file(code, df=None, start=None, type='f'):
                 if tmpo not in plist:
                     plist.append(tmpo)
         if len(plist) == 0:
-            raise Exception("data position is None")
+            # raise Exception("data position is None")
+            log.error("Exception:%s data position is None to 0"%(code))
+            write_all_kdata_to_file(code,file_path)
+            return False
         po = plist[-1]
         fo.seek(po)
         dater = fo.read(10)
@@ -1210,7 +1213,9 @@ def write_tdx_sina_data_to_file(code, dm=None, df=None, dl=2, type='f'):
                     plist.append(tmpo)
     #                break
         if len(plist) == 0:
-            raise Exception("data position is None")
+            log.error("Exception:%s data position is None to 0"%(code))
+            write_all_kdata_to_file(code,file_path)
+            return False
         po = plist[-1]
         fo.seek(po)
         dater = fo.read(10)
@@ -3201,9 +3206,9 @@ if __name__ == '__main__':
 #    code='300174'
     # get_tdx_append_now_df_api_tofile('603113', dm=None, newdays=1, start=None, end=None, type='f', df=None, dl=2, power=True)
 #
-    code = '000801'
+    code = '002695'
     print get_tdx_append_now_df_api(code, start=None, end=None, type='f', df=None, dm=None, dl=5, power=True, newdays=None, write_tushare=False).T
-#    get_tdx_append_now_df_api_tofile(code, dm=None, newdays=1, start=None, end=None, type='f', df=None, dl=2, power=True)
+    print get_tdx_append_now_df_api_tofile(code, dm=None, newdays=1, start=None, end=None, type='f', df=None, dl=2, power=True)
     # print get_tdx_Exp_day_to_df(code,dl=30,newdays=0)[:2]
     # print df
     # sys.exit(0)

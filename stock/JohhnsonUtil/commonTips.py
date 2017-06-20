@@ -1014,12 +1014,15 @@ def to_mp_run_async(cmd, urllist,*args):
         # result = pool.apply_async(cmd, (code, arg))
         # arg=(code)+','+(args)
         # result = code
-        result = pool.apply_async(cmd, (code,) + args).get()
-        if (count <> 0 and idx % count == 0) and time.time() - time_s > 1:
-           log.info("idx:%s code:%s"%(idx,code)),
-           idx +=1
-           time_s = time.time()
-        results.append(result)
+        try:
+            result = pool.apply_async(cmd, (code,) + args).get()
+            if (count <> 0 and idx % count == 0) and time.time() - time_s > 1:
+               log.info("idx:%s code:%s"%(idx,code)),
+               idx +=1
+               time_s = time.time()
+            results.append(result)
+        except Exception as e:
+            print e,code
     pool.close()
     pool.join()
     # results = flatten(map(lambda x: x.get(), results))
