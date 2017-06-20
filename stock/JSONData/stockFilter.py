@@ -23,7 +23,7 @@ def getBollFilter(df=None,boll=-5,duration=ct.PowerCountdl,filter=True,ma5d=True
         return None
     else:
         df.loc[df.percent >= 9.95,'percent']=10
-
+        df.loc[df.per1d >= 9.95,'percent']=10
 
     if 'ma5d' in df.columns:
         df = df[df.buy > df.ma5d * ct.changeRatio]
@@ -47,16 +47,17 @@ def getBollFilter(df=None,boll=-5,duration=ct.PowerCountdl,filter=True,ma5d=True
         #     # if 1 < fibl < dl / 2 and fibh > dl / 3:
         #     if fibh > dl / 3:
         #         df = df[ ((df.ma5d * ct.changeRatio < df.low) & (df.low < df.ma5d * (2 - ct.changeRatio))) | ((df.percent > 1) & (df.volume > 3))]
+        # print df.loc['000801']
         if 'vstd' in df.columns:
             # df = df[(df.lvol * df.volume > (df.vstd + df.lvol)) | ((df.percent > -5) & (df.hv/df.lv > 3))]
             df = df[(df.lvol * df.volume > (df.vstd + df.lvol)) | ((df.percent > -10) & (df.hv/df.lv > 1.2))]
                     # [dd.lvol * dd.volume > (dd.vstd + dd.lvol) | dd.lvol * dd.volume >(dd.ldvolume + dd.vstd]
+        # print df.loc['000801']
+        
         if percent:
-            if  cct.get_now_time_int() > 920 and cct.get_now_time_int() <= 1400:
-                # df = df[((df.fibl < int(duration / 1.5)) &  (df.volume > 2.5 * cct.get_work_time_ratio() )) | (df.percent > 3)]
-                df = df[ (df.volume > 2.5 * cct.get_work_time_ratio()) | (df.percent > 3)]
-            if cct.get_now_time_int() > 926 or cct.get_now_time_int() < 900:
-                df = df[df.percent > 1 ]
+            if  cct.get_now_time_int() > 930 and cct.get_now_time_int() <= 1400:
+                df = df[ (df.volume > 1.5 * cct.get_work_time_ratio()) | (df.percent > 0)]
+            df = df[(df.per1d > 9) | (df.per2d > 4) | (df.per3d > 6)]
                 # df = df[df.oph > 10]
         if 'boll' in df.columns:
             return df[df.boll >= boll]

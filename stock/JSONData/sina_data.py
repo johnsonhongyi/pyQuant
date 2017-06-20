@@ -184,7 +184,7 @@ class Sina:
 #                return_hdf_status = not cct.get_work_day_status() or (cct.get_work_day_status() and (cct.get_work_time() and l_time < sina_limit_time))
                 return_hdf_status = not cct.get_work_time() or (cct.get_work_time() and l_time < sina_limit_time)
                 log.info("915:%s sina_time:%0.2f limit:%s"%(sina_time_status,l_time,sina_limit_time))
-                if sina_time_status and l_time < 10:
+                if sina_time_status and l_time < 8:
                     log.info("open 915 hdf ok:%s"%(len(h5)))
                     return h5
                 elif not sina_time_status and return_hdf_status:

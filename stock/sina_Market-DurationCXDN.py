@@ -78,7 +78,7 @@ if __name__ == "__main__":
         log_level = LoggerFactory.ERROR
     # log_level = LoggerFactory.DEBUG if args['--debug']  else LoggerFactory.ERROR
     log.setLevel(log_level)
-        
+
     # if log_level == LoggerFactory.DEBUG:
     # handler=StderrHandler(format_string='{record.channel}: {record.message) [{record.extra[cwd]}]')
     # log.level = log.debug
@@ -146,8 +146,11 @@ if __name__ == "__main__":
             # top_now = tdd.getSinaAlldf(market=u'一带一路',filename='ydyl', vol=ct.json_countVol, vtype=ct.json_countType)
             # top_now = tdd.getSinaAlldf(market='次新股',filename='cxg', vol=ct.json_countVol, vtype=ct.json_countType)
             time_Rt = time.time()
-            top_now = tdd.getSinaAlldf(market='网络安全+雄安新区',filename='wlaq', vol=ct.json_countVol, vtype=ct.json_countType)
+            # top_now = tdd.getSinaAlldf(market='网络安全+雄安新区',filename='wlaq', vol=ct.json_countVol, vtype=ct.json_countType)
             # top_now = tdd.getSinaAlldf(market=u'京津冀',filename='beijing', vol=ct.json_countVol, vtype=ct.json_countType)
+            top_now = tdd.getSinaAlldf(
+               market='all', vol=ct.json_countVol, vtype=ct.json_countType)
+
             now_count = len(top_now)
             radio_t = cct.get_work_time_ratio()
             # top_now = top_now[top_now.buy > 0]
@@ -166,7 +169,7 @@ if __name__ == "__main__":
 
                     time_Rt = time.time()
                     top_all,lastpTDX_DF = tdd.get_append_lastp_to_df(top_now, lastpTDX_DF=None, dl=duration_date,end=end_date,ptype=ptype,filter=filter, power=False, lastp=False,newdays=newdays)
-                    
+
                 elif len(top_all) == 0 and len(lastpTDX_DF) > 0:
                     time_Rt = time.time()
                     top_all = top_now
@@ -292,7 +295,7 @@ if __name__ == "__main__":
                     # print len(top_all),top_all.shape
                     top_all = tdd.get_powerdf_to_all(top_all,top_temp)
                     top_all = tdd.get_powerdf_to_all(top_all,top_end)
-                    top_temp = stf.getBollFilter(df=top_temp, boll=ct.bollFilter,duration=ct.PowerCountdl,filter=True)
+                    top_temp = stf.getBollFilter(df=top_temp, boll=ct.bollFilter,duration=ct.PowerCountdl,filter=True,percent=True)
                     print ("N:%s K:%s %s G:%s" % (
                         now_count, len(top_all[top_all['buy'] > 0]),
                         len(top_now[top_now['volume'] <= 0]), goldstock)),
@@ -396,7 +399,7 @@ if __name__ == "__main__":
                     market_sort_value = ct.Market_sort_idx[st]
                     market_sort_value_key = eval(market_sort_value+'_key')
                     if len(st_l) > 1 and st_l[1]=='f':
-                       market_sort_value_key = [ key^1 for key in market_sort_value_key]                         
+                       market_sort_value_key = [ key^1 for key in market_sort_value_key]
                 else:
                     log.error("market_sort key error:%s"%(st))
                     cct.sleeprandom(5)

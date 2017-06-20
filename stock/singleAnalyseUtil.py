@@ -543,8 +543,8 @@ if __name__ == '__main__':
                             cct.sleep(60)
                             print ".",
                         else:
-                            cct.sleep(random.randint(0, 30))
-                            print "."
+                            # cct.sleep(random.randint(0, 30))
+                            # print "."
                             fibcount = 0
                             break
                 else:
