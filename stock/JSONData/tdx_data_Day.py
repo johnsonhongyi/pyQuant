@@ -2221,6 +2221,7 @@ def compute_lastdays_percent(df=None, lastdays=3):
         if 'date' in df.columns:
             df = df.set_index('date')
         df = df.sort_index(ascending=True)
+        df = df[df.index < cct.get_today()]
         df = df.fillna(0)
         for da in range(1, lastdays + 1, 1):
             df['lastp%sd' % da] = df['close'].shift(da)
@@ -3206,9 +3207,9 @@ if __name__ == '__main__':
 #    code='300174'
     # get_tdx_append_now_df_api_tofile('603113', dm=None, newdays=1, start=None, end=None, type='f', df=None, dl=2, power=True)
 #
-    code = '002695'
-    print get_tdx_append_now_df_api(code, start=None, end=None, type='f', df=None, dm=None, dl=5, power=True, newdays=None, write_tushare=False).T
-    print get_tdx_append_now_df_api_tofile(code, dm=None, newdays=1, start=None, end=None, type='f', df=None, dl=2, power=True)
+    code = '300661'
+    print get_tdx_append_now_df_api(code, start=None, end=None, type='f', df=None, dm=None, dl=5, power=True, newdays=0, write_tushare=False).T
+    print get_tdx_append_now_df_api_tofile(code, dm=None, newdays=0, start=None, end=None, type='f', df=None, dl=2, power=True)
     # print get_tdx_Exp_day_to_df(code,dl=30,newdays=0)[:2]
     # print df
     # sys.exit(0)

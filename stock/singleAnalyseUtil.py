@@ -466,7 +466,7 @@ if __name__ == '__main__':
         log_level = LoggerFactory.ERROR
     # log_level = LoggerFactory.DEBUG if args['--debug']  else LoggerFactory.ERROR
     log.setLevel(log_level)
-    
+
 #    log.setLevel(LoggerFactory.DEBUG)
     # print len(sys.argv)
     if cct.isMac():
@@ -551,12 +551,11 @@ if __name__ == '__main__':
                     cct.sleep(60)
             elif cct.get_work_duration():
                 while 1:
-                    cct.sleep(60)
                     if cct.get_work_duration():
                         print ".",
                         cct.sleep(60)
                     else:
-                        print "."
+                        print "#"
                         cct.sleep(random.randint(0, 30))
                         top_all = pd.DataFrame()
                         fibcount = 0

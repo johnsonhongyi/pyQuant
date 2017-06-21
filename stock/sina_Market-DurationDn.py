@@ -163,6 +163,7 @@ if __name__ == "__main__":
                         top_all, lastpTDX_DF = tdd.get_append_lastp_to_df(
                             top_now, lastpTDX_DF=None, dl=duration_date, end=end_date, ptype=ptype, filter=filter, power=ct.lastPower, lastp=lastp, newdays=newdays)
                     else:
+                        newdays = 0
                         top_all, lastpTDX_DF = tdd.get_append_lastp_to_df(
                             top_now, lastpTDX_DF=None, dl=duration_date, end=end_date, ptype=ptype, filter=filter, power=ct.lastPower, lastp=lastp, newdays=newdays, checknew=True)
                     # codelist = top_all.index.tolist()

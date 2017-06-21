@@ -50,7 +50,7 @@ sina_limit_time = 15
 h5_time_l_count = 6
 sina_dd_limit_time = 360
 diffcode = 0.2
-duration_sleep_time = 30
+duration_sleep_time = 45
 
 # powerdiff = 'ra * fibl + rah*(abs(float(%s)-fibl))/fib +ma +kdj+rsi'
 '''
