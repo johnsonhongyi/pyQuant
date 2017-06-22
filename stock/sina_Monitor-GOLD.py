@@ -79,6 +79,8 @@ def get_sina_url(vol='0', type='0', pageCount='100'):
     #             code_g[code]= df.loc[ix,'name']
     # interval = (time.time() - start_t)
     # print "time:", interval
+
+
 def evalcmd(dir_mo):
     end = True
     import readline
@@ -92,7 +94,7 @@ def evalcmd(dir_mo):
         # if cmd == 'e' or cmd == 'q' or len(cmd) == 0:
         if cmd == 'e' or cmd == 'q':
             break
-        elif len(cmd)==0:
+        elif len(cmd) == 0:
             continue
         else:
             try:
@@ -102,7 +104,7 @@ def evalcmd(dir_mo):
                     print eval(cmd)
                 print ''
             except Exception, e:
-                print e 
+                print e
                 # evalcmd(dir_mo)
                 # break
 
@@ -110,16 +112,16 @@ if __name__ == "__main__":
     from docopt import docopt
     log = LoggerFactory.log
     args = docopt(cct.sina_doc, version='sina_cxdn')
-    # print args,args['--debug']
-    if args['--debug'] == 'debug':
+    # print args,args['-d']
+    if args['-d'] == 'debug':
         log_level = LoggerFactory.DEBUG
-    elif args['--debug'] == 'info':
+    elif args['-d'] == 'info':
         log_level = LoggerFactory.INFO
     else:
         log_level = LoggerFactory.ERROR
-    # log_level = LoggerFactory.DEBUG if args['--debug']  else LoggerFactory.ERROR
+    # log_level = LoggerFactory.DEBUG if args['-d']  else LoggerFactory.ERROR
     log.setLevel(log_level)
-    
+
     # width, height = 132, 18
     if cct.isMac():
         width, height = 155, 16
@@ -144,10 +146,10 @@ if __name__ == "__main__":
     blkname = '065.blk'
     block_path = tdd.get_tdx_dir_blocknew() + blkname
     lastpTDX_DF = pd.DataFrame()
-    parser=cct.MoniterArgmain()
-    parserDuraton=cct.DurationArgmain()
+    parser = cct.MoniterArgmain()
+    parserDuraton = cct.DurationArgmain()
     market_sort_value = ct.Market_sort_idx['1']
-    market_sort_value_key = eval(market_sort_value+'_key')
+    market_sort_value_key = eval(market_sort_value + '_key')
     while 1:
         try:
             time_Rt = time.time()
@@ -168,15 +170,15 @@ if __name__ == "__main__":
                 if 'trade' in top_now.columns:
                     top_now['buy'] = (
                         map(lambda x, y: y if int(x) == 0 else x, top_now['buy'].values, top_now['trade'].values))
-      
+
                 if len(top_all) == 0 and len(lastpTDX_DF) == 0:
                     cct.get_terminal_Position(position=sys.argv[0])
 
                     # time_Rt = time.time()
-                    top_all,lastpTDX_DF = tdd.get_append_lastp_to_df(top_now)
+                    top_all, lastpTDX_DF = tdd.get_append_lastp_to_df(top_now)
                 elif len(top_all) == 0 and len(lastpTDX_DF) > 0:
                     # time_Rt = time.time()
-                    top_all = tdd.get_append_lastp_to_df(top_now,lastpTDX_DF)
+                    top_all = tdd.get_append_lastp_to_df(top_now, lastpTDX_DF)
                     # top_all = top_all.merge(lastpTDX_DF, left_index=True, right_index=True, how='left')
                     # top_all = top_all[top_all['llow'] > 0]
                 else:
@@ -188,11 +190,10 @@ if __name__ == "__main__":
                     #         top_all.loc[symbol,['name', 'percent', 'dff', 'couts', 'trade', 'high', 'open', 'low', 'ratio', 'volume',
                     #        'prev_p']] = top_now.loc[symbol,['name', 'percent', 'dff', 'couts', 'trade', 'high', 'open', 'low', 'ratio', 'volume',
                     #        'prev_p']]
-                                
+
                     #     else:
                     #         top_all.append(top_now.loc[symbol])
-                    top_all=cct.combine_dataFrame(top_all,top_now, col=None)
-                    
+                    top_all = cct.combine_dataFrame(top_all, top_now, col=None)
 
                 # top_bak = top_all
                 # top_all['buy'] = (
@@ -209,28 +210,28 @@ if __name__ == "__main__":
                     top_all['volume'] = (
                         map(lambda x, y: round(x / y / radio_t, 1), top_all['volume'].values, top_all['lvol'].values))
                     top_all['dff'] = (
-                        map(lambda x, y: round(((float(x) - float(y)) / float(y) * 100), 1),top_all['buy'].values,top_all['lastp'].values))
+                        map(lambda x, y: round(((float(x) - float(y)) / float(y) * 100), 1), top_all['buy'].values, top_all['lastp'].values))
                     if cct.get_now_time_int() > 915 and cct.get_now_time_int() < ct.checkfilter_end_time:
                         top_all = top_all[top_all.low > top_all.llow * ct.changeRatio]
                         # top_all = top_all[top_all.trade > top_all.lhigh * ct.changeRatio]
 
                     if cct.get_now_time_int() > 915 and cct.get_now_time_int() <= 926:
-                        top_all['percent']= (map(lambda x, y: round((x-y)/y*100,1) if int(y) > 0 else 0, top_all.trade, top_all.llastp))
+                        top_all['percent'] = (map(lambda x, y: round((x - y) / y * 100, 1)
+                                                  if int(y) > 0 else 0, top_all.trade, top_all.llastp))
                     # if cct.get_now_time_int() > 930 and 'lastp' in top_all.columns:
                     #     top_all = top_all[top_all.trade >= top_all.llastp]
                     # top_all = top_all.loc[:,
-                              # ['name', 'percent', 'ma5d','dff', 'couts', 'volume', 'trade', 'prev_p', 'ratio']]
+                        # ['name', 'percent', 'ma5d','dff', 'couts', 'volume', 'trade', 'prev_p', 'ratio']]
                     # if cct.get_now_time_int() > 1030 and cct.get_now_time_int() < 1400:
                         # top_all = top_all[(top_all.volume > ct.VolumeMinR) & (top_all.volume < ct.VolumeMaxR)]
 
                 # top_all = top_all.sort_values(by=[ 'couts', 'dff','volume', 'ratio'], ascending=[0, 0, 0, 1])
-                top_all = top_all.sort_values(by=ct.Monitor_sort_count, ascending=[0,0, 0, 0, 1])
+                top_all = top_all.sort_values(by=ct.Monitor_sort_count, ascending=[0, 0, 0, 0, 1])
                 # top_all = top_all.sort_values(by=[ 'couts'], ascending=[0])
                 # top_all=top_all.sort_values(by=['dff','percent','couts','ratio'],ascending=[0,0,1,1])
 
                 # top_all=top_all.sort_values(by=['dff','couts'],ascending=[0,0])
                 # top_all=top_all.sort_values(by=['dff','percent','couts','ratio'],ascending=[0,0,1,1])
-
 
                 # print top_all
                 # print pt.PrettyTable([''] + list(top_all.columns))
@@ -239,17 +240,17 @@ if __name__ == "__main__":
                 # print rl.format_for_print(top_all)
                 # print top_all[:10]
 
-
                 top_temp = top_all[:ct.PowerCount].copy()
                 top_temp = pct.powerCompute_df(top_temp, dl=ct.PowerCountdl)
                 goldstock = len(top_all[(top_all.buy >= top_all.lhigh * 0.99) & (top_all.buy >= top_all.llastp * 0.99)])
-                # print "G:%s Rt:%0.1f dT:%s N:%s" % (len(top_all),float(time.time() - time_Rt),cct.get_time_to_date(time_s),cct.get_now_time())
+                # print "G:%s Rt:%0.1f dT:%s N:%s" % (len(top_all),float(time.time() -
+                # time_Rt),cct.get_time_to_date(time_s),cct.get_now_time())
                 cct.set_console(width, height,
-                    title=['dT:%s' % cct.get_time_to_date(time_s), 'G:%s' % len(top_all), 'zxg: %s' % (blkname)])
-                
-                top_all = tdd.get_powerdf_to_all(top_all,top_temp)
+                                title=['dT:%s' % cct.get_time_to_date(time_s), 'G:%s' % len(top_all), 'zxg: %s' % (blkname)])
+
+                top_all = tdd.get_powerdf_to_all(top_all, top_temp)
                 top_temp = stf.getBollFilter(df=top_temp, boll=1)
-                print "G:%s Rt:%0.1f dT:%s N:%s T:%s" % (goldstock,float(time.time() - time_Rt),cct.get_time_to_date(time_s),cct.get_now_time(),len(top_temp))
+                print "G:%s Rt:%0.1f dT:%s N:%s T:%s" % (goldstock, float(time.time() - time_Rt), cct.get_time_to_date(time_s), cct.get_now_time(), len(top_temp))
                 if 'op' in top_temp.columns:
                     # top_temp = top_temp.sort_values(by=['ra','op','couts'],ascending=[0, 0,0])
                     # top_temp = top_temp.sort_values(by=['dff', 'op', 'ra', 'percent', 'ratio'],
@@ -258,16 +259,16 @@ if __name__ == "__main__":
                     # top_temp = top_temp.sort_values(by=ct.Duration_percentdn_ra,
                                     # ascending=ct.Duration_percentdn_ra_key)
                     # top_temp = top_temp.sort_values(by=ct.Duration_percent_op,
-                    #                 ascending=ct.Duration_percent_op_key)                                    
+                    #                 ascending=ct.Duration_percent_op_key)
                     top_temp = top_temp.sort_values(by=eval(market_sort_value),
-                                        ascending=market_sort_value_key)
-                    # top_temp = top_temp.sort_values(by=['op','ra','dff', 'percent', 'ratio'], ascending=[0,0,0, 0, 1])                
+                                                    ascending=market_sort_value_key)
+                    # top_temp = top_temp.sort_values(by=['op','ra','dff', 'percent', 'ratio'], ascending=[0,0,0, 0, 1])
                 # if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935:
                 #     top_temp = top_temp.loc[:,ct.Monitor_format_trade]
                 # else:
                 #     top_temp = top_temp.loc[:,ct.Monitor_format_trade]
-                print rl.format_for_print(top_temp.loc[:, ct.Monitor_format_trade][:10]) 
-                
+                print rl.format_for_print(top_temp.loc[:, ct.Monitor_format_trade][:10])
+
                 # print rl.format_for_print(top_all[:10])
                 if status:
                     for code in top_all[:10].index:
@@ -306,8 +307,7 @@ if __name__ == "__main__":
                         print "."
                         break
             else:
-                raise KeyboardInterrupt("StopTime")    
-
+                raise KeyboardInterrupt("StopTime")
 
         except (KeyboardInterrupt) as e:
             # print "key"
@@ -316,21 +316,20 @@ if __name__ == "__main__":
             # cct.sleep(1)
             # if success > 3:
             # st=raw_input("status:[go(g),clear(c),quit(q,e)]:")
-            st = cct.cct_raw_input(ct.RawMenuArgmain()%(market_sort_value))
-
+            st = cct.cct_raw_input(ct.RawMenuArgmain() % (market_sort_value))
 
             if len(st) == 0:
                 status = False
             elif len(st.split()[0]) == 1 and st.split()[0].isdigit():
-                st_l=st.split()
+                st_l = st.split()
                 st = st_l[0]
                 if st in ct.Market_sort_idx.keys():
                     market_sort_value = ct.Market_sort_idx[st]
-                    market_sort_value_key = eval(market_sort_value+'_key')
-                    if len(st_l) > 1 and st_l[1]=='f':
-                       market_sort_value_key = [ key^1 for key in market_sort_value_key]                         
+                    market_sort_value_key = eval(market_sort_value + '_key')
+                    if len(st_l) > 1 and st_l[1] == 'f':
+                        market_sort_value_key = cct.negate_boolean_list(market_sort_value_key)
                 else:
-                    log.error("market_sort key error:%s"%(st))
+                    log.error("market_sort key error:%s" % (st))
                     cct.sleeprandom(5)
 
             # elif st.startswith('d') or st.startswith('dt'):
@@ -347,8 +346,7 @@ if __name__ == "__main__":
             #         time_s = time.time()
             #         status = False
             #         top_all = pd.DataFrame()
-            #         lastpTDX_DF = pd.DataFrame()            
-
+            #         lastpTDX_DF = pd.DataFrame()
 
             elif st.lower() == 'g' or st.lower() == 'go':
                 status = True
@@ -357,7 +355,7 @@ if __name__ == "__main__":
                 status = False
             elif st.startswith('w') or st.startswith('a'):
                 args = cct.writeArgmain().parse_args(st.split())
-                codew = stf.WriteCountFilter(top_temp,writecount=args.dl)
+                codew = stf.WriteCountFilter(top_temp, writecount=args.dl)
                 if args.code == 'a':
                     cct.write_to_blocknew(block_path, codew)
                     # cct.write_to_blocknew(all_diffpath,codew)
@@ -365,24 +363,23 @@ if __name__ == "__main__":
                     cct.write_to_blocknew(block_path, codew, False)
                     # cct.write_to_blocknew(all_diffpath,codew,False)
                 print "wri ok:%s" % block_path
-                cct.sleeprandom(ct.duration_sleep_time/2)
+                cct.sleeprandom(ct.duration_sleep_time / 2)
 
                 # cct.sleep(5)
             elif st.lower() == 'r':
                 dir_mo = eval(cct.eval_rule)
                 evalcmd(dir_mo)
             elif st.startswith('q') or st.startswith('e'):
-                print "exit:%s"%(st)
+                print "exit:%s" % (st)
             else:
-                print "input error:%s"%(st)
+                print "input error:%s" % (st)
 
         except (IOError, EOFError) as e:
             print "Error", e
             import traceback
             traceback.print_exc()
-            cct.sleeprandom(ct.duration_sleep_time/2)
+            cct.sleeprandom(ct.duration_sleep_time / 2)
             # raw_input("Except")
-
 
             # http://stackoverflow.com/questions/17709270/i-want-to-create-a-column-of-value-count-in-my-pandas-dataframe
             # df['couts'] = df.groupby(['Color'])['Value'].transform('count')

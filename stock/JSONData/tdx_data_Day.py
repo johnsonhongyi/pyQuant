@@ -3186,14 +3186,14 @@ if __name__ == '__main__':
     from docopt import docopt
     log = LoggerFactory.log
     args = docopt(cct.sina_doc, version='sina_cxdn')
-    # print args,args['--debug']
-    if args['--debug'] == 'debug':
+    print args,args['-d']
+    if args['-d'] == 'debug':
         log_level = LoggerFactory.DEBUG
-    elif args['--debug'] == 'info':
+    elif args['-d'] == 'info':
         log_level = LoggerFactory.INFO
     else:
         log_level = LoggerFactory.ERROR
-    # log_level = LoggerFactory.DEBUG if args['--debug']  else LoggerFactory.ERROR
+    # log_level = LoggerFactory.DEBUG if args['-d']  else LoggerFactory.ERROR
     log.setLevel(log_level)
 
     # print cct.get_ramdisk_path('tdx')
@@ -3207,9 +3207,12 @@ if __name__ == '__main__':
 #    code='300174'
     # get_tdx_append_now_df_api_tofile('603113', dm=None, newdays=1, start=None, end=None, type='f', df=None, dl=2, power=True)
 #
-    code = '300661'
-    print get_tdx_append_now_df_api(code, start=None, end=None, type='f', df=None, dm=None, dl=5, power=True, newdays=0, write_tushare=False).T
-    print get_tdx_append_now_df_api_tofile(code, dm=None, newdays=0, start=None, end=None, type='f', df=None, dl=2, power=True)
+    # code = '300661'
+    code = '600581'
+    # code = '600619'
+
+    print get_tdx_append_now_df_api(code, start=None, end=None, type='f', df=None, dm=None, dl=20, power=True, newdays=0, write_tushare=False).T
+    # print get_tdx_append_now_df_api_tofile(code, dm=None, newdays=0, start=None, end=None, type='f', df=None, dl=2, power=True)
     # print get_tdx_Exp_day_to_df(code,dl=30,newdays=0)[:2]
     # print df
     # sys.exit(0)

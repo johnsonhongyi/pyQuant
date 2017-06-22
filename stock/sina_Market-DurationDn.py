@@ -61,14 +61,14 @@ if __name__ == "__main__":
     from docopt import docopt
     log = LoggerFactory.log
     args = docopt(cct.sina_doc, version='sina_cxdn')
-    # print args,args['--debug']
-    if args['--debug'] == 'debug':
+    # print args,args['-d']
+    if args['-d'] == 'debug':
         log_level = LoggerFactory.DEBUG
-    elif args['--debug'] == 'info':
+    elif args['-d'] == 'info':
         log_level = LoggerFactory.INFO
     else:
         log_level = LoggerFactory.ERROR
-    # log_level = LoggerFactory.DEBUG if args['--debug']  else LoggerFactory.ERROR
+    # log_level = LoggerFactory.DEBUG if args['-d']  else LoggerFactory.ERROR
     log.setLevel(log_level)
 
     # log.setLevel(LoggerFactory.DEBUG)
@@ -76,7 +76,7 @@ if __name__ == "__main__":
     # log.level = log.debug
     # error_handler = SyslogHandler('Sina-M-Log', level='ERROR')
 
-    width, height = 175, 21
+    width, height = 178, 21
 
     def set_duration_console(duration_date):
         if cct.isMac():
@@ -437,8 +437,7 @@ if __name__ == "__main__":
                     market_sort_value = ct.Market_sort_idx[st]
                     market_sort_value_key = eval(market_sort_value + '_key')
                     if len(st_l) > 1 and st_l[1] == 'f':
-                        market_sort_value_key = [
-                            key ^ 1 for key in market_sort_value_key]
+                        market_sort_value_key = cct.negate_boolean_list(market_sort_value_key)
                 else:
                     log.error("market_sort key error:%s" % (st))
                     cct.sleeprandom(5)

@@ -36,7 +36,7 @@ def evalcmd(dir_mo):
         # if cmd == 'e' or cmd == 'q' or len(cmd) == 0:
         if cmd == 'e' or cmd == 'q':
             break
-        elif len(cmd)==0:
+        elif len(cmd) == 0:
             continue
         else:
             try:
@@ -46,7 +46,7 @@ def evalcmd(dir_mo):
                     print eval(cmd)
                 print ''
             except Exception, e:
-                print e 
+                print e
                 # evalcmd(dir_mo)
                 # break
 
@@ -57,16 +57,16 @@ if __name__ == "__main__":
     from docopt import docopt
     log = LoggerFactory.log
     args = docopt(cct.sina_doc, version='sina_cxdn')
-    # print args,args['--debug']
-    if args['--debug'] == 'debug':
+    # print args,args['-d']
+    if args['-d'] == 'debug':
         log_level = LoggerFactory.DEBUG
-    elif args['--debug'] == 'info':
+    elif args['-d'] == 'info':
         log_level = LoggerFactory.INFO
     else:
         log_level = LoggerFactory.ERROR
-    # log_level = LoggerFactory.DEBUG if args['--debug']  else LoggerFactory.ERROR
+    # log_level = LoggerFactory.DEBUG if args['-d']  else LoggerFactory.ERROR
     log.setLevel(log_level)
-    
+
     # log.setLevel(LoggerFactory.DEBUG)
 
     # handler=StderrHandler(format_string='{record.channel}: {record.message) [{record.extra[cwd]}]')
@@ -99,7 +99,7 @@ if __name__ == "__main__":
     # all_diffpath = tdd.get_tdx_dir_blocknew() + '062.blk'
     status_change = False
     market_sort_value = ct.Market_sort_idx['2']
-    market_sort_value_key = eval(market_sort_value+'_key')
+    market_sort_value_key = eval(market_sort_value + '_key')
     while 1:
         try:
             # df = sina_data.Sina().all
@@ -126,13 +126,13 @@ if __name__ == "__main__":
                 if 'trade' in top_now.columns:
                     top_now['buy'] = (
                         map(lambda x, y: y if int(x) == 0 else x, top_now['buy'].values, top_now['trade'].values))
-      
+
                 if len(top_all) == 0 and len(lastpTDX_DF) == 0:
                     cct.get_terminal_Position(position=sys.argv[0])
 
-                    top_all,lastpTDX_DF = tdd.get_append_lastp_to_df(top_now)
+                    top_all, lastpTDX_DF = tdd.get_append_lastp_to_df(top_now)
                 elif len(top_all) == 0 and len(lastpTDX_DF) > 0:
-                    top_all = tdd.get_append_lastp_to_df(top_now,lastpTDX_DF)
+                    top_all = tdd.get_append_lastp_to_df(top_now, lastpTDX_DF)
 
                     # if len(top_all[:5][top_all[:5]['volume'] > 0]) > 3:
                     #     # top_all['volume'] = top_all['volume'].apply(lambda x: round(float(x) / radio_t, 1))
@@ -161,9 +161,7 @@ if __name__ == "__main__":
                     #                 top_all.loc[symbol, ct.columns_now] = top_now.loc[symbol, ct.columns_now]
                     #         else:
                     #             top_all.loc[symbol, ct.columns_now] = top_now.loc[symbol, ct.columns_now]
-                    top_all=cct.combine_dataFrame(top_all,top_now, col=None)
-
-
+                    top_all = cct.combine_dataFrame(top_all, top_now, col=None)
 
                 # top_all=top_all.sort_values(by=['dff','percent','couts'],ascending=[0,0,1])
                 # top_all=top_all.sort_values(by=['dff','ratio','percent','couts'],ascending=[0,1,0,1])
@@ -178,26 +176,25 @@ if __name__ == "__main__":
                 # if cct.get_now_time_int() <1500:
 
                 top_dif = top_all.copy()
-                top_dif['dff'] = (map(lambda x, y: round((x - y) / y * 100, 1), top_dif['buy'].values, top_dif['lastp'].values))
-                
+                top_dif['dff'] = (map(lambda x, y: round((x - y) / y * 100, 1),
+                                      top_dif['buy'].values, top_dif['lastp'].values))
+
                 log.info('dif1:%s' % len(top_dif))
                 if not (cct.get_now_time_int() > 915 and cct.get_now_time_int() <= 925):
-                    top_dif=top_dif[top_dif.lvol > ct.LvolumeSize]
+                    top_dif = top_dif[top_dif.lvol > ct.LvolumeSize]
                 if cct.get_now_time_int() > 915 and cct.get_now_time_int() < ct.checkfilter_end_time:
                     top_dif = top_dif[top_dif.low > top_dif.llow * ct.changeRatio]
                     # top_dif = top_dif[top_dif.buy >= top_dif.lhigh * ct.changeRatio]
                 log.debug('dif2:%s' % len(top_dif))
-                
+
                 # if cct.get_now_time_int() > 915 and cct.get_now_time_int() <= 926:
-                    # top_dif['percent']= (map(lambda x, y: round((x-y)/y*100,1) if int(y) > 0 else 0, top_dif.buy, top_dif.llastp))
+                # top_dif['percent']= (map(lambda x, y: round((x-y)/y*100,1) if int(y) > 0 else 0, top_dif.buy, top_dif.llastp))
 
                 # if top_dif[:1].llow.values <> 0:
                 if len(top_dif[:5][top_dif[:5]['buy'] > 0]) > 3:
                     log.debug('diff2-0-low>0')
-                    top_dif = top_dif[top_dif.low >= top_dif.llow* ct.changeRatio]
+                    top_dif = top_dif[top_dif.low >= top_dif.llow * ct.changeRatio]
                     log.debug('diff2-1:%s' % len(top_dif))
-
-
 
                     # top_dif = top_dif[top_dif.low >= top_dif.lhigh* ct.changeRatio]
 
@@ -216,7 +213,6 @@ if __name__ == "__main__":
                     # top_dif = top_dif[top_dif.volume > 1]
                     if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 1030:
                         top_dif = top_dif[(top_dif.volume > ct.VolumeMinR) & (top_dif.volume < ct.VolumeMaxR)]
-                
 
                 if len(top_dif) == 0:
                     print "No G,DataFrame is Empty!!!!!!"
@@ -238,29 +234,30 @@ if __name__ == "__main__":
                     else:
                         # print "Good Morning!!!"
                         top_dif = top_dif.sort_values(by=['dff', 'percent', 'ratio'], ascending=[0, 0, 1])
-        
+
                     # top_all=top_all.sort_values(by=['percent','dff','couts','ratio'],ascending=[0,0,1,1])
                     # print rl.format_for_print(top_dif[:10])
                     top_temp = top_dif[:ct.PowerCount].copy()
                     top_temp = pct.powerCompute_df(top_temp, dl=ct.PowerCountdl)
-                    goldstock = len(top_dif[(top_dif.buy >= top_dif.lhigh * 0.99) & (top_dif.buy >= top_dif.llastp * 0.99)])
-                    
+                    goldstock = len(top_dif[(top_dif.buy >= top_dif.lhigh * 0.99)
+                                            & (top_dif.buy >= top_dif.llastp * 0.99)])
+
                     cct.set_console(width, height,
-                        title=['dT:%s' % cct.get_time_to_date(time_s), 'G:%s' % len(top_dif), 'zxg: %s' % (blkname)])
-                   
-                    top_all = tdd.get_powerdf_to_all(top_all,top_temp)
-                    top_temp = stf.getBollFilter(df=top_temp, boll=ct.bollFilter,duration=ct.PowerCountdl)
-                    print ("A:%s N:%s K:%s %s G:%s" % (
+                                    title=['dT:%s' % cct.get_time_to_date(time_s), 'G:%s' % len(top_dif), 'zxg: %s' % (blkname)])
+
+                    top_all = tdd.get_powerdf_to_all(top_all, top_temp)
+                    top_temp = stf.getBollFilter(df=top_temp, boll=ct.bollFilter, duration=ct.PowerCountdl)
+                    print("A:%s N:%s K:%s %s G:%s" % (
                         df_count, now_count, len(top_all[top_all['buy'] > 0]),
                         len(top_now[top_now['volume'] <= 0]), goldstock)),
                     # print "Rt:%0.3f" % (float(time.time() - time_Rt))
-                    print "Rt:%0.1f dT:%s N:%s T:%s %s%%" % (float(time.time() - time_Rt), cct.get_time_to_date(time_s),cct.get_now_time(),len(top_temp),round(len(top_temp)/now_count*100,1))
+                    print "Rt:%0.1f dT:%s N:%s T:%s %s%%" % (float(time.time() - time_Rt), cct.get_time_to_date(time_s), cct.get_now_time(), len(top_temp), round(len(top_temp) / now_count * 100, 1))
                     if 'op' in top_temp.columns:
 
                         top_temp = top_temp.sort_values(by=eval(market_sort_value),
-                                        ascending=market_sort_value_key)
+                                                        ascending=market_sort_value_key)
                     #     top_temp = top_temp.loc[:,ct.MonitorMarket_format_buy]
-                    print rl.format_for_print(top_temp.loc[:,ct.MonitorMarket_format_buy][:10])
+                    print rl.format_for_print(top_temp.loc[:, ct.MonitorMarket_format_buy][:10])
                     # print rl.format_for_print(top_dif[:10])
                     # print top_all.loc['000025',:]
                     # print "staus",status
@@ -310,20 +307,20 @@ if __name__ == "__main__":
             # if success > 3:
             #     raw_input("Except")
             #     sys.exit(0)
-            st = cct.cct_raw_input(ct.RawMenuArgmain()%(market_sort_value))
+            st = cct.cct_raw_input(ct.RawMenuArgmain() % (market_sort_value))
 
             if len(st) == 0:
                 status = False
             elif len(st.split()[0]) == 1 and st.split()[0].isdigit():
-                st_l=st.split()
+                st_l = st.split()
                 st = st_l[0]
                 if st in ct.Market_sort_idx.keys():
                     market_sort_value = ct.Market_sort_idx[st]
-                    market_sort_value_key = eval(market_sort_value+'_key')
-                    if len(st_l) > 1 and st_l[1]=='f':
-                       market_sort_value_key = [ key^1 for key in market_sort_value_key]                         
+                    market_sort_value_key = eval(market_sort_value + '_key')
+                    if len(st_l) > 1 and st_l[1] == 'f':
+                        market_sort_value_key = cct.negate_boolean_list(market_sort_value_key)
                 else:
-                    log.error("market_sort key error:%s"%(st))
+                    log.error("market_sort key error:%s" % (st))
                     cct.sleeprandom(5)
 
             elif st.lower() == 'r':
@@ -341,7 +338,7 @@ if __name__ == "__main__":
                 status = False
             elif st.startswith('w') or st.startswith('a'):
                 args = cct.writeArgmain().parse_args(st.split())
-                codew = stf.WriteCountFilter(top_temp,writecount=args.dl)
+                codew = stf.WriteCountFilter(top_temp, writecount=args.dl)
                 if args.code == 'a':
                     cct.write_to_blocknew(block_path, codew)
                     # sl.write_to_blocknew(all_diffpath, codew)
@@ -349,20 +346,19 @@ if __name__ == "__main__":
                     cct.write_to_blocknew(block_path, codew, False)
                     # sl.write_to_blocknew(all_diffpath, codew, False)
                 print "wri ok:%s" % block_path
-                cct.sleeprandom(ct.duration_sleep_time/2)
+                cct.sleeprandom(ct.duration_sleep_time / 2)
 
                 # cct.sleep(2)
             elif st.startswith('q') or st.startswith('e'):
-                print "exit:%s"%(st)
+                print "exit:%s" % (st)
             else:
-                print "input error:%s"%(st)
+                print "input error:%s" % (st)
         except (IOError, EOFError, Exception) as e:
             print "Error", e
             import traceback
             traceback.print_exc()
-            cct.sleeprandom(ct.duration_sleep_time/2)
+            cct.sleeprandom(ct.duration_sleep_time / 2)
             # raw_input("Except")
-
 
             # sl.get_code_search_loop()
             # print data.describe()

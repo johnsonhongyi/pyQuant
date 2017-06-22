@@ -32,13 +32,16 @@ except ImportError:
 #     today = TODAY.strftime('%Y-%m-%d')
 #     return today
 
-global fibcount,except_count
+global fibcount, except_count
 fibcount = 0
 except_count = 0
+
+
 def time_sleep(timemin):
     time1 = time.time()
     time.sleep(timemin)
     return True
+
 
 def evalcmd(dir_mo):
     end = True
@@ -53,7 +56,7 @@ def evalcmd(dir_mo):
         # if cmd == 'e' or cmd == 'q' or len(cmd) == 0:
         if cmd == 'e' or cmd == 'q':
             break
-        elif len(cmd)==0:
+        elif len(cmd) == 0:
             continue
         else:
             try:
@@ -63,6 +66,7 @@ def evalcmd(dir_mo):
                 print e
                 evalcmd(dir_mo)
                 break
+
 
 def get_all_toplist():
     # gold = {}
@@ -256,30 +260,36 @@ def f_print(lens, datastr):
     return data
 
 
-def fibonacciCount(code, dl=60, start=None,days=0):
-    fibl=[]
-    if not isinstance(code,list):
+def fibonacciCount(code, dl=60, start=None, days=0):
+    fibl = []
+    if not isinstance(code, list):
         codes = [code]
     else:
         codes = code
     for code in codes:
-        df = tdd.get_tdx_append_now_df_api(code,dl=dl)
-        for ptype in ['low','high']:
+        df = tdd.get_tdx_append_now_df_api(code, dl=dl)
+        for ptype in ['low', 'high']:
             if ptype == 'low':
-                op, ra, st, daysData = pct.get_linear_model_status(code,df=df,filter='y', dl=dl, ptype=ptype, days=days)
-                dd,boll=getab.Get_BBANDS(df,days=days)
+                op, ra, st, daysData = pct.get_linear_model_status(
+                    code, df=df, filter='y', dl=dl, ptype=ptype, days=days)
+                dd, boll = getab.Get_BBANDS(df, days=days)
             else:
                 # df = tdd.get_tdx_append_now_df_api(code,dl=dl)
-                op, ra, st, daysData = pct.get_linear_model_status(code,df=df,filter='y', dl=dl, ptype=ptype, days=days)
-                dd,boll=getab.Get_BBANDS(df, dtype='d')
+                op, ra, st, daysData = pct.get_linear_model_status(
+                    code, df=df, filter='y', dl=dl, ptype=ptype, days=days)
+                dd, boll = getab.Get_BBANDS(df, dtype='d')
             fib = cct.getFibonacci(300, daysData[0])
             # log.debug('st:%s days:%s fib:%s'%(st,days,fib))
-            # print "%s op:%s ra:%s days:%s fib:%s %s" % (code, op, ra,days,fib, st)
+            # print "%s op:%s ra:%s days:%s fib:%s %s" % (code, op,
+            # ra,days,fib, st)
             if not daysData[1].ma5d[0]:
                 daysData[1].ma5d[0] = 0
-            fibl.append([code, op, ra,[daysData[0],int(daysData[1].ma5d[0])],fib,st])
+            fibl.append(
+                [code, op, ra, [daysData[0], int(daysData[1].ma5d[0])], fib, st])
     return fibl
-def get_hot_countNew(changepercent, rzrq,fibl=None,fibc=10):
+
+
+def get_hot_countNew(changepercent, rzrq, fibl=None, fibc=10):
     global fibcount
     if fibcount == 0 or fibcount >= fibc:
         if fibcount >= fibc:
@@ -287,19 +297,20 @@ def get_hot_countNew(changepercent, rzrq,fibl=None,fibc=10):
         else:
             fibcount += 1
         if fibl is not None:
-            int=0
+            int = 0
             for f in fibl:
-                code, op, ra,daysData,fib, st = f[0],f[1],f[2],f[3],f[4],f[5]
-                int +=1
-                if int%2 != 0:
-                    print "%s op:%s ra:%s d:%s fib:%s m5:%s  %s" % (code, f_print(3,op),f_print(5,ra),f_print(2,daysData[0]),f_print(3,fib),f_print(4,daysData[1]), st),
+                code, op, ra, daysData, fib, st = f[
+                    0], f[1], f[2], f[3], f[4], f[5]
+                int += 1
+                if int % 2 != 0:
+                    print "%s op:%s ra:%s d:%s fib:%s m5:%s  %s" % (code, f_print(3, op), f_print(5, ra), f_print(2, daysData[0]), f_print(3, fib), f_print(4, daysData[1]), st),
                 else:
-                    print "%s op:%s ra:%s d:%s fib:%s m5:%s " % (st,f_print(3,op), f_print(5,ra),f_print(2,daysData[0]),f_print(3,fib),f_print(4,daysData[1]))
+                    print "%s op:%s ra:%s d:%s fib:%s m5:%s " % (st, f_print(3, op), f_print(5, ra), f_print(2, daysData[0]), f_print(3, fib), f_print(4, daysData[1]))
 
     else:
         fibcount += 1
     allTop = pd.DataFrame()
-    indexKeys = [ 'sh','sz', 'cyb']
+    indexKeys = ['sh', 'sz', 'cyb']
     ffindex = ffu.get_dfcfw_fund_flow('all')
     ffall = {}
     ffall['zlr'] = 0
@@ -307,14 +318,15 @@ def get_hot_countNew(changepercent, rzrq,fibl=None,fibc=10):
 
     for market in indexKeys:
         # market = ct.SINA_Market_KEY()
-#        df = rd.get_sina_Market_json(market, False)
+        #        df = rd.get_sina_Market_json(market, False)
         df = sina_data.Sina().market(market)
         # count=len(df.index)
         log.info("market:%s" % df[:1])
         df = df.dropna()
         df = df[df.close > 0]
         if 'percent' not in df.columns:
-            df['percent'] = map(lambda x,y: round((x-y)/y*100, 1), df.close.values,df.llastp.values)
+            df['percent'] = map(lambda x, y: round(
+                (x - y) / y * 100, 1), df.close.values, df.llastp.values)
 
         if 'percent' in df.columns.values:
             # and len(df[:20][df[:20]['percent']>0])>3:
@@ -375,8 +387,8 @@ def get_hot_countNew(changepercent, rzrq,fibl=None,fibc=10):
     ff = ffall
     zzb = 0
     if len(ff) > 0:
-        zlr = round(float(ff['zlr']),1)
-        zzb = round(float(ff['zzb'])/3,1)
+        zlr = round(float(ff['zlr']), 1)
+        zzb = round(float(ff['zzb']) / 3, 1)
         zt = str(ff['time'])
         print(u"流入: %s亿 占比: %s%% %s" %
               (f_print(4, zlr), f_print(4, zzb), f_print(4, zt)))
@@ -397,24 +409,27 @@ def get_hot_countNew(changepercent, rzrq,fibl=None,fibc=10):
     else:
         print(u"\t\tSh: \t%s Vr:  \t%s Sz: \t%s Vr: \t%s ") % (0, 0, 0, 0)
     if len(hgt) > 0:
-        print("\t\tHgt: %s Ggt: %s Sgt: %s Gst: %s" % (hgt['hgt'], hgt['ggt'],szt['hgt'],szt['ggt']))
+        print("\t\tHgt: %s Ggt: %s Sgt: %s Gst: %s" %
+              (hgt['hgt'], hgt['ggt'], szt['hgt'], szt['ggt']))
     else:
-        print("\t\tHgt: \t%s Ggt: \t%s Sgt: %s Gst: %s" % (0, 0,0,0))
+        print("\t\tHgt: \t%s Ggt: \t%s Sgt: %s Gst: %s" % (0, 0, 0, 0))
     if len(rzrq) > 0:
-        shpcent = round((rzrq['shrz'] / rzrq['sh'] * 100), 1) if rzrq['sh'] > 0 else '?'
-        szpcent = round((rzrq['szrz'] / rzrq['sz'] * 100), 1) if rzrq['sz'] > 0 else '?'
+        shpcent = round((rzrq['shrz'] / rzrq['sh'] * 100),
+                        1) if rzrq['sh'] > 0 else '?'
+        szpcent = round((rzrq['szrz'] / rzrq['sz'] * 100),
+                        1) if rzrq['sz'] > 0 else '?'
         print(u"\tSh: %s rz:%s :%s%% sz: %s rz:%s :%s%% All: %s diff: %s亿" % (
-            f_print(5, rzrq['sh']), f_print(4, rzrq['shrz']), shpcent, f_print(5, rzrq['sz']), f_print(4, rzrq['szrz']),
+            f_print(5, rzrq['sh']), f_print(4, rzrq['shrz']), shpcent, f_print(
+                5, rzrq['sz']), f_print(4, rzrq['szrz']),
             szpcent, f_print(4, rzrq['all']), f_print(5, rzrq['dff'])))
     bigcount = rd.getconfigBigCount(count=None, write=True)
     # print bigcount
 
-
     cct.set_console(width, height,
-        title=['B:%s-%s V:%s' % (bigcount[0], bigcount[2], bigcount[1]), 'ZL: %s' % (zlr if len(ff) > 0 else 0),
-               'To:%s' % len(topTen), 'D:%s' % len(
-                crash), 'Sh: %s ' % ff['scent'] if len(ff) > 0 else '?', 'Vr:%s%% ' % ff['svol'] if len(ff) > 0 else '?',
-               'MR: %s' % zzb, 'ZL: %s' % (zlr if len(ff) > 0 else '?')])
+                    title=['B:%s-%s V:%s' % (bigcount[0], bigcount[2], bigcount[1]), 'ZL: %s' % (zlr if len(ff) > 0 else 0),
+                           'To:%s' % len(topTen), 'D:%s' % len(
+                        crash), 'Sh: %s ' % ff['scent'] if len(ff) > 0 else '?', 'Vr:%s%% ' % ff['svol'] if len(ff) > 0 else '?',
+                        'MR: %s' % zzb, 'ZL: %s' % (zlr if len(ff) > 0 else '?')])
 
     return allTop
 
@@ -457,14 +472,14 @@ if __name__ == '__main__':
     from docopt import docopt
     log = LoggerFactory.log
     args = docopt(cct.sina_doc, version='sina_cxdn')
-    # print args,args['--debug']
-    if args['--debug'] == 'debug':
+    # print args,args['-d']
+    if args['-d'] == 'debug':
         log_level = LoggerFactory.DEBUG
-    elif args['--debug'] == 'info':
+    elif args['-d'] == 'info':
         log_level = LoggerFactory.INFO
     else:
         log_level = LoggerFactory.ERROR
-    # log_level = LoggerFactory.DEBUG if args['--debug']  else LoggerFactory.ERROR
+    # log_level = LoggerFactory.DEBUG if args['-d']  else LoggerFactory.ERROR
     log.setLevel(log_level)
 
 #    log.setLevel(LoggerFactory.DEBUG)
@@ -491,10 +506,10 @@ if __name__ == '__main__':
     days = '10'
     success = 0
     rzrq = ffu.get_dfcfw_rzrq_SHSZ()
-    dl=34
+    dl = 34
     fibc = 3
     fibl = fibonacciCount(['999999', '399001', '399006'], dl=dl)
-    percentDuration=2
+    percentDuration = 2
     cct.get_terminal_Position(position=sys.argv[0])
     while 1:
         try:
@@ -502,12 +517,13 @@ if __name__ == '__main__':
                 if len(fibl) == 0 or fibcount >= fibc:
                     # print "change FibDiff"
                     fibcount = 0
-                    fibl = fibonacciCount(['999999', '399001', '399006'], dl=dl)
+                    fibl = fibonacciCount(
+                        ['999999', '399001', '399006'], dl=dl)
                 if len(rzrq) == 0 or rzrq['sh'] == 0 or rzrq['sz'] == 0 or rzrq['all'] == 0:
-                    if rzrq['shrz'] == 0 or rzrq['szrz'] == 0 or rzrq['dff'] == 0:
+                    if rzrq['shrz'] == 0 or rzrq['szrz'] == 0 or rzrq['dff'] == 0 or rzrq['all'] == 0:
                         log.warn("rzrq 0")
                     rzrq = ffu.get_dfcfw_rzrq_SHSZ()
-                get_hot_countNew(percentDuration, rzrq,fibl,fibc)
+                get_hot_countNew(percentDuration, rzrq, fibl, fibc)
                 fibcount += 1
             if status:
                 # status=True
@@ -613,9 +629,9 @@ if __name__ == '__main__':
                 dir_mo = eval(cct.eval_rule)
                 evalcmd(dir_mo)
             elif st.startswith('q') or st.startswith('e'):
-                print "exit:%s"%(st)
+                print "exit:%s" % (st)
             else:
-                print "input error:%s"%(st)
+                print "input error:%s" % (st)
                 # cct.sleep(0.5)
                 # if success > 3:
                 #     raw_input("Except")
@@ -632,12 +648,12 @@ if __name__ == '__main__':
             import traceback
             traceback.print_exc()
             # global except_count
-            except_count +=1
+            except_count += 1
             if except_count < 4:
-                cct.sleeprandom(ct.duration_sleep_time/2)
+                cct.sleeprandom(ct.duration_sleep_time / 2)
             else:
                 print "except_count >3"
-                cct.sleeprandom(ct.duration_sleep_time*2)
+                cct.sleeprandom(ct.duration_sleep_time * 2)
                 # sys.exit(0)
         # finally:
         #     cct.sleeprandom(ct.duration_sleep_time/2)

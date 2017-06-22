@@ -335,11 +335,11 @@ sina_doc="""sina_Johnson.
 
 Usage:
   sina_cxdn.py
-  sina_cxdn.py --debug <info>
+  sina_cxdn.py [-d <debug>]
 
 Options:
   -h --help     Show this screen.
-  --debug <info>    [default: error].
+  -d <debug>    [default: error].
 """
 
 sina_doc_old="""sina_Johnson.
@@ -1495,6 +1495,16 @@ def LineArgmain():
     # logger.setLevel(logging.ERROR)
     return parser
 
+def negate_boolean_list(negate_list,idx=1):
+    cout_all = len(negate_list)
+    if idx < cout_all:
+        sort_negate_l = [key ^ 1 for key in negate_list[:idx]]
+        sort_negate_l.extend(negate_list[idx:])
+    else:
+        sort_negate_l = [key ^ 1 for key in negate_list]
+
+    return sort_negate_l
+
 def sort_by_value(df,column='dff',file=None,count=5,num=5,asc=0):
     """[summary]
 
@@ -1633,14 +1643,14 @@ if __name__ == '__main__':
     from docopt import docopt
     log = LoggerFactory.log
     args = docopt(cct.sina_doc, version='sina_cxdn')
-    # print args,args['--debug']
-    if args['--debug'] == 'debug':
+    # print args,args['-d']
+    if args['-d'] == 'debug':
         log_level = LoggerFactory.DEBUG
-    elif args['--debug'] == 'info':
+    elif args['-d'] == 'info':
         log_level = LoggerFactory.INFO
     else:
         log_level = LoggerFactory.ERROR
-    # log_level = LoggerFactory.DEBUG if args['--debug']  else LoggerFactory.ERROR
+    # log_level = LoggerFactory.DEBUG if args['-d']  else LoggerFactory.ERROR
     log.setLevel(log_level)
         
     s_time=time.time()
