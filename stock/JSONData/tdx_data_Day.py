@@ -1297,7 +1297,7 @@ def Write_market_all_day_mp(market='all', rewrite=False):
 #        get_tdx_append_now_df_api2(code,dl=dl,dm=dz,newdays=5)
         # get_tdx_append_now_df_api_tofile('603113', dm=None, newdays=1, start=None, end=None, type='f', df=None, dl=2, power=True)
         results = cct.to_mp_run_async(
-            get_tdx_append_now_df_api_tofile, code_list, dm, 5)
+            get_tdx_append_now_df_api_tofile, code_list, dm, 0)
         # for code in code_list:
         #    print "code:%s "%(code),
         #    res=get_tdx_append_now_df_api_tofile(code,dm,5)
@@ -3186,7 +3186,7 @@ if __name__ == '__main__':
     from docopt import docopt
     log = LoggerFactory.log
     args = docopt(cct.sina_doc, version='sina_cxdn')
-    print args,args['-d']
+    # print args,args['-d']
     if args['-d'] == 'debug':
         log_level = LoggerFactory.DEBUG
     elif args['-d'] == 'info':
@@ -3212,7 +3212,7 @@ if __name__ == '__main__':
     # code = '600619'
 
     print get_tdx_append_now_df_api(code, start=None, end=None, type='f', df=None, dm=None, dl=20, power=True, newdays=0, write_tushare=False).T
-    # print get_tdx_append_now_df_api_tofile(code, dm=None, newdays=0, start=None, end=None, type='f', df=None, dl=2, power=True)
+    print get_tdx_append_now_df_api_tofile(code, dm=None, newdays=0, start=None, end=None, type='f', df=None, dl=2, power=True)
     # print get_tdx_Exp_day_to_df(code,dl=30,newdays=0)[:2]
     # print df
     # sys.exit(0)

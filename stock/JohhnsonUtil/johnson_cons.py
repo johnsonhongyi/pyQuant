@@ -45,6 +45,7 @@ sleep_time = 6
 tdx_max_int = 10
 wcd_limit_day = 30
 h5_limit_time = 180
+h5_power_limit_time = 1200
 big_H5_Size = 8
 sina_limit_time = 15
 h5_time_l_count = 6

@@ -165,6 +165,7 @@ def write_hdf_db(fname, df, table='all', index=False, baseCount=500, append=True
 #    if not os.path.exists(cct.get_ramdisk_dir()):
 #        log.info("NO RamDisk")
 #        return False
+    code_subdf = df.index.tolist()
     global RAMDISK_KEY
     if not RAMDISK_KEY < 1:
         return df
@@ -198,25 +199,25 @@ def write_hdf_db(fname, df, table='all', index=False, baseCount=500, append=True
                 if len(diff_columns) <> 0:
                     log.error("columns diff:%s" % (diff_columns))
 
-                df['timel'] = time.time()
+                limit_t = time.time()
+                df['timel'] = limit_t
                 # df_code = df.index.tolist()
 
                 df = cct.combine_dataFrame(tmpdf, df, col=None, append=append)
 
-                # if fname == 'powerCompute':
-                #     dif_co = list(set(tmpdf.index) & set(df_code))
-                #     dd = tmpdf.loc[dif_co]
-                #     o_time = sorted(set(dd.timel.tolist()))
-                #     o_time = [time.time() - t_x for t_x in o_time]
-#                    o_time_ra = int(o_time[0]/o_time[-1])
-#                    if cct.get_work_time() and len(o_time) > ct.h5_time_l_count:
-                    # if cct.get_work_time() and (len(o_time) > ct.h5_time_l_count):
-                    #     df['timel'] = time.time()
-                    #     log.error("%s %s o_time:%s %s" % (fname, table, len(
-                    #         o_time), [time.time() - t_x for t_x in o_time[:3]]))
 
                 if not append:
                     df['timel'] = time.time()
+                elif fname == 'powerCompute':
+                    o_time = df[df.timel < limit_t].timel.tolist()
+                    o_time = sorted(set(o_time), reverse=False)
+                    if len(o_time) > ct.h5_time_l_count:
+                        o_time = [time.time() - t_x for t_x in o_time]
+                        o_timel = len(o_time)
+                        o_time = np.mean(o_time)
+                        if o_time > ct.h5_power_limit_time * 1.5:
+                            df['timel'] = time.time()
+                            log.error("%s %s o_time:%.1f timel:%s" % (fname, table, o_time,o_timel))
 
     #            df=cct.combine_dataFrame(tmpdf, df, col=None,append=False)
                 log.info("read hdf time:%0.2f" % (time.time() - time_t))
@@ -365,7 +366,7 @@ def load_hdf_db(fname, table='all', code_l=None, timelimit=True, index=False, li
                         df = dd.loc[dif_co]
                 else:
                     if len(code_l) > ct.h5_time_l_count * 10 and INIT_LOG_Error < 5:
-                        INIT_LOG_Error += 1
+                        # INIT_LOG_Error += 1
                         log.error("fn:%s cl:%s h5:%s don't find:%s dra:%0.2f log_err:%s" % (
                             fname, len(code_l), len(dd), len(code_l) - len(dif_co), dratio, INIT_LOG_Error))
         else:
@@ -506,8 +507,12 @@ def load_hdf_db(fname, table='all', code_l=None, timelimit=True, index=False, li
 
 if __name__ == "__main__":
 
-    import tushare as ts
-    df = ts.get_k_data('300334', start='2017-04-01')
-    # with SafeHDFStore('example.h5') as store:
+#    import tushare as ts
+#    df = ts.get_k_data('300334', start='2017-04-01')
+    with SafeHDFStore('powerCompute.h5') as h5:
+        dd = h5['d_21_y_all']
+        print len(set(dd.timel))
+        print time.time()- np.mean(list(set(dd.timel)))
+
     # Only put inside this block the code which operates on the store
     # store['result'] = df

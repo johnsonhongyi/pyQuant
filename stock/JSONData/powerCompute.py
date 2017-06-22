@@ -898,6 +898,7 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y', tal
         h5_combine_status = True
         statuslist = False
 
+    # code_src = code_l
     global Power_CXG_Error, drop_cxg, wencai_drop
 #    drop_cxg
 
@@ -907,7 +908,7 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y', tal
                      'boll', 'rah', 'df2', 'fibl', 'macd', 'vstd', 'oph', 'lvolume']
     # [['ma' ,'rsi' ,'kdj' ,'boll', 'ra','rah', 'df2' ,'fibl','fib' ,'macd' ,'oph']]
     # [['ma' ,'rsi' ,'kdj' ,'boll', 'ra',rah', 'df2' ,'fibl','fib' ,'macd' ,'vstd', 'oph']]
-    h5 = h5a.load_hdf_db(h5_fname, h5_table, code_l=code_l, limit_time=1200)
+    h5 = h5a.load_hdf_db(h5_fname, h5_table, code_l=code_l, limit_time=ct.h5_power_limit_time)
     if h5 is not None:
         log.info("power hdf5 data:%s" % (len(h5)))
         if h5_combine_status:
@@ -1181,7 +1182,7 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y', tal
 
     # print "global:%s"%(cct.GlobalValues().getkey('dropcxg'))
 
-    h5 = h5a.write_hdf_db(h5_fname, df, table=h5_table, append=True)
+    h5 = h5a.write_hdf_db(h5_fname, df.loc[code_l], table=h5_table, append=True)
 
     print "Power:%s:%0.2f" % (len(code_l), time.time() - ts),
 
