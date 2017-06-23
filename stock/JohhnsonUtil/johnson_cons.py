@@ -34,7 +34,7 @@ duration_date_l = 10
 duration_date_up = 60
 duration_date_sort = 21
 lastdays = 3
-bollFilter = -10
+bollFilter = 11
 writeblockbakNum = 12
 checkfilter = True
 lastPower = False
@@ -171,7 +171,7 @@ Duration_format_trade = ['name', 'trade', 'boll', 'dff', 'df2',
                          'percent','per1d',  'per3d',  'ra', 'op', 'ratio', 'couts','volume', 'date', 'category']
 
 
-Monitor_format_trade = ['name', 'trade', 'boll', 'dff', 'df2',
+Monitor_format_trade = ['name', 'trade', 'boll', 'dff', 'df2','couts',
                         'percent','per1d','per3d', 'ra', 'op', 'fib', 'ratio',  'volume', 'category']
 MonitorMarket_format_buy = ['name', 'buy', 'boll', 'dff', 'df2',
                             'couts', 'percent', 'per1d', 'per3d','ra', 'op', 'ratio',  'volume', 'date', 'category']

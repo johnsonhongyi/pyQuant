@@ -130,7 +130,7 @@ if __name__ == "__main__":
     duration_date = ct.duration_date_l
     end_date = cct.last_tddate(days=3)
     # all_diffpath = tdd.get_tdx_dir_blocknew() + '062.blk'
-    market_sort_value = ct.Market_sort_idx['2']
+    market_sort_value = ct.Market_sort_idx['1']
     market_sort_value_key = eval(market_sort_value + '_key')
     while 1:
         try:

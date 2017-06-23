@@ -59,7 +59,8 @@ class SafeHDFStore(HDFStore):
                 break
             # except FileExistsError:
 #            except FileExistsError as e:
-            except (IOError, EOFError, Exception) as e:
+            # except (IOError, EOFError, Exception) as e:
+            except (IOError, OSError) as e:
                 # time.sleep(probe_interval)
                 log.error("IOError Error:%s" % (e))
                 if self.countlock <= 10:
@@ -75,7 +76,9 @@ class SafeHDFStore(HDFStore):
 #                log.info("safeHDF Except:%s"%(e))
 #                time.sleep(probe_interval)
 #                return None
+        # HDFStore.__init__(self, fname, *args, **kwargs)
         HDFStore.__init__(self, fname, *args, **kwargs)
+        
         # HDFStore.__init__(self,fname,complevel=self.complevel,complib=self.complib, **kwargs)
         # HDFStore.__init__(self,fname,format="table",complevel=self.complevel,complib=self.complib, **kwargs)
         # ptrepack --complib=zlib --complevel 9 --overwrite sina_data.h5 out.h5
@@ -102,6 +105,28 @@ class SafeHDFStore(HDFStore):
                     os.remove(self.temp_file)
             os.remove(self._lock)
             gc.collect()
+
+def clean_cols_for_hdf(data):
+    types = data.apply(lambda x: pd.lib.infer_dtype(x.values))
+    for col in types[types=='mixed'].index:
+        data[col] = data[col].astype(str)
+    # data[<your appropriate columns here>].fillna(0,inplace=True)
+    return data
+
+def write_hdf(f, key, df, complib):
+    """Append pandas dataframe to hdf5.
+
+    Args:
+    f       -- File path
+    key     -- Store key
+    df      -- Pandas dataframe
+    complib -- Compress lib 
+
+    NOTE: We use maximum compression w/ zlib.
+    """
+
+    with SafeHDF5Store(f, complevel=9, complib=complib) as store:
+        df.to_hdf(store, key, format='table', append=True)
 # with SafeHDFStore('example.hdf') as store:
 #     # Only put inside this block the code which operates on the store
 #     store['result'] = result
@@ -242,6 +267,7 @@ def write_hdf_db(fname, df, table='all', index=False, baseCount=500, append=True
             # da.index.get_loc('000005')     da.iloc[slice(22,33,None)]
             # mask = totals['dirty']+totals['swap'] > 1e7     result =
             # mask.loc[mask]
+            # store.remove('key_name', where='<where clause>')
             multi_code = tmpdf.index.get_level_values('code').unique().tolist()
             df_code = df.index.tolist()
             diff_code = set(df_code) - set(multi_code)
@@ -261,15 +287,17 @@ def write_hdf_db(fname, df, table='all', index=False, baseCount=500, append=True
                 log.info("col:%s" % (col))
                 df[col] = df[col].astype(str)
             df.index = df.index.astype(str)
-
+            df = df.fillna(0)
         with SafeHDFStore(fname) as h5:
             df = df.fillna(0)
             if h5 is not None:
                 if '/' + table in h5.keys():
                     h5.remove(table)
-                    h5[table] = df
+                    h5.put(table, df, format='table',data_columns=True,append=False)
                 else:
-                    h5[table] = df
+                    h5.put(table, df, format='table',data_columns=True, append=False)
+                h5.flush()
+                    # h5[table] = df
             else:
                 log.error("HDFile is None,Pls check:%s" % (fname))
     log.info("write hdf time:%0.2f" % (time.time() - time_t))
@@ -509,10 +537,17 @@ if __name__ == "__main__":
 
 #    import tushare as ts
 #    df = ts.get_k_data('300334', start='2017-04-01')
-    with SafeHDFStore('powerCompute.h5') as h5:
-        dd = h5['d_21_y_all']
-        print len(set(dd.timel))
-        print time.time()- np.mean(list(set(dd.timel)))
+    fname = ['sina_data.h5','tdx_last_df','powerCompute.h5','get_sina_all_ratio']
+    # fname = 'powerCompute.h5'
+    for na in fname:
+        with SafeHDFStore(na) as h5:
+            print h5
+        # print h5['d_21_y_all'].loc['300666']
+        # h5.remove('high_10_y_20170620_all_15')
+        # print h5
+        # dd = h5['d_21_y_all']
+        # print len(set(dd.timel))
+        # print time.time()- np.mean(list(set(dd.timel)))
 
     # Only put inside this block the code which operates on the store
     # store['result'] = df

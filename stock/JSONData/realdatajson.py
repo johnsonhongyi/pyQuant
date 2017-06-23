@@ -771,6 +771,7 @@ if __name__ == '__main__':
     # print len(df)
     for mk in ['sz','cyb','sh']:
         df=get_sina_Market_json(mk,num=100)
+        # print df.loc['600581']
         print "mk:\t",len(df)
     import tushare as ts
     s_t=time.time()

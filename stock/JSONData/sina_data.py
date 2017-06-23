@@ -582,6 +582,7 @@ if __name__ == "__main__":
     for ma in ['sh','sz','cyb','all']:
     # for ma in ['sh']:
         df = Sina().market(ma)
+        # print df.loc['600581']
         # print len(sina.all)
         print "market:%s %s"%(ma,len(df))
         # print df[df.code == '600581']

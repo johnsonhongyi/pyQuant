@@ -10,7 +10,7 @@ log = LoggerFactory.log
 import time
 
 
-def getBollFilter(df=None, boll=-5, duration=ct.PowerCountdl, filter=True, ma5d=True, dl=14, percent=False):
+def getBollFilter(df=None, boll=11, duration=ct.PowerCountdl, filter=True, ma5d=True, dl=14, percent=False):
 
     # drop_cxg = cct.GlobalValues().getkey('dropcxg')
     # if len(drop_cxg) >0:
@@ -64,7 +64,7 @@ def getBollFilter(df=None, boll=-5, duration=ct.PowerCountdl, filter=True, ma5d=
             df = df[(df.per1d > 9) | (df.per2d > 4) | (df.per3d > 6)]
             # df = df[df.oph > 10]
         if 'boll' in df.columns:
-            return df[df.boll >= boll]
+            return df[(df.boll >= boll) | (df.percent > 6) | (df.per2d > 6) ]
 
     return df
 

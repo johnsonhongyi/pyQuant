@@ -1018,7 +1018,7 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y', tal
                     tdx_df = tdx_df[:-days]
                     print len(tdx_df)
                 tdx_days = len(tdx_df)
-                if tdx_days < 16:
+                if 8 < tdx_days < 16:
                     if tdx_days > 6:
                         top_count = 0
                         for day in range(len(tdx_df), 0, -1):
@@ -1056,6 +1056,9 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y', tal
                         if Power_CXG_Error < 2:
                             log.error('CXG Good:%s' % (code))
                         continue
+                elif tdx_days <= 8:
+                    drop_cxg.append(code)
+                    continue
 
             else:
                 df.loc[code, 'op'] = 0
@@ -1166,6 +1169,7 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y', tal
 
     if len(drop_cxg) > 0:
         drop_cxg = list(set(drop_cxg))
+        code_l = [co for co in code_l if co not in drop_cxg]
         drop_t = [co for co in drop_cxg if co in df.index]
         if len(drop_t) > 0:
             Power_CXG_Error += 1

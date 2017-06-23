@@ -91,7 +91,7 @@ if __name__ == "__main__":
     blkname = '064.blk'
     block_path = tdd.get_tdx_dir_blocknew() + blkname
     lastpTDX_DF = pd.DataFrame()
-    market_sort_value = ct.Market_sort_idx['6']
+    market_sort_value = ct.Market_sort_idx['8']
     market_sort_value_key = eval(market_sort_value + '_key')
     while 1:
         try:
