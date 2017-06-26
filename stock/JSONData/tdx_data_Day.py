@@ -149,7 +149,7 @@ def write_all_kdata_to_file(code, f_path, df=None):
     print "writeCode:%s size:%s" % (code, os.path.getsize(f_path) / 50)
 
 
-def get_tdx_Exp_day_to_df(code, start=None, end=None, dl=None, newdays=None, type='f', wds=True, lastdays=3):
+def get_tdx_Exp_day_to_df(code, start=None, end=None, dl=None, newdays=None, type='f', wds=True, lastdays=3, resample='d'):
     """[get local tdx data]
     [description]
     Arguments:
@@ -170,7 +170,7 @@ def get_tdx_Exp_day_to_df(code, start=None, end=None, dl=None, newdays=None, typ
     # h5 = h5a.load_hdf_db(h5_fname, table=h5_table, code_l=codelist)
     # if h5 is not None and not h5.empty:
     #     return h5
-
+    resample_dtype = ['d', 'w', 'm']
     start = cct.day8_to_day10(start)
     end = cct.day8_to_day10(end)
     if dl is not None and dl < 70:
@@ -272,6 +272,8 @@ def get_tdx_Exp_day_to_df(code, start=None, end=None, dl=None, newdays=None, typ
             #            df.drop_duplicates('date',inplace=True)
             df = df.set_index('date')
             df = df.sort_index(ascending=True)
+            if not resample == 'd' and resample in resample_dtype:
+                df = get_tdx_stock_period_to_type(df, period_day=resample)
             df['ma5d'] = pd.rolling_mean(df.close, 5)
             df['ma10d'] = pd.rolling_mean(df.close, 10)
             df['ma20d'] = pd.rolling_mean(df.close, 20)
@@ -282,7 +284,7 @@ def get_tdx_Exp_day_to_df(code, start=None, end=None, dl=None, newdays=None, typ
             df['cmean'] = round(df.close[-tdx_max_int:max_int_end].mean(), 2)
             df['hv'] = df.vol[-tdx_max_int:max_int_end].max()
             df['lv'] = df.vol[-tdx_max_int:max_int_end].min()
-            if df.close[-5:].max() > df.open[-5:].min() * 1.6:
+            if resample == 'd' and df.close[-5:].max() > df.open[-5:].min() * 1.6:
                 # if initTdxdata < 3:
                 log.error("%s dl None outdata!" % (code))
                 initTdxdata += 1
@@ -365,7 +367,7 @@ def get_tdx_Exp_day_to_df(code, start=None, end=None, dl=None, newdays=None, typ
         data_l = data.split('\n')
         if newstockdayl == 0:
             if len(data_l) < 2:
-                if write_k_data_status:
+                if write_k_data_status and resample == 'd':
                     write_all_kdata_to_file(code, file_path)
                     data = cct.read_last_lines(file_path, inxdl)
                     data_l = data.split('\n')
@@ -399,7 +401,8 @@ def get_tdx_Exp_day_to_df(code, start=None, end=None, dl=None, newdays=None, typ
                 #     break
         df = pd.DataFrame(dt_list, columns=ct.TDX_Day_columns)
         # df.sort_index(ascending=False, inplace=True)
-        df = compute_lastdays_percent(df, lastdays=lastdays)
+        if resample == 'd':
+            df = compute_lastdays_percent(df, lastdays=lastdays)
 
         if start is not None and end is not None:
             df = df[(df.date >= start) & (df.date <= end)]
@@ -416,6 +419,11 @@ def get_tdx_Exp_day_to_df(code, start=None, end=None, dl=None, newdays=None, typ
             if 'date' in df.columns:
                 df = df.set_index('date')
             df = df.sort_index(ascending=True)
+            if not resample == 'd' and resample in resample_dtype:
+                df = get_tdx_stock_period_to_type(df, period_day=resample)
+                df = compute_lastdays_percent(df, lastdays=lastdays)
+                if 'date' in df.columns:
+                    df = df.set_index('date')
             df['ma5d'] = pd.rolling_mean(df.close, 5)
             df['ma10d'] = pd.rolling_mean(df.close, 10)
             df['ma20d'] = pd.rolling_mean(df.close, 20)
@@ -427,7 +435,7 @@ def get_tdx_Exp_day_to_df(code, start=None, end=None, dl=None, newdays=None, typ
             df['hv'] = df.vol[-tdx_max_int:max_int_end].max()
             df['lv'] = df.vol[-tdx_max_int:max_int_end].min()
             dratio = (dl - len(df)) / float(dl)
-            if dratio < 0.2 and df.close[-5:].max() > df.open[-5:].min() * 1.6:
+            if resample == 'd' and dratio < 0.2 and df.close[-5:].max() > df.open[-5:].min() * 1.6:
 
                 # if initTdxdata < 3:
                 log.error("%s start:%s df:%s dl:%s outdata!" %
@@ -1852,7 +1860,8 @@ def compute_lastdays_percent(df=None, lastdays=3):
         if 'date' in df.columns:
             df = df.set_index('date')
         df = df.sort_index(ascending=True)
-        df = df[df.index < cct.get_today()]
+        if cct.get_work_day_status() and 915 < cct.get_now_time_int() < 1500:
+            df = df[df.index < cct.get_today()]
         df = df.fillna(0)
         for da in range(1, lastdays + 1, 1):
             df['lastp%sd' % da] = df['close'].shift(da)
@@ -1946,7 +1955,7 @@ def get_tdx_exp_low_or_high_price(code, dt=None, ptype='close', dl=None, end=Non
         return dd
 
 
-def get_tdx_exp_low_or_high_power(code, dt=None, ptype='close', dl=None, end=None, power=False, lastp=False, newdays=None):
+def get_tdx_exp_low_or_high_power(code, dt=None, ptype='close', dl=None, end=None, power=False, lastp=False, newdays=None, resample='d'):
     '''
     :param code:999999
     :param dayl:Duration Days
@@ -1959,7 +1968,7 @@ def get_tdx_exp_low_or_high_power(code, dt=None, ptype='close', dl=None, end=Non
     if dt is not None or dl is not None:
         # log.debug("dt:%s dl:%s"%(dt,dl))
         df = get_tdx_Exp_day_to_df(
-            code, start=dt, dl=dl, end=end, newdays=newdays).sort_index(ascending=False)
+            code, start=dt, dl=dl, end=end, newdays=newdays, resample=resample).sort_index(ascending=False)
         if df is not None and len(df) > 0:
 
             if power:
@@ -2047,6 +2056,7 @@ def get_tdx_exp_low_or_high_power(code, dt=None, ptype='close', dl=None, end=Non
                 log.debug("date:%s %s:%s" % (lowdate, ptype, lowp))
                 # log.debug("date:%s %s:%s" % (dt, ptype, lowp))
                 dd = df[df.index == lowdate].copy()
+#                if not isinstance(dd,Series):
                 if ptype == 'high':
                     lowp = dz.low.min()
                     dd.low = lowp
@@ -2061,10 +2071,11 @@ def get_tdx_exp_low_or_high_power(code, dt=None, ptype='close', dl=None, end=Non
                     dd['date'] = dt
                     # print dd
                 if 'ma5d' in df.columns and 'ma10d' in df.columns:
-                    if df[:1].ma5d[0] is not None and df[:1].ma5d[0] != 0:
-                        dd['ma5d'] = round(float(df[:1].ma5d[0]), 2)
-                    if df[:1].ma10d[0] is not None and df[:1].ma10d[0] != 0:
-                        dd['ma10d'] = round(float(df[:1].ma10d[0]), 2)
+#                    print df[:1],code
+                    if len(df.ma5d) > 0 and df[:1].ma5d.values[0] is not None and df[:1].ma5d.values[0] != 0:
+                        dd['ma5d'] = round(float(df[:1].ma5d.values[0]), 2)
+                    if len(df.ma10d) > 0 and df[:1].ma10d.values[0] is not None and df[:1].ma10d.values[0] != 0:
+                        dd['ma10d'] = round(float(df[:1].ma10d.values[0]), 2)
             else:
                 dd = Series()
 
@@ -2288,7 +2299,7 @@ def get_tdx_all_day_LastDF(codeList, type=0, dt=None, ptype='close'):
     return df
 
 
-def get_append_lastp_to_df(top_all, lastpTDX_DF=None, dl=ct.PowerCountdl, end=None, ptype='low', filter='y', power=True, lastp=False, newdays=None, checknew=False):
+def get_append_lastp_to_df(top_all, lastpTDX_DF=None, dl=ct.PowerCountdl, end=None, ptype='low', filter='y', power=True, lastp=False, newdays=None, checknew=False, resample='d'):
     codelist = top_all.index.tolist()
 #    codelist = ['603169']
     log.info('toTDXlist:%s' % len(codelist))
@@ -2296,10 +2307,10 @@ def get_append_lastp_to_df(top_all, lastpTDX_DF=None, dl=ct.PowerCountdl, end=No
     h5_fname = 'tdx_last_df'
     # market=ptype+'_'+str(dl)+'_'+filter+'_'+str(len(codelist))
     if end is not None:
-        h5_table = ptype + '_' + str(dl) + '_' + filter + \
+        h5_table = ptype + '_' + resample + '_' + str(dl) + '_' + filter + \
             '_' + end.replace('-', '') + '_' + 'all'
     else:
-        h5_table = ptype + '_' + str(dl) + '_' + filter + '_' + 'all'
+        h5_table = ptype + '_' + resample + '_' + str(dl) + '_' + filter + '_' + 'all'
 
     # if newdays is not None:
     #     h5_table = h5_table + '_'+ str(newdays)
@@ -2324,7 +2335,7 @@ def get_append_lastp_to_df(top_all, lastpTDX_DF=None, dl=ct.PowerCountdl, end=No
             # powerCompute'''
             print "td.",
             tdxdata = get_tdx_exp_all_LastDF_DL(
-                codelist, dt=dl, end=end, ptype=ptype, filter=filter, power=power, lastp=lastp, newdays=newdays)
+                codelist, dt=dl, end=end, ptype=ptype, filter=filter, power=power, lastp=lastp, newdays=newdays, resample=resample)
             # if checknew:
             #     tdx_list = tdxdata.index.tolist()
             #     diff_code = list(set(codelist) - set(tdx_list))
@@ -2379,7 +2390,7 @@ def get_append_lastp_to_df(top_all, lastpTDX_DF=None, dl=ct.PowerCountdl, end=No
             log.error("tdx Out:%s code:%s" % (len(diff_code), diff_code[:2]))
             log.debug("diff_code:%s" % (diff_code))
             tdx_diff = get_tdx_exp_all_LastDF_DL(
-                diff_code, dt=dl, end=end, ptype=ptype, filter=filter, power=power, lastp=lastp, newdays=0)
+                diff_code, dt=dl, end=end, ptype=ptype, filter=filter, power=power, lastp=lastp, newdays=0, resample=resample)
             if tdx_diff is not None and len(tdx_diff) > 0:
                 tdx_diff.rename(columns={'open': 'lopen'}, inplace=True)
                 tdx_diff.rename(columns={'high': 'lhigh'}, inplace=True)
@@ -2516,7 +2527,7 @@ def get_tdx_exp_all_LastDF(codeList, dt=None, end=None, ptype='low', filter='n')
     return df
 
 
-def get_tdx_exp_all_LastDF_DL(codeList, dt=None, end=None, ptype='low', filter='n', power=False, lastp=False, newdays=None, dl=None):
+def get_tdx_exp_all_LastDF_DL(codeList, dt=None, end=None, ptype='low', filter='n', power=False, lastp=False, newdays=None, dl=None, resample='d'):
     time_t = time.time()
     # df = rl.get_sina_Market_json(market)
     # code_list = np.array(df.code)
@@ -2548,7 +2559,7 @@ def get_tdx_exp_all_LastDF_DL(codeList, dt=None, end=None, ptype='low', filter='
                 dt = None
             log.info("LastDF:%s,%s" % (dt, dl))
         results = cct.to_mp_run_async(
-            get_tdx_exp_low_or_high_power, codeList, dt, ptype, dl, end, power, lastp, newdays)
+            get_tdx_exp_low_or_high_power, codeList, dt, ptype, dl, end, power, lastp, newdays, resample)
         # results = get_tdx_exp_low_or_high_price(codeList[0], dt,ptype,dl)
 #        results=[]
 #        for code in codeList:
@@ -2590,14 +2601,14 @@ def get_tdx_exp_all_LastDF_DL(codeList, dt=None, end=None, ptype='low', filter='
 
         if len(codeList) > 150:
             results = cct.to_mp_run_async(
-                get_tdx_exp_low_or_high_power, codeList, dt, ptype, dl, end, power, lastp, newdays)
+                get_tdx_exp_low_or_high_power, codeList, dt, ptype, dl, end, power, lastp, newdays, resample)
         else:
             results = []
             ts = time.time()
             for code in codeList:
                 ts_1 = time.time()
                 results.append(get_tdx_exp_low_or_high_power(
-                    code, dt, ptype, dl, end, power, lastp, newdays))
+                    code, dt, ptype, dl, end, power, lastp, newdays, resample))
 #            print round(time.time()-ts_1,2),
 #        print round(time.time()-ts,2),
         # print dt,ptype,dl,end
@@ -2686,14 +2697,27 @@ def get_tdx_search_day_DF(market='cyb'):
     return results
 
 
-def get_tdx_stock_period_to_type(stock_data, type='w'):
-    period_type = type
+def get_tdx_stock_period_to_type(stock_data, period_day='w',periods=5):
+    period_type = period_day
     # 转换周最后一日变量
-    stock_data.index = pd.to_datetime(stock_data.index, format='%Y-%m-%d')
-    period_stock_data = stock_data.resample(period_type, how='last')
+    if cct.get_work_day_status() and 915 < cct.get_now_time_int() < 1500:
+        stock_data = stock_data[stock_data.index < cct.get_today()]
+    if stock_data.index.name == 'date':
+        stock_data.index = pd.to_datetime(stock_data.index, format='%Y-%m-%d')
+    elif 'date' in stock_data.columns:
+        df = df.set_index('date')
+        df = df.sort_index(ascending=True)
+        stock_data.index = pd.to_datetime(stock_data.index, format='%Y-%m-%d')
+    else:
+        log.error("index.name not date,pls check:%s"%(stock_data[:1]))
+
+    period_stock_data = stock_data.resample(period_type,how='last')
     # 周数据的每日change连续相乘
     # period_stock_data['percent']=stock_data['percent'].resample(period_type,how=lambda x:(x+1.0).prod()-1.0)
     # 周数据open等于第一日
+    # print stock_data.index[0],stock_data.index[-1]
+    # period_stock_data.index = pd.DatetimeIndex(start=stock_data.index.values[0],end=stock_data.index.values[-1],freq='BM')
+
     period_stock_data['open'] = stock_data[
         'open'].resample(period_type, how='first')
     # 周high等于Max high
@@ -2709,12 +2733,18 @@ def get_tdx_stock_period_to_type(stock_data, type='w'):
     # 计算周线turnover,【traded_market_value】 流通市值【market_value】 总市值【turnover】 换手率，成交量/流通股本
     # period_stock_data['turnover']=period_stock_data['vol']/(period_stock_data['traded_market_value'])/period_stock_data['close']
     # 去除无交易纪录
-    period_stock_data = period_stock_data[period_stock_data['code'].notnull()]
+    stock_data['date'] =  stock_data.index
+    period_stock_data.index = stock_data['date'].resample(period_type,how='last')
+    
+    if 'code' in period_stock_data.columns:
+        period_stock_data = period_stock_data[period_stock_data['code'].notnull()]
     # period_stock_data.reset_index(inplace=True)
     # period_stock_data.set_index('date',inplace=True)
-    period_stock_data.index = map(
-        lambda x: str(x)[:10], period_stock_data.index)
-    # print period_stock_data[:1].index
+
+    if period_stock_data.index.name == 'date':
+        period_stock_data.index = map(lambda x: str(x)[:10], period_stock_data.index)
+        period_stock_data.index.name = 'date'
+
     return period_stock_data
 
 
@@ -2811,7 +2841,6 @@ def testnumba(number=500):
     # rands)),number=number)
 
 
-
 if __name__ == '__main__':
     import sys
     import timeit
@@ -2843,9 +2872,11 @@ if __name__ == '__main__':
     code = '600581'
     # code = '600619'
 
-    print get_tdx_append_now_df_api(code, start=None, end=None, type='f', df=None, dm=None, dl=6, power=True, newdays=0, write_tushare=False).T
+    print get_tdx_Exp_day_to_df(code, dl=30, newdays=0, resample='w')[:2]
+    print get_tdx_Exp_day_to_df(code, dl=60, newdays=0, resample='m')[:2]
+    # print get_tdx_Exp_day_to_df(code, dl=30, newdays=0, resample='d')[:2]
+    # print get_tdx_append_now_df_api(code, start=None, end=None, type='f', df=None, dm=None, dl=6, power=True, newdays=0, write_tushare=False).T
     # print get_tdx_append_now_df_api_tofile(code, dm=None, newdays=0, start=None, end=None, type='f', df=None, dl=2, power=True)
-    # print get_tdx_Exp_day_to_df(code,dl=30,newdays=0)[:2]
     # print df
     # sys.exit(0)
 #    print write_tdx_tushare_to_file(code)

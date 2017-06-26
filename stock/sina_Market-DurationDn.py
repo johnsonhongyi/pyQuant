@@ -105,6 +105,7 @@ if __name__ == "__main__":
 #    duration_date = ct.duration_date
     duration_date = ct.duration_date_l
     du_date = duration_date
+    resample = ct.resample_dtype
     # print cct.last_tddate(2)
     # end_date = cct.last_tddate(days=int(duration_date/4))
     end_date = cct.last_tddate(days=ct.lastdays)
@@ -161,11 +162,11 @@ if __name__ == "__main__":
                     print "term:%s" % (cct.get_terminal_Position(cmd='DurationDn.py')),
                     if cct.get_terminal_Position(cmd='DurationDn.py') > 1:
                         top_all, lastpTDX_DF = tdd.get_append_lastp_to_df(
-                            top_now, lastpTDX_DF=None, dl=duration_date, end=end_date, ptype=ptype, filter=filter, power=ct.lastPower, lastp=lastp, newdays=newdays)
+                            top_now, lastpTDX_DF=None, dl=duration_date, end=end_date, ptype=ptype, filter=filter, power=ct.lastPower, lastp=lastp, newdays=newdays, resample=resample)
                     else:
                         newdays = 15
                         top_all, lastpTDX_DF = tdd.get_append_lastp_to_df(
-                            top_now, lastpTDX_DF=None, dl=duration_date, end=end_date, ptype=ptype, filter=filter, power=ct.lastPower, lastp=lastp, newdays=newdays, checknew=True)
+                            top_now, lastpTDX_DF=None, dl=duration_date, end=end_date, ptype=ptype, filter=filter, power=ct.lastPower, lastp=lastp, newdays=newdays, checknew=True, resample=resample)
                     # codelist = top_all.index.tolist()
                     # log.info('toTDXlist:%s' % len(codelist))
                     # # tdxdata = tdd.get_tdx_all_day_LastDF(codelist,dt=duration_date,ptype=ptype)
@@ -333,11 +334,11 @@ if __name__ == "__main__":
                     top_all = tdd.get_powerdf_to_all(top_all, top_temp)
                     top_all = tdd.get_powerdf_to_all(top_all, top_end)
                     top_temp = stf.getBollFilter(
-                        df=top_temp, boll=ct.bollFilter, duration=ct.PowerCountdl)
+                        df=top_temp, boll=ct.bollFilter, duration=ct.PowerCountdl,resample=resample)
                     print("N:%s K:%s %s G:%s" % (
                         now_count, len(top_all[top_all['buy'] > 0]),
                         len(top_now[top_now['volume'] <= 0]), goldstock)),
-                    print "Rt:%0.1f dT:%s N:%s T:%s %s%%" % (float(time.time() - time_Rt), cct.get_time_to_date(time_s), cct.get_now_time(), len(top_temp), round(len(top_temp) / now_count * 100, 3))
+                    print "Rt:%0.1f dT:%s N:%s T:%s %s%%" % (float(time.time() - time_Rt), cct.get_time_to_date(time_s), cct.get_now_time(), len(top_temp), round(len(top_temp) / float(ct.PowerCount) * 100, 1))
                     # print round(len(top_temp)/now_count*100,1)
                     # print len(top_temp)/now_count*100
 

@@ -103,6 +103,7 @@ if __name__ == "__main__":
     # duration_date = ct.duration_date
     duration_date = ct.duration_date_l
     du_date = duration_date
+    resample = ct.resample_dtype
     end_date = None
     ptype = 'low'
     filter = 'y'
@@ -147,7 +148,7 @@ if __name__ == "__main__":
 
                     # time_Rt = time.time()
                     top_all, lastpTDX_DF = tdd.get_append_lastp_to_df(
-                        top_now, lastpTDX_DF=None, dl=duration_date, end=end_date, ptype=ptype, filter=filter, power=ct.lastPower, lastp=False)
+                        top_now, lastpTDX_DF=None, dl=duration_date, end=end_date, ptype=ptype, filter=filter, power=ct.lastPower, lastp=False, resample=resample)
                     log.debug("len:%s" % (len(top_all)))
                     # codelist = top_all.index.tolist()
                     # log.info('toTDXlist:%s' % len(codelist))
@@ -315,11 +316,11 @@ if __name__ == "__main__":
                     top_all = tdd.get_powerdf_to_all(top_all, top_temp)
                     top_all = tdd.get_powerdf_to_all(top_all, top_end)
 
-                    top_temp = stf.getBollFilter(df=top_temp, boll=ct.bollFilter, duration=ct.PowerCountdl)
+                    top_temp = stf.getBollFilter(df=top_temp, boll=ct.bollFilter, duration=ct.PowerCountdl,resample=resample)
                     print("N:%s K:%s %s G:%s" % (
                         now_count, len(top_all[top_all['buy'] > 0]),
                         len(top_now[top_now['volume'] <= 0]), goldstock)),
-                    print "Rt:%0.1f dT:%s N:%s T:%s %0.1f%%" % (float(time.time() - time_Rt), cct.get_time_to_date(time_s), cct.get_now_time(), len(top_temp), round(len(top_temp) / now_count * 100, 1))
+                    print "Rt:%0.1f dT:%s N:%s T:%s %0.1f%%" % (float(time.time() - time_Rt), cct.get_time_to_date(time_s), cct.get_now_time(), len(top_temp), round(len(top_temp) / float(ct.PowerCount) * 100, 1))
                     # top_end = stf.getBollFilter(df=top_end, boll=ct.bollFilter,duration=ct.PowerCountdl)
                     if 'op' in top_temp.columns:
                         if cct.get_now_time_int() > ct.checkfilter_end_timeDu and (int(duration_date) > int(ct.duration_date_sort) or int(duration_date) < ct.duration_diff):

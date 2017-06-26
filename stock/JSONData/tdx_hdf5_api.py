@@ -64,7 +64,7 @@ class SafeHDFStore(HDFStore):
                 # time.sleep(probe_interval)
                 log.error("IOError Error:%s" % (e))
                 if self.countlock <= 10:
-                    time.sleep(random.randint(1, 3))
+                    time.sleep(random.randint(1, 4))
                     # time.sleep(random.randint(0,5))
                     self.countlock += 1
                 else:
@@ -78,7 +78,7 @@ class SafeHDFStore(HDFStore):
 #                return None
         # HDFStore.__init__(self, fname, *args, **kwargs)
         HDFStore.__init__(self, fname, *args, **kwargs)
-        
+
         # HDFStore.__init__(self,fname,complevel=self.complevel,complib=self.complib, **kwargs)
         # HDFStore.__init__(self,fname,format="table",complevel=self.complevel,complib=self.complib, **kwargs)
         # ptrepack --complib=zlib --complevel 9 --overwrite sina_data.h5 out.h5
@@ -120,7 +120,7 @@ def write_hdf(f, key, df, complib):
     f       -- File path
     key     -- Store key
     df      -- Pandas dataframe
-    complib -- Compress lib 
+    complib -- Compress lib
 
     NOTE: We use maximum compression w/ zlib.
     """
@@ -190,6 +190,7 @@ def write_hdf_db(fname, df, table='all', index=False, baseCount=500, append=True
 #    if not os.path.exists(cct.get_ramdisk_dir()):
 #        log.info("NO RamDisk")
 #        return False
+    df = df.fillna(0)
     code_subdf = df.index.tolist()
     global RAMDISK_KEY
     if not RAMDISK_KEY < 1:

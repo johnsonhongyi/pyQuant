@@ -128,6 +128,7 @@ if __name__ == "__main__":
     block_path = tdd.get_tdx_dir_blocknew() + blkname
     lastpTDX_DF = pd.DataFrame()
     duration_date = ct.duration_date_l
+    resample = ct.resample_dtype
     end_date = cct.last_tddate(days=3)
     # all_diffpath = tdd.get_tdx_dir_blocknew() + '062.blk'
     market_sort_value = ct.Market_sort_idx['1']
@@ -167,10 +168,11 @@ if __name__ == "__main__":
                     terminal_count = cct.get_terminal_Position(position=sys.argv[0])
                     print "term:%s" % (terminal_count),
                     if terminal_count > 1:
-                        top_all, lastpTDX_DF = tdd.get_append_lastp_to_df(top_now, lastpTDX_DF=None, dl=duration_date)
+                        top_all, lastpTDX_DF = tdd.get_append_lastp_to_df(
+                            top_now, lastpTDX_DF=None, dl=duration_date, resample=resample)
                     else:
                         top_all, lastpTDX_DF = tdd.get_append_lastp_to_df(
-                            top_now, lastpTDX_DF=None, dl=duration_date, checknew=True)
+                            top_now, lastpTDX_DF=None, dl=duration_date, checknew=True, resample=resample)
                     # time_Rt = time.time()
                     # top_all,lastpTDX_DF = tdd.get_append_lastp_to_df(top_now,end=end_date,dl=duration_date)
                 elif len(top_all) == 0 and len(lastpTDX_DF) > 0:
@@ -240,12 +242,12 @@ if __name__ == "__main__":
 
                     top_all = tdd.get_powerdf_to_all(top_all, top_temp)
                     # top_temp = stf.getBollFilter(df=top_temp, boll=ct.bollFilter,duration=ct.PowerCountdl)
-                    top_temp = stf.getBollFilter(df=top_temp, boll=-10, duration=ct.PowerCountdl)
+                    top_temp = stf.getBollFilter(df=top_temp, boll=-10, duration=ct.PowerCountdl,resample=resample)
                     print("A:%s N:%s K:%s %s G:%s" % (
                         df_count, now_count, len(top_all[top_all['buy'] > 0]),
                         len(top_now[top_now['volume'] <= 0]), goldstock)),
                     # print "Rt:%0.3f" % (float(time.time() - time_Rt))
-                    print "Rt:%0.1f dT:%s N:%s T:%s %s%%" % (float(time.time() - time_Rt), cct.get_time_to_date(time_s), cct.get_now_time(), len(top_temp), round(len(top_temp) / now_count * 100, 1))
+                    print "Rt:%0.1f dT:%s N:%s T:%s %s%%" % (float(time.time() - time_Rt), cct.get_time_to_date(time_s), cct.get_now_time(), len(top_temp), round(len(top_temp) / float(ct.PowerCount) * 100, 1))
                     if 'op' in top_temp.columns:
 
                         if duration_date > ct.duration_date_sort:
