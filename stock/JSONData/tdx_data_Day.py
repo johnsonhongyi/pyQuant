@@ -2702,6 +2702,7 @@ def get_tdx_stock_period_to_type(stock_data, period_day='w',periods=5):
     # 转换周最后一日变量
     if cct.get_work_day_status() and 915 < cct.get_now_time_int() < 1500:
         stock_data = stock_data[stock_data.index < cct.get_today()]
+    stock_data['date'] =  stock_data.index
     if stock_data.index.name == 'date':
         stock_data.index = pd.to_datetime(stock_data.index, format='%Y-%m-%d')
     elif 'date' in stock_data.columns:
@@ -2733,18 +2734,17 @@ def get_tdx_stock_period_to_type(stock_data, period_day='w',periods=5):
     # 计算周线turnover,【traded_market_value】 流通市值【market_value】 总市值【turnover】 换手率，成交量/流通股本
     # period_stock_data['turnover']=period_stock_data['vol']/(period_stock_data['traded_market_value'])/period_stock_data['close']
     # 去除无交易纪录
-    stock_data['date'] =  stock_data.index
     period_stock_data.index = stock_data['date'].resample(period_type,how='last')
-    
+    # print period_stock_data.index[:1]
     if 'code' in period_stock_data.columns:
         period_stock_data = period_stock_data[period_stock_data['code'].notnull()]
     # period_stock_data.reset_index(inplace=True)
     # period_stock_data.set_index('date',inplace=True)
-
+    # print period_stock_data.columns,period_stock_data.index.name
     if period_stock_data.index.name == 'date':
         period_stock_data.index = map(lambda x: str(x)[:10], period_stock_data.index)
         period_stock_data.index.name = 'date'
-
+    # print period_stock_data
     return period_stock_data
 
 

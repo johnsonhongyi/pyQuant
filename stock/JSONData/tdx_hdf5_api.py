@@ -59,8 +59,8 @@ class SafeHDFStore(HDFStore):
                 break
             # except FileExistsError:
 #            except FileExistsError as e:
-            # except (IOError, EOFError, Exception) as e:
-            except (IOError, OSError) as e:
+            except (IOError, EOFError, Exception) as e:
+            # except (IOError, OSError) as e:
                 # time.sleep(probe_interval)
                 log.error("IOError Error:%s" % (e))
                 if self.countlock <= 10:
