@@ -106,7 +106,8 @@ if __name__ == "__main__":
 #    duration_date = 120
     # duration_date = 300
     du_date = duration_date
-    resample = ct.resample_dtype
+    # resample = ct.resample_dtype
+    resample = 'w'
     end_date = None
     ptype = 'low'
     filter = 'y'
