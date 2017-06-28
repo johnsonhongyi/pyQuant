@@ -1857,6 +1857,9 @@ def get_duration_price_date(code=None, ptype='low', dt=None, df=None, dl=None, e
 
 def compute_lastdays_percent(df=None, lastdays=3):
     if df is not None and len(df) > lastdays:
+        if len(df) > lastdays + 1:
+            lastdays = len(df) - 1
+            lastdays = lastdays if lastdays < 6 else 5
         if 'date' in df.columns:
             df = df.set_index('date')
         df = df.sort_index(ascending=True)
@@ -2742,6 +2745,7 @@ def get_tdx_stock_period_to_type(stock_data, period_day='w',periods=5):
     # period_stock_data.set_index('date',inplace=True)
     # print period_stock_data.columns,period_stock_data.index.name
     if period_stock_data.index.name == 'date':
+        # stock_data.index = pd.to_datetime(stock_data.index, format='%Y-%m-%d')
         period_stock_data.index = map(lambda x: str(x)[:10], period_stock_data.index)
         period_stock_data.index.name = 'date'
     # print period_stock_data
@@ -2896,7 +2900,8 @@ if __name__ == '__main__':
         h5_fname = 'tdx_df'
         dl = 30
         h5_table = 'all' + '_' + str(dl)
-        for code in dfcode[:50]:
+        # for code in dfcode[:500]:
+        for code in dfcode[:500]:
             # for code in dfcode:
             df = get_tdx_Exp_day_to_df(code, dl=dl)
             # print df
@@ -2905,9 +2910,9 @@ if __name__ == '__main__':
             if len(df) > 0:
                 df.index = map(lambda x: x.replace(
                     '-', '').replace('\n', ''), df.index)
-                df.index = df.index.astype(int)
+                df.index = df.index.astype(str)
                 df.index.name = 'date'
-                df.code = df.code.astype(int)
+                df.code = df.code.astype(str)
                 # df.info()
                 # if 'code' in df.columns:
                 # df.drop(['code'],axis=1,inplace=True)
@@ -2916,7 +2921,7 @@ if __name__ == '__main__':
                 df = df.astype(float)
                 # xcode = cct.code_to_symbol(code)
                 dd = pd.concat([dd, df], axis=0)
-                print ".", len(dd)
+                # print ".", len(dd)
                 # st.append(xcode,df)
                 put_time = time.time()
                 # st.put("df", df, format="table", append=True, data_columns=['code','date'])
@@ -2942,7 +2947,7 @@ if __name__ == '__main__':
                 # log.error("code :%s is None"%(code))
                 #
         h5a.write_hdf_db(h5_fname, dd, table=h5_table,
-                         index=False, baseCount=500, append=False)
+                         index=False, baseCount=500, append=False,MultiIndex=True)
         print("hdf5 all :%s  time:%0.2f" % (len(dfcode), time.time() - time_s))
         # st.close()
 

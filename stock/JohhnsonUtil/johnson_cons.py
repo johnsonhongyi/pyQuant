@@ -47,12 +47,12 @@ tdx_max_int = 10
 wcd_limit_day = 30
 h5_limit_time = 180
 h5_power_limit_time = 1200
-big_H5_Size = 8
+big_H5_Size = 10
 sina_limit_time = 15
 h5_time_l_count = 6
-sina_dd_limit_time = 360
+sina_dd_limit_time = 300
 diffcode = 0.2
-duration_sleep_time = 45
+duration_sleep_time = 60
 
 # powerdiff = 'ra * fibl + rah*(abs(float(%s)-fibl))/fib +ma +kdj+rsi'
 '''

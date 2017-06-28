@@ -547,7 +547,7 @@ if __name__ == '__main__':
             int_time = cct.get_now_time_int()
             if cct.get_work_time():
                 if int_time < 1000:
-                    cct.sleep(60)
+                    cct.sleep(45)
                 else:
                     cct.sleep(ct.duration_sleep_time)
             int_time = cct.get_now_time_int()

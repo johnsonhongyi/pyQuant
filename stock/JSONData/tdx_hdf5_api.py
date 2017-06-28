@@ -16,9 +16,10 @@ import numpy as np
 import subprocess
 log = LoggerFactory.log
 import gc
-global RAMDISK_KEY, INIT_LOG_Error
+global RAMDISK_KEY, INIT_LOG_Error,Compress_Count
 RAMDISK_KEY = 0
 INIT_LOG_Error = 0
+Compress_Count = 1
 BaseDir = cct.get_ramdisk_dir()
 
 
@@ -35,7 +36,7 @@ class SafeHDFStore(HDFStore):
         self.write_status = False
         self.complevel = 9
         self.complib = 'zlib'
-        self.ptrepack_cmds = "ptrepack --chunkshape=auto --propindexes --complevel=9 --complib=blosc %s %s"
+        self.ptrepack_cmds = "ptrepack --chunkshape=auto --propindexes --complevel=9 --complib=%s %s %s"
         self.big_H5_Size = ct.big_H5_Size
         global RAMDISK_KEY
         if not os.path.exists(baseDir):
@@ -92,19 +93,61 @@ class SafeHDFStore(HDFStore):
             HDFStore.__exit__(self, *args, **kwargs)
             os.close(self._flock)
             h5_size = os.path.getsize(self.fname) / 1000 / 1000
-            if h5_size > self.big_H5_Size:
-                log.info("h5_size:%sM" % (h5_size))
+            # print ("h5_size:%s"%(h5_size))
+            global Compress_Count
+            if h5_size > self.big_H5_Size * Compress_Count:
+                log.error("h5_size:%sM" % (h5_size))
                 os.rename(self.fname, self.temp_file)
                 p = subprocess.Popen(self.ptrepack_cmds % (
-                    self.temp_file, self.fname), shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+                    self.complib,self.temp_file, self.fname), shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
                 p.wait()
                 if p.returncode != 0:
                     log.error("ptrepack hdf Error.:%s" % (self.fname))
                     # return -1
                 else:
                     os.remove(self.temp_file)
+                Compress_Count +=1
+
             os.remove(self._lock)
             gc.collect()
+
+'''
+https://stackoverflow.com/questions/21126295/how-do-you-create-a-compressed-dataset-in-pytables-that-can-store-a-unicode-stri/21128497#21128497
+>>> h5file = pt.openFile("test1.h5",'w')
+>>> recordStringInHDF5(h5file, h5file.root, 'mrtamb',
+    u'\u266b Hey Mr. Tambourine Man \u266b')
+
+/mrtamb (CArray(30,), shuffle, zlib(5)) ''
+  atom := UInt8Atom(shape=(), dflt=0)
+  maindim := 0
+  flavor := 'numpy'
+  byteorder := 'irrelevant'
+  chunkshape := (65536,)
+
+>>> h5file.flush()
+>>> h5file.close()
+>>> h5file = pt.openFile("test1.h5")
+>>> print retrieveStringFromHDF5(h5file.root.mrtamb)
+
+♫ Hey Mr. Tambourine Man ♫
+
+'''
+def recordStringInHDF5(h5file, group, nodename, s, complevel=5, complib='zlib'):
+    '''creates a CArray object in an HDF5 file
+    that represents a unicode string'''
+
+    bytes = np.fromstring(s.encode('utf-8'),np.uint8)
+    atom = pt.UInt8Atom()
+    filters = pt.Filters(complevel=complevel, complib=complib)
+    ca = h5file.create_carray(group, nodename, atom, shape=(len(bytes),),
+                               filters=filters)
+    ca[:] = bytes
+    return ca
+
+def retrieveStringFromHDF5(node):
+    return unicode(node.read().tostring(), 'utf-8')
+
+
 
 def clean_cols_for_hdf(data):
     types = data.apply(lambda x: pd.lib.infer_dtype(x.values))
@@ -182,7 +225,7 @@ def get_hdf5_file(fpath, wr_mode='r', complevel=9, complib='zlib', mutiindx=Fals
     # return store
 
 
-def write_hdf_db(fname, df, table='all', index=False, baseCount=500, append=True, MultiIndex=False):
+def write_hdf_db(fname, df, table='all', index=False,complib='zlib',baseCount=500, append=True, MultiIndex=False):
     if 'code' in df.columns:
         df = df.set_index('code')
 #    write_status = False
@@ -195,15 +238,9 @@ def write_hdf_db(fname, df, table='all', index=False, baseCount=500, append=True
     global RAMDISK_KEY
     if not RAMDISK_KEY < 1:
         return df
-#    if df is not None and not df.empty and len(df) > 0:
-#        dd = df.dtypes.to_frame()
-#        if 'object' in dd.values:
-#            dd = dd[dd == 'object'].dropna()
-#            col = dd.index.tolist()
-#            log.info("col:%s"%(col))
-#            df[col] = df[col].astype(str)
-#        df.index = df.index.astype(str)
-    df['timel'] = time.time()
+
+    if not MultiIndex:
+        df['timel'] = time.time()
     if df is not None and not df.empty and table is not None:
         # h5 = get_hdf5_file(fname,wr_mode='r')
         tmpdf = []
@@ -211,6 +248,7 @@ def write_hdf_db(fname, df, table='all', index=False, baseCount=500, append=True
             if store is not None:
                 if '/' + table in store.keys():
                     tmpdf = store[table]
+
         if not MultiIndex:
             if index:
                 # log.error("debug index:%s %s %s"%(df,index,len(df)))
@@ -254,6 +292,8 @@ def write_hdf_db(fname, df, table='all', index=False, baseCount=500, append=True
                          (time.time() - time_t))
         else:
             # df.loc[(df.index.get_level_values('code')== 600004)]
+            # df.loc[(df.index.get_level_values('code')== '600199')]
+            # da.swaplevel(0, 1, axis=0).loc['2017-05-25']
             # df.loc[(600004,20170414),:]
             # df.xs(20170425,level='date')
             # df.index.get_level_values('code').unique()
@@ -269,11 +309,20 @@ def write_hdf_db(fname, df, table='all', index=False, baseCount=500, append=True
             # mask = totals['dirty']+totals['swap'] > 1e7     result =
             # mask.loc[mask]
             # store.remove('key_name', where='<where clause>')
-            multi_code = tmpdf.index.get_level_values('code').unique().tolist()
-            df_code = df.index.tolist()
-            diff_code = set(df_code) - set(multi_code)
-            # da.drop(('000001','2017-05-11'))
-            pass
+            
+            if tmpdf is not None and len(tmpdf) > 0:
+                # multi_code = tmpdf.index.get_level_values('code').unique().tolist()
+                multi_code = tmpdf.index.get_level_values('code').unique().tolist()
+                inx_key = multi_code[random.randint(0,len(multi_code))]
+                if inx_key in df.index.get_level_values('code'):
+                    now_time = df.loc[inx_key].index[-1]
+                    tmp_time =  tmpdf.loc[inx_key].index[-1]
+                    if now_time == tmp_time:
+                        log.error("%s %s Multi out time in hdf5:%s"%(fname,table,now_time))
+                        return False
+                # da.drop(('000001','2017-05-11'))
+            else:
+                pass
 
     time_t = time.time()
     if df is not None and not df.empty and table is not None:
@@ -281,26 +330,43 @@ def write_hdf_db(fname, df, table='all', index=False, baseCount=500, append=True
         if df is not None and not df.empty and len(df) > 0:
             dd = df.dtypes.to_frame()
 
-        if not MultiIndex:
-            if 'object' in dd.values:
-                dd = dd[dd == 'object'].dropna()
-                col = dd.index.tolist()
-                log.info("col:%s" % (col))
+        if 'object' in dd.values:
+            dd = dd[dd == 'object'].dropna()
+            col = dd.index.tolist()
+            log.info("col:%s" % (col))
+            if not MultiIndex:
                 df[col] = df[col].astype(str)
-            df.index = df.index.astype(str)
-            df = df.fillna(0)
+                df.index = df.index.astype(str)
+                df = df.fillna(0)
+            # else:
+            #     print col
+            #     for co in col:
+            #         print ('object:%s'%(co))
+                # df = df.drop(col,axis=1)
+#                    df[co] = df[co].apply()
+#                    recordStringInHDF5(h5file, h5file.root, 'mrtamb',u'\u266b Hey Mr. Tambourine Man \u266b')
+
         with SafeHDFStore(fname) as h5:
             df = df.fillna(0)
             if h5 is not None:
                 if '/' + table in h5.keys():
-                    h5.remove(table)
-                    h5.put(table, df, format='table',data_columns=True,append=False)
+                    if not MultiIndex:
+                        h5.remove(table)
+                        h5.put(table, df, format='table',data_columns=True,append=False)
+                    else:
+                        h5.put(table, df, format='table',complib=complib,data_columns=True,append=True)
+                        # h5.append(table, df, format='table', append=True,data_columns=True, dropna=None)
                 else:
-                    h5.put(table, df, format='table',data_columns=True, append=False)
+                    if not MultiIndex:
+                        h5.put(table, df, format='table',data_columns=True, append=False)
+                    else:
+                        h5.put(table, df, format='table',complib=complib,data_columns=True,append=True)
+                        # h5.append(table, df, format='table', append=True, data_columns=True, dropna=None)
+                        # h5[table]=df
                 h5.flush()
-                    # h5[table] = df
             else:
                 log.error("HDFile is None,Pls check:%s" % (fname))
+
     log.info("write hdf time:%0.2f" % (time.time() - time_t))
 
     return True

@@ -110,10 +110,11 @@ if __name__ == "__main__":
     ptype = 'high'
     # op, ra, duration_date, days = pct.get_linear_model_status('999999', filter='y', dl=dl, ptype=ptype, days=1)
     # duration_date = ct.duration_date
-    duration_date = ct.duration_date_l
+    duration_date = ct.duration_date_up
     # duration_date = 30
     du_date = duration_date
-    resample = ct.resample_dtype
+    # resample = ct.resample_dtype
+    resample = 'w'
     newdays = 18
     # print cct.last_tddate(2)
     # end_date = cct.last_tddate(days=int(duration_date/4))
@@ -150,8 +151,8 @@ if __name__ == "__main__":
             # top_now = tdd.getSinaAlldf(market='次新股',filename='cxg', vol=ct.json_countVol, vtype=ct.json_countType)
             time_Rt = time.time()
             # top_now = tdd.getSinaAlldf(market='网络安全+雄安新区',filename='wlaq', vol=ct.json_countVol, vtype=ct.json_countType)
-            top_now = tdd.getSinaAlldf(market=u'京津冀', filename='beijing', vol=ct.json_countVol, vtype=ct.json_countType)
-            # top_now = tdd.getSinaAlldf(market='all', vol=ct.json_countVol, vtype=ct.json_countType)
+            # top_now = tdd.getSinaAlldf(market=u'京津冀', filename='beijing', vol=ct.json_countVol, vtype=ct.json_countType)
+            top_now = tdd.getSinaAlldf(market='sh', vol=ct.json_countVol, vtype=ct.json_countType)
 
             now_count = len(top_now)
             radio_t = cct.get_work_time_ratio()

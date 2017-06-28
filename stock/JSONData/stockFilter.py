@@ -10,7 +10,7 @@ log = LoggerFactory.log
 import time
 
 
-def getBollFilter(df=None, boll=11, duration=ct.PowerCountdl, filter=True, ma5d=True, dl=14, percent=False, resample='d'):
+def getBollFilter(df=None, boll=6, duration=ct.PowerCountdl, filter=True, ma5d=True, dl=14, percent=False, resample='d'):
 
     # drop_cxg = cct.GlobalValues().getkey('dropcxg')
     # if len(drop_cxg) >0:
@@ -52,9 +52,10 @@ def getBollFilter(df=None, boll=11, duration=ct.PowerCountdl, filter=True, ma5d=
         #         df = df[ ((df.ma5d * ct.changeRatio < df.low) & (df.low < df.ma5d * (2 - ct.changeRatio))) | ((df.percent > 1) & (df.volume > 3))]
         # print df.loc['000801']
         if 'vstd' in df.columns:
-            # df = df[(df.lvol * df.volume > (df.vstd + df.lvol)) | ((df.percent > -5) & (df.hv/df.lv > 3))]
             df = df[(df.lvol * df.volume > (df.vstd + df.lvol)) |
                     ((df.percent > -10) & (df.hv / df.lv > 1.2))]
+
+            # df = df[(df.lvol * df.volume > (df.vstd + df.lvol)) | ((df.percent > -5) & (df.hv/df.lv > 3))]
             # [dd.lvol * dd.volume > (dd.vstd + dd.lvol) | dd.lvol * dd.volume >(dd.ldvolume + dd.vstd]
         # print df.loc['000801']
 

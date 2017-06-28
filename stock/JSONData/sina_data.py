@@ -538,9 +538,29 @@ class Sina:
         # cct.get_now_time()))
         log.info("hdf:all%s %s"%(len(df),len(self.stock_codes)))
         h5a.write_hdf_db(self.hdf_name,df,self.table,index=index)
+        dd = df.copy()
+        if not index and len(df) > 3000:
+            time_s=time.time()
+            df.index = df.index.astype(str)
+            # df.ticktime = df.ticktime.astype(str)
+            df.ticktime = map(lambda x: int(x.replace(':', '')), df.ticktime)
+            if 'code' not in df.columns:
+                df = df.reset_index()
+            if 'dt' in df.columns:
+                df = df.drop(['dt'],axis=1)
+                # df.dt = df.dt.astype(str)
+            if 'name' in df.columns:
+                # df.name = df.name.astype(str)
+                df = df.drop(['name'],axis=1)
+            df = df.set_index(['code', 'ticktime'])
+            h5_fname = 'sina_MultiIndex_data'
+            h5_table = 'all' + '_'+ str(ct.sina_limit_time)
+            h5a.write_hdf_db(h5_fname, df, table=h5_table,index=False, baseCount=500, append=False,MultiIndex=True)
+            log.info("hdf5 class all :%s  time:%0.2f" % (len(df), time.time() - time_s))
+
 #        self.index_status = False
         log.info("wr end:%0.2f"%(time.time() - self.start_t))
-        return df
+        return dd
         # df = pd.DataFrame.from_dict(stock_dict, orient='columns',
         #                             columns=['name', 'open', 'close', 'now', 'high', 'low', 'buy', 'sell', 'turnover',
         #                                      'volume', 'bid1_volume', 'bid1', 'bid2_volume', 'bid2', 'bid3_volume',
@@ -573,12 +593,74 @@ if __name__ == "__main__":
     # print df
     # df = sina.get_stock_code_data('000001',index=True).set_index('code')
     # df= sina.get_stock_code_data('999999,399001',index=True)
-    df = sina.get_stock_code_data('000026')
-    print df.T
+    # df = sina.get_stock_code_data('000026')
+    # print df.T
 #    print sina.get_stock_code_data('002873')
     # print sina.get_stock_code_data('600199,300334',index=False)
     # print len(sina.market('sh'))
-    # sys.exit(0)
+
+    time_s = time.time()
+    dd = pd.DataFrame()
+    # st=h5a.get_hdf5_file(f_name, wr_mode='w', complevel=9, complib='zlib',mutiindx=True)
+    h5_fname = 'sina_multi_index'
+    dl = 30
+    h5_table = 'all' + '_' + str(dl)
+    df = Sina().market('all')
+    if 1 and len(df) > 0:
+        # stock_data.index = pd.to_datetime(stock_data.index, format='%Y-%m-%d')
+        # period_stock_data.index = map(lambda x: str(x)[:10], period_stock_data.index)
+        # df.index = map(lambda x: x.replace('-', '').replace('\n', ''), df.index)
+        # df.index = pd.to_datetime(df.index, format='%Y-%m-%d')
+        df.index = df.index.astype(str)
+        # df.index.name = 'date'
+        # df.index = df.index.astype(int)
+        # df.ticktime = df.ticktime.astype(str)
+        # df.ticktime = pd.to_datetime(df.ticktime, format='%H:%M:%S').dt.time()
+        df.ticktime = map(lambda x: int(x.replace(':', '')), df.ticktime)
+        if 'code' not in df.columns:
+            df = df.reset_index()
+        if 'dt' in df.columns:
+            df = df.drop(['dt'],axis=1)
+            # df.dt = df.dt.astype(str)
+        if 'name' in df.columns:
+            df = df.drop(['name'],axis=1)
+        if 'timel' in df.columns:
+            df = df.drop(['timel'],axis=1)
+            # df.name = df.name.astype(str)
+        df = df.set_index(['code', 'ticktime'])
+        # df = df.astype(float)
+        # xcode = cct.code_to_symbol(code)
+        # dd = pd.concat([dd, df], axis=0)
+        print df.loc[('600151')].index[-1]
+        print ".", len(df)
+        # st.append(xcode,df)
+        put_time = time.time()
+        # st.put("df", df, format="table", append=True, data_columns=['code','date'])
+        # print "t:%0.1f"%(time.time()-put_time),
+        # aa[aa.index.get_level_values('code')==333]
+        # st.select_column('df','code').unique()
+        # %timeit st.select_column('df','code')
+        # %timeit st.select('df',columns=['close'])
+        # result_df = df.loc[(df.index.get_level_values('A') > 1.7) & (df.index.get_level_values('B') < 666)]
+        # x.loc[(x.A>=3.3)&(x.A<=6.6)]
+        # st[xcode]=df
+        '''
+        Traceback (most recent call last):
+          File "tdx_data_Day.py", line 3013, in <module>
+            df = get_tdx_Exp_day_to_df(code,dl=30)
+          File "tdx_data_Day.py", line 200, in get_tdx_Exp_day_to_df
+            topen = float(a[1])
+        IndexError: list index out of range
+        Closing remaining open files:/Volumes/RamDisk/tdx_all_df_30.h5...done
+        '''
+        # print df
+        # print df.shape
+        # log.error("code :%s is None"%(code))
+        time_s = time.time()
+        h5a.write_hdf_db(h5_fname, df, table=h5_table,index=False, baseCount=500, append=False,MultiIndex=True)
+        print("hdf5 main all :%s  time:%0.2f" % (len(df), time.time() - time_s))
+
+    sys.exit(0)
     for ma in ['sh','sz','cyb','all']:
     # for ma in ['sh']:
         df = Sina().market(ma)

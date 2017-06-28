@@ -233,12 +233,12 @@ def get_sina_Market_json(market='all', showtime=True, num='100', retry_count=3, 
         if 'code' in df.columns:
             df=df.drop_duplicates('code')
             df = df.set_index('code')
-        if market == 'all':
-            append_status = False
-        else:
-            append_status = True
+#        if market == 'all':
+#            append_status = False #(new all don't append main )
+#        else:
+#        append_status = True
 
-        h5 = h5a.write_hdf_db(h5_fname, df, table=h5_table,append=append_status)
+        h5 = h5a.write_hdf_db(h5_fname, df, table=h5_table,append=True)
         if showtime: print ("Market-df:%s %s" % (format((time.time() - start_t), '.1f'), len(df))),
 
         return df
