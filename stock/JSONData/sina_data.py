@@ -539,11 +539,12 @@ class Sina:
         log.info("hdf:all%s %s"%(len(df),len(self.stock_codes)))
         h5a.write_hdf_db(self.hdf_name,df,self.table,index=index)
         dd = df.copy()
-        if not index and len(df) > 3000:
+        if not index and len(df) > 3000 and 930 < cct.get_now_time_int() < 1501:
             time_s=time.time()
             df.index = df.index.astype(str)
-            # df.ticktime = df.ticktime.astype(str)
-            df.ticktime = map(lambda x: int(x.replace(':', '')), df.ticktime)
+            df.ticktime = df.ticktime.astype(str)
+            # df.ticktime = map(lambda x: int(x.replace(':', '')), df.ticktime)
+            df = df.loc[:,['open','high','low','close','llastp','volume','ticktime']]
             if 'code' not in df.columns:
                 df = df.reset_index()
             if 'dt' in df.columns:
