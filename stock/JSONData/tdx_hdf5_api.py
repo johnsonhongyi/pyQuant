@@ -101,7 +101,7 @@ class SafeHDFStore(HDFStore):
             global Compress_Count
             if Compress_Count == 1 and self.h5_size_org > self.big_H5_Size_limit:
                 # Compress_Count += int(self.h5_size_org / self.big_H5_Size_limit)
-                log.info("Compress_Count init:%s h5_size_org:%s"%(Compress_Count,self.h5_size_org))
+                log.info("Compress_Count init:%s h5_size_org:%s" % (Compress_Count, self.h5_size_org))
             if h5_size > self.big_H5_Size_limit * Compress_Count:
                 log.error("h5_size:%sM Limit:%s" % (h5_size, self.big_H5_Size_limit * Compress_Count))
                 os.rename(self.fname, self.temp_file)
@@ -137,6 +137,9 @@ https://stackoverflow.com/questions/21126295/how-do-you-create-a-compressed-data
 >>> print retrieveStringFromHDF5(h5file.root.mrtamb)
 
 ♫ Hey Mr. Tambourine Man ♫
+
+write-performance
+https://stackoverflow.com/questions/20083098/improve-pandas-pytables-hdf5-table-write-performance
 
 '''
 
@@ -361,15 +364,17 @@ def write_hdf_db(fname, df, table='all', index=False, complib='blosc', baseCount
                 if '/' + table in h5.keys():
                     if not MultiIndex:
                         h5.remove(table)
-                        h5.put(table, df, format='table',index=False, data_columns=True, append=False)
+                        h5[table] = df
+                        # h5.put(table, df, format='table',index=False, data_columns=True, append=False)
                     else:
-                        h5.put(table, df, format='table',index=False, complib=complib, data_columns=True, append=True)
+                        h5.put(table, df, format='table', index=False, complib=complib, data_columns=True, append=True)
                         # h5.append(table, df, format='table', append=True,data_columns=True, dropna=None)
                 else:
                     if not MultiIndex:
-                        h5.put(table, df, format='table',index=False, data_columns=True, append=False)
+                        h5[table] = df
+                        # h5.put(table, df, format='table',index=False, data_columns=True, append=False)
                     else:
-                        h5.put(table, df, format='table',index=False, complib=complib, data_columns=True, append=True)
+                        h5.put(table, df, format='table', index=False, complib=complib, data_columns=True, append=True)
                         # h5.append(table, df, format='table', append=True, data_columns=True, dropna=None)
                         # h5[table]=df
                 h5.flush()
