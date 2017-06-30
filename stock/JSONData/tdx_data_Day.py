@@ -1859,7 +1859,7 @@ def compute_lastdays_percent(df=None, lastdays=3):
     if df is not None and len(df) > lastdays:
         if len(df) > lastdays + 1:
             lastdays = len(df) - 1
-            lastdays = lastdays if lastdays < 8 else 8
+            lastdays = lastdays if lastdays < ct.compute_lastdays else ct.compute_lastdays
         if 'date' in df.columns:
             df = df.set_index('date')
         df = df.sort_index(ascending=True)

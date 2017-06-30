@@ -1631,7 +1631,7 @@ def combine_dataFrame(maindf,subdf,col=None,compare=None,append=False,clean=True
     if append:
         dif_co = list(set(maindf_co)-set(subdf_co))
         if len(dif_co) > 0:
-            log.error("columns col:%s %s"%(dif_co,eval(("maindf.%s")%(dif_co[0]))[1]))
+            log.error("col:%s %s"%(dif_co[:3],eval(("maindf.%s")%(dif_co[0]))[1]))
     return maindf
 
 if __name__ == '__main__':

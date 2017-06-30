@@ -62,7 +62,7 @@ h5_time_l_count = 6
 sina_dd_limit_time = 300
 diffcode = 0.2
 duration_sleep_time = 60
-
+compute_lastdays = 6
 # powerdiff = 'ra * fibl + rah*(abs(float(%s)-fibl))/fib +ma +kdj+rsi'
 '''
             ma  rsi  kdj  boll    ra   rah    df2  fibl  fib  macd  oph
