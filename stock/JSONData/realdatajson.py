@@ -461,10 +461,11 @@ def get_sina_all_json_dd(vol='0', type='0', num='10000', retry_count=3, pause=0.
             # for i in range(2, ct.PAGE_NUM[0]):
             #     newdf = _parsing_dayprice_json(i)
             #     df = df.append(newdf, ignore_index=True)
+            # print "dd",
+            time_drop=time.time()
             df['couts']=df.groupby(['code'])['code'].transform('count')
             # df=df[(df['kind'] == 'U')]
             df=df.sort_values(by='couts',ascending=0)
-            time_drop=time.time()
             df=df.drop_duplicates('code')
             print "djdf:%0.1f"%(time.time()-time_drop),
             # df=df[df.price >df.prev_price]

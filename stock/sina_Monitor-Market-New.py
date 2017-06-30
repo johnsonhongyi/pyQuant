@@ -98,8 +98,7 @@ if __name__ == "__main__":
     # initTdx = True
     # all_diffpath = tdd.get_tdx_dir_blocknew() + '062.blk'
     status_change = False
-    market_sort_value = ct.Market_sort_idx['2']
-    market_sort_value_key = eval(market_sort_value + '_key')
+    market_sort_value, market_sort_value_key = ct.get_market_sort_value_key('2')
     while 1:
         try:
             # df = sina_data.Sina().all
@@ -254,10 +253,11 @@ if __name__ == "__main__":
                     print "Rt:%0.1f dT:%s N:%s T:%s %s%%" % (float(time.time() - time_Rt), cct.get_time_to_date(time_s), cct.get_now_time(), len(top_temp), round(len(top_temp) / float(ct.PowerCount) * 100, 1))
                     if 'op' in top_temp.columns:
 
-                        top_temp = top_temp.sort_values(by=eval(market_sort_value),
+                        top_temp = top_temp.sort_values(by=(market_sort_value),
                                                         ascending=market_sort_value_key)
                     #     top_temp = top_temp.loc[:,ct.MonitorMarket_format_buy]
-                    print rl.format_for_print(top_temp.loc[:, ct.MonitorMarket_format_buy][:10])
+                    ct_MonitorMarket_Values = ct.get_Duration_format_Values(ct.MonitorMarket_format_buy, market_sort_value[0])
+                    print rl.format_for_print(top_temp.loc[:, ct_MonitorMarket_Values][:10])
                     # print rl.format_for_print(top_dif[:10])
                     # print top_all.loc['000025',:]
                     # print "staus",status
@@ -313,12 +313,9 @@ if __name__ == "__main__":
                 status = False
             elif len(st.split()[0]) == 1 and st.split()[0].isdigit():
                 st_l = st.split()
-                st = st_l[0]
-                if st in ct.Market_sort_idx.keys():
-                    market_sort_value = ct.Market_sort_idx[st]
-                    market_sort_value_key = eval(market_sort_value + '_key')
-                    if len(st_l) > 1 and st_l[1] == 'f':
-                        market_sort_value_key = cct.negate_boolean_list(market_sort_value_key)
+                st_k = st_l[0]
+                if st_k in ct.Market_sort_idx.keys() and len(top_all) > 0:
+                    market_sort_value, market_sort_value_key = ct.get_market_sort_value_key(st, top_all=top_all)
                 else:
                     log.error("market_sort key error:%s" % (st))
                     cct.sleeprandom(5)

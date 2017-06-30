@@ -594,8 +594,8 @@ if __name__ == "__main__":
     # print df
     # df = sina.get_stock_code_data('000001',index=True).set_index('code')
     # df= sina.get_stock_code_data('999999,399001',index=True)
-    # df = sina.get_stock_code_data('000026')
-    # print df.T
+    df = sina.get_stock_code_data('600007')
+    print df.T
 #    print sina.get_stock_code_data('002873')
     # print sina.get_stock_code_data('600199,300334',index=False)
     # print len(sina.market('sh'))

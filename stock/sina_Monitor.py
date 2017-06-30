@@ -91,8 +91,7 @@ if __name__ == "__main__":
     blkname = '064.blk'
     block_path = tdd.get_tdx_dir_blocknew() + blkname
     lastpTDX_DF = pd.DataFrame()
-    market_sort_value = ct.Market_sort_idx['8']
-    market_sort_value_key = eval(market_sort_value + '_key')
+    market_sort_value, market_sort_value_key = ct.get_market_sort_value_key('2')
     while 1:
         try:
             # df = rl.get_sina_all_json_dd(vol, type)
@@ -225,7 +224,7 @@ if __name__ == "__main__":
 
                     # top_temp = top_temp.sort_values(by=ct.Duration_percent_op,
                                         # ascending=ct.Duration_percent_op_key)
-                    top_temp = top_temp.sort_values(by=eval(market_sort_value),
+                    top_temp = top_temp.sort_values(by=(market_sort_value),
                                                     ascending=market_sort_value_key)
 
                     # top_temp = top_temp.sort_values(by=['op','ra','dff', 'percent', 'ratio'], ascending=[0,0,0, 0, 1])
@@ -233,7 +232,8 @@ if __name__ == "__main__":
                 #     top_temp = top_temp.loc[:, ct.Monitor_format_trade]
                 # else:
                 #     top_temp = top_temp.loc[:, ct.Monitor_format_trade]
-                print rl.format_for_print(top_temp.loc[:, ct.Monitor_format_trade][:10])
+                ct_MonitorMarket_Values = ct.get_Duration_format_Values(ct.Monitor_format_trade, market_sort_value[0])
+                print rl.format_for_print(top_temp.loc[:, ct_MonitorMarket_Values][:10])  
                 # print rl.format_for_print(top_temp.loc[:, ct.Sina_Monitor_format][:10])
 
                 # print rl.format_for_print(top_all[:10])
@@ -293,12 +293,9 @@ if __name__ == "__main__":
                 status = False
             elif len(st.split()[0]) == 1 and st.split()[0].isdigit():
                 st_l = st.split()
-                st = st_l[0]
-                if st in ct.Market_sort_idx.keys():
-                    market_sort_value = ct.Market_sort_idx[st]
-                    market_sort_value_key = eval(market_sort_value + '_key')
-                    if len(st_l) > 1 and st_l[1] == 'f':
-                        market_sort_value_key = cct.negate_boolean_list(market_sort_value_key)
+                st_k = st_l[0]
+                if st_k in ct.Market_sort_idx.keys() and len(top_all) > 0:
+                    market_sort_value, market_sort_value_key = ct.get_market_sort_value_key(st, top_all=top_all)
                 else:
                     log.error("market_sort key error:%s" % (st))
                     cct.sleeprandom(5)

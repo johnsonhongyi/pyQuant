@@ -119,8 +119,7 @@ if __name__ == "__main__":
     # all_diffpath = tdd.get_tdx_dir_blocknew() + '062.blk'
     parser = cct.MoniterArgmain()
     parserDuraton = cct.DurationArgmain()
-    market_sort_value = ct.Market_sort_idx['1']
-    market_sort_value_key = eval(market_sort_value + '_key')
+    market_sort_value, market_sort_value_key = ct.get_market_sort_value_key('2')
     while 1:
         try:
             # df = sina_data.Sina().all
@@ -324,10 +323,10 @@ if __name__ == "__main__":
                     # top_end = stf.getBollFilter(df=top_end, boll=ct.bollFilter,duration=ct.PowerCountdl)
                     if 'op' in top_temp.columns:
                         if cct.get_now_time_int() > ct.checkfilter_end_timeDu and (int(duration_date) > int(ct.duration_date_sort) or int(duration_date) < ct.duration_diff):
-                            top_temp = top_temp.sort_values(by=eval(market_sort_value),
+                            top_temp = top_temp.sort_values(by=(market_sort_value),
                                                             ascending=market_sort_value_key)
                         else:
-                            top_temp = top_temp.sort_values(by=eval(market_sort_value),
+                            top_temp = top_temp.sort_values(by=(market_sort_value),
                                                             ascending=market_sort_value_key)
 
                     if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935:
@@ -335,7 +334,8 @@ if __name__ == "__main__":
                         # top_temp = top_temp[ (top_temp['ma5d'] > top_temp['ma10d']) & (top_temp['buy'] > top_temp['ma10d']) ][:10]
                         top_dd = pd.concat([top_temp[:10], top_end], axis=0)
                         # top_dd = top_dd.drop_duplicates()
-                        top_dd = top_dd.loc[:, ct.Duration_format_buy]
+                        ct_Duration_format_Values = ct.get_Duration_format_Values(ct.Duration_format_buy, market_sort_value[0])
+                        top_dd = top_dd.loc[:, ct_Duration_format_Values]
                     else:
                         # top_temp = top_temp[top_temp['trade'] > top_temp['ma10d']]
                         # top_temp = top_temp[top_temp['ma5d'] > top_temp['ma10d']][:10]
@@ -343,7 +343,8 @@ if __name__ == "__main__":
 
                         top_dd = pd.concat([top_temp[:10], top_end], axis=0)
                         # top_dd = top_dd.drop_duplicates()
-                        top_dd = top_dd.loc[:, ct.Duration_format_trade]
+                        ct_Duration_format_Values = ct.get_Duration_format_Values(ct.Duration_format_trade, market_sort_value[0])
+                        top_dd = top_dd.loc[:, ct_Duration_format_Values]
                     print rl.format_for_print(top_dd)
                 # if cct.get_now_time_int() < 930 or cct.get_now_time_int() > 1505 or (cct.get_now_time_int() > 1125 and cct.get_now_time_int() < 1505):
                 # print rl.format_for_print(top_dif[-10:])
@@ -393,12 +394,9 @@ if __name__ == "__main__":
                 status = False
             elif len(st.split()[0]) == 1 and st.split()[0].isdigit():
                 st_l = st.split()
-                st = st_l[0]
-                if st in ct.Market_sort_idx.keys():
-                    market_sort_value = ct.Market_sort_idx[st]
-                    market_sort_value_key = eval(market_sort_value + '_key')
-                    if len(st_l) > 1 and st_l[1] == 'f':
-                        market_sort_value_key = cct.negate_boolean_list(market_sort_value_key)
+                st_k = st_l[0]
+                if st_k in ct.Market_sort_idx.keys() and len(top_all) > 0:
+                    market_sort_value, market_sort_value_key = ct.get_market_sort_value_key(st, top_all=top_all)
                 else:
                     log.error("market_sort key error:%s" % (st))
                     cct.sleeprandom(5)

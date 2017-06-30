@@ -67,7 +67,7 @@ class SafeHDFStore(HDFStore):
             except (IOError, EOFError, Exception) as e:
                 # except (IOError, OSError) as e:
                 # time.sleep(probe_interval)
-                if self.countlock > 2:
+                if self.countlock > 1:
                     log.error("IOError Error:%s" % (e))
                 if self.countlock <= 10:
                     time.sleep(round(random.randint(1, 4) / 1.2, 2))
@@ -103,7 +103,7 @@ class SafeHDFStore(HDFStore):
                 # Compress_Count += int(self.h5_size_org / self.big_H5_Size_limit)
                 log.info("Compress_Count init:%s h5_size_org:%s" % (Compress_Count, self.h5_size_org))
             if h5_size > self.big_H5_Size_limit * Compress_Count:
-                log.error("h5_size:%sM Limit:%s" % (h5_size, self.big_H5_Size_limit * Compress_Count))
+                log.error("fname:%s h5_size:%sM Limit:%s" % (self.fname,h5_size, self.big_H5_Size_limit * Compress_Count))
                 os.rename(self.fname, self.temp_file)
                 p = subprocess.Popen(self.ptrepack_cmds % (
                     self.complib, self.temp_file, self.fname), shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
@@ -117,7 +117,6 @@ class SafeHDFStore(HDFStore):
 
             os.remove(self._lock)
             gc.collect()
-
 '''
 https://stackoverflow.com/questions/21126295/how-do-you-create-a-compressed-dataset-in-pytables-that-can-store-a-unicode-stri/21128497#21128497
 >>> h5file = pt.openFile("test1.h5",'w')
@@ -623,7 +622,8 @@ if __name__ == "__main__":
     for na in fname:
         with SafeHDFStore(na) as h5:
             print h5
-        # print h5['d_21_y_all'].loc['300666']
+            if '/' + 'all' in h5.keys():
+                print h5['all'].loc['600007']
         # h5.remove('high_10_y_20170620_all_15')
         # print h5
         # dd = h5['d_21_y_all']

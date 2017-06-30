@@ -1859,7 +1859,7 @@ def compute_lastdays_percent(df=None, lastdays=3):
     if df is not None and len(df) > lastdays:
         if len(df) > lastdays + 1:
             lastdays = len(df) - 1
-            lastdays = lastdays if lastdays < 6 else 5
+            lastdays = lastdays if lastdays < 8 else 8
         if 'date' in df.columns:
             df = df.set_index('date')
         df = df.sort_index(ascending=True)
@@ -2334,9 +2334,10 @@ def get_append_lastp_to_df(top_all, lastpTDX_DF=None, dl=ct.PowerCountdl, end=No
             log.info("load hdf data:%s %s %s" % (h5_fname, h5_table, len(h5)))
             tdxdata = h5
         else:
+            log.info("no hdf data:%s %s" % (h5_fname, h5_table))
             # tdxdata = get_tdx_all_day_LastDF(codelist) '''only get lastp no
             # powerCompute'''
-            print "td.",
+            print "TD.",
             tdxdata = get_tdx_exp_all_LastDF_DL(
                 codelist, dt=dl, end=end, ptype=ptype, filter=filter, power=power, lastp=lastp, newdays=newdays, resample=resample)
             # if checknew:
