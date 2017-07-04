@@ -1504,7 +1504,7 @@ def getSinaAlldf(market='cyb', vol=ct.json_countVol, vtype=ct.json_countType, fi
         dm = df
     # if cct.get_work_time() or (cct.get_now_time_int() > 915) :
     dm['percent'] = map(lambda x, y: round(
-        (x - y) / y * 100, 1), dm.close.values, dm.llastp.values)
+        (x - y) / y * 100, 2), dm.close.values, dm.llastp.values)
     log.debug("dm percent:%s" % (dm[:1]))
     # dm['volume'] = map(lambda x: round(x / 100, 1), dm.volume.values)
     dm['trade'] = dm['close']

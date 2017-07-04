@@ -24,9 +24,10 @@ def getBollFilter(df=None, boll=6, duration=ct.PowerCountdl, filter=True, ma5d=T
         print "dataframe is None"
         return None
     else:
-        df.loc[df.percent >= 9.95, 'percent'] = 10
+        df.loc[df.percent >= 9.94, 'percent'] = 10
         if resample == 'd':
-            df.loc[df.per1d >= 9.95, 'per1d'] = 10
+            df.loc[df.per1d >= 9.94, 'per1d'] = 10
+            df['percent'] = df['percent'].apply(lambda x:round(x,1))
 
     if 'ma5d' in df.columns:
         df = df[df.buy > df.ma5d * ct.changeRatio]
