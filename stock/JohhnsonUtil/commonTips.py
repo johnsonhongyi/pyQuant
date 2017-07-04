@@ -186,7 +186,7 @@ terminal_positionKey = {'sina_Market-DurationDn.py': '217, 520',
                'sina_Monitor-Market-LH.py': '184, 239',
                'sina_Monitor-Market.py': '19, 179',
                'sina_Monitor.py': '39, 22',
-               'singleAnalyseUtil.py': '620, 22',
+               'singleAnalyseUtil.py': '652, 22',
                'LinePower.py':'40, 497',}
 
 script_set_position = '''tell application "Terminal"

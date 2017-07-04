@@ -149,7 +149,7 @@ if __name__ == "__main__":
             # top_now = tdd.getSinaAlldf(market=u'一带一路',filename='ydyl', vol=ct.json_countVol, vtype=ct.json_countType)
             # top_now = tdd.getSinaAlldf(market='次新股',filename='cxg', vol=ct.json_countVol, vtype=ct.json_countType)
             time_Rt = time.time()
-            top_now = tdd.getSinaAlldf(market='网络安全+雄安新区',filename='wlaq', vol=ct.json_countVol, vtype=ct.json_countType)
+            top_now = tdd.getSinaAlldf(market='网络安全+雄安新区', filename='wlaq', vol=ct.json_countVol, vtype=ct.json_countType)
 #            top_now = tdd.getSinaAlldf(market=u'京津冀', filename='beijing', vol=ct.json_countVol, vtype=ct.json_countType)
             # top_now = tdd.getSinaAlldf(market='sh', vol=ct.json_countVol, vtype=ct.json_countType)
 
@@ -347,7 +347,7 @@ if __name__ == "__main__":
                         # top_temp = top_temp[ (top_temp['ma5d'] > top_temp['ma10d']) & (top_temp['trade'] > top_temp['ma10d']) ][:10]
 
                         top_dd = pd.concat([top_temp[:10], top_end], axis=0)
-                        ct_Duration_format_Values = ct.get_Duration_format_Values(ct.Duration_format_trade, market_sort_value[0])
+                        ct_Duration_format_Values = ct.get_Duration_format_Values(ct.Duration_format_trade, market_sort_value[:2])
                         top_dd = top_dd.loc[:, ct_Duration_format_Values]
 
                     print rl.format_for_print(top_dd)
