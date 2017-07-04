@@ -63,7 +63,8 @@ def getBollFilter(df=None, boll=6, duration=ct.PowerCountdl, filter=True, ma5d=T
             if cct.get_now_time_int() > 930 and cct.get_now_time_int() <= 1400:
                 df = df[(df.volume > 1.5 * cct.get_work_time_ratio())
                         | (df.percent > 0)]
-            df = df[(df.per1d > 9) | (df.per2d > 4) | (df.per3d > 6)]
+            # df = df[(df.per1d > 9) | (df.per2d > 4) | (df.per3d > 6)]
+            df = df[(df.per1d > 0) | (df.per2d > 4) | (df.per3d > 6)]
             # df = df[df.oph > 10]
         if 'boll' in df.columns:
             if 915 < cct.get_now_time_int() < 926:

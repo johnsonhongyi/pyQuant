@@ -90,23 +90,27 @@ Duration_sort_per_ratio = ['percent', 'ratio', 'op',
 Duration_sort_per_ratio_key = [0, 1, 0, 1, 1, 0, 0, 1, 1]
 
 
-Duration_sort_per1d = ['per1d', 'percent', 'per3d', 'ratio', 'op',
+# Duration_sort_per1d = ['per1d', 'percent', 'per3d', 'ratio', 'op',
+#                        'fib', 'fibl', 'ra', 'percent', 'volume', 'couts']
+# Duration_sort_per1d_key = [0, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1]
+
+Duration_sort_perd = ['per%sd', 'perc%sd', 'percent', 'b1_v', 'ratio', 'op',
+                      'fib', 'fibl', 'ra', 'volume', 'couts']
+Duration_sort_perd_key = [0, 0, 0, 0, 1, 0, 1, 1, 0, 1, 1]
+
+Duration_sort_percd = ['perc%sd', 'per%sd', 'percent', 'b1_v', 'ratio', 'op',
                        'fib', 'fibl', 'ra', 'percent', 'volume', 'couts']
-Duration_sort_per1d_key = [0, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1]
-
-Duration_sort_perd = ['percent', 'ratio', 'op',
-                      'fib', 'fibl', 'ra', 'percent', 'volume', 'couts']
-Duration_sort_perd_key = [0, 0, 1, 0, 1, 1, 0, 0, 1, 1]
+Duration_sort_percd_key = [0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1]
 
 
-Duration_sort_per3d = ['per3d', 'percent', 'per1d', 'ratio', 'op',
-                       'fib', 'fibl', 'ra', 'percent', 'volume', 'couts']
-Duration_sort_per3d_key = [0, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1]
+# Duration_sort_per3d = ['per3d', 'percent', 'per1d', 'ratio', 'op',
+#                        'fib', 'fibl', 'ra', 'percent', 'volume', 'couts']
+# Duration_sort_per3d_key = [0, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1]
 
 
-Duration_percent_dff = ['percent', 'dff', 'df2', 'op',
+Duration_percent_dff = ['percent', 'b1_v', 'dff', 'df2', 'op',
                         'fib', 'fibl', 'ra', 'ratio', 'volume', 'couts']
-Duration_percent_dff_key = [0, 0, 0, 0, 1, 1, 0, 1, 1, 1]
+Duration_percent_dff_key = [0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 1]
 
 Duration_percent_vol = ['percent', 'volume', 'dff',
                         'df2', 'op', 'fib', 'fibl', 'ra', 'ratio', 'couts']
@@ -160,96 +164,7 @@ MonitorMarket_sort_op = ['dff', 'fib', 'fibl', 'op',
 MonitorMarket_sort_op_key = [0, 0, 1, 0, 0, 0, 1, 1, 1]
 
 
-def RawMenuArgmain():
-    raw = 'status:[go(g),clear(c),[d 20150101 [l|h]|[y|n|pn|py],quit(q),W(a),sh]:'
-    raw_input_menu = raw + "\n\tNow : %s" + \
-        "\n\t1:Sort By Percent\t2:Sort by per1d\t3:Sort By per3d\t\t4:Sort By DFF\n\t5:Sort By Ra_dff\t6:Sort By df2\t7:Sort Ma dff\t\t8:Sort by Count \nplease input:"
-    return raw_input_menu
 
-# "Sort By Percent\t3:Sort By DFF\n\t2:Sort By OP\t\t4:Sort By Ra\nplease input:"
-
-Market_sort_idx = {'1': 'ct.Duration_percent_dff', '2': 'ct.Duration_sort_per1d', '3': 'ct.Duration_sort_per3d', '4': 'ct.Duration_dff_percent', '5': 'ct.Duration_ra_dff', '6': 'ct.Duration_percent_df2dff',
-                   '7': 'ct.Duration_sort_ma', '8': 'ct.Monitor_sort_count'}
-
-Market_sort_idx_perd = {'1': 'ct.Duration_percent_dff', '2': 'ct.Duration_sort_perd', '3': 'ct.Duration_sort_per3d', '4': 'ct.Duration_dff_percent', '5': 'ct.Duration_ra_dff', '6': 'ct.Duration_percent_df2dff',
-                        '7': 'ct.Duration_sort_ma', '8': 'ct.Monitor_sort_count'}
-
-# Market_sort_idx = {'1': 'ct.Duration_percent_dff', '2': 'ct.Duration_dff_percent', '3': 'ct.Duration_ra_dff', '4': 'ct.Duration_percent_df2dff',
-#                    '5': 'ct.Duration_sort_ma', '6': 'ct.Monitor_sort_count', '7': 'ct.Duration_sort_per_ratio', '8': 'ct.Duration_percent_vol'}
-
-
-def negate_boolean_list(negate_list, idx=1):
-    cout_all = len(negate_list)
-    if idx < cout_all:
-        sort_negate_l = [key ^ 1 for key in negate_list[:idx]]
-        sort_negate_l.extend(negate_list[idx:])
-    else:
-        sort_negate_l = [key ^ 1 for key in negate_list]
-
-    return sort_negate_l
-
-def get_Duration_format_Values(duration_format,column=None,replace='per3d'):
-    if column is not None and column not in duration_format:
-        t_list = []
-        for v in duration_format:
-            if v == replace:
-#                print replace,v
-                t_list.append(column)
-            else:
-                t_list.append(v)
-        duration_format = t_list
-    # else:
-        # print("%s in duration"%(column))
-    return duration_format
-
-# print get_Duration_format_Values(Duration_dff_percent,'percent')
-
-def get_market_sort_value_key(st, top_all=None):
-    st_l = st.split()
-    st_count = len(st_l)
-    st = st_l[0]
-    if st in Market_sort_idx_perd.keys():
-        # market_sort_value = Market_sort_idx_perd[st]
-        market_sort_value = Market_sort_idx_perd[st].replace("ct.", '')
-        if st == '2':
-            market_sort_value_key = eval(market_sort_value + '_key')
-            if st_count > 1 and st_l[1].isdigit():
-                idx_perd = st_l[1]
-                if top_all is not None and len(top_all) > 0:
-                    if 'per%sd' % idx_perd in top_all.columns:
-                        market_sort_value = get_Dynamic_Duration_perd(market_sort_value, idx_perd)
-                    else:
-                        idx_k = None
-                        for inx in range(int(idx_perd)-1,1,-1):
-                            if 'per%sd' % inx in top_all.columns:
-                                idx_k = inx
-                                break
-                        if idx_k is not None:
-                            market_sort_value = get_Dynamic_Duration_perd(market_sort_value, idx_k)
-                        else:
-                            market_sort_value = get_Dynamic_Duration_perd(market_sort_value, '1')
-                else:
-                    market_sort_value = get_Dynamic_Duration_perd(market_sort_value, '1')
-
-                if st_count > 2 and st_l[2] == 'f':
-                    market_sort_value_key = negate_boolean_list(market_sort_value_key)
-                if st_count > 1 and st_l[1] == 'f':
-                    market_sort_value_key = negate_boolean_list(market_sort_value_key)
-            else:
-                market_sort_value = get_Dynamic_Duration_perd(market_sort_value, '1')
-        else:
-            market_sort_value_key = eval(market_sort_value + '_key')
-            if st_count > 1 and st_l[1] == 'f':
-                market_sort_value_key = negate_boolean_list(market_sort_value_key)
-            market_sort_value = eval(market_sort_value)
-    return market_sort_value, market_sort_value_key
-
-
-def get_Dynamic_Duration_perd(market_sort_value, idx_perd):
-    idx_l = ['per%sd' % idx_perd]
-    idx_l.extend(eval(market_sort_value))
-    return idx_l
-# print get_market_sort_value_key('1 ')
 # edit 170620
 # Duration_format_buy=['name', 'buy', 'ma5d','boll','dff','df2', 'percent','ra','op', 'ratio','couts','ma','volume', 'date','category']
 # Duration_format_trade=['name', 'trade', 'ma5d','boll','dff','df2','percent', 'ra','op', 'ratio','couts','ma','volume', 'date','category']
@@ -590,6 +505,161 @@ INDEX_SYMBOL = {"399990": "sz399990", "000006": "sh000006", "399998": "sz399998"
                 "000131": "sh000131", "000964": "sh000964", "399339": "sz399339", "399964": "sz399964", "399991": "sz399991", "399417": "sz399417", "000146": "sh000146", "399551": "sz399551", "000137": "sh000137", "000118": "sh000118", "399976": "sz399976", "000109": "sh000109", "399681": "sz399681", "399438": "sz399438", "000117": "sh000117", "399614": "sz399614", "399669": "sz399669", "000111": "sh000111", "399670": "sz399670", "000097": "sh000097", "000106": "sh000106", "000039": "sh000039", "399935": "sz399935", "000935": "sh000935", "399813": "sz399813", "000037": "sh000037", "399811": "sz399811", "399705": "sz399705", "399556": "sz399556", "000113": "sh000113", "000072": "sh000072", "399651": "sz399651", "399617": "sz399617", "399684": "sz399684", "000041": "sh000041", "399807": "sz399807", "399959": "sz399959", "399967": "sz399967", "399326": "sz399326", "399688": "sz399688", "399368": "sz399368", "399241": "sz399241", "399696": "sz399696", "000850": "sh000850", "000110": "sh000110", "399621": "sz399621", "399243": "sz399243",
                 "399973": "sz399973", "399987": "sz399987", "000112": "sh000112", "399997": "sz399997",
                 "hkHSI": "hkHSI"}
+
+
+def RawMenuArgmain():
+    raw = 'status:[go(g),clear(c),[d 20150101 [l|h]|[y|n|pn|py],quit(q),W(a),sh]:'
+    raw_input_menu = raw + "\n\tNow : %s" + \
+        "\n\t1:Sort By Percent\t2:Sort by per1d\t3:Sort By percd\t\t4:Sort By DFF\n\t5:Sort By Ra_dff\t6:Sort By df2\t7:Sort Ma dff\t\t8:Sort by Count \nplease input:"
+    return raw_input_menu
+
+# "Sort By Percent\t3:Sort By DFF\n\t2:Sort By OP\t\t4:Sort By Ra\nplease input:"
+
+Market_sort_idx = {'1': 'ct.Duration_percent_dff', '2': 'ct.Duration_sort_per1d', '3': 'ct.Duration_sort_per3d', '4': 'ct.Duration_dff_percent', '5': 'ct.Duration_ra_dff', '6': 'ct.Duration_percent_df2dff',
+                   '7': 'ct.Duration_sort_ma', '8': 'ct.Monitor_sort_count'}
+
+Market_sort_idx_perd = {'1': 'ct.Duration_percent_dff', '2': 'ct.Duration_sort_perd', '3': 'ct.Duration_sort_percd', '4': 'ct.Duration_dff_percent', '5': 'ct.Duration_ra_dff', '6': 'ct.Duration_percent_df2dff',
+                        '7': 'ct.Duration_sort_ma', '8': 'ct.Monitor_sort_count'}
+
+# Market_sort_idx = {'1': 'ct.Duration_percent_dff', '2': 'ct.Duration_dff_percent', '3': 'ct.Duration_ra_dff', '4': 'ct.Duration_percent_df2dff',
+#                    '5': 'ct.Duration_sort_ma', '6': 'ct.Monitor_sort_count', '7': 'ct.Duration_sort_per_ratio', '8': 'ct.Duration_percent_vol'}
+
+
+def negate_boolean_list(negate_list, idx=1, position=False):
+    cout_all = len(negate_list)
+    if not position:
+        if idx < cout_all:
+            sort_negate_l = [key ^ 1 for key in negate_list[:idx]]
+            sort_negate_l.extend(negate_list[idx:])
+        else:
+            sort_negate_l = [key ^ 1 for key in negate_list]
+    else:
+        if idx < cout_all:
+            sort_negate_k = negate_list[idx] ^ 1
+            sort_list = []
+            for i, x in enumerate(negate_list):
+                if i <> idx:
+                    sort_list.append(x)
+                else:
+                    sort_list.append(sort_negate_k)
+            sort_negate_l = sort_list
+        else:
+            sort_negate_l = [key ^ 1 for key in negate_list]
+
+    return sort_negate_l
+
+
+def get_Duration_format_Values(duration_format, column=None, replace='per3d'):
+    if column is not None:
+        t_list = []
+        if isinstance(column, list):
+            for co in column:
+                if co not in duration_format:
+                    if co.find('per') > -1:
+                        if co.find('perc') > -1:
+                            replace = 'per3d'
+                        else:
+                            replace = 'per1d'
+                    for v in duration_format:
+                        if v == replace:
+                            #                print replace,v
+                            t_list.append(co)
+                        else:
+                            t_list.append(v)
+
+                    duration_format = t_list
+                    t_list = []
+        else:
+            if column not in duration_format:
+                for v in duration_format:
+                    if v == replace:
+                        #                print replace,v
+                        t_list.append(column)
+                    else:
+                        t_list.append(v)
+        if len(t_list) == len(duration_format):
+            duration_format = t_list
+
+    return duration_format
+
+# print get_Duration_format_Values(Duration_format_buy,'percent')
+
+
+def get_market_sort_value_key(st, top_all=None):
+    st_l = st.split()
+    st_count = len(st_l)
+    st = st_l[0]
+    if st in Market_sort_idx_perd.keys():
+        # market_sort_value = Market_sort_idx_perd[st]
+        market_sort_value = Market_sort_idx_perd[st].replace("ct.", '')
+        if st in ['2', '3']:
+            idx_value = eval(market_sort_value)[0]
+            market_sort_value_key = eval(market_sort_value + '_key')
+            if st_count > 1 and st_l[1].isdigit():
+                idx_perd = st_l[1]
+                if top_all is not None and len(top_all) > 0:
+                    if idx_value % idx_perd in top_all.columns:
+                        market_sort_value = get_Dynamic_Duration_perd(market_sort_value, idx_perd, top_all.columns)
+                    else:
+                        idx_k = None
+                        for inx in range(int(idx_perd) - 1, 1, -1):
+                            if idx_value % inx in top_all.columns:
+                                idx_k = inx
+                                break
+                        if idx_k is not None:
+                            market_sort_value = get_Dynamic_Duration_perd(market_sort_value, idx_k, top_all.columns)
+                        else:
+                            market_sort_value = get_Dynamic_Duration_perd(market_sort_value, '1')
+                else:
+                    market_sort_value = get_Dynamic_Duration_perd(market_sort_value, '1')
+
+                if st_count > 2:
+                    if st_l[2] == 'f':
+                        market_sort_value_key = negate_boolean_list(market_sort_value_key)
+                    if st_count == 4:
+                        if st_l[3] == 'f':
+                            market_sort_value_key = negate_boolean_list(market_sort_value_key, idx=1, position=True)
+
+                if st_count > 1 and st_l[1] == 'f':
+                    market_sort_value_key = negate_boolean_list(market_sort_value_key)
+                    if st_count == 3 and st_l[2] == 'f':
+                        market_sort_value_key = negate_boolean_list(market_sort_value_key, idx=1, position=True)
+            else:
+                market_sort_value = get_Dynamic_Duration_perd(market_sort_value, '1')
+                # print market_sort_value,st_count
+                if st_count > 1 and st_l[1] == 'f':
+                    market_sort_value_key = negate_boolean_list(market_sort_value_key)
+                if st_count == 3 and st_l[2] == 'f':
+                    market_sort_value_key = negate_boolean_list(market_sort_value_key, idx=1, position=True)
+        else:
+            market_sort_value_key = eval(market_sort_value + '_key')
+            if st_count > 1 and st_l[1] == 'f':
+                market_sort_value_key = negate_boolean_list(market_sort_value_key)
+            market_sort_value = eval(market_sort_value)
+    return market_sort_value, market_sort_value_key
+
+
+def get_Dynamic_Duration_perd(market_sort_value, idx_perd, columns=None):
+    idx_value = eval(market_sort_value)[0]
+    idx_value2 = eval(market_sort_value)[1]
+    idx_l = [idx_value % idx_perd]
+    if idx_perd == 1:
+        if columns:
+            idx_k = idx_perd
+            for inx in range(8, 1, -1):
+                if idx_value2 % inx in columns:
+                    idx_k = inx
+                    break
+        idx_l2 = [idx_value2 % idx_k]
+    else:
+        idx_l2 = [idx_value2 % 3]
+    idx_l.extend(idx_l2)
+    idx_l.extend(eval(market_sort_value)[2:])
+    return idx_l
+# print get_market_sort_value_key('2 3 1 f')
+# print get_market_sort_value_key('1')
+# print get_market_sort_value_key('1 f ')
+# print get_Duration_format_Values(Duration_format_buy,['per5d','perc5d'])
 
 
 def _write_head():

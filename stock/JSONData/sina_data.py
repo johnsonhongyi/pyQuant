@@ -524,6 +524,8 @@ class Sina:
             df['low']=df['buy']
         else:
             # df.rename(columns={'now': 'close'}, inplace=True)
+            df['b1_v'] =  (
+                (df['b1_v'] / df['volume']*100)).map(lambda x: round(x, 1))
             df['close'] = df['now']
 
         # df =
@@ -594,7 +596,7 @@ if __name__ == "__main__":
     # print df
     # df = sina.get_stock_code_data('000001',index=True).set_index('code')
     # df= sina.get_stock_code_data('999999,399001',index=True)
-    df = sina.get_stock_code_data('600007')
+    df = sina.get_stock_code_data('300356')
     print df.T
 #    print sina.get_stock_code_data('002873')
     # print sina.get_stock_code_data('600199,300334',index=False)

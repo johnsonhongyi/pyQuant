@@ -1652,7 +1652,7 @@ if __name__ == '__main__':
         log_level = LoggerFactory.ERROR
     # log_level = LoggerFactory.DEBUG if args['-d']  else LoggerFactory.ERROR
     log.setLevel(log_level)
-        
+
     s_time=time.time()
     print get_work_day_status()
     print get_terminal_Position(cmd='DurationDN.py', position=None, close=False)
