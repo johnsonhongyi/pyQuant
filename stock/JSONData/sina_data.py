@@ -517,15 +517,18 @@ class Sina:
 #            df.rename(columns={'buy': 'close'}, inplace=True)
             df['close']=df['buy']
             df['low']=df['buy']
+            df['b1_v'] = ((df['b1_v'] - df['a1_v'])/100/10000).map(lambda x: round(x, 1)+0.01)
         elif (cct.get_now_time_int() > 830 and cct.get_now_time_int() <= 915):
 #            df.rename(columns={'buy': 'close'}, inplace=True)
             df['buy']=df['llastp']
             df['close']=df['buy']
             df['low']=df['buy']
+            df['b1_v'] = ((df['b1_v'] - df['a1_v'])/100/10000).map(lambda x: round(x, 1)+0.01)
         else:
             # df.rename(columns={'now': 'close'}, inplace=True)
-            df['b1_v'] =  (
-                (df['b1_v'] / df['volume']*100)).map(lambda x: round(x, 1))
+            # df['b1_v'] = ((df['b1_v'] - df['a1_v'])/100/10000).map(lambda x: round(x, 1)+0.01)
+            df['b1_v'] =  (df['b1_v'] / df['volume']*100).map(lambda x: round(x, 1))
+
             df['close'] = df['now']
 
         # df =
