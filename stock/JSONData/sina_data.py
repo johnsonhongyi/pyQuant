@@ -21,7 +21,9 @@ log = LoggerFactory.log
 import tdx_hdf5_api as h5a
 from JSONData import realdatajson as rl
 
+
 class StockCode:
+
     def __init__(self):
         self.start_t = time.time()
         self.STOCK_CODE_PATH = 'stock_codes.conf'
@@ -29,10 +31,10 @@ class StockCode:
         # print os.path.getsize(self.stock_code_path)
         if not os.path.exists(self.stock_code_path) or os.path.getsize(self.stock_code_path) < 500:
             stock_codes = self.get_stock_codes(True)
-            print ("create:%s counts:%s"%(self.stock_code_path,len(stock_codes)))
+            print("create:%s counts:%s" % (self.stock_code_path, len(stock_codes)))
         if cct.creation_date_duration(self.stock_code_path) > 10:
-            stock_codes=self.get_stock_codes(True)
-            print ("days:%s %s update stock_codes.conf"%(cct.creation_date_duration(self.stock_code_path),len(stock_codes)))
+            stock_codes = self.get_stock_codes(True)
+            print("days:%s %s update stock_codes.conf" % (cct.creation_date_duration(self.stock_code_path), len(stock_codes)))
 
         self.stock_codes = None
 
@@ -45,13 +47,14 @@ class StockCode:
         grep_stock_codes = re.compile('~(\d+)`')
         response = requests.get(all_stock_codes_url)
         stock_codes = grep_stock_codes.findall(response.text)
-        stock_codes = list(set([elem for elem in stock_codes if elem.startswith(('6','30','00'))]))
+        stock_codes = list(set([elem for elem in stock_codes if elem.startswith(('6', '30', '00'))]))
         # df=rl.get_sina_Market_json('all')
         # stock_codes = df.index.tolist()
         with open(self.stock_code_path, 'w') as f:
             f.write(json.dumps(dict(stock=stock_codes)))
         return stock_codes
     # @property
+
     def get_stock_codes(self, realtime=False):
         """获取所有股票 ID 到 all_stock_code 目录下"""
         # print "days:",cct.creation_date_duration(self.stock_code_path)
@@ -64,9 +67,9 @@ class StockCode:
             # df=rl.get_sina_Market_json('all')
             # stock_codes = df.index.tolist()
             stock_codes = self.update_stock_codes()
-            log.info("readltime codes:%s"%(len(stock_codes)))
+            log.info("readltime codes:%s" % (len(stock_codes)))
             # with open(self.stock_code_path, 'w') as f:
-                # f.write(json.dumps(dict(stock=stock_codes)))
+            # f.write(json.dumps(dict(stock=stock_codes)))
             return stock_codes
         else:
             with open(self.stock_code_path) as f:
@@ -84,8 +87,8 @@ class Sina:
         # self.grep_stock_detail = re.compile(r'(\d+)=([^\S][^,]+?)%s' %
         # (r',([\.\d]+)' * 29,))   #\n特例A (4)
         self.grep_stock_detail = re.compile(
-            r'(\d+)=([^\n][^,]+.)%s%s' % (r',([\.\d]+)' * 29,r',(\d{4}-\d{2}-\d{2}),(\d{2}:\d{2}:\d{2})'))
-            # r'(\d+)=([^\n][^,]+.)%s' % (r',([\.\d]+)' * 29,))
+            r'(\d+)=([^\n][^,]+.)%s%s' % (r',([\.\d]+)' * 29, r',(\d{4}-\d{2}-\d{2}),(\d{2}:\d{2}:\d{2})'))
+        # r'(\d+)=([^\n][^,]+.)%s' % (r',([\.\d]+)' * 29,))
 
         # 去除\n特例A(3356)
         # self.grep_stock_detail = re.compile(r'(00\d{4}|30\d{4}|60\d{4})=([^\n][^,]+.)%s' % (r',([\.\d]+)' * 29,))   #去除\n特例A(股票2432)
@@ -102,6 +105,7 @@ class Sina:
 #        self.index_status = False
         self.hdf_name = 'sina_data'
         self.table = 'all'
+        self.sina_limit_time = ct.sina_limit_time
         # self.all
         # h5 = self.load_hdf_db(table='all', code_l=None, init=True)
         # if h5 is None:
@@ -121,7 +125,6 @@ class Sina:
     #
     #     response = requests.get(self.sina_stock_api + self.stock_list[index])
     #     self.stock_data.append(response.text)
-
 
     # def load_hdf_db(self,table='all',code_l=None):
     #     h5=tdd.top_hdf_api(fname=self.hdf_name, table=table, df=None)
@@ -151,7 +154,6 @@ class Sina:
     #             return h5
     #     return None
 
-
     # def write_hdf_db(self,df,table='all'):
     #     # if 'code' in df.columns:
     #         # df = df.set_index('code')
@@ -170,9 +172,9 @@ class Sina:
         self.stock_codes = self.stockcode.get_stock_codes()
         self.load_stock_codes()
         # print "stocks:",len(self.stock_codes)
-        self.stock_codes = [elem for elem in self.stock_codes if elem.startswith(('6','30','00'))]
+        self.stock_codes = [elem for elem in self.stock_codes if elem.startswith(('6', '30', '00'))]
 
-        h5 = h5a.load_hdf_db(self.hdf_name,self.table, code_l=self.stock_codes)
+        h5 = h5a.load_hdf_db(self.hdf_name, self.table, code_l=self.stock_codes, limit_time=self.sina_limit_time)
         # print "stocks:",len(self.stock_codes)
         if h5 is not None and len(h5) > 0:
             o_time = h5[h5.timel <> 0].timel
@@ -183,15 +185,15 @@ class Sina:
                 sina_time_status = (cct.get_work_day_status() and 915 < cct.get_now_time_int() < 926)
 #                return_hdf_status = not cct.get_work_day_status() or (cct.get_work_day_status() and (cct.get_work_time() and l_time < sina_limit_time))
                 return_hdf_status = not cct.get_work_time() or (cct.get_work_time() and l_time < sina_limit_time)
-                log.info("915:%s sina_time:%0.2f limit:%s"%(sina_time_status,l_time,sina_limit_time))
+                log.info("915:%s sina_time:%0.2f limit:%s" % (sina_time_status, l_time, sina_limit_time))
                 if sina_time_status and l_time < 8:
-                    log.info("open 915 hdf ok:%s"%(len(h5)))
+                    log.info("open 915 hdf ok:%s" % (len(h5)))
                     return h5
                 elif not sina_time_status and return_hdf_status:
-                    log.info("return hdf5 data:%s"%(len(h5)))
+                    log.info("return hdf5 data:%s" % (len(h5)))
                     return h5
                 else:
-                    log.info("no return  hdf5:%s"%(len(h5)))
+                    log.info("no return  hdf5:%s" % (len(h5)))
 
         # self.stock_with_exchange_list = list(
             # map(lambda stock_code: ('sh%s' if stock_code.startswith(('5', '6', '9')) else 'sz%s') % stock_code,
@@ -225,7 +227,7 @@ class Sina:
         #           (len(self.stock_list), len(self.stock_list)))
         return self.get_stock_data()
 
-    def market(self,market):
+    def market(self, market):
         if market in ['all']:
             return self.all
         else:
@@ -235,8 +237,8 @@ class Sina:
             self.load_stock_codes()
             # print type(self.stock_codes)
             # self.stock_with_exchange_list = list(
-                # map(lambda stock_code: ('sh%s' if stock_code.startswith(('5', '6', '9')) else 'sz%s') % stock_code,
-                    # self.stock_codes))        elif market == 'cyb':
+            # map(lambda stock_code: ('sh%s' if stock_code.startswith(('5', '6', '9')) else 'sz%s') % stock_code,
+            # self.stock_codes))        elif market == 'cyb':
             # print len(self.stock_codes)
             # self.stock_codes = [elem for elem in self.stock_codes if elem.startswith(('6','30','00'))]
             # print len(self.stock_codes)
@@ -248,15 +250,15 @@ class Sina:
             elif market == 'sz':
                 self.stock_codes = [elem for elem in self.stock_codes if elem.startswith('00')]
                 self.stock_with_exchange_list = list(
-                    map(lambda stock_code: ('sz%s' ) % stock_code,
+                    map(lambda stock_code: ('sz%s') % stock_code,
                         self.stock_codes))
             elif market == 'cyb':
                 self.stock_codes = [elem for elem in self.stock_codes if elem.startswith('30')]
                 self.stock_with_exchange_list = list(
-                    map(lambda stock_code: ('sz%s' )% stock_code,
+                    map(lambda stock_code: ('sz%s') % stock_code,
                         self.stock_codes))
 
-            h5 = h5a.load_hdf_db(self.hdf_name,self.table, code_l=self.stock_codes)
+            h5 = h5a.load_hdf_db(self.hdf_name, self.table, code_l=self.stock_codes, limit_time=self.sina_limit_time)
             if h5 is not None:
                 return h5
 
@@ -344,15 +346,15 @@ class Sina:
     #     # cct.to_mp_run(self.get_stocks_by_range, threads)
     #
     #     return self.format_response_data()
-    def set_stock_codes_index_init(self,code,index=False):
-        if not isinstance(code,list):
-            code =  code.split(',')
-        code_l=[]
+    def set_stock_codes_index_init(self, code, index=False):
+        if not isinstance(code, list):
+            code = code.split(',')
+        code_l = []
         if index:
             if isinstance(code, list):
                 for x in code:
                     if x.startswith('999'):
-                        code_l.append(str(1000000-int(x)).zfill(6))
+                        code_l.append(str(1000000 - int(x)).zfill(6))
                     else:
                         code_l.append(x)
                 # self.stock_codes = map(lambda stock_code: (
@@ -373,16 +375,16 @@ class Sina:
 
     def get_stock_code_data(self, code, index=False):
 
-#        self.stock_codes = code
+        #        self.stock_codes = code
         # self.stock_with_exchange_list = list(
         #     map(lambda stock_code: ('sh%s' if stock_code.startswith(('5', '6', '9')) else 'sz%s') % stock_code,
         #         ulist))
-#        self.index_status = index
-        code_l=self.set_stock_codes_index_init(code,index)
+        #        self.index_status = index
+        code_l = self.set_stock_codes_index_init(code, index)
 
-        h5 = h5a.load_hdf_db(self.hdf_name,self.table, code_l=code_l,index=index)
+        h5 = h5a.load_hdf_db(self.hdf_name, self.table, code_l=code_l, index=index, limit_time=self.sina_limit_time)
         if h5 is not None:
-            log.info("find index hdf5 data:%s"%(len(h5)))
+            log.info("find index hdf5 data:%s" % (len(h5)))
             return h5
 #        else:
 #            h5 = h5a.load_hdf_db(self.hdf_name,self.table, code_l=code_l,index=index)
@@ -398,17 +400,16 @@ class Sina:
         # self.get_tdx_dd()
         return self.dataframe
 
-    def get_stock_list_data(self, ulist,index=False):
+    def get_stock_list_data(self, ulist, index=False):
 
-#        self.index_status = index
+        #        self.index_status = index
         if index:
-            ulist=self.set_stock_codes_index_init(ulist,index)
+            ulist = self.set_stock_codes_index_init(ulist, index)
 
-        h5 = h5a.load_hdf_db(self.hdf_name,self.table, code_l=ulist,index=index)
+        h5 = h5a.load_hdf_db(self.hdf_name, self.table, code_l=ulist, index=index)
         if h5 is not None:
-            log.info("hdf5 data:%s"%(len(h5)))
+            log.info("hdf5 data:%s" % (len(h5)))
             return h5
-
 
         self.stock_data = []
         if len(ulist) > self.max_num:
@@ -443,7 +444,6 @@ class Sina:
                 self.stock_codes = map(lambda stock_code: ('sh%s' if stock_code.startswith(
                     ('5', '6', '9')) else 'sz%s') % stock_code, ulist)
 
-
             self.url = self.sina_stock_api + ','.join(self.stock_codes)
             log.info("stock_list:%s" % self.url[:30])
             response = requests.get(self.url)
@@ -456,7 +456,7 @@ class Sina:
     #     df = tdd.get_tdx_all_day_LastDF(self.stock_codes)
         # print df
 
-    def format_response_data(self,index=False):
+    def format_response_data(self, index=False):
         stocks_detail = ''.join(self.stock_data)
         # print stocks_detail
         result = self.grep_stock_detail.finditer(stocks_detail)
@@ -513,22 +513,27 @@ class Sina:
         # if cct.get_work_time() or (cct.get_now_time_int() > 915) :
         # df = df.drop('close', axis=1)
         df.rename(columns={'close': 'llastp'}, inplace=True)
-        if (cct.get_now_time_int() > 915 and cct.get_now_time_int() < 931):
-#            df.rename(columns={'buy': 'close'}, inplace=True)
-            df['close']=df['buy']
-            df['low']=df['buy']
-            df['b1_v'] = ((df['b1_v'] - df['a1_v'])/100/10000).map(lambda x: round(x, 1)+0.01)
-        elif (cct.get_now_time_int() > 830 and cct.get_now_time_int() <= 915):
-#            df.rename(columns={'buy': 'close'}, inplace=True)
-            df['buy']=df['llastp']
-            df['close']=df['buy']
-            df['low']=df['buy']
-            df['b1_v'] = ((df['b1_v'] - df['a1_v'])/100/10000).map(lambda x: round(x, 1)+0.01)
-        else:
-            # df.rename(columns={'now': 'close'}, inplace=True)
-            # df['b1_v'] = ((df['b1_v'] - df['a1_v'])/100/10000).map(lambda x: round(x, 1)+0.01)
-            df['b1_v'] =  (df['b1_v'] / df['volume']*100).map(lambda x: round(x, 1))
+        df['b1_vv'] = df['b1_v']
+        if (cct.get_now_time_int() > 915 and cct.get_now_time_int() < 926):
+            #            df.rename(columns={'buy': 'close'}, inplace=True)
+            df['close'] = df['buy']
+            df['low'] = df['buy']
+            df['b1_v'] = ((df['b1_v']) / 100 / 10000).map(lambda x: round(x, 1) + 0.01)
+            # df['b1_vv'] = map(lambda x: round(x / 100 / 10000, 1) + 0.01, df['b1_v'])
 
+        elif (cct.get_now_time_int() > 830 and cct.get_now_time_int() <= 915):
+            #            df.rename(columns={'buy': 'close'}, inplace=True)
+            df['buy'] = df['llastp']
+            df['close'] = df['buy']
+            df['low'] = df['buy']
+            df['b1_v'] = ((df['b1_v']) / df['volume'] * 100).map(lambda x: round(x, 1))
+
+            # df['b1_vv'] = map(lambda x, y: round(x / y * 100, 1), df['b1_v'].values, df['volume'].values)
+
+        else:
+            # df['b1_vv'] = map(lambda x, y: round(x / y * 100, 1), df.b1_v.values, df.volume.values)
+            df['b1_v'] = ((df['b1_v']) / df['volume'] * 100).map(lambda x: round(x, 1))
+            # df.rename(columns={'now': 'close'}, inplace=True)
             df['close'] = df['now']
 
         # df =
@@ -541,31 +546,31 @@ class Sina:
         df = df.set_index('code')
         # print ("Market-df:%s %s time: %s" % (
         # cct.get_now_time()))
-        log.info("hdf:all%s %s"%(len(df),len(self.stock_codes)))
-        h5a.write_hdf_db(self.hdf_name,df,self.table,index=index)
+        log.info("hdf:all%s %s" % (len(df), len(self.stock_codes)))
+        h5a.write_hdf_db(self.hdf_name, df, self.table, index=index)
         dd = df.copy()
-        if not index and len(df) > 3000 and 930 < cct.get_now_time_int() < 1501:
-            time_s=time.time()
+        if not index and len(df) > 3000 and 915 < cct.get_now_time_int() < 1501:
+            time_s = time.time()
             df.index = df.index.astype(str)
             df.ticktime = df.ticktime.astype(str)
             # df.ticktime = map(lambda x: int(x.replace(':', '')), df.ticktime)
-            df = df.loc[:,['open','high','low','close','llastp','volume','ticktime']]
+            df = df.loc[:, ['open', 'high', 'low', 'close', 'llastp', 'volume', 'ticktime']]
             if 'code' not in df.columns:
                 df = df.reset_index()
             if 'dt' in df.columns:
-                df = df.drop(['dt'],axis=1)
+                df = df.drop(['dt'], axis=1)
                 # df.dt = df.dt.astype(str)
             if 'name' in df.columns:
                 # df.name = df.name.astype(str)
-                df = df.drop(['name'],axis=1)
+                df = df.drop(['name'], axis=1)
             df = df.set_index(['code', 'ticktime'])
             h5_fname = 'sina_MultiIndex_data'
-            h5_table = 'all' + '_'+ str(ct.sina_limit_time)
-            h5a.write_hdf_db(h5_fname, df, table=h5_table,index=False, baseCount=500, append=False,MultiIndex=True)
+            h5_table = 'all' + '_' + str(ct.sina_limit_time)
+            h5a.write_hdf_db(h5_fname, df, table=h5_table, index=False, baseCount=500, append=False, MultiIndex=True)
             log.info("hdf5 class all :%s  time:%0.2f" % (len(df), time.time() - time_s))
 
 #        self.index_status = False
-        log.info("wr end:%0.2f"%(time.time() - self.start_t))
+        log.info("wr end:%0.2f" % (time.time() - self.start_t))
         return dd
         # df = pd.DataFrame.from_dict(stock_dict, orient='columns',
         #                             columns=['name', 'open', 'close', 'now', 'high', 'low', 'buy', 'sell', 'turnover',
@@ -590,6 +595,7 @@ if __name__ == "__main__":
         log_level = LoggerFactory.ERROR
     # log_level = LoggerFactory.DEBUG if args['-d']  else LoggerFactory.ERROR
     log.setLevel(log_level)
+    # log.setLevel(LoggerFactory.DEBUG)
 
     # log.setLevel(LoggerFactory.DEBUG)
     sina = Sina()
@@ -599,7 +605,7 @@ if __name__ == "__main__":
     # print df
     # df = sina.get_stock_code_data('000001',index=True).set_index('code')
     # df= sina.get_stock_code_data('999999,399001',index=True)
-    df = sina.get_stock_code_data('300356')
+    df = sina.get_stock_code_data(['300421', '300633', '300306'])
     print df.T
 #    print sina.get_stock_code_data('002873')
     # print sina.get_stock_code_data('600199,300334',index=False)
@@ -626,12 +632,12 @@ if __name__ == "__main__":
         if 'code' not in df.columns:
             df = df.reset_index()
         if 'dt' in df.columns:
-            df = df.drop(['dt'],axis=1)
+            df = df.drop(['dt'], axis=1)
             # df.dt = df.dt.astype(str)
         if 'name' in df.columns:
-            df = df.drop(['name'],axis=1)
+            df = df.drop(['name'], axis=1)
         if 'timel' in df.columns:
-            df = df.drop(['timel'],axis=1)
+            df = df.drop(['timel'], axis=1)
             # df.name = df.name.astype(str)
         df = df.set_index(['code', 'ticktime'])
         # df = df.astype(float)
@@ -663,16 +669,16 @@ if __name__ == "__main__":
         # print df.shape
         # log.error("code :%s is None"%(code))
         time_s = time.time()
-        h5a.write_hdf_db(h5_fname, df, table=h5_table,index=False, baseCount=500, append=False,MultiIndex=True)
+        h5a.write_hdf_db(h5_fname, df, table=h5_table, index=False, baseCount=500, append=False, MultiIndex=True)
         print("hdf5 main all :%s  time:%0.2f" % (len(df), time.time() - time_s))
 
     sys.exit(0)
-    for ma in ['sh','sz','cyb','all']:
-    # for ma in ['sh']:
+    for ma in ['sh', 'sz', 'cyb', 'all']:
+        # for ma in ['sh']:
         df = Sina().market(ma)
         # print df.loc['600581']
         # print len(sina.all)
-        print "market:%s %s"%(ma,len(df))
+        print "market:%s %s" % (ma, len(df))
         # print df[df.code == '600581']
         # print sina.get_stock_code_data('999999',index=True)
         # df = sina.get_stock_list_data(['600629', '000507']).set_index('code')

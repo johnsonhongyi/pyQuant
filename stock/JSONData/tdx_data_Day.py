@@ -1516,12 +1516,15 @@ def getSinaAlldf(market='cyb', vol=ct.json_countVol, vtype=ct.json_countType, fi
         # print dm[dm.code=='000001'].b1_v
         dm['volume'] = map(lambda x: x, dm.b1_v.values)
         dm = dm[(dm.b1 > 0) | (dm.a1 > 0)]
-        # print dm[dm.code=='000001'].volume
+        dm['b1_v'] = map(lambda x: round(x / 100 / 10000, 1) + 0.01, dm['b1_v'])
     elif cct.get_now_time_int() > 926:
         # dm = dm[dm.open > 0]
         dm = dm[(dm.b1 > 0) | (dm.a1 > 0)]
+        # dm['b1_v'] = map(lambda x, y: round(x / y * 100, 1), dm['b1_v'], dm['volume'])
+
     else:
         dm = dm[dm.buy > 0]
+        dm['b1_v'] = map(lambda x: round(x / 100 / 10000, 1) + 0.01, dm['b1_v'])
 
     # print dm[dm.code == '002474'].volume
     # print 'ratio' in dm.columns
@@ -1873,7 +1876,7 @@ def compute_lastdays_percent(df=None, lastdays=3):
             df['lasth%sd' % da] = df['high'].shift(da)
             df['lastl%sd' % da] = df['low'].shift(da)
             # lasp_percent = df['per%sd' % (da - 1)][da-1] if (da - 1) > 0 else 0
-            df['per%sd' % da] = ((df['close'] - df['lastp%sd' % da]) / df['lastp%sd' % da] ).map(lambda x: round(x * 100, 2))
+            df['per%sd' % da] = ((df['close'] - df['lastp%sd' % da]) / df['lastp%sd' % da]).map(lambda x: round(x * 100, 2))
             if da == 1:
                 # df['perlastp'] = df['per%sd' % da]
                 df['perlastp'] = (df['per%sd' % da]).map(lambda x: 1 if x >= -0.1 else 0)
@@ -2088,7 +2091,7 @@ def get_tdx_exp_low_or_high_power(code, dt=None, ptype='close', dl=None, end=Non
                     dd['date'] = dt
                     # print dd
                 if 'ma5d' in df.columns and 'ma10d' in df.columns:
-#                    print df[:1],code
+                    #                    print df[:1],code
                     if len(df.ma5d) > 0 and df[:1].ma5d.values[0] is not None and df[:1].ma5d.values[0] != 0:
                         dd['ma5d'] = round(float(df[:1].ma5d.values[0]), 2)
                     if len(df.ma10d) > 0 and df[:1].ma10d.values[0] is not None and df[:1].ma10d.values[0] != 0:

@@ -266,7 +266,7 @@ if __name__ == "__main__":
                 #     top_temp = top_temp.loc[:,ct.Monitor_format_trade]
                 # else:
                 #     top_temp = top_temp.loc[:,ct.Monitor_format_trade]
-                ct_MonitorMarket_Values = ct.get_Duration_format_Values(ct.Monitor_format_trade, market_sort_value[0])
+                ct_MonitorMarket_Values = ct.get_Duration_format_Values(ct.Monitor_format_trade, market_sort_value[:2])
                 print rl.format_for_print(top_temp.loc[:, ct_MonitorMarket_Values][:10])                
 
                 # print rl.format_for_print(top_all[:10])
