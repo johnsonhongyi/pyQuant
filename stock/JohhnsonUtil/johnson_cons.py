@@ -585,7 +585,7 @@ def get_Duration_format_Values(duration_format, column=None, replace='per3d'):
 # print get_Duration_format_Values(Duration_format_buy,'percent')
 
 
-def get_market_sort_value_key(st, top_all=None):
+def get_market_sort_value_key(st, top_all=None,perd_d=3):
     st_l = st.split()
     st_count = len(st_l)
     st = st_l[0]
@@ -611,7 +611,10 @@ def get_market_sort_value_key(st, top_all=None):
                         else:
                             market_sort_value = get_Dynamic_Duration_perd(market_sort_value, '1')
                 else:
-                    market_sort_value = get_Dynamic_Duration_perd(market_sort_value, '1')
+                    if st_l[1] <> 'f' and int(st_l[1]) <= perd_d: 
+                        market_sort_value = get_Dynamic_Duration_perd(market_sort_value, int(st_l[1]))
+                    else:
+                        market_sort_value = get_Dynamic_Duration_perd(market_sort_value, '1')
 
                 if st_count > 2:
                     if st_l[2] == 'f':
@@ -643,13 +646,15 @@ def get_Dynamic_Duration_perd(market_sort_value, idx_perd, columns=None):
     idx_value = eval(market_sort_value)[0]
     idx_value2 = eval(market_sort_value)[1]
     idx_l = [idx_value % idx_perd]
-    if idx_perd == 1:
-        if columns:
+    if idx_perd > 1:
+        if idx_perd > 3 and columns is not None and len(columns) > 0:
             idx_k = idx_perd
             for inx in range(8, 1, -1):
                 if idx_value2 % inx in columns:
                     idx_k = inx
                     break
+        else:
+            idx_k = idx_perd if idx_perd <=3 else 3
         idx_l2 = [idx_value2 % idx_k]
     else:
         idx_l2 = [idx_value2 % 3]
@@ -658,8 +663,8 @@ def get_Dynamic_Duration_perd(market_sort_value, idx_perd, columns=None):
     return idx_l
 # print get_market_sort_value_key('2 3 1 f')
 # print get_market_sort_value_key('1')
-# print get_market_sort_value_key('1 f ')
-# print get_Duration_format_Values(Duration_format_buy,['per5d','perc5d'])
+# print get_market_sort_value_key('2 2')
+# print get_Duration_format_Values(Duration_format_buy,['per2d','perc2d'])
 
 
 def _write_head():

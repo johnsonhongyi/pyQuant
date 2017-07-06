@@ -148,7 +148,7 @@ if __name__ == "__main__":
     lastpTDX_DF = pd.DataFrame()
     parser = cct.MoniterArgmain()
     parserDuraton = cct.DurationArgmain()
-    market_sort_value, market_sort_value_key = ct.get_market_sort_value_key('2')
+    market_sort_value, market_sort_value_key = ct.get_market_sort_value_key('1')
     while 1:
         try:
             time_Rt = time.time()

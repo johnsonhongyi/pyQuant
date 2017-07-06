@@ -17,7 +17,7 @@ from trollius.coroutines import From
 import LoggerFactory
 import johnson_cons as ct
 import socket
-
+from configobj import ConfigObj
 log = LoggerFactory.log
 
 # log.setLevel(Log.DEBUG)
@@ -756,7 +756,7 @@ def get_work_time():
     now_t = int(now_t)
     if not get_work_day_status():
         return False
-    if (now_t > 1130 and now_t < 1300) or now_t < 915 or now_t > 1502:
+    if (now_t > 1132 and now_t < 1300) or now_t < 915 or now_t > 1502:
         return False
         # return True
     else:
@@ -778,7 +778,7 @@ def get_work_hdf_status():
 def get_work_duration():
     int_time = get_now_time_int()
     # now_t = int(now_t)
-    if get_work_day_status() and ( (800 < int_time < 915) or (1130 < int_time < 1300)):
+    if get_work_day_status() and ( (800 < int_time < 915) or (1132 < int_time < 1300)):
     # if (int_time > 830 and int_time < 915) or (int_time > 1130 and int_time < 1300) or (int_time > 1500 and int_time < 1510):
         # return False
         return True
@@ -1151,6 +1151,32 @@ def code_to_tdx_blk(code):
         else:
             return '1%s' % code if code[:1] in ['5', '6'] else '0%s' % code
 
+
+def get_config_value(fname,classtype,xvalue,newvalue,xtype='limit',write=False):
+    conf_ini = fname
+    # conf_ini = cct.get_work_path('stock','JSONData','count.ini')
+    if os.path.exists(conf_ini):
+        # log.info("file ok:%s"%conf_ini)
+        config = ConfigObj(conf_ini,encoding='UTF8')
+        if classtype in config.keys():
+            if int(config[classtype][xtype]) > xvalue:
+                log.info("f_size:%s < read_limit:%s" % (xvalue, config[classtype][xtype]))
+            else:
+                log.error("f_size:%s > read_limit:%s" % (xvalue, config[classtype][xtype]))
+                config[classtype][xtype] = newvalue
+                config.write()
+                return True
+        else:
+            # log.error("no type:%s f_size:%s" % (classtype, xvalue))
+            config[classtype] = {}
+            config[classtype][xtype] = newvalue
+            config.write()
+    else:
+        config = ConfigObj(conf_ini,encoding='UTF8')
+        config[classtype] = {}
+        config[classtype][xtype] = newvalue
+        config.write()
+    return False
 
 def write_to_blocknew(p_name, data, append=True):
     # index_list = ['1999999','47#IFL0',  '0399006', '27#HSI']
@@ -1642,7 +1668,7 @@ if __name__ == '__main__':
     print get_run_path()
     from docopt import docopt
     log = LoggerFactory.log
-    args = docopt(cct.sina_doc, version='sina_cxdn')
+    args = docopt(sina_doc, version='sina_cxdn')
     # print args,args['-d']
     if args['-d'] == 'debug':
         log_level = LoggerFactory.DEBUG

@@ -30,6 +30,8 @@ class SafeHDFStore(HDFStore):
         self.probe_interval = kwargs.pop("probe_interval", 2)
         lock = cct.get_ramdisk_path(args[0], lock=True)
         baseDir = BaseDir
+        self.fname_o = args[0]
+        self.config_ini = baseDir + os.path.sep+ 'h5config.txt'
         self.fname = cct.get_ramdisk_path(args[0])
         self._lock = lock
         self.countlock = 0
@@ -40,6 +42,7 @@ class SafeHDFStore(HDFStore):
         self.ptrepack_cmds = "ptrepack --chunkshape=auto --complevel=9 --complib=%s %s %s"
         self.big_H5_Size_limit = ct.big_H5_Size_limit
         self.h5_size_org = 0
+        # self.pt_lock_file = self.fname + '.txt'
         global RAMDISK_KEY
         if not os.path.exists(baseDir):
             if RAMDISK_KEY < 1:
@@ -54,6 +57,34 @@ class SafeHDFStore(HDFStore):
         # ptrepack --chunkshape=auto --propindexes --complevel=9 --complib=blosc in.h5 out.h5
         # subprocess.call(["ptrepack", "-o", "--chunkshape=auto", "--propindexes", --complevel=9,", ",--complib=blosc,infilename, outfilename])
         # os.system()
+
+    '''def read_write_pt_File(self, f_size, mode='a+'):
+        with open(self.pt_lock_file, mode) as f:
+            f.seek(0)
+            read_limit = f.read()
+            limit_now = ((f_size / 10 + 1) * self.big_H5_Size_limit)
+            # log.info("big_size:%s read_limit:%s" % (self.big_H5_Size_limit, f_size))
+            if read_limit is not None and len(read_limit) > 0:
+                if int(read_limit) > f_size:
+                    log.info("f_size:%s < read_limit:%s" % (self.big_H5_Size_limit, f_size))
+                    return False
+                else:
+                    f.seek(0)
+                    log.error("f_size:%s > read_limit:%s" % (self.big_H5_Size_limit, f_size))
+                    f.truncate()
+                    f.write(str(limit_now))
+                    return True
+            else:
+                f.seek(0)
+                f.write(str(limit_now))
+                return False
+        # with open(fname, mode) as f:
+        #     f.seek(0)
+        #     model.input(f.read())
+        #     model.compute()
+        #     f.seek(0)
+        #     f.truncate()
+        #     f.write(model.output())'''
 
     def run(self, fname, *args, **kwargs):
         while True:
@@ -98,22 +129,25 @@ class SafeHDFStore(HDFStore):
             HDFStore.__exit__(self, *args, **kwargs)
             os.close(self._flock)
             h5_size = os.path.getsize(self.fname) / 1000 / 1000
+            new_limit = ((h5_size / 10 + 1) * self.big_H5_Size_limit)
             global Compress_Count
             if Compress_Count == 1 and self.h5_size_org > self.big_H5_Size_limit:
-                # Compress_Count += int(self.h5_size_org / self.big_H5_Size_limit)
                 log.info("Compress_Count init:%s h5_size_org:%s" % (Compress_Count, self.h5_size_org))
-            if h5_size > self.big_H5_Size_limit * Compress_Count:
-                log.error("fname:%s h5_size:%sM Limit:%s" % (self.fname,h5_size, self.big_H5_Size_limit * Compress_Count))
-                os.rename(self.fname, self.temp_file)
-                p = subprocess.Popen(self.ptrepack_cmds % (
-                    self.complib, self.temp_file, self.fname), shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-                p.wait()
-                if p.returncode != 0:
-                    log.error("ptrepack hdf Error.:%s" % (self.fname))
-                    # return -1
-                else:
-                    os.remove(self.temp_file)
-                Compress_Count += 1
+            log.info("fname:%s h5_size:%s big:%s" % (self.fname,h5_size, self.big_H5_Size_limit * Compress_Count))
+            if  h5_size > self.big_H5_Size_limit * Compress_Count:
+                if cct.get_config_value(self.config_ini,self.fname_o,h5_size,new_limit):
+                    time_pt=time.time()
+                    os.rename(self.fname, self.temp_file)
+                    p=subprocess.Popen(self.ptrepack_cmds % (
+                        self.complib, self.temp_file, self.fname), shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+                    p.wait()
+                    if p.returncode != 0:
+                        log.error("ptrepack hdf Error.:%s" % (self.fname))
+                        # return -1
+                    else:
+                        os.remove(self.temp_file)
+                    Compress_Count += 1
+                    log.error("fname:%s h5_size:%sM Limit:%s t:%.1f" % (self.fname, h5_size, self.big_H5_Size_limit * Compress_Count, time_pt - time.time()))
 
             os.remove(self._lock)
             gc.collect()
@@ -147,12 +181,12 @@ def recordStringInHDF5(h5file, group, nodename, s, complevel=5, complib='blosc')
     '''creates a CArray object in an HDF5 file
     that represents a unicode string'''
 
-    bytes = np.fromstring(s.encode('utf-8'), np.uint8)
-    atom = pt.UInt8Atom()
-    filters = pt.Filters(complevel=complevel, complib=complib)
-    ca = h5file.create_carray(group, nodename, atom, shape=(len(bytes),),
+    bytes=np.fromstring(s.encode('utf-8'), np.uint8)
+    atom=pt.UInt8Atom()
+    filters=pt.Filters(complevel=complevel, complib=complib)
+    ca=h5file.create_carray(group, nodename, atom, shape=(len(bytes),),
                               filters=filters)
-    ca[:] = bytes
+    ca[:]=bytes
     return ca
 
 
@@ -161,9 +195,9 @@ def retrieveStringFromHDF5(node):
 
 
 def clean_cols_for_hdf(data):
-    types = data.apply(lambda x: pd.lib.infer_dtype(x.values))
+    types=data.apply(lambda x: pd.lib.infer_dtype(x.values))
     for col in types[types == 'mixed'].index:
-        data[col] = data[col].astype(str)
+        data[col]=data[col].astype(str)
     # data[<your appropriate columns here>].fillna(0,inplace=True)
     return data
 
@@ -193,7 +227,7 @@ def write_hdf(f, key, df, complib):
 def get_hdf5_file(fpath, wr_mode='r', complevel=9, complib='blosc', mutiindx=False):
     '''old outdata'''
     # store=pd.HDFStore(fpath,wr_mode, complevel=complevel, complib=complib)
-    fpath = cct.get_ramdisk_path(fpath)
+    fpath=cct.get_ramdisk_path(fpath)
     if fpath is None:
         log.info("don't exists %s" % (fpath))
         return None
@@ -201,13 +235,13 @@ def get_hdf5_file(fpath, wr_mode='r', complevel=9, complib='blosc', mutiindx=Fal
     if os.path.exists(fpath):
         if wr_mode == 'w':
             # store=pd.HDFStore(fpath,complevel=None, complib=None, fletcher32=False)
-            store = pd.HDFStore(fpath)
+            store=pd.HDFStore(fpath)
         else:
-            lock = cct.get_ramdisk_path(fpath, lock=True)
+            lock=cct.get_ramdisk_path(fpath, lock=True)
             while True:
                 try:
                     #                    lock_s = os.open(lock, os.O_CREAT |os.O_EXCL |os.O_WRONLY)
-                    lock_s = os.open(lock, os.O_CREAT | os.O_EXCL)
+                    lock_s=os.open(lock, os.O_CREAT | os.O_EXCL)
                     log.info("SafeHDF:%s read lock:%s" % (lock_s, lock))
                     break
                 # except FileExistsError:
@@ -217,13 +251,13 @@ def get_hdf5_file(fpath, wr_mode='r', complevel=9, complib='blosc', mutiindx=Fal
                     log.error("IOError READ ERROR:%s" % (e))
                     time.sleep(random.random())
 
-            store = pd.HDFStore(fpath, mode=wr_mode)
+            store=pd.HDFStore(fpath, mode=wr_mode)
             # store=pd.HDFStore(fpath, mode=wr_mode, complevel=None, complib=None, fletcher32=False)
             os.remove(lock)
 #            store = SafeHDFStore(fpath)
     else:
         if mutiindx:
-            store = pd.HDFStore(fpath)
+            store=pd.HDFStore(fpath)
             # store = pd.HDFStore(fpath,complevel=9,complib='zlib')
         else:
             return None
@@ -239,59 +273,59 @@ def get_hdf5_file(fpath, wr_mode='r', complevel=9, complib='blosc', mutiindx=Fal
 
 def write_hdf_db(fname, df, table='all', index=False, complib='blosc', baseCount=500, append=True, MultiIndex=False):
     if 'code' in df.columns:
-        df = df.set_index('code')
+        df=df.set_index('code')
 #    write_status = False
-    time_t = time.time()
+    time_t=time.time()
 #    if not os.path.exists(cct.get_ramdisk_dir()):
 #        log.info("NO RamDisk")
 #        return False
-    df = df.fillna(0)
-    code_subdf = df.index.tolist()
+    df=df.fillna(0)
+    code_subdf=df.index.tolist()
     global RAMDISK_KEY
     if not RAMDISK_KEY < 1:
         return df
 
     if not MultiIndex:
-        df['timel'] = time.time()
+        df['timel']=time.time()
     if df is not None and not df.empty and table is not None:
         # h5 = get_hdf5_file(fname,wr_mode='r')
-        tmpdf = []
+        tmpdf=[]
         with SafeHDFStore(fname) as store:
             if store is not None:
                 if '/' + table in store.keys():
-                    tmpdf = store[table]
+                    tmpdf=store[table]
 
         if not MultiIndex:
             if index:
                 # log.error("debug index:%s %s %s"%(df,index,len(df)))
-                df.index = map((lambda x: str(1000000 - int(x))
+                df.index=map((lambda x: str(1000000 - int(x))
                                 if x.startswith('0') else x), df.index)
             if tmpdf is not None and len(tmpdf) > 0:
                 if 'code' in tmpdf.columns:
-                    tmpdf = tmpdf.set_index('code')
+                    tmpdf=tmpdf.set_index('code')
                 if 'code' in df.columns:
-                    df = df.set_index('code')
-                diff_columns = set(df.columns) - set(tmpdf.columns)
+                    df=df.set_index('code')
+                diff_columns=set(df.columns) - set(tmpdf.columns)
                 if len(diff_columns) <> 0:
                     log.error("columns diff:%s" % (diff_columns))
 
-                limit_t = time.time()
-                df['timel'] = limit_t
+                limit_t=time.time()
+                df['timel']=limit_t
                 # df_code = df.index.tolist()
 
-                df = cct.combine_dataFrame(tmpdf, df, col=None, append=append)
+                df=cct.combine_dataFrame(tmpdf, df, col=None, append=append)
 
                 if not append:
-                    df['timel'] = time.time()
+                    df['timel']=time.time()
                 elif fname == 'powerCompute':
-                    o_time = df[df.timel < limit_t].timel.tolist()
-                    o_time = sorted(set(o_time), reverse=False)
+                    o_time=df[df.timel < limit_t].timel.tolist()
+                    o_time=sorted(set(o_time), reverse=False)
                     if len(o_time) > ct.h5_time_l_count:
-                        o_time = [time.time() - t_x for t_x in o_time]
-                        o_timel = len(o_time)
-                        o_time = np.mean(o_time)
+                        o_time=[time.time() - t_x for t_x in o_time]
+                        o_timel=len(o_time)
+                        o_time=np.mean(o_time)
                         if o_time > ct.h5_power_limit_time * 1.5:
-                            df['timel'] = time.time()
+                            df['timel']=time.time()
                             log.error("%s %s o_time:%.1f timel:%s" % (fname, table, o_time, o_timel))
 
     #            df=cct.combine_dataFrame(tmpdf, df, col=None,append=False)
@@ -323,11 +357,11 @@ def write_hdf_db(fname, df, table='all', index=False, complib='blosc', baseCount
 
             if tmpdf is not None and len(tmpdf) > 0:
                 # multi_code = tmpdf.index.get_level_values('code').unique().tolist()
-                multi_code = tmpdf.index.get_level_values('code').unique().tolist()
-                inx_key = multi_code[random.randint(0, len(multi_code))]
+                multi_code=tmpdf.index.get_level_values('code').unique().tolist()
+                inx_key=multi_code[random.randint(0, len(multi_code))]
                 if inx_key in df.index.get_level_values('code'):
-                    now_time = df.loc[inx_key].index[-1]
-                    tmp_time = tmpdf.loc[inx_key].index[-1]
+                    now_time=df.loc[inx_key].index[-1]
+                    tmp_time=tmpdf.loc[inx_key].index[-1]
                     if now_time == tmp_time:
                         log.error("%s %s Multi out time in hdf5:%s" % (fname, table, now_time))
                         return False
@@ -335,20 +369,20 @@ def write_hdf_db(fname, df, table='all', index=False, complib='blosc', baseCount
             else:
                 pass
 
-    time_t = time.time()
+    time_t=time.time()
     if df is not None and not df.empty and table is not None:
         #        df['timel'] =  time.time()
         if df is not None and not df.empty and len(df) > 0:
-            dd = df.dtypes.to_frame()
+            dd=df.dtypes.to_frame()
 
         if 'object' in dd.values:
-            dd = dd[dd == 'object'].dropna()
-            col = dd.index.tolist()
+            dd=dd[dd == 'object'].dropna()
+            col=dd.index.tolist()
             log.info("col:%s" % (col))
             if not MultiIndex:
-                df[col] = df[col].astype(str)
-                df.index = df.index.astype(str)
-                df = df.fillna(0)
+                df[col]=df[col].astype(str)
+                df.index=df.index.astype(str)
+                df=df.fillna(0)
             # else:
             #     print col
             #     for co in col:
@@ -358,19 +392,19 @@ def write_hdf_db(fname, df, table='all', index=False, complib='blosc', baseCount
 #                    recordStringInHDF5(h5file, h5file.root, 'mrtamb',u'\u266b Hey Mr. Tambourine Man \u266b')
 
         with SafeHDFStore(fname) as h5:
-            df = df.fillna(0)
+            df=df.fillna(0)
             if h5 is not None:
                 if '/' + table in h5.keys():
                     if not MultiIndex:
                         h5.remove(table)
-                        h5[table] = df
+                        h5[table]=df
                         # h5.put(table, df, format='table',index=False, data_columns=True, append=False)
                     else:
                         h5.put(table, df, format='table', index=False, complib=complib, data_columns=True, append=True)
                         # h5.append(table, df, format='table', append=True,data_columns=True, dropna=None)
                 else:
                     if not MultiIndex:
-                        h5[table] = df
+                        h5[table]=df
                         # h5.put(table, df, format='table',index=False, data_columns=True, append=False)
                     else:
                         h5.put(table, df, format='table', index=False, complib=complib, data_columns=True, append=True)
@@ -422,46 +456,46 @@ def write_hdf_db(fname, df, table='all', index=False, complib='blosc', baseCount
 
 
 def load_hdf_db(fname, table='all', code_l=None, timelimit=True, index=False, limit_time=ct.h5_limit_time, dratio_limit=0.12):
-    time_t = time.time()
+    time_t=time.time()
     global RAMDISK_KEY, INIT_LOG_Error
     if not RAMDISK_KEY < 1:
         return None
-    df = None
-    dd = None
+    df=None
+    dd=None
     if code_l is not None:
         if table is not None:
             with SafeHDFStore(fname) as store:
                 if store is not None:
                     if '/' + table in store.keys():
-                        dd = store[table]
+                        dd=store[table]
             if dd is not None and len(dd) > 0:
                 if index:
-                    code_l = map((lambda x: str(1000000 - int(x))
+                    code_l=map((lambda x: str(1000000 - int(x))
                                   if x.startswith('0') else x), code_l)
-                dif_co = list(set(dd.index) & set(code_l))
-                dratio = (float(len(code_l)) - float(len(dif_co))) / \
+                dif_co=list(set(dd.index) & set(code_l))
+                dratio=(float(len(code_l)) - float(len(dif_co))) / \
                     float(len(code_l))
                 # if dratio < 0.1 or len(dd) > 3100:
                 if dratio < dratio_limit:
                     log.info("find all:%s :%s %0.2f" %
                              (len(code_l), len(code_l) - len(dif_co), dratio))
                     if timelimit and len(dd) > 0:
-                        dd = dd.loc[dif_co]
-                        o_time = dd[dd.timel <> 0].timel.tolist()
+                        dd=dd.loc[dif_co]
+                        o_time=dd[dd.timel <> 0].timel.tolist()
 #                        if fname == 'powerCompute':
 #                            o_time = sorted(set(o_time),reverse=True)
-                        o_time = sorted(set(o_time), reverse=False)
-                        o_time = [time.time() - t_x for t_x in o_time]
+                        o_time=sorted(set(o_time), reverse=False)
+                        o_time=[time.time() - t_x for t_x in o_time]
 
                         if len(dd) > 0:
                             # if len(dd) > 0 and (not cct.get_work_time() or len(o_time) <= ct.h5_time_l_count):
-                            l_time = np.mean(o_time)
-                            return_hdf_status = (not cct.get_work_time()) or (
+                            l_time=np.mean(o_time)
+                            return_hdf_status=(not cct.get_work_time()) or (
                                 cct.get_work_time() and l_time < limit_time)
                             # return_hdf_status = l_time < limit_time
                             # print return_hdf_status,l_time,limit_time
                             if return_hdf_status:
-                                df = dd
+                                df=dd
                                 log.info("return hdf: %s timel:%s l_t:%s hdf ok:%s" % (
                                     fname, len(o_time), l_time, len(df)))
                         else:
@@ -471,7 +505,7 @@ def load_hdf_db(fname, table='all', code_l=None, timelimit=True, index=False, li
                                  (fname, [time.time() - t_x for t_x in o_time]))
 
                     else:
-                        df = dd.loc[dif_co]
+                        df=dd.loc[dif_co]
                 else:
                     if len(code_l) > ct.h5_time_l_count * 10 and INIT_LOG_Error < 5:
                         # INIT_LOG_Error += 1
@@ -485,45 +519,47 @@ def load_hdf_db(fname, table='all', code_l=None, timelimit=True, index=False, li
             with SafeHDFStore(fname) as store:
                 if store is not None:
                     if '/' + table in store.keys():
-                        dd = store[table]
+                        dd=store[table]
             if dd is not None and len(dd) > 0:
                 if timelimit:
                     if dd is not None and len(dd) > 0:
-                        o_time = dd[dd.timel <> 0].timel.tolist()
-                        o_time = sorted(set(o_time))
-                        o_time = [time.time() - t_x for t_x in o_time]
+                        o_time=dd[dd.timel <> 0].timel.tolist()
+                        o_time=sorted(set(o_time))
+                        o_time=[time.time() - t_x for t_x in o_time]
                         if len(o_time) > 0:
-                            l_time = np.mean(o_time)
+                            l_time=np.mean(o_time)
                             # l_time = time.time() - l_time
-#                                    return_hdf_status = not cct.get_work_day_status()  or not cct.get_work_time() or (cct.get_work_day_status() and (cct.get_work_time() and l_time < limit_time))
-                            return_hdf_status = not cct.get_work_time() or (
+# return_hdf_status = not cct.get_work_day_status()  or not
+# cct.get_work_time() or (cct.get_work_day_status() and
+# (cct.get_work_time() and l_time < limit_time))
+                            return_hdf_status=not cct.get_work_time() or (
                                 cct.get_work_time() and l_time < limit_time)
                             log.info("return_hdf_status:%s time:%0.2f" %
                                      (return_hdf_status, l_time))
                             if return_hdf_status:
                                 log.info("return hdf5 data:%s o_time:%s" %
                                          (len(dd), len(o_time)))
-                                df = dd
+                                df=dd
                             else:
                                 log.info("no return time hdf5:%s" % (len(dd)))
                         log.info('fname:%s l_time:%s' %
                                  (fname, [time.time() - t_x for t_x in o_time]))
                 else:
-                    df = dd
+                    df=dd
             else:
                 log.error("%s is not find %s" % (fname, table))
         else:
             log.error("% / table is Init None:%s"(fname, table))
 
     if df is not None and len(df) > 0:
-        df = df.fillna(0)
+        df=df.fillna(0)
         if 'timel' in df.columns:
-            time_list = df.timel.tolist()
+            time_list=df.timel.tolist()
             # time_list = sorted(set(time_list),key = time_list.index)
-            time_list = sorted(set(time_list))
+            time_list=sorted(set(time_list))
             # log.info("test:%s"%(sorted(set(time_list),key = time_list.index)))
             if time_list is not None and len(time_list) > 0:
-                df['timel'] = time_list[0]
+                df['timel']=time_list[0]
                 log.info("load hdf times:%s" %
                          ([time.time() - t_x for t_x in time_list]))
 
@@ -617,7 +653,7 @@ if __name__ == "__main__":
 
     #    import tushare as ts
     #    df = ts.get_k_data('300334', start='2017-04-01')
-    fname = ['sina_data.h5', 'tdx_last_df', 'powerCompute.h5', 'get_sina_all_ratio']
+    fname=['sina_data.h5', 'tdx_last_df', 'powerCompute.h5', 'get_sina_all_ratio']
     # fname = 'powerCompute.h5'
     for na in fname:
         with SafeHDFStore(na) as h5:

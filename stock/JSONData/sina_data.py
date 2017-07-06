@@ -106,6 +106,8 @@ class Sina:
         self.hdf_name = 'sina_data'
         self.table = 'all'
         self.sina_limit_time = ct.sina_limit_time
+        pd.options.mode.chained_assignment = None
+
         # self.all
         # h5 = self.load_hdf_db(table='all', code_l=None, init=True)
         # if h5 is None:
@@ -549,12 +551,14 @@ class Sina:
         log.info("hdf:all%s %s" % (len(df), len(self.stock_codes)))
         h5a.write_hdf_db(self.hdf_name, df, self.table, index=index)
         dd = df.copy()
-        if not index and len(df) > 3000 and 915 < cct.get_now_time_int() < 1501:
+        # if not index and len(df) > 3000 and 915 < cct.get_now_time_int() < 1505:
+        if not index and len(df) > 3000 and cct.get_work_time():
             time_s = time.time()
             df.index = df.index.astype(str)
             df.ticktime = df.ticktime.astype(str)
             # df.ticktime = map(lambda x: int(x.replace(':', '')), df.ticktime)
-            df = df.loc[:, ['open', 'high', 'low', 'close', 'llastp', 'volume', 'ticktime']]
+            # df = df.loc[:, ['open', 'high', 'low', 'close', 'llastp', 'volume', 'ticktime']]
+            df = df.loc[:, ['close','high', 'low', 'llastp', 'volume', 'ticktime']]
             if 'code' not in df.columns:
                 df = df.reset_index()
             if 'dt' in df.columns:
@@ -610,13 +614,46 @@ if __name__ == "__main__":
 #    print sina.get_stock_code_data('002873')
     # print sina.get_stock_code_data('600199,300334',index=False)
     # print len(sina.market('sh'))
-
+    def compute_lastdays_percent(df=None, step=3):
+        if df is not None and len(df) > step:
+            df = df.sort_index(ascending=True)
+            # if cct.get_work_day_status() and 915 < cct.get_now_time_int() < 1500:
+                # df = df[df.index < cct.get_today()]
+            df = df.fillna(0)
+            da = step
+            # for da in range(1, step + 1, 1):
+            df['lastp%sd' % da] = df['close'].shift(da)
+            df['lastv%sd' % da] = df['volume'].shift(da)
+            df['per%sd' % da] = ((df['close'] - df['lastp%sd' % da]) / df['lastp%sd' % da]).map(lambda x: round(x * 100, 2))
+            df['vol%sd' % da] = ((df['volume'] - df['lastv%sd' % da])).map(lambda x: round(x / 100, 1))
+            # if da == 1:
+            #     df['perlastp'] = (df['per%sd' % da]).map(lambda x: 1 if x >= -0.1 else 0)
+            # df['perlastp'] = (df['per%sd' % da]).map(lambda x: 1 if x >= 0 else -1)
+            # df['perc%sd' % da] = int(df['perlastp'][-da:].sum())
+            # df = df.reset_index()
+        else:
+            log.info("compute df is none")
+        return df
+    h5_fname='sina_MultiIndex_data'
+    # h5_fname='sina_multi_index'
+    h5_table = 'all_10'
+    time_s=time.time()
+    df = h5a.load_hdf_db(h5_fname, table=h5_table, code_l=None, timelimit=False, dratio_limit=0.12)  
+    # import pandas as pd
+    # df = pd.HDFStore(cct.get_ramdisk_path(h5_fname))[h5_table]
+    code='300248'
+    # print df.loc[code]
+    print "t:",round(time.time()-time_s,1),
+    df = compute_lastdays_percent(df=df.loc[code], step=1)
+    # print df[df.index < '09:32:00']
+    print round(time.time()-time_s,1),df[-50:]
+    # sys.exit(0)
     time_s = time.time()
     dd = pd.DataFrame()
     # st=h5a.get_hdf5_file(f_name, wr_mode='w', complevel=9, complib='zlib',mutiindx=True)
     h5_fname = 'sina_multi_index'
     dl = 30
-    h5_table = 'all' + '_' + str(dl)
+    h5_table = 'all' + '_' + str(10)
     df = Sina().market('all')
     if 1 and len(df) > 0:
         # stock_data.index = pd.to_datetime(stock_data.index, format='%Y-%m-%d')
@@ -628,7 +665,21 @@ if __name__ == "__main__":
         # df.index = df.index.astype(int)
         # df.ticktime = df.ticktime.astype(str)
         # df.ticktime = pd.to_datetime(df.ticktime, format='%H:%M:%S').dt.time()
+        # price change  volume   amount type
+        
+        
         df.ticktime = map(lambda x: int(x.replace(':', '')), df.ticktime)
+        # df = df.loc[:, ['open', 'high', 'low', 'close', 'llastp', 'volume', 'ticktime']]
+        # df = df.loc[:, ['open', 'high', 'low', 'close', 'llastp', 'volume', 'ticktime']]
+        df = df.loc[:, ['close','high', 'low', 'llastp', 'volume', 'ticktime']]
+                   # if 'code' not in df.columns:
+                   #     df = df.reset_index()
+                   # if 'dt' in df.columns:
+                   #     df = df.drop(['dt'], axis=1)
+                   #     # df.dt = df.dt.astype(str)
+                   # if 'name' in df.columns:
+                   #     # df.name = df.name.astype(str)
+                   #     df = df.drop(['name'], axis=1)
         if 'code' not in df.columns:
             df = df.reset_index()
         if 'dt' in df.columns:
@@ -643,7 +694,7 @@ if __name__ == "__main__":
         # df = df.astype(float)
         # xcode = cct.code_to_symbol(code)
         # dd = pd.concat([dd, df], axis=0)
-        print df.loc[('600151')].index[-1]
+        # print df.loc[('600151')].index[-1]
         print ".", len(df)
         # st.append(xcode,df)
         put_time = time.time()
@@ -671,6 +722,7 @@ if __name__ == "__main__":
         time_s = time.time()
         h5a.write_hdf_db(h5_fname, df, table=h5_table, index=False, baseCount=500, append=False, MultiIndex=True)
         print("hdf5 main all :%s  time:%0.2f" % (len(df), time.time() - time_s))
+
 
     sys.exit(0)
     for ma in ['sh', 'sz', 'cyb', 'all']:
