@@ -1160,7 +1160,14 @@ def get_config_value(fname,classtype,xvalue,newvalue,xtype='limit',write=False):
         config = ConfigObj(conf_ini,encoding='UTF8')
         if classtype in config.keys():
             if int(config[classtype][xtype]) > xvalue:
-                log.info("f_size:%s < read_limit:%s" % (xvalue, config[classtype][xtype]))
+                ratio = float(config[classtype][xtype]) / newvalue  
+                if ratio < 1.2: 
+                    log.info("f_size:%s < read_limit:%s ratio:%0.2f" % (xvalue, config[classtype][xtype],ratio))
+                else:
+                    config[classtype][xtype] = newvalue
+                    config.write()
+                    log.info("f_size:%s < read_limit:%s ratio < 2 ratio:%0.2f" % (xvalue, config[classtype][xtype],ratio))
+
             else:
                 log.error("f_size:%s > read_limit:%s" % (xvalue, config[classtype][xtype]))
                 config[classtype][xtype] = newvalue
@@ -1171,11 +1178,13 @@ def get_config_value(fname,classtype,xvalue,newvalue,xtype='limit',write=False):
             config[classtype] = {}
             config[classtype][xtype] = newvalue
             config.write()
+            return True
     else:
         config = ConfigObj(conf_ini,encoding='UTF8')
         config[classtype] = {}
         config[classtype][xtype] = newvalue
         config.write()
+        return True
     return False
 
 def write_to_blocknew(p_name, data, append=True):

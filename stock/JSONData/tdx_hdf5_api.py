@@ -16,10 +16,10 @@ import numpy as np
 import subprocess
 log = LoggerFactory.log
 import gc
-global RAMDISK_KEY, INIT_LOG_Error, Compress_Count
+global RAMDISK_KEY, INIT_LOG_Error
 RAMDISK_KEY = 0
 INIT_LOG_Error = 0
-Compress_Count = 1
+# Compress_Count = 1
 BaseDir = cct.get_ramdisk_dir()
 
 
@@ -129,12 +129,13 @@ class SafeHDFStore(HDFStore):
             HDFStore.__exit__(self, *args, **kwargs)
             os.close(self._flock)
             h5_size = os.path.getsize(self.fname) / 1000 / 1000
-            new_limit = ((h5_size / 10 + 1) * self.big_H5_Size_limit)
-            global Compress_Count
-            if Compress_Count == 1 and self.h5_size_org > self.big_H5_Size_limit:
-                log.info("Compress_Count init:%s h5_size_org:%s" % (Compress_Count, self.h5_size_org))
-            log.info("fname:%s h5_size:%s big:%s" % (self.fname,h5_size, self.big_H5_Size_limit * Compress_Count))
-            if  h5_size > self.big_H5_Size_limit * Compress_Count:
+            new_limit = ((h5_size / self.big_H5_Size_limit + 1) * self.big_H5_Size_limit)
+            # global Compress_Count
+           # if Compress_Count == 1 and self.h5_size_org > self.big_H5_Size_limit:
+#                cct.get_config_value(self.config_ini,self.fname_o,h5_size,new_limit)
+               # log.info("Compress_Count init:%s h5_size_org:%s" % (Compress_Count, self.h5_size_org))
+            log.info("fname:%s h5_size:%s big:%s" % (self.fname,h5_size, self.big_H5_Size_limit))
+            if  h5_size >= self.big_H5_Size_limit:
                 if cct.get_config_value(self.config_ini,self.fname_o,h5_size,new_limit):
                     time_pt=time.time()
                     os.rename(self.fname, self.temp_file)
@@ -146,8 +147,8 @@ class SafeHDFStore(HDFStore):
                         # return -1
                     else:
                         os.remove(self.temp_file)
-                    Compress_Count += 1
-                    log.error("fname:%s h5_size:%sM Limit:%s t:%.1f" % (self.fname, h5_size, self.big_H5_Size_limit * Compress_Count, time_pt - time.time()))
+                    # Compress_Count += 2
+                    log.error("fname:%s h5_size:%sM Limit:%s t:%.1f" % (self.fname, h5_size, self.big_H5_Size_limit , time_pt - time.time()))
 
             os.remove(self._lock)
             gc.collect()
