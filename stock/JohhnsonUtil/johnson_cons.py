@@ -715,7 +715,7 @@ def get_Dynamic_Duration_perd_org(market_sort_value, idx_perd, columns=None):
     idx_l.extend(eval(market_sort_value)[2:])
     return idx_l
 
-print get_market_sort_value_key('3 2 3')
+# print get_market_sort_value_key('3 2 3')
 # print get_market_sort_value_key('1')
 # print get_market_sort_value_key('2 2 5')
 # print get_Dynamic_Duration_perd('Duration_sort_perd',3,Monitor_format_trade)
