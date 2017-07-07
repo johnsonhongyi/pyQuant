@@ -651,7 +651,7 @@ def get_Dynamic_Duration_perd(market_sort_value, idx_perd, columns=None):
     idx_value = eval(market_sort_value)[0]
     idx_value2 = eval(market_sort_value)[1]
     idx_l = [idx_value % idx_perd]
-    print  idx_value,idx_l
+    # print  idx_value,idx_l
     if idx_perd > 1:
         if idx_perd > 3 and columns is not None and len(columns) > 0:
             idx_k = idx_perd
