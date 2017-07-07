@@ -516,12 +516,14 @@ class Sina:
         # df = df.drop('close', axis=1)
         df.rename(columns={'close': 'llastp'}, inplace=True)
         df['b1_vv'] = df['b1_v']
-        if (cct.get_now_time_int() > 915 and cct.get_now_time_int() < 926):
+        if (cct.get_now_time_int() > 915 and cct.get_now_time_int() < 1100):
             #            df.rename(columns={'buy': 'close'}, inplace=True)
             df['close'] = df['buy']
             df['low'] = df['buy']
-            df['b1_v'] = ((df['b1_v']) / 100 / 10000).map(lambda x: round(x, 1) + 0.01)
+            df['b1_v'] = ((df['b1_v'] + df['b2_v'])/ 100 / 10000 ).map(lambda x: round(x, 1)+0.01)
+            # df['b1_v'] = ((df['b1_v']) / 100 / 10000).map(lambda x: round(x, 1) + 0.01)
             # df['b1_vv'] = map(lambda x: round(x / 100 / 10000, 1) + 0.01, df['b1_v'])
+            print 'a'
 
         elif (cct.get_now_time_int() > 830 and cct.get_now_time_int() <= 915):
             #            df.rename(columns={'buy': 'close'}, inplace=True)
@@ -609,7 +611,7 @@ if __name__ == "__main__":
     # print df
     # df = sina.get_stock_code_data('000001',index=True).set_index('code')
     # df= sina.get_stock_code_data('999999,399001',index=True)
-    df = sina.get_stock_code_data(['300421', '300633', '300306'])
+    df = sina.get_stock_code_data(['300421', '300609', '300306','600007'])
     print df.T
 #    print sina.get_stock_code_data('002873')
     # print sina.get_stock_code_data('600199,300334',index=False)
@@ -635,18 +637,20 @@ if __name__ == "__main__":
             log.info("compute df is none")
         return df
     h5_fname='sina_MultiIndex_data'
-    # h5_fname='sina_multi_index'
+    h5_fname='sina_multi_index'
     h5_table = 'all_10'
     time_s=time.time()
     df = h5a.load_hdf_db(h5_fname, table=h5_table, code_l=None, timelimit=False, dratio_limit=0.12)  
     # import pandas as pd
     # df = pd.HDFStore(cct.get_ramdisk_path(h5_fname))[h5_table]
-    code='300248'
-    # print df.loc[code]
+    # code='300248'
+    code='000099'
     print "t:",round(time.time()-time_s,1),
-    df = compute_lastdays_percent(df=df.loc[code], step=1)
-    # print df[df.index < '09:32:00']
-    print round(time.time()-time_s,1),df[-50:]
+    if df is not None and len(df) > 0:
+        df = compute_lastdays_percent(df=df.loc[code], step=1)
+        print df[:3]
+        # print df[df.index < '09:32:00']
+        print df[-10:],round(time.time()-time_s,1)
     # sys.exit(0)
     time_s = time.time()
     dd = pd.DataFrame()

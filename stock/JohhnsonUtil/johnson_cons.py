@@ -553,17 +553,22 @@ def get_Duration_format_Values(duration_format, column=None, replace='per3d'):
     if column is not None:
         t_list = []
         if isinstance(column, list):
-            for co in column:
-                if co not in duration_format:
+            for i,co in enumerate(column):
+                if replace in column or co not in duration_format:
                     if co.find('per') > -1:
                         if co.find('perc') > -1:
                             replace = 'per3d'
                         else:
                             replace = 'per1d'
+                    count = duration_format.count(replace)
+                    idx = 1
                     for v in duration_format:
                         if v == replace:
-                            #                print replace,v
-                            t_list.append(co)
+                            if count == idx:
+                                t_list.append(co)
+                            else:
+                                idx += 1
+                                t_list.append(v)
                         else:
                             t_list.append(v)
 
@@ -611,7 +616,7 @@ def get_market_sort_value_key(st, top_all=None,perd_d=3):
                         else:
                             market_sort_value = get_Dynamic_Duration_perd(market_sort_value, '1')
                 else:
-                    if st_l[1] <> 'f' and int(st_l[1]) <= perd_d: 
+                    if st_l[1] <> 'f' and int(st_l[1]) <= perd_d:
                         market_sort_value = get_Dynamic_Duration_perd(market_sort_value, int(st_l[1]))
                     else:
                         market_sort_value = get_Dynamic_Duration_perd(market_sort_value, '1')
@@ -646,6 +651,7 @@ def get_Dynamic_Duration_perd(market_sort_value, idx_perd, columns=None):
     idx_value = eval(market_sort_value)[0]
     idx_value2 = eval(market_sort_value)[1]
     idx_l = [idx_value % idx_perd]
+    print  idx_value,idx_l
     if idx_perd > 1:
         if idx_perd > 3 and columns is not None and len(columns) > 0:
             idx_k = idx_perd
@@ -656,15 +662,19 @@ def get_Dynamic_Duration_perd(market_sort_value, idx_perd, columns=None):
         else:
             idx_k = idx_perd if idx_perd <=3 else 3
         idx_l2 = [idx_value2 % idx_k]
+        print  idx_value,idx_l,idx_l2
     else:
         idx_l2 = [idx_value2 % 3]
+    print  idx_value,idx_l,idx_l2
+
     idx_l.extend(idx_l2)
     idx_l.extend(eval(market_sort_value)[2:])
     return idx_l
 # print get_market_sort_value_key('2 3 1 f')
 # print get_market_sort_value_key('1')
-# print get_market_sort_value_key('2 2')
-# print get_Duration_format_Values(Duration_format_buy,['per2d','perc2d'])
+# print get_market_sort_value_key('2 3')
+# print get_Dynamic_Duration_perd('Duration_sort_perd',3,Monitor_format_trade)
+# print get_Duration_format_Values(Duration_format_buy,['per3d','perc3d'])
 
 
 def _write_head():
