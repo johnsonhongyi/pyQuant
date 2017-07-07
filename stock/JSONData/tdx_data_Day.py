@@ -31,7 +31,7 @@ log = LoggerFactory.log
 # log.setLevel(LoggerFactory.ERROR)
 
 path_sep = os.path.sep
-newdaysinit = 15
+newdaysinit = ct.newdays_limit_days
 changedays = 0
 global initTdxdata, initTushareCsv
 initTdxdata = 0

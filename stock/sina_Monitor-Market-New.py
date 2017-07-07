@@ -75,10 +75,10 @@ if __name__ == "__main__":
 
     # width, height = 132, 18
     if cct.isMac():
-        width, height = 166, 16
+        width, height = 170, 16
         cct.set_console(width, height)
     else:
-        width, height = 166, 18
+        width, height = 170, 18
         cct.set_console(width, height)
     status = False
     vol = ct.json_countVol
