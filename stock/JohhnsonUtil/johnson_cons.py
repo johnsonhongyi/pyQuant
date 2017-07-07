@@ -662,10 +662,10 @@ def get_Dynamic_Duration_perd(market_sort_value, idx_perd, columns=None):
         else:
             idx_k = idx_perd if idx_perd <=3 else 3
         idx_l2 = [idx_value2 % idx_k]
-        print  idx_value,idx_l,idx_l2
+        # print  idx_value,idx_l,idx_l2
     else:
         idx_l2 = [idx_value2 % 3]
-    print  idx_value,idx_l,idx_l2
+    # print  idx_value,idx_l,idx_l2
 
     idx_l.extend(idx_l2)
     idx_l.extend(eval(market_sort_value)[2:])
