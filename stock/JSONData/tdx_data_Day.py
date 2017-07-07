@@ -1879,7 +1879,8 @@ def compute_lastdays_percent(df=None, lastdays=3):
             df['per%sd' % da] = ((df['close'] - df['lastp%sd' % da]) / df['lastp%sd' % da]).map(lambda x: round(x * 100, 2))
             if da == 1:
                 # df['perlastp'] = df['per%sd' % da]
-                df['perlastp'] = (df['per%sd' % da]).map(lambda x: 1 if x >= -0.1 else 0)
+                # df['perlastp'] = (df['per%sd' % da]).map(lambda x: 1 if x >= -0.1 else 0)
+                df['perlastp'] = map((lambda x, y, z: (1 if (x - y) else -2) + (1 if z > 0 else 0)), df['high'], df['lasth%sd' % da], df['per%sd' % da])
 
             df['mean%sd' % da] = (
                 (df['lasth%sd' % da] + df['lastl%sd' % da]) / 2).map(lambda x: round(x, 2))
@@ -2893,6 +2894,7 @@ if __name__ == '__main__':
     # code = '300661'
     # code = '600581'
     code = '603668'
+    # code = '000916'
     # code = '600619'
 
     # print get_tdx_Exp_day_to_df(code, dl=30, newdays=0, resample='d')

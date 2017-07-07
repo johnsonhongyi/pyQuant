@@ -596,6 +596,7 @@ def get_market_sort_value_key(st, top_all=None,perd_d=3):
     st_l = st.split()
     st_count = len(st_l)
     st = st_l[0]
+    f_count = st_l.count('f')
     if st in Market_sort_idx_perd.keys():
         # market_sort_value = Market_sort_idx_perd[st]
         market_sort_value = Market_sort_idx_perd[st].replace("ct.", '')
@@ -606,6 +607,8 @@ def get_market_sort_value_key(st, top_all=None,perd_d=3):
                 idx_perd = st_l[1]
                 if top_all is not None and len(top_all) > 0:
                     if idx_value % idx_perd in top_all.columns:
+                        if st_count > 2 and st_l[2].isdigit():
+                            idx_perd = st_l[1:3]
                         market_sort_value = get_Dynamic_Duration_perd(market_sort_value, idx_perd, top_all.columns)
                     else:
                         idx_k = None
@@ -619,48 +622,87 @@ def get_market_sort_value_key(st, top_all=None,perd_d=3):
                             market_sort_value = get_Dynamic_Duration_perd(market_sort_value, '1')
                 else:
                     if st_l[1] <> 'f' and int(st_l[1]) <= perd_d:
-                        market_sort_value = get_Dynamic_Duration_perd(market_sort_value, int(st_l[1]))
+                        if st_count > 2 and st_l[2].isdigit():
+                            idx_perd = st_l[1:3]
+                        market_sort_value = get_Dynamic_Duration_perd(market_sort_value, idx_perd)
                     else:
                         market_sort_value = get_Dynamic_Duration_perd(market_sort_value, '1')
 
-                if st_count > 2:
-                    if st_l[2] == 'f':
-                        market_sort_value_key = negate_boolean_list(market_sort_value_key)
-                    if st_count == 4:
-                        if st_l[3] == 'f':
-                            market_sort_value_key = negate_boolean_list(market_sort_value_key, idx=1, position=True)
-
-                if st_count > 1 and st_l[1] == 'f':
+                if f_count == 2:
                     market_sort_value_key = negate_boolean_list(market_sort_value_key)
-                    if st_count == 3 and st_l[2] == 'f':
+                    market_sort_value_key = negate_boolean_list(market_sort_value_key, idx=1, position=True)
+                elif f_count == 1:
+                    if 'd' in st_l:
                         market_sort_value_key = negate_boolean_list(market_sort_value_key, idx=1, position=True)
+                    else:
+                        market_sort_value_key = negate_boolean_list(market_sort_value_key)
+
             else:
                 market_sort_value = get_Dynamic_Duration_perd(market_sort_value, '1')
-                # print market_sort_value,st_count
-                if st_count > 1 and st_l[1] == 'f':
+                if f_count == 2:
                     market_sort_value_key = negate_boolean_list(market_sort_value_key)
-                if st_count == 3 and st_l[2] == 'f':
                     market_sort_value_key = negate_boolean_list(market_sort_value_key, idx=1, position=True)
+                elif f_count == 1:
+                    if 'd' in st_l:
+                        market_sort_value_key = negate_boolean_list(market_sort_value_key, idx=1, position=True)
+                    else:
+                        market_sort_value_key = negate_boolean_list(market_sort_value_key)
         else:
             market_sort_value_key = eval(market_sort_value + '_key')
-            if st_count > 1 and st_l[1] == 'f':
+            if f_count == 2:
                 market_sort_value_key = negate_boolean_list(market_sort_value_key)
+                market_sort_value_key = negate_boolean_list(market_sort_value_key, idx=1, position=True)
+            elif f_count == 1:
+                if 'd' in st_l:
+                    market_sort_value_key = negate_boolean_list(market_sort_value_key, idx=1, position=True)
+                else:
+                    market_sort_value_key = negate_boolean_list(market_sort_value_key)
             market_sort_value = eval(market_sort_value)
     return market_sort_value, market_sort_value_key
 
-
 def get_Dynamic_Duration_perd(market_sort_value, idx_perd, columns=None):
+    # idx_value = eval(market_sort_value)[0]
+    # idx_value2 = eval(market_sort_value)[1]
+    if not isinstance(idx_perd, list):
+        idx_perd =[idx_perd,idx_perd]
+    # idx_l = [idx_value % idx_perd[0]]
+    idx_l = []
+    for i,idx in enumerate(idx_perd):
+        idx_value = eval(market_sort_value)[i]
+        idx_perd = int(idx)
+        if idx_perd > 1 or i == 0:
+            if idx_perd > 3 and columns is not None and len(columns) > 0:
+                idx_k = idx_perd
+                if not idx_value % idx_k in columns:
+                    for inx in range(8, 1, -1):
+                        if idx_value % inx in columns:
+                            idx_k = inx
+                            break
+            else:
+                idx_k = idx_perd if idx_perd <=3 else 3
+            idx_l2 = [idx_value % idx_k]
+        else:
+            idx_l2 = [idx_value % 2]
+
+        idx_l.extend(idx_l2)
+    idx_l.extend(eval(market_sort_value)[2:])
+    return idx_l
+
+def get_Dynamic_Duration_perd_org(market_sort_value, idx_perd, columns=None):
     idx_value = eval(market_sort_value)[0]
     idx_value2 = eval(market_sort_value)[1]
     idx_l = [idx_value % idx_perd]
     # print  idx_value,idx_l
+    idx_perd = int(idx_perd)
     if idx_perd > 1:
         if idx_perd > 3 and columns is not None and len(columns) > 0:
             idx_k = idx_perd
-            for inx in range(8, 1, -1):
-                if idx_value2 % inx in columns:
-                    idx_k = inx
-                    break
+            if not idx_value2 % idx_k in columns:
+
+                for inx in range(8, 1, -1):
+                    if idx_value2 % inx in columns:
+                        idx_k = inx
+                        break
         else:
             idx_k = idx_perd if idx_perd <=3 else 3
         idx_l2 = [idx_value2 % idx_k]
@@ -672,9 +714,10 @@ def get_Dynamic_Duration_perd(market_sort_value, idx_perd, columns=None):
     idx_l.extend(idx_l2)
     idx_l.extend(eval(market_sort_value)[2:])
     return idx_l
-# print get_market_sort_value_key('2 3 1 f')
+
+print get_market_sort_value_key('3 2 3')
 # print get_market_sort_value_key('1')
-# print get_market_sort_value_key('2 3')
+# print get_market_sort_value_key('2 2 5')
 # print get_Dynamic_Duration_perd('Duration_sort_perd',3,Monitor_format_trade)
 # print get_Duration_format_Values(Duration_format_buy,['per3d','perc3d'])
 
