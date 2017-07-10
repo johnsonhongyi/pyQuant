@@ -28,7 +28,10 @@ def getBollFilter(df=None, boll=6, duration=ct.PowerCountdl, filter=True, ma5d=T
         if resample == 'd':
             df.loc[df.per1d >= 9.94, 'per1d'] = 10
             df['percent'] = df['percent'].apply(lambda x:round(x,1))
-
+    radio_t = cct.get_work_time_ratio()
+    df['lvolr%s'%(resample)] = df['volume']
+    df['volume'] = (map(lambda x, y: round(x / y / radio_t, 1), df.nvol.values, df.lvolume.values))
+            
     if 'ma5d' in df.columns:
         df = df[df.buy > df.ma5d * ct.changeRatio]
 

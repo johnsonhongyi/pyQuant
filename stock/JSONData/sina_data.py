@@ -536,7 +536,7 @@ class Sina:
             # df.rename(columns={'now': 'close'}, inplace=True)
             df['close'] = df['now']
 
-        # df =
+        df['nvol'] = df['volume']
         df = df.drop_duplicates('code')
         # df = df.loc[:, ct.SINA_Total_Columns_Clean]
         # df = df.loc[:, ct.SINA_Total_Columns]

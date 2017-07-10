@@ -795,7 +795,7 @@ def get_tdx_append_now_df_api(code, start=None, end=None, type='f', df=None, dm=
         dm_code = dm_code.set_index('date')
         # log.debug("df.open:%s dm.open%s" % (df.open[-1], round(dm.open[-1], 2)))
         # print df.close[-1],round(dm.close[-1],2)
-        if end is None and ((df is not None and df.empty) or (round(df.open[-1], 2) != round(dm.open[-1], 2)) or (round(df.close[-1], 2) != round(dm.close[-1], 2))):
+        if end is None and ((df is not None and not dm.empty) or (round(df.open[-1], 2) != round(dm.open[-1], 2)) or (round(df.close[-1], 2) != round(dm.close[-1], 2))):
             if dm.open[0] > 0 and len(df) > 0:
                 if dm_code.index == df.index[-1]:
                     log.debug("app_api_dm.Index:%s df:%s" %
@@ -841,7 +841,7 @@ def get_tdx_append_now_df_api(code, start=None, end=None, type='f', df=None, dm=
     return df
 
 
-def get_tdx_append_now_df_api_tofile(code, dm=None, newdays=0, start=None, end=None, type='f', df=None, dl=2, power=True):
+def get_tdx_append_now_df_api_tofile(code, dm=None, newdays=0, start=None, end=None, type='f', df=None, dl=5, power=True):
 
     start = cct.day8_to_day10(start)
     end = cct.day8_to_day10(end)
@@ -1019,7 +1019,7 @@ def get_tdx_append_now_df_api_tofile(code, dm=None, newdays=0, start=None, end=N
         dm_code = dm_code.set_index('date')
         # log.debug("df.open:%s dm.open%s" % (df.open[-1], round(dm.open[-1], 2)))
         # print df.close[-1],round(dm.close[-1],2)
-        if end is None and ((df is not None and df.empty) or (round(df.open[-1], 2) != round(dm.open[-1], 2)) or (round(df.close[-1], 2) != round(dm.close[-1], 2))):
+        if end is None and ((df is not None and not dm.empty) or (round(df.open[-1], 2) != round(dm.open[-1], 2)) or (round(df.close[-1], 2) != round(dm.close[-1], 2))):
             if dm.open[0] > 0 and len(df) > 0:
                 if dm_code.index[-1] == df.index[-1]:
                     log.debug("app_api_dm.Index:%s df:%s" %
@@ -1109,11 +1109,11 @@ def write_tdx_tushare_to_file(code, df=None, start=None, type='f'):
             tmpo = fo.tell()
             line = fo.readline()
             alist = line.split(',')
-            if len(alist) == 7:
+            if len(alist) >= 7:
                 if len(alist[0]) != 10:
                     continue
                 tvol = round(float(alist[5]), 0)
-                tamount = round(float(alist[6].replace('\r\n', '')), 0)
+                tamount = round(float(alist[6].split('\r')[0].replace('\r\n', '')), 0)
     #            print int(tamount)
                 if fsize > 600 and (int(tvol) == 0 or int(tamount) == 0):
                     continue
@@ -1128,6 +1128,10 @@ def write_tdx_tushare_to_file(code, df=None, start=None, type='f'):
         po = plist[-1]
         fo.seek(po)
         dater = fo.read(10)
+        if dater.startswith('\n') and len(dater) == 10:
+            po = plist[-1]+2
+            fo.seek(po)
+            dater = fo.read(10)
         df = df[df.index >= dater]
     if len(df) >= 1:
         if fsize == 0:
@@ -1209,11 +1213,12 @@ def write_tdx_sina_data_to_file(code, dm=None, df=None, dl=2, type='f'):
             tmpo = fo.tell()
             line = fo.readline()
             alist = line.split(',')
-            if len(alist) == 7:
+            if len(alist) >= 7:
                 if len(alist[0]) != 10:
                     continue
+                tdate = alist[0]
                 tvol = round(float(alist[5]), 0)
-                tamount = round(float(alist[6].replace('\r\n', '')), 0)
+                tamount = round(float(alist[6].split('\r')[0].replace('\r\n', '')), 0)
     #            print int(tamount)
                 if fsize > 600 and (int(tvol) == 0 or int(tamount) == 0):
                     continue
@@ -1228,6 +1233,10 @@ def write_tdx_sina_data_to_file(code, dm=None, df=None, dl=2, type='f'):
         po = plist[-1]
         fo.seek(po)
         dater = fo.read(10)
+        if dater.startswith('\n') and len(dater) == 10:
+            po = plist[-1]+2
+            fo.seek(po)
+            dater = fo.read(10)
         df = df[df.index >= dater]
 
     if len(df) >= 1:
@@ -1310,10 +1319,10 @@ def Write_market_all_day_mp(market='all', rewrite=False):
         results = cct.to_mp_run_async(
             get_tdx_append_now_df_api_tofile, code_list, dm, 0)
         # for code in code_list:
-        #    print "code:%s "%(code),
-        #    res=get_tdx_append_now_df_api_tofile(code,dm,5)
-        #    print "status:%s\t"%(len(res)),
-        #    results.append(res)
+           # print "code:%s "%(code),
+           # res=get_tdx_append_now_df_api_tofile(code,dm,5)
+           # print "status:%s\t"%(len(res)),
+           # results.append(res)
         print "t:", round(time.time() - time_t, 2)
 
 
@@ -1374,12 +1383,12 @@ def get_tdx_power_now_df(code, start=None, end=None, type='f', df=None, dm=None,
         # print df.close[-1],round(dm.close[-1],2)
         # if df.close[-1] != round(dm.close[-1], 2) and end is None:
 
-        # if (df is not None and df.empty) or (df.open[-1] != round(dm.open[-1], 2) and end is None):
+        # if (df is not None and not dm.empty) or (df.open[-1] != round(dm.open[-1], 2) and end is None):
         #     # print (dm),(df)
         #     if dm.open[0] > 0:
         #         df = df.append(dm_code)
         #         df = df.astype(float)
-        if end is None and ((df is not None and df.empty) or (round(df.open[-1], 2) != round(dm.open[-1], 2)) or (round(df.close[-1], 2) != round(dm.close[-1], 2))):
+        if end is None and ((df is not None and not dm.empty) or (round(df.open[-1], 2) != round(dm.open[-1], 2)) or (round(df.close[-1], 2) != round(dm.close[-1], 2))):
             if dm.open[0] > 0:
                 if dm_code.index == df.index[-1]:
                     log.debug("app_api_dm.Index:%s df:%s" %
@@ -1996,13 +2005,6 @@ def get_tdx_exp_low_or_high_power(code, dt=None, ptype='close', dl=None, end=Non
         df = get_tdx_Exp_day_to_df(
             code, start=dt, dl=dl, end=end, newdays=newdays, resample=resample).sort_index(ascending=False)
         if df is not None and len(df) > 0:
-            # if code == '000916':
-                # print code,df.vol[1],df.vol
-            if len(df) > 1:
-                df['lvol'] = df.vol[1]
-            else:
-                df['lvol'] = df.vol[0]
-                log.info("object"%(code))
             if power:
                 from JSONData import powerCompute as pct
                 dtype = 'd'
@@ -2387,7 +2389,7 @@ def get_append_lastp_to_df(top_all, lastpTDX_DF=None, dl=ct.PowerCountdl, end=No
             tdxdata.rename(columns={'close': 'lastp'}, inplace=True)
             # tdxdata.rename(columns={'low': 'lastp'}, inplace=True)
             tdxdata.rename(columns={'low': 'llow'}, inplace=True)
-            tdxdata.rename(columns={'vol': 'lowvol'}, inplace=True)
+            tdxdata.rename(columns={'vol': 'lvol'}, inplace=True)
             tdxdata.rename(columns={'amount': 'lamount'}, inplace=True)
             h5 = h5a.write_hdf_db(
                 h5_fname, tdxdata, table=h5_table, append=True)
@@ -2414,7 +2416,7 @@ def get_append_lastp_to_df(top_all, lastpTDX_DF=None, dl=ct.PowerCountdl, end=No
                 tdx_diff.rename(columns={'close': 'lastp'}, inplace=True)
                 # tdxdata.rename(columns={'low': 'lastp'}, inplace=True)
                 tdx_diff.rename(columns={'low': 'llow'}, inplace=True)
-                tdx_diff.rename(columns={'vol': 'lowvol'}, inplace=True)
+                tdx_diff.rename(columns={'vol': 'lvol'}, inplace=True)
                 tdx_diff.rename(columns={'amount': 'lamount'}, inplace=True)
                 tdxdata = pd.concat([tdxdata, tdx_diff], axis=0)
                 # h5 = h5a.write_hdf_db(h5_fname, tdxdata, table=h5_table)
@@ -2885,7 +2887,10 @@ if __name__ == '__main__':
     # print python_resample(qs, xs, rands)
     # print get_kdate_data('300534', start='2017-05-01', end='', ktype='D')
 #    code='300174'
-    # get_tdx_append_now_df_api_tofile('603113', dm=None, newdays=1, start=None, end=None, type='f', df=None, dl=2, power=True)
+    # dm = get_sina_data_df(sina_data.Sina().market('all').index.tolist())
+    dm = None
+    # get_tdx_append_now_df_api_tofile('002196', dm=dm,newdays=0, start=None, end=None, type='f', df=None, dl=10, power=True)
+    get_tdx_append_now_df_api_tofile('002196', dm=dm,newdays=1,dl=5)
 #
     # code = '300661'
     # code = '600581'
