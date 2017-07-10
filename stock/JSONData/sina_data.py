@@ -520,7 +520,7 @@ class Sina:
             #            df.rename(columns={'buy': 'close'}, inplace=True)
             df['close'] = df['buy']
             df['low'] = df['buy']
-            df['b1_v'] = ((df['b1_v'] + df['b2_v']) / 100 / 10000).map(lambda x: round(x, 1) + 0.01)
+            # df['b1_v'] = ((df['b1_v'] + df['b2_v']) / 100 / 10000).map(lambda x: round(x, 1) + 0.01)
             # df['b1_v'] = ((df['b1_v']) / 100 / 10000).map(lambda x: round(x, 1) + 0.01)
             # df['b1_vv'] = map(lambda x: round(x / 100 / 10000, 1) + 0.01, df['b1_v'])
 
@@ -529,13 +529,10 @@ class Sina:
             df['buy'] = df['llastp']
             df['close'] = df['buy']
             df['low'] = df['buy']
-            df['b1_v'] = ((df['b1_v']) / df['volume'] * 100).map(lambda x: round(x, 1))
-
-            # df['b1_vv'] = map(lambda x, y: round(x / y * 100, 1), df['b1_v'].values, df['volume'].values)
+            # df['b1_v'] = ((df['b1_v']) / df['volume'] * 100).map(lambda x: round(x, 1))
 
         else:
-            # df['b1_vv'] = map(lambda x, y: round(x / y * 100, 1), df.b1_v.values, df.volume.values)
-            df['b1_v'] = ((df['b1_v']) / df['volume'] * 100).map(lambda x: round(x, 1))
+            # df['b1_v'] = ((df['b1_v']) / df['volume'] * 100).map(lambda x: round(x, 1))
             # df.rename(columns={'now': 'close'}, inplace=True)
             df['close'] = df['now']
 
@@ -610,7 +607,7 @@ if __name__ == "__main__":
     # print df
     # df = sina.get_stock_code_data('000001',index=True).set_index('code')
     # df= sina.get_stock_code_data('999999,399001',index=True)
-    df = sina.get_stock_code_data(['300421', '300609', '300306', '600007'])
+    df = sina.get_stock_code_data(['300609', '000831', '300306', '600007'])
     print df.T
 #    print sina.get_stock_code_data('002873')
     # print sina.get_stock_code_data('600199,300334',index=False)

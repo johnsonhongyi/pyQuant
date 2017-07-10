@@ -1516,15 +1516,21 @@ def getSinaAlldf(market='cyb', vol=ct.json_countVol, vtype=ct.json_countType, fi
         # print dm[dm.code=='000001'].b1_v
         dm['volume'] = map(lambda x: x, dm.b1_v.values)
         dm = dm[(dm.b1 > 0) | (dm.a1 > 0)]
-        dm['b1_v'] = map(lambda x: round(x / 100 / 10000, 1) + 0.01, dm['b1_v'])
+#        dm['b1_v'] = map(lambda x: round(x / 100 / 10000, 1) + 0.01, dm['b1_v'])
+        dm['b1_v'] = ((dm['b1_v'] + dm['b2_v']) / 100 / 10000).map(lambda x: round(x, 1) + 0.01)
+
     elif cct.get_now_time_int() > 926:
         # dm = dm[dm.open > 0]
         dm = dm[(dm.b1 > 0) | (dm.a1 > 0)]
+        dm['b1_v'] = ((dm['b1_v']) / dm['volume'] * 100).map(lambda x: round(x, 1))
+
         # dm['b1_v'] = map(lambda x, y: round(x / y * 100, 1), dm['b1_v'], dm['volume'])
 
     else:
         dm = dm[dm.buy > 0]
-        dm['b1_v'] = map(lambda x: round(x / 100 / 10000, 1) + 0.01, dm['b1_v'])
+#        dm['b1_v'] = map(lambda x: round(x / 100 / 10000, 1) + 0.01, dm['b1_v'])
+        dm['b1_v'] = ((dm['b1_v']) / dm['volume'] * 100).map(lambda x: round(x, 1))
+
 
     # print dm[dm.code == '002474'].volume
     # print 'ratio' in dm.columns
