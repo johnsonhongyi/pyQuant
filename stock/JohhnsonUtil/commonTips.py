@@ -649,6 +649,8 @@ def get_work_day_status():
 
 def last_tddate(days=1):
     # today = datetime.datetime.today().date() + datetime.timedelta(-days)
+    if days is None:
+        return days
     today = datetime.datetime.today().date()
     log.debug("today:%s " % (today))
     # return str(today)

@@ -1996,11 +1996,13 @@ def get_tdx_exp_low_or_high_power(code, dt=None, ptype='close', dl=None, end=Non
         df = get_tdx_Exp_day_to_df(
             code, start=dt, dl=dl, end=end, newdays=newdays, resample=resample).sort_index(ascending=False)
         if df is not None and len(df) > 0:
+            # if code == '000916':
+                # print code,df.vol[1],df.vol
             if len(df) > 1:
                 df['lvol'] = df.vol[1]
             else:
                 df['lvol'] = df.vol[0]
-                log.info("code:%s df is 1 day"%(code))
+                log.info("object"%(code))
             if power:
                 from JSONData import powerCompute as pct
                 dtype = 'd'
