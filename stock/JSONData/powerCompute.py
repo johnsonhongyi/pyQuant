@@ -1142,7 +1142,6 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y', tal
             df.loc[code, 'vstd'] = volstd
             df.loc[code, 'lvolume'] = tdx_df.vol[1]
 
-            # if len(wcdf[wcdf.index == code]) > 0:
             if code in wcdf_code:
                 df.loc[code, 'category'] = wcdf.loc[code, 'category']
             else:

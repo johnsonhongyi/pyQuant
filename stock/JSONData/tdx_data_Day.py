@@ -1514,7 +1514,7 @@ def getSinaAlldf(market='cyb', vol=ct.json_countVol, vtype=ct.json_countType, fi
         # print dm[dm.code=='000001'].a1
         # print dm[dm.code=='000001'].a1_v
         # print dm[dm.code=='000001'].b1_v
-        dm['volume'] = map(lambda x: x, dm.b1_v.values)
+        dm['volume'] = map(lambda x,y: x+y, dm.b1_v.values,dm.b2_v.values)
         dm = dm[(dm.b1 > 0) | (dm.a1 > 0)]
 #        dm['b1_v'] = map(lambda x: round(x / 100 / 10000, 1) + 0.01, dm['b1_v'])
         dm['b1_v'] = ((dm['b1_v'] + dm['b2_v']) / 100 / 10000).map(lambda x: round(x, 1) + 0.01)
@@ -1531,8 +1531,7 @@ def getSinaAlldf(market='cyb', vol=ct.json_countVol, vtype=ct.json_countType, fi
 #        dm['b1_v'] = map(lambda x: round(x / 100 / 10000, 1) + 0.01, dm['b1_v'])
         dm['b1_v'] = ((dm['b1_v']) / dm['volume'] * 100).map(lambda x: round(x, 1))
 
-
-    # print dm[dm.code == '002474'].volume
+    dm['nvol'] = dm['volume']
     # print 'ratio' in dm.columns
     # print time.time()-time_s
     if cct.get_now_time_int() > 932 and market not in ['sh', 'sz', 'cyb']:
@@ -1997,7 +1996,7 @@ def get_tdx_exp_low_or_high_power(code, dt=None, ptype='close', dl=None, end=Non
         df = get_tdx_Exp_day_to_df(
             code, start=dt, dl=dl, end=end, newdays=newdays, resample=resample).sort_index(ascending=False)
         if df is not None and len(df) > 0:
-
+            df['lvol'] = df.vol[1]
             if power:
                 from JSONData import powerCompute as pct
                 dtype = 'd'
@@ -2382,17 +2381,8 @@ def get_append_lastp_to_df(top_all, lastpTDX_DF=None, dl=ct.PowerCountdl, end=No
             tdxdata.rename(columns={'close': 'lastp'}, inplace=True)
             # tdxdata.rename(columns={'low': 'lastp'}, inplace=True)
             tdxdata.rename(columns={'low': 'llow'}, inplace=True)
-            tdxdata.rename(columns={'vol': 'lvol'}, inplace=True)
+            tdxdata.rename(columns={'vol': 'lowvol'}, inplace=True)
             tdxdata.rename(columns={'amount': 'lamount'}, inplace=True)
-    #        if power:
-    #            tdxdata = tdxdata.loc[:, ['llow', 'lhigh', 'lastp', 'lvol', 'date','ra','op','fib','fibl','ma5d','ma10d','ldate']]
-    #            # print len(tdxdata[tdxdata.op >15]),
-    #        else:
-    #            tdxdata = tdxdata.loc[:, ['llow', 'lhigh', 'lastp', 'lvol','ma5d','ma10d','date']]
-    #            # tdxdata = tdxdata.loc[
-    #            #     :, ['llow', 'lhigh', 'lastp', 'lvol', 'date']]
-
-            # h5 = top_hdf_api(fname=h5_fname,wr_mode='w',table=market,df=tdxdata)
             h5 = h5a.write_hdf_db(
                 h5_fname, tdxdata, table=h5_table, append=True)
 
@@ -2401,12 +2391,6 @@ def get_append_lastp_to_df(top_all, lastpTDX_DF=None, dl=ct.PowerCountdl, end=No
         tdxdata = lastpTDX_DF
     log.debug("TdxLastP: %s %s" %
               (len(tdxdata), tdxdata.columns.values))
-    # :, ['llow', 'lhigh', 'lastp', 'lvol','ma5d', 'date']]
-    # data.drop('amount',axis=0,inplace=True)
-    # df_now=top_all.merge(data,on='code',how='left')
-    # df_now=pd.merge(top_all,data,left_index=True,right_index=True,how='left')
-    # top_all = top_all.merge(
-    #     tdxdata, left_index=True, right_index=True, how='left')
     if checknew:
         tdx_list = tdxdata.index.tolist()
         diff_code = list(set(codelist) - set(tdx_list))
@@ -2424,7 +2408,7 @@ def get_append_lastp_to_df(top_all, lastpTDX_DF=None, dl=ct.PowerCountdl, end=No
                 tdx_diff.rename(columns={'close': 'lastp'}, inplace=True)
                 # tdxdata.rename(columns={'low': 'lastp'}, inplace=True)
                 tdx_diff.rename(columns={'low': 'llow'}, inplace=True)
-                tdx_diff.rename(columns={'vol': 'lvol'}, inplace=True)
+                tdx_diff.rename(columns={'vol': 'lowvol'}, inplace=True)
                 tdx_diff.rename(columns={'amount': 'lamount'}, inplace=True)
                 tdxdata = pd.concat([tdxdata, tdx_diff], axis=0)
                 # h5 = h5a.write_hdf_db(h5_fname, tdxdata, table=h5_table)
