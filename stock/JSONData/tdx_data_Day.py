@@ -1893,15 +1893,19 @@ def compute_lastdays_percent(df=None, lastdays=3):
             if da == 1:
                 # df['perlastp'] = df['per%sd' % da]
                 # df['perlastp'] = (df['per%sd' % da]).map(lambda x: 1 if x >= -0.1 else 0)
-                df['perlastp'] = map((lambda x, y, z: (1 if (x - y) else -2) + (1 if z > 0 else 0)), df['high'], df['lasth%sd' % da], df['per%sd' % da])
-
+                down_zero, down_dn = 0, -1
+                df['perlastp'] = map((lambda h,lh,l,ll,c,lc: (1 if (h - lh) > 0 else down_dn) + (1 if (c - lc) > 0 else down_dn) +  (1 if (l - ll) > 0 else down_dn)+(2 if (c - lh) > 0 else down_zero)+(2 if (l - lc) > 0 else down_zero)+(0 if (h - lc) > 0 else down_dn)), df['high'], df['lasth%sd' % da],df['low'], df['lastl%sd' % da],df['close'] ,df['lastp%sd' % da])
             df['mean%sd' % da] = (
                 (df['lasth%sd' % da] + df['lastl%sd' % da]) / 2).map(lambda x: round(x, 2))
             df['per%sd' % da] = df['per%sd' % da][-1]
             df['perc%sd' % da] = int(df['perlastp'][-da:].sum())
+            # print df['perlastp'][-da:]
             # print 'a',df['perlastp'][-da:]
             # print "b",lastdays+1-da,df['perlastp'][-(lastdays+1-da):]
-            # df['per%sd' % da] = df['perlastp'][-da:].sum()
+            # df['per%sd' % da] = df['per%sd' % da][-1]
+            df['lastp%sd' % da] = df['lastp%sd' % da][-1]
+            df['lasth%sd' % da] = df['lasth%sd' % da][-1]
+            df['lastl%sd' % da] = df['lastl%sd' % da][-1]
             df['mean%sd' % da] = df['mean%sd' % da][-1]
             # break
             # reg_data_f = reg_data.ix(reg_data['uid'] == reg_data['uid0']
@@ -2001,12 +2005,11 @@ def get_tdx_exp_low_or_high_power(code, dt=None, ptype='close', dl=None, end=Non
     # dt = cct.day8_to_day10(dt)
     if dt is not None or dl is not None:
         # log.debug("dt:%s dl:%s"%(dt,dl))
-        df = get_tdx_Exp_day_to_df(
-            code, start=dt, dl=dl, end=end, newdays=newdays, resample=resample).sort_index(ascending=False)
+        df = get_tdx_Exp_day_to_df(code, start=dt, dl=dl, end=end, newdays=newdays, resample=resample).sort_index(ascending=False)
         if df is not None and len(df) > 0:
             if power:
                 from JSONData import powerCompute as pct
-                dtype = 'd'
+                dtype = resample
                 opc = 0
                 stl = ''
                 rac = 0
@@ -2889,18 +2892,20 @@ if __name__ == '__main__':
     # dm = get_sina_data_df(sina_data.Sina().market('all').index.tolist())
     dm = None
     # get_tdx_append_now_df_api_tofile('002196', dm=dm,newdays=0, start=None, end=None, type='f', df=None, dl=10, power=True)
-    get_tdx_append_now_df_api_tofile('002196', dm=dm,newdays=1,dl=5)
+    # get_tdx_append_now_df_api_tofile('002196', dm=dm,newdays=1,dl=5)
 #
     # code = '300661'
     # code = '600581'
-    code = '603668'
+    code = '300609'
+    # code = '000001'
     # code = '000916'
     # code = '600619'
 
     # print get_tdx_Exp_day_to_df(code, dl=30, newdays=0, resample='d')
     # print get_tdx_exp_low_or_high_power(code, dl=30, newdays=0, resample='d')
     # print get_tdx_exp_low_or_high_power(code, dl=20,end='2017-06-28',ptype='high')
-    print get_tdx_exp_low_or_high_power(code, dl=20, end='2017-06-28', ptype='low')
+    # print get_tdx_exp_low_or_high_power(code, dl=20, end='2017-06-28', ptype='low')
+    print get_tdx_exp_low_or_high_power(code, dl=20, end='2017-07-07', ptype='high',power=False)
     # print get_tdx_Exp_day_to_df(code, dl=60, newdays=0, resample='m')[:2]
     # print get_tdx_Exp_day_to_df(code, dl=30, newdays=0, resample='d')[:2]
     # print get_tdx_append_now_df_api(code, start=None, end=None, type='f', df=None, dm=None, dl=6, power=True, newdays=0, write_tushare=False).T

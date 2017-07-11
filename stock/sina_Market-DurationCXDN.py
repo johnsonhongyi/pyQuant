@@ -114,7 +114,7 @@ if __name__ == "__main__":
     # duration_date = 30
     du_date = duration_date
     # resample = ct.resample_dtype
-    resample = 'w'
+    resample = 'd'
     newdays = 18
     # print cct.last_tddate(2)
     # end_date = cct.last_tddate(days=int(duration_date/4))
