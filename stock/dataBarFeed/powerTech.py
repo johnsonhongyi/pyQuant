@@ -381,7 +381,6 @@ def get_linear_model_status(code, df=None, dtype='d', type='m', start=None, end=
 
 def get_diff_index(code,df=None,start=None,end=None,dl=None,dtype='d',ptype='close'):
     df = get_duration_filter(code,df=df,dl=dl,ptype=ptype)
-
     if not dtype == 'd':
         df = tdd.get_tdx_stock_period_to_type(df, dtype).sort_index(ascending=True)
 

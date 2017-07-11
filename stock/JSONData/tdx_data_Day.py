@@ -1525,7 +1525,6 @@ def getSinaAlldf(market='cyb', vol=ct.json_countVol, vtype=ct.json_countType, fi
         # print dm[dm.code=='000001'].b1_v
         dm['volume'] = map(lambda x,y: x+y, dm.b1_v.values,dm.b2_v.values)
         dm = dm[(dm.b1 > 0) | (dm.a1 > 0)]
-#        dm['b1_v'] = map(lambda x: round(x / 100 / 10000, 1) + 0.01, dm['b1_v'])
         dm['b1_v'] = ((dm['b1_v'] + dm['b2_v']) / 100 / 10000).map(lambda x: round(x, 1) + 0.01)
 
     elif cct.get_now_time_int() > 926:

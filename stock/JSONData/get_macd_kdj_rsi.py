@@ -10,6 +10,7 @@ import tushare as ts
 import tdx_data_Day as tdd
 from JohhnsonUtil import LoggerFactory as LoggerFactory
 from JohhnsonUtil import johnson_cons as ct
+from JohhnsonUtil import commonTips as cct
 import math
 # log = LoggerFactory.getLogger("get_macd_kdj_rsi")
 log = LoggerFactory.log
@@ -282,10 +283,16 @@ def Get_BBANDS_algo(df):
     return operate
 
 
-def Get_BBANDS(df, dtype='d', days=5):
+def Get_BBANDS(df, dtype='d', days=5,dl=ct.PowerCountdl,dm=None):
+    if not isinstance(df,pd.DataFrame):
+        code = df
+        df = tdd.get_tdx_append_now_df_api(code,dl=dl * 2,dm=dm,newdays=5)
+        # print code,dl,dl*2,len(df)
+    else:
+        code = None        
     log.debug("BBANDS:%s" % (len(df)))
     if len(df) < limitCount:
-        return (df, 20)
+        return (df, 10)
     df = df.sort_index(ascending=True)
     upperband, middleband, lowerband = ta.BBANDS(
         np.array(df['close']), timeperiod=20, nbdevdn=2, matype=0)
@@ -353,7 +360,10 @@ def Get_BBANDS(df, dtype='d', days=5):
 #        print operate
 #    operate = op
     df = df.sort_index(ascending=False)
-    return df, operate
+    if code is None:
+        return df, operate
+    else:
+        return code,operate
 
 # 修改了的函数，按照多个指标进行分析
 
@@ -724,17 +734,28 @@ if __name__ == '__main__':
     #    code='300201'
     import sys
     # print powerStd('600208',ptype='vol')
-    code = '600744'
-    # codel=['000737','002695','601555','002486','600321','002437','399006','999999']
+    code = '002160'
+    codel=['000737','002695','601555','002486','600321','002437','399006','999999']
     # codel = ['300661', '600212', '300153', '603580']
-    codel=['600212']
-    # ,'999999']
-    dl = 21
-    for code in codel:
-        df = tdd.get_tdx_append_now_df_api(
-            code, dl=dl).sort_index(ascending=True)
-    # print algoMultiDay(df, column='close')
-        print "code:%s : %s" % (code, algoMultiDay_trends(df, column='close'))
+    # codel=['600212']
+    # dl = 21
+    # for code in codel:
+    #     df = tdd.get_tdx_append_now_df_api(
+    #         code, dl=dl).sort_index(ascending=True)
+    # # print algoMultiDay(df, column='close')
+    #     print "code:%s : %s" % (code, algoMultiDay_trends(df, column='close'))
+    dm = tdd.get_sina_data_df(code)
+    print "tt",Get_BBANDS(code,'d',5,ct.PowerCountdl,dm) 
+    time_st=time.time()
+
+    dm = tdd.get_sina_data_df(codel)
+    results = cct.to_mp_run_async(Get_BBANDS,codel,'d',5,ct.PowerCountdl,dm)
+    # results=[]
+    # for code in codel:
+        # results.append(Get_BBANDS(code,'d',5,ct.PowerCountdl,dm))  
+    bolldf = pd.DataFrame(results, columns=['code','boll'])  
+    bolldf = bolldf.set_index('code')
+    print "t:%.2f %s"%(time.time()-time_st,bolldf)
 #    code='600321'
 #    code:002732 boll: 45 ma: 6.0  macd:-1 RSI:0 kdj: 3 time:0.0241
 #    code:002623 boll: 41 ma: 10.0  macd:-5 RSI:4 kdj: -1 time:0.0216

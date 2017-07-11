@@ -520,6 +520,7 @@ class Sina:
             #            df.rename(columns={'buy': 'close'}, inplace=True)
             df['close'] = df['buy']
             df['low'] = df['buy']
+            df['volume'] =  ((df['b1_v'] + df['b2_v'])).map(lambda x: x)
             # df['b1_v'] = ((df['b1_v'] + df['b2_v']) / 100 / 10000).map(lambda x: round(x, 1) + 0.01)
             # df['b1_v'] = ((df['b1_v']) / 100 / 10000).map(lambda x: round(x, 1) + 0.01)
             # df['b1_vv'] = map(lambda x: round(x / 100 / 10000, 1) + 0.01, df['b1_v'])

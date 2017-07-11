@@ -1673,8 +1673,7 @@ def combine_dataFrame(maindf,subdf,col=None,compare=None,append=False,clean=True
 
 if __name__ == '__main__':
     GlobalValues()
-    # GlobalValues()._init()
-    GlobalValues().setkey('key', 'value')
+    GlobalValues().setkey('key', 'GlobalValuesvalue')
     print GlobalValues().getkey('key', defValue=None)
     print get_run_path()
     from docopt import docopt
@@ -1691,6 +1690,7 @@ if __name__ == '__main__':
     log.setLevel(log_level)
 
     s_time=time.time()
+    print "last:",last_tddate(2)
     print get_work_day_status()
     print get_terminal_Position(cmd='DurationDN.py', position=None, close=False)
     print get_terminal_Position(cmd='Johnson@', position=None, close=False)
@@ -1715,7 +1715,6 @@ if __name__ == '__main__':
     print get_work_time_ratio()
     print getCoding(u'啊中国'.encode("utf16"))
     print get_today_duration('2017-01-06')
-    print last_tddate(2)
     print get_work_day_status()
     import sys
     sys.exit(0)

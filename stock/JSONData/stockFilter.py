@@ -4,6 +4,8 @@ sys.path.append("..")
 from JohhnsonUtil import commonTips as cct
 import JohhnsonUtil.johnson_cons as ct
 from JSONData import powerCompute as pct
+from JSONData import tdx_data_Day as tdd
+from JSONData import get_macd_kdj_rsi as getab
 import pandas as pd
 from JohhnsonUtil import LoggerFactory
 log = LoggerFactory.log
@@ -31,7 +33,13 @@ def getBollFilter(df=None, boll=6, duration=ct.PowerCountdl, filter=True, ma5d=T
     radio_t = cct.get_work_time_ratio()
     df['lvolr%s'%(resample)] = df['volume']
     df['volume'] = (map(lambda x, y: round(x / y / radio_t, 1), df.nvol.values, df.lvolume.values))
-            
+    if (cct.get_now_time_int() > 915 and cct.get_now_time_int() < 926):
+        df['b1_v'] = df['volume']
+    else:
+        dd=df[df.percent < 10]
+        dd['b1_v'] = dd['volume']
+        df=cct.combine_dataFrame(df, dd.loc[:,['b1_v']])
+        # print "t:%0.2f"%(time.time()-time_ss)
     if 'ma5d' in df.columns:
         df = df[df.buy > df.ma5d * ct.changeRatio]
 
@@ -69,7 +77,14 @@ def getBollFilter(df=None, boll=6, duration=ct.PowerCountdl, filter=True, ma5d=T
                         | (df.percent > 0)]
             # df = df[(df.per1d > 9) | (df.per2d > 4) | (df.per3d > 6)]
             df = df[(df.per1d > 0) | (df.per2d > 4) | (df.per3d > 6)]
-            # df = df[df.oph > 10]
+        # time_ss=time.time()
+        # codel = df.index.tolist()
+        # dm = tdd.get_sina_data_df(codel)
+        # results = cct.to_mp_run_async(getab.Get_BBANDS, codel,'d',5,duration,dm)
+        # bolldf = pd.DataFrame(results, columns=['code','boll'])  
+        # bolldf = bolldf.set_index('code')
+        # df = cct.combine_dataFrame(df, bolldf)
+        # print "bollt:%0.2f"%(time.time()-time_ss),
         if 'boll' in df.columns:
             if 915 < cct.get_now_time_int() < 926:
                 df = df[(df.boll >= boll) | ((df.percent > 6) & (df.op > 4)) | ((df.per3d > 6) & (df.op > 4))]
