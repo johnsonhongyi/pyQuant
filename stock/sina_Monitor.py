@@ -91,7 +91,7 @@ if __name__ == "__main__":
     blkname = '064.blk'
     block_path = tdd.get_tdx_dir_blocknew() + blkname
     lastpTDX_DF = pd.DataFrame()
-    market_sort_value, market_sort_value_key = ct.get_market_sort_value_key('2 2')
+    market_sort_value, market_sort_value_key = ct.get_market_sort_value_key('8')
     while 1:
         try:
             # df = rl.get_sina_all_json_dd(vol, type)

@@ -403,7 +403,7 @@ def get_tdx_Exp_day_to_df(code, start=None, end=None, dl=None, newdays=None, typ
         df = pd.DataFrame(dt_list, columns=ct.TDX_Day_columns)
         # df.sort_index(ascending=False, inplace=True)
         if resample == 'd':
-            df = compute_lastdays_percent(df, lastdays=lastdays)
+            df = compute_lastdays_percent(df, lastdays=lastdays,resample=resample)
 
         if start is not None and end is not None:
             df = df[(df.date >= start) & (df.date <= end)]
@@ -422,7 +422,7 @@ def get_tdx_Exp_day_to_df(code, start=None, end=None, dl=None, newdays=None, typ
             df = df.sort_index(ascending=True)
             if not resample == 'd' and resample in resample_dtype:
                 df = get_tdx_stock_period_to_type(df, period_day=resample)
-                df = compute_lastdays_percent(df, lastdays=lastdays)
+                df = compute_lastdays_percent(df, lastdays=lastdays,resample=resample)
                 if 'date' in df.columns:
                     df = df.set_index('date')
             df['ma5d'] = pd.rolling_mean(df.close, 5)
@@ -1873,8 +1873,11 @@ def get_duration_price_date(code=None, ptype='low', dt=None, df=None, dl=None, e
         return lowdate, index_d, df
 
 
-def compute_lastdays_percent(df=None, lastdays=3):
+def compute_lastdays_percent(df=None, lastdays=3,resample='d'):
     if df is not None and len(df) > lastdays:
+        if resample <> 'd':
+            df=df[:-1]
+            # print "df:",df[-1:]
         if len(df) > lastdays + 1:
             lastdays = len(df) - 1
             lastdays = lastdays if lastdays < ct.compute_lastdays else ct.compute_lastdays
@@ -1894,7 +1897,8 @@ def compute_lastdays_percent(df=None, lastdays=3):
                 # df['perlastp'] = df['per%sd' % da]
                 # df['perlastp'] = (df['per%sd' % da]).map(lambda x: 1 if x >= -0.1 else 0)
                 down_zero, down_dn = 0, -1
-                df['perlastp'] = map((lambda h,lh,l,ll,c,lc: (1 if (h - lh) > 0 else down_dn) + (1 if (c - lc) > 0 else down_dn) +  (1 if (l - ll) > 0 else down_dn)+(2 if (c - lh) > 0 else down_zero)+(2 if (l - lc) > 0 else down_zero)+(0 if (h - lc) > 0 else down_dn)), df['high'], df['lasth%sd' % da],df['low'], df['lastl%sd' % da],df['close'] ,df['lastp%sd' % da])
+                # df['perlastp'] = map((lambda h,lh,l,ll,c,lc: (1 if (h - lh) > 0 else down_dn) + (1 if (c - lc) > 0 else down_dn) +  (1 if (l - ll) > 0 else down_dn)+(2 if (c - lh) > 0 else down_zero)+(2 if (l - lc) > 0 else down_zero)+(0 if (h - lc) > 0 else down_dn)), df['high'], df['lasth%sd' % da],df['low'], df['lastl%sd' % da],df['close'] ,df['lastp%sd' % da])
+                df['perlastp'] = map((lambda c,lc: (1 if (c - lc) > 0 else down_zero) + (1 if (c - lc)/lc*100 > 3 else down_zero) + (down_dn if (c - lc)/lc*100 < -3 else down_zero)), df['close'] ,df['lastp%sd' % da])
             df['mean%sd' % da] = (
                 (df['lasth%sd' % da] + df['lastl%sd' % da]) / 2).map(lambda x: round(x, 2))
             df['per%sd' % da] = df['per%sd' % da][-1]
@@ -2896,16 +2900,23 @@ if __name__ == '__main__':
 #
     # code = '300661'
     # code = '600581'
-    code = '300609'
+    # code = '300609'
+    code = '000916'
+    resample ='d'
     # code = '000001'
     # code = '000916'
     # code = '600619'
+
+    # print get_tdx_exp_all_LastDF_DL([code],  dt=60, ptype='low', filter='y', power=ct.lastPower, resample=resample)
 
     # print get_tdx_Exp_day_to_df(code, dl=30, newdays=0, resample='d')
     # print get_tdx_exp_low_or_high_power(code, dl=30, newdays=0, resample='d')
     # print get_tdx_exp_low_or_high_power(code, dl=20,end='2017-06-28',ptype='high')
     # print get_tdx_exp_low_or_high_power(code, dl=20, end='2017-06-28', ptype='low')
-    print get_tdx_exp_low_or_high_power(code, dl=20, end='2017-07-07', ptype='high',power=False)
+    
+    # print get_tdx_exp_low_or_high_power(code, dl=60, end=None, ptype='high',power=False,resample=resample)
+    print get_tdx_exp_low_or_high_power(code, dl=60, end=None, ptype='low',power=False,resample=resample)
+    
     # print get_tdx_Exp_day_to_df(code, dl=60, newdays=0, resample='m')[:2]
     # print get_tdx_Exp_day_to_df(code, dl=30, newdays=0, resample='d')[:2]
     # print get_tdx_append_now_df_api(code, start=None, end=None, type='f', df=None, dm=None, dl=6, power=True, newdays=0, write_tushare=False).T

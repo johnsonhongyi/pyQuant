@@ -43,7 +43,7 @@ duration_date_l = 20
 resample_dtype = 'd'
 duration_date_up = 60
 duration_date_sort = 21
-lastdays = 2
+lastdays = 3
 bollFilter = 6
 writeblockbakNum = 12
 checkfilter = True
@@ -64,7 +64,7 @@ h5_time_l_count = 6
 sina_dd_limit_time = 300
 diffcode = 0.2
 duration_sleep_time = 60
-compute_lastdays = 6
+compute_lastdays = 9
 # powerdiff = 'ra * fibl + rah*(abs(float(%s)-fibl))/fib +ma +kdj+rsi'
 '''
             ma  rsi  kdj  boll    ra   rah    df2  fibl  fib  macd  oph

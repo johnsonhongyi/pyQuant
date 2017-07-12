@@ -148,6 +148,7 @@ if __name__ == "__main__":
                 if len(top_all) == 0 and len(lastpTDX_DF) == 0:
                     cct.get_terminal_Position(position=sys.argv[0])
 
+                    # print duration_date, end_date, ptype, filter, ct.lastPower,resample
                     # time_Rt = time.time()
                     top_all, lastpTDX_DF = tdd.get_append_lastp_to_df(
                         top_now, lastpTDX_DF=None, dl=duration_date, end=end_date, ptype=ptype, filter=filter, power=ct.lastPower, lastp=False, resample=resample)
