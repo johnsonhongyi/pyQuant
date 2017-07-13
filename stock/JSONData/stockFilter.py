@@ -32,11 +32,16 @@ def getBollFilter(df=None, boll=6, duration=ct.PowerCountdl, filter=True, ma5d=T
             df['percent'] = df['percent'].apply(lambda x: round(x, 1))
             # time_ss = time.time()
             perc_col = [co for co in df.columns if co.find('perc') > -1]
+            per_col = [co for co in df.columns if co.find('per') > -1]
+            per_col = list(set(per_col) - set(perc_col) - set(['per1d','perlastp']))
             perc_col.remove('percent')
             da, down_zero, down_dn = 1, 0, -1
             df['perc_n'] = map((lambda h, lh, l, ll, c, lc: (1 if (h - lh) > 0 else down_dn) + (1 if c - lc > 0 else down_dn) + (1 if (l - ll) > 0 else down_dn) + (2 if (c - lh) > 0 else down_zero) + (2 if (l - lc) > 0 else down_zero) + (0 if (h - lc) > 0 else down_dn)), df['high'], df['lasth%sd' % da], df['low'], df['lastl%sd' % da], df['close'],df['lastp%sd' % da])
             for co in perc_col:
                 df[co] = (df[co]+df['perc_n']).map(lambda x:x)
+
+            for co in per_col:
+                df[co] = (df[co]+df['percent']).map(lambda x:x)
             # print "percT:%.2f"%(time.time()-time_ss)
 
 
@@ -59,11 +64,14 @@ def getBollFilter(df=None, boll=6, duration=ct.PowerCountdl, filter=True, ma5d=T
         if cct.get_now_time_int() > 915 and cct.get_now_time_int() <= 1000:
             # df = df[df.buy > df.cmean * ct.changeRatioUp ]
             df = df[df.buy > df.hmax * ct.changeRatio]
+            # df = df[df.buy > df.cmean]
 
         elif cct.get_now_time_int() > 1000 and cct.get_now_time_int() <= 1430:
-            df = df[df.buy > df.cmean]
+            df = df[df.buy > df.hmax * ct.changeRatio]
+            # df = df[df.buy > df.cmean]
         else:
             df = df[df.buy > df.hmax * ct.changeRatio]
+            # df = df[df.buy > df.cmean]
 
         # if ma5d:
         #     # op, ra, st, days = pct.get_linear_model_status('999999', filter='y', dl=dl, ptype='low')
