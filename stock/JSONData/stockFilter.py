@@ -46,7 +46,9 @@ def getBollFilter(df=None, boll=6, duration=ct.PowerCountdl, filter=True, ma5d=T
 
     if 'b1_v' in df.columns:
         df = df[df.b1_v > 0]
-
+    elif 'nvol' in df.columns:
+        df = df[df.nvol > 0]
+            
     radio_t = cct.get_work_time_ratio()
     df['lvolr%s' % (resample)] = df['volume']
     df['volume'] = (map(lambda x, y: round(x / y / radio_t, 1), df.nvol.values, df.lvolume.values))
@@ -111,7 +113,9 @@ def getBollFilter(df=None, boll=6, duration=ct.PowerCountdl, filter=True, ma5d=T
         op_l = 3
         if 'boll' in df.columns:
             if 915 < cct.get_now_time_int() < 926:
-                df = df[(df.boll >= boll) | ((df.percent > percent_l) & (df.op > 4)) | ((df.percent > percent_l) & (df.per3d > per3d_l))]
+                # df = df[(df.boll >= boll) | ((df.percent > percent_l) & (df.op > 4)) | ((df.percent > percent_l) & (df.per3d > per3d_l))]
+                # df = df[((df.percent > percent_l) & (df.op > 4)) | ((df.percent > percent_l) & (df.per3d > per3d_l))]
+                pass
             elif 926 < cct.get_now_time_int() < 1501:
                 df = df[(df.boll >= boll) | ((df.low <> 0) & (df.open == df.low) & (((df.percent > percent_l) & (df.op > op_l)) | ((df.percent > percent_l) & (df.per3d > per3d_l))))]
             else:

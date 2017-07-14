@@ -551,7 +551,7 @@ class Sina:
         h5a.write_hdf_db(self.hdf_name, df, self.table, index=index)
         dd = df.copy()
         # if not index and len(df) > 3000 and 915 < cct.get_now_time_int() < 1505:
-        if not index and len(df) > 3000 and cct.get_work_time():
+        if cct.get_now_time_int() >= 925 and not index and len(df) > 3000 and cct.get_work_time():
             time_s = time.time()
             df.index = df.index.astype(str)
             df.ticktime = df.ticktime.astype(str)
@@ -585,71 +585,6 @@ class Sina:
         #                                      'ask4', 'ask5_volume', 'ask5'])
         # return stock_dict
 
-
-def get_tdx_stock_period_to_type(stock_data, period_day='30T', periods=5):
-    period_type = period_day
-    # 转换周最后一日变量
-    if cct.get_work_day_status() and 915 < cct.get_now_time_int() < 1500:
-        stock_data = stock_data[stock_data.index < cct.get_today()]
-    # print stock_data.index.get_level_values(1)
-    # stock_data.set_index(stock_data.index.get_level_values(1))
-    stock_data=stock_data.reset_index().set_index(stock_data.index.get_level_values(1))
-    if stock_data.index.name == 'ticktime':
-        stock_data.index = pd.to_datetime(stock_data.index, format='%Y-%m-%d %H:%M:%S')
-    elif stock_data.index.name == 'date':
-        stock_data.index = pd.to_datetime(stock_data.index, format='%Y-%m-%d')
-    elif 'date' in stock_data.columns:
-        stock_data = stock_data.set_index('date')
-        stock_data = stock_data.sort_index(ascending=True)
-        stock_data.index = pd.to_datetime(stock_data.index, format='%Y-%m-%d')
-    else:
-        log.error("index.name not date,pls check:%s" % (stock_data[:1]))
-
-    period_stock_data = stock_data.resample(period_type, how='last')
-    # 周数据的每日change连续相乘
-    # period_stock_data['percent']=stock_data['percent'].resample(period_type,how=lambda x:(x+1.0).prod()-1.0)
-    # 周数据open等于第一日
-    # print stock_data.index[0],stock_data.index[-1]
-    # period_stock_data.index =
-    # pd.DatetimeIndex(start=stock_data.index.values[0],end=stock_data.index.values[-1],freq='BM')
-
-    if 'open' in stock_data.columns:
-        period_stock_data['open'] = stock_data[
-            'open'].resample(period_type, how='first')
-    # 周high等于Max high
-    if 'high' in stock_data.columns:
-        period_stock_data['high'] = stock_data[
-            'high'].resample(period_type, how='max')
-    if 'low' in stock_data.columns:
-        period_stock_data['low'] = stock_data[
-            'low'].resample(period_type, how='min')
-    # volume等于所有数据和
-    if 'amount' in stock_data.columns:
-        period_stock_data['amount'] = stock_data[
-            'amount'].resample(period_type, how='sum')
-    if 'volume' in stock_data.columns:
-        period_stock_data['volume'] = stock_data[
-            'volume'].resample(period_type, how='sum')
-    # 计算周线turnover,【traded_market_value】 流通市值【market_value】 总市值【turnover】 换手率，成交量/流通股本
-    # period_stock_data['turnover']=period_stock_data['vol']/(period_stock_data['traded_market_value'])/period_stock_data['close']
-    # 去除无交易纪录
-    if 'date' in stock_data.columns:
-        period_stock_data.index = stock_data['date'].resample(period_type, how='last')
-    if 'code' in period_stock_data.columns:
-        period_stock_data = period_stock_data[period_stock_data['code'].notnull()]
-    # period_stock_data.reset_index(inplace=True)
-    # period_stock_data.set_index('date',inplace=True)
-    # print period_stock_data.columns,period_stock_data.index.name
-    if period_stock_data.index.name == 'date':
-        # stock_data.index = pd.to_datetime(stock_data.index, format='%Y-%m-%d')
-        period_stock_data.index = map(lambda x: str(x)[:10], period_stock_data.index)
-        period_stock_data.index.name = 'date'
-    if period_stock_data.index.name == 'ticktime':
-        period_stock_data.index = map(lambda x: str(x)[:10], period_stock_data.index)
-        period_stock_data = period_stock_data.set_index(['code', 'ticktime'])
-
-    return period_stock_data
-
 def nanrankdata_len(x):
     time_s = time.time()
     df=get_tdx_stock_period_to_type(x, period_day='5T')
@@ -681,11 +616,14 @@ if __name__ == "__main__":
     # df = sina.get_stock_code_data('000001',index=True).set_index('code')
     # df= sina.get_stock_code_data('999999,399001',index=True)
     df = sina.get_stock_code_data(['600203', '000831', '300306', '600007'])
-    print df.T
+    # print df.T
 #    print sina.get_stock_code_data('002873')
     # print sina.get_stock_code_data('600199,300334',index=False)
     # print len(sina.market('sh'))
-
+    def using_Grouper_eval(df,freq='5T',col='low',func={'close':'min','low':'min','volume':'sum'}):
+        level_values = df.index.get_level_values
+        return eval("(df.groupby([level_values(i) for i in [0]]+[pd.Grouper(freq=freq, level=-1)]).agg(%s))"%(func))
+   
     def compute_lastdays_percent(df=None, step=3):
         if df is not None and len(df) > step:
             df = df.sort_index(ascending=True)
@@ -698,39 +636,31 @@ if __name__ == "__main__":
             df['lastv%sd' % da] = df['volume'].shift(da)
             df['per%sd' % da] = ((df['close'] - df['lastp%sd' % da]) / df['lastp%sd' % da]).map(lambda x: round(x * 100, 2))
             df['vol%sd' % da] = ((df['volume'] - df['lastv%sd' % da])).map(lambda x: round(x / 100, 1))
-            # if da == 1:
-            #     df['perlastp'] = (df['per%sd' % da]).map(lambda x: 1 if x >= -0.1 else 0)
-            # df['perlastp'] = (df['per%sd' % da]).map(lambda x: 1 if x >= 0 else -1)
-            # df['perc%sd' % da] = int(df['perlastp'][-da:].sum())
-            # df = df.reset_index()
         else:
             log.info("compute df is none")
         return df
     h5_fname = 'sina_MultiIndex_data'
-    h5_fname = 'sina_multi_index'
+    # h5_fname = 'sina_multi_index'
     h5_table = 'all_10'
     time_s = time.time()
     df = h5a.load_hdf_db(h5_fname, table=h5_table, code_l=None, timelimit=False, dratio_limit=0.12)
     if df is not None and len(df) > 0:
         print df[:1]
-    '''
+    # '''
     stock_data = df
-    # stock_data=stock_data.reset_index().set_index(stock_data.index.get_level_values(1))
-    stock_data=stock_data.reset_index().set_index('ticktime')
     print "t1:%0.3f df:%s"%(time.time()-time_s,df.shape)
-    if stock_data.index.name == 'ticktime':
-        stock_data.index = pd.to_datetime(stock_data.index, format='%Y-%m-%d %H:%M:%S')
-        # stock_data = stock_data.reset_index()
+    df = using_Grouper_eval(df, freq='5T', col='low', func={'close':'min','low':'min','volume':'sum'})
+    # stock_data = stock_data.reset_index().set_index('ticktime')
+    # df = stock_data.groupby('code').resample('5T', how={'low': 'min', 'close':'min', 'volume': 'sum'})
     print "t2:%0.3f df:%s"%(time.time()-time_s,df.shape)
-    # stock_data = stock_data.set_index(['code','ticktime'])
-    # print stock_data.groupby('code').resample('30T', how={'low': 'min', 'close':'mean', 'volume': 'sum'})
-    # df = stock_data.groupby('code').resample('30T', how={'low': 'min', 'close':'mean', 'volume': 'sum'})
-
-    # df = stock_data.set_index(['code','ticktime'])
+    print df.loc['600999'][-2:]
+    df = using_Grouper_eval(df, freq='30T', col='low', func={'close':'min','low':'min','volume':'sum'})
+    # df = stock_data.groupby('code').resample('30T', how={'low': 'min', 'close':'min', 'volume': 'sum'})
     # df = df.groupby(level=0).transform(get_tdx_stock_period_to_type)
+    # df = df.groupby([df.index.get_level_values(i) for i in [0]]+[pd.Grouper(freq='30T', level=-1)]).transform(get_tdx_stock_period_to_type)
     print "t3:%0.3f df:%s"%(time.time()-time_s,df.shape)
-    print df[:5]
-    '''
+    print df.loc['600999'][-2:]
+    # '''
     # print df.groupby(pd.Grouper(freq='30T', level='ticktime'))
     # df.groupby(level=0)['low'].transform('min').loc['600805'][:5]
     # print df.groupby(level=0).transform(nanrankdata_len)[:10]

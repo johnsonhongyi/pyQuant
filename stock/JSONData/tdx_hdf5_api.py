@@ -147,8 +147,7 @@ class SafeHDFStore(HDFStore):
                         # return -1
                     else:
                         os.remove(self.temp_file)
-                    # Compress_Count += 2
-                    log.error("fname:%s h5_size:%sM Limit:%s t:%.1f" % (self.fname, h5_size, self.big_H5_Size_limit , time_pt - time.time()))
+                        log.error("fname:%s h5_size:%sM Limit:%s t:%.1f" % (self.fname, h5_size, new_limit , time_pt - time.time()))
 
             os.remove(self._lock)
             gc.collect()
