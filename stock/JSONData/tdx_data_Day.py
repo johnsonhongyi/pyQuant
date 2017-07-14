@@ -2731,8 +2731,8 @@ def get_tdx_stock_period_to_type(stock_data, period_day='w', periods=5):
     if stock_data.index.name == 'date':
         stock_data.index = pd.to_datetime(stock_data.index, format='%Y-%m-%d')
     elif 'date' in stock_data.columns:
-        df = df.set_index('date')
-        df = df.sort_index(ascending=True)
+        stock_data = stock_data.set_index('date')
+        stock_data = stock_data.sort_index(ascending=True)
         stock_data.index = pd.to_datetime(stock_data.index, format='%Y-%m-%d')
     else:
         log.error("index.name not date,pls check:%s" % (stock_data[:1]))

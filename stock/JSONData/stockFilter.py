@@ -44,6 +44,8 @@ def getBollFilter(df=None, boll=6, duration=ct.PowerCountdl, filter=True, ma5d=T
                 df[co] = (df[co]+df['percent']).map(lambda x:x)
             # print "percT:%.2f"%(time.time()-time_ss)
 
+    if 'b1_v' in df.columns:
+        df = df[df.b1_v > 0]
 
     radio_t = cct.get_work_time_ratio()
     df['lvolr%s' % (resample)] = df['volume']
