@@ -4,12 +4,12 @@ sys.path.append("..")
 from JohhnsonUtil import commonTips as cct
 import JohhnsonUtil.johnson_cons as ct
 from JSONData import powerCompute as pct
-from JSONData import tdx_data_Day as tdd
+# from JSONData import tdx_data_Day as tdd
 from JSONData import get_macd_kdj_rsi as getab
 import pandas as pd
 from JohhnsonUtil import LoggerFactory
 log = LoggerFactory.log
-import time
+import time,random
 
 
 def getBollFilter(df=None, boll=6, duration=ct.PowerCountdl, filter=True, ma5d=True, dl=14, percent=False, resample='d'):
@@ -33,13 +33,23 @@ def getBollFilter(df=None, boll=6, duration=ct.PowerCountdl, filter=True, ma5d=T
             # time_ss = time.time()
             perc_col = [co for co in df.columns if co.find('perc') > -1]
             per_col = [co for co in df.columns if co.find('per') > -1]
-            per_col = list(set(per_col) - set(perc_col) - set(['per1d','perlastp']))
+            per_col = list(set(per_col) - set(perc_col) - set(['per1d', 'perlastp']))
             perc_col.remove('percent')
-            da, down_zero, down_dn, percent_l = 1, 0, -1, 3
+            da, down_zero, down_dn, percent_l = 1, 0, -1, 1
             # df['perc_n'] = map((lambda h, lh, l, ll, c, lc: (1 if (h - lh) > 0 else down_dn) + (1 if c - lc > 0 else down_dn) + (1 if (l - ll) > 0 else down_dn) + (2 if (c - lh) > 0 else down_zero) + (2 if (l - lc) > 0 else down_zero) + (0 if (h - lc) > 0 else down_dn)), df['high'], df['lasth%sd' % da], df['low'], df['lastl%sd' % da], df['close'],df['lastp%sd' % da])
             # df['perc_n'] = map((lambda c, lc: (1 if (c - lc) > 0 else down_zero) + (1 if (c - lc) / lc * 100 > 3 else down_zero) +
-                                # (down_dn if (c - lc) / lc * 100 < -3 else down_zero)), df['close'], df['lastp%sd' % da])
-            df['perc_n'] = map((lambda c,lc,lp: (1 if (c - lc) >= 0 else down_dn) + (2 if (c - lc)/lc*100 > percent_l and lp > 0 else down_zero)), df['close'] ,df['lastp%sd' % da],df['per%sd' % da])
+            # (down_dn if (c - lc) / lc * 100 < -3 else down_zero)), df['close'], df['lastp%sd' % da])
+
+            
+            idx_rnd = random.randint(0,len(df))
+            # print "idx_rnd",idx_rnd,df.ix[idx_rnd].lastp0d ,df.ix[idx_rnd].close,df.ix[idx_rnd].lastp0d != df.ix[idx_rnd].close
+            if cct.get_work_time() or df.ix[idx_rnd].lastp0d <> df.ix[idx_rnd].close:
+                nowd,per1d = 0 ,1
+                df['perc_n'] = map(cct.func_compute_percd,df['close'], df['per%sd' % per1d], df['lastp%sd' % (nowd)], df['lasth%sd' % (nowd)], df['lastl%sd' % (nowd)], df['high'], df['low'])
+            else:
+                nowd,per1d = 1 ,2
+                # print  df['per%sd' % da+1], df['lastp%sd' % (da)], df['lasth%sd' % (da)], df['lastl%sd' % (da)], df['high'], df['low']
+                df['perc_n'] = map(cct.func_compute_percd,df['close'], df['per%sd' % per1d], df['lastp%sd' % (nowd)], df['lasth%sd' % (nowd)], df['lastl%sd' % (nowd)], df['high'], df['low'])
 
             for co in perc_col:
                 df[co] = (df[co] + df['perc_n']).map(lambda x: x)
@@ -49,7 +59,7 @@ def getBollFilter(df=None, boll=6, duration=ct.PowerCountdl, filter=True, ma5d=T
             # print "percT:%.2f"%(time.time()-time_ss)
 
     if 'b1_v' in df.columns and 'nvol' in df.columns:
-        df = df[ (df.b1_v > 0) |(df.nvol > 0)]
+        df = df[(df.b1_v > 0) | (df.nvol > 0)]
 
     radio_t = cct.get_work_time_ratio()
     df['lvolr%s' % (resample)] = df['volume']
@@ -169,9 +179,8 @@ def WriteCountFilter(df, op='op', writecount=ct.writeCount, end=None, duration=1
     codel = []
     if str(writecount) <> 'all':
         if end is None and int(writecount) > 0:
-            writecount = int(writecount)
-            if writecount < 100 and len(df) > 0 and 'percent' in df.columns:
-                codel = df.index[:writecount].tolist()
+            if int(writecount) < 100 and len(df) > 0 and 'percent' in df.columns:
+                codel = df.index[:int(writecount)].tolist()
                 dd = df[df.percent == 10]
                 df_list = dd.index.tolist()
                 for co in df_list:

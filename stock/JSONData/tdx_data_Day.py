@@ -1894,12 +1894,19 @@ def compute_lastdays_percent(df=None, lastdays=3,resample='d'):
             # lasp_percent = df['per%sd' % (da - 1)][da-1] if (da - 1) > 0 else 0
             df['per%sd' % da] = ((df['close'] - df['lastp%sd' % da]) / df['lastp%sd' % da]).map(lambda x: round(x * 100, 2))
             if da == 1:
+                df['lastp%sd' % 0] = df['close'][-1]
+                df['lasth%sd' % 0] = df['high'][-1]
+                df['lastl%sd' % 0] = df['low'][-1]
                 # df['perlastp'] = df['per%sd' % da]
                 # df['perlastp'] = (df['per%sd' % da]).map(lambda x: 1 if x >= -0.1 else 0)
                 # down_zero, down_dn = 0, -1
                 down_zero, down_dn, percent_l = 0, -1, 0
-                # df['perlastp'] = map((lambda h,lh,l,ll,c,lc: (1 if (h - lh) > 0 else down_dn) + (1 if (c - lc) > 0 else down_dn) +  (1 if (l - ll) > 0 else down_dn)+(2 if (c - lh) > 0 else down_zero)+(2 if (l - lc) > 0 else down_zero)+(0 if (h - lc) > 0 else down_dn)), df['high'], df['lasth%sd' % da],df['low'], df['lastl%sd' % da],df['close'] ,df['lastp%sd' % da])
-                df['perlastp'] = map((lambda c,lc,lp: (1 if (c - lc) >= 0 else down_dn) + (2 if (c - lc)/lc*100 > percent_l and lp > 0 else down_zero)), df['close'] ,df['lastp%sd' % da],df['per%sd' % da])
+                # df['perlastp'] = map((lambda c,lc,lp: (1 if (c - lc) >= 0 else down_dn) + (2 if (c - lc)/lc*100 > percent_l and lp > 0 else down_zero)), df['close'] ,df['lastp%sd' % da],df['per%sd' % da])
+            
+                nowd,per1d = 1 ,2
+                df['per%sd' % per1d] = ((df['lastp%sd' % da] - df['close'].shift(per1d)) / df['close'].shift(per1d)).map(lambda x: round(x * 100, 2))
+                df['perlastp'] = map(cct.func_compute_percd,df['close'], df['per%sd' % per1d], df['lastp%sd' % (nowd)], df['lasth%sd' % (nowd)], df['lastl%sd' % (nowd)], df['high'], df['low'])
+
             df['mean%sd' % da] = (
                 (df['lasth%sd' % da] + df['lastl%sd' % da]) / 2).map(lambda x: round(x, 2))
             df['per%sd' % da] = df['per%sd' % da][-1]
@@ -2902,7 +2909,8 @@ if __name__ == '__main__':
     # code = '300661'
     # code = '600581'
     # code = '300609'
-    code = '000916'
+    # code = '000916'
+    code = '600326'
     resample ='d'
     # code = '000001'
     # code = '000916'

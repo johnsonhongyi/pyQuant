@@ -1587,6 +1587,28 @@ def get_diff_dratio(mainlist,sublist):
     log.info("dratio all:%s :%s %0.2f"%(len(sublist),len(sublist)-len(dif_co),dratio))
     return dratio
 
+def func_compute_percd(c, lp, lc, lh, ll, nh, nl):
+    initc = 0
+    down_zero, down_dn, percent_l = 0, -1, 1
+    n_p = (c - lc) / lc * 100
+    n_hp = nh - lh
+    n_lp = nl - ll
+    if n_p >= 0:
+        if n_p > percent_l and n_hp > 0:
+            initc += 2
+        else:
+            initc += 1
+        if lp > 0 and n_lp > 0:
+            initc += 1
+    else:
+        if n_p < -percent_l and n_hp < 0:
+            initc -= 2
+        else:
+            initc -= 1
+        if lp < 0 and n_lp < 0:
+            initc -= 1
+    return initc
+
 def combine_dataFrame(maindf,subdf,col=None,compare=None,append=False,clean=True):
     times = time.time()
     maindf_co=maindf.columns
