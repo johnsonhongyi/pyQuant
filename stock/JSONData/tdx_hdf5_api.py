@@ -135,19 +135,19 @@ class SafeHDFStore(HDFStore):
 #                cct.get_config_value(self.config_ini,self.fname_o,h5_size,new_limit)
                # log.info("Compress_Count init:%s h5_size_org:%s" % (Compress_Count, self.h5_size_org))
             log.info("fname:%s h5_size:%s big:%s" % (self.fname,h5_size, self.big_H5_Size_limit))
-            if  h5_size >= self.big_H5_Size_limit:
-                if cct.get_config_value(self.config_ini,self.fname_o,h5_size,new_limit):
-                    time_pt=time.time()
-                    os.rename(self.fname, self.temp_file)
-                    p=subprocess.Popen(self.ptrepack_cmds % (
-                        self.complib, self.temp_file, self.fname), shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-                    p.wait()
-                    if p.returncode != 0:
-                        log.error("ptrepack hdf Error.:%s" % (self.fname))
-                        # return -1
-                    else:
-                        os.remove(self.temp_file)
-                        log.error("fname:%s h5_size:%sM Limit:%s t:%.1f" % (self.fname, h5_size, new_limit , time_pt - time.time()))
+            # if  h5_size >= self.big_H5_Size_limit:
+            if cct.get_config_value(self.config_ini,self.fname_o,h5_size,new_limit):
+                time_pt=time.time()
+                os.rename(self.fname, self.temp_file)
+                p=subprocess.Popen(self.ptrepack_cmds % (
+                    self.complib, self.temp_file, self.fname), shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+                p.wait()
+                if p.returncode != 0:
+                    log.error("ptrepack hdf Error.:%s" % (self.fname))
+                    # return -1
+                else:
+                    os.remove(self.temp_file)
+                    log.error("fname:%s h5_size:%sM Limit:%s t:%.1f" % (self.fname, h5_size, new_limit , time_pt - time.time()))
 
             os.remove(self._lock)
             gc.collect()
