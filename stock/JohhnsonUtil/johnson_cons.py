@@ -55,7 +55,7 @@ sleep_time = 6
 tdx_max_int = 10
 wcd_limit_day = 30
 h5_limit_time = 180
-h5_power_limit_time = 1200
+h5_power_limit_time = 3600
 cxg_limit_days = 20
 newdays_limit_days = 30
 big_H5_Size_limit = 10
@@ -65,6 +65,9 @@ sina_dd_limit_time = 300
 diffcode = 0.2
 duration_sleep_time = 60
 compute_lastdays = 9
+sort_value_key_percd = '3 3'
+sort_value_key_perd = '2 1'
+
 # powerdiff = 'ra * fibl + rah*(abs(float(%s)-fibl))/fib +ma +kdj+rsi'
 '''
             ma  rsi  kdj  boll    ra   rah    df2  fibl  fib  macd  oph

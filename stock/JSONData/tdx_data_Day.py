@@ -1896,9 +1896,10 @@ def compute_lastdays_percent(df=None, lastdays=3,resample='d'):
             if da == 1:
                 # df['perlastp'] = df['per%sd' % da]
                 # df['perlastp'] = (df['per%sd' % da]).map(lambda x: 1 if x >= -0.1 else 0)
-                down_zero, down_dn = 0, -1
+                # down_zero, down_dn = 0, -1
+                down_zero, down_dn, percent_l = 0, -1, 0
                 # df['perlastp'] = map((lambda h,lh,l,ll,c,lc: (1 if (h - lh) > 0 else down_dn) + (1 if (c - lc) > 0 else down_dn) +  (1 if (l - ll) > 0 else down_dn)+(2 if (c - lh) > 0 else down_zero)+(2 if (l - lc) > 0 else down_zero)+(0 if (h - lc) > 0 else down_dn)), df['high'], df['lasth%sd' % da],df['low'], df['lastl%sd' % da],df['close'] ,df['lastp%sd' % da])
-                df['perlastp'] = map((lambda c,lc: (1 if (c - lc) > 0 else down_zero) + (1 if (c - lc)/lc*100 > 3 else down_zero) + (down_dn if (c - lc)/lc*100 < -3 else down_zero)), df['close'] ,df['lastp%sd' % da])
+                df['perlastp'] = map((lambda c,lc,lp: (1 if (c - lc) >= 0 else down_dn) + (2 if (c - lc)/lc*100 > percent_l and lp > 0 else down_zero)), df['close'] ,df['lastp%sd' % da],df['per%sd' % da])
             df['mean%sd' % da] = (
                 (df['lasth%sd' % da] + df['lastl%sd' % da]) / 2).map(lambda x: round(x, 2))
             df['per%sd' % da] = df['per%sd' % da][-1]
