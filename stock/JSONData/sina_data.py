@@ -622,6 +622,7 @@ if __name__ == "__main__":
     # print len(sina.market('sh'))
     def using_Grouper_eval(df,freq='5T',col='low',func={'close':'min','low':'min','volume':'sum'}):
         level_values = df.index.get_level_values
+        # df.groupby(pd.TimeGrouper('5Min'))['val'].apply(lambda x: len(x) > 3)
         return eval("(df.groupby([level_values(i) for i in [0]]+[pd.Grouper(freq=freq, level=-1)]).agg(%s))"%(func))
    
     def compute_lastdays_percent(df=None, step=3):
