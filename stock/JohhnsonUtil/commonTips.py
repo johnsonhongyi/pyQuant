@@ -1186,7 +1186,6 @@ def get_config_value(fname,classtype,xvalue,newvalue,xtype='limit',write=False):
         config[classtype] = {}
         config[classtype][xtype] = newvalue
         config.write()
-        return True
     return False
 
 def write_to_blocknew(p_name, data, append=True):
