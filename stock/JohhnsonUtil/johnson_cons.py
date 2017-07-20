@@ -600,7 +600,6 @@ def get_Duration_format_Values(duration_format, column=None, replace='per3d'):
         if len(t_list) == len(duration_format):
             duration_format = t_list
         if not 'b1_v' in duration_format:
-            print 'b1_v'
             duration_format = get_Duration_format_Values(duration_format, column='b1_v', replace='volume')
 
     return duration_format
