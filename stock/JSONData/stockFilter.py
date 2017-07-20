@@ -9,8 +9,19 @@ from JSONData import get_macd_kdj_rsi as getab
 import pandas as pd
 from JohhnsonUtil import LoggerFactory
 log = LoggerFactory.log
-import time,random
+import time
+import random
 
+# def func_compute_df2(c,lc,lp,h,l,b1_v):
+def func_compute_df2(c,lc,h,l):
+    if h - l == 0:
+        du_p = 0.1
+    else:
+        du_p = round((h - l) / lc * 100, 1)
+    mean_p = round((h+l)/2,1)
+    if c < mean_p and c < lc:
+        du_p = -du_p
+    return du_p
 
 def getBollFilter(df=None, boll=6, duration=ct.PowerCountdl, filter=True, ma5d=True, dl=14, percent=False, resample='d'):
 
@@ -40,16 +51,17 @@ def getBollFilter(df=None, boll=6, duration=ct.PowerCountdl, filter=True, ma5d=T
             # df['perc_n'] = map((lambda c, lc: (1 if (c - lc) > 0 else down_zero) + (1 if (c - lc) / lc * 100 > 3 else down_zero) +
             # (down_dn if (c - lc) / lc * 100 < -3 else down_zero)), df['close'], df['lastp%sd' % da])
 
-            
-            idx_rnd = random.randint(0,len(df)-10)
+            idx_rnd = random.randint(0, len(df) - 10)
             # print "idx_rnd",idx_rnd,df.ix[idx_rnd].lastp0d ,df.ix[idx_rnd].close,df.ix[idx_rnd].lastp0d != df.ix[idx_rnd].close
             if cct.get_work_time() or df.ix[idx_rnd].lastp0d <> df.ix[idx_rnd].close:
-                nowd,per1d = 0 ,1
-                df['perc_n'] = map(cct.func_compute_percd,df['close'], df['per%sd' % per1d], df['lastp%sd' % (nowd)], df['lasth%sd' % (nowd)], df['lastl%sd' % (nowd)], df['high'], df['low'])
+                nowd, per1d = 0, 1
+                df['perc_n'] = map(cct.func_compute_percd, df['close'], df['per%sd' % per1d], df['lastp%sd' %
+                                                                                                 (nowd)], df['lasth%sd' % (nowd)], df['lastl%sd' % (nowd)], df['high'], df['low'])
             else:
-                nowd,per1d = 1 ,2
+                nowd, per1d = 1, 2
                 # print  df['per%sd' % da+1], df['lastp%sd' % (da)], df['lasth%sd' % (da)], df['lastl%sd' % (da)], df['high'], df['low']
-                df['perc_n'] = map(cct.func_compute_percd,df['close'], df['per%sd' % per1d], df['lastp%sd' % (nowd)], df['lasth%sd' % (nowd)], df['lastl%sd' % (nowd)], df['high'], df['low'])
+                df['perc_n'] = map(cct.func_compute_percd, df['close'], df['per%sd' % per1d], df['lastp%sd' %
+                                                                                                 (nowd)], df['lasth%sd' % (nowd)], df['lastl%sd' % (nowd)], df['high'], df['low'])
 
             for co in perc_col:
                 df[co] = (df[co] + df['perc_n']).map(lambda x: x)
@@ -71,6 +83,10 @@ def getBollFilter(df=None, boll=6, duration=ct.PowerCountdl, filter=True, ma5d=T
         dd['b1_v'] = dd['volume']
         df = cct.combine_dataFrame(df, dd.loc[:, ['b1_v']])
         # print "t:%0.2f"%(time.time()-time_ss)
+
+    # df['df2'] = (map(lambda x, y, z: w=round((x - y) / z * 100, 1), df.high.values, df.low.values, df.llastp.values))
+    # df['df2'] = (map(func_compute_df2, df.close.values, df.llastp.values,df.high.values, df.low.values,df.ratio.values))
+    # df['df2'] = (map(func_compute_df2, df.close.values, df.llastp.values,df.high.values, df.low.values))
 
     if 'ma5d' in df.columns:
         df = df[df.buy > df.ma5d * ct.changeRatio]

@@ -99,14 +99,17 @@ Duration_sort_per_ratio_key = [0, 1, 0, 1, 1, 0, 0, 1, 1]
 #                        'fib', 'fibl', 'ra', 'percent', 'volume', 'couts']
 # Duration_sort_per1d_key = [0, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1]
 
-Duration_sort_perd = ['per%sd','dff','perc%sd', 'percent', 'b1_v', 'ratio', 'op',
+Duration_sort_perd = ['per%sd', 'dff', 'perc%sd', 'percent', 'b1_v', 'ratio', 'op',
                       'fib', 'fibl', 'ra', 'volume', 'couts']
-Duration_sort_perd_key = [0,0, 0, 0, 0, 1, 0, 1, 1, 0, 1, 1]
+Duration_sort_perd_key = [0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 1, 1]
 
 Duration_sort_percd = ['perc%sd', 'per%sd', 'percent', 'b1_v', 'ratio', 'op',
                        'fib', 'fibl', 'ra', 'percent', 'volume', 'couts']
 Duration_sort_percd_key = [0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1]
 
+# Duration_sort_percd = ['perc%sd', 'dff', 'per%sd', 'percent', 'b1_v', 'ratio', 'op',
+#                        'fib', 'fibl', 'ra', 'percent', 'volume', 'couts']
+# Duration_sort_percd_key = [0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1]
 
 # Duration_sort_per3d = ['per3d', 'percent', 'per1d', 'ratio', 'op',
 #                        'fib', 'fibl', 'ra', 'percent', 'volume', 'couts']
@@ -141,8 +144,8 @@ Duration_ra_dff = ['ra', 'dff', 'couts', 'percent',
 
 Duration_ra_dff_key = [0, 0, 0, 0, 0, 1, 1, 1, 1]
 
-Duration_sort_ma = ['ma', 'dff', 'percent', 'ratio', 'volume']
-Duration_sort_ma_key = [0, 0, 0, 0, 0]
+Duration_sort_per_df2 = ['percent', 'df2', 'ma', 'dff', 'ratio', 'volume']
+Duration_sort_per_df2_key = [0, 0, 0, 0, 0, 0]
 
 # Duration_ra_goldop=['ra','percent','dff','boll','op','fib','fibl','ratio','volume','couts']
 # Duration_ra_goldop_key=[0,0,0,0,0,1,1,1,1,1]
@@ -167,7 +170,6 @@ Monitor_sort_op_key = [1, 1, 0, 0, 0, 0, 1]
 MonitorMarket_sort_op = ['dff', 'fib', 'fibl', 'op',
                          'ra', 'percent', 'ratio', 'volume', 'couts']
 MonitorMarket_sort_op_key = [0, 0, 1, 0, 0, 0, 1, 1, 1]
-
 
 
 # edit 170620
@@ -515,16 +517,16 @@ INDEX_SYMBOL = {"399990": "sz399990", "000006": "sh000006", "399998": "sz399998"
 def RawMenuArgmain():
     raw = 'status:[go(g),clear(c),[d 20150101 [l|h]|[y|n|pn|py],quit(q),W(a),sh]:'
     raw_input_menu = raw + "\n\tNow : %s" + \
-        "\n\t1:Sort By Percent\t2:Sort by per1d\t3:Sort By percd\t\t4:Sort By DFF\n\t5:Sort By Ra_dff\t6:Sort By df2\t7:Sort Ma dff\t\t8:Sort by Count \nplease input:"
+        "\n\t1:Sort By Percent\t2:Sort by per1d\t3:Sort By percd\t\t4:Sort By DFF\n\t5:Sort By Ra_dff\t6:Sort By df2\t7:Sort Pe df2\t\t8:Sort by Count \nplease input:"
     return raw_input_menu
 
 # "Sort By Percent\t3:Sort By DFF\n\t2:Sort By OP\t\t4:Sort By Ra\nplease input:"
 
 Market_sort_idx = {'1': 'ct.Duration_percent_dff', '2': 'ct.Duration_sort_per1d', '3': 'ct.Duration_sort_per3d', '4': 'ct.Duration_dff_percent', '5': 'ct.Duration_ra_dff', '6': 'ct.Duration_percent_df2dff',
-                   '7': 'ct.Duration_sort_ma', '8': 'ct.Monitor_sort_count'}
+                   '7': 'ct.Duration_sort_per_df2', '8': 'ct.Monitor_sort_count'}
 
 Market_sort_idx_perd = {'1': 'ct.Duration_percent_dff', '2': 'ct.Duration_sort_perd', '3': 'ct.Duration_sort_percd', '4': 'ct.Duration_dff_percent', '5': 'ct.Duration_ra_dff', '6': 'ct.Duration_percent_df2dff',
-                        '7': 'ct.Duration_sort_ma', '8': 'ct.Monitor_sort_count'}
+                        '7': 'ct.Duration_sort_per_df2', '8': 'ct.Monitor_sort_count'}
 
 # Market_sort_idx = {'1': 'ct.Duration_percent_dff', '2': 'ct.Duration_dff_percent', '3': 'ct.Duration_ra_dff', '4': 'ct.Duration_percent_df2dff',
 #                    '5': 'ct.Duration_sort_ma', '6': 'ct.Monitor_sort_count', '7': 'ct.Duration_sort_per_ratio', '8': 'ct.Duration_percent_vol'}
@@ -563,11 +565,11 @@ def get_Duration_format_Values(duration_format, column=None, replace='per3d'):
             column.remove('percent')
 #        idx_list = eval(market_sort_value)[:]
 #        idx_key = [ idx_list.index(x) for x in perd_l if x in idx_list]
-        idx_key = [ column.index(x) for x in column if x.find('per') > -1]
+        idx_key = [column.index(x) for x in column if x.find('per') > -1]
         if len(idx_key) == 0:
-           idx_key = [ column.index(x) for x in column if x.find('b1_v') > -1]
+            idx_key = [column.index(x) for x in column if x.find('b1_v') > -1]
         if isinstance(column, list):
-#            for i,co in enumerate(idx_key):
+            #            for i,co in enumerate(idx_key):
             for co in (idx_key):
                 if replace in column or column[co] not in duration_format:
                     if column[co].find('per') > -1:
@@ -607,7 +609,7 @@ def get_Duration_format_Values(duration_format, column=None, replace='per3d'):
 # print get_Duration_format_Values(Duration_format_buy,'percent')
 
 
-def get_market_sort_value_key(st, top_all=None,perd_d=3):
+def get_market_sort_value_key(st, top_all=None, perd_d=3):
     st_l = st.split()
     st_count = len(st_l)
     st = st_l[0]
@@ -679,20 +681,21 @@ def get_market_sort_value_key(st, top_all=None,perd_d=3):
             market_sort_value = eval(market_sort_name)
     return market_sort_value, market_sort_value_key
 
+
 def get_Dynamic_Duration_perd(market_sort_value, idx_perd, columns=None):
     # idx_value = eval(market_sort_value)[0]
     # idx_value2 = eval(market_sort_value)[1]
     if not isinstance(idx_perd, list):
-        idx_perd =[idx_perd,'2' if idx_perd == '1' else idx_perd]
+        idx_perd = [idx_perd, '2' if idx_perd == '1' else idx_perd]
     # idx_l = [idx_value % idx_perd[0]]
 #    idx_l = []
-    perd_l = ['per%sd','perc%sd']
+    perd_l = ['per%sd', 'perc%sd']
     idx_list = eval(market_sort_value)[:]
-    idx_key = [ idx_list.index(x) for x in perd_l if x in idx_list]
+    idx_key = [idx_list.index(x) for x in perd_l if x in idx_list]
     if len(idx_key) == 0:
-        print ('idx_ker None:%s'%(idx_list))
+        print('idx_ker None:%s' % (idx_list))
 #        idx_key = [ idx_list.index(x) for x in idx_list if x.find('per') > -1 ]
-    for i,idx in enumerate(idx_perd):
+    for i, idx in enumerate(idx_perd):
         idx_value = eval(market_sort_value)[idx_key[i]]
         idx_perd = int(idx)
         if idx_perd > 1 or i == 0:
@@ -704,15 +707,16 @@ def get_Dynamic_Duration_perd(market_sort_value, idx_perd, columns=None):
                             idx_k = inx
                             break
             else:
-                idx_k = idx_perd if idx_perd <=3 else 3
+                idx_k = idx_perd if idx_perd <= 3 else 3
             idx_l2 = idx_value % idx_k
         else:
             idx_l2 = idx_value % idx_perd
         del idx_list[idx_key[i]]
-        idx_list.insert(idx_key[i],idx_l2)
+        idx_list.insert(idx_key[i], idx_l2)
 #        idx_l.extend(idx_l2)
 #    idx_l.extend(eval(market_sort_value)[2:])
     return idx_list
+
 
 def get_Dynamic_Duration_perd_org(market_sort_value, idx_perd, columns=None):
     idx_value = eval(market_sort_value)[0]
@@ -730,7 +734,7 @@ def get_Dynamic_Duration_perd_org(market_sort_value, idx_perd, columns=None):
                         idx_k = inx
                         break
         else:
-            idx_k = idx_perd if idx_perd <=3 else 3
+            idx_k = idx_perd if idx_perd <= 3 else 3
         idx_l2 = [idx_value2 % idx_k]
         # print  idx_value,idx_l,idx_l2
     else:

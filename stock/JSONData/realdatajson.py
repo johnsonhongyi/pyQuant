@@ -135,6 +135,7 @@ def _get_sina_Market_url(market='sh_a', count=None, num='1000'):
 
 def get_sina_Market_json(market='all', showtime=True, num='100', retry_count=3, pause=0.001):
     start_t = time.time()
+#   qq stock api
 #    http://qt.gtimg.cn/q=sz000858,sh600199
 #    http://blog.csdn.net/ustbhacker/article/details/8365756
     # url="http://vip.stock.finance.sina.com.cn/quotes_service/api/json_v2.php/Market_Center.getHQNodeData?page=1&num=50&sort=changepercent&asc=0&node=sh_a&symbol="
@@ -770,7 +771,7 @@ if __name__ == '__main__':
     # print df
     # df = get_sina_all_json_dd(1,0,num=10000)
     # print len(df)
-    for mk in ['sz','cyb','sh']:
+    for mk in ['sh','sz','cyb']:
         df=get_sina_Market_json(mk,num=100)
         # print df.loc['600581']
         print "mk:\t",len(df)
