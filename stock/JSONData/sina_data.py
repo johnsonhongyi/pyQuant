@@ -548,9 +548,9 @@ class Sina:
         # print ("Market-df:%s %s time: %s" % (
         # cct.get_now_time()))
         log.info("hdf:all%s %s" % (len(df), len(self.stock_codes)))
-        h5a.write_hdf_db(self.hdf_name, df, self.table, index=index)
         dd = df.copy()
-        # if not index and len(df) > 3000 and 915 < cct.get_now_time_int() < 1505:
+        h5_fname = 'sina_MultiIndex_data'
+        h5_table = 'all' + '_' + str(ct.sina_limit_time)
         if cct.get_now_time_int() >= 925 and not index and len(df) > 3000 and cct.get_work_time():
             time_s = time.time()
             df.index = df.index.astype(str)
@@ -569,12 +569,17 @@ class Sina:
                 # df.name = df.name.astype(str)
                 df = df.drop(['name'], axis=1)
             df = df.set_index(['code', 'ticktime'])
-            h5_fname = 'sina_MultiIndex_data'
-            h5_table = 'all' + '_' + str(ct.sina_limit_time)
             h5a.write_hdf_db(h5_fname, df, table=h5_table, index=False, baseCount=500, append=False, MultiIndex=True)
             log.info("hdf5 class all :%s  time:%0.2f" % (len(df), time.time() - time_s))
-
-#        self.index_status = False
+        if 'nlow' not in df.columns or (cct.get_now_time_int() >= 930 and cct.get_now_time_int() <=946):
+            h5 = h5a.load_hdf_db(h5_fname, h5_table, timelimit=False)
+            if h5 is not None and len(h5) > len(df):
+                h5 = cct.get_limit_multiIndex_Group(h5, freq='5T',end='09:45:00')
+                h5 = h5.reset_index().set_index('code')
+                h5.rename(columns={'low': 'nlow'}, inplace=True)
+                h5 = h5.drop(['ticktime'], axis=1)
+                dd = cct.combine_dataFrame(dd, h5, col=None, compare=None, append=False, clean=True)
+        h5a.write_hdf_db(self.hdf_name, dd, self.table, index=index)
         log.info("wr end:%0.2f" % (time.time() - self.start_t))
         return dd
         # df = pd.DataFrame.from_dict(stock_dict, orient='columns',
@@ -616,15 +621,12 @@ if __name__ == "__main__":
     # df = sina.get_stock_code_data('000001',index=True).set_index('code')
     # df= sina.get_stock_code_data('999999,399001',index=True)
     df = sina.get_stock_code_data(['600203', '000831', '300306', '600007'])
-    # print df.T
+    # print df.nlow[:5]
 #    print sina.get_stock_code_data('002873')
     # print sina.get_stock_code_data('600199,300334',index=False)
     # print len(sina.market('sh'))
-    def using_Grouper_eval(df,freq='5T',col='low',func={'close':'min','low':'min','volume':'sum'}):
-        level_values = df.index.get_level_values
-        # df.groupby(pd.TimeGrouper('5Min'))['val'].apply(lambda x: len(x) > 3)
-        return eval("(df.groupby([level_values(i) for i in [0]]+[pd.Grouper(freq=freq, level=-1)]).agg(%s))"%(func))
    
+
     def compute_lastdays_percent(df=None, step=3):
         if df is not None and len(df) > step:
             df = df.sort_index(ascending=True)
@@ -632,11 +634,14 @@ if __name__ == "__main__":
             # df = df[df.index < cct.get_today()]
             df = df.fillna(0)
             da = step
-            # for da in range(1, step + 1, 1):
-            df['lastp%sd' % da] = df['close'].shift(da)
-            df['lastv%sd' % da] = df['volume'].shift(da)
-            df['per%sd' % da] = ((df['close'] - df['lastp%sd' % da]) / df['lastp%sd' % da]).map(lambda x: round(x * 100, 2))
-            df['vol%sd' % da] = ((df['volume'] - df['lastv%sd' % da])).map(lambda x: round(x / 100, 1))
+            if 'close' in df.columns:
+                df['lastp%sd' % da] = df['close'].shift(da)
+            if 'volume' in df.columns:
+                df['lastv%sd' % da] = df['volume'].shift(da)
+            if 'close' in df.columns and 'lastp%sd' % da in df.columns:
+                df['per%sd' % da] = ((df['close'] - df['lastp%sd' % da]) / df['lastp%sd' % da]).map(lambda x: round(x * 100, 2))
+            if 'volume' in df.columns and 'lastv%sd' % da in df.columns:
+                df['vol%sd' % da] = ((df['volume'] - df['lastv%sd' % da])).map(lambda x: round(x / 100, 1))
         else:
             log.info("compute df is none")
         return df
@@ -650,17 +655,21 @@ if __name__ == "__main__":
     # '''
     stock_data = df
     print "t1:%0.3f df:%s"%(time.time()-time_s,df.shape)
-    df = using_Grouper_eval(df, freq='5T', col='low', func={'close':'min','low':'min','volume':'sum'})
+    # df = cct.using_Grouper_eval(df, freq='5T', col=['low','close'], closed='right', label='right')
+    df = cct.get_limit_multiIndex_Group(df, freq='5T', col=['low','close'], index='ticktime', end='09:45:00')
+    # df = using_Grouper(df, freq='5T')
     # stock_data = stock_data.reset_index().set_index('ticktime')
     # df = stock_data.groupby('code').resample('5T', how={'low': 'min', 'close':'min', 'volume': 'sum'})
     print "t2:%0.3f df:%s"%(time.time()-time_s,df.shape)
-    print df.loc['600999'][-2:]
-    df = using_Grouper_eval(df, freq='30T', col='low', func={'close':'min','low':'min','volume':'sum'})
+    print df.loc['000001'][-2:]
+    df = cct.using_Grouper(df, freq='5T', col=['low','close'], closed='right', label='right')
+    # df = using_Grouper(df, freq='30T')
+
     # df = stock_data.groupby('code').resample('30T', how={'low': 'min', 'close':'min', 'volume': 'sum'})
     # df = df.groupby(level=0).transform(get_tdx_stock_period_to_type)
     # df = df.groupby([df.index.get_level_values(i) for i in [0]]+[pd.Grouper(freq='30T', level=-1)]).transform(get_tdx_stock_period_to_type)
     print "t3:%0.3f df:%s"%(time.time()-time_s,df.shape)
-    print df.loc['600999'][-2:]
+    print df.loc['000001'][-2:]
     # '''
     # print df.groupby(pd.Grouper(freq='30T', level='ticktime'))
     # df.groupby(level=0)['low'].transform('min').loc['600805'][:5]
@@ -696,6 +705,7 @@ if __name__ == "__main__":
 
         # df.ticktime = map(lambda x: int(x.replace(':', '')), df.ticktime)
         df.ticktime = map(lambda x,y: str(x)+' '+str(y),df.dt,df.ticktime)
+        print df.ticktime[:3]
         df.ticktime = pd.to_datetime(df.ticktime, format='%Y-%m-%d %H:%M:%S')
         print df.ticktime[:2]
         # sys.exit(0)

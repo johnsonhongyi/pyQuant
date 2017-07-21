@@ -770,7 +770,8 @@ if __name__ == '__main__':
     # df = get_market_price_sina_dd_realTime(dp='', vol='1', type='0')
     # print df
     # df = get_sina_all_json_dd(1,0,num=10000)
-    # print len(df)
+    df = get_sina_Market_json(market='all', showtime=True, num='100', retry_count=3, pause=0.001)
+    print df.shape,df.loc['600306']
     for mk in ['sh','sz','cyb']:
         df=get_sina_Market_json(mk,num=100)
         # print df.loc['600581']

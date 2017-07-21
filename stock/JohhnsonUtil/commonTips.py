@@ -6,7 +6,8 @@ import os
 import platform
 import re
 import sys
-import time,random
+import time
+import random
 from compiler.ast import flatten
 from multiprocessing.pool import ThreadPool, cpu_count
 
@@ -36,32 +37,32 @@ requests.adapters.DEFAULT_RETRIES = 0
 # print sys.path
 # from JSONData import tdx_data_Day as tdd
 global initGlobalValue
-initGlobalValue=0
+initGlobalValue = 0
+
+
 class GlobalValues:
     # -*- coding: utf-8 -*-
+
     def __init__(self):
         global initGlobalValue
         if initGlobalValue == 0:
             self._init_()
-            initGlobalValue +=1
+            initGlobalValue += 1
 
-    def _init_(self):#初始化
+    def _init_(self):  # 初始化
         global _global_dict
         _global_dict = {}
 
-
-    def setkey(self,key,value):
+    def setkey(self, key, value):
         # """ 定义一个全局变量 """
         _global_dict[key] = value
 
-
-    def getkey(self,key,defValue=None):
-    # 　　""" 获得一个全局变量,不存在则返回默认值 """
+    def getkey(self, key, defValue=None):
+        # 　　""" 获得一个全局变量,不存在则返回默认值 """
         try:
             return _global_dict[key]
         except KeyError:
             return defValue
-
 
 
 def get_os_system():
@@ -82,36 +83,39 @@ win10Lengend = r'D:\Program\gfzq'
 win10Lixin = r'C:\zd_zszq'
 win7rootAsus = r'D:\Program Files\gfzq'
 win7rootXunji = r'E:\DOC\Parallels\WinTools\zd_pazq'
-win7rootList = [win10Lixin,win7rootAsus,win7rootXunji,win10Lengend]
+win7rootList = [win10Lixin, win7rootAsus, win7rootXunji, win10Lengend]
 macroot = r'/Users/Johnson/Documents/Johnson/WinTools/zd_pazq'
 xproot = r'E:\DOC\Parallels\WinTools\zd_pazq'
 mac_ramdisk_root = r'/Volumes/RamDisk'
 win10_ramdisk_root = r'R:'
-ramdisk_rootList = [win10_ramdisk_root,mac_ramdisk_root]
+ramdisk_rootList = [win10_ramdisk_root, mac_ramdisk_root]
 path_sep = os.path.sep
+
+
 def get_tdx_dir():
     os_sys = get_sys_system()
     os_platform = get_sys_platform()
     if os_sys.find('Darwin') == 0:
         log.info("DarwinFind:%s" % os_sys)
-        basedir = macroot.replace('/', path_sep).replace('\\',path_sep)
+        basedir = macroot.replace('/', path_sep).replace('\\', path_sep)
         log.info("Mac:%s" % os_platform)
 
     elif os_sys.find('Win') == 0:
         log.info("Windows:%s" % os_sys)
         if os_platform.find('XP') == 0:
             log.info("XP:%s" % os_platform)
-            basedir = xproot.replace('/', path_sep).replace('\\',path_sep)  # 如果你的安装路径不同,请改这里
+            basedir = xproot.replace('/', path_sep).replace('\\', path_sep)  # 如果你的安装路径不同,请改这里
         else:
             log.info("Win7O:%s" % os_platform)
             for root in win7rootList:
-                basedir = root.replace('/', path_sep).replace('\\',path_sep)  # 如果你的安装路径不同,请改这里
+                basedir = root.replace('/', path_sep).replace('\\', path_sep)  # 如果你的安装路径不同,请改这里
                 if os.path.exists(basedir):
-                    log.info("%s : path:%s" % (os_platform,basedir))
+                    log.info("%s : path:%s" % (os_platform, basedir))
                     break
     if not os.path.exists(basedir):
         log.error("basedir not exists")
     return basedir
+
 
 def get_sys_platform():
     return platform.platform()
@@ -120,25 +124,27 @@ def get_sys_platform():
 def get_sys_system():
     return platform.system()
 
+
 def get_ramdisk_dir():
     os_platform = get_sys_platform()
     basedir = None
     for root in ramdisk_rootList:
-        basedir = root.replace('/', path_sep).replace('\\',path_sep)
+        basedir = root.replace('/', path_sep).replace('\\', path_sep)
         if os.path.exists(basedir):
-            log.info("%s : path:%s" % (os_platform,basedir))
+            log.info("%s : path:%s" % (os_platform, basedir))
             break
     return basedir
 
 RamBaseDir = get_ramdisk_dir()
-def get_ramdisk_path(filename,lock=False):
+
+
+def get_ramdisk_path(filename, lock=False):
     if filename:
-        basedir =  RamBaseDir
+        basedir = RamBaseDir
         # basedir = ramdisk_root.replace('/', path_sep).replace('\\',path_sep)
         if not os.path.isdir(basedir):
-            log.error("ramdisk Root Err:%s"%(basedir))
+            log.error("ramdisk Root Err:%s" % (basedir))
             return None
-
 
         if not os.path.exists(basedir):
             log.error("basedir not exists")
@@ -149,15 +155,15 @@ def get_ramdisk_path(filename,lock=False):
                 filename = filename + '.h5'
         else:
             if filename.endswith('h5'):
-                filename = filename.replace('h5','lock')
+                filename = filename.replace('h5', 'lock')
             else:
                 filename = filename + '.lock'
 
         if filename.find(basedir) >= 0:
-            log.info("file:%s"%(filename))
+            log.info("file:%s" % (filename))
             return filename
 
-        file_path = basedir  + path_sep + filename
+        file_path = basedir + path_sep + filename
         # for root in win7rootList:
         #     basedir = root.replace('/', path_sep).replace('\\',path_sep)  # 如果你的安装路径不同,请改这里
         #     if os.path.exists(basedir):
@@ -180,14 +186,14 @@ end tell
 '''
 
 terminal_positionKey = {'sina_Market-DurationDn.py': '217, 520',
-               'sina_Market-DurationCXDN.py': '8, 52',
-               'sina_Market-DurationSH.py': '-23, 539',
-               'sina_Market-DurationUP.py': '-19, 111',
-               'sina_Monitor-Market-LH.py': '184, 239',
-               'sina_Monitor-Market.py': '19, 179',
-               'sina_Monitor.py': '39, 22',
-               'singleAnalyseUtil.py': '652, 22',
-               'LinePower.py':'40, 497',}
+                        'sina_Market-DurationCXDN.py': '8, 52',
+                        'sina_Market-DurationSH.py': '-23, 539',
+                        'sina_Market-DurationUP.py': '-19, 111',
+                        'sina_Monitor-Market-LH.py': '184, 239',
+                        'sina_Monitor-Market.py': '19, 179',
+                        'sina_Monitor.py': '39, 22',
+                        'singleAnalyseUtil.py': '652, 22',
+                        'LinePower.py': '40, 497', }
 
 script_set_position = '''tell application "Terminal"
     --activate
@@ -199,10 +205,12 @@ closeterminalw = '''osascript -e 'tell application "Terminal" to close windows %
 
 scriptquit = '''tell application "Python Launcher" to quit'''
 
-def get_terminal_Position(cmd=None, position=None,close=False):
+
+def get_terminal_Position(cmd=None, position=None, close=False):
     win_count = 0
-    if get_os_system() == 'mac' :
+    if get_os_system() == 'mac':
         import subprocess
+
         def cct_doScript(scriptn):
             proc = subprocess.Popen(['osascript', '-'],
                                     stdin=subprocess.PIPE,
@@ -218,120 +226,124 @@ def get_terminal_Position(cmd=None, position=None,close=False):
         count = cct_doScript(scriptcount)
         if position is None:
             if count > 0 and cmd is not None:
-                log.info("count:%s"%(count))
-                for n in xrange(1, int(count)+1):
+                log.info("count:%s" % (count))
+                for n in xrange(1, int(count) + 1):
                     title = cct_doScript(scriptname % ('get', str(object=n)))
-                    log.info("count n:%s title:%s"%(n,title))
+                    log.info("count n:%s title:%s" % (n, title))
                     if close:
-                        log.info("close:%s"%(title))
+                        log.info("close:%s" % (title))
                     if title.lower().find(cmd.lower()) >= 0:
-                        log.info("WinFind:%s get_title:%s "%(n,title))
-                        win_count+=1
+                        log.info("WinFind:%s get_title:%s " % (n, title))
+                        win_count += 1
                         # print "get:%s"%(n)
                         # position=cct_doScript(script_get_position % ('get', str(n)))
                         if close:
-                            log.info("close:%s %s"%(n,cmd))
-                            os.system(closeterminalw%(n))
+                            log.info("close:%s %s" % (n, cmd))
+                            os.system(closeterminalw % (n))
         else:
             # sleep(1, catch=True)
             position = position.split(os.sep)[-1]
-            log.info("position Argv:%s"%(position))
+            log.info("position Argv:%s" % (position))
             if int(count) > 0:
                 if position in terminal_positionKey.keys():
-                    log.info("count:%s"%(count))
-                    for n in xrange(1, int(count)+1):
+                    log.info("count:%s" % (count))
+                    for n in xrange(1, int(count) + 1):
                         title = cct_doScript(scriptname % ('get', str(object=n)))
                         if title.lower().find(position.lower()) > 0:
-                            log.info("title:%s po:%s"%(title, terminal_positionKey[position]))
-                            position = cct_doScript(script_set_position % ('set', str(n),terminal_positionKey[position]))
+                            log.info("title:%s po:%s" % (title, terminal_positionKey[position]))
+                            position = cct_doScript(script_set_position % ('set', str(n), terminal_positionKey[position]))
                 else:
-                    log.info("Keys not position:%s"%(position))
+                    log.info("Keys not position:%s" % (position))
     return win_count
 
 
-
 get_terminal_Position(cmd=scriptquit, position=None, close=False)
-get_terminal_Position('Johnson — bash',close=True)
+get_terminal_Position('Johnson — bash', close=True)
 log.info("close Python Launcher")
 
 from numba.decorators import autojit
+
+
 def run_numba(func):
-    funct = autojit(lambda:func)
+    funct = autojit(lambda: func)
     return funct
 
-def get_work_path(base,dpath,fname):
+
+def get_work_path(base, dpath, fname):
     baser = os.getcwd().split(base)[0]
-    base = baser  + base + path_sep + dpath + path_sep
+    base = baser + base + path_sep + dpath + path_sep
     filepath = base + fname
     return filepath
+
 
 def get_rzrq_code(market='all'):
 
     baser = os.getcwd().split('stock')[0]
-    base = baser  + 'stock' +path_sep + 'JohhnsonUtil' + path_sep
+    base = baser + 'stock' + path_sep + 'JohhnsonUtil' + path_sep
     szrz = base + 'szrzrq.csv'
     shrz = base + 'shrzrq.csv'
-    if market in ['all','sz','sh']:
-        dfsz = pd.read_csv(szrz,dtype={'code':str},encoding = 'gbk')
+    if market in ['all', 'sz', 'sh']:
+        dfsz = pd.read_csv(szrz, dtype={'code': str}, encoding='gbk')
         if market == 'sz':
             return dfsz
-        dfsh = pd.read_csv(shrz,dtype={'code':str},encoding ='gbk')
-        dfsh = dfsh.loc[:,['code','name']]
+        dfsh = pd.read_csv(shrz, dtype={'code': str}, encoding='gbk')
+        dfsh = dfsh.loc[:, ['code', 'name']]
         if market == 'sh':
             return dfsh
-        dd = dfsz.append(dfsh,ignore_index=True)
+        dd = dfsz.append(dfsh, ignore_index=True)
     elif market == 'cx':
-        cxzx = base +  'cxgzx.csv'
-        dfot = pd.read_csv(cxzx,dtype={'code':str},sep='\t',encoding ='gbk')
-        dd = dfot.loc[:,['code','name']]
+        cxzx = base + 'cxgzx.csv'
+        dfot = pd.read_csv(cxzx, dtype={'code': str}, sep='\t', encoding='gbk')
+        dd = dfot.loc[:, ['code', 'name']]
     else:
-        cxzx = base +  market + '.csv'
-        dfot = pd.read_csv(cxzx,dtype={'code':str},sep='\t',encoding ='gbk')
-        dd = dfot.loc[:,['code','name']]
-    print "rz:%s"%(len(dd)),
+        cxzx = base + market + '.csv'
+        dfot = pd.read_csv(cxzx, dtype={'code': str}, sep='\t', encoding='gbk')
+        dd = dfot.loc[:, ['code', 'name']]
+    print "rz:%s" % (len(dd)),
     return dd
 
-def get_tushare_market(market='zxb',renew=False,days=5):
-    def tusharewrite_to_csv(market,filename,days):
+
+def get_tushare_market(market='zxb', renew=False, days=5):
+    def tusharewrite_to_csv(market, filename, days):
         import tushare as ts
         if market == 'zxb':
             df = ts.get_sme_classified()
         elif market == 'captops':
-            df = ts.cap_tops(days).loc[:,['code','name']]
+            df = ts.cap_tops(days).loc[:, ['code', 'name']]
             if days != 10:
                 initda = days * 2
-                df2 = ts.inst_tops(initda).loc[:,['code','name']]
+                df2 = ts.inst_tops(initda).loc[:, ['code', 'name']]
                 df = df.append(df2)
-                df.drop_duplicates('code',inplace=True)
+                df.drop_duplicates('code', inplace=True)
         else:
             log.warn('market not found')
             return pd.DataFrame()
-        if len(df)>0:
+        if len(df) > 0:
             df = df.set_index('code')
         else:
             log.warn("get error")
-        df.to_csv(filename,encoding='gbk')
-        log.warn("update %s :%s"%(market,len(df))),
+        df.to_csv(filename, encoding='gbk')
+        log.warn("update %s :%s" % (market, len(df))),
         df.reset_index(inplace=True)
         return df
 
     baser = os.getcwd().split('stock')[0]
-    base = baser  + 'stock' +path_sep + 'JohhnsonUtil' + path_sep
-    filepath = base + market+'.csv'
+    base = baser + 'stock' + path_sep + 'JohhnsonUtil' + path_sep
+    filepath = base + market + '.csv'
     if os.path.exists(filepath):
         if renew and creation_date_duration(filepath) > 0:
             df = tusharewrite_to_csv(market, filepath, days)
         else:
-            df = pd.read_csv(filepath,dtype={'code':str},encoding = 'gbk')
+            df = pd.read_csv(filepath, dtype={'code': str}, encoding='gbk')
             # df = pd.read_csv(filepath,dtype={'code':str})
             if len(df) == 0:
-                df = tusharewrite_to_csv(market, filepath ,days)
+                df = tusharewrite_to_csv(market, filepath, days)
     else:
-        df = tusharewrite_to_csv(market, filepath , days)
+        df = tusharewrite_to_csv(market, filepath, days)
 
     return df
 
-sina_doc="""sina_Johnson.
+sina_doc = """sina_Johnson.
 
 Usage:
   sina_cxdn.py
@@ -342,7 +354,7 @@ Options:
   -d <debug>    [default: error].
 """
 
-sina_doc_old="""sina_Johnson.
+sina_doc_old = """sina_Johnson.
 
 Usage:
   sina_cxdn.py
@@ -354,16 +366,18 @@ Options:
   --debug       Debug [default: error].
   --de=<debug>    [default: error].
 """
-  # --info    info [default:False].
+# --info    info [default:False].
+
 
 def sys_default_utf8(default_encoding='utf-8'):
     #import sys
-#    default_encoding = 'utf-8'
+    #    default_encoding = 'utf-8'
     if sys.getdefaultencoding() != default_encoding:
         reload(sys)
         sys.setdefaultencoding(default_encoding)
 
 sys_default_utf8()
+
 
 def get_tdx_dir_blocknew():
     blocknew_path = get_tdx_dir() + r'/T0002/blocknew/'.replace('/', path_sep).replace('\\', path_sep)
@@ -376,8 +390,9 @@ def isMac():
     else:
         return False
 
+
 def check_chinese(checkstr):
-    status = re.match('[ \u4e00 -\u9fa5]+',checkstr) == None
+    status = re.match('[ \u4e00 -\u9fa5]+', checkstr) == None
     return status
 # def whichEncode(text):
 #   text0 = text[0]
@@ -391,6 +406,8 @@ def check_chinese(checkstr):
 #     elif "ascii" in str(e):
 #       return "Unicode"
 #   return "utf8"
+
+
 def getCoding(strInput):
     '''
     获取编码格式
@@ -413,6 +430,7 @@ def getCoding(strInput):
     except:
         pass
 
+
 def tran2UTF8(strInput):
     '''
     转化为utf8格式
@@ -425,6 +443,7 @@ def tran2UTF8(strInput):
     elif strCodingFmt == "gbk":
         return strInput.decode("gbk").encode("utf8")
 
+
 def tran2GBK(strInput):
     '''
     转化为gbk格式
@@ -436,7 +455,6 @@ def tran2GBK(strInput):
         return strInput.encode("gbk")
     elif strCodingFmt == "utf8":
         return strInput.decode("utf8").encode("gbk")
-
 
 
 def creation_date_duration(path_to_file):
@@ -460,21 +478,25 @@ def creation_date_duration(path_to_file):
     today = datetime.date.today()
     return (today - dtm).days
 
+
 def set_ctrl_handler():
     # os.environ['FOR_DISABLE_CONSOLE_CTRL_HANDLER'] = '1'
-    import win32api,thread
+    import win32api
+    import thread
     # def doSaneThing(sig, func=None):
-        # '''忽略所有KeyCtrl'''
-        # return True
+    # '''忽略所有KeyCtrl'''
+    # return True
     # win32api.SetConsoleCtrlHandler(doSaneThing, 1)
+
     def handler(dwCtrlType, hook_sigint=thread.interrupt_main):
-        print ("ctrl:%s"%(dwCtrlType))
-        if dwCtrlType == 0: # CTRL_C_EVENT
+        print("ctrl:%s" % (dwCtrlType))
+        if dwCtrlType == 0:  # CTRL_C_EVENT
             # hook_sigint()
             # raise KeyboardInterrupt("CTRL-C!")
-            return 1 # don't chain to the next handler
-        return 0 # chain to the next handler
+            return 1  # don't chain to the next handler
+        return 0  # chain to the next handler
     win32api.SetConsoleCtrlHandler(handler, 1)
+
 
 def set_console(width=80, height=15, color=3, title=None):
     # mode con cp select=936
@@ -505,15 +527,17 @@ def set_console(width=80, height=15, color=3, title=None):
     # os.system('color %s'%color)
     # set_ctrl_handler()
 
+
 def timeit_time(cmd, num=5):
     import timeit
     time_it = timeit.timeit(lambda: cmd, number=num)
-    print ("timeit:%s" % time_it)
+    print("timeit:%s" % time_it)
 
 
 def get_delay_time():
     delay_time = 8000
     return delay_time
+
 
 def cct_raw_input(sts):
     # print sts
@@ -523,7 +547,7 @@ def cct_raw_input(sts):
         inputerr = cct_raw_input(" Break: ")
 #        if inputerr == 'e' or inputerr == 'q':
 #            return 'e'
-            # raise Exception('raw interrupt')
+        # raise Exception('raw interrupt')
         if len(inputerr) > 0:
             return inputerr
         else:
@@ -541,6 +565,7 @@ eval_rule = "[elem for elem in dir() if elem.startswith('top') or elem.startswit
 # readline.set_completer(completer.complete)
 # readline.parse_and_bind('tab:complete')
 
+
 class MyCompleter(object):  # Custom completer
 
     def __init__(self, options):
@@ -552,7 +577,7 @@ class MyCompleter(object):  # Custom completer
                 # self.matches = [s for s in self.options
                 #                     if s and s.startswith(text)]
                 self.matches = [s for s in self.options
-                                   if text in s]
+                                if text in s]
             else:  # no text entered, all matches possible
                 self.matches = self.options[:]
 
@@ -563,7 +588,6 @@ class MyCompleter(object):  # Custom completer
             return None
 
 
-
 def cct_eval(cmd):
     try:
         st = eval(cmd)
@@ -571,11 +595,13 @@ def cct_eval(cmd):
         st = ''
         print e
     return st
-def sleep(timet,catch=True):
-    times=time.time()
+
+
+def sleep(timet, catch=True):
+    times = time.time()
     try:
-        for _ in range(int(timet)*2):
-            if int(time.time()-times) >= int(timet):
+        for _ in range(int(timet) * 2):
+            if int(time.time() - times) >= int(timet):
                 break
             time.sleep(0.5)
     except (KeyboardInterrupt) as e:
@@ -587,14 +613,17 @@ def sleep(timet,catch=True):
             pass
         # raise Exception("code is None")
     # print time.time()-times
+
+
 def sleeprandom(timet):
     now_t = get_now_time_int()
     if now_t > 915 and now_t < 926:
-        sleeptime=random.randint(10/3, 5)
+        sleeptime = random.randint(10 / 3, 5)
     else:
-        sleeptime=random.randint(timet/3, timet)
-    print "Error2sleep:%s"%(sleeptime)
-    sleep(sleeptime,False)
+        sleeptime = random.randint(timet / 3, timet)
+    print "Error2sleep:%s" % (sleeptime)
+    sleep(sleeptime, False)
+
 
 def get_cpu_count():
     return cpu_count()
@@ -604,11 +633,11 @@ def get_os_path_sep():
     return os.path.sep
 
 
-def day8_to_day10(start):
+def day8_to_day10(start, sep='-'):
     if start:
         start = str(start)
         if len(start) == 8:
-            start = start[:4] + '-' + start[4:6] + '-' + start[6:]
+            start = start[:4] + sep + start[4:6] + sep + start[6:]
             return start
     return start
 
@@ -638,14 +667,16 @@ def get_today(sep='-'):
     # return days
     return days.count() - holidays
 
+
 def get_work_day_status():
     today = datetime.datetime.today().date()
     day_n = int(today.strftime("%w"))
-    if day_n >0 and day_n < 6:
+    if day_n > 0 and day_n < 6:
         return True
     else:
         return False
     # return str(today)
+
 
 def last_tddate(days=1):
     # today = datetime.datetime.today().date() + datetime.timedelta(-days)
@@ -654,12 +685,13 @@ def last_tddate(days=1):
     today = datetime.datetime.today().date()
     log.debug("today:%s " % (today))
     # return str(today)
+
     def get_work_day(today):
         day_n = int(today.strftime("%w"))
         if day_n == 0:
             lastd = today + datetime.timedelta(-2)
             log.debug("0:%s" % lastd)
-        elif day_n == 1 :
+        elif day_n == 1:
             lastd = today + datetime.timedelta(-3)
             log.debug("1:%s" % lastd)
         else:
@@ -668,7 +700,7 @@ def last_tddate(days=1):
         return lastd
         # if days==0:
         # return str(lasd)
-    lastday=today
+    lastday = today
     for x in range(days):
         # print x
         lastday = get_work_day(today)
@@ -727,8 +759,8 @@ def testdf2(df):
         pass
 
 
-def get_today_duration(datastr,endday=None):
-    if datastr is not None and len(datastr)>6:
+def get_today_duration(datastr, endday=None):
+    if datastr is not None and len(datastr) > 6:
         if endday:
             today = datetime.datetime.strptime(day8_to_day10(endday), '%Y-%m-%d').date()
         else:
@@ -739,6 +771,7 @@ def get_today_duration(datastr,endday=None):
         duration_day = None
     return (duration_day)
 
+
 def get_now_time():
     # now = time.time()
     # now = time.localtime()
@@ -747,6 +780,7 @@ def get_now_time():
     d_time = datetime.datetime.now().strftime("%H:%M")
 
     return d_time
+
 
 def get_now_time_int():
     now_t = datetime.datetime.now().strftime("%H%M")
@@ -766,6 +800,7 @@ def get_work_time():
             # sleep(random.randint(5, 120))
         return True
 
+
 def get_work_hdf_status():
     now_t = str(get_now_time()).replace(':', '')
     now_t = int(now_t)
@@ -777,24 +812,23 @@ def get_work_hdf_status():
         return True
     return False
 
+
 def get_work_duration():
     int_time = get_now_time_int()
     # now_t = int(now_t)
-    if get_work_day_status() and ( (800 < int_time < 915) or (1132 < int_time < 1300)):
-    # if (int_time > 830 and int_time < 915) or (int_time > 1130 and int_time < 1300) or (int_time > 1500 and int_time < 1510):
+    if get_work_day_status() and ((800 < int_time < 915) or (1132 < int_time < 1300)):
+        # if (int_time > 830 and int_time < 915) or (int_time > 1130 and int_time < 1300) or (int_time > 1500 and int_time < 1510):
         # return False
         return True
     else:
         return False
 
 
-
-
 def get_work_time_ratio():
-    initx=6.5
-    stepx=0.5
-    init=0
-    initAll=10
+    initx = 6.5
+    stepx = 0.5
+    init = 0
+    initAll = 10
     now = time.localtime()
     ymd = time.strftime("%Y:%m:%d:", now)
     hm1 = '09:30'
@@ -807,48 +841,48 @@ def get_work_time_ratio():
         d2 = datetime.datetime.strptime(ymd + '09:29', '%Y:%m:%d:%H:%M')
         d1 = datetime.datetime.strptime(ymd + '09:30', '%Y:%m:%d:%H:%M')
         ds = float((d1 - d2).seconds)
-        init +=1
-        ratio_t = round(ds / all_work_time/(initx+init*stepx)*initAll, 3)
+        init += 1
+        ratio_t = round(ds / all_work_time / (initx + init * stepx) * initAll, 3)
     elif now_t > 930 and now_t <= 1000:
         d2 = datetime.datetime.strptime(ymd + hm1, '%Y:%m:%d:%H:%M')
         ds = float((d1 - d2).seconds)
-        init +=1
-        ratio_t = round(ds / all_work_time/(initx+init*stepx)*initAll, 3)
+        init += 1
+        ratio_t = round(ds / all_work_time / (initx + init * stepx) * initAll, 3)
     elif now_t > 1000 and now_t <= 1030:
         d2 = datetime.datetime.strptime(ymd + hm1, '%Y:%m:%d:%H:%M')
         ds = float((d1 - d2).seconds)
-        init +=2
-        ratio_t = round(ds / all_work_time/(initx+init*stepx)*initAll, 3)
+        init += 2
+        ratio_t = round(ds / all_work_time / (initx + init * stepx) * initAll, 3)
     elif now_t > 1030 and now_t <= 1100:
         d2 = datetime.datetime.strptime(ymd + hm1, '%Y:%m:%d:%H:%M')
         ds = float((d1 - d2).seconds)
-        init +=3
-        ratio_t = round(ds / all_work_time/(initx+init*stepx)*initAll, 3)
+        init += 3
+        ratio_t = round(ds / all_work_time / (initx + init * stepx) * initAll, 3)
     elif now_t > 1100 and now_t <= 1130:
         d2 = datetime.datetime.strptime(ymd + hm1, '%Y:%m:%d:%H:%M')
         ds = float((d1 - d2).seconds)
-        init +=4
-        ratio_t = round(ds / all_work_time/(initx+init*stepx)*initAll, 3)
+        init += 4
+        ratio_t = round(ds / all_work_time / (initx + init * stepx) * initAll, 3)
     elif now_t > 1130 and now_t < 1300:
-        init +=4
-        ratio_t = 0.5/(initx+init*stepx)*initAll
+        init += 4
+        ratio_t = 0.5 / (initx + init * stepx) * initAll
     elif now_t >= 1500 or now_t < 930:
         ratio_t = 1.0
     elif now_t > 1300 and now_t <= 1330:
         d2 = datetime.datetime.strptime(ymd + hm2, '%Y:%m:%d:%H:%M')
         ds = float((d1 - d2).seconds)
-        init +=5
-        ratio_t = round((ds + 7200) / all_work_time/(initx+init*stepx)*initAll, 3)
+        init += 5
+        ratio_t = round((ds + 7200) / all_work_time / (initx + init * stepx) * initAll, 3)
     elif now_t > 1330 and now_t <= 1400:
         d2 = datetime.datetime.strptime(ymd + hm2, '%Y:%m:%d:%H:%M')
         ds = float((d1 - d2).seconds)
-        init +=6
-        ratio_t = round((ds + 7200) / all_work_time/(initx+init*stepx)*initAll, 3)
+        init += 6
+        ratio_t = round((ds + 7200) / all_work_time / (initx + init * stepx) * initAll, 3)
     elif now_t > 1400 and now_t <= 1430:
         d2 = datetime.datetime.strptime(ymd + hm2, '%Y:%m:%d:%H:%M')
         ds = float((d1 - d2).seconds)
-        init +=7
-        ratio_t = round((ds + 7200) / all_work_time/(initx+init*stepx)*initAll, 3)
+        init += 7
+        ratio_t = round((ds + 7200) / all_work_time / (initx + init * stepx) * initAll, 3)
     else:
         d2 = datetime.datetime.strptime(ymd + hm2, '%Y:%m:%d:%H:%M')
         ds = float((d1 - d2).seconds)
@@ -857,7 +891,7 @@ def get_work_time_ratio():
     return ratio_t
 
 
-def get_url_data_R(url,timeout=10):
+def get_url_data_R(url, timeout=10):
     # headers = {'User-Agent':'Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.6) Gecko/20091201 Firefox/3.5.6'}
     headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.2; rv:16.0) Gecko/20100101 Firefox/16.0',
                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
@@ -869,8 +903,8 @@ def get_url_data_R(url,timeout=10):
         fp.close()
     # except (HTTPError, URLError) as error:
         # log.error('Data of %s not retrieved because %s\nURL: %s', name, error, url)
-    except (socket.timeout,socket.error) as e:
-    # print data.encoding
+    except (socket.timeout, socket.error) as e:
+        # print data.encoding
         data = ''
         log.error('socket timed out - URL %s', url)
     except Exception as e:
@@ -880,8 +914,8 @@ def get_url_data_R(url,timeout=10):
     return data
 
 
-def get_url_data(url,retry_count=5,pause=0.05,timeout=10):
-#    headers = {'User-Agent':'Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.6) Gecko/20091201 Firefox/3.5.6'}
+def get_url_data(url, retry_count=5, pause=0.05, timeout=10):
+    #    headers = {'User-Agent':'Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.6) Gecko/20091201 Firefox/3.5.6'}
     headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.2; rv:16.0) Gecko/20100101 Firefox/16.0',
                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
                'Connection': 'keep-alive'}
@@ -890,7 +924,7 @@ def get_url_data(url,retry_count=5,pause=0.05,timeout=10):
         time.sleep(pause)
         try:
             data = requests.get(url, headers=headers, timeout=timeout)
-        except (socket.timeout,socket.error) as e:
+        except (socket.timeout, socket.error) as e:
             data = ''
             log.error('socket timed out - URL %s', url)
         except Exception as e:
@@ -907,9 +941,10 @@ def get_url_data(url,retry_count=5,pause=0.05,timeout=10):
     #     else:
     #         return df
         sleeprandom(10)
-    print "url:%s"%(url)
+    print "url:%s" % (url)
     return ''
     # raise IOError(ct.NETWORK_URL_ERROR_MSG)
+
 
 def get_div_list(ls, n):
     # if isinstance(codeList, list) or isinstance(codeList, set) or
@@ -993,7 +1028,7 @@ def to_mp_run(cmd, urllist):
     return results
 
 
-def to_mp_run_async(cmd, urllist,*args):
+def to_mp_run_async(cmd, urllist, *args):
     # n_t=time.time()
     # print "mp_async:%s" % len(urllist),
     # print "a!!!!:",status
@@ -1011,7 +1046,7 @@ def to_mp_run_async(cmd, urllist,*args):
     time_s = time.time()
     results = []
     idx = 1
-    count =int(len(urllist)/10)
+    count = int(len(urllist) / 10)
     for code in urllist:
         # result = pool.apply_async(cmd, (code, arg))
         # arg=(code)+','+(args)
@@ -1019,12 +1054,12 @@ def to_mp_run_async(cmd, urllist,*args):
         try:
             result = pool.apply_async(cmd, (code,) + args).get()
             if (count <> 0 and idx % count == 0) and time.time() - time_s > 1:
-               log.info("idx:%s code:%s"%(idx,code)),
-               idx +=1
-               time_s = time.time()
+                log.info("idx:%s code:%s" % (idx, code)),
+                idx += 1
+                time_s = time.time()
             results.append(result)
         except Exception as e:
-            print e,code
+            print e, code
     pool.close()
     pool.join()
     # results = flatten(map(lambda x: x.get(), results))
@@ -1033,7 +1068,7 @@ def to_mp_run_async(cmd, urllist,*args):
     return results
 
 
-def f_print(lens, datastr,type=None):
+def f_print(lens, datastr, type=None):
     data = ('{0:%s}' % (lens)).format(str(datastr))
     if type is not None:
         if type == 'f':
@@ -1061,16 +1096,18 @@ def read_last_lines(filename, lines=1):
         # print curpos
         while (curpos > 0):  # while not BOF
             # seek ahead block_size+the length of last read block
-            curpos -= (block_size + len(block));
-            if curpos < 0: curpos = 0
+            curpos -= (block_size + len(block))
+            if curpos < 0:
+                curpos = 0
             fsock.seek(curpos)
             # read to end
             block = fsock.read()
             nl_count = block.count('\n')
             # if read enough(more)
-            if nl_count >= lines: break
+            if nl_count >= lines:
+                break
         # get the exact start position
-        for n in range(nl_count - lines ):
+        for n in range(nl_count - lines):
             start = block.find('\n', start) + 1
     finally:
         fsock.close()
@@ -1087,7 +1124,7 @@ def _write_to_csv(df, filename, indexCode='code'):
     # print df[['code','name']]
     df.to_csv(CURRENTDAY + '-' + filename + '.csv',
               encoding='gbk', index=False)  # 选择保存
-    print("write csv:%s"%(CURRENTDAY + '-' + filename + '.csv'))
+    print("write csv:%s" % (CURRENTDAY + '-' + filename + '.csv'))
     # df.to_csv(filename, encoding='gbk', index=False)
 
 
@@ -1154,21 +1191,21 @@ def code_to_tdx_blk(code):
             return '1%s' % code if code[:1] in ['5', '6'] else '0%s' % code
 
 
-def get_config_value(fname,classtype,xvalue,newvalue,xtype='limit',write=False):
+def get_config_value(fname, classtype, xvalue, newvalue, xtype='limit', write=False):
     conf_ini = fname
     # conf_ini = cct.get_work_path('stock','JSONData','count.ini')
     if os.path.exists(conf_ini):
         # log.info("file ok:%s"%conf_ini)
-        config = ConfigObj(conf_ini,encoding='UTF8')
+        config = ConfigObj(conf_ini, encoding='UTF8')
         if classtype in config.keys():
             if int(config[classtype][xtype]) > xvalue:
-                ratio = float(config[classtype][xtype]) / newvalue  
-                if ratio < 1.2: 
-                    log.info("f_size:%s < read_limit:%s ratio:%0.2f" % (xvalue, config[classtype][xtype],ratio))
+                ratio = float(config[classtype][xtype]) / newvalue
+                if ratio < 1.2:
+                    log.info("f_size:%s < read_limit:%s ratio:%0.2f" % (xvalue, config[classtype][xtype], ratio))
                 else:
                     config[classtype][xtype] = newvalue
                     config.write()
-                    log.info("f_size:%s < read_limit:%s ratio < 2 ratio:%0.2f" % (xvalue, config[classtype][xtype],ratio))
+                    log.info("f_size:%s < read_limit:%s ratio < 2 ratio:%0.2f" % (xvalue, config[classtype][xtype], ratio))
 
             else:
                 log.error("f_size:%s > read_limit:%s" % (xvalue, config[classtype][xtype]))
@@ -1182,23 +1219,25 @@ def get_config_value(fname,classtype,xvalue,newvalue,xtype='limit',write=False):
             config.write()
             return True
     else:
-        config = ConfigObj(conf_ini,encoding='UTF8')
+        config = ConfigObj(conf_ini, encoding='UTF8')
         config[classtype] = {}
         config[classtype][xtype] = newvalue
         config.write()
     return False
 
+
 def write_to_blocknew(p_name, data, append=True):
     # index_list = ['1999999','47#IFL0',  '0399006', '27#HSI']
     # index_list = ['1999999','47#IFL0', '27#HSI',  '0399006']
-    index_list = ['1999999','47#IFL0', '27#HSI',  '0159915']
+    index_list = ['1999999', '47#IFL0', '27#HSI',  '0159915']
+
     def writeBlocknew(p_name, data, append=True):
         if append:
             fout = open(p_name, 'rb+')
             # fout = open(p_name)
             flist_t = fout.readlines()
             # flist_t = file(p_name, mode='rb+', buffering=None)
-            flist=[]
+            flist = []
             # errstatus=False
             for code in flist_t:
                 if len(code) <= 6 or len(code) > 12:
@@ -1209,7 +1248,7 @@ def write_to_blocknew(p_name, data, append=True):
                         continue
                     else:
                         # errstatus = True
-                        code = code+'\r\n'
+                        code = code + '\r\n'
                 flist.append(code)
             for co in index_list:
                 inx = (co) + '\r\n'
@@ -1227,7 +1266,7 @@ def write_to_blocknew(p_name, data, append=True):
         else:
             fout = open(p_name, 'rb+')
             flist_t = fout.readlines()
-            flist=[]
+            flist = []
             # flist_t = file(p_name, mode='rb+', buffering=None)
             if len(flist_t) > 4:
                 # errstatus=False
@@ -1238,7 +1277,7 @@ def write_to_blocknew(p_name, data, append=True):
                             continue
                         else:
                             # errstatus = True
-                            code = code+'\r\n'
+                            code = code + '\r\n'
                     flist.append(code)
                 # if errstatus:
                 fout.close()
@@ -1246,7 +1285,7 @@ def write_to_blocknew(p_name, data, append=True):
                     writecount = ct.writeblockbakNum
                 else:
                     writecount = 9
-                flist=flist[:writecount]
+                flist = flist[:writecount]
 
                 for co in index_list:
                     inx = (co) + '\r\n'
@@ -1264,7 +1303,7 @@ def write_to_blocknew(p_name, data, append=True):
                     raw = (i) + '\r\n'
                     fout.write(raw)
 
-        counts=0
+        counts = 0
         for i in data:
             # print type(i)
             # if append and len(flist) > 0:
@@ -1274,22 +1313,22 @@ def write_to_blocknew(p_name, data, append=True):
             # else:
             raw = code_to_tdxblk(i) + '\r\n'
             if len(raw) > 8 and not raw in flist:
-                counts +=1
+                counts += 1
                 fout.write(raw)
                 # raw = pack('IfffffII', t, i[2], i[3], i[4], i[5], i[6], i[7], i[8])
         fout.flush()
         fout.close()
         if p_name.find('066.blk') >= 0:
-            print "write to %s:%s"%(p_name,counts)
+            print "write to %s:%s" % (p_name, counts)
 
-    blockNew= get_tdx_dir_blocknew() + 'zxg.blk'
+    blockNew = get_tdx_dir_blocknew() + 'zxg.blk'
     blockNewStart = get_tdx_dir_blocknew() + '066.blk'
     # writeBlocknew(blockNew, data)
-    p_data=['zxg','069','068','067','061']
+    p_data = ['zxg', '069', '068', '067', '061']
     if len(p_name) < 5:
         if p_name in p_data:
-            p_name = get_tdx_dir_blocknew() + p_name +'.blk'
-            print "p_name:%s"%(p_name)
+            p_name = get_tdx_dir_blocknew() + p_name + '.blk'
+            print "p_name:%s" % (p_name)
         else:
             print 'p_name is not ok'
             return None
@@ -1297,14 +1336,14 @@ def write_to_blocknew(p_name, data, append=True):
     if p_name.find('061.blk') > 0 or p_name.find('062.blk') > 0 or p_name.find('063.blk') > 0:
         writeBlocknew(p_name, data, append)
         writeBlocknew(blockNew, data)
-        writeBlocknew(blockNewStart, data,append)
+        writeBlocknew(blockNewStart, data, append)
         # print "write to zxg and 066:%s:%s"%(p_name,len(data))
     elif p_name.find('065.blk') > 0:
         writeBlocknew(p_name, data, append)
-        writeBlocknew(blockNew,data,append)
-        writeBlocknew(blockNewStart, data,append)
+        writeBlocknew(blockNew, data, append)
+        writeBlocknew(blockNewStart, data, append)
         # print "write to %s:%s"%(p_name,len(data))
-    elif p_name.find('068.blk')  > 0 or p_name.find('069.blk') > 0:
+    elif p_name.find('068.blk') > 0 or p_name.find('069.blk') > 0:
 
         writeBlocknew(p_name, data, append)
         # print "write to %s:%s"%(p_name,len(data))
@@ -1312,7 +1351,7 @@ def write_to_blocknew(p_name, data, append=True):
         writeBlocknew(p_name, data, append)
         writeBlocknew(blockNew, data)
         # writeBlocknew(blockNewStart, data[:ct.writeCount - 1])
-        writeBlocknew(blockNewStart, data,append)
+        writeBlocknew(blockNewStart, data, append)
         # print "write to other and start:%s :%s"%(p_name,len(data))
 
 
@@ -1328,7 +1367,8 @@ def get_run_path():
         raise TypeError('log path error.')
     return path
 
-def getFibonacci(num,days=None):
+
+def getFibonacci(num, days=None):
     res = [0, 1]
     a = 0
     b = 1
@@ -1351,9 +1391,10 @@ def getFibonacci(num,days=None):
     # fib = days
     # for x in fibl:
         # if days < x:
-            # fib = x
-            # break
+        # fib = x
+        # break
     # return fib
+
 
 def varname(p):
     import inspect
@@ -1361,11 +1402,12 @@ def varname(p):
     for line in inspect.getframeinfo(inspect.currentframe().f_back)[3]:
         m = re.search(r'\bvarname\s*\(\s*([A-Za-z_][A-Za-z0-9_]*)\s*\)', line)
         if m:
-          return m.group(1)
+            return m.group(1)
+
 
 def varnamestr(obj, namespace=globals()):
     # namestr(a, globals())
-    if isinstance(namespace,dict):
+    if isinstance(namespace, dict):
         n_list = [name for name in namespace if namespace[name] is obj]
     else:
         log.error("namespce not dict")
@@ -1378,6 +1420,69 @@ def varnamestr(obj, namespace=globals()):
         else:
             return n
     return None
+
+multiIndex_func = {'close': 'min', 'low': 'min', 'volume': 'sum'}
+
+
+def using_Grouper_eval(df, freq='5T', col='low', closed='right', label='right'):
+    func = {}
+    if isinstance(col, list):
+        for k in col:
+            if k in multiIndex_func.keys():
+                func[k] = multiIndex_func[k]
+    else:
+        if col in multiIndex_func.keys():
+            func[col] = multiIndex_func[col]
+    level_values = df.index.get_level_values
+    return eval("(df.groupby([level_values(i) for i in [0]]+[pd.Grouper(freq=freq, level=-1,closed='%s',label='%s')]).agg(%s))" % (closed, label, func))
+
+
+def using_Grouper(df, freq='5T', col='low', closed='right', label='right'):
+    func = {}
+    if isinstance(col, list):
+        for k in col:
+            if k in multiIndex_func.keys():
+                func[k] = multiIndex_func[k]
+    else:
+        if col in multiIndex_func.keys():
+            func[col] = multiIndex_func[col]
+    level_values = df.index.get_level_values
+    return (df.groupby([level_values(i) for i in [0]] + [pd.Grouper(freq=freq, level=-1, closed=closed, label=label)]).agg(func))
+
+
+def select_multiIndex_index(df, index='ticktime', start=None, end=None, datev=None):
+    if start is not None and len(start) < 10:
+        if datev is None:
+            start = get_today() + ' ' + start
+        else:
+            start = day8_to_day10(datev) + ' ' + start
+        if end is None:
+            end = start
+    else:
+        if end is None:
+            end = start
+    if end is not None and len(end) < 10:
+        if datev is None:
+            end = get_today() + ' ' + end
+            if start is None:
+                start = get_today(sep='-')
+        else:
+            end = day8_to_day10(datev) + ' ' + end
+            if start is None:
+                start = day8_to_day10(datev)
+    else:
+        if start is None:
+            start = end
+    df = df[(df.index.get_level_values('ticktime') >= start) & (df.index.get_level_values('ticktime') <= end)]
+    return df
+
+
+def get_limit_multiIndex_Group(df, freq='5T', col='low', index='ticktime', start=None, end='10:00:00'):
+    df = select_multiIndex_index(df, index=index, start=start, end=end)
+    df = using_Grouper(df, freq=freq, col=col)
+    df = select_multiIndex_index(df, index=index, start=end, end=end)
+    return df
+
 
 def get_stock_tdx_period_to_type(stock_data, type='w'):
     period_type = type
@@ -1399,6 +1504,7 @@ def get_stock_tdx_period_to_type(stock_data, type='w'):
     period_stock_data = period_stock_data[period_stock_data['code'].notnull()]
     period_stock_data.reset_index(inplace=True)
     return period_stock_data
+
 
 def MoniterArgmain():
 
@@ -1434,14 +1540,15 @@ def MoniterArgmain():
 #     # print arg_t.dl
 #     return arg_t
 
+
 def writeArgmain():
     # from ConfigParser import ConfigParser
     # import shlex
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument('code', type=str, nargs='?', help='w or a or all')
-    parser.add_argument('dl', nargs='?', type=str, help='1,5,10',default=ct.writeCount)
-    parser.add_argument('end', nargs='?', type=str, help='1,5,10',default=None)
+    parser.add_argument('dl', nargs='?', type=str, help='1,5,10', default=ct.writeCount)
+    parser.add_argument('end', nargs='?', type=str, help='1,5,10', default=None)
     # if parser.code == 'all':
     #     print parser.dl
     # parser.add_argument('end', nargs='?', type=str, help='20160101')
@@ -1460,6 +1567,7 @@ def writeArgmain():
     # parser.add_argument('-m', action="store", dest="mpl", type=str, default='y',
     #                     help='mpl show')
     return parser
+
 
 def DurationArgmain():
     parser = argparse.ArgumentParser()
@@ -1483,6 +1591,7 @@ def DurationArgmain():
 #     raw = 'status:[go(g),clear(c),[d 20150101 [l|h]|[y|n|pn|py],quit(q),W(a),sh]:'
 #     raw_input_menu=raw+"\n\tNow : %s"+"\n\t1:Sort By Percent\t2:Sort By DFF\t3:Sort By OPRa\t\n\t4:Sort By Ra \t\t5:Sort by Counts\nplease input:"
 #     return raw_input_menu
+
 
 def LineArgmain():
     # from ConfigParser import ConfigParser
@@ -1531,7 +1640,8 @@ def LineArgmain():
     # logger.setLevel(logging.ERROR)
     return parser
 
-def negate_boolean_list(negate_list,idx=1):
+
+def negate_boolean_list(negate_list, idx=1):
     cout_all = len(negate_list)
     if idx < cout_all:
         sort_negate_l = [key ^ 1 for key in negate_list[:idx]]
@@ -1541,7 +1651,8 @@ def negate_boolean_list(negate_list,idx=1):
 
     return sort_negate_l
 
-def sort_by_value(df,column='dff',file=None,count=5,num=5,asc=0):
+
+def sort_by_value(df, column='dff', file=None, count=5, num=5, asc=0):
     """[summary]
 
     [description]
@@ -1560,31 +1671,33 @@ def sort_by_value(df,column='dff',file=None,count=5,num=5,asc=0):
         [type] -- [description]
     """
     if not isinstance(column, list):
-        dd = df.sort_values(by=[column],ascending=[asc])
+        dd = df.sort_values(by=[column], ascending=[asc])
     else:
-        dd = df.sort_values(by=column,ascending=asc)
+        dd = df.sort_values(by=column, ascending=asc)
     if file is None:
-        if num >0:
-            print dd.iloc[0:num,0:10]
-            print dd.iloc[0:num,31:40]
-            print dd.iloc[0:num,-15:-4]
+        if num > 0:
+            print dd.iloc[0:num, 0:10]
+            print dd.iloc[0:num, 31:40]
+            print dd.iloc[0:num, -15:-4]
         else:
-            print dd.iloc[num::,0:10]
-            print dd.iloc[0:num,31:40]
-            print dd.iloc[num::,-15:-4]
+            print dd.iloc[num::, 0:10]
+            print dd.iloc[0:num, 31:40]
+            print dd.iloc[num::, -15:-4]
         return dd
     else:
         if str(count) == 'all':
             write_to_blocknew(file, dd.index.tolist(), append=True)
         else:
             write_to_blocknew(file, dd.index.tolist()[:int(count)], append=True)
-        print "file:%s"%(file)
+        print "file:%s" % (file)
 
-def get_diff_dratio(mainlist,sublist):
+
+def get_diff_dratio(mainlist, sublist):
     dif_co = list(set(mainlist) & set(sublist))
-    dratio = round((float(len(sublist)) - float(len(dif_co)))/float(len(sublist)),2)
-    log.info("dratio all:%s :%s %0.2f"%(len(sublist),len(sublist)-len(dif_co),dratio))
+    dratio = round((float(len(sublist)) - float(len(dif_co))) / float(len(sublist)), 2)
+    log.info("dratio all:%s :%s %0.2f" % (len(sublist), len(sublist) - len(dif_co), dratio))
     return dratio
+
 
 def func_compute_percd(c, lp, lc, lh, ll, nh, nl):
     initc = 0
@@ -1608,9 +1721,10 @@ def func_compute_percd(c, lp, lc, lh, ll, nh, nl):
             initc -= 1
     return initc
 
-def combine_dataFrame(maindf,subdf,col=None,compare=None,append=False,clean=True):
+
+def combine_dataFrame(maindf, subdf, col=None, compare=None, append=False, clean=True):
     times = time.time()
-    maindf_co=maindf.columns
+    maindf_co = maindf.columns
     subdf_co = subdf.columns
     maindf = maindf.fillna(0)
     subdf = subdf.fillna(0)
@@ -1626,7 +1740,7 @@ def combine_dataFrame(maindf,subdf,col=None,compare=None,append=False,clean=True
         if 'code' in subdf.columns:
             subdf = subdf.set_index('code')
 
-        no_index = maindf.drop([inx for inx in maindf.index  if inx not in subdf.index], axis=0)
+        no_index = maindf.drop([inx for inx in maindf.index if inx not in subdf.index], axis=0)
 #        no_index = maindf.loc[subdf.index]
         if col is not None and compare is not None:
             # if col in subdf.columns:
@@ -1638,19 +1752,19 @@ def combine_dataFrame(maindf,subdf,col=None,compare=None,append=False,clean=True
             pass
             # no_index[compare]=map((lambda x,y:y-x),eval("subdf.%s"%(col)),eval("no_index.%s"%(col)))
         else:
-            sub_col = list(set(subdf.columns)-set())
+            sub_col = list(set(subdf.columns) - set())
 
-        drop_sub_col=[col for col in no_index.columns if col in subdf.columns]
+        drop_sub_col = [col for col in no_index.columns if col in subdf.columns]
         no_index = no_index.drop(drop_sub_col, axis=1)
         no_index = no_index.merge(subdf, left_index=True, right_index=True, how='left')
-        maindf = maindf.drop([inx for inx in maindf.index  if inx in subdf.index], axis=0)
-        maindf = pd.concat([maindf, no_index],axis=0)
+        maindf = maindf.drop([inx for inx in maindf.index if inx in subdf.index], axis=0)
+        maindf = pd.concat([maindf, no_index], axis=0)
     else:
-#        if len(list(set(maindf.columns)-set()))
-#        if len(maindf) < len(subdf):
-#            maindf,subdf =subdf,maindf
+        #        if len(list(set(maindf.columns)-set()))
+        #        if len(maindf) < len(subdf):
+        #            maindf,subdf =subdf,maindf
         maindf = maindf.drop([col for col in maindf.index if col in subdf.index], axis=0)
-        maindf = pd.concat([maindf, subdf],axis=0)
+        maindf = pd.concat([maindf, subdf], axis=0)
         # if 'timel' in maindf.columns:
         #     time_list = set(maindf.timel)
         #     log.info("times:%s"%(time_list))
@@ -1658,8 +1772,8 @@ def combine_dataFrame(maindf,subdf,col=None,compare=None,append=False,clean=True
             if not maindf.index.name == 'code':
                 maindf.index.name = 'code'
         maindf.reset_index(inplace=True)
-        maindf.drop_duplicates('code',inplace=True)
-        maindf.set_index('code',inplace=True)
+        maindf.drop_duplicates('code', inplace=True)
+        maindf.set_index('code', inplace=True)
 #        maindf['timel']=time.time()
     '''
         if 'code' in maindf.columns:
@@ -1685,11 +1799,11 @@ def combine_dataFrame(maindf,subdf,col=None,compare=None,append=False,clean=True
         maindf = pd.concat([maindf, no_index],axis=0)
     '''
     # maindf = maindf.drop_duplicates()
-    log.info("combine df :%0.2f"%(time.time()-times))
+    log.info("combine df :%0.2f" % (time.time() - times))
     if append:
-        dif_co = list(set(maindf_co)-set(subdf_co))
+        dif_co = list(set(maindf_co) - set(subdf_co))
         if len(dif_co) > 0:
-            log.error("col:%s %s"%(dif_co[:3],eval(("maindf.%s")%(dif_co[0]))[1]))
+            log.error("col:%s %s" % (dif_co[:3], eval(("maindf.%s") % (dif_co[0]))[1]))
     return maindf
 
 if __name__ == '__main__':
@@ -1710,20 +1824,20 @@ if __name__ == '__main__':
     # log_level = LoggerFactory.DEBUG if args['-d']  else LoggerFactory.ERROR
     log.setLevel(log_level)
 
-    s_time=time.time()
-    print "last:",last_tddate(2)
+    s_time = time.time()
+    print "last:", last_tddate(2)
     print get_work_day_status()
     print get_terminal_Position(cmd='DurationDN.py', position=None, close=False)
     print get_terminal_Position(cmd='Johnson@', position=None, close=False)
     print get_terminal_Position(cmd='Johnson — bash', position=None, close=False)
-    print "t:%0.2f"%(time.time()-s_time)
+    print "t:%0.2f" % (time.time() - s_time)
     print get_ramdisk_path('a', lock=False)
     # print get_work_time_ratio()
     # print typeday8_to_day10(None)
     # write_to_blocknew('abc', ['300380','601998'], append=True)
     print get_now_time_int()
     print get_work_duration()
-    print get_today_duration('2017-01-01','20170504')
+    print get_today_duration('2017-01-01', '20170504')
     # print get_tushare_market(market='captops', renew=True,days=10).shape
     # print get_rzrq_code()[:3]
     # times =1483686638.0
@@ -1751,7 +1865,7 @@ if __name__ == '__main__':
         # print last_tddate(2)
     # print get_os_system()
     set_console()
-    set_console(title=['G','dT'])
+    set_console(title=['G', 'dT'])
     raw_input("a")
     # print System.IO.Path
     # print workdays('2010-01-01','2010-05-01')
