@@ -67,7 +67,7 @@ duration_sleep_time = 60
 compute_lastdays = 9
 sort_value_key_percd = '3 3'
 sort_value_key_perd = '2 1'
-
+idx_perd_1to_2 = 1
 # powerdiff = 'ra * fibl + rah*(abs(float(%s)-fibl))/fib +ma +kdj+rsi'
 '''
             ma  rsi  kdj  boll    ra   rah    df2  fibl  fib  macd  oph
@@ -686,7 +686,7 @@ def get_Dynamic_Duration_perd(market_sort_value, idx_perd, columns=None):
     # idx_value = eval(market_sort_value)[0]
     # idx_value2 = eval(market_sort_value)[1]
     if not isinstance(idx_perd, list):
-        idx_perd = [idx_perd, '2' if idx_perd == '1' else idx_perd]
+        idx_perd = [idx_perd, idx_perd_1to_2 if idx_perd == '1' else idx_perd]
     # idx_l = [idx_value % idx_perd[0]]
 #    idx_l = []
     perd_l = ['per%sd', 'perc%sd']
