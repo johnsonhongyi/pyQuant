@@ -1465,14 +1465,16 @@ def select_multiIndex_index(df, index='ticktime', start=None, end=None, datev=No
         if datev is None:
             end = get_today() + ' ' + end
             if start is None:
-                start = get_today(sep='-')
+                start = get_today(sep='-')+' '+'09:30:00'
         else:
             end = day8_to_day10(datev) + ' ' + end
             if start is None:
-                start = day8_to_day10(datev)
+                start = day8_to_day10(datev)+' '+'09:30:00'
     else:
-        if start is None:
-            start = end
+        if start is None and end is not None:
+            start = get_today(sep='-')+' '+'09:30:00'
+            end = get_today(sep='-')+' '+'09:45:00'
+            log.error("start and end is None to 930 and 945")
     df = df[(df.index.get_level_values('ticktime') >= start) & (df.index.get_level_values('ticktime') <= end)]
     return df
 
@@ -1480,7 +1482,9 @@ def select_multiIndex_index(df, index='ticktime', start=None, end=None, datev=No
 def get_limit_multiIndex_Group(df, freq='5T', col='low', index='ticktime', start=None, end='10:00:00'):
     df = select_multiIndex_index(df, index=index, start=start, end=end)
     df = using_Grouper(df, freq=freq, col=col)
-    df = select_multiIndex_index(df, index=index, start=end, end=end)
+    df = select_multiIndex_index(df, index=index, start=start, end=end)
+    if col == 'close':
+        df.rename(columns={'close': 'low'}, inplace=True)
     return df
 
 
@@ -1802,7 +1806,7 @@ def combine_dataFrame(maindf, subdf, col=None, compare=None, append=False, clean
     log.info("combine df :%0.2f" % (time.time() - times))
     if append:
         dif_co = list(set(maindf_co) - set(subdf_co))
-        if len(dif_co) > 0:
+        if len(dif_co) > 1:
             log.error("col:%s %s" % (dif_co[:3], eval(("maindf.%s") % (dif_co[0]))[1]))
     return maindf
 

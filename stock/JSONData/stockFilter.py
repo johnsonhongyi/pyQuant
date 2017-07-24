@@ -91,6 +91,9 @@ def getBollFilter(df=None, boll=6, duration=ct.PowerCountdl, filter=True, ma5d=T
     if 'ma5d' in df.columns:
         df = df[df.buy > df.ma5d * ct.changeRatio]
 
+    if 'nlow' in df.columns and 932 < cct.get_now_time_int() < 1030:
+        df = df[df.low >= df.nlow]
+
     if filter:
 
         if cct.get_now_time_int() > 915 and cct.get_now_time_int() <= 1000:

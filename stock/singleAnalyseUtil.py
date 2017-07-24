@@ -552,7 +552,11 @@ if __name__ == '__main__':
                     cct.sleep(ct.duration_sleep_time)
             int_time = cct.get_now_time_int()
             if cct.get_work_time():
-                if int_time < 930:
+                if 915 < int_time < 925:
+                    while 1:
+                        cct.sleep(60)
+                        break
+                elif int_time < 930:
                     while 1:
                         cct.sleep(60)
                         if cct.get_now_time_int() < 931:

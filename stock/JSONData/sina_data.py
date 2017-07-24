@@ -571,14 +571,18 @@ class Sina:
             df = df.set_index(['code', 'ticktime'])
             h5a.write_hdf_db(h5_fname, df, table=h5_table, index=False, baseCount=500, append=False, MultiIndex=True)
             log.info("hdf5 class all :%s  time:%0.2f" % (len(df), time.time() - time_s))
-        if 'nlow' not in df.columns or (cct.get_now_time_int() >= 930 and cct.get_now_time_int() <=946):
-            h5 = h5a.load_hdf_db(h5_fname, h5_table, timelimit=False)
-            if h5 is not None and len(h5) > len(df):
-                h5 = cct.get_limit_multiIndex_Group(h5, freq='5T',end='09:45:00')
-                h5 = h5.reset_index().set_index('code')
-                h5.rename(columns={'low': 'nlow'}, inplace=True)
-                h5 = h5.drop(['ticktime'], axis=1)
-                dd = cct.combine_dataFrame(dd, h5, col=None, compare=None, append=False, clean=True)
+            if 'nlow' not in df.columns or (cct.get_now_time_int() > 930 and cct.get_now_time_int() <=946):
+                h5 = h5a.load_hdf_db(h5_fname, h5_table, timelimit=False)
+                freq='15T'
+                endtime = '09:45:00'
+                if h5 is not None and len(h5) > len(df):
+                    h5 = cct.get_limit_multiIndex_Group(h5, freq=freq,end=endtime)
+                    if h5 is not None and len(h5) > 0:
+                        h5 = h5.reset_index().set_index('code')
+                        h5.rename(columns={'low': 'nlow'}, inplace=True)
+                        log.info("get_limit_multiIndex_Group:%s freq:%s endtime:%s"%(len(h5),freq,endtime))
+                        h5 = h5.drop(['ticktime'], axis=1)
+                        dd = cct.combine_dataFrame(dd, h5, col=None, compare=None, append=False, clean=True)
         h5a.write_hdf_db(self.hdf_name, dd, self.table, index=index)
         log.info("wr end:%0.2f" % (time.time() - self.start_t))
         return dd
@@ -625,7 +629,7 @@ if __name__ == "__main__":
 #    print sina.get_stock_code_data('002873')
     # print sina.get_stock_code_data('600199,300334',index=False)
     # print len(sina.market('sh'))
-   
+
 
     def compute_lastdays_percent(df=None, step=3):
         if df is not None and len(df) > step:
@@ -652,24 +656,23 @@ if __name__ == "__main__":
     df = h5a.load_hdf_db(h5_fname, table=h5_table, code_l=None, timelimit=False, dratio_limit=0.12)
     if df is not None and len(df) > 0:
         print df[:1]
-    # '''
-    stock_data = df
-    print "t1:%0.3f df:%s"%(time.time()-time_s,df.shape)
-    # df = cct.using_Grouper_eval(df, freq='5T', col=['low','close'], closed='right', label='right')
-    df = cct.get_limit_multiIndex_Group(df, freq='5T', col=['low','close'], index='ticktime', end='09:45:00')
-    # df = using_Grouper(df, freq='5T')
-    # stock_data = stock_data.reset_index().set_index('ticktime')
-    # df = stock_data.groupby('code').resample('5T', how={'low': 'min', 'close':'min', 'volume': 'sum'})
-    print "t2:%0.3f df:%s"%(time.time()-time_s,df.shape)
-    print df.loc['000001'][-2:]
-    df = cct.using_Grouper(df, freq='5T', col=['low','close'], closed='right', label='right')
-    # df = using_Grouper(df, freq='30T')
+        stock_data = df
+        print "t1:%0.3f df:%s"%(time.time()-time_s,df.shape)
+        # df = cct.using_Grouper_eval(df, freq='5T', col=['low','close'], closed='right', label='right')
+        df = cct.get_limit_multiIndex_Group(df, freq='15T', col=['low','close'], index='ticktime', end='09:45:00')
+        # df = using_Grouper(df, freq='5T')
+        # stock_data = stock_data.reset_index().set_index('ticktime')
+        # df = stock_data.groupby('code').resample('5T', how={'low': 'min', 'close':'min', 'volume': 'sum'})
+        print "t2:%0.3f df:%s"%(time.time()-time_s,df.shape)
+        print df.loc['000001'][-2:]
+        df = cct.using_Grouper(df, freq='15T', col=['low','close'], closed='right', label='right')
+        # df = using_Grouper(df, freq='30T')
 
-    # df = stock_data.groupby('code').resample('30T', how={'low': 'min', 'close':'min', 'volume': 'sum'})
-    # df = df.groupby(level=0).transform(get_tdx_stock_period_to_type)
-    # df = df.groupby([df.index.get_level_values(i) for i in [0]]+[pd.Grouper(freq='30T', level=-1)]).transform(get_tdx_stock_period_to_type)
-    print "t3:%0.3f df:%s"%(time.time()-time_s,df.shape)
-    print df.loc['000001'][-2:]
+        # df = stock_data.groupby('code').resample('30T', how={'low': 'min', 'close':'min', 'volume': 'sum'})
+        # df = df.groupby(level=0).transform(get_tdx_stock_period_to_type)
+        # df = df.groupby([df.index.get_level_values(i) for i in [0]]+[pd.Grouper(freq='30T', level=-1)]).transform(get_tdx_stock_period_to_type)
+        print "t3:%0.3f df:%s"%(time.time()-time_s,df.shape)
+        print df.loc['000001'][-2:]
     # '''
     # print df.groupby(pd.Grouper(freq='30T', level='ticktime'))
     # df.groupby(level=0)['low'].transform('min').loc['600805'][:5]
