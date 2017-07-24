@@ -1421,7 +1421,7 @@ def varnamestr(obj, namespace=globals()):
             return n
     return None
 
-multiIndex_func = {'close': 'min', 'low': 'min', 'volume': 'sum'}
+multiIndex_func = {'close': 'mean', 'low': 'min','high':'max', 'volume': 'sum'}
 
 
 def using_Grouper_eval(df, freq='5T', col='low', closed='right', label='right'):
@@ -1471,20 +1471,41 @@ def select_multiIndex_index(df, index='ticktime', start=None, end=None, datev=No
             if start is None:
                 start = day8_to_day10(datev)+' '+'09:30:00'
     else:
-        if start is None and end is not None:
-            start = get_today(sep='-')+' '+'09:30:00'
-            end = get_today(sep='-')+' '+'09:45:00'
-            log.error("start and end is None to 930 and 945")
+        if start is None:
+            if end is None:
+                start = get_today(sep='-')+' '+'09:30:00'
+                end = get_today(sep='-')+' '+'09:45:00'
+                log.error("start and end is None to 930 and 945")
+            else:
+                start = end
     df = df[(df.index.get_level_values('ticktime') >= start) & (df.index.get_level_values('ticktime') <= end)]
     return df
 
+def from_list_to_dict(col,func_dict):
+    func = {}
+    if isinstance(col, list):
+        for k in col:
+            if k in func_dict.keys():
+                func[k] = func_dict[k]
+    elif isinstance(col, dict):
+        func = col
+    else:
+        if col in func_dict.keys():
+            func[col] = func_dict[col]  
+    return func
+
+def get_limit_multiIndex_Row(df, freq='5T', col=multiIndex_func, index='ticktime', start=None, end='10:00:00'):
+    df = select_multiIndex_index(df, index=index, start=start, end=end)
+    func = from_list_to_dict(col, multiIndex_func)
+    df = df.groupby(level=[0]).agg(func)
+    return df
 
 def get_limit_multiIndex_Group(df, freq='5T', col='low', index='ticktime', start=None, end='10:00:00'):
     df = select_multiIndex_index(df, index=index, start=start, end=end)
     df = using_Grouper(df, freq=freq, col=col)
-    df = select_multiIndex_index(df, index=index, start=start, end=end)
-    if col == 'close':
-        df.rename(columns={'close': 'low'}, inplace=True)
+    # df = select_multiIndex_index(df, index=index, start=start, end=end)
+    # if col == 'close':
+        # df.rename(columns={'close': 'low'}, inplace=True)
     return df
 
 
@@ -1806,7 +1827,8 @@ def combine_dataFrame(maindf, subdf, col=None, compare=None, append=False, clean
     log.info("combine df :%0.2f" % (time.time() - times))
     if append:
         dif_co = list(set(maindf_co) - set(subdf_co))
-        if len(dif_co) > 1:
+        # print "diff_co",set(dif_co) - set(['nhigh','nlow','nclose']) 
+        if set(dif_co) - set(['nhigh','nlow','nclose']) > 0 and len(dif_co) > 1 :
             log.error("col:%s %s" % (dif_co[:3], eval(("maindf.%s") % (dif_co[0]))[1]))
     return maindf
 

@@ -13,15 +13,18 @@ import time
 import random
 
 # def func_compute_df2(c,lc,lp,h,l,b1_v):
-def func_compute_df2(c,lc,h,l):
+
+
+def func_compute_df2(c, lc, h, l):
     if h - l == 0:
         du_p = 0.1
     else:
         du_p = round((h - l) / lc * 100, 1)
-    mean_p = round((h+l)/2,1)
+    mean_p = round((h + l) / 2, 1)
     if c < mean_p and c < lc:
         du_p = -du_p
     return du_p
+
 
 def getBollFilter(df=None, boll=6, duration=ct.PowerCountdl, filter=True, ma5d=True, dl=14, percent=False, resample='d'):
 
@@ -91,8 +94,12 @@ def getBollFilter(df=None, boll=6, duration=ct.PowerCountdl, filter=True, ma5d=T
     if 'ma5d' in df.columns:
         df = df[df.buy > df.ma5d * ct.changeRatio]
 
-    if 'nlow' in df.columns and 932 < cct.get_now_time_int() < 1030:
-        df = df[df.low >= df.nlow]
+    # if 'nlow' in df.columns and 932 < cct.get_now_time_int() < 1030:
+    if 'nlow' in df.columns and 932 < cct.get_now_time_int():
+        if 'nhigh' in df.columns:
+            df = df[((df.low >= df.nlow) & (df.close > df.nclose)) | ((df.close > df.nclose) & (df.close >= df.nhigh) & (df.high > df.nhigh))]
+        else:
+            df = df[((df.low >= df.nlow) & (df.close > df.llastp))]
 
     if filter:
 

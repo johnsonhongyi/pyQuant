@@ -58,8 +58,7 @@ def using_Grouper(df, freq='5T', col='low', closed='right', label='right'):
     # +[pd.Grouper(freq=freq, level=-1)]).mean())
     # .resample('30T', how={'low': 'min', 'close':'mean', 'volume': 'sum'}))
 
-
-def select_multiIndex_index(df, index='ticktime', start=None, end=None,datev=None):
+def select_multiIndex_index(df, index='ticktime', start=None, end=None, datev=None):
     if start is not None and len(start) < 10:
         if datev is None:
             start = get_today() + ' ' + start
@@ -74,16 +73,49 @@ def select_multiIndex_index(df, index='ticktime', start=None, end=None,datev=Non
         if datev is None:
             end = get_today() + ' ' + end
             if start is None:
-                start = get_today(sep='-')
+                start = get_today(sep='-')+' '+'09:30:00'
         else:
             end = day8_to_day10(datev) + ' ' + end
             if start is None:
-                start = day8_to_day10(datev)
+                start = day8_to_day10(datev)+' '+'09:30:00'
     else:
         if start is None:
-            start = end
+            if end is None:
+                start = get_today(sep='-')+' '+'09:30:00'
+                end = get_today(sep='-')+' '+'09:45:00'
+            else:
+                start = end
     df = df[(df.index.get_level_values('ticktime') >= start) & (df.index.get_level_values('ticktime') <= end)]
     return df
+
+
+# def select_multiIndex_index(df, index='ticktime', start=None, end=None,datev=None):
+#     if start is not None and len(start) < 10:
+#         if datev is None:
+#             start = get_today() + ' ' + start
+#         else:
+#             start = day8_to_day10(datev) + ' ' + start
+#         if end is None:
+#             end = start
+#     else:
+#         if end is None:
+#             end = start
+#     if end is not None and len(end) < 10:
+#         if datev is None:
+#             end = get_today() + ' ' + end
+#             if start is None:
+#                 start = get_today(sep='-')
+#         else:
+#             end = day8_to_day10(datev) + ' ' + end
+#             if start is None:
+#                 start = day8_to_day10(datev)
+#     else:
+#         if start is None:
+#             start = end
+#     df = df[(df.index.get_level_values('ticktime') >= start) & (df.index.get_level_values('ticktime') <= end)]
+#     return df
+    
+    
 # https://stackoverflow.com/questions/23966152/how-to-create-a-group-id-based-on-5-minutes-interval-in-pandas-timeseries
 # df.groupby(pd.TimeGrouper('5Min'))['val'].apply(lambda x: len(x) > 3)
 #  df.groupby(pd.TimeGrouper('5Min'))['val'].mean()
@@ -134,25 +166,38 @@ def select_multiIndex_index(df, index='ticktime', start=None, end=None,datev=Non
 # directly from the associated object
 
 import time
+tpp = '/Volumes/RamDisk/sina_MultiIndex_data.h5'
+# tpp = '/Users/Johnson/Desktop/sina_MultiIndex_data-0717.h5'
 time_s = time.time()
-# tpp = '/Volumes/RamDisk/sina_MultiIndex_data.h5'
-tpp = '/Users/Johnson/Desktop/sina_MultiIndex_data-0717.h5'
 spp = pd.HDFStore(tpp)
 df = spp.all_10.copy()
 spp.close()
 # print (df).loc['600999'][:10]
 print "t0:%0.3f" % (time.time() - time_s)
-starttime = '2017-07-01 09:25:00'
-endtime = '2017-07-17 09:45:00'
+# starttime = '2017-07-01 09:25:00'
+# endtime = '2017-07-17 09:45:00'
 # df = select_multiIndex_index(df, index='ticktime', end=endtime)
-df = select_multiIndex_index(df, index='ticktime', start='2017-07-01 09:25:00',end='2017-07-17 09:45:00')
-print "sel:",df[:2]
+time_s = time.time()
+# df = select_multiIndex_index(df, index='ticktime', start='2017-07-01 09:25:00',end='2017-07-17 09:45:00')
+df = select_multiIndex_index(df, index='ticktime', start=None,end=None)
 dd = using_Grouper(df, freq='5T')
-print "5t",dd[:5]
-print select_multiIndex_index(dd, start=endtime)[:2]
-print "select1:%0.3f" % (time.time() - time_s)
-print using_Grouper_eval(df, freq='5T', col='low').loc['000001']
-print "5t_t2:%0.2f" % (time.time() - time_s)
+print "select1 count:%s :%0.3f" % (len(dd),time.time() - time_s)
+# print select_multiIndex_index(dd, start=endtime)[:2]
+print "sel:",df.loc['000002'][:2]
+print "5t",dd.loc['000002'][:5]
+print df.loc['000001'][:2]
+time_s = time.time()
+dz = df.groupby(level=[0]).min()
+print "5t_t2:1count:%s :%0.2f" % (len(dz),time.time() - time_s)
+print ".loc:",dz.loc['000001']
+time_s = time.time()
+df = using_Grouper_eval(df, freq='5T', col=['low','close'])
+print "5t_t2 count:%s :%0.2f" % (len(df),time.time() - time_s)
+print df.loc['000001'][:2]
+time_s = time.time()
+dd =  df.groupby(level=[0]).apply(lambda x: x[-1:])
+print "last_t3 count:%s :%0.2f" % (len(dd),time.time() - time_s)
+print dd[:4]
 
 
 def using_reset_index(df):

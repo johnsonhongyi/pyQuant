@@ -520,7 +520,7 @@ class Sina:
             #            df.rename(columns={'buy': 'close'}, inplace=True)
             df['close'] = df['buy']
             df['low'] = df['buy']
-            df['volume'] =  ((df['b1_v'] + df['b2_v'])).map(lambda x: x)
+            df['volume'] = ((df['b1_v'] + df['b2_v'])).map(lambda x: x)
             # df['b1_v'] = ((df['b1_v'] + df['b2_v']) / 100 / 10000).map(lambda x: round(x, 1) + 0.01)
             # df['b1_v'] = ((df['b1_v']) / 100 / 10000).map(lambda x: round(x, 1) + 0.01)
             # df['b1_vv'] = map(lambda x: round(x / 100 / 10000, 1) + 0.01, df['b1_v'])
@@ -556,7 +556,7 @@ class Sina:
             df.index = df.index.astype(str)
             df.ticktime = df.ticktime.astype(str)
             # df.ticktime = map(lambda x: int(x.replace(':', '')), df.ticktime)
-            df.ticktime = map(lambda x,y: str(x)+' '+str(y),df.dt,df.ticktime)
+            df.ticktime = map(lambda x, y: str(x) + ' ' + str(y), df.dt, df.ticktime)
             df.ticktime = pd.to_datetime(df.ticktime, format='%Y-%m-%d %H:%M:%S')
             # df = df.loc[:, ['open', 'high', 'low', 'close', 'llastp', 'volume', 'ticktime']]
             df = df.loc[:, ['close', 'high', 'low', 'llastp', 'volume', 'ticktime']]
@@ -571,18 +571,47 @@ class Sina:
             df = df.set_index(['code', 'ticktime'])
             h5a.write_hdf_db(h5_fname, df, table=h5_table, index=False, baseCount=500, append=False, MultiIndex=True)
             log.info("hdf5 class all :%s  time:%0.2f" % (len(df), time.time() - time_s))
-            if 'nlow' not in df.columns or (cct.get_now_time_int() > 930 and cct.get_now_time_int() <=946):
-                h5 = h5a.load_hdf_db(h5_fname, h5_table, timelimit=False)
-                freq='15T'
-                endtime = '09:45:00'
+
+        # if 'nlow' not in df.columns or 'nhigh' not in df.columns or ( cct.get_work_time() and 932 < cct.get_now_time_int() < 1500):
+        if 'nlow' not in df.columns or 'nhigh' not in df.columns or cct.get_work_time():
+            all_func = {'low': 'nlow', 'high': 'nhigh', 'close': 'nclose'}
+            h5 = h5a.load_hdf_db(h5_fname, h5_table, timelimit=False)
+            def get_col_agg_df(h5,dd,run_col,all_func,startime,endtime):
+                now_col = [ all_func[co] for co in run_col if co in all_func.keys()]
+                now_func = cct.from_list_to_dict(run_col,all_func)
                 if h5 is not None and len(h5) > len(df):
-                    h5 = cct.get_limit_multiIndex_Group(h5, freq=freq,end=endtime)
+                    time_n = time.time()
+                    # h5 = cct.get_limit_multiIndex_Group(h5, freq=freq,end=endtime)
+                    h5 = cct.get_limit_multiIndex_Row(h5,col=run_col,start=startime, end=endtime)
                     if h5 is not None and len(h5) > 0:
                         h5 = h5.reset_index().set_index('code')
-                        h5.rename(columns={'low': 'nlow'}, inplace=True)
-                        log.info("get_limit_multiIndex_Group:%s freq:%s endtime:%s"%(len(h5),freq,endtime))
-                        h5 = h5.drop(['ticktime'], axis=1)
+                        h5.rename(columns=now_func, inplace=True)
+                        # log.info("get_limit_multiIndex_Row:%s  endtime:%s" % (len(h5), endtime))
+                        #h5 = h5.drop(['ticktime'], axis=1)
+                        h5 = h5.loc[:, now_col]
                         dd = cct.combine_dataFrame(dd, h5, col=None, compare=None, append=False, clean=True)
+                        log.info('agg_df_Row:%.2f h5:%s endtime:%s' % ((time.time() - time_n), len(h5),endtime))
+                return dd
+            # freq = '15T'
+            time_s = time.time()
+            if cct.get_work_time() and cct.get_now_time_int() <= 1000:
+                run_col = ['low', 'high', 'close']
+                startime = None
+                endtime = '10:00:00'
+                dd = get_col_agg_df(h5, dd, run_col, all_func, startime, endtime)
+            else:
+                run_col = ['low', 'high']
+                startime = None
+                endtime = '10:00:00'
+                dd = get_col_agg_df(h5, dd, run_col, all_func, startime, endtime)
+                startime = '09:30:00'
+                endtime = '15:01:00'
+                run_col = ['close']
+                # h5 = cct.get_limit_multiIndex_Group(h5, freq='15T', col=run_col,start=startime, end=endtime)
+                dd = get_col_agg_df(h5, dd, run_col, all_func, startime, endtime)
+            log.info("agg_df_all_time:%0.2f"%(time.time()-time_s))
+                    # top_temp[:1][['high','nhigh','low','nlow','close','nclose','llastp']]
+
         h5a.write_hdf_db(self.hdf_name, dd, self.table, index=index)
         log.info("wr end:%0.2f" % (time.time() - self.start_t))
         return dd
@@ -594,10 +623,11 @@ class Sina:
         #                                      'ask4', 'ask5_volume', 'ask5'])
         # return stock_dict
 
+
 def nanrankdata_len(x):
     time_s = time.time()
-    df=get_tdx_stock_period_to_type(x, period_day='5T')
-    print 't:%0.2f'%(time.time()-time_s)
+    df = get_tdx_stock_period_to_type(x, period_day='5T')
+    print 't:%0.2f' % (time.time() - time_s)
     return df
 
 if __name__ == "__main__":
@@ -630,7 +660,6 @@ if __name__ == "__main__":
     # print sina.get_stock_code_data('600199,300334',index=False)
     # print len(sina.market('sh'))
 
-
     def compute_lastdays_percent(df=None, step=3):
         if df is not None and len(df) > step:
             df = df.sort_index(ascending=True)
@@ -657,21 +686,22 @@ if __name__ == "__main__":
     if df is not None and len(df) > 0:
         print df[:1]
         stock_data = df
-        print "t1:%0.3f df:%s"%(time.time()-time_s,df.shape)
+        print "t1:%0.3f df:%s" % (time.time() - time_s, df.shape)
         # df = cct.using_Grouper_eval(df, freq='5T', col=['low','close'], closed='right', label='right')
-        df = cct.get_limit_multiIndex_Group(df, freq='15T', col=['low','close'], index='ticktime', end='09:45:00')
+        # dd = cct.get_limit_multiIndex_Group(df, freq='15T', col=['low', 'close'], index='ticktime', end='09:45:00')
+        dd = cct.get_limit_multiIndex_Row(df, freq='15T', col=['low', 'high'], index='ticktime', end='09:45:00')
         # df = using_Grouper(df, freq='5T')
         # stock_data = stock_data.reset_index().set_index('ticktime')
         # df = stock_data.groupby('code').resample('5T', how={'low': 'min', 'close':'min', 'volume': 'sum'})
-        print "t2:%0.3f df:%s"%(time.time()-time_s,df.shape)
-        print df.loc['000001'][-2:]
-        df = cct.using_Grouper(df, freq='15T', col=['low','close'], closed='right', label='right')
+        print "t2:%0.3f df:%s" % (time.time() - time_s, dd.shape)
+        print dd.loc['600191'][-2:]
+        df = cct.using_Grouper(df, freq='15T', col=['low', 'high'], closed='right', label='right')
         # df = using_Grouper(df, freq='30T')
 
         # df = stock_data.groupby('code').resample('30T', how={'low': 'min', 'close':'min', 'volume': 'sum'})
         # df = df.groupby(level=0).transform(get_tdx_stock_period_to_type)
         # df = df.groupby([df.index.get_level_values(i) for i in [0]]+[pd.Grouper(freq='30T', level=-1)]).transform(get_tdx_stock_period_to_type)
-        print "t3:%0.3f df:%s"%(time.time()-time_s,df.shape)
+        print "t3:%0.3f df:%s" % (time.time() - time_s, df.shape)
         print df.loc['000001'][-2:]
     # '''
     # print df.groupby(pd.Grouper(freq='30T', level='ticktime'))
@@ -679,7 +709,7 @@ if __name__ == "__main__":
     # print df.groupby(level=0).transform(nanrankdata_len)[:10]
     # import pandas as pd
     # df = pd.HDFStore(cct.get_ramdisk_path(h5_fname))[h5_table]
-    code='300248'
+    code = '300248'
     # code = '000099'
     # print "t:", round(time.time() - time_s, 1),
     if df is not None and len(df) > 0 and code in df.index:
@@ -707,7 +737,7 @@ if __name__ == "__main__":
         # price change  volume   amount type
 
         # df.ticktime = map(lambda x: int(x.replace(':', '')), df.ticktime)
-        df.ticktime = map(lambda x,y: str(x)+' '+str(y),df.dt,df.ticktime)
+        df.ticktime = map(lambda x, y: str(x) + ' ' + str(y), df.dt, df.ticktime)
         print df.ticktime[:3]
         df.ticktime = pd.to_datetime(df.ticktime, format='%Y-%m-%d %H:%M:%S')
         print df.ticktime[:2]
