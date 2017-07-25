@@ -97,7 +97,10 @@ def getBollFilter(df=None, boll=6, duration=ct.PowerCountdl, filter=True, ma5d=T
     # if 'nlow' in df.columns and 932 < cct.get_now_time_int() < 1030:
     if 'nlow' in df.columns and 932 < cct.get_now_time_int():
         if 'nhigh' in df.columns and 'nclose' in df.columns:
-            df = df[((df.low >= df.nlow) & (df.close > df.nclose)) | ((df.close > df.nclose) & (df.close > df.nhigh * ct.changeRatio) & (df.high > df.nhigh * ct.changeRatio))]
+            if cct.get_now_time_int() > 1002:
+                df = df[((df.low >= df.nlow) & (df.close > df.nclose)) | ((df.close > df.nclose) & (df.close > df.nhigh * ct.changeRatio) & (df.high > df.nhigh))]
+            else:
+                df = df[((df.low >= df.nlow) & (df.close > df.nclose)) | ((df.close > df.nclose) & (df.close > df.nhigh * ct.changeRatio))]
         else:
             df = df[((df.low >= df.nlow) & (df.close > df.llastp))]
 

@@ -178,6 +178,8 @@ print "t0:%0.3f" % (time.time() - time_s)
 # endtime = '2017-07-17 09:45:00'
 # df = select_multiIndex_index(df, index='ticktime', end=endtime)
 time_s = time.time()
+# top_temp[:1][['high','nhigh','low','nlow','close','nclose','llastp']]
+
 # df = select_multiIndex_index(df, index='ticktime', start='2017-07-01 09:25:00',end='2017-07-17 09:45:00')
 df = select_multiIndex_index(df, index='ticktime', start=None,end=None)
 dd = using_Grouper(df, freq='5T')
