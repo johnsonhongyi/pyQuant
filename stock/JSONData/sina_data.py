@@ -175,9 +175,9 @@ class Sina:
         self.load_stock_codes()
         # print "stocks:",len(self.stock_codes)
         self.stock_codes = [elem for elem in self.stock_codes if elem.startswith(('6', '30', '00'))]
-
+        time_s=time.time()
         h5 = h5a.load_hdf_db(self.hdf_name, self.table, code_l=self.stock_codes, limit_time=self.sina_limit_time)
-        # print "stocks:",len(self.stock_codes)
+        log.info("h5a stocksTime:%0.2f"%(time.time()-time_s))
         if h5 is not None and len(h5) > 0:
             o_time = h5[h5.timel <> 0].timel
             if len(o_time) > 0:
@@ -196,6 +196,8 @@ class Sina:
                     return h5
                 else:
                     log.info("no return  hdf5:%s" % (len(h5)))
+        else:
+            log.info("no return  hdf5:%s" % (len(h5) if h5 is not None else 'None'))
 
         # self.stock_with_exchange_list = list(
             # map(lambda stock_code: ('sh%s' if stock_code.startswith(('5', '6', '9')) else 'sz%s') % stock_code,
@@ -572,8 +574,8 @@ class Sina:
             h5a.write_hdf_db(h5_fname, df, table=h5_table, index=False, baseCount=500, append=False, MultiIndex=True)
             log.info("hdf5 class all :%s  time:%0.2f" % (len(df), time.time() - time_s))
 
-        # if 'nlow' not in df.columns or 'nhigh' not in df.columns or ( cct.get_work_time() and 932 < cct.get_now_time_int() < 1500):
-        if 'nlow' not in df.columns or 'nhigh' not in df.columns or cct.get_work_time():
+        if 'nlow' not in df.columns or 'nhigh' not in df.columns or ( cct.get_work_time() and 932 < cct.get_now_time_int() < 1500):
+        # if 'nlow' not in df.columns or 'nhigh' not in df.columns or cct.get_work_time():
             all_func = {'low': 'nlow', 'high': 'nhigh', 'close': 'nclose'}
             h5 = h5a.load_hdf_db(h5_fname, h5_table, timelimit=False)
             def get_col_agg_df(h5,dd,run_col,all_func,startime,endtime):
