@@ -1465,15 +1465,15 @@ def select_multiIndex_index(df, index='ticktime', start=None, end=None, datev=No
         if datev is None:
             end = get_today() + ' ' + end
             if start is None:
-                start = get_today(sep='-')+' '+'09:30:00'
+                start = get_today(sep='-')+' '+'09:25:00'
         else:
             end = day8_to_day10(datev) + ' ' + end
             if start is None:
-                start = day8_to_day10(datev)+' '+'09:30:00'
+                start = day8_to_day10(datev)+' '+'09:25:00'
     else:
         if start is None:
             if end is None:
-                start = get_today(sep='-')+' '+'09:30:00'
+                start = get_today(sep='-')+' '+'09:25:00'
                 end = get_today(sep='-')+' '+'09:45:00'
                 log.error("start and end is None to 930 and 945")
             else:

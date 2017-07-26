@@ -63,6 +63,7 @@ sina_limit_time = 10
 h5_time_l_count = 6
 sina_dd_limit_time = 300
 diffcode = 0.2
+dratio_limit = 0.12
 duration_sleep_time = 60
 compute_lastdays = 9
 sort_value_key_percd = '3 3'
@@ -362,8 +363,8 @@ DFCFW_FUND_FLOW_URL_New = "http://nufm.dfcfw.com/EM_Finance2014NumericApplicatio
 # DFCFW_FUND_FLOW_URL_New="http://nufm.dfcfw.com/EM_Finance2014NumericApplication/JS.aspx?type=CT&cmd=%s"
 
 # TDX_Day_columns=['code','date','open','high','low','close','vol','amount']
-TDX_Day_columns = ['code', 'date', 'open', 'high', 'low', 'close', 'vol',
-                   'amount', 'ra', 'op', 'fib', 'ma5d', 'ma10d', 'ldate', 'hmax', 'lmin', 'cmean']
+TDX_Day_columns_all = ['code', 'date', 'open', 'high', 'low', 'close', 'vol','amount', 'ra', 'op', 'fib', 'ma5d', 'ma10d', 'ldate', 'hmax', 'lmin', 'cmean']
+TDX_Day_columns = ['code', 'date', 'open', 'high', 'low', 'close', 'vol','amount']
 
 DFCFW_FUND_FLOW_HGT = "http://nufm.dfcfw.com/EM_Finance2014NumericApplication/JS.aspx?type=CT&cmd=0000011&sty=SHSTD&st=z&sr=&p=&ps=&cb=&js=var%20quote_zjl%3d{rank:[%28x%29],pages:%28pc%29}&token=beb0a0047196124721f56b0f0ff5a27c&jsName=quote_zjl&dt=1452070103085"
 DFCFW_FUND_FLOW_SZT = "http://nufm.dfcfw.com/EM_Finance2014NumericApplication/JS.aspx?type=CT&cmd=0000011&sty=SZSTD&st=z&sr=&p=&ps=&cb=&js=var%20quote_zjl%3d{rank:[%28x%29],pages:%28pc%29}&token=beb0a0047196124721f56b0f0ff5a27c&jsName=quote_zjl&dt=1452070103085"

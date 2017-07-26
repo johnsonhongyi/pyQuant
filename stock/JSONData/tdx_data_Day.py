@@ -150,7 +150,7 @@ def write_all_kdata_to_file(code, f_path, df=None):
     print "writeCode:%s size:%s" % (code, os.path.getsize(f_path) / 50)
 
 
-def get_tdx_Exp_day_to_df(code, start=None, end=None, dl=None, newdays=None, type='f', wds=True, lastdays=3, resample='d'):
+def get_tdx_Exp_day_to_df(code, start=None, end=None, dl=None, newdays=None, type='f', wds=True, lastdays=3, resample='d',MultiIndex=False):
     """[get local tdx data]
     [description]
     Arguments:
@@ -260,31 +260,27 @@ def get_tdx_Exp_day_to_df(code, start=None, end=None, dl=None, newdays=None, typ
         # df.sort_index(ascending=False, inplace=True)
         if start is not None and end is not None:
             df = df[(df.date >= start) & (df.date <= end)]
-            print "startend"
+            # print "startend"
         elif end is not None:
             df = df[df.date <= end]
         elif start is not None:
             df = df[df.date >= start]
-        # df['ma5d'] = df.close.rolling(window=5,center=False).mean()
-        # df['ma10d'] = df.close.rolling(window=10,center=False).mean()
-        # df['ma20d'] = df.close.rolling(window=20,center=False).mean()
-        # df['ma60d'] = df.close.rolling(window=60,center=False).mean()
         if len(df) > 0:
-            #            df.drop_duplicates('date',inplace=True)
             df = df.set_index('date')
             df = df.sort_index(ascending=True)
-            if not resample == 'd' and resample in resample_dtype:
-                df = get_tdx_stock_period_to_type(df, period_day=resample)
-            df['ma5d'] = pd.rolling_mean(df.close, 5)
-            df['ma10d'] = pd.rolling_mean(df.close, 10)
-            df['ma20d'] = pd.rolling_mean(df.close, 20)
-            df['ma60d'] = pd.rolling_mean(df.close, 60)
-            # df['msg'] = df.high[-tdx_max_int:].max()
-            df['hmax'] = df.close[-tdx_max_int:max_int_end].max()
-            df['lmin'] = df.low[-tdx_max_int:max_int_end].min()
-            df['cmean'] = round(df.close[-tdx_max_int:max_int_end].mean(), 2)
-            df['hv'] = df.vol[-tdx_max_int:max_int_end].max()
-            df['lv'] = df.vol[-tdx_max_int:max_int_end].min()
+            if not MultiIndex:
+                if not resample == 'd' and resample in resample_dtype:
+                    df = get_tdx_stock_period_to_type(df, period_day=resample)
+                df['ma5d'] = pd.rolling_mean(df.close, 5)
+                df['ma10d'] = pd.rolling_mean(df.close, 10)
+                df['ma20d'] = pd.rolling_mean(df.close, 20)
+                df['ma60d'] = pd.rolling_mean(df.close, 60)
+                # df['msg'] = df.high[-tdx_max_int:].max()
+                df['hmax'] = df.close[-tdx_max_int:max_int_end].max()
+                df['lmin'] = df.low[-tdx_max_int:max_int_end].min()
+                df['cmean'] = round(df.close[-tdx_max_int:max_int_end].mean(), 2)
+                df['hv'] = df.vol[-tdx_max_int:max_int_end].max()
+                df['lv'] = df.vol[-tdx_max_int:max_int_end].min()
             if resample == 'd' and df.close[-5:].max() > df.open[-5:].min() * 1.6:
                 # if initTdxdata < 3:
                 log.error("%s dl None outdata!" % (code))
@@ -292,11 +288,9 @@ def get_tdx_Exp_day_to_df(code, start=None, end=None, dl=None, newdays=None, typ
                 if write_k_data_status:
                     write_all_kdata_to_file(code, f_path=file_path)
                     df = get_tdx_Exp_day_to_df(
-                        code, start=start, end=end, dl=dl, newdays=newdays, type='f', wds=False)
+                        code, start=start, end=end, dl=dl, newdays=newdays, type='f', wds=False,MultiIndex=MultiIndex)
                 # write_tdx_sina_data_to_file(code, df=df)
             df = df.fillna(0)
-            # df.index = df.index.to_datetime()
-            # df.index.name = code
             df = df.sort_index(ascending=False)
         return df
     elif dl is not None and int(dl) == 1:
@@ -400,9 +394,10 @@ def get_tdx_Exp_day_to_df(code, start=None, end=None, dl=None, newdays=None, typ
                 continue
                 # if dt is not None and tdate < dt:
                 #     break
+        
         df = pd.DataFrame(dt_list, columns=ct.TDX_Day_columns)
         # df.sort_index(ascending=False, inplace=True)
-        if resample == 'd':
+        if not MultiIndex and resample == 'd':
             df = compute_lastdays_percent(df, lastdays=lastdays,resample=resample)
 
         if start is not None and end is not None:
@@ -420,21 +415,22 @@ def get_tdx_Exp_day_to_df(code, start=None, end=None, dl=None, newdays=None, typ
             if 'date' in df.columns:
                 df = df.set_index('date')
             df = df.sort_index(ascending=True)
-            if not resample == 'd' and resample in resample_dtype:
-                df = get_tdx_stock_period_to_type(df, period_day=resample)
-                df = compute_lastdays_percent(df, lastdays=lastdays,resample=resample)
-                if 'date' in df.columns:
-                    df = df.set_index('date')
-            df['ma5d'] = pd.rolling_mean(df.close, 5)
-            df['ma10d'] = pd.rolling_mean(df.close, 10)
-            df['ma20d'] = pd.rolling_mean(df.close, 20)
-            df['ma60d'] = pd.rolling_mean(df.close, 60)
-            # df['hmax'] = df.high[-tdx_max_int:].max()
-            df['hmax'] = df.close[-tdx_max_int:max_int_end].max()
-            df['lmin'] = df.low[-tdx_max_int:max_int_end].min()
-            df['cmean'] = round(df.close[-tdx_max_int:max_int_end].mean(), 2)
-            df['hv'] = df.vol[-tdx_max_int:max_int_end].max()
-            df['lv'] = df.vol[-tdx_max_int:max_int_end].min()
+            if not MultiIndex:
+                if not resample == 'd' and resample in resample_dtype:
+                    df = get_tdx_stock_period_to_type(df, period_day=resample)
+                    df = compute_lastdays_percent(df, lastdays=lastdays,resample=resample)
+                    if 'date' in df.columns:
+                        df = df.set_index('date')
+                df['ma5d'] = pd.rolling_mean(df.close, 5)
+                df['ma10d'] = pd.rolling_mean(df.close, 10)
+                df['ma20d'] = pd.rolling_mean(df.close, 20)
+                df['ma60d'] = pd.rolling_mean(df.close, 60)
+                # df['hmax'] = df.high[-tdx_max_int:].max()
+                df['hmax'] = df.close[-tdx_max_int:max_int_end].max()
+                df['lmin'] = df.low[-tdx_max_int:max_int_end].min()
+                df['cmean'] = round(df.close[-tdx_max_int:max_int_end].mean(), 2)
+                df['hv'] = df.vol[-tdx_max_int:max_int_end].max()
+                df['lv'] = df.vol[-tdx_max_int:max_int_end].min()
             dratio = (dl - len(df)) / float(dl)
             if resample == 'd' and dratio < 0.2 and df.close[-5:].max() > df.open[-5:].min() * 1.6:
 
@@ -445,22 +441,10 @@ def get_tdx_Exp_day_to_df(code, start=None, end=None, dl=None, newdays=None, typ
                 if write_k_data_status:
                     write_all_kdata_to_file(code, file_path)
                     df = get_tdx_Exp_day_to_df(
-                        code, start=start, end=end, dl=dl, newdays=newdays, type='f', wds=False)
+                        code, start=start, end=end, dl=dl, newdays=newdays, type='f', wds=False,MultiIndex=MultiIndex)
 
                 # write_tdx_sina_data_to_file(code, df=df)
             df = df.fillna(0)
-            # if len(df) > lastdays:
-            #     df = df.sort_index(ascending=True)
-            #     for da in range(1,lastdays+1,1):
-            #         df['lastp%sd'%da] = df['close'].shift(da)
-            #         df['lasth%sd'%da] = df['high'].shift(da)
-            #         df['lastl%sd'%da] = df['low'].shift(da)
-            #         df['percent%sd'%da] = ((df['close'] - df['lastp%sd'%da])/df['lastp%sd'%da]).map(lambda x:round(x*100,2))
-            #         df['mean%sd'%da] = ((df['lasth%sd'%da] + df['lastl%sd'%da])/2).map(lambda x:round(x,2))
-            #         df['percent%sd'%da] = df['percent%sd'%da][-1]
-            #         df['mean%sd'%da] = df['mean%sd'%da][-1]
-            # df.index = df.index.to_datetime()
-            # df.index.name = code
             df = df.sort_index(ascending=False)
         return df
 
@@ -1268,6 +1252,118 @@ def write_tdx_sina_data_to_file(code, dm=None, df=None, dl=2, type='f'):
     fo.close()
     return "NTrue"
 
+def Write_tdx_all_to_hdf(market,h5_fname='tdx_all_df',h5_table='all',dl=300):
+    time_a = time.time()
+    h5_fname = h5_fname +'_'+str(dl)
+    h5_table = h5_table + '_' + str(dl)
+    if market == 'all':
+        market = ['cyb','sh','sz']
+    if not isinstance(market, list):
+        market = [market]
+    for ma in market:
+        dd = pd.DataFrame()
+        df = sina_data.Sina().market(ma)
+        dfcode = df.index.tolist()
+        # print dfcode[:5]
+        print "ma:%s dl:%s count:%s" % (ma,dl,len(dfcode))
+        # f_name = 'tdx_all_df_30'
+        time_s = time.time()
+        # st=h5a.get_hdf5_file(f_name, wr_mode='w', complevel=9, complib='zlib',mutiindx=True)
+        # for code in dfcode[:500]:
+        for code in dfcode:
+            # for code in dfcode:
+            df = get_tdx_Exp_day_to_df(code, dl=dl,MultiIndex=True)
+            # print df
+            # (map(lambda x, y: y if int(x) == 0 else x, top_dif['buy'].values, top_dif['trade'].values))
+            # print df.index
+            if len(df) > 0:
+                # df.index = map(lambda x: x.replace('-', '').replace('\n', ''), df.index)
+                df.index = map(lambda x: x.replace('\n', ''), df.index)
+                df.index = df.index.astype(str)
+                df.index.name = 'date'
+                df.code = df.code.astype(str)
+                
+                '''sina_data MutiIndex
+                df.index = df.index.astype(str)
+                df.ticktime = df.ticktime.astype(str)
+                # df.ticktime = map(lambda x: int(x.replace(':', '')), df.ticktime)
+                df.ticktime = map(lambda x, y: str(x) + ' ' + str(y), df.dt, df.ticktime)
+                df.ticktime = pd.to_datetime(df.ticktime, format='%Y-%m-%d %H:%M:%S')
+                # df = df.loc[:, ['open', 'high', 'low', 'close', 'llastp', 'volume', 'ticktime']]
+                df = df.loc[:, ['close', 'high', 'low', 'llastp', 'volume', 'ticktime']]
+                if 'code' not in df.columns:
+                   df = df.reset_index()
+                if 'dt' in df.columns:
+                   df = df.drop(['dt'], axis=1)
+                   # df.dt = df.dt.astype(str)
+                if 'name' in df.columns:
+                   # df.name = df.name.astype(str)
+                   df = df.drop(['name'], axis=1)
+                df = df.set_index(['code', 'ticktime'])
+                h5a.write_hdf_db(h5_fname, df, table=h5_table, index=False, baseCount=500, append=False, MultiIndex=True)
+                log.info("hdf5 class all :%s  time:%0.2f" % (len(df), time.time() - time_s))
+                '''
+
+                # df.info()
+                # if 'code' in df.columns:
+                # df.drop(['code'],axis=1,inplace=True)
+                df = df.sort_index(ascending=True)
+                df = df.reset_index()
+                df = df.set_index(['code', 'date'])
+                # df = df.astype(float)
+                # xcode = cct.code_to_symbol(code)
+                # if len(dd) >0:
+                #     print "code:%s df in :%s"%(code,code in dd.index.get_level_values('code'))
+                dd = pd.concat([dd, df], axis=0)
+                # print ".", len(dd)
+                # st.append(xcode,df)
+                # put_time = time.time()
+                # st.put("df", df, format="table", append=True, data_columns=['code','date'])
+                # print "t:%0.1f"%(time.time()-put_time),
+                # aa[aa.index.get_level_values('code')==333]
+                # st.select_column('df','code').unique()
+                # %timeit st.select_column('df','code')
+                # %timeit st.select('df',columns=['close'])
+                # result_df = df.loc[(df.index.get_level_values('A') > 1.7) & (df.index.get_level_values('B') < 666)]
+                # x.loc[(x.A>=3.3)&(x.A<=6.6)]
+                # st[xcode]=df
+                '''
+                Traceback (most recent call last):
+                  File "tdx_data_Day.py", line 3013, in <module>
+                    df = get_tdx_Exp_day_to_df(code,dl=30)
+                  File "tdx_data_Day.py", line 200, in get_tdx_Exp_day_to_df
+                    topen = float(a[1])
+                IndexError: list index out of range
+                Closing remaining open files:/Volumes/RamDisk/tdx_all_df_30.h5...done
+                '''
+        concat_t = time.time() - time_s
+        print("dd.concat all :%s  time:%0.2f" % (len(dfcode), concat_t))
+        h5a.write_hdf_db(h5_fname, dd, table=h5_table,index=False, baseCount=500, append=False, MultiIndex=True)
+        print("hdf5 write all :%s  atime:%0.2f wtime:%0.2f" % (len(dfcode), time.time() - time_a,time.time() -time_s-concat_t))
+
+def Write_Sina_data_to_Tdx_HDF(df):
+    if cct.get_now_time_int() >= 925 and not index and len(df) > 3000:
+        time_s = time.time()
+        df.index = df.index.astype(str)
+        # df.ticktime = df.ticktime.astype(str)
+        # df.ticktime = map(lambda x: int(x.replace(':', '')), df.ticktime)
+        # df.ticktime = map(lambda x, y: str(x) + ' ' + str(y), df.dt, df.ticktime)
+        # df.ticktime = pd.to_datetime(df.ticktime, format='%Y-%m-%d %H:%M:%S')
+        df.dt = pd.to_datetime(df.ticktime, format='%Y-%m-%d %H:%M:%S')
+        # df = df.loc[:, ['open', 'high', 'low', 'close', 'llastp', 'volume', 'ticktime']]
+        # ['code', 'date', 'open', 'high', 'low', 'close', 'vol','amount']
+        df.rename(columns={'volume': 'vol','turnover': 'amount','dt':'date'}, inplace=True)
+        df = df.loc[:, ['date', 'open', 'high', 'low', 'close', 'vol','amount']]
+        if 'code' not in df.columns:
+            df = df.reset_index()
+        # if 'dt' in df.columns:
+            # df = df.drop(['dt'], axis=1)
+            # df.dt = df.dt.astype(str)
+        # if 'name' in df.columns:
+            # df.name = df.name.astype(str)
+            # df = df.drop(['name'], axis=1)
+        df = df.set_index(['code', 'ticktime'])
+        h5a.write_hdf_db(h5_fname, df, table=h5_table, index=False, baseCount=500, append=False, MultiIndex=True)
 
 def Write_market_all_day_mp(market='all', rewrite=False):
     sh_index = '601998'
@@ -2924,7 +3020,7 @@ if __name__ == '__main__':
     # print get_tdx_exp_low_or_high_power(code, dl=20, end='2017-06-28', ptype='low')
     
     # print get_tdx_exp_low_or_high_power(code, dl=60, end=None, ptype='high',power=False,resample=resample)
-    print get_tdx_exp_low_or_high_power(code, dl=60, end=None, ptype='low',power=False,resample=resample)
+    print get_tdx_exp_low_or_high_power(code, dl=60, end=None, ptype='low',power=False,resample=resample)[:2]
     
     # print get_tdx_Exp_day_to_df(code, dl=60, newdays=0, resample='m')[:2]
     # print get_tdx_Exp_day_to_df(code, dl=30, newdays=0, resample='d')[:2]
@@ -2934,70 +3030,13 @@ if __name__ == '__main__':
     # sys.exit(0)
 #    print write_tdx_tushare_to_file(code)
 
-    hdf5_wri = cct.cct_raw_input("write all data to hdf[y|n]:")
+    hdf5_wri = cct.cct_raw_input("write all tdx data to hdf[y|n]:")
     # hdf5_wri='y'
-    time_s = time.time()
     if hdf5_wri == 'y':
-        df = sina_data.Sina().market('sh')
-        dfcode = df.index.tolist()
-        # print dfcode[:5]
-        print "count:%s" % (len(dfcode))
-        # f_name = 'tdx_all_df_30'
-        t_st = time.time()
-        dd = pd.DataFrame()
-        # st=h5a.get_hdf5_file(f_name, wr_mode='w', complevel=9, complib='zlib',mutiindx=True)
-        h5_fname = 'tdx_df'
-        dl = 30
-        h5_table = 'all' + '_' + str(dl)
-        # for code in dfcode[:500]:
-        for code in dfcode[:500]:
-            # for code in dfcode:
-            df = get_tdx_Exp_day_to_df(code, dl=dl)
-            # print df
-            # (map(lambda x, y: y if int(x) == 0 else x, top_dif['buy'].values, top_dif['trade'].values))
-            # print df.index
-            if len(df) > 0:
-                df.index = map(lambda x: x.replace(
-                    '-', '').replace('\n', ''), df.index)
-                df.index = df.index.astype(str)
-                df.index.name = 'date'
-                df.code = df.code.astype(str)
-                # df.info()
-                # if 'code' in df.columns:
-                # df.drop(['code'],axis=1,inplace=True)
-                df = df.reset_index()
-                df = df.set_index(['code', 'date'])
-                df = df.astype(float)
-                # xcode = cct.code_to_symbol(code)
-                dd = pd.concat([dd, df], axis=0)
-                # print ".", len(dd)
-                # st.append(xcode,df)
-                put_time = time.time()
-                # st.put("df", df, format="table", append=True, data_columns=['code','date'])
-                # print "t:%0.1f"%(time.time()-put_time),
-                # aa[aa.index.get_level_values('code')==333]
-                # st.select_column('df','code').unique()
-                # %timeit st.select_column('df','code')
-                # %timeit st.select('df',columns=['close'])
-                # result_df = df.loc[(df.index.get_level_values('A') > 1.7) & (df.index.get_level_values('B') < 666)]
-                # x.loc[(x.A>=3.3)&(x.A<=6.6)]
-                # st[xcode]=df
-                '''
-                Traceback (most recent call last):
-                  File "tdx_data_Day.py", line 3013, in <module>
-                    df = get_tdx_Exp_day_to_df(code,dl=30)
-                  File "tdx_data_Day.py", line 200, in get_tdx_Exp_day_to_df
-                    topen = float(a[1])
-                IndexError: list index out of range
-                Closing remaining open files:/Volumes/RamDisk/tdx_all_df_30.h5...done
-                '''
-                # print df
-                # print df.shape
-                # log.error("code :%s is None"%(code))
-                #
-        h5a.write_hdf_db(h5_fname, dd, table=h5_table,
-                         index=False, baseCount=500, append=False, MultiIndex=True)
-        print("hdf5 all :%s  time:%0.2f" % (len(dfcode), time.time() - time_s))
+        Write_tdx_all_to_hdf('all', h5_fname='tdx_all_df', h5_table='all', dl=300)
+
+        # time_s = time.time()
+
         # st.close()
 
     market = cct.cct_raw_input("write all data [all,sh,sz,cyb,alla] :")

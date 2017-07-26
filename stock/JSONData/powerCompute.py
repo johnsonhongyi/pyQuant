@@ -976,6 +976,18 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y', tal
         dmname = dm.name
         wcdf = wcd.get_wencai_data(dmname, 'wencai')
         wcdf_code = wcdf.index.tolist()
+        df['op'] = 0
+        df['ra'] = 0
+        df['fib'] = 0
+        df['fibl'] = 0
+        df['ldate'] = 0
+        df['boll'] = 0
+        df['kdj'] = 0
+        df['macd'] = 0
+        df['rsi'] = 0
+        df['ma'] = 0
+        df['oph'] = 0
+        df['rah'] = 0
 
         for code in code_l:
 
@@ -1061,19 +1073,19 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y', tal
                     continue
 
             else:
-                df.loc[code, 'op'] = 0
-                df.loc[code, 'ra'] = 0
-                df.loc[code, 'fib'] = 0
-                df.loc[code, 'fibl'] = 0
-                df.loc[code, 'ldate'] = 0
-                df.loc[code, 'boll'] = 0
-                df.loc[code, 'kdj'] = 0
-                df.loc[code, 'macd'] = 0
-                df.loc[code, 'rsi'] = 0
-                df.loc[code, 'ma'] = 0
-                df.loc[code, 'oph'] = 0
-                df.loc[code, 'rah'] = 0
-                df = df.fillna(0)
+                # df.loc[code, 'op'] = 0
+                # df.loc[code, 'ra'] = 0
+                # df.loc[code, 'fib'] = 0
+                # df.loc[code, 'fibl'] = 0
+                # df.loc[code, 'ldate'] = 0
+                # df.loc[code, 'boll'] = 0
+                # df.loc[code, 'kdj'] = 0
+                # df.loc[code, 'macd'] = 0
+                # df.loc[code, 'rsi'] = 0
+                # df.loc[code, 'ma'] = 0
+                # df.loc[code, 'oph'] = 0
+                # df.loc[code, 'rah'] = 0
+                # df = df.fillna(0)
                 continue
     #        tdx_df = tdd.get_tdx_power_now_df(code, start=start, end=end, type='f', df=None, dm=dz, dl=dl*2)
             opc = 0
@@ -1153,11 +1165,13 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y', tal
             # df = getab.Get_BBANDS(df, dtype='d')
             #'volume', 'ratio', 'couts','ldate' -> 'ma','macd','rsi','kdj'
             # df = df.drop_duplicates()
-        df = df.fillna(0)
         df.loc[:, 'fibl'] = df.loc[:, 'fibl'].astype(int)
         # df['df2'] = (map(lambda ra, fibl,rah,fib,ma,kdj,rsi:round(eval(ct.powerdiff%(ct.PowerCountdl)),1),\
         #                  df['ra'].values, df['fibl'].values,df['rah'].values,df['fib'].values,df['ma'].values,\
         #                  df['kdj'].values,df['rsi'].values))
+        if "fib" not in df.columns:
+            df['fib'] = 0
+        df = df.fillna(0)
         df['df2'] = (map(lambda ra, fibl, rah, fib, ma, kdj, rsi: int(eval(ct.powerdiff % (dl))),
                          df['ra'].values, df['fibl'].values, df[
                              'rah'].values, df['fib'].values, df['ma'].values,

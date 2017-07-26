@@ -247,7 +247,7 @@ class Sina:
             # self.stock_codes = [elem for elem in self.stock_codes if elem.startswith(('6','30','00'))]
             # print len(self.stock_codes)
             if market == 'sh':
-                self.stock_codes = [elem for elem in self.stock_codes if elem.startswith('6')]
+                self.stock_codes = [elem for elem in self.stock_codes if elem.startswith('60')]
                 self.stock_with_exchange_list = list(
                     map(lambda stock_code: ('sh%s') % stock_code,
                         self.stock_codes))
@@ -261,7 +261,7 @@ class Sina:
                 self.stock_with_exchange_list = list(
                     map(lambda stock_code: ('sz%s') % stock_code,
                         self.stock_codes))
-
+            self.stock_codes = list(set(self.stock_codes))
             h5 = h5a.load_hdf_db(self.hdf_name, self.table, code_l=self.stock_codes, limit_time=self.sina_limit_time)
             if h5 is not None:
                 return h5
@@ -574,7 +574,7 @@ class Sina:
             h5a.write_hdf_db(h5_fname, df, table=h5_table, index=False, baseCount=500, append=False, MultiIndex=True)
             log.info("hdf5 class all :%s  time:%0.2f" % (len(df), time.time() - time_s))
 
-        if 'nlow' not in df.columns or 'nhigh' not in df.columns or ( cct.get_work_time() and 932 < cct.get_now_time_int() < 1500):
+        if 'nlow' not in df.columns or 'nhigh' not in df.columns or ( cct.get_work_time() and 931 < cct.get_now_time_int() < 1500):
         # if 'nlow' not in df.columns or 'nhigh' not in df.columns or cct.get_work_time():
             all_func = {'low': 'nlow', 'high': 'nhigh', 'close': 'nclose'}
             h5 = h5a.load_hdf_db(h5_fname, h5_table, timelimit=False)
@@ -722,6 +722,15 @@ if __name__ == "__main__":
     time_s = time.time()
     dd = pd.DataFrame()
     # st=h5a.get_hdf5_file(f_name, wr_mode='w', complevel=9, complib='zlib',mutiindx=True)
+    for ma in ['sh', 'sz', 'cyb', 'all']:
+        # for ma in ['sh']:
+        df = Sina().market(ma)
+        # print df.loc['600581']
+        # print len(sina.all)
+        print "market:%s %s" % (ma, len(df))
+    
+    sys.exit(0)
+    
     h5_fname = 'sina_multi_index'
     dl = 30
     h5_table = 'all' + '_' + str(10)
@@ -798,13 +807,7 @@ if __name__ == "__main__":
         h5a.write_hdf_db(h5_fname, df, table=h5_table, index=False, baseCount=500, append=False, MultiIndex=True)
         print("hdf5 main all :%s  time:%0.2f" % (len(df), time.time() - time_s))
 
-    sys.exit(0)
-    for ma in ['sh', 'sz', 'cyb', 'all']:
-        # for ma in ['sh']:
-        df = Sina().market(ma)
-        # print df.loc['600581']
-        # print len(sina.all)
-        print "market:%s %s" % (ma, len(df))
+
         # print df[df.code == '600581']
         # print sina.get_stock_code_data('999999',index=True)
         # df = sina.get_stock_list_data(['600629', '000507']).set_index('code')

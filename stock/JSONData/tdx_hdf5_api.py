@@ -143,7 +143,7 @@ class SafeHDFStore(HDFStore):
                     self.complib, self.temp_file, self.fname), shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
                 p.wait()
                 if p.returncode != 0:
-                    log.error("ptrepack hdf Error.:%s" % (self.fname))
+                    log.error("ptrepack hdf Error:%s Er:%s" % (self.fname,p.stderr))
                     # return -1
                 else:
                     os.remove(self.temp_file)
@@ -358,13 +358,17 @@ def write_hdf_db(fname, df, table='all', index=False, complib='blosc', baseCount
             if tmpdf is not None and len(tmpdf) > 0:
                 # multi_code = tmpdf.index.get_level_values('code').unique().tolist()
                 multi_code=tmpdf.index.get_level_values('code').unique().tolist()
+                df_multi_code = df.index.get_level_values('code').unique().tolist()
+                dratio = cct.get_diff_dratio(multi_code, df_multi_code)
                 inx_key=multi_code[random.randint(0, len(multi_code))]
-                if inx_key in df.index.get_level_values('code'):
+                if dratio < ct.dratio_limit and inx_key in df.index.get_level_values('code'):
                     now_time=df.loc[inx_key].index[-1]
                     tmp_time=tmpdf.loc[inx_key].index[-1]
                     if now_time == tmp_time:
                         log.error("%s %s Multi out time in hdf5:%s" % (fname, table, now_time))
                         return False
+                else:
+                    log.error("dratio:%s main:%s new:%s %s %s Multi out in hdf5" % (dratio,len(multi_code),len(df_multi_code),fname, table))
                 # da.drop(('000001','2017-05-11'))
             else:
                 pass
@@ -455,7 +459,7 @@ def write_hdf_db(fname, df, table='all', index=False, complib='blosc', baseCount
 #    return None
 
 
-def load_hdf_db(fname, table='all', code_l=None, timelimit=True, index=False, limit_time=ct.h5_limit_time, dratio_limit=0.12):
+def load_hdf_db(fname, table='all', code_l=None, timelimit=True, index=False, limit_time=ct.h5_limit_time, dratio_limit=ct.dratio_limit):
     time_t=time.time()
     global RAMDISK_KEY, INIT_LOG_Error
     if not RAMDISK_KEY < 1:
