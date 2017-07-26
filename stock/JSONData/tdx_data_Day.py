@@ -1341,29 +1341,50 @@ def Write_tdx_all_to_hdf(market,h5_fname='tdx_all_df',h5_table='all',dl=300):
         h5a.write_hdf_db(h5_fname, dd, table=h5_table,index=False, baseCount=500, append=False, MultiIndex=True)
         print("hdf5 write all :%s  atime:%0.2f wtime:%0.2f" % (len(dfcode), time.time() - time_a,time.time() -time_s-concat_t))
 
-def Write_Sina_data_to_Tdx_HDF(df):
-    if cct.get_now_time_int() >= 925 and not index and len(df) > 3000:
-        time_s = time.time()
-        df.index = df.index.astype(str)
-        # df.ticktime = df.ticktime.astype(str)
-        # df.ticktime = map(lambda x: int(x.replace(':', '')), df.ticktime)
-        # df.ticktime = map(lambda x, y: str(x) + ' ' + str(y), df.dt, df.ticktime)
-        # df.ticktime = pd.to_datetime(df.ticktime, format='%Y-%m-%d %H:%M:%S')
-        df.dt = pd.to_datetime(df.ticktime, format='%Y-%m-%d %H:%M:%S')
-        # df = df.loc[:, ['open', 'high', 'low', 'close', 'llastp', 'volume', 'ticktime']]
-        # ['code', 'date', 'open', 'high', 'low', 'close', 'vol','amount']
-        df.rename(columns={'volume': 'vol','turnover': 'amount','dt':'date'}, inplace=True)
-        df = df.loc[:, ['date', 'open', 'high', 'low', 'close', 'vol','amount']]
-        if 'code' not in df.columns:
-            df = df.reset_index()
-        # if 'dt' in df.columns:
-            # df = df.drop(['dt'], axis=1)
-            # df.dt = df.dt.astype(str)
-        # if 'name' in df.columns:
-            # df.name = df.name.astype(str)
-            # df = df.drop(['name'], axis=1)
-        df = df.set_index(['code', 'ticktime'])
-        h5a.write_hdf_db(h5_fname, df, table=h5_table, index=False, baseCount=500, append=False, MultiIndex=True)
+def Write_sina_to_tdx(market='all',h5_fname='tdx_all_df',h5_table='all',dl=300):
+    h5_fname = h5_fname +'_'+str(dl)
+    h5_table = h5_table + '_' + str(dl)
+    if cct.get_work_day_status() and cct.get_now_time_int() > 1500:
+        if market == 'all':
+            mlist = ['sh', 'sz', 'cyb']
+        else:
+            mlist = [market]
+        results = []
+        for mk in mlist:
+            time_t = time.time()
+            df = sina_data.Sina().market(mk)
+            allcount = len(df)
+            # df = rl.get_sina_Market_json(mk)
+            # print df.loc['600581']
+            if 'b1' in df.columns:
+                df = df[(df.b1 > 0) | (df.a1 > 0)]
+            print("market:%s A:%s open:%s" % (mk, allcount,len(df))),
+            # code_list = df.index.tolist()
+            # df = get_sina_data_df(code_list)
+            df.index = df.index.astype(str)
+            # df.ticktime = map(lambda x: int(x.replace(':', '')), df.ticktime)
+            # df.ticktime = map(lambda x, y: str(x) + ' ' + str(y), df.dt, df.ticktime)
+            # df.ticktime = pd.to_datetime(df.ticktime, format='%Y-%m-%d %H:%M:%S')
+            df.dt = pd.to_datetime(df.dt, format='%Y-%m-%d')
+            df.dt = df.dt.astype(str)
+            df['dt'] = (map(lambda x: str(x)[:10],df['dt']))
+            # df = df.loc[:, ['open', 'high', 'low', 'close', 'llastp', 'volume', 'ticktime']]
+            # ['code', 'date', 'open', 'high', 'low', 'close', 'vol','amount']
+            df.rename(columns={'volume': 'vol','turnover': 'amount','dt':'date'}, inplace=True)
+            df = df.loc[:, ['date', 'open', 'high', 'low', 'close', 'vol','amount']]
+            if 'code' not in df.columns:
+                df = df.reset_index()
+            # if 'dt' in df.columns:
+                # df = df.drop(['dt'], axis=1)
+                # df.dt = df.dt.astype(str)
+            # if 'name' in df.columns:
+                # df.name = df.name.astype(str)
+                # df = df.drop(['name'], axis=1)
+            df = df.set_index(['code', 'date'])
+            df = df.astype(float)
+            h5a.write_hdf_db(h5_fname, df, table=h5_table, index=False, baseCount=500, append=False, MultiIndex=True)
+            print "writime:%0.2f"%(time.time()-time_t)
+        return df
 
 def Write_market_all_day_mp(market='all', rewrite=False):
     sh_index = '601998'
@@ -1411,7 +1432,7 @@ def Write_market_all_day_mp(market='all', rewrite=False):
     #        write_tdx_tushare_to_file(sh_index,index_ts)
 #        get_tdx_append_now_df_api2(code,dl=dl,dm=dz,newdays=5)
         # get_tdx_append_now_df_api_tofile('603113', dm=None, newdays=1,
-        # start=None, end=None, type='f', df=None, dl=2, power=True)
+        # start=None, end=None, type='f', df=None, dl=2, power=True)        
         results = cct.to_mp_run_async(
             get_tdx_append_now_df_api_tofile, code_list, dm, 0)
         # for code in code_list:
@@ -1429,6 +1450,7 @@ def Write_market_all_day_mp(market='all', rewrite=False):
         for inx in ['999999', '399006', '399005', '399001']:
             get_tdx_append_now_df_api_tofile(inx)
         print "Index Wri ok",
+    Write_sina_to_tdx(market='all')
     print "All is ok"
     return results
 
@@ -2987,7 +3009,8 @@ if __name__ == '__main__':
         log_level = LoggerFactory.ERROR
     # log_level = LoggerFactory.DEBUG if args['-d']  else LoggerFactory.ERROR
     log.setLevel(log_level)
-
+    Write_tdx_all_to_hdf(market='all')
+    # Write_sina_to_tdx(market='all')
     # print cct.get_ramdisk_path('tdx')
     # testnumba(1000)
     # n = 100

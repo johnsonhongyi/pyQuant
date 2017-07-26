@@ -360,15 +360,19 @@ def write_hdf_db(fname, df, table='all', index=False, complib='blosc', baseCount
                 multi_code=tmpdf.index.get_level_values('code').unique().tolist()
                 df_multi_code = df.index.get_level_values('code').unique().tolist()
                 dratio = cct.get_diff_dratio(multi_code, df_multi_code)
-                inx_key=multi_code[random.randint(0, len(multi_code))]
-                if dratio < ct.dratio_limit and inx_key in df.index.get_level_values('code'):
-                    now_time=df.loc[inx_key].index[-1]
-                    tmp_time=tmpdf.loc[inx_key].index[-1]
-                    if now_time == tmp_time:
-                        log.error("%s %s Multi out time in hdf5:%s" % (fname, table, now_time))
-                        return False
+                if dratio < ct.dratio_limit:
+                    comm_code = list(set(df_multi_code) & set(multi_code))
+                    inx_key=comm_code[random.randint(0, len(comm_code))]
+                    if  inx_key in df.index.get_level_values('code'):
+                        now_time=df.loc[inx_key].index[-1]
+                        tmp_time=tmpdf.loc[inx_key].index[-1]
+                        if now_time == tmp_time:
+                            log.error("%s %s Multi out time hdf5:%s No Wri" % (fname, table, now_time))
+                            return False
+                elif dratio == 1:
+                    print ("newData ratio:%s all:%s"%(dratio,len(df)))
                 else:
-                    log.error("dratio:%s main:%s new:%s %s %s Multi out in hdf5" % (dratio,len(multi_code),len(df_multi_code),fname, table))
+                    log.error("dratio:%s main:%s new:%s %s %s Multi All Wri" % (dratio,len(multi_code),len(df_multi_code),fname, table))
                 # da.drop(('000001','2017-05-11'))
             else:
                 pass
