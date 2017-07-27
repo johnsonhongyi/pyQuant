@@ -1386,6 +1386,21 @@ def Write_sina_to_tdx(market='all',h5_fname='tdx_all_df',h5_table='all',dl=300):
             print "writime:%0.2f"%(time.time()-time_t)
         return df
 
+def test_Tdx_multi_data(start='2017-07-24',end=cct.get_today()):
+    h5_fname='tdx_all_df'
+    h5_table='all'
+    dl=300
+    time_s = time.time()
+    h5_fname = h5_fname +'_'+str(dl)
+    h5_table = h5_table + '_' + str(dl)
+    startime = start
+    endtime = end
+    print endtime
+    h5 = h5a.load_hdf_db(h5_fname, table=h5_table, timelimit=False)
+    h51 = cct.get_limit_multiIndex_Row(h5,freq=None,col=None,index='date',start=startime, end=endtime)
+    print "test_tdx time:%0.2f"%(time.time()-time_s)
+    return h51
+
 def Write_market_all_day_mp(market='all', rewrite=False):
     sh_index = '601998'
     dd = get_tdx_Exp_day_to_df(sh_index, dl=1)
@@ -2018,8 +2033,9 @@ def compute_lastdays_percent(df=None, lastdays=3,resample='d'):
                 # df['perlastp'] = df['per%sd' % da]
                 # df['perlastp'] = (df['per%sd' % da]).map(lambda x: 1 if x >= -0.1 else 0)
                 # down_zero, down_dn = 0, -1
-                down_zero, down_dn, percent_l = 0, -1, 2
-                df['perlastp'] = map((lambda c,lc,lp: (1 if (c - lc) >= 0 else down_dn) + (2 if (c - lc)/lc*100 > percent_l and lp > 0 else down_zero)), df['close'] ,df['lastp%sd' % da],df['per%sd' % da])
+                down_zero, down_dn, percent_l = 0, 0, 2
+                # df['perlastp'] = map((lambda c,lc,lp: (1 if (c - lc) >= 0 else down_dn) + (2 if (c - lc)/lc*100 > percent_l and lp > 0 else down_zero)), df['close'] ,df['lastp%sd' % da],df['per%sd' % da])
+                df['perlastp'] = map((lambda c,lc: (1 if (c - lc) >= 0 else down_dn)), df['close'] ,df['lastp%sd' % da])
             
                 # nowd,per1d = 1 ,2
                 # df['per%sd' % per1d] = ((df['lastp%sd' % da] - df['close'].shift(per1d)) / df['close'].shift(per1d)).map(lambda x: round(x * 100, 2))
@@ -3009,9 +3025,9 @@ if __name__ == '__main__':
         log_level = LoggerFactory.ERROR
     # log_level = LoggerFactory.DEBUG if args['-d']  else LoggerFactory.ERROR
     log.setLevel(log_level)
-    Write_tdx_all_to_hdf(market='all')
-    # Write_sina_to_tdx(market='all')
-    # print cct.get_ramdisk_path('tdx')
+    print cct.get_ramdisk_path('tdx')
+    df = test_Tdx_multi_data()
+    print df[:5]
     # testnumba(1000)
     # n = 100
     # xs = np.arange(n, dtype=np.float64)
@@ -3057,6 +3073,8 @@ if __name__ == '__main__':
     # hdf5_wri='y'
     if hdf5_wri == 'y':
         Write_tdx_all_to_hdf('all', h5_fname='tdx_all_df', h5_table='all', dl=300)
+        # Write_tdx_all_to_hdf(market='all')
+        # Write_sina_to_tdx(market='all')
 
         # time_s = time.time()
 

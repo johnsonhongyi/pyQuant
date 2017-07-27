@@ -1478,7 +1478,7 @@ def select_multiIndex_index(df, index='ticktime', start=None, end=None, datev=No
                 log.error("start and end is None to 930 and 945")
             else:
                 start = end
-    df = df[(df.index.get_level_values('ticktime') >= start) & (df.index.get_level_values('ticktime') <= end)]
+    df = df[(df.index.get_level_values(index) >= start) & (df.index.get_level_values(index) <= end)]
     return df
 
 def from_list_to_dict(col,func_dict):
@@ -1496,13 +1496,15 @@ def from_list_to_dict(col,func_dict):
 
 def get_limit_multiIndex_Row(df, freq='5T', col=multiIndex_func, index='ticktime', start=None, end='10:00:00'):
     df = select_multiIndex_index(df, index=index, start=start, end=end)
-    func = from_list_to_dict(col, multiIndex_func)
-    df = df.groupby(level=[0]).agg(func)
+    if col is not None:
+        func = from_list_to_dict(col, multiIndex_func)
+        df = df.groupby(level=[0]).agg(func)
     return df
 
 def get_limit_multiIndex_Group(df, freq='5T', col='low', index='ticktime', start=None, end='10:00:00'):
     df = select_multiIndex_index(df, index=index, start=start, end=end)
-    df = using_Grouper(df, freq=freq, col=col)
+    if freq is not None and col is not None:
+        df = using_Grouper(df, freq=freq, col=col)
     # df = select_multiIndex_index(df, index=index, start=start, end=end)
     # if col == 'close':
         # df.rename(columns={'close': 'low'}, inplace=True)

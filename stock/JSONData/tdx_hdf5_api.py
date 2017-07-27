@@ -367,7 +367,7 @@ def write_hdf_db(fname, df, table='all', index=False, complib='blosc', baseCount
                         now_time=df.loc[inx_key].index[-1]
                         tmp_time=tmpdf.loc[inx_key].index[-1]
                         if now_time == tmp_time:
-                            log.error("%s %s Multi out time hdf5:%s No Wri" % (fname, table, now_time))
+                            log.info("%s %s Multi out time hdf5:%s No Wri" % (fname, table, now_time))
                             return False
                 elif dratio == 1:
                     print ("newData ratio:%s all:%s"%(dratio,len(df)))
