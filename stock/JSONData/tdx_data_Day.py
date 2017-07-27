@@ -1349,7 +1349,7 @@ def Write_sina_to_tdx(market='all',h5_fname='tdx_all_df',h5_table='all',dl=300):
             mlist = ['sh', 'sz', 'cyb']
         else:
             mlist = [market]
-        results = []
+        # results = []
         for mk in mlist:
             time_t = time.time()
             df = sina_data.Sina().market(mk)
@@ -1382,23 +1382,27 @@ def Write_sina_to_tdx(market='all',h5_fname='tdx_all_df',h5_table='all',dl=300):
                 # df = df.drop(['name'], axis=1)
             df = df.set_index(['code', 'date'])
             df = df.astype(float)
-            h5a.write_hdf_db(h5_fname, df, table=h5_table, index=False, baseCount=500, append=False, MultiIndex=True)
-            print "writime:%0.2f"%(time.time()-time_t)
+            status = h5a.write_hdf_db(h5_fname, df, table=h5_table, index=False, baseCount=500, append=False, MultiIndex=True)
+            if status:
+                print "Tdx writime:%0.2f"%(time.time()-time_t)
+            else:
+                print "Tdx no writime:%0.2f"%(time.time()-time_t)
         return df
 
-def test_Tdx_multi_data(start='2017-07-24',end=cct.get_today()):
-    h5_fname='tdx_all_df'
-    h5_table='all'
-    dl=300
+def search_Tdx_multi_data_duration(fname,table,start=None,end=None,freq=None,col=None,index='date'):
+    # h5_fname='tdx_all_df'
+    # h5_table='all'
+    # dl=300
     time_s = time.time()
-    h5_fname = h5_fname +'_'+str(dl)
-    h5_table = h5_table + '_' + str(dl)
-    startime = start
-    endtime = end
-    print endtime
-    h5 = h5a.load_hdf_db(h5_fname, table=h5_table, timelimit=False)
-    h51 = cct.get_limit_multiIndex_Row(h5,freq=None,col=None,index='date',start=startime, end=endtime)
-    print "test_tdx time:%0.2f"%(time.time()-time_s)
+    # h5_fname = h5_fname +'_'+str(dl)
+    # h5_table = h5_table + '_' + str(dl)
+    h5 = h5a.load_hdf_db(fname, table=table, timelimit=False)
+    if h5 is not None and len(h5) >0:
+        h51 = cct.get_limit_multiIndex_Row(h5,freq=freq,col=col,index=index,start=start, end=end)
+    else:
+        h51 = None
+        # log.error("h5 is None")
+    log.info("test_tdx time:%0.2f"%(time.time()-time_s))
     return h51
 
 def Write_market_all_day_mp(market='all', rewrite=False):
@@ -3025,9 +3029,11 @@ if __name__ == '__main__':
         log_level = LoggerFactory.ERROR
     # log_level = LoggerFactory.DEBUG if args['-d']  else LoggerFactory.ERROR
     log.setLevel(log_level)
+    # Write_sina_to_tdx(market='all')
     print cct.get_ramdisk_path('tdx')
-    df = test_Tdx_multi_data()
-    print df[:5]
+    df = search_Tdx_multi_data_duration('tdx_all_df_300', 'all_300', start='20170726', end=None, freq=None, col=None, index='date')
+    if df is not None:
+        print df[df.index.get_level_values('code')][:3]
     # testnumba(1000)
     # n = 100
     # xs = np.arange(n, dtype=np.float64)

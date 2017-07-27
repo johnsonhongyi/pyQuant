@@ -32,7 +32,13 @@ class SafeHDFStore(HDFStore):
         baseDir = BaseDir
         self.fname_o = args[0]
         self.config_ini = baseDir + os.path.sep+ 'h5config.txt'
-        self.fname = cct.get_ramdisk_path(args[0])
+        if args[0] == cct.tdx_hd5_name:
+            self.fname = cct.get_run_path_tdx(args[0])
+            log.info("tdx_hd5:%s"%(self.fname))
+        else:
+            self.fname = cct.get_ramdisk_path(args[0])
+            log.info("ramdisk_hd5:%s"%(self.fname))
+
         self._lock = lock
         self.countlock = 0
         self.write_status = False
@@ -115,6 +121,9 @@ class SafeHDFStore(HDFStore):
 #                return None
         # HDFStore.__init__(self, fname, *args, **kwargs)
         HDFStore.__init__(self, fname, *args, **kwargs)
+        # if not os.path.exists(cct.get_ramdisk_path(cct.tdx_hd5_name)):
+        #     if os.path.exists(cct.tdx_hd5_path):
+        #         tdx_size = os.path.getsize(cct.tdx_hd5_path)
 
         # HDFStore.__init__(self,fname,complevel=self.complevel,complib=self.complib, **kwargs)
         # HDFStore.__init__(self,fname,format="table",complevel=self.complevel,complib=self.complib, **kwargs)

@@ -79,6 +79,19 @@ def get_os_system():
     else:
         return 'other'
 
+def get_run_path_tdx(fp=None):
+    path = os.getcwd()
+    alist = path.split('stock')
+    if len(alist) > 0:
+        path = alist[0]
+        # os_sep=get_os_path_sep()
+        if fp is not None:
+            path = path  + fp + '.h5'
+    else:
+        print "error"
+        raise TypeError('log path error.')
+    return path
+
 win10Lengend = r'D:\Program\gfzq'
 win10Lixin = r'C:\zd_zszq'
 win7rootAsus = r'D:\Program Files\gfzq'
@@ -87,6 +100,8 @@ win7rootList = [win10Lixin, win7rootAsus, win7rootXunji, win10Lengend]
 macroot = r'/Users/Johnson/Documents/Johnson/WinTools/zd_pazq'
 xproot = r'E:\DOC\Parallels\WinTools\zd_pazq'
 mac_ramdisk_root = r'/Volumes/RamDisk'
+tdx_hd5_name = r'tdx_all_df_%s'%(300)
+tdx_hd5_path = get_run_path_tdx(tdx_hd5_name)
 win10_ramdisk_root = r'R:'
 ramdisk_rootList = [win10_ramdisk_root, mac_ramdisk_root]
 path_sep = os.path.sep
@@ -1355,19 +1370,6 @@ def write_to_blocknew(p_name, data, append=True):
         # print "write to other and start:%s :%s"%(p_name,len(data))
 
 
-def get_run_path():
-    path = os.getcwd()
-    alist = path.split('stock')
-    if len(alist) > 0:
-        path = alist[0]
-        # os_sep=get_os_path_sep()
-        path = path + 'stock' + get_os_path_sep()
-    else:
-        print "error"
-        raise TypeError('log path error.')
-    return path
-
-
 def getFibonacci(num, days=None):
     res = [0, 1]
     a = 0
@@ -1451,34 +1453,45 @@ def using_Grouper(df, freq='5T', col='low', closed='right', label='right'):
 
 
 def select_multiIndex_index(df, index='ticktime', start=None, end=None, datev=None):
-    if start is not None and len(start) < 10:
-        if datev is None:
-            start = get_today() + ' ' + start
-        else:
-            start = day8_to_day10(datev) + ' ' + start
-        if end is None:
-            end = start
-    else:
-        if end is None:
-            end = start
-    if end is not None and len(end) < 10:
-        if datev is None:
-            end = get_today() + ' ' + end
-            if start is None:
-                start = get_today(sep='-')+' '+'09:25:00'
-        else:
-            end = day8_to_day10(datev) + ' ' + end
-            if start is None:
-                start = day8_to_day10(datev)+' '+'09:25:00'
-    else:
-        if start is None:
-            if end is None:
-                start = get_today(sep='-')+' '+'09:25:00'
-                end = get_today(sep='-')+' '+'09:45:00'
-                log.error("start and end is None to 930 and 945")
+    if index <> 'date':
+        if start is not None and len(start) < 10:
+            if datev is None:
+                start = get_today() + ' ' + start
             else:
-                start = end
-    df = df[(df.index.get_level_values(index) >= start) & (df.index.get_level_values(index) <= end)]
+                start = day8_to_day10(datev) + ' ' + start
+            if end is None:
+                end = start
+        else:
+            if end is None:
+                end = start
+        if end is not None and len(end) < 10:
+            if datev is None:
+                end = get_today() + ' ' + end
+                if start is None:
+                    start = get_today(sep='-')+' '+'09:25:00'
+            else:
+                end = day8_to_day10(datev) + ' ' + end
+                if start is None:
+                    start = day8_to_day10(datev)+' '+'09:25:00'
+        else:
+            if start is None:
+                if end is None:
+                    start = get_today(sep='-')+' '+'09:25:00'
+                    end = get_today(sep='-')+' '+'09:45:00'
+                    log.error("start and end is None to 930 and 945")
+                else:
+                    start = end
+    else:
+        start = day8_to_day10(start)
+        end = day8_to_day10(end)
+    if start is None and end is not None:
+        df = df[(df.index.get_level_values(index) <= end)]
+    elif start is not None and end is None:
+        df = df[(df.index.get_level_values(index) >= start)]
+    elif start is not None and end is not None:
+        df = df[(df.index.get_level_values(index) >= start) & (df.index.get_level_values(index) <= end)]
+    else:
+        log.error("start end is None")
     return df
 
 def from_list_to_dict(col,func_dict):
@@ -1838,7 +1851,8 @@ if __name__ == '__main__':
     GlobalValues()
     GlobalValues().setkey('key', 'GlobalValuesvalue')
     print GlobalValues().getkey('key', defValue=None)
-    print get_run_path()
+    print get_run_path_tdx('aa')
+    print get_ramdisk_path(tdx_hd5_name)
     from docopt import docopt
     log = LoggerFactory.log
     args = docopt(sina_doc, version='sina_cxdn')
