@@ -74,6 +74,11 @@ def getBollFilter(df=None, boll=6, duration=ct.PowerCountdl, filter=True, ma5d=T
             # print "percT:%.2f"%(time.time()-time_ss)
     if 'fib' not in df.columns:
         df['fib'] = 0
+    else:
+        co2int = ['op' , 'fibl']
+        co2int.extend([co for co in df.columns.tolist() if co.startswith('perc') and co.endswith('d')])
+        for co in co2int:
+            df[co] = df[co].astype(int)
 
     if 'b1_v' in df.columns and 'nvol' in df.columns:
         df = df[(df.b1_v > 0) | (df.nvol > 0)]

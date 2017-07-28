@@ -156,7 +156,7 @@ class SafeHDFStore(HDFStore):
                     # return -1
                 else:
                     os.remove(self.temp_file)
-                    log.error("fname:%s h5_size:%sM Limit:%s t:%.1f" % (self.fname, h5_size, new_limit , time_pt - time.time()))
+                    # log.error("fname:%s h5_size:%sM Limit:%s t:%.1f" % (self.fname, h5_size, new_limit , time_pt - time.time()))
 
             os.remove(self._lock)
             gc.collect()
@@ -372,7 +372,8 @@ def write_hdf_db(fname, df, table='all', index=False, complib='blosc', baseCount
                 dratio = cct.get_diff_dratio(multi_code, df_multi_code)
                 if dratio < ct.dratio_limit:
                     comm_code = list(set(df_multi_code) & set(multi_code))
-                    inx_key=comm_code[random.randint(0, len(comm_code))]
+                    # print df_multi_code,multi_code,comm_code,len(comm_code)
+                    inx_key=comm_code[random.randint(0, len(comm_code)-1)]
                     if  inx_key in df.index.get_level_values('code'):
                         now_time=df.loc[inx_key].index[-1]
                         tmp_time=tmpdf.loc[inx_key].index[-1]
