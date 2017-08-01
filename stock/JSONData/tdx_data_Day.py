@@ -173,9 +173,10 @@ def get_tdx_Exp_day_to_df(code, start=None, end=None, dl=None, newdays=None, typ
     # if h5 is not None and not h5.empty:
     #     return h5
 
-    dd = cct.GlobalValues().getkey(cct.tdx_hd5_name)
+    # dd = cct.GlobalValues().getkey(cct.tdx_hd5_name)
+    dd = None
     if dd is not None:
-        log.info("tdx_multi_data:",len(dd.index.get_level_values(0)))
+        log.info("tdx_multi_data:%s"%(len(dd.index.get_level_values(0))))
         # df = dd.loc[dd.index.isin([code], level='code')]
         df = dd.loc[code]
     else:
@@ -1263,15 +1264,21 @@ def write_tdx_sina_data_to_file(code, dm=None, df=None, dl=2, type='f'):
 
 def Write_tdx_all_to_hdf(market, h5_fname='tdx_all_df', h5_table='all', dl=300,index=False):
     time_a = time.time()
-    h5_fname = h5_fname + '_' + str(dl)
-    h5_table = h5_table + '_' + str(dl)
+    if not h5_fname.endswith(str(dl)):
+        h5_fname = h5_fname + '_' + str(dl)
+        h5_table = h5_table + '_' + str(dl)
+    else:
+        log.error("start write index tdx data:%s"%(tdx_index_code_list))
     if market == 'all':
         index_key = tdx_index_code_list
         Write_tdx_all_to_hdf(index_key,h5_fname=h5_fname, h5_table=h5_table, dl=dl,index=True)
         index = False
         market = ['cyb', 'sh', 'sz']
     if not isinstance(market, list):
-            mlist = [market]
+        mlist = [market]
+    else:
+        mlist = market
+
     if index:
         mlist=['inx']
     status = False
@@ -1299,7 +1306,8 @@ def Write_tdx_all_to_hdf(market, h5_fname='tdx_all_df', h5_table='all', dl=300,i
                 df.index = map(lambda x: x.replace('\n', ''), df.index)
                 df.index = df.index.astype(str)
                 df.index.name = 'date'
-                df.code = df.code.astype(str)
+                if 'code' in df.columns:
+                    df.code = df.code.astype(str)
 
                 '''sina_data MutiIndex
                 df.index = df.index.astype(str)
@@ -1357,7 +1365,10 @@ def Write_tdx_all_to_hdf(market, h5_fname='tdx_all_df', h5_table='all', dl=300,i
         concat_t = time.time() - time_s
         print("dd.concat all :%s  time:%0.2f" % (len(dfcode), concat_t))
         status = h5a.write_hdf_db(h5_fname, dd, table=h5_table, index=False, baseCount=500, append=False, MultiIndex=True)
-        print("hdf5 write all :%s  atime:%0.2f wtime:%0.2f" % (len(dfcode), time.time() - time_a, time.time() - time_s - concat_t))
+        if status:
+            print("hdf5 write all ok:%s  atime:%0.2f wtime:%0.2f" % (len(dfcode), time.time() - time_a, time.time() - time_s - concat_t))
+        else:
+            print("hdf5 write false:%s  atime:%0.2f wtime:%0.2f" % (len(dfcode), time.time() - time_a, time.time() - time_s - concat_t))
 
     return status
 
@@ -1498,6 +1509,9 @@ def Write_market_all_day_mp(market='all', rewrite=False):
         # print df.loc['600581']
         df = df[(df.b1 > 0) | (df.a1 > 0)]
         print("market:%s A:%s" % (mk, len(df))),
+        if df is  None or len(df) < 10:
+            print "df is none"
+            break
         code_list = df.index.tolist()
         dm = get_sina_data_df(code_list)
         log.info('code_list:%s df:%s' % (len(code_list), len(df)))
@@ -3110,14 +3124,11 @@ if __name__ == '__main__':
     start=None
     time_s = time.time()
     df = search_Tdx_multi_data_duration('tdx_all_df_300', 'all_300', df=None,code_l=code_list, start=start, end=None, freq=None, col=None, index='date')
-    print "t1:%0.2f"%(time.time()-time_s),df.loc['399005'][:2]
-    if df is not None:
-        print "2:",df[-3:]
+    if df is not None:print "t1:%0.2f %s"%(time.time()-time_s,df.loc['399005'][:2])
     time_s = time.time()
     df = search_Tdx_multi_data_duration('tdx_all_df_300', 'all_300', code_l=code_list, start=start, end=None, freq=None, col=None, index='date')
     print "t1:%0.2f"%(time.time()-time_s)
-    if df is not None:
-        print "1:",df[-3:]
+    if df is not None:print "1:",df[-3:]
         # print df[df.index.get_level_values('code')]
     # testnumba(1000)
     # n = 100
@@ -3168,6 +3179,10 @@ if __name__ == '__main__':
     # hdf5_wri='y'
     if hdf5_wri == 'y':
         Write_tdx_all_to_hdf('all', h5_fname='tdx_all_df', h5_table='all', dl=300)
+    
+    # hdf5_wri = cct.cct_raw_input("write all index tdx data to hdf[y|n]:")
+    # if hdf5_wri == 'y':
+        # Write_tdx_all_to_hdf(tdx_index_code_list, h5_fname='tdx_all_df', h5_table='all', dl=300,index=True)
         # Write_tdx_all_to_hdf(market='all')
         # Write_sina_to_tdx(market='all')
 

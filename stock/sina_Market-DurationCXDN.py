@@ -149,7 +149,7 @@ if __name__ == "__main__":
             # top_now = tdd.getSinaAlldf(market=u'一带一路',filename='ydyl', vol=ct.json_countVol, vtype=ct.json_countType)
             # top_now = tdd.getSinaAlldf(market='次新股',filename='cxg', vol=ct.json_countVol, vtype=ct.json_countType)
             time_Rt = time.time()
-            top_now = tdd.getSinaAlldf(market='网络安全+雄安新区', filename='wlaq', vol=ct.json_countVol, vtype=ct.json_countType)
+            top_now = tdd.getSinaAlldf(market='雄安新区', filename='xaxq', vol=ct.json_countVol, vtype=ct.json_countType)
 #            top_now = tdd.getSinaAlldf(market=u'京津冀', filename='beijing', vol=ct.json_countVol, vtype=ct.json_countType)
             # top_now = tdd.getSinaAlldf(market='sh', vol=ct.json_countVol, vtype=ct.json_countType)
 

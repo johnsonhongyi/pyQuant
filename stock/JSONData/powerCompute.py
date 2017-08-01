@@ -221,6 +221,7 @@ def Candlestick(ax, bars=None, quotes=None, width=0.5, colorup='k', colordown='r
 
 
 def twoLineCompute(code, df=None, start=None, end=None, ptype='low'):
+
     # ptype='low'
     # ptype='high'
     if df is None:

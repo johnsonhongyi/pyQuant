@@ -556,6 +556,9 @@ def get_delay_time():
 
 def cct_raw_input(sts):
     # print sts
+    if GlobalValues().getkey('Except_count') is None:
+        GlobalValues().setkey('Except_count',0)
+    st = None
     try:
         st = raw_input(sts)
     except (KeyboardInterrupt) as e:
@@ -563,12 +566,18 @@ def cct_raw_input(sts):
 #        if inputerr == 'e' or inputerr == 'q':
 #            return 'e'
         # raise Exception('raw interrupt')
-        if len(inputerr) > 0:
+        if inputerr is not None and len(inputerr) > 0:
             return inputerr
         else:
             return ''
     except (IOError, EOFError, Exception) as e:
-        print "cct_raw_input:ExceptionError", e
+        count_Except = GlobalValues().getkey('Except_count')
+        if count_Except is not None and count_Except < 4:
+            GlobalValues().setkey('Except_count',count_Except+1)
+            print "cct_raw_input:ExceptionError:%s count:%s" %(e,count_Except)
+        else:
+            print "cct_ExceptionError:%s count:%s" %(e,count_Except)
+            sys.exit(0)
     return st
 
 # eval_rule = "[elem for elem in dir() if not elem.startswith('_') and not elem.startswith('ti')]"
@@ -1244,7 +1253,8 @@ def get_config_value(fname, classtype, xvalue, newvalue, xtype='limit', write=Fa
 def write_to_blocknew(p_name, data, append=True):
     # index_list = ['1999999','47#IFL0',  '0399006', '27#HSI']
     # index_list = ['1999999','47#IFL0', '27#HSI',  '0399006']
-    index_list = ['1999999', '47#IFL0', '27#HSI',  '0159915']
+    # index_list = ['1999999', '47#IFL0', '27#HSI',  '0159915']
+    index_list = ['1999999', '27#HSI',  '0159915']
 
     def writeBlocknew(p_name, data, append=True):
         if append:

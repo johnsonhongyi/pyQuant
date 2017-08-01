@@ -766,12 +766,15 @@ def get_market_price_sina_dd_realTime(dp='',vol='0',type='0'):
 if __name__ == '__main__':
     import sys
     # log.setLevel(LoggerFactory.DEBUG)
-    # df = get_sina_all_json_dd('0', '3')
+    # print ct.json_countType,ct.json_countVol
+    # df = get_sina_all_json_dd(ct.json_countType, ct.json_countVol)
+    # df = get_sina_all_json_dd('0', '1')
+    # print df.couts.sum()
     # df = get_market_price_sina_dd_realTime(dp='', vol='1', type='0')
     # print df
     # df = get_sina_all_json_dd(1,0,num=10000)
     df = get_sina_Market_json(market='all', showtime=True, num='100', retry_count=3, pause=0.001)
-    print df.shape,df.loc['600306']
+    # print df.shape,df.loc['600306']
     for mk in ['sh','sz','cyb']:
         df=get_sina_Market_json(mk,num=100)
         # print df.loc['600581']
@@ -782,7 +785,7 @@ if __name__ == '__main__':
     print "len:%s,time:%0.2f"%(len(df),time.time()-s_t)
     print df[:1]
     # _get_sina_json_dd_url()
-    # print sina_json_Big_Count()
+    print "Big_Count:",sina_json_Big_Count()
     # print getconfigBigCount(write=True)
     sys.exit(0)
     # post_login()

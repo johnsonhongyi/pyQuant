@@ -88,6 +88,14 @@ def select_multiIndex_index(df, index='ticktime', start=None, end=None, datev=No
     df = df[(df.index.get_level_values('ticktime') >= start) & (df.index.get_level_values('ticktime') <= end)]
     return df
 
+import numpy as np
+def maxdrawdown(arr):
+    i = np.argmax((np.maximum.accumulate(arr) - arr)/np.maximum.accumulate(arr)) # end of the period
+    j = np.argmax(arr[:i]) # start of period
+    return (1-arr[i]/arr[j])
+
+# pd.expanding_max(df.close,min_periods=10)
+# pd.expanding_min(df.close,min_periods=10)
 
 # def select_multiIndex_index(df, index='ticktime', start=None, end=None,datev=None):
 #     if start is not None and len(start) < 10:
