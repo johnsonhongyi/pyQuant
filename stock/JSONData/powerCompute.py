@@ -221,7 +221,22 @@ def Candlestick(ax, bars=None, quotes=None, width=0.5, colorup='k', colordown='r
 
 
 def twoLineCompute(code, df=None, start=None, end=None, ptype='low'):
-
+    """[summary]
+    
+    [find low list and high list]
+    
+    Arguments:
+        code {[type]} -- [description]
+    
+    Keyword Arguments:
+        df {[type]} -- [description] (default: {None})
+        start {[type]} -- [description] (default: {None})
+        end {[type]} -- [description] (default: {None})
+        ptype {str} -- [description] (default: {'low'})
+    
+    Returns:
+        [list] -- [description]
+    """
     # ptype='low'
     # ptype='high'
     if df is None:
@@ -236,6 +251,17 @@ def twoLineCompute(code, df=None, start=None, end=None, ptype='low'):
     # pd.rolling_min(df.low,window=len(series)/8).unique()
 
     def get_Top(df, ptype):
+        """[summary]
+        
+        [description]
+        
+        Arguments:
+            df {[type]} -- [description]
+            ptype {[type]} -- [ohlc]
+        
+        Returns:
+            [list] -- [description]
+        """
         if len(df) < 30:
             period_type = 'd'
         elif len(df) > 30 and len(df) < 120:
@@ -295,6 +321,23 @@ def twoLineCompute(code, df=None, start=None, end=None, ptype='low'):
 
 
 def get_linear_model_status_LSH(code, ptype='low', dtype='d', type='l', start=None, end=None):
+    """[summary]
+    
+    [description]
+    
+    Arguments:
+        code {[type]} -- [description]
+    
+    Keyword Arguments:
+        ptype {str} -- [description] (default: {'low'})
+        dtype {str} -- [description] (default: {'d'})
+        type {str} -- [description] (default: {'l'})
+        start {[type]} -- [description] (default: {None})
+        end {[type]} -- [description] (default: {None})
+    
+    Returns:
+        bool -- [description]
+    """
     # df = tdd.get_tdx_append_now_df(code, ptype, start, end).sort_index(ascending=True)
     df = tdd.get_tdx_append_now_df_api(
         code, start, end).sort_index(ascending=True)

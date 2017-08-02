@@ -152,20 +152,28 @@ def write_all_kdata_to_file(code, f_path, df=None):
 
 
 def get_tdx_Exp_day_to_df(code, start=None, end=None, dl=None, newdays=None, type='f', wds=True, lastdays=3, resample='d', MultiIndex=False):
-    """[get local tdx data]
+    """[summary]
+    
     [description]
+    
     Arguments:
-        code {[str]} -- [999999]
+        code {[type]} -- [description]
+    
     Keyword Arguments:
-        start {date} -- [description] (default: {None})
-        end {date} -- [description] (default: {None})
-        dl {int} -- [description] (default: {None})
-        newdays {int} -- [description] (default: {None})
+        start {[type]} -- [description] (default: {None})
+        end {[type]} -- [description] (default: {None})
+        dl {[type]} -- [description] (default: {None})
+        newdays {[type]} -- [description] (default: {None})
         type {str} -- [description] (default: {'f'})
-
+        wds {bool} -- [description] (default: {True})
+        lastdays {number} -- [description] (default: {3})
+        resample {str} -- [description] (default: {'d'})
+        MultiIndex {bool} -- [description] (default: {False})
+    
     Returns:
-        [type] -- [dateframe or series]
+        [type] -- [description]
     """
+
 
     # h5_fname = 'tdx_day'
     # h5_table = 'day'+'_'+'dl'
@@ -1263,6 +1271,22 @@ def write_tdx_sina_data_to_file(code, dm=None, df=None, dl=2, type='f'):
 
 
 def Write_tdx_all_to_hdf(market, h5_fname='tdx_all_df', h5_table='all', dl=300,index=False):
+    """[summary]
+    
+    [Write all code tdx to h5]
+    
+    Arguments:
+        market {[type]} -- ['cyb','sz','sh']
+    
+    Keyword Arguments:
+        h5_fname {str} -- [description] (default: {'tdx_all_df'})
+        h5_table {str} -- [description] (default: {'all'})
+        dl {number} -- [description] (default: {300})
+        index {bool} -- [description] (default: {False})
+    
+    Returns:
+        [boll] -- [write status]
+    """
     time_a = time.time()
     if not h5_fname.endswith(str(dl)):
         h5_fname = h5_fname + '_' + str(dl)
@@ -1373,6 +1397,20 @@ def Write_tdx_all_to_hdf(market, h5_fname='tdx_all_df', h5_table='all', dl=300,i
     return status
 
 def Write_sina_to_tdx(market='all', h5_fname='tdx_all_df', h5_table='all', dl=300,index=False):
+    """[summary]
+    
+    [description]
+    
+    Keyword Arguments:
+        market {str} -- [description] (default: {'all'})
+        h5_fname {str} -- [description] (default: {'tdx_all_df'})
+        h5_table {str} -- [description] (default: {'all'})
+        dl {number} -- [description] (default: {300})
+        index {bool} -- [description] (default: {False})
+    
+    Returns:
+        [type] -- [description]
+    """
     h5_fname = h5_fname + '_' + str(dl)
     h5_table = h5_table + '_' + str(dl)
     status = False
@@ -1865,6 +1903,20 @@ def get_tdx_day_to_df(code):
 
 
 def get_duration_Index_date(code='999999', dt=None, ptype='low', dl=None, power=False):
+    """[summary]
+    
+    [description]
+    
+    Keyword Arguments:
+        code {str} -- [description] (default: {'999999'})
+        dt {[type]} -- [description] (default: {None})
+        ptype {str} -- [description] (default: {'low'})
+        dl {[type]} -- [description] (default: {None})
+        power {bool} -- [description] (default: {False})
+    
+    Returns:
+        [type] -- [description]
+    """
     if dt is not None:
         if len(str(dt)) < 8:
             dl = int(dt) + changedays

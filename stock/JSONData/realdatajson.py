@@ -293,6 +293,24 @@ def getconfigBigCount(count=None,write=False):
     return cl
 
 def sina_json_Big_Count(vol='1', type='0', num='10000'):
+    """[summary]
+    
+    [description]
+    
+    Parameters
+    ----------
+    vol : {str}, optional
+        [description] (the default is '1', which [default_description])
+    type : {str}, optional
+        [description] (the default is '0', which [default_description])
+    num : {str}, optional
+        [description] (the default is '10000', which [default_description])
+    
+    Returns
+    -------
+    [type]
+        [description]
+    """
     url = ct.JSON_DD_CountURL % (ct.DD_VOL_List[vol], type)
     log.info("Big_Count_url:%s"%url)
     data = cct.get_url_data(url)

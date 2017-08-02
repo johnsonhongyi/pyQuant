@@ -56,7 +56,16 @@ class StockCode:
     # @property
 
     def get_stock_codes(self, realtime=False):
-        """获取所有股票 ID 到 all_stock_code 目录下"""
+        """[summary]
+        
+        [获取所有股票 ID 到 all_stock_code 目录下]
+        
+        Keyword Arguments:
+            realtime {bool} -- [description] (default: {False})
+        
+        Returns:
+            [type] -- [description]
+        """
         # print "days:",cct.creation_date_duration(self.stock_code_path)
         if realtime:
             # all_stock_codes_url = 'http://www.shdjt.com/js/lib/astock.js'
@@ -599,12 +608,14 @@ class Sina:
             if cct.get_work_time() and cct.get_now_time_int() <= 1000:
                 run_col = ['low', 'high', 'close']
                 startime = None
-                endtime = '10:00:00'
+                # endtime = '10:00:00'
+                endtime = '09:40:00'
                 dd = get_col_agg_df(h5, dd, run_col, all_func, startime, endtime)
             else:
                 run_col = ['low', 'high']
                 startime = None
-                endtime = '10:00:00'
+                # endtime = '10:00:00'
+                endtime = '09:40:00'
                 dd = get_col_agg_df(h5, dd, run_col, all_func, startime, endtime)
                 startime = '09:30:00'
                 endtime = '15:01:00'

@@ -234,7 +234,28 @@ def write_hdf(f, key, df, complib):
 
 
 def get_hdf5_file(fpath, wr_mode='r', complevel=9, complib='blosc', mutiindx=False):
-    '''old outdata'''
+    """[summary]
+    
+    [old api out date]
+    
+    Parameters
+    ----------
+    fpath : {[type]}
+        [description]
+    wr_mode : {str}, optional
+        [description] (the default is 'r', which [default_description])
+    complevel : {number}, optional
+        [description] (the default is 9, which [default_description])
+    complib : {str}, optional
+        [description] (the default is 'blosc', which [default_description])
+    mutiindx : {bool}, optional
+        [description] (the default is False, which [default_description])
+    
+    Returns
+    -------
+    [type]
+        [description]
+    """
     # store=pd.HDFStore(fpath,wr_mode, complevel=complevel, complib=complib)
     fpath=cct.get_ramdisk_path(fpath)
     if fpath is None:
@@ -281,6 +302,34 @@ def get_hdf5_file(fpath, wr_mode='r', complevel=9, complib='blosc', mutiindx=Fal
 
 
 def write_hdf_db(fname, df, table='all', index=False, complib='blosc', baseCount=500, append=True, MultiIndex=False):
+    """[summary]
+    
+    [description]
+    
+    Parameters
+    ----------
+    fname : {[type]}
+        [description]
+    df : {[type]}
+        [description]
+    table : {str}, optional
+        [description] (the default is 'all', which [default_description])
+    index : {bool}, optional
+        [description] (the default is False, which [default_description])
+    complib : {str}, optional
+        [description] (the default is 'blosc', which [default_description])
+    baseCount : {number}, optional
+        [description] (the default is 500, which [default_description])
+    append : {bool}, optional
+        [description] (the default is True, which [default_description])
+    MultiIndex : {bool}, optional
+        [description] (the default is False, which [default_description])
+    
+    Returns
+    -------
+    [type]
+        [description]
+    """
     if 'code' in df.columns:
         df=df.set_index('code')
 #    write_status = False
@@ -475,6 +524,34 @@ def write_hdf_db(fname, df, table='all', index=False, complib='blosc', baseCount
 
 
 def load_hdf_db(fname, table='all', code_l=None, timelimit=True, index=False, limit_time=ct.h5_limit_time, dratio_limit=ct.dratio_limit,MultiIndex=False):
+    """[summary]
+    
+    [load hdf ]
+    
+    Parameters
+    ----------
+    fname : {[type]}
+        [description]
+    table : {str}, optional
+        [description] (the default is 'all', which [default_description])
+    code_l : {[type]}, optional
+        [description] (the default is None, which [default_description])
+    timelimit : {bool}, optional
+        [description] (the default is True, which [default_description])
+    index : {bool}, optional
+        [description] (the default is False, which [default_description])
+    limit_time : {[type]}, optional
+        [description] (the default is ct.h5_limit_time, which [default_description])
+    dratio_limit : {[type]}, optional
+        [description] (the default is ct.dratio_limit, which [default_description])
+    MultiIndex : {bool}, optional
+        [description] (the default is False, which [default_description])
+    
+    Returns
+    -------
+    [dataframe]
+        [description]
+    """
     time_t=time.time()
     global RAMDISK_KEY, INIT_LOG_Error
     if not RAMDISK_KEY < 1:
