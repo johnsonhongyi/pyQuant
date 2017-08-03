@@ -200,15 +200,15 @@ scriptname = '''tell application "Terminal"
 end tell
 '''
 
-terminal_positionKey = {'sina_Market-DurationDn.py': '217, 520',
-                        'sina_Market-DurationCXDN.py': '8, 52',
-                        'sina_Market-DurationSH.py': '-23, 539',
-                        'sina_Market-DurationUP.py': '-19, 111',
+terminal_positionKey = {'sina_Market-DurationDn.py': '216, 490',
+                        'sina_Market-DurationCXDN.py': '-16, 54',
+                        'sina_Market-DurationSH.py': '-28, 563',
+                        'sina_Market-DurationUP.py': '-22, 89',
                         'sina_Monitor-Market-LH.py': '184, 239',
                         'sina_Monitor-Market.py': '19, 179',
-                        'sina_Monitor.py': '39, 22',
-                        'singleAnalyseUtil.py': '652, 22',
-                        'LinePower.py': '40, 497', }
+                        'sina_Monitor.py': '28, 23',
+                        'singleAnalyseUtil.py': '651, 23',
+                        'LinePower.py': '38, 365', }
 
 script_set_position = '''tell application "Terminal"
     --activate
@@ -219,9 +219,22 @@ end tell
 closeterminalw = '''osascript -e 'tell application "Terminal" to close windows %s' '''
 
 scriptquit = '''tell application "Python Launcher" to quit'''
+clean_terminal = ["Python Launcher",'Johnson — -bash']
 
 
 def get_terminal_Position(cmd=None, position=None, close=False):
+    """[summary]
+    
+    [description]
+    
+    Keyword Arguments:
+        cmd {[type]} -- [description] (default: {None})
+        position {[type]} -- [description] (default: {None})
+        close {bool} -- [description] (default: {False})
+    
+    Returns:
+        [type] -- [description]
+    """
     win_count = 0
     if get_os_system() == 'mac':
         import subprocess
@@ -244,9 +257,8 @@ def get_terminal_Position(cmd=None, position=None, close=False):
                 log.info("count:%s" % (count))
                 for n in xrange(1, int(count) + 1):
                     title = cct_doScript(scriptname % ('get', str(object=n)))
-                    log.info("count n:%s title:%s" % (n, title))
-                    if close:
-                        log.info("close:%s" % (title))
+                    # log.info("count n:%s title:%s" % (n, title))
+
                     if title.lower().find(cmd.lower()) >= 0:
                         log.info("WinFind:%s get_title:%s " % (n, title))
                         win_count += 1
@@ -255,6 +267,11 @@ def get_terminal_Position(cmd=None, position=None, close=False):
                         if close:
                             log.info("close:%s %s" % (n, cmd))
                             os.system(closeterminalw % (n))
+                            break
+                    else:
+                        if close:
+                            log.info("Title notFind:%s title:%s find:%s" % (n, title,cmd.lower()))
+
         else:
             # sleep(1, catch=True)
             position = position.split(os.sep)[-1]
@@ -264,17 +281,20 @@ def get_terminal_Position(cmd=None, position=None, close=False):
                     log.info("count:%s" % (count))
                     for n in xrange(1, int(count) + 1):
                         title = cct_doScript(scriptname % ('get', str(object=n)))
-                        if title.lower().find(position.lower()) > 0:
-                            log.info("title:%s po:%s" % (title, terminal_positionKey[position]))
+                        if title.lower().find(position.lower()) >= 0:
+                            log.info("title find:%s po:%s" % (title, terminal_positionKey[position]))
                             position = cct_doScript(script_set_position % ('set', str(n), terminal_positionKey[position]))
+                            break
+                        else:
+                            log.info("title not find:%s po:%s" % (title, position))
                 else:
                     log.info("Keys not position:%s" % (position))
     return win_count
 
-
 get_terminal_Position(cmd=scriptquit, position=None, close=False)
-get_terminal_Position('Johnson — bash', close=True)
+# get_terminal_Position('Johnson —', close=True)
 log.info("close Python Launcher")
+
 
 from numba.decorators import autojit
 
@@ -541,7 +561,7 @@ def set_console(width=80, height=15, color=3, title=None):
     # printf "\033]0;My Window title\007”
     # os.system('color %s'%color)
     # set_ctrl_handler()
-
+    # get_terminal_Position('Johnson —', close=True)
 
 def timeit_time(cmd, num=5):
     import timeit
@@ -634,7 +654,16 @@ def sleep(timet, catch=True):
         if catch:
             raise KeyboardInterrupt("Sleep Time")
         else:
-            pass
+            print ("KeyboardInterrupt Sleep Time")
+
+    except (IOError, EOFError, Exception) as e:
+            count_Except = GlobalValues().getkey('Except_count')
+            if count_Except is not None and count_Except < 4:
+                GlobalValues().setkey('Except_count',count_Except+1)
+                print "cct_raw_input:ExceptionError:%s count:%s" %(e,count_Except)
+            else:
+                print "cct_ExceptionError:%s count:%s" %(e,count_Except)
+                sys.exit(0)    
         # raise Exception("code is None")
     # print time.time()-times
 
@@ -932,6 +961,7 @@ def get_url_data_R(url, timeout=10):
         data = ''
         log.error('socket timed out - URL %s', url)
     except Exception as e:
+        data = ''
         log.error('Exception - URL %s', url)
     else:
         log.info('Access successful.')
@@ -1876,8 +1906,13 @@ if __name__ == '__main__':
     else:
         log_level = LoggerFactory.ERROR
     # log_level = LoggerFactory.DEBUG if args['-d']  else LoggerFactory.ERROR
+    log_level = LoggerFactory.DEBUG
     log.setLevel(log_level)
 
+    # get_terminal_Position(cmd=scriptquit, position=None, close=False)
+    get_terminal_Position('Johnson —', close=True)
+    # get_terminal_Position('Johnson — bash', close=True)
+    log.info("close Python Launcher")
     s_time = time.time()
     print "last:", last_tddate(2)
     print get_work_day_status()

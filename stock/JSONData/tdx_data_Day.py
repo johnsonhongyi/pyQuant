@@ -1461,7 +1461,7 @@ def Write_sina_to_tdx(market='all', h5_fname='tdx_all_df', h5_table='all', dl=30
             df = df.set_index(['code', 'date'])
             df = df.astype(float)
             status = h5a.write_hdf_db(h5_fname, df, table=h5_table, index=False, baseCount=500, append=False, MultiIndex=True)
-            if status:
+            if status is not None and status:
                 print "Tdx writime:%0.2f" % (time.time() - time_t)
             else:
                 print "Tdx no writime:%0.2f" % (time.time() - time_t)

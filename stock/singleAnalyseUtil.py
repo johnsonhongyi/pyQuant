@@ -501,6 +501,7 @@ if __name__ == '__main__':
         status = False
         num_input = ''
 
+    status = False
     code = ''
     ave = None
     days = '10'
@@ -634,6 +635,7 @@ if __name__ == '__main__':
                 evalcmd(dir_mo)
             elif st.startswith('q') or st.startswith('e'):
                 print "exit:%s" % (st)
+                sys.exit(0)
             else:
                 print "input error:%s" % (st)
                 # cct.sleep(0.5)

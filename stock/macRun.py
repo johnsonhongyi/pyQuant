@@ -208,8 +208,8 @@ def setPosition(cmd=None, position=None):
             title = doScript(scriptname % ('get', str(object=n)))
             for key in positionKey:
                 # print "key:%s"%(key)
-                if title.lower().find(key.lower()) > 0:
-                    # print title, positionKey[key]
+                if title.lower().find(key.lower()) >= 0:
+                    print "find:",title,key, positionKey[key]
                     position = doScript(
                         script_set_position % ('set', str(n), positionKey[key]))
                     # print doScript(script_get_position % ('get', str(n)))
@@ -240,7 +240,7 @@ if int(count) > 3:
     print getPosition('singleAnalyseUtil.py')
     print getPosition('sina_Market-DurationDn.py')
     print getPosition('sina_Monitor-Market-LH.py')
-    print getPosition('sina_Market-DurationUP.py')
+    print "'sina_Market-DurationUP.py'",getPosition('sina_Market-DurationUP.py')
     print getPosition('sina_Market-DurationSH.py')
     print getPosition('sina_Market-DurationCXDN.py')
     print getPosition('sina_Market-DurationCXUP.py')
@@ -254,6 +254,7 @@ if int(count) > 3:
 setPosition(cmd=None, position=None)
 
 getPosition('Johnson — bash',close=True)
+getPosition('Johnson —',close=True)
 # getPosition('Johnson — python',close=True)
 getPosition('Johnson — osasc',close=True)
 
