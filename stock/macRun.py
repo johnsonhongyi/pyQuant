@@ -253,10 +253,11 @@ if int(count) > 3:
     
 setPosition(cmd=None, position=None)
 
-getPosition('Johnson — bash',close=True)
-getPosition('Johnson —',close=True)
+getPosition(cct.clean_terminal[1],close=True)
+# getPosition('Johnson —',close=True)
+# getPosition('Johnson —',close=True)
 # getPosition('Johnson — python',close=True)
-getPosition('Johnson — osasc',close=True)
+# getPosition('Johnson — osasc',close=True)
 
 '''
 

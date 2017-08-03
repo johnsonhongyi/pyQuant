@@ -38,7 +38,7 @@ requests.adapters.DEFAULT_RETRIES = 0
 # from JSONData import tdx_data_Day as tdd
 global initGlobalValue
 initGlobalValue = 0
-
+clean_terminal = ["Python Launcher",'Johnson — -bash']
 
 class GlobalValues:
     # -*- coding: utf-8 -*-
@@ -219,7 +219,7 @@ end tell
 closeterminalw = '''osascript -e 'tell application "Terminal" to close windows %s' '''
 
 scriptquit = '''tell application "Python Launcher" to quit'''
-clean_terminal = ["Python Launcher",'Johnson — -bash']
+
 
 
 def get_terminal_Position(cmd=None, position=None, close=False):
@@ -292,7 +292,7 @@ def get_terminal_Position(cmd=None, position=None, close=False):
     return win_count
 
 get_terminal_Position(cmd=scriptquit, position=None, close=False)
-# get_terminal_Position('Johnson —', close=True)
+# get_terminal_Position('Johnson — -bash', close=True)
 log.info("close Python Launcher")
 
 
@@ -561,7 +561,7 @@ def set_console(width=80, height=15, color=3, title=None):
     # printf "\033]0;My Window title\007”
     # os.system('color %s'%color)
     # set_ctrl_handler()
-    # get_terminal_Position('Johnson —', close=True)
+    get_terminal_Position(clean_terminal[1], close=True)
 
 def timeit_time(cmd, num=5):
     import timeit
@@ -1910,15 +1910,15 @@ if __name__ == '__main__':
     log.setLevel(log_level)
 
     # get_terminal_Position(cmd=scriptquit, position=None, close=False)
-    get_terminal_Position('Johnson —', close=True)
-    # get_terminal_Position('Johnson — bash', close=True)
+    # get_terminal_Position('Johnson —', close=True)
+    get_terminal_Position(clean_terminal[1], close=True)
     log.info("close Python Launcher")
     s_time = time.time()
     print "last:", last_tddate(2)
     print get_work_day_status()
     print get_terminal_Position(cmd='DurationDN.py', position=None, close=False)
     print get_terminal_Position(cmd='Johnson@', position=None, close=False)
-    print get_terminal_Position(cmd='Johnson — bash', position=None, close=False)
+    print get_terminal_Position(cmd=clean_terminal[1], position=None, close=False)
     print "t:%0.2f" % (time.time() - s_time)
     print get_ramdisk_path('a', lock=False)
     # print get_work_time_ratio()
