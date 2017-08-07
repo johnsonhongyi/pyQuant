@@ -34,7 +34,7 @@ def getBollFilter(df=None, boll=6, duration=ct.PowerCountdl, filter=True, ma5d=T
         # drop_cxg = list(set(drop_cxg))
         # drop_t = [ co for co in drop_cxg if co in df.index]
         # if len(drop_t) > 0:
-            # df = df.drop(drop_t,axis=0)
+            # df = df.drop(drop_t,axis=0)top
             # log.error("stf drop_cxg:%s"%(len(drop_t)))
     if df is None:
         print "dataframe is None"
@@ -99,7 +99,10 @@ def getBollFilter(df=None, boll=6, duration=ct.PowerCountdl, filter=True, ma5d=T
     # df['df2'] = (map(func_compute_df2, df.close.values, df.llastp.values,df.high.values, df.low.values))
 
     if 'ma5d' in df.columns:
-        df = df[df.buy > df.ma5d * ct.changeRatio]
+        if 'ma20d' in df.columns:
+            df = df[ df.buy > df.ma20d ]
+        else:
+            df = df[df.buy > df.ma5d * ct.changeRatio]
 
     # if 'nlow' in df.columns and 932 < cct.get_now_time_int() < 1030:
     if 'nlow' in df.columns and 932 < cct.get_now_time_int():

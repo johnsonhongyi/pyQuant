@@ -1,6 +1,5 @@
 # -*- coding:utf-8 -*-
 # !/usr/bin/env python
-
 import gc
 import random
 import re
@@ -9,14 +8,13 @@ import time
 
 import pandas as pd
 import JohhnsonUtil.johnson_cons as ct
-import singleAnalyseUtil as sl
 from JSONData import powerCompute as pct
 from JSONData import stockFilter as stf
 from JSONData import realdatajson as rl
 from JSONData import tdx_data_Day as tdd
 from JSONData import LineHistogram as lhg
-from JohhnsonUtil import LoggerFactory as LoggerFactory
 from JohhnsonUtil import commonTips as cct
+from JohhnsonUtil import LoggerFactory as LoggerFactory
 
 # from logbook import Logger,StreamHandler,SyslogHandler
 # from logbook import StderrHandler
@@ -69,6 +67,7 @@ if __name__ == "__main__":
     else:
         log_level = LoggerFactory.ERROR
     # log_level = LoggerFactory.DEBUG if args['-d']  else LoggerFactory.ERROR
+    # log_level = LoggerFactory.DEBUG
     log.setLevel(log_level)
 
     # log.setLevel(LoggerFactory.DEBUG)

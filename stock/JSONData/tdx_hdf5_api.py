@@ -9,6 +9,8 @@ import pandas as pd
 from pandas import HDFStore
 sys.path.append("..")
 from JohhnsonUtil import LoggerFactory
+# from JohhnsonUtil.commonTips import get_ramdisk_dir
+# print get_ramdisk_dir()
 from JohhnsonUtil import commonTips as cct
 from JohhnsonUtil import johnson_cons as ct
 import random

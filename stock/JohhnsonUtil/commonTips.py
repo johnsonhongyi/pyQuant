@@ -99,11 +99,12 @@ win7rootXunji = r'E:\DOC\Parallels\WinTools\zd_pazq'
 win7rootList = [win10Lixin, win7rootAsus, win7rootXunji, win10Lengend]
 macroot = r'/Users/Johnson/Documents/Johnson/WinTools/zd_pazq'
 xproot = r'E:\DOC\Parallels\WinTools\zd_pazq'
-mac_ramdisk_root = r'/Volumes/RamDisk'
 tdx_hd5_name = r'tdx_all_df_%s'%(300)
 tdx_hd5_path = get_run_path_tdx(tdx_hd5_name)
-win10_ramdisk_root = r'R:'
-ramdisk_rootList = [win10_ramdisk_root, mac_ramdisk_root]
+# win10_ramdisk_root = r'R:'
+# mac_ramdisk_root = r'/Volumes/RamDisk'
+# ramdisk_rootList = [win10_ramdisk_root, mac_ramdisk_root]
+ramdisk_rootList = LoggerFactory.ramdisk_rootList
 path_sep = os.path.sep
 
 
