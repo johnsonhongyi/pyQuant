@@ -100,7 +100,7 @@ def getBollFilter(df=None, boll=6, duration=ct.PowerCountdl, filter=True, ma5d=T
 
     if 'ma5d' in df.columns:
         if 'ma20d' in df.columns:
-            df = df[ df.buy > df.ma20d ]
+            df = df[ (df.buy > df.ma20d) & ( df.ma5d >= df.ma20d) ]
         else:
             df = df[df.buy > df.ma5d * ct.changeRatio]
 

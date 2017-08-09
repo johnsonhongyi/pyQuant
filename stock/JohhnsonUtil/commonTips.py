@@ -292,7 +292,7 @@ def get_terminal_Position(cmd=None, position=None, close=False):
                     log.info("Keys not position:%s" % (position))
     return win_count
 
-get_terminal_Position(cmd=scriptquit, position=None, close=False)
+# get_terminal_Position(cmd=scriptquit, position=None, close=False)
 # get_terminal_Position('Johnson — -bash', close=True)
 log.info("close Python Launcher")
 
@@ -562,6 +562,7 @@ def set_console(width=80, height=15, color=3, title=None):
     # printf "\033]0;My Window title\007”
     # os.system('color %s'%color)
     # set_ctrl_handler()
+    get_terminal_Position(cmd=scriptquit, position=None, close=False)
     get_terminal_Position(clean_terminal[1], close=True)
 
 def timeit_time(cmd, num=5):
