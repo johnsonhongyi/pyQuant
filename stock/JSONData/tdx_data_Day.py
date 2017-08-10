@@ -1725,9 +1725,10 @@ def getSinaAlldf(market='cyb', vol=ct.json_countVol, vtype=ct.json_countType, fi
 #        else:
 #            if 'buy' in df.columns:
 #                df = df[(df.buy > 0)]
-
-    codelist = df.index.astype(str).tolist()
-
+    if isinstance(df, pd.DataFrame):
+        codelist = df.index.astype(str).tolist()
+    else:
+        log.error("df isn't pd:%s"%(df))
 #    h5_table = market if not cct.check_chinese(market) else filename
 #    h5 = top_hdf_api(fname=h5_fname,table=h5_table,df=None)
     h5_fname = 'tdx_now'
@@ -1789,10 +1790,10 @@ def getSinaAlldf(market='cyb', vol=ct.json_countVol, vtype=ct.json_countType, fi
     dm['nvol'] = dm['volume']
     if cct.get_now_time_int() > 932 and market not in ['sh', 'sz', 'cyb']:
         dd = rl.get_sina_Market_json('all')
-#        dd = dd.set_index('code')
-        dd.drop([inx for inx in dd.index if inx not in dm.index],
-                axis=0, inplace=True)
-        df = dd
+        if isinstance(dd,pd.DataFrame):
+            dd.drop([inx for inx in dd.index if inx not in dm.index],
+                    axis=0, inplace=True)
+            df = dd
     if len(df) < 10 or len(dm) < 10:
         log.error("len(df):%s dm:%s" % (len(df), len(dm)))
         dm['ratio'] = 0

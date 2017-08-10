@@ -792,7 +792,7 @@ if __name__ == '__main__':
     # print df
     # df = get_sina_all_json_dd(1,0,num=10000)
     df = get_sina_Market_json(market='all', showtime=True, num='100', retry_count=3, pause=0.001)
-    # print df.shape,df.loc['600306']
+    print df
     for mk in ['sh','sz','cyb']:
         df=get_sina_Market_json(mk,num=100)
         # print df.loc['600581']

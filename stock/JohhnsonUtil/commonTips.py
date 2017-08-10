@@ -961,10 +961,12 @@ def get_url_data_R(url, timeout=10):
     except (socket.timeout, socket.error) as e:
         # print data.encoding
         data = ''
-        log.error('socket timed out - URL %s', url)
+        log.error('socket timed out error:%s - URL %s '%(e,url))
+        sleeprandom(60)
     except Exception as e:
         data = ''
-        log.error('Exception - URL %s', url)
+        log.error('url Exception Error:%s - URL %s '%(e,url))
+        sleeprandom(60)
     else:
         log.info('Access successful.')
     return data
