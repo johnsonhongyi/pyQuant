@@ -87,7 +87,7 @@ class StockCode:
 
 
 # -*- encoding: utf-8 -*-
-
+all_func = {'low': 'nlow', 'high': 'nhigh', 'close': 'nclose'}
 
 class Sina:
     """新浪免费行情获取"""
@@ -469,6 +469,23 @@ class Sina:
     #     df = tdd.get_tdx_all_day_LastDF(self.stock_codes)
         # print df
 
+    def get_col_agg_df(self,h5,dd,run_col,all_func,startime,endtime):
+        now_col = [ all_func[co] for co in run_col if co in all_func.keys()]
+        now_func = cct.from_list_to_dict(run_col,all_func)
+        if h5 is not None and len(h5) > len(dd):
+            time_n = time.time()
+            # h5 = cct.get_limit_multiIndex_Group(h5, freq=freq,end=endtime)
+            h5 = cct.get_limit_multiIndex_Row(h5,col=run_col,start=startime, end=endtime)
+            if h5 is not None and len(h5) > 0:
+                h5 = h5.reset_index().set_index('code')
+                h5.rename(columns=now_func, inplace=True)
+                # log.info("get_limit_multiIndex_Row:%s  endtime:%s" % (len(h5), endtime))
+                #h5 = h5.drop(['ticktime'], axis=1)
+                h5 = h5.loc[:, now_col]
+                dd = cct.combine_dataFrame(dd, h5, col=None, compare=None, append=False, clean=True)
+                log.info('agg_df_Row:%.2f h5:%s endtime:%s' % ((time.time() - time_n), len(h5),endtime))
+        return dd
+
     def format_response_data(self, index=False):
         stocks_detail = ''.join(self.stock_data)
         # print stocks_detail
@@ -585,43 +602,27 @@ class Sina:
 
         if 'nlow' not in df.columns or 'nhigh' not in df.columns or ( cct.get_work_time() and 931 < cct.get_now_time_int() < 1500):
         # if 'nlow' not in df.columns or 'nhigh' not in df.columns or cct.get_work_time():
-            all_func = {'low': 'nlow', 'high': 'nhigh', 'close': 'nclose'}
             h5 = h5a.load_hdf_db(h5_fname, h5_table, timelimit=False)
-            def get_col_agg_df(h5,dd,run_col,all_func,startime,endtime):
-                now_col = [ all_func[co] for co in run_col if co in all_func.keys()]
-                now_func = cct.from_list_to_dict(run_col,all_func)
-                if h5 is not None and len(h5) > len(df):
-                    time_n = time.time()
-                    # h5 = cct.get_limit_multiIndex_Group(h5, freq=freq,end=endtime)
-                    h5 = cct.get_limit_multiIndex_Row(h5,col=run_col,start=startime, end=endtime)
-                    if h5 is not None and len(h5) > 0:
-                        h5 = h5.reset_index().set_index('code')
-                        h5.rename(columns=now_func, inplace=True)
-                        # log.info("get_limit_multiIndex_Row:%s  endtime:%s" % (len(h5), endtime))
-                        #h5 = h5.drop(['ticktime'], axis=1)
-                        h5 = h5.loc[:, now_col]
-                        dd = cct.combine_dataFrame(dd, h5, col=None, compare=None, append=False, clean=True)
-                        log.info('agg_df_Row:%.2f h5:%s endtime:%s' % ((time.time() - time_n), len(h5),endtime))
-                return dd
+
             # freq = '15T'
             time_s = time.time()
             if cct.get_work_time() and cct.get_now_time_int() <= 1000:
                 run_col = ['low', 'high', 'close']
                 startime = None
                 # endtime = '10:00:00'
-                endtime = '09:40:00'
-                dd = get_col_agg_df(h5, dd, run_col, all_func, startime, endtime)
+                endtime = '09:45:00'
+                dd = self.get_col_agg_df(h5, dd, run_col, all_func, startime, endtime)
             else:
                 run_col = ['low', 'high']
                 startime = None
                 # endtime = '10:00:00'
-                endtime = '09:40:00'
-                dd = get_col_agg_df(h5, dd, run_col, all_func, startime, endtime)
+                endtime = '09:45:00'
+                dd = self.get_col_agg_df(h5, dd, run_col, all_func, startime, endtime)
                 startime = '09:30:00'
                 endtime = '15:01:00'
                 run_col = ['close']
                 # h5 = cct.get_limit_multiIndex_Group(h5, freq='15T', col=run_col,start=startime, end=endtime)
-                dd = get_col_agg_df(h5, dd, run_col, all_func, startime, endtime)
+                dd = self.get_col_agg_df(h5, dd, run_col, all_func, startime, endtime)
             log.info("agg_df_all_time:%0.2f"%(time.time()-time_s))
                     # top_temp[:1][['high','nhigh','low','nlow','close','nclose','llastp']]
 
@@ -667,7 +668,9 @@ if __name__ == "__main__":
     # print df
     # df = sina.get_stock_code_data('000001',index=True).set_index('code')
     # df= sina.get_stock_code_data('999999,399001',index=True)
-    df = sina.get_stock_code_data(['600203', '000831', '300306', '600007'])
+    code_agg = '300081'
+    df = sina.get_stock_code_data([code_agg, '000831', '300306', '600007'])
+    # df = sina.all
     # print df.nlow[:5]
 #    print sina.get_stock_code_data('002873')
     # print sina.get_stock_code_data('600199,300334',index=False)
@@ -691,11 +694,47 @@ if __name__ == "__main__":
         else:
             log.info("compute df is none")
         return df
+
+    def get_col_agg_df(h5,dd,run_col,all_func,startime,endtime):
+        now_col = [ all_func[co] for co in run_col if co in all_func.keys()]
+        now_func = cct.from_list_to_dict(run_col,all_func)
+        if h5 is not None and len(h5) > len(dd):
+            time_n = time.time()
+            # h5 = cct.get_limit_multiIndex_Group(h5, freq=freq,end=endtime)
+            h5 = cct.get_limit_multiIndex_Row(h5,col=run_col,start=startime, end=endtime)
+            if h5 is not None and len(h5) > 0:
+                h5 = h5.reset_index().set_index('code')
+                h5.rename(columns=now_func, inplace=True)
+                # log.info("get_limit_multiIndex_Row:%s  endtime:%s" % (len(h5), endtime))
+                #h5 = h5.drop(['ticktime'], axis=1)
+                h5 = h5.loc[:, now_col]
+                dd = cct.combine_dataFrame(dd, h5, col=None, compare=None, append=False, clean=True)
+                log.info('agg_df_Row:%.2f h5:%s endtime:%s' % ((time.time() - time_n), len(h5),endtime))
+        return dd
     h5_fname = 'sina_MultiIndex_data'
     # h5_fname = 'sina_multi_index'
     h5_table = 'all_10'
     time_s = time.time()
-    df = h5a.load_hdf_db(h5_fname, table=h5_table, code_l=None, timelimit=False, dratio_limit=0.12)
+    h5 = h5a.load_hdf_db(h5_fname, table=h5_table, code_l=None, timelimit=False, dratio_limit=0.12)
+    if cct.get_work_time() and cct.get_now_time_int() <= 1000:
+        run_col = ['low', 'high', 'close']
+        startime = None
+        # endtime = '10:00:00'
+        endtime = '09:45:00'
+        dd = get_col_agg_df(h5, df, run_col, all_func, startime, endtime)
+    else:
+        run_col = ['low', 'high']
+        startime = None
+        # endtime = '10:00:00'
+        endtime = '09:45:00'
+        dd = get_col_agg_df(h5, df, run_col, all_func, startime, endtime)
+        startime = '09:30:00'
+        endtime = '15:01:00'
+        run_col = ['close']
+        # h5 = cct.get_limit_multiIndex_Group(h5, freq='15T', col=run_col,start=startime, end=endtime)
+        dd = get_col_agg_df(h5, df, run_col, all_func, startime, endtime)
+    print dd.loc[code_agg],dd
+    '''
     if df is not None and len(df) > 0:
         print df[:1]
         stock_data = df
@@ -715,13 +754,14 @@ if __name__ == "__main__":
         # df = df.groupby(level=0).transform(get_tdx_stock_period_to_type)
         # df = df.groupby([df.index.get_level_values(i) for i in [0]]+[pd.Grouper(freq='30T', level=-1)]).transform(get_tdx_stock_period_to_type)
         print "t3:%0.3f df:%s" % (time.time() - time_s, df.shape)
-        print df.loc['000001'][-2:]
-    # '''
+        print df.loc['300081'][-2:]
+    '''
     # print df.groupby(pd.Grouper(freq='30T', level='ticktime'))
     # df.groupby(level=0)['low'].transform('min').loc['600805'][:5]
     # print df.groupby(level=0).transform(nanrankdata_len)[:10]
     # import pandas as pd
     # df = pd.HDFStore(cct.get_ramdisk_path(h5_fname))[h5_table]
+    sys.exit(0)
     code = '300248'
     # code = '000099'
     # print "t:", round(time.time() - time_s, 1),
@@ -740,12 +780,12 @@ if __name__ == "__main__":
         # print len(sina.all)
         print "market:%s %s" % (ma, len(df))
     
-    sys.exit(0)
     
     h5_fname = 'sina_multi_index'
     dl = 30
     h5_table = 'all' + '_' + str(10)
-    df = Sina().market('all')
+    # df = Sina().market('all')
+    df = ''
     if 1 and len(df) > 0:
         # stock_data.index = pd.to_datetime(stock_data.index, format='%Y-%m-%d')
         # period_stock_data.index = map(lambda x: str(x)[:10], period_stock_data.index)

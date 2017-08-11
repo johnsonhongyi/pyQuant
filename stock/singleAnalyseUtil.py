@@ -429,7 +429,7 @@ def get_hot_countNew(changepercent, rzrq, fibl=None, fibc=10):
                     title=['B:%s-%s V:%s' % (bigcount[0], bigcount[2], bigcount[1]), 'ZL: %s' % (zlr if len(ff) > 0 else 0),
                            'To:%s' % len(topTen), 'D:%s' % len(
                         crash), 'Sh: %s ' % ff['scent'] if len(ff) > 0 else '?', 'Vr:%s%% ' % ff['svol'] if len(ff) > 0 else '?',
-                        'MR: %s' % zzb, 'ZL: %s' % (zlr if len(ff) > 0 else '?')])
+                        'MR: %s' % zzb, 'ZL: %s' % (zlr if len(ff) > 0 else '?')],closeTerminal=False)
 
     return allTop
 

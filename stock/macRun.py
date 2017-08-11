@@ -250,10 +250,10 @@ if int(count) > 3:
     print getPosition('LinePower.py')
     getPosition('Johnson@',close=True)
     getPosition('/Users/Johnson/Documents',close=True)
-    
-setPosition(cmd=None, position=None)
-
-getPosition(cct.clean_terminal[1],close=True)
+else:   
+    setPosition(cmd=None, position=None)
+    cct.get_terminal_Position(cct.clean_terminal[2],close=True)
+cct.get_terminal_Position(cct.clean_terminal[1],close=True)
 # getPosition('Johnson —',close=True)
 # getPosition('Johnson —',close=True)
 # getPosition('Johnson — python',close=True)

@@ -1795,7 +1795,7 @@ def getSinaAlldf(market='cyb', vol=ct.json_countVol, vtype=ct.json_countType, fi
                     axis=0, inplace=True)
             df = dd
     if len(df) < 10 or len(dm) < 10:
-        log.error("len(df):%s dm:%s" % (len(df), len(dm)))
+        log.info("len(df):%s dm:%s" % (len(df), len(dm)))
         dm['ratio'] = 0
     else:
         if len(dm) <> len(df):

@@ -38,7 +38,7 @@ requests.adapters.DEFAULT_RETRIES = 0
 # from JSONData import tdx_data_Day as tdd
 global initGlobalValue
 initGlobalValue = 0
-clean_terminal = ["Python Launcher",'Johnson — -bash']
+clean_terminal = ["Python Launcher",'Johnson — -bash','Johnson — python']
 
 class GlobalValues:
     # -*- coding: utf-8 -*-
@@ -223,7 +223,7 @@ scriptquit = '''tell application "Python Launcher" to quit'''
 
 
 
-def get_terminal_Position(cmd=None, position=None, close=False):
+def get_terminal_Position(cmd=None, position=None, close=False,retry=False):
     """[summary]
     
     [description]
@@ -254,6 +254,7 @@ def get_terminal_Position(cmd=None, position=None, close=False):
 
         count = cct_doScript(scriptcount)
         if position is None:
+            close_list = []
             if count > 0 and cmd is not None:
                 log.info("count:%s" % (count))
                 for n in xrange(1, int(count) + 1):
@@ -266,12 +267,21 @@ def get_terminal_Position(cmd=None, position=None, close=False):
                         # print "get:%s"%(n)
                         # position=cct_doScript(script_get_position % ('get', str(n)))
                         if close:
+                            close_list.append(n)
                             log.info("close:%s %s" % (n, cmd))
-                            os.system(closeterminalw % (n))
-                            break
+                            # os.system(closeterminalw % (n))
+                            # break
                     else:
                         if close:
-                            log.info("Title notFind:%s title:%s find:%s" % (n, title,cmd.lower()))
+                            log.info("Title notFind:%s title:%s Cmd:%s" % (n, title.replace('\n',''),cmd.lower()))
+            if len(close_list) > 0:
+                if not retry and len(close_list) > 1:
+                    sleep(5)
+                    get_terminal_Position(cmd=cmd, position=position, close=close,retry=True)
+                else:
+                    for n in close_list:
+                        os.system(closeterminalw % (close_list[0]))
+                        log.error("close:%s %s" % (n, cmd))
 
         else:
             # sleep(1, catch=True)
@@ -534,7 +544,7 @@ def set_ctrl_handler():
     win32api.SetConsoleCtrlHandler(handler, 1)
 
 
-def set_console(width=80, height=15, color=3, title=None):
+def set_console(width=80, height=15, color=3, title=None,closeTerminal=True):
     # mode con cp select=936
     # os.system("mode con: cols=%s lines=%s"%(width,height))
     # print os.path.splitext(sys.argv[0])
@@ -562,8 +572,9 @@ def set_console(width=80, height=15, color=3, title=None):
     # printf "\033]0;My Window title\007”
     # os.system('color %s'%color)
     # set_ctrl_handler()
-    get_terminal_Position(cmd=scriptquit, position=None, close=False)
-    get_terminal_Position(clean_terminal[1], close=True)
+    if closeTerminal:
+        get_terminal_Position(cmd=scriptquit, position=None, close=False)
+        get_terminal_Position(clean_terminal[1], close=True)
 
 def timeit_time(cmd, num=5):
     import timeit
@@ -984,10 +995,11 @@ def get_url_data(url, retry_count=5, pause=0.05, timeout=10):
             data = requests.get(url, headers=headers, timeout=timeout)
         except (socket.timeout, socket.error) as e:
             data = ''
-            log.error('socket timed out - URL %s', url)
+            log.error('socket timed out error:%s - URL %s '%(e,url))
+            sleeprandom(60)
         except Exception as e:
-            log.error('Exception - URL %s', url)
-            print(e)
+            log.error('url Exception Error:%s - URL %s '%(e,url))
+            sleeprandom(60)
         else:
             log.info('Access successful.')
         # print data.text
@@ -1915,6 +1927,7 @@ if __name__ == '__main__':
 
     # get_terminal_Position(cmd=scriptquit, position=None, close=False)
     # get_terminal_Position('Johnson —', close=True)
+    get_terminal_Position(clean_terminal[2],close=True)
     get_terminal_Position(clean_terminal[1], close=True)
     log.info("close Python Launcher")
     s_time = time.time()

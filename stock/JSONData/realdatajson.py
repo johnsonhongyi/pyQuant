@@ -238,8 +238,10 @@ def get_sina_Market_json(market='all', showtime=True, num='100', retry_count=3, 
 #            append_status = False #(new all don't append main )
 #        else:
 #        append_status = True
-
-        h5 = h5a.write_hdf_db(h5_fname, df, table=h5_table,append=True)
+        if market=='all':
+            h5 = h5a.write_hdf_db(h5_fname, df, table=h5_table,append=False)
+        else:
+            h5 = h5a.write_hdf_db(h5_fname, df, table=h5_table,append=True)
         if showtime: print ("Market-df:%s %s" % (format((time.time() - start_t), '.1f'), len(df))),
 
         return df
@@ -294,9 +296,9 @@ def getconfigBigCount(count=None,write=False):
 
 def sina_json_Big_Count(vol='1', type='0', num='10000'):
     """[summary]
-    
+
     [description]
-    
+
     Parameters
     ----------
     vol : {str}, optional
@@ -305,7 +307,7 @@ def sina_json_Big_Count(vol='1', type='0', num='10000'):
         [description] (the default is '0', which [default_description])
     num : {str}, optional
         [description] (the default is '10000', which [default_description])
-    
+
     Returns
     -------
     [type]

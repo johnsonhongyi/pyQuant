@@ -107,12 +107,13 @@ def getLogger(name='',logpath=None,writemode='a'):
     # formatter = logging.Formatter( '%(levelname)-5s %(message)s');
     handler = RotatingFileHandler(log_f, maxBytes=2*1000*1000, 
                                  backupCount=1, encoding=None, delay=0)
-    formatter = logging.Formatter( '%(filename)s(%(funcName)s:%(lineno)s):%(levelname)-5s %(message)s');
-    # console.setFormatter(formatter);
+    # formatter = logging.Formatter( '%(filename)s(%(funcName)s:%(lineno)s):%(levelname)-5s %(message)s');
+    formatter = logging.Formatter(  "[%(asctime)s] %(levelname)s:%(filename)s(%(funcName)s:%(lineno)s): %(message)s");
+    console.setFormatter(formatter);
     handler.setFormatter(formatter)
     logger = logging.getLogger(name)
+    logger.addHandler(console)
     logger.addHandler(handler)
-    logger.addHandler(console);
     return logger
 
 log = getLogger('')
