@@ -105,10 +105,11 @@ def getBollFilter(df=None, boll=6, duration=ct.PowerCountdl, filter=True, ma5d=T
             df = df[df.buy > df.ma5d * ct.changeRatio]
 
     # if 'nlow' in df.columns and 932 < cct.get_now_time_int() < 1030:
-    if 'nlow' in df.columns and 932 < cct.get_now_time_int():
+    
+    if 'nlow' in df.columns and 940 < cct.get_now_time_int():
         if 'nhigh' in df.columns and 'nclose' in df.columns:
             if cct.get_now_time_int() > ct.nlow_limit_time:
-                df = df[ (df.low >= df.nlow) & ((df.open > df.llastp * ct.changeRatio) & (df.close > df.llastp * ct.changeRatio)) & (((df.low >= df.nlow) & (df.close > df.nclose)) | ((df.close > df.nclose) & (df.close > df.nhigh * ct.changeRatio) & (df.high > df.nhigh)))]
+                df = df[ (df.low >= df.nlow) & ((df.open > df.llastp * ct.changeRatio) & (df.nclose > df.llastp * ct.changeRatio)) & (((df.low >= df.nlow) & (df.close > df.nclose)) | ((df.close > df.nclose) & (df.close > df.nhigh * ct.changeRatio) & (df.high > df.nhigh)))]
             else:
                 df = df[ ((df.open > df.llastp * ct.changeRatio) & (df.close > df.llastp * ct.changeRatio)) & (((df.low >= df.nlow) & (df.close > df.nclose)) | ((df.close > df.nclose) & (df.close > df.nhigh * ct.changeRatio)))]
         else:
