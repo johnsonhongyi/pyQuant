@@ -290,10 +290,10 @@ def get_tdx_Exp_day_to_df(code, start=None, end=None, dl=None, newdays=None, typ
             if not MultiIndex:
                 if not resample == 'd' and resample in resample_dtype:
                     df = get_tdx_stock_period_to_type(df, period_day=resample)
-                df['ma5d'] = df.close.rolling(window=5,center=False).mean()
-                df['ma10d'] = df.close.rolling(window=10,center=False).mean()
-                df['ma20d'] = df.close.rolling(window=20,center=False).mean()
-                df['ma60d'] = df.close.rolling(window=60,center=False).mean()
+                df['ma5d'] = pd.rolling_mean(df.close, 5)
+                df['ma10d'] = pd.rolling_mean(df.close, 10)
+                df['ma20d'] = pd.rolling_mean(df.close, 20)
+                df['ma60d'] = pd.rolling_mean(df.close, 60)
                 # df['msg'] = df.high[-tdx_max_int:].max()
                 df['hmax'] = df.close[-tdx_max_int:max_int_end].max()
                 df['lmin'] = df.low[-tdx_max_int:max_int_end].min()
@@ -438,12 +438,10 @@ def get_tdx_Exp_day_to_df(code, start=None, end=None, dl=None, newdays=None, typ
                     df = compute_lastdays_percent(df, lastdays=lastdays, resample=resample)
                     if 'date' in df.columns:
                         df = df.set_index('date')
-                # df['ma5d'] = pd.rolling_mean(df.close, 5)
-                df['ma5d'] = df.close.rolling(window=5,center=False).mean()
-                df['ma10d'] = df.close.rolling(window=10,center=False).mean()
-                df['ma20d'] = df.close.rolling(window=20,center=False).mean()
-                df['ma60d'] = df.close.rolling(window=60,center=False).mean()
-
+                df['ma5d'] = pd.rolling_mean(df.close, 5)
+                df['ma10d'] = pd.rolling_mean(df.close, 10)
+                df['ma20d'] = pd.rolling_mean(df.close, 20)
+                df['ma60d'] = pd.rolling_mean(df.close, 60)
                 # df['hmax'] = df.high[-tdx_max_int:].max()
                 df['hmax'] = df.close[-tdx_max_int:max_int_end].max()
                 df['lmin'] = df.low[-tdx_max_int:max_int_end].min()
@@ -713,24 +711,14 @@ def get_tdx_append_now_df_api(code, start=None, end=None, type='f', df=None, dm=
 
     if cct.get_now_time_int() > 830 and cct.get_now_time_int() < 930:
         log.debug("now > 830 and <930 return")
-<<<<<<< HEAD
         if isinstance(df,pd.DataFrame):
             df = df.sort_index(ascending=True)
-            df['ma5d'] = df.close.rolling(window=5,center=False).mean()
-            df['ma10d'] = df.close.rolling(window=10,center=False).mean()
-            df['ma20d'] = df.close.rolling(window=20,center=False).mean()
-            df['ma60d'] = df.close.rolling(window=60,center=False).mean()
+            df['ma5d'] = pd.rolling_mean(df.close, 5)
+            df['ma10d'] = pd.rolling_mean(df.close, 10)
+            df['ma20d'] = pd.rolling_mean(df.close, 20)
+            df['ma60d'] = pd.rolling_mean(df.close, 60)
             df = df.fillna(0)
             df = df.sort_index(ascending=False)
-=======
-        df = df.sort_index(ascending=True)
-        df['ma5d'] = pd.rolling_mean(df.close, 5)
-        df['ma10d'] = pd.rolling_mean(df.close, 10)
-        df['ma20d'] = pd.rolling_mean(df.close, 20)
-        df['ma60d'] = pd.rolling_mean(df.close, 60)
-        df = df.fillna(0)
-        df = df.sort_index(ascending=False)
->>>>>>> parent of f1cfc6f... option mod
         return df
     # else:
     #     # if dm is None and not write_tushare and cct.get_work_time() and cct.get_now_time_int() < 1505:
@@ -763,10 +751,10 @@ def get_tdx_append_now_df_api(code, start=None, end=None, type='f', df=None, dm=
                 vol_div = 10
             if dz.open.values == df.open[-1] and 'volume' in dz.columns and int(df.vol[-1] / vol_div) == int(dz.volume.values / vol_div):
                 df = df.sort_index(ascending=True)
-                df['ma5d'] = df.close.rolling(window=5,center=False).mean()
-                df['ma10d'] = df.close.rolling(window=10,center=False).mean()
-                df['ma20d'] = df.close.rolling(window=20,center=False).mean()
-                df['ma60d'] = df.close.rolling(window=60,center=False).mean()
+                df['ma5d'] = pd.rolling_mean(df.close, 5)
+                df['ma10d'] = pd.rolling_mean(df.close, 10)
+                df['ma20d'] = pd.rolling_mean(df.close, 20)
+                df['ma60d'] = pd.rolling_mean(df.close, 60)
                 df = df.fillna(0)
                 df = df.sort_index(ascending=False)
                 return df
@@ -840,10 +828,10 @@ def get_tdx_append_now_df_api(code, start=None, end=None, type='f', df=None, dm=
         # print df
     if len(df) > 0:
         df = df.sort_index(ascending=True)
-        df['ma5d'] = df.close.rolling(window=5,center=False).mean()
-        df['ma10d'] = df.close.rolling(window=10,center=False).mean()
-        df['ma20d'] = df.close.rolling(window=20,center=False).mean()
-        df['ma60d'] = df.close.rolling(window=60,center=False).mean()
+        df['ma5d'] = pd.rolling_mean(df.close, 5)
+        df['ma10d'] = pd.rolling_mean(df.close, 10)
+        df['ma20d'] = pd.rolling_mean(df.close, 20)
+        df['ma60d'] = pd.rolling_mean(df.close, 60)
         df = df.fillna(0)
         df = df.sort_index(ascending=False)
     if end is None and writedm and len(df) > 0:
@@ -960,10 +948,10 @@ def get_tdx_append_now_df_api_tofile(code, dm=None, newdays=0, start=None, end=N
     if cct.get_now_time_int() > 900 and cct.get_now_time_int() < 930 and len(df) > 0:
         log.debug("now > 830 and <930 return")
         df = df.sort_index(ascending=True)
-        df['ma5d'] = df.close.rolling(window=5,center=False).mean()
-        df['ma10d'] = df.close.rolling(window=10,center=False).mean()
-        df['ma20d'] = df.close.rolling(window=20,center=False).mean()
-        df['ma60d'] = df.close.rolling(window=60,center=False).mean()
+        df['ma5d'] = pd.rolling_mean(df.close, 5)
+        df['ma10d'] = pd.rolling_mean(df.close, 10)
+        df['ma20d'] = pd.rolling_mean(df.close, 20)
+        df['ma60d'] = pd.rolling_mean(df.close, 60)
         df = df.fillna(0)
         df = df.sort_index(ascending=False)
         return df
@@ -990,10 +978,10 @@ def get_tdx_append_now_df_api_tofile(code, dm=None, newdays=0, start=None, end=N
                 vol_div = 10
             if round(dz.open.values, 1) == round(df.open[-1], 1) and 'volume' in dz.columns and int(df.vol[-1] / vol_div) == int(dz.volume.values / vol_div):
                 df = df.sort_index(ascending=True)
-                df['ma5d'] = df.close.rolling(window=5,center=False).mean()
-                df['ma10d'] = df.close.rolling(window=10,center=False).mean()
-                df['ma20d'] = df.close.rolling(window=20,center=False).mean()
-                df['ma60d'] = df.close.rolling(window=60,center=False).mean()
+                df['ma5d'] = pd.rolling_mean(df.close, 5)
+                df['ma10d'] = pd.rolling_mean(df.close, 10)
+                df['ma20d'] = pd.rolling_mean(df.close, 20)
+                df['ma60d'] = pd.rolling_mean(df.close, 60)
                 df = df.fillna(0)
                 df = df.sort_index(ascending=False)
                 return df
@@ -1049,10 +1037,10 @@ def get_tdx_append_now_df_api_tofile(code, dm=None, newdays=0, start=None, end=N
 
     if len(df) > 5:
         df = df.sort_index(ascending=True)
-        df['ma5d'] = df.close.rolling(window=5,center=False).mean()
-        df['ma10d'] = df.close.rolling(window=10,center=False).mean()
-        df['ma20d'] = df.close.rolling(window=20,center=False).mean()
-        df['ma60d'] = df.close.rolling(window=60,center=False).mean()
+        df['ma5d'] = pd.rolling_mean(df.close, 5)
+        df['ma10d'] = pd.rolling_mean(df.close, 10)
+        df['ma20d'] = pd.rolling_mean(df.close, 20)
+        df['ma60d'] = pd.rolling_mean(df.close, 60)
         df = df.fillna(0)
         df = df.sort_index(ascending=False)
     if writedm and len(df) > 0:
@@ -1659,10 +1647,10 @@ def get_tdx_power_now_df(code, start=None, end=None, type='f', df=None, dm=None,
         log.debug("c_name:%s df.name:%s" % (c_name, df.name[-1]))
     if len(df) > 0:
         df = df.sort_index(ascending=True)
-        df['ma5d'] = df.close.rolling(window=5,center=False).mean()
-        df['ma10d'] = df.close.rolling(window=10,center=False).mean()
-        df['ma20d'] = df.close.rolling(window=20,center=False).mean()
-        df['ma60d'] = df.close.rolling(window=60,center=False).mean()
+        df['ma5d'] = pd.rolling_mean(df.close, 5)
+        df['ma10d'] = pd.rolling_mean(df.close, 10)
+        df['ma20d'] = pd.rolling_mean(df.close, 20)
+        df['ma60d'] = pd.rolling_mean(df.close, 60)
         # df['ma5d'].fillna(0)
         # df['ma10d'].fillna(0)
         # df['ma20d'].fillna(0)
@@ -2838,7 +2826,7 @@ def get_tdx_exp_all_LastDF(codeList, dt=None, end=None, ptype='low', filter='n')
     return df
 
 
-def get_tdx_exp_all_LastDF_DL(codeList, dt=None, end=None, ptype='low', filter='n', power=False, lastp=False, newdays=None, dl=None, resample='d'):
+def get_tdx_exp_all_LastDF_DL(codeList, dt=None, end=None, ptype='low', filter='n', power=False, lastp=False, newdays=None, dl=None, resample='d',showRunTime=True):
     time_t = time.time()
     # df = rl.get_sina_Market_json(market)
     # code_list = np.array(df.code)
@@ -2947,7 +2935,7 @@ def get_tdx_exp_all_LastDF_DL(codeList, dt=None, end=None, ptype='low', filter='
     #     df=df[df.op >10]
     #     df=df[df.ra < 11]
     # print "op:",len(df),
-    if dl != None:
+    if showRunTime and dl != None:
         global initTdxdata
         if initTdxdata > 2:
             print "All_OUT:%s " % (initTdxdata),
@@ -3023,9 +3011,7 @@ def get_tdx_stock_period_to_type(stock_data, period_day='w', periods=5):
     else:
         log.error("index.name not date,pls check:%s" % (stock_data[:1]))
 
-    # period_stock_data = stock_data.resample(period_type, how='last')
-    period_stock_data = stock_data.resample(period_type).last()
-
+    period_stock_data = stock_data.resample(period_type, how='last')
     # 周数据的每日change连续相乘
     # period_stock_data['percent']=stock_data['percent'].resample(period_type,how=lambda x:(x+1.0).prod()-1.0)
     # 周数据open等于第一日
@@ -3034,21 +3020,21 @@ def get_tdx_stock_period_to_type(stock_data, period_day='w', periods=5):
     # pd.DatetimeIndex(start=stock_data.index.values[0],end=stock_data.index.values[-1],freq='BM')
 
     period_stock_data['open'] = stock_data[
-        'open'].resample(period_type).first()
+        'open'].resample(period_type, how='first')
     # 周high等于Max high
     period_stock_data['high'] = stock_data[
-        'high'].resample(period_type).max()
+        'high'].resample(period_type, how='max')
     period_stock_data['low'] = stock_data[
-        'low'].resample(period_type).min()
+        'low'].resample(period_type, how='min')
     # volume等于所有数据和
     period_stock_data['amount'] = stock_data[
-        'amount'].resample(period_type).sum()
+        'amount'].resample(period_type, how='sum')
     period_stock_data['vol'] = stock_data[
-        'vol'].resample(period_type).sum()
+        'vol'].resample(period_type, how='sum')
     # 计算周线turnover,【traded_market_value】 流通市值【market_value】 总市值【turnover】 换手率，成交量/流通股本
     # period_stock_data['turnover']=period_stock_data['vol']/(period_stock_data['traded_market_value'])/period_stock_data['close']
     # 去除无交易纪录
-    period_stock_data.index = stock_data['date'].resample(period_type).last()
+    period_stock_data.index = stock_data['date'].resample(period_type, how='last')
     # print period_stock_data.index[:1]
     if 'code' in period_stock_data.columns:
         period_stock_data = period_stock_data[period_stock_data['code'].notnull()]
@@ -3171,7 +3157,9 @@ if __name__ == '__main__':
         log_level = LoggerFactory.ERROR
     # log_level = LoggerFactory.DEBUG if args['-d']  else LoggerFactory.ERROR
     log.setLevel(log_level)
-
+    code='399006'
+    print get_tdx_Exp_day_to_df(code, dl=30, newdays=0, resample='d')[:2]
+    sys.exit(0)
     # log.setLevel(LoggerFactory.INFO)
     # print Write_tdx_all_to_hdf('all', h5_fname='tdx_all_df', h5_table='all', dl=300)
     # print Write_tdx_all_to_hdf(tdx_index_code_list, h5_fname='tdx_all_df', h5_table='all', dl=300,index=True)
