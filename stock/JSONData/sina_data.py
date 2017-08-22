@@ -475,6 +475,7 @@ class Sina:
         if h5 is not None and len(h5) > len(dd):
             time_n = time.time()
             # h5 = cct.get_limit_multiIndex_Group(h5, freq=freq,end=endtime)
+            # import pdb;pdb.set_trace()
             h5 = cct.get_limit_multiIndex_Row(h5,col=run_col,start=startime, end=endtime)
             if h5 is not None and len(h5) > 0:
                 h5 = h5.reset_index().set_index('code')
@@ -604,17 +605,16 @@ class Sina:
         # if 'nlow' not in df.columns or 'nhigh' not in df.columns or cct.get_work_time():
             h5 = h5a.load_hdf_db(h5_fname, h5_table, timelimit=False)
 
-            # freq = '15T'
             time_s = time.time()
             if cct.get_work_time() and cct.get_now_time_int() <= 1000:
                 run_col = ['low', 'high', 'close']
-                startime = None
+                startime = '09:25:00'
                 # endtime = '10:00:00'
                 endtime = '09:45:00'
                 dd = self.get_col_agg_df(h5, dd, run_col, all_func, startime, endtime)
             else:
                 run_col = ['low', 'high']
-                startime = None
+                startime = '09:25:00'
                 # endtime = '10:00:00'
                 endtime = '09:45:00'
                 dd = self.get_col_agg_df(h5, dd, run_col, all_func, startime, endtime)
@@ -668,8 +668,9 @@ if __name__ == "__main__":
     # print df
     # df = sina.get_stock_code_data('000001',index=True).set_index('code')
     # df= sina.get_stock_code_data('999999,399001',index=True)
-    code_agg = '300081'
+    code_agg = '300310'
     df = sina.get_stock_code_data([code_agg, '000831', '300306', '600007'])
+    print df.columns
     # df = sina.all
     # print df.nlow[:5]
 #    print sina.get_stock_code_data('002873')

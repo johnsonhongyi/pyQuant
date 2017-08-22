@@ -1545,7 +1545,12 @@ def select_multiIndex_index(df, index='ticktime', start=None, end=None, datev=No
     elif start is not None and end is None:
         df = df[(df.index.get_level_values(index) >= start)]
     elif start is not None and end is not None:
-        df = df[(df.index.get_level_values(index) >= start) & (df.index.get_level_values(index) <= end)]
+        idx = df.index.get_level_values(index)[0] if len(df.index.get_level_values(index)) > 0 else 0
+        log.info("idx:%s idx<=end:%s"%(idx,idx <= pd.Timestamp(end)))
+        if idx <= pd.Timestamp(end):
+            df = df[(df.index.get_level_values(index) >= start) & (df.index.get_level_values(index) <= end)]
+        else:
+            df = df[(df.index.get_level_values(index) >= start)]
     else:
         log.error("start end is None")
     return df
