@@ -107,10 +107,8 @@ if __name__ == "__main__":
     resample = ct.resample_dtype
     # print cct.last_tddate(2)
     # end_date = cct.last_tddate(days=int(duration_date/4))
-    # end_date = cct.last_tddate(days=ct.lastdays)
-    # ptype = 'high'
-    end_date = None
-    ptype = 'low'
+    end_date = cct.last_tddate(days=ct.lastdays)
+    ptype = 'high'
     filter = 'y'
     if len(str(duration_date)) < 4:
         # duration_date = tdd.get_duration_price_date('999999', dl=duration_date, end=end_date, ptype='dutype')

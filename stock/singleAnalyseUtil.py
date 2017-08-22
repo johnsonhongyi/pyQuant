@@ -315,7 +315,7 @@ def get_hot_countNew(changepercent, rzrq, fibl=None, fibc=10):
     ffall = {}
     ffall['zlr'] = 0
     ffall['zzb'] = 0
-    top_Ten_Dropcxg=[]
+
     for market in indexKeys:
         # market = ct.SINA_Market_KEY()
         #        df = rd.get_sina_Market_json(market, False)
@@ -338,9 +338,6 @@ def get_hot_countNew(changepercent, rzrq, fibl=None, fibc=10):
             # else:
             top = df[df['percent'] > changepercent]
             topTen = df[df['percent'] > 9.9]
-            topT_l = tdd.get_tdx_exp_all_LastDF_DL(topTen.index.tolist(), dt=20,newdays=10,showRunTime=False)
-            if isinstance(topT_l, pd.DataFrame):
-                top_Ten_Dropcxg.extend(topT_l.index.tolist())  
             crashTen = df[df['percent'] < -9.8]
             crash = df[df['percent'] < -changepercent]
         else:
@@ -377,13 +374,11 @@ def get_hot_countNew(changepercent, rzrq, fibl=None, fibc=10):
     count = len(df.index)
     top = df[df['percent'] > changepercent]
     topTen = df[df['percent'] > 9.9]
-    topTen = str(len(topTen)) +'('+str(len(top_Ten_Dropcxg))+')'
-    # print "top_Ten_Dropcxg:%s",top_Ten_Dropcxg
     crashTen = df[df['percent'] < -9.8]
     crash = df[df['percent'] < -changepercent]
     print(
         u" \tA:%s topT:%s top>%s:%s" % (
-            f_print(4, count), f_print(3, (topTen)), changepercent, f_print(4, len(top)))),
+            f_print(4, count), f_print(3, len(topTen)), changepercent, f_print(4, len(top)))),
     print(u"crashT:%s crash<-%s:%s" %
           (f_print(3, len(crashTen)), changepercent, f_print(4, len(crash)))),
 
@@ -655,7 +650,7 @@ if __name__ == '__main__':
             cct.sleeprandom(30)
 #            print "Error2sleep:%s"%(sleeptime)
         except Exception as e:
-            log.error("Error Exception:%s"%(e))
+            print "Error Exception", e
             import traceback
             traceback.print_exc()
             # global except_count

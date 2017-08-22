@@ -713,6 +713,7 @@ def get_tdx_append_now_df_api(code, start=None, end=None, type='f', df=None, dm=
 
     if cct.get_now_time_int() > 830 and cct.get_now_time_int() < 930:
         log.debug("now > 830 and <930 return")
+<<<<<<< HEAD
         if isinstance(df,pd.DataFrame):
             df = df.sort_index(ascending=True)
             df['ma5d'] = df.close.rolling(window=5,center=False).mean()
@@ -721,6 +722,15 @@ def get_tdx_append_now_df_api(code, start=None, end=None, type='f', df=None, dm=
             df['ma60d'] = df.close.rolling(window=60,center=False).mean()
             df = df.fillna(0)
             df = df.sort_index(ascending=False)
+=======
+        df = df.sort_index(ascending=True)
+        df['ma5d'] = pd.rolling_mean(df.close, 5)
+        df['ma10d'] = pd.rolling_mean(df.close, 10)
+        df['ma20d'] = pd.rolling_mean(df.close, 20)
+        df['ma60d'] = pd.rolling_mean(df.close, 60)
+        df = df.fillna(0)
+        df = df.sort_index(ascending=False)
+>>>>>>> parent of f1cfc6f... option mod
         return df
     # else:
     #     # if dm is None and not write_tushare and cct.get_work_time() and cct.get_now_time_int() < 1505:
@@ -2828,7 +2838,7 @@ def get_tdx_exp_all_LastDF(codeList, dt=None, end=None, ptype='low', filter='n')
     return df
 
 
-def get_tdx_exp_all_LastDF_DL(codeList, dt=None, end=None, ptype='low', filter='n', power=False, lastp=False, newdays=None, dl=None, resample='d',showRunTime=True):
+def get_tdx_exp_all_LastDF_DL(codeList, dt=None, end=None, ptype='low', filter='n', power=False, lastp=False, newdays=None, dl=None, resample='d'):
     time_t = time.time()
     # df = rl.get_sina_Market_json(market)
     # code_list = np.array(df.code)
@@ -2937,7 +2947,7 @@ def get_tdx_exp_all_LastDF_DL(codeList, dt=None, end=None, ptype='low', filter='
     #     df=df[df.op >10]
     #     df=df[df.ra < 11]
     # print "op:",len(df),
-    if showRunTime and dl != None:
+    if dl != None:
         global initTdxdata
         if initTdxdata > 2:
             print "All_OUT:%s " % (initTdxdata),
@@ -3161,9 +3171,7 @@ if __name__ == '__main__':
         log_level = LoggerFactory.ERROR
     # log_level = LoggerFactory.DEBUG if args['-d']  else LoggerFactory.ERROR
     log.setLevel(log_level)
-    code='399006'
-    print get_tdx_Exp_day_to_df(code, dl=30, newdays=0, resample='d')[:2]
-    sys.exit(0)
+
     # log.setLevel(LoggerFactory.INFO)
     # print Write_tdx_all_to_hdf('all', h5_fname='tdx_all_df', h5_table='all', dl=300)
     # print Write_tdx_all_to_hdf(tdx_index_code_list, h5_fname='tdx_all_df', h5_table='all', dl=300,index=True)

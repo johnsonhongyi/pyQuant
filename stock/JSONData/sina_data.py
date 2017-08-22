@@ -606,7 +606,7 @@ class Sina:
 
             # freq = '15T'
             time_s = time.time()
-            if cct.get_work_time() and cct.get_now_time_int() <= 945:
+            if cct.get_work_time() and cct.get_now_time_int() <= 1000:
                 run_col = ['low', 'high', 'close']
                 startime = None
                 # endtime = '10:00:00'

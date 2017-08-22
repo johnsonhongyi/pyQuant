@@ -103,6 +103,7 @@ def get_dfcfw_fund_flow(market):
             dd['sjlr'] = round(float(data[9+i*25])/10000, 1)
             dd['sjzb'] = round(float(data[10+i*25].replace("%","")), 1)
             dd['time'] = data[24+i*25].split(" ")[1][:5]
+            # print dd['time']
         else:
             dd['zlr'] = 0.0
             dd['zzb'] = 0.0
@@ -445,7 +446,7 @@ if __name__ == "__main__":
 #    pp=get_dfcfw_fund_HGT(ct.DFCFW_FUND_FLOW_HGT)
     # print get_dfcfw_rzrq_SHSZ(url=ct.DFCFW_RZRQ_SHSZ)
     indexKeys = [ 'sh','sz', 'cyb']
-    ffindex = get_dfcfw_fund_flow('all')
+    ffindex = ffu.get_dfcfw_fund_flow('all')
     # print get_dfcfw_fund_SHSZ()
     sys.exit(0)
     # for x in pp.keys():
