@@ -7,8 +7,9 @@ from JSONData import wencaiData as wcd
 from JSONData import get_macd_kdj_rsi as getab
 import JohhnsonUtil.johnson_cons as ct
 from JohhnsonUtil import commonTips as cct
+from JohhnsonUtil import LoggerFactory as LoggerFactory
+log = LoggerFactory.log
 import argparse
-
 
 def parseArgmain():
     # from ConfigParser import ConfigParser

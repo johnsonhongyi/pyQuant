@@ -5,7 +5,7 @@ sys.path.append("..")
 import numpy as np
 import pandas as pd
 from statsmodels import regression
-import statsmodels.api as sm
+from statsmodels import api as sm
 from pylab import plt, mpl
 from matplotlib.dates import num2date, date2num
 from matplotlib.lines import Line2D
@@ -19,9 +19,9 @@ from JSONData import wencaiData as wcd
 from JSONData import tdx_hdf5_api as h5a
 from JohhnsonUtil import zoompan
 from JohhnsonUtil import LoggerFactory as LoggerFactory
+log = LoggerFactory.log
 import time
 # log = LoggerFactory.getLogger("PowerCompute")
-log = LoggerFactory.log
 # log.setLevel(LoggerFactory.INFO)
 
 if not cct.isMac():
@@ -147,7 +147,8 @@ def Candlestick(ax, bars=None, quotes=None, width=0.5, colorup='k', colordown='r
 
         return lines, boxes
 
-    date = date2num(bars.index.to_datetime().to_pydatetime())
+    # date = date2num(bars.index.to_datetime().to_pydatetime())
+    date = date2num(pd.to_datetime(bars.index).to_pydatetime())
     openp = bars['open']
     closep = bars['close']
     highp = bars['high']
@@ -274,12 +275,12 @@ def twoLineCompute(code, df=None, start=None, end=None, ptype='low'):
         log.info("period:%s" % period_type)
         df.index = pd.to_datetime(df.index)
         if ptype == 'high':
-            dfw = df[ptype].resample(period_type, how='max')
+            dfw = df[ptype].resample(period_type).max()
             # price=dfw.min()
             # idx = dfw[dfw == price].index.values[0]
             ##dd = dfw[dfw.index >= idx]
         else:
-            dfw = df[ptype].resample(period_type, how='min')
+            dfw = df[ptype].resample(period_type).min()
             # price=dfw.max()
             # idx = dfw[dfw == price].index.values[0]
             ##dd = dfw[dfw.index >= idx]
@@ -295,13 +296,15 @@ def twoLineCompute(code, df=None, start=None, end=None, ptype='low'):
             nrange = np.arange(all, 1, -step)
         else:
             nrange = np.arange(1, all, step)
-
+        # import pdb;pdb.set_trace()
         for x in nrange:
             # for x in np.arange(1, all, step):
             if ptype == 'high':
-                mlist = pd.rolling_max(dd, window=all / x).unique()
+                # mlist = pd.rolling_max(dd, window=all / x).unique()
+                mlist = dd.rolling(window=int(all / x)).max().unique()
             else:
-                mlist = pd.rolling_min(dd, window=all / x).unique()
+                # mlist = pd.rolling_min(dd, window=all / x).unique()
+                mlist = dd.rolling(window=int(all / x)).min().unique()
             if len(mlist) > 2:
                 if str(mlist[0]).strip() == ('nan'):
                     # if str(mlist[0]).find('nan') >0 :print "N"
@@ -472,6 +475,7 @@ def get_linear_model_status(code, df=None, dtype='d', type='m', start=None, end=
         # log.debug("duration:%s" % cct.get_today_duration(duration))
         asset = asset.dropna()
         X = np.arange(len(asset))
+        # import pdb;pdb.set_trace()
         x = sm.add_constant(X)
         model = regression.linear_model.OLS(asset.astype(float), x).fit()
         a = model.params[0]
@@ -837,8 +841,10 @@ def get_linear_model_candles(code, ptype='low', dtype='d', start=None, end=None,
     # pass
     # eval("df.%s"%ptype).ewm(span=20).mean().plot(style='k')
     eval("df.%s" % 'close').plot(style='k')
-    roll_mean = pd.rolling_mean(df.high, window=10)
+    roll_mean = df.high.rolling(window=10,center=False).mean()
     plt.plot(roll_mean, 'b')
+    roll_mean_low = df.low.rolling(window=10,center=False).mean()
+    plt.plot(roll_mean_low, 'g')
     # print roll_mean[-1]
     # plt.legend(["MA:10"+str(roll_mean[-1]], fontsize=12,loc=2)
 

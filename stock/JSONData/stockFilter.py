@@ -75,7 +75,7 @@ def getBollFilter(df=None, boll=6, duration=ct.PowerCountdl, filter=True, ma5d=T
     if 'fib' not in df.columns:
         df['fib'] = 0
     else:
-        co2int = ['op' , 'fibl']
+        co2int = ['op', 'fibl']
         co2int.extend([co for co in df.columns.tolist() if co.startswith('perc') and co.endswith('d')])
         for co in co2int:
             df[co] = df[co].astype(int)
@@ -100,18 +100,22 @@ def getBollFilter(df=None, boll=6, duration=ct.PowerCountdl, filter=True, ma5d=T
 
     if 'ma5d' in df.columns:
         if 'ma20d' in df.columns:
-            df = df[ (df.buy > df.ma20d) & ( df.ma5d >= df.ma20d) ]
+            df = df[(df.buy > df.ma20d) & (df.ma5d >= df.ma20d)]
         else:
             df = df[df.buy > df.ma5d * ct.changeRatio]
 
     # if 'nlow' in df.columns and 932 < cct.get_now_time_int() < 1030:
-    
+
     if 'nlow' in df.columns and 940 < cct.get_now_time_int():
+        for col in ['nhigh', 'nclose', 'nlow']:
+            df[col] = df[col].apply(lambda x: round(x, 2))
         if 'nhigh' in df.columns and 'nclose' in df.columns:
             if cct.get_now_time_int() > ct.nlow_limit_time:
-                df = df[ (df.low >= df.nlow) & ((df.open > df.llastp * ct.changeRatio) & (df.nclose > df.llastp * ct.changeRatio)) & (((df.low >= df.nlow) & (df.close > df.nclose)) | ((df.close > df.nclose) & (df.close > df.nhigh * ct.changeRatio) & (df.high > df.nhigh)))]
+                df = df[(df.low >= df.nlow) & ((df.open > df.llastp * ct.changeRatio) & (df.nclose > df.llastp * ct.changeRatio)) &
+                        (((df.low >= df.nlow) & (df.close >= df.nclose)) | ((df.close >= df.nclose) & (df.close > df.nhigh * ct.changeRatio) & (df.high >= df.nhigh)))]
             else:
-                df = df[ ((df.open > df.llastp * ct.changeRatio) & (df.close > df.llastp * ct.changeRatio)) & (((df.low >= df.nlow) & (df.close > df.nclose)) | ((df.close > df.nclose) & (df.close > df.nhigh * ct.changeRatio)))]
+                df = df[((df.open > df.llastp * ct.changeRatio) & (df.close > df.llastp * ct.changeRatio)) &
+                        (((df.low >= df.nlow) & (df.close >= df.nclose)) | ((df.close >= df.nclose) & (df.close > df.nhigh * ct.changeRatio)))]
         else:
             df = df[((df.low >= df.nlow) & (df.close > df.llastp))]
 

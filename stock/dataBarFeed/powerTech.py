@@ -11,7 +11,7 @@ from JohhnsonUtil import commonTips as cct
 from JohhnsonUtil import LoggerFactory as LoggerFactory
 import numpy as np
 # import pandas as pd
-import statsmodels.api as sm
+from statsmodels import api as sm
 from statsmodels import regression
 # log = LoggerFactory.getLogger("powerTech")
 log = LoggerFactory.log

@@ -5,7 +5,7 @@ import sys
 
 import numpy as np
 import pandas as pd
-import statsmodels.api as sm
+from statsmodels import api as sm
 from pylab import plt
 from sklearn.linear_model import LinearRegression
 from statsmodels import regression

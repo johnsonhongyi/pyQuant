@@ -6,7 +6,7 @@ import sys
 
 import numpy as np
 import pandas as pd
-import statsmodels.api as sm
+from statsmodels import api as sm
 from matplotlib.dates import num2date, date2num
 from matplotlib.lines import Line2D
 from matplotlib.patches import Rectangle
