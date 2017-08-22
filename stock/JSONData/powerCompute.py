@@ -148,6 +148,7 @@ def Candlestick(ax, bars=None, quotes=None, width=0.5, colorup='k', colordown='r
         return lines, boxes
 
     date = date2num(bars.index.to_datetime().to_pydatetime())
+    # date = date2num(pd.to_datetime(bars.index).to_pydatetime())
     openp = bars['open']
     closep = bars['close']
     highp = bars['high']
@@ -299,9 +300,9 @@ def twoLineCompute(code, df=None, start=None, end=None, ptype='low'):
         for x in nrange:
             # for x in np.arange(1, all, step):
             if ptype == 'high':
-                mlist = pd.rolling_max(dd, window=all / x).unique()
+                mlist = pd.rolling_max(dd, window=int(all / x)).unique()
             else:
-                mlist = pd.rolling_min(dd, window=all / x).unique()
+                mlist = pd.rolling_min(dd, window=int(all / x)).unique()
             if len(mlist) > 2:
                 if str(mlist[0]).strip() == ('nan'):
                     # if str(mlist[0]).find('nan') >0 :print "N"
