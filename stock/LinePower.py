@@ -9,34 +9,24 @@ import JohhnsonUtil.johnson_cons as ct
 from JohhnsonUtil import commonTips as cct
 from JohhnsonUtil import LoggerFactory as LoggerFactory
 log = LoggerFactory.log
-import argparse
 
+
+import argparse
 def parseArgmain():
-    # from ConfigParser import ConfigParser
-    # import shlex
     try:
         parser = argparse.ArgumentParser()
         parser.add_argument('code', type=str, nargs='?', help='999999')
         parser.add_argument('start', nargs='?', type=str, help='20150612')
         parser.add_argument('end', nargs='?', type=str, help='20160101')
-        parser.add_argument('-d', action="store", dest="dtype", type=str, nargs='?', choices=['d', 'w', 'm'], default='d',
-                            help='DateType')
-        parser.add_argument('-v', action="store", dest="vtype", type=str, choices=['f', 'b'], default='f',
-                            help='Price Forward or back')
-        parser.add_argument('-p', action="store", dest="ptype", type=str, choices=['high', 'low', 'close'], default='low',
-                            help='price type')
-        parser.add_argument('-f', action="store", dest="filter", type=str, choices=['y', 'n'], default='y',
-                            help='find duration low')
-        parser.add_argument('-l', action="store", dest="dl", type=int, default=30,
-                            help='dl default=30')
-        parser.add_argument('-dl', action="store", dest="days", type=int, default=0,
-                            help='days')
-        parser.add_argument('-m', action="store", dest="mpl", type=str, default='y',
-                            help='mpl show')
-        parser.add_argument('-i', action="store", dest="line", type=str, choices=['y', 'n'], default='y',
-                        help='LineHis show')
-        parser.add_argument('-w', action="store", dest="wencai", type=str, choices=['y', 'n'], default='n',
-                        help='WenCai Search')
+        parser.add_argument('-d', action="store", dest="dtype", type=str, nargs='?', choices=['d', 'w', 'm'], default='d',help='DateType')
+        parser.add_argument('-v', action="store", dest="vtype", type=str, choices=['f', 'b'], default='f',help='Price Forward or back')
+        parser.add_argument('-p', action="store", dest="ptype", type=str, choices=['high', 'low', 'close'], default='low',help='price type')
+        parser.add_argument('-f', action="store", dest="filter", type=str, choices=['y', 'n'], default='y',help='find duration low')
+        parser.add_argument('-l', action="store", dest="dl", type=int, default=30,help='dl default=30')
+        parser.add_argument('-da', action="store", dest="days", type=int, default=0,help='days')
+        parser.add_argument('-m', action="store", dest="mpl", type=str, default='y',help='mpl show')
+        parser.add_argument('-i', action="store", dest="line", type=str, choices=['y', 'n'], default='y', help='LineHis show')
+        parser.add_argument('-w', action="store", dest="wencai", type=str, choices=['y', 'n'], default='n',help='WenCai Search')
         return parser
     except Exception, e:
         # print 'Eerror:',e
@@ -83,6 +73,7 @@ if __name__ == "__main__":
             # log.setLevel(LoggerFactory.DEBUG)
             code = raw_input("code:")
             args = parser.parse_args(code.split())
+            print args
             # print str(args.code)
             if not str(args.code) == 'None' and (args.wencai == 'y' or re.match('[ \u4e00 -\u9fa5]+',code) == None):
                 df  = wcd.get_wencai_Market_url(code,200)
@@ -103,17 +94,11 @@ if __name__ == "__main__":
                 if args.start is not None and len(args.start) < 4:
                     args.dl = int(args.start)
                     args.start = None
-                # ptype='f', df=None, dtype='d', type='m', start=None, end=None, days=1, filter='n'):
-                # print args.end
-                # op, ra, st = get_linear_model_status(args.code, dtype=args.dtype, start=cct.day8_to_day10(
-                #      args.start), end=cct.day8_to_day10(args.end), filter=args.filter, dl=args.dl)
-                # print "code:%s op:%s ra:%s  start:%s" % (code, op, ra, st)
                 start = cct.day8_to_day10(args.start)
                 end = cct.day8_to_day10(args.end)
                 df = None
                 if args.line == 'y' and args.mpl == 'y':
                     code = args.code
-                    # print code, args.ptype, args.dtype, start, end
                     args.filter = 'n'
                     df=lht.get_linear_model_histogramDouble(code, dtype=args.dtype, start=start, end=end,filter=args.filter, dl=args.dl)
                     # candlestick_powercompute(code,start, end)
@@ -202,8 +187,6 @@ if __name__ == "__main__":
             elif code == 'h' or code == 'help':
                 parser.print_help()
             else:
-                # print "code error"
-                # print '',
                 pass
         except (KeyboardInterrupt) as e:
             # print "key"

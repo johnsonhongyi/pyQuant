@@ -390,6 +390,7 @@ def get_linear_model_status(code, df=None, dtype='d', type='m', start=None, end=
     # log.setLevel(LoggerFactory.DEBUG)
     # else:
     # log.setLevel(LoggerFactory.ERROR)
+    index_d = None
     if start is not None and end is None and filter == 'y':
         # if code not in ['999999','399006','399001']:
         # index_d,dl=tdd.get_duration_Index_date(dt=start)
@@ -427,7 +428,7 @@ def get_linear_model_status(code, df=None, dtype='d', type='m', start=None, end=
                   (code, start, index_d))
     if start != index_d and start == cct.get_today():
         return -11, -11, cct.get_today(), [0, pd.DataFrame()]
-    if len(df) > 0 and df is not None:
+    if df is not None and len(df) > 0:
         df = df.sort_index(ascending=True)
         df = df[df.index >= start]
         # if start and index_d and len(df) > 2 and filter == 'y':
@@ -444,7 +445,7 @@ def get_linear_model_status(code, df=None, dtype='d', type='m', start=None, end=
         # filter = 'y'
         # print start,ptype
 
-    if len(df) == 0 or df is None:
+    if df is None or len(df) == 0:
         if start is not None and len(start) > 8 and int(start[:4]) > 2500:
             log.warn("code:%s ERROR:%s" % (code, start))
             start = '2016-01-01'
