@@ -358,6 +358,7 @@ if __name__ == "__main__":
                 # cct.sleep(2)
             elif st.startswith('q') or st.startswith('e'):
                 print "exit:%s" % (st)
+                sys.exit(0)
             else:
                 print "input error:%s" % (st)
         except (IOError, EOFError, Exception) as e:

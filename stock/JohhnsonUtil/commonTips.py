@@ -596,8 +596,8 @@ def cct_raw_input(sts):
         st = raw_input(sts)
     except (KeyboardInterrupt) as e:
         inputerr = cct_raw_input(" Break: ")
-#        if inputerr == 'e' or inputerr == 'q':
-#            return 'e'
+        if inputerr == 'e' or inputerr == 'q':
+           sys.exit(0)
         # raise Exception('raw interrupt')
         if inputerr is not None and len(inputerr) > 0:
             return inputerr

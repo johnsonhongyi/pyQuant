@@ -489,9 +489,10 @@ if __name__ == "__main__":
                         pass
             elif st.startswith('q') or st.startswith('e'):
                 print "exit:%s" % (st)
+                sys.exit(0)
             else:
                 print "input error:%s" % (st)
-        except (IOError, EOFError, Exception) as e:
+        except (IOError, EOFError, Exception) as e:status
             #            print "Error", e
             import traceback
             traceback.print_exc()

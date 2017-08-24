@@ -322,6 +322,7 @@ if __name__ == "__main__":
                 evalcmd(dir_mo)
             elif st.startswith('q') or st.startswith('e'):
                 print "exit:%s" % (st)
+                sys.exit(0)
             else:
                 print "input error:%s" % (st)
         except (IOError, EOFError) as e:

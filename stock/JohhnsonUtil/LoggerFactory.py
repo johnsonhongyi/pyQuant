@@ -7,7 +7,7 @@ import logging
 import sys,os
 from logging.handlers import RotatingFileHandler
 # sys.path.append("..")
-
+import ipykernel.iostream 
 # from logbook import StderrHandler
 # from commonTips import RamBaseDir as rbd
 # print sys.modules
@@ -82,42 +82,82 @@ NOTSET = 0
 # http://blog.sina.com.cn/s/blog_411fed0c0100wkvj.html
 
 
-def getLogger(name='',logpath=None,writemode='a'):
-    # now = time.strftime('%Y-%m-%d %H:%M:%S')
-    # path_sep = get_os_path_sep()
-#    log_path = get_run_path() + 'stock.log'
-#    global log_path
+def testlog():
+    #logging.basicConfig(filename="test.log",level=logging.DEBUG)
+    logger = logging.getLogger(__name__)
+    logger.setLevel(logging.DEBUG)
+
+    # create file handler which logs even debug messages
+    fh = logging.FileHandler('test.log')
+    fh.setLevel(logging.DEBUG)
+    # create console handler with a higher log level
+    ch = logging.StreamHandler()
+    ch.setLevel(logging.ERROR)
+    # create formatter and add it to the handlers
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    fh.setFormatter(formatter)
+    ch.setFormatter(formatter)
+    # add the handlers to the logger
+    logger.addHandler(fh)
+    logger.addHandler(ch)
+
+def getLogger(name=None,logpath=None,writemode='a'):
+
     if logpath is None:
         log_f = get_log_file(log_n='stock.log')
-    _logformat = "[%(asctime)s] %(levelname)s:%(filename)s(%(funcName)s:%(lineno)s): %(message)s"
-    logging.basicConfig(
-        # level    =eval('logging.%s'%(level_s)),
-        # format   = now +":" + name + ' LINE %(lineno)-4d  %(levelname)-8s %(message)s',
-        # level=logging.DEBUG,
-        level=logging.ERROR,
-        # level=logging.INFO,
-        format=_logformat,
-        datefmt='%m-%d %H:%M',
-        filename=log_f,
-        filemode=writemode);
+    else:
+        log_f = logpath
+    # logging.basicConfig(
+    #         level=logging.ERROR,
+    #         format=_logformat,
+    #         datefmt='%m-%d %H:%M',
+    #         filename=log_f,
+    #         filemode=writemode);
+    logger = logging.getLogger(name)
+    '''
+    #jupyter Notebook
+    if len(logger.handlers) > 0:
+        print "name:%s handlers:%s stdout:%s"%(name,logger.handlers,sys.stdout)
+        logger.handlers.pop()
+    else:
+        logger.propagate = False
+        print "name:%s no handlers,stdout:%s"%(name,sys.stdout)
+    if isinstance(type(sys.stderr),ipykernel.iostream.OutStream):
+        print 'ipython'
+        stdout = sys.stdout
+        stderr = sys.stderr
+    '''
+    logger.setLevel(logging.ERROR)
+    # create file handler which logs even debug messages
+    
+    # handler = logging.FileHandler(log_f)
+    # handler.setLevel(logging.DEBUG)
+    # create console handler with a higher log level
+    if len(logger.handlers) > 0:
+        ch = logger.handlers[0].stream
+        # print "name:%s handlers:%s stdout:%s"%(name,logger.handlers[0],sys.stdout)
+    else:
+        ch = logging.StreamHandler()
+    # ch.setLevel(logging.ERROR)
+    # create formatter and add it to the handlers
 
-    console = logging.StreamHandler();
-    console.setLevel(logging.DEBUG);
     # formatter = logging.Formatter(name + ': LINE %(lineno)-4d : %(levelname)-8s %(message)s');
     # formatter = logging.Formatter( '%(levelname)-5s %(message)s');
     handler = RotatingFileHandler(log_f, maxBytes=2*1000*1000, 
                                  backupCount=1, encoding=None, delay=0)
-    # formatter = logging.Formatter( '%(filename)s(%(funcName)s:%(lineno)s):%(levelname)-5s %(message)s');
-    formatter = logging.Formatter(  "[%(asctime)s] %(levelname)s:%(filename)s(%(funcName)s:%(lineno)s): %(message)s");
-    console.setFormatter(formatter);
-    handler.setFormatter(formatter)
-    logger = logging.getLogger(name)
-    logger.addHandler(console)
+    # fh_formatter = logging.Formatter( '%(filename)s(%(funcName)s:%(lineno)s):%(levelname)-5s %(message)s');
+    handler_logformat = logging.Formatter("[%(asctime)s] %(levelname)s:%(filename)s(%(funcName)s:%(lineno)s): %(message)s")
+    ch_formatter = logging.Formatter("[%(asctime)s] %(levelname)s:%(filename)s(%(funcName)s:%(lineno)s): %(message)s");
+    
+    handler.setFormatter(handler_logformat)
+    ch.setFormatter(ch_formatter)
+    logger.addHandler(ch)
     logger.addHandler(handler)
     return logger
 
-log = getLogger('')
-
+log = getLogger()
+# sys.stdout = log.handlers[0].stream
+# sys.stderr = log.handlers[0].stream
 # def log_format(record, handler):
 #     handler = StderrHandler()
 #     # handler.format_string = '{record.channel}: {record.message}'
