@@ -73,7 +73,7 @@ if __name__ == "__main__":
             # log.setLevel(LoggerFactory.DEBUG)
             code = raw_input("code:")
             args = parser.parse_args(code.split())
-            print args
+            # print args
             # print str(args.code)
             if not str(args.code) == 'None' and (args.wencai == 'y' or re.match('[ \u4e00 -\u9fa5]+',code) == None):
                 df  = wcd.get_wencai_Market_url(code,200)

@@ -164,6 +164,9 @@ def get_dfcfw_fund_SHSZ(url=ct.DFCFW_ZS_SHSZ):
 #    sina = Sina()
     dd = Sina().get_stock_code_data('999999,399001',index=True)
 #    sh =  dd[dd.index == '000001']
+    if 'amount' not in dd.columns:
+        if 'turnover' in dd.columns:
+            dd.rename(columns={'turnover': 'amount'}, inplace=True)
     sh =  dd[dd.index == '999999']
     if len(sh) >0 and not sh.name.values[0] == '上证指数':
         log.error('sh data is error')
@@ -195,7 +198,6 @@ def get_dfcfw_fund_SHSZ(url=ct.DFCFW_ZS_SHSZ):
             df = get_zs_VolRatio()
             if len(df['amount']) > 0:
                 radio_t = cct.get_work_time_ratio()
-                # print radio_t
                 # print df.loc['999999','amount']
                 # print type(dd['svol'])
                 log.debug("type:%s radio_t:%s" % (type(dd['svol']), radio_t))
@@ -226,8 +228,8 @@ def get_dfcfw_fund_SHSZ(url=ct.DFCFW_ZS_SHSZ):
         #var C1Cache={quotation:["0000011,上证指数,3113.18,121762623488,4.41,0.14%,463|197|656|143,536|280|1187|217","3990012,
         #深证成指,9816.71,145863270400,-10.08,-0.10%,463|197|656|143,536|280|1187|217"]}
         if len(sh) == 1 and len(sz) == 1:
-            dd['svol'] = round(float(sh.turnover) / 100000000, 1)
-            dd['zvol'] = round(float(sz.turnover) / 100000000, 1)
+            dd['svol'] = round(float(sh.amount) / 100000000, 1)
+            dd['zvol'] = round(float(sz.amount) / 100000000, 1)
                 # print data[3],data2[3]
             dd['scent'] = str(round((sh.close[0] - sh.llastp[0]) / sh.llastp[0] *100,2))+'%'
             dd['sup'] = round((sh.close[0] - sh.llastp[0]),2)
@@ -236,17 +238,15 @@ def get_dfcfw_fund_SHSZ(url=ct.DFCFW_ZS_SHSZ):
             df = get_zs_VolRatio()
             if len(df['amount']) > 0:
                 radio_t = cct.get_work_time_ratio()
-                # print radio_t
-                # print df.loc['999999','amount']
                 # print type(dd['svol'])
                 svol_r = round(
-                    dd['svol'] / (df.loc['999999', 'amount'] / 10000000) / radio_t, 1)
+                    dd['svol'] / (df.loc['999999', 'amount'] / 100000000) / radio_t, 1)
                 svol_v = round(
-                    svol_r * (df.loc['999999', 'amount'] / 10000000), 1)
+                    svol_r * (df.loc['999999', 'amount'] / 100000000), 1)
                 zvol_r = round(
-                    dd['zvol'] / (df.loc['399001', 'amount'] / 10000000) / radio_t, 1)
+                    dd['zvol'] / (df.loc['399001', 'amount'] / 100000000) / radio_t, 1)
                 zvol_v = round(
-                    svol_r * (df.loc['399001', 'amount'] / 10000000), 1)
+                    svol_r * (df.loc['399001', 'amount'] / 100000000), 1)
                 dd['svol'] = "%s-%s-%s" % ((dd['svol'], svol_v, svol_r))
                 dd['zvol'] = "%s-%s-%s" % ((dd['zvol'], zvol_v, zvol_r))
     return dd
@@ -322,10 +322,10 @@ def get_dfcfw_rzrq_SHSZ(url=ct.DFCFW_RZRQ_SHSZ):
 
 
 def get_zs_VolRatio():
-    list = ['000001', '399001']
+    ilist = ['999999', '399001']
     # list=['000001','399001','399006','399005']
-    df = tdd.get_tdx_all_day_LastDF(list, type=1)
-    if not len(df) == len(list):
+    df = tdd.get_tdx_all_day_LastDF(ilist)
+    if not len(df) == len(ilist):
         return ''
     return df
 
@@ -446,8 +446,9 @@ if __name__ == "__main__":
 #    pp=get_dfcfw_fund_HGT(ct.DFCFW_FUND_FLOW_HGT)
     # print get_dfcfw_rzrq_SHSZ(url=ct.DFCFW_RZRQ_SHSZ)
     indexKeys = [ 'sh','sz', 'cyb']
-    ffindex = ffu.get_dfcfw_fund_flow('all')
-    # print get_dfcfw_fund_SHSZ()
+    ffindex = get_dfcfw_fund_flow('all')
+    print ffindex
+    print get_dfcfw_fund_SHSZ()
     sys.exit(0)
     # for x in pp.keys():
     # print pp[x]

@@ -97,7 +97,8 @@ win10Lixin = r'C:\zd_zszq'
 win7rootAsus = r'D:\Program Files\gfzq'
 win7rootXunji = r'E:\DOC\Parallels\WinTools\zd_pazq'
 win7rootList = [win10Lixin, win7rootAsus, win7rootXunji, win10Lengend]
-macroot = r'/Users/Johnson/Documents/Johnson/WinTools/zd_pazq'
+# macroot = r'/Users/Johnson/Documents/Johnson/WinTools/zd_pazq'
+macroot = r'/Users/Johnson/Documents/Johnson/WinTools/new_tdx'
 xproot = r'E:\DOC\Parallels\WinTools\zd_pazq'
 tdx_hd5_name = r'tdx_all_df_%s'%(300)
 tdx_hd5_path = get_run_path_tdx(tdx_hd5_name)
@@ -1299,8 +1300,8 @@ def get_config_value(fname, classtype, xvalue, newvalue, xtype='limit', write=Fa
 def write_to_blocknew(p_name, data, append=True):
     # index_list = ['1999999','47#IFL0',  '0399006', '27#HSI']
     # index_list = ['1999999','47#IFL0', '27#HSI',  '0399006']
-    # index_list = ['1999999', '47#IFL0', '27#HSI',  '0159915']
-    index_list = ['1999999', '27#HSI',  '0159915']
+    index_list = ['1999999', '47#IFL0', '27#HSI',  '0159915']
+    # index_list = ['1999999', '27#HSI',  '0159915']
 
     def writeBlocknew(p_name, data, append=True):
         if append:

@@ -543,6 +543,7 @@ class Sina:
         # if self.index_status:
         # if cct.get_work_time() or (cct.get_now_time_int() > 915) :
         # df = df.drop('close', axis=1)
+
         df.rename(columns={'close': 'llastp'}, inplace=True)
         df['b1_vv'] = df['b1_v']
         if (cct.get_now_time_int() > 915 and cct.get_now_time_int() < 926):
@@ -574,6 +575,9 @@ class Sina:
         df = df.fillna(0)
 #        df = df.sort_values(by='code', ascending=0)
         df = df.set_index('code')
+        if index:
+            df.index=map((lambda x: str(1000000 - int(x))
+                            if x.startswith('0') else x), df.index)
         # print ("Market-df:%s %s time: %s" % (
         # cct.get_now_time()))
         log.info("hdf:all%s %s" % (len(df), len(self.stock_codes)))
@@ -664,10 +668,11 @@ if __name__ == "__main__":
     sina = Sina()
     # print len(df)
     # code='601198'
-    # df = sina.get_stock_list_data(['999999'],index=True)
-    # print df
+    print sina.get_stock_list_data(['999999','399001','399006'],index=True)
+    print sina.get_stock_code_data('999999,399001',index=True)
     # df = sina.get_stock_code_data('000001',index=True).set_index('code')
     # df= sina.get_stock_code_data('999999,399001',index=True)
+    # sys.exit(0)
     code_agg = '300310'
     df = sina.get_stock_code_data([code_agg, '000831', '300306', '600007'])
     print df.columns
