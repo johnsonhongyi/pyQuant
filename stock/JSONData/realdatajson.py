@@ -158,7 +158,7 @@ def get_sina_Market_json(market='all', showtime=True, num='100', retry_count=3, 
     h5 = h5a.load_hdf_db(h5_fname, table=h5_table,limit_time=limit_time)
     if h5 is not None and len(h5) > 0 and 'timel' in h5.columns:
         o_time = h5[h5.timel <> 0].timel
-        if len(h5) < 500:
+        if len(h5) < 2000:
             log.error("h5 not full data")
             o_time = []
         if len(o_time) > 0:
@@ -186,7 +186,7 @@ def get_sina_Market_json(market='all', showtime=True, num='100', retry_count=3, 
     # else:
 
 #    market = 'all'
-    if market=='all':
+    if h5 is None or market=='all':
         url_list=[]
         # for m in ct.SINA_Market_KEY.values():
         for m in ['sh_a','sz_a']:

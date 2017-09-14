@@ -964,7 +964,8 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y', tal
             #            status = len(set(power_columns) & set(df_co)) - len(power_columns) == 0
             #            if status:
 
-            h5 = h5[(h5.op <> 0) & (h5.ra <> 0) & (h5.df2 <> 0 )]
+#            h5 = h5[(h5.op <> 0) & (h5.ra <> 0) & (h5.df2 <> 0 )]
+            h5 = h5[(h5.df2 <> 0 )]
             h5 = h5.drop(
                 [inx for inx in h5.columns if inx not in power_columns], axis=1)
             code_l = list(set(df.index) - set(h5.index))
@@ -1213,10 +1214,18 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y', tal
         #                  df['kdj'].values,df['rsi'].values))
 #        if "fib" not in df.columns:
 #            df['fib'] = 0
-        df['df2'] = (map(lambda ra, fibl, rah, fib, ma, kdj, rsi: (eval(ct.powerdiff % (dl))),
-                         df['ra'].values, df['fibl'].values, df[
-                             'rah'].values, df['fib'].values, df['ma'].values,
-                         df['kdj'].values, df['rsi'].values))
+        def compute_df2(df):
+           df['df2'] = (map(lambda ra, fibl, rah, fib, ma, kdj, rsi: (eval(ct.powerdiff % (dl))),
+                     df['ra'].values, df['fibl'].values, df[
+                         'rah'].values, df['fib'].values, df['ma'].values,
+                     df['kdj'].values, df['rsi'].values))
+           return df
+        if len(df) <> len(code_l):
+            dd = df.loc[code_l]
+            dd = compute_df2(dd)
+            df = cct.combine_dataFrame(df, dd, col=None)
+        else:
+            df = compute_df2(df)
         # df = df.replace(np.inf,0)
         # df = df.replace(-np.inf,0)
         # df = df.fillna(0)

@@ -1,0 +1,4 @@
+%matplotlib inline
+import sys
+sys.path.append('../')
+import JSONData.tdx_data_Day as tdd
