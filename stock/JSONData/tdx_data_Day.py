@@ -1474,6 +1474,26 @@ def Write_sina_to_tdx(market='all', h5_fname='tdx_all_df', h5_table='all', dl=30
 
 
 def search_Tdx_multi_data_duration(fname, table, df=None,  code_l=None, start=None, end=None, freq=None, col=None, index='date'):
+    """[summary]
+    
+    [description]
+    
+    Arguments:
+        fname {[type]} -- [tdx_all_df]
+        table {[type]} -- [all_300]
+    
+    Keyword Arguments:
+        df {[type]} -- [description] (default: {None})
+        code_l {[type]} -- [description] (default: {None})
+        start {[type]} -- [20170101 or daysl] (default: {None})
+        end {[type]} -- [description] (default: {None})
+        freq {[type]} -- [description] (default: {None})
+        col {[type]} -- [description] (default: {None})
+        index {str} -- [description] (default: {'date'})
+    
+    Returns:
+        [type] -- [description]
+    """
     # h5_fname='tdx_all_df'
     # h5_table='all'
     # dl=300
@@ -1505,8 +1525,12 @@ def search_Tdx_multi_data_duration(fname, table, df=None,  code_l=None, start=No
 
     log.info("search_Multi_tdx time:%0.2f" % (time.time() - time_s))
     return h51
-# code_list= None
-# df = search_Tdx_multi_data_duration('tdx_all_df_300', 'all_300', df=None,code_l=code_list, start=10, end=None, freq=None, col=None, index='date')
+# code_list = ['000001','399006','999999']
+# code_list = sina_data.Sina().all.index.tolist()
+# df = search_Tdx_multi_data_duration('tdx_all_df_300', 'all_300', df=None,code_l=code_list, start=20170101, end=None, freq=None, col=None, index='date')
+# print df.index.get_level_values('code').unique().shape
+# print df.loc['600310']
+
 
 def Write_market_all_day_mp(market='all', rewrite=False):
     sh_index = '601998'

@@ -106,18 +106,18 @@ def getBollFilter(df=None, boll=6, duration=ct.PowerCountdl, filter=True, ma5d=T
 
     # if 'nlow' in df.columns and 932 < cct.get_now_time_int() < 1030:
 
-    # if 'nlow' in df.columns and 945 < cct.get_now_time_int():
-    #     for col in ['nhigh', 'nclose', 'nlow']:
-    #         df[col] = df[col].apply(lambda x: round(x, 2))
-    #     if 'nhigh' in df.columns and 'nclose' in df.columns:
-    #         if cct.get_now_time_int() > ct.nlow_limit_time:
-    #             df = df[(df.low >= df.nlow) & ((df.open > df.llastp * ct.changeRatio) & (df.nclose > df.llastp * ct.changeRatio)) &
-    #                     (((df.low >= df.nlow) & (df.close >= df.nclose)) | ((df.close >= df.nclose) & (df.close > df.nhigh * ct.changeRatio) & (df.high >= df.nhigh)))]
-    #         else:
-    #             df = df[((df.open > df.llastp * ct.changeRatio) & (df.close > df.llastp * ct.changeRatio)) &
-    #                     (((df.low >= df.nlow) & (df.close >= df.nclose)) | ((df.close >= df.nclose) & (df.close > df.nhigh * ct.changeRatio)))]
-    #     else:
-    #         df = df[((df.low >= df.nlow) & (df.close > df.llastp))]
+    if 'nlow' in df.columns and 945 < cct.get_now_time_int():
+        for col in ['nhigh', 'nclose', 'nlow']:
+            df[col] = df[col].apply(lambda x: round(x, 2))
+        if 'nhigh' in df.columns and 'nclose' in df.columns:
+            if cct.get_now_time_int() > ct.nlow_limit_time:
+                df = df[(df.low >= df.nlow) & ((df.open > df.llastp * ct.changeRatio) & (df.nclose > df.llastp * ct.changeRatio)) &
+                        (((df.low >= df.nlow) & (df.close >= df.nclose)) | ((df.close >= df.nclose) & (df.close > df.nhigh * ct.changeRatio) & (df.high >= df.nhigh)))]
+            else:
+                df = df[((df.open > df.llastp * ct.changeRatio) & (df.close > df.llastp * ct.changeRatio)) &
+                        (((df.low >= df.nlow) & (df.close >= df.nclose)) | ((df.close >= df.nclose) & (df.close > df.nhigh * ct.changeRatio)))]
+        else:
+            df = df[((df.low >= df.nlow) & (df.close > df.llastp))]
 
     if filter:
 

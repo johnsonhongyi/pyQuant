@@ -223,18 +223,18 @@ def Candlestick(ax, bars=None, quotes=None, width=0.5, colorup='k', colordown='r
 
 def twoLineCompute(code, df=None, start=None, end=None, ptype='low'):
     """[summary]
-    
+
     [find low list and high list]
-    
+
     Arguments:
         code {[type]} -- [description]
-    
+
     Keyword Arguments:
         df {[type]} -- [description] (default: {None})
         start {[type]} -- [description] (default: {None})
         end {[type]} -- [description] (default: {None})
         ptype {str} -- [description] (default: {'low'})
-    
+
     Returns:
         [list] -- [description]
     """
@@ -253,13 +253,13 @@ def twoLineCompute(code, df=None, start=None, end=None, ptype='low'):
 
     def get_Top(df, ptype):
         """[summary]
-        
+
         [description]
-        
+
         Arguments:
             df {[type]} -- [description]
             ptype {[type]} -- [ohlc]
-        
+
         Returns:
             [list] -- [description]
         """
@@ -323,19 +323,19 @@ def twoLineCompute(code, df=None, start=None, end=None, ptype='low'):
 
 def get_linear_model_status_LSH(code, ptype='low', dtype='d', type='l', start=None, end=None):
     """[summary]
-    
+
     [description]
-    
+
     Arguments:
         code {[type]} -- [description]
-    
+
     Keyword Arguments:
         ptype {str} -- [description] (default: {'low'})
         dtype {str} -- [description] (default: {'d'})
         type {str} -- [description] (default: {'l'})
         start {[type]} -- [description] (default: {None})
         end {[type]} -- [description] (default: {None})
-    
+
     Returns:
         bool -- [description]
     """
@@ -964,6 +964,7 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y', tal
             #            status = len(set(power_columns) & set(df_co)) - len(power_columns) == 0
             #            if status:
 
+            h5 = h5[(h5.op <> 0) & (h5.ra <> 0) & (h5.df2 <> 0 )]
             h5 = h5.drop(
                 [inx for inx in h5.columns if inx not in power_columns], axis=1)
             code_l = list(set(df.index) - set(h5.index))

@@ -428,7 +428,7 @@ def get_hot_countNew(changepercent, rzrq, fibl=None, fibc=10):
                 5, rzrq['sz']), f_print(4, rzrq['szrz']),
             szpcent, f_print(4, rzrq['all']), f_print(5, rzrq['dff'])))
     bigcount = rd.getconfigBigCount(count=None, write=True)
-    # print bigcount
+    # print "bigcount:",bigcount
 
     cct.set_console(width, height,
                     title=['B:%s-%s V:%s' % (bigcount[0], bigcount[2], bigcount[1]), 'ZL: %s' % (zlr if len(ff) > 0 else 0),
