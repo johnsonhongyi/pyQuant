@@ -26,7 +26,7 @@ from JohhnsonUtil import commonTips as cct
 
 # log=LoggerFactory.getLogger('wencaiData')
 log=LoggerFactory.log
-
+# curl 'http://www.iwencai.com/stockpick/search?typed=1&preParams=&ts=1&f=1&qs=index_rewrite&selfsectsn=&querytype=&searchfilter=&tid=stockpick&w=%E9%9B%84%E5%AE%89' -H 'Cookie: v=AZaxA_wZ09rYlOd-tO91dApK4U2ZN9pxLHsO1QD_gnkUwzj_aMcqgfwLXuTQ' 
 
 def post_login(root='http://upass.10jqka.com.cn/login',url=None):
     import urllib2,urllib
@@ -41,15 +41,19 @@ def post_login(root='http://upass.10jqka.com.cn/login',url=None):
     'captchaCode':"",
     'longLogin':"on",
     }
+    getData = {
+     'v':'AZaxA_wZ09rYlOd-tO91dApK4U2ZN9pxLHsO1QD_gnkUwzj_aMcqgfwLXuTQ'
+    }
 
     headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.2; rv:16.0) Gecko/20100101 Firefox/16.0',
            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-           'Connection': 'keep-alive'}
+           'Connection': 'keep-alive','v':'AZaxA_wZ09rYlOd-tO91dApK4U2ZN9pxLHsO1QD_gnkUwzj_aMcqgfwLXuTQ'}
     from cookielib import CookieJar
     cj = CookieJar()
     opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
     data_encoded = urllib.urlencode(postData)
-    url = 'http://www.iwencai.com/stockpick/search?typed=0&preParams=&ts=1&f=1&qs=result_original&selfsectsn=&querytype=&searchfilter=&tid=stockpick&w=%s'
+    # url = 'http://www.iwencai.com/stockpick/search?typed=0&preParams=&ts=1&f=1&qs=result_original&selfsectsn=&querytype=&searchfilter=&tid=stockpick&w=%s'
+    url = 'http://www.iwencai.com/stockpick/search?typed=1&preParams=&ts=1&f=1&qs=index_rewrite&selfsectsn=&querytype=&searchfilter=&tid=stockpick&w=%s'
     url = url%('国企改革')
     for ck in cj:
         print ck
@@ -59,15 +63,14 @@ def post_login(root='http://upass.10jqka.com.cn/login',url=None):
         content = response.read()
         # count = re.findall('\[[A-Za-z].*\]', data, re.S)
         status = response.getcode()
-        # print content
         for ck in cj:
             print ck
-        print ":"
+        print "\t:"
         # cj["session"]["u_name_wc"] = "mx_149958484"
         if status == 200:
-            response = opener.open(url)
+            response = opener.open(url,data=headers)
             page =  response.read()
-#            print page
+            print page
 #            for ck in cj:
 #                print ck
     except  urllib2.HTTPError, e:
@@ -80,15 +83,75 @@ def post_login(root='http://upass.10jqka.com.cn/login',url=None):
     # print info
     # get_wencai_Market_url(url=None)
 
+def retry_post_data(root='http://upass.10jqka.com.cn/login',key='国企改革'):
+    url = 'http://www.iwencai.com/stockpick/search?typed=1&preParams=&ts=1&f=1&qs=index_rewrite&selfsectsn=&querytype=&searchfilter=&tid=stockpick&w=%s'
+    urldata = url%(key)
+    import urllib2,urllib
+    # postData = {
+    # 'act':"login_submit",
+    # 'isiframe':"1",
+    # 'view':"iwc_quick",
+    # 'rsa_version':"default_2",
+    # 'redir':"http://www.iwencai.com/user/pop-logined",
+    # 'uname':"OuY03m5D1ojuPmpTAbgkpcm0dod5fMbU8jVOwd17WCPEW0pz52RyEcXU+2ZLiBmP+5jckGeUR5ba/fDjkUaPVaisn9Je4l7+JPv3iX/VS4erW25ueJEoVszK9kM3oF2mT3lraObawMclBteFcfwWHyWhsW7YmN19cgOdsQWWWno=",
+    # 'passwd':"IVORnBZ0Pdi+ix+ehVqiCdYTWCkGBy/kYEeTyTmi+5QBiL8SvYZZg3LLVzzfeMbOWaR/rK4Aoc80kSpqCIETfN3EmhA1CKK9ukI0TImlm8ASlqqz/lUq0lm5LwuMRdBjcD3hoP4RnvDc+W2+ng4XA31YsG6pBo+YF5IHcIxaScU=",
+    # 'captchaCode':"",
+    # 'longLogin':"on",
+    # }
+    # getData = {
+    #  'v':'AZaxA_wZ09rYlOd-tO91dApK4U2ZN9pxLHsO1QD_gnkUwzj_aMcqgfwLXuTQ'
+    # }
+
+    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.2; rv:16.0) Gecko/20100101 Firefox/16.0',
+           'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+           'Connection': 'keep-alive','v':'AZaxA_wZ09rYlOd-tO91dApK4U2ZN9pxLHsO1QD_gnkUwzj_aMcqgfwLXuTQ'}
+    from cookielib import CookieJar
+    cj = CookieJar()
+    # opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
+    # data_encoded = urllib.urlencode(postData)
+    # url = 'http://www.iwencai.com/stockpick/search?typed=0&preParams=&ts=1&f=1&qs=result_original&selfsectsn=&querytype=&searchfilter=&tid=stockpick&w=%s'
+
+    for ck in cj:
+        print ck
+    print ":"
+    try:
+        response = opener.open(root,data_encoded)
+        content = response.read()
+        # count = re.findall('\[[A-Za-z].*\]', data, re.S)
+        status = response.getcode()
+        for ck in cj:
+            print ck
+        print "\t:"
+        # cj["session"]["u_name_wc"] = "mx_149958484"
+        if status == 200:
+            response = opener.open(url,data=headers)
+            page =  response.read()
+            print page
+#            for ck in cj:
+#                print ck
+    except  urllib2.HTTPError, e:
+         print e.code
+    # f= response.read().decode("utf8")
+    # outfile =open("rel_ip.txt","w")
+    # print >> outfile , "%s"   % ( f)
+    #打印响应的信息
+    # info = response.info()
+    # print info
+    # get_wencai_Market_url(url=None)
+
+
 global null,wencai_count
+config_ini = cct.get_ramdisk_dir() + os.path.sep+ 'h5config.txt'
+fname = 'wencai_count'
 null = None
-wencai_count = 0
+wencai_count = cct.get_config_value_wencai(config_ini,fname)
+# cct.get_config_value_wencai(config_ini,fname)
 
 def get_wencai_Market_url(filter='国企改革',perpage=1,url=None,):
     urllist = []
     global null,wencai_count
     df = pd.DataFrame()
-    if url == None and wencai_count < 1:
+    if url == None and cct.get_config_value_wencai(config_ini,fname) < 1:
         time_s = time.time()
         wencairoot = 'http://www.iwencai.com/stockpick/search?typed=0&preParams=&ts=1&f=1&qs=result_original&selfsectsn=&querytype=&searchfilter=&tid=stockpick&w=%s'
         url = wencairoot%(filter)
@@ -98,9 +161,15 @@ def get_wencai_Market_url(filter='国企改革',perpage=1,url=None,):
         cache_root="http://www.iwencai.com/stockpick/cache?token=%s&p=1&perpage=%s&showType="
         cache_ends = "[%22%22,%22%22,%22onTable%22,%22onTable%22,%22onTable%22,%22onTable%22,%22onTable%22,%22onTable%22,%22onTable%22,%22onTable%22]"
 #        url="http://www.iwencai.com/stockpick/search?typed=0&preParams=&ts=1&f=1&qs=result_original&selfsectsn=&querytype=&searchfilter=&tid=stockpick&w=%E6%9C%89%E8%89%B2+%E7%85%A4%E7%82%AD"
-        data = cct.get_url_data(url,retry_count=1)
-        if len(re.findall('系统判断您访问次数过多'.decode('utf8'),data)):
+        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.2; rv:16.0) Gecko/20100101 Firefox/16.0',
+               'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+               'Connection': 'keep-alive',
+               'Cookie':'v=AZaxA_wZ09rYlOd-tO91dApK4U2ZN9pxLHsO1QD_gnkUwzj_aMcqgfwLXuTQ',}
+        data = cct.get_url_data(url,retry_count=1,headers=headers)
+        # data = None
+        if data is  None or (len(data) < 10 or len(re.findall('系统判断您访问次数过多'.decode('utf8'),data))):
             wencai_count+=1
+            cct.get_config_value_wencai(config_ini,fname,currvalue=wencai_count,update=True)
             log.error("acces deny:%s"%('系统判断您访问次数过多'))
             return df
         # print data
@@ -289,7 +358,7 @@ def get_wencai_data(dm,market='wencai',days=120):
                 #     if not x in df.code.values:
                 #         print x,dm[x],
 
-        if wencai_count < 3:
+        if wencai_count < 1:
             wcd_d = get_codelist_df(dm.tolist())
             log.error("dratio:%s diff:%s dm:%s err:%s"%(dratio,len(diff_code),len(dm),wencai_count))
             if len(wcd_d) > 0:
@@ -367,7 +436,10 @@ def get_write_wencai_market_to_csv(df=None,market='wcbk',renew=False,days=60):
 #                df = wencaiwrite_to_csv(df, filepath)
     else:
         df = wencaiwrite_to_csv(df, filepath)
-    df = df.drop_duplicates()
+    if df is not None and len(df) > 1:
+        df = df.drop_duplicates()
+    else:
+        log.error('wencaiErr:%s'%(market))
     if 'code' in df.columns:
         df=df.set_index('code')
     return df

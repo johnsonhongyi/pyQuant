@@ -38,7 +38,8 @@ requests.adapters.DEFAULT_RETRIES = 0
 # from JSONData import tdx_data_Day as tdd
 global initGlobalValue
 initGlobalValue = 0
-clean_terminal = ["Python Launcher",'Johnson — -bash','Johnson — python']
+clean_terminal = ["Python Launcher", 'Johnson — -bash', 'Johnson — python']
+
 
 class GlobalValues:
     # -*- coding: utf-8 -*-
@@ -79,6 +80,7 @@ def get_os_system():
     else:
         return 'other'
 
+
 def get_run_path_tdx(fp=None):
     path = os.getcwd()
     alist = path.split('stock')
@@ -86,7 +88,7 @@ def get_run_path_tdx(fp=None):
         path = alist[0]
         # os_sep=get_os_path_sep()
         if fp is not None:
-            path = path  + fp + '.h5'
+            path = path + fp + '.h5'
     else:
         print "error"
         raise TypeError('log path error.')
@@ -100,7 +102,7 @@ win7rootList = [win10Lixin, win7rootAsus, win7rootXunji, win10Lengend]
 # macroot = r'/Users/Johnson/Documents/Johnson/WinTools/zd_pazq'
 macroot = r'/Users/Johnson/Documents/Johnson/WinTools/new_tdx'
 xproot = r'E:\DOC\Parallels\WinTools\zd_pazq'
-tdx_hd5_name = r'tdx_all_df_%s'%(300)
+tdx_hd5_name = r'tdx_all_df_%s' % (300)
 tdx_hd5_path = get_run_path_tdx(tdx_hd5_name)
 # win10_ramdisk_root = r'R:'
 # mac_ramdisk_root = r'/Volumes/RamDisk'
@@ -223,17 +225,16 @@ closeterminalw = '''osascript -e 'tell application "Terminal" to close windows %
 scriptquit = '''tell application "Python Launcher" to quit'''
 
 
-
-def get_terminal_Position(cmd=None, position=None, close=False,retry=False):
+def get_terminal_Position(cmd=None, position=None, close=False, retry=False):
     """[summary]
-    
+
     [description]
-    
+
     Keyword Arguments:
         cmd {[type]} -- [description] (default: {None})
         position {[type]} -- [description] (default: {None})
         close {bool} -- [description] (default: {False})
-    
+
     Returns:
         [type] -- [description]
     """
@@ -274,11 +275,11 @@ def get_terminal_Position(cmd=None, position=None, close=False,retry=False):
                             # break
                     else:
                         if close:
-                            log.info("Title notFind:%s title:%s Cmd:%s" % (n, title.replace('\n',''),cmd.lower()))
+                            log.info("Title notFind:%s title:%s Cmd:%s" % (n, title.replace('\n', ''), cmd.lower()))
             if len(close_list) > 0:
                 if not retry and len(close_list) > 1:
                     sleep(5)
-                    get_terminal_Position(cmd=cmd, position=position, close=close,retry=True)
+                    get_terminal_Position(cmd=cmd, position=position, close=close, retry=True)
                 else:
                     for n in close_list:
                         os.system(closeterminalw % (close_list[0]))
@@ -545,7 +546,7 @@ def set_ctrl_handler():
     win32api.SetConsoleCtrlHandler(handler, 1)
 
 
-def set_console(width=80, height=15, color=3, title=None,closeTerminal=True):
+def set_console(width=80, height=15, color=3, title=None, closeTerminal=True):
     # mode con cp select=936
     # os.system("mode con: cols=%s lines=%s"%(width,height))
     # print os.path.splitext(sys.argv[0])
@@ -577,6 +578,7 @@ def set_console(width=80, height=15, color=3, title=None,closeTerminal=True):
         get_terminal_Position(cmd=scriptquit, position=None, close=False)
         get_terminal_Position(clean_terminal[1], close=True)
 
+
 def timeit_time(cmd, num=5):
     import timeit
     time_it = timeit.timeit(lambda: cmd, number=num)
@@ -591,14 +593,14 @@ def get_delay_time():
 def cct_raw_input(sts):
     # print sts
     if GlobalValues().getkey('Except_count') is None:
-        GlobalValues().setkey('Except_count',0)
+        GlobalValues().setkey('Except_count', 0)
     st = None
     try:
         st = raw_input(sts)
     except (KeyboardInterrupt) as e:
         inputerr = cct_raw_input(" Break: ")
         if inputerr == 'e' or inputerr == 'q':
-           sys.exit(0)
+            sys.exit(0)
         # raise Exception('raw interrupt')
         if inputerr is not None and len(inputerr) > 0:
             return inputerr
@@ -607,10 +609,10 @@ def cct_raw_input(sts):
     except (IOError, EOFError, Exception) as e:
         count_Except = GlobalValues().getkey('Except_count')
         if count_Except is not None and count_Except < 4:
-            GlobalValues().setkey('Except_count',count_Except+1)
-            print "cct_raw_input:ExceptionError:%s count:%s" %(e,count_Except)
+            GlobalValues().setkey('Except_count', count_Except + 1)
+            print "cct_raw_input:ExceptionError:%s count:%s" % (e, count_Except)
         else:
-            print "cct_ExceptionError:%s count:%s" %(e,count_Except)
+            print "cct_ExceptionError:%s count:%s" % (e, count_Except)
             sys.exit(0)
     return st
 
@@ -668,16 +670,16 @@ def sleep(timet, catch=True):
         if catch:
             raise KeyboardInterrupt("Sleep Time")
         else:
-            print ("KeyboardInterrupt Sleep Time")
+            print("KeyboardInterrupt Sleep Time")
 
     except (IOError, EOFError, Exception) as e:
-            count_Except = GlobalValues().getkey('Except_count')
-            if count_Except is not None and count_Except < 4:
-                GlobalValues().setkey('Except_count',count_Except+1)
-                print "cct_raw_input:ExceptionError:%s count:%s" %(e,count_Except)
-            else:
-                print "cct_ExceptionError:%s count:%s" %(e,count_Except)
-                sys.exit(0)    
+        count_Except = GlobalValues().getkey('Except_count')
+        if count_Except is not None and count_Except < 4:
+            GlobalValues().setkey('Except_count', count_Except + 1)
+            print "cct_raw_input:ExceptionError:%s count:%s" % (e, count_Except)
+        else:
+            print "cct_ExceptionError:%s count:%s" % (e, count_Except)
+            sys.exit(0)
         # raise Exception("code is None")
     # print time.time()-times
 
@@ -973,22 +975,23 @@ def get_url_data_R(url, timeout=10):
     except (socket.timeout, socket.error) as e:
         # print data.encoding
         data = ''
-        log.error('socket timed out error:%s - URL %s '%(e,url))
+        log.error('socket timed out error:%s - URL %s ' % (e, url))
         sleeprandom(60)
     except Exception as e:
         data = ''
-        log.error('url Exception Error:%s - URL %s '%(e,url))
+        log.error('url Exception Error:%s - URL %s ' % (e, url))
         sleeprandom(60)
     else:
         log.info('Access successful.')
     return data
 
 
-def get_url_data(url, retry_count=5, pause=0.05, timeout=10):
+def get_url_data(url, retry_count=5, pause=0.05, timeout=10, headers=None):
     #    headers = {'User-Agent':'Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.6) Gecko/20091201 Firefox/3.5.6'}
-    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.2; rv:16.0) Gecko/20100101 Firefox/16.0',
-               'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-               'Connection': 'keep-alive'}
+    if headers is None:
+        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.2; rv:16.0) Gecko/20100101 Firefox/16.0',
+                   'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+                   'Connection': 'keep-alive'}
 
     for _ in range(retry_count):
         time.sleep(pause)
@@ -996,10 +999,10 @@ def get_url_data(url, retry_count=5, pause=0.05, timeout=10):
             data = requests.get(url, headers=headers, timeout=timeout)
         except (socket.timeout, socket.error) as e:
             data = ''
-            log.error('socket timed out error:%s - URL %s '%(e,url))
+            log.error('socket timed out error:%s - URL %s ' % (e, url))
             sleeprandom(60)
         except Exception as e:
-            log.error('url Exception Error:%s - URL %s '%(e,url))
+            log.error('url Exception Error:%s - URL %s ' % (e, url))
             sleeprandom(60)
         else:
             log.info('Access successful.')
@@ -1262,40 +1265,61 @@ def code_to_tdx_blk(code):
             return '1%s' % code if code[:1] in ['5', '6'] else '0%s' % code
 
 
-def get_config_value(fname, classtype, xvalue, newvalue, xtype='limit', write=False):
+def get_config_value(fname, classtype, currvalue, limitvalue=1, xtype='limit', read=False):
     conf_ini = fname
     # conf_ini = cct.get_work_path('stock','JSONData','count.ini')
     if os.path.exists(conf_ini):
         # log.info("file ok:%s"%conf_ini)
         config = ConfigObj(conf_ini, encoding='UTF8')
         if classtype in config.keys():
-            if int(config[classtype][xtype]) > xvalue:
-                ratio = float(config[classtype][xtype]) / newvalue
+            if int(config[classtype][xtype]) > currvalue:
+                ratio = float(config[classtype][xtype]) / limitvalue
                 if ratio < 1.2:
-                    log.info("f_size:%s < read_limit:%s ratio:%0.2f" % (xvalue, config[classtype][xtype], ratio))
+                    log.info("f_size:%s < read_limit:%s ratio:%0.2f" % (currvalue, config[classtype][xtype], ratio))
                 else:
-                    config[classtype][xtype] = newvalue
+                    config[classtype][xtype] = limitvalue
                     config.write()
-                    log.info("f_size:%s < read_limit:%s ratio < 2 ratio:%0.2f" % (xvalue, config[classtype][xtype], ratio))
+                    log.info("f_size:%s < read_limit:%s ratio < 2 ratio:%0.2f" % (currvalue, config[classtype][xtype], ratio))
 
             else:
-                log.error("f_size:%s > read_limit:%s" % (xvalue, config[classtype][xtype]))
-                config[classtype][xtype] = newvalue
+
+                log.error("f_size:%s > read_limit:%s" % (currvalue, config[classtype][xtype]))
+                config[classtype][xtype] = limitvalue
                 config.write()
                 return True
         else:
-            # log.error("no type:%s f_size:%s" % (classtype, xvalue))
+            # log.error("no type:%s f_size:%s" % (classtype, currvalue))
             config[classtype] = {}
-            config[classtype][xtype] = newvalue
+            config[classtype][xtype] = limitvalue
             config.write()
             return True
     else:
         config = ConfigObj(conf_ini, encoding='UTF8')
         config[classtype] = {}
-        config[classtype][xtype] = newvalue
+        config[classtype][xtype] = limitvalue
         config.write()
     return False
 
+def get_config_value_wencai(fname, classtype, currvalue=0, xtype='limit', update=False):
+    conf_ini = fname
+    if os.path.exists(conf_ini):
+        config = ConfigObj(conf_ini, encoding='UTF8')
+        if not update:
+            if classtype in config.keys():
+                return int(config[classtype][xtype])
+            else:
+                config[classtype][xtype] = currvalue
+                config.write()
+        else:
+            if int(config[classtype][xtype]) <> currvalue:
+                config[classtype][xtype] = currvalue
+                config.write()
+    else:
+        config = ConfigObj(conf_ini, encoding='UTF8')
+        config[classtype] = {}
+        config[classtype][xtype] = currvalue
+        config.write()
+    return int(currvalue)
 
 def write_to_blocknew(p_name, data, append=True):
     # index_list = ['1999999','47#IFL0',  '0399006', '27#HSI']
@@ -1480,7 +1504,7 @@ def varnamestr(obj, namespace=globals()):
             return n
     return None
 
-multiIndex_func = {'close': 'mean', 'low': 'min','high':'max', 'volume': 'sum'}
+multiIndex_func = {'close': 'mean', 'low': 'min', 'high': 'max', 'volume': 'sum'}
 
 
 def using_Grouper_eval(df, freq='5T', col='low', closed='right', label='right'):
@@ -1525,16 +1549,16 @@ def select_multiIndex_index(df, index='ticktime', start=None, end=None, datev=No
             if datev is None:
                 end = get_today() + ' ' + end
                 if start is None:
-                    start = get_today(sep='-')+' '+'09:25:00'
+                    start = get_today(sep='-') + ' ' + '09:25:00'
             else:
                 end = day8_to_day10(datev) + ' ' + end
                 if start is None:
-                    start = day8_to_day10(datev)+' '+'09:25:00'
+                    start = day8_to_day10(datev) + ' ' + '09:25:00'
         else:
             if start is None:
                 if end is None:
-                    start = get_today(sep='-')+' '+'09:25:00'
-                    end = get_today(sep='-')+' '+'09:45:00'
+                    start = get_today(sep='-') + ' ' + '09:25:00'
+                    end = get_today(sep='-') + ' ' + '09:45:00'
                     log.error("start and end is None to 930 and 945")
                 else:
                     start = end
@@ -1547,7 +1571,7 @@ def select_multiIndex_index(df, index='ticktime', start=None, end=None, datev=No
         df = df[(df.index.get_level_values(index) >= start)]
     elif start is not None and end is not None:
         idx = df.index.get_level_values(index)[0] if len(df.index.get_level_values(index)) > 0 else 0
-        log.info("idx:%s idx<=end:%s"%(idx,idx <= pd.Timestamp(end)))
+        log.info("idx:%s idx<=end:%s" % (idx, idx <= pd.Timestamp(end)))
         if idx <= pd.Timestamp(end):
             df = df[(df.index.get_level_values(index) >= start) & (df.index.get_level_values(index) <= end)]
         else:
@@ -1556,7 +1580,8 @@ def select_multiIndex_index(df, index='ticktime', start=None, end=None, datev=No
         log.error("start end is None")
     return df
 
-def from_list_to_dict(col,func_dict):
+
+def from_list_to_dict(col, func_dict):
     func = {}
     if isinstance(col, list):
         for k in col:
@@ -1566,8 +1591,9 @@ def from_list_to_dict(col,func_dict):
         func = col
     else:
         if col in func_dict.keys():
-            func[col] = func_dict[col]  
+            func[col] = func_dict[col]
     return func
+
 
 def get_limit_multiIndex_Row(df, col=multiIndex_func, index='ticktime', start=None, end='10:00:00'):
     df = select_multiIndex_index(df, index=index, start=start, end=end)
@@ -1575,6 +1601,7 @@ def get_limit_multiIndex_Row(df, col=multiIndex_func, index='ticktime', start=No
         func = from_list_to_dict(col, multiIndex_func)
         df = df.groupby(level=[0]).agg(func)
     return df
+
 
 def get_limit_multiIndex_freq(df, freq='5T', col='low', index='ticktime', start=None, end='10:00:00'):
     df = select_multiIndex_index(df, index=index, start=start, end=end)
@@ -1908,8 +1935,8 @@ def combine_dataFrame(maindf, subdf, col=None, compare=None, append=False, clean
     log.info("combine df :%0.2f" % (time.time() - times))
     if append:
         dif_co = list(set(maindf_co) - set(subdf_co))
-        # print "diff_co",set(dif_co) - set(['nhigh','nlow','nclose']) 
-        if set(dif_co) - set(['nhigh','nlow','nclose']) > 0 and len(dif_co) > 1 :
+        # print "diff_co",set(dif_co) - set(['nhigh','nlow','nclose'])
+        if set(dif_co) - set(['nhigh', 'nlow', 'nclose']) > 0 and len(dif_co) > 1:
             log.error("col:%s %s" % (dif_co[:3], eval(("maindf.%s") % (dif_co[0]))[1]))
     return maindf
 
@@ -1935,7 +1962,7 @@ if __name__ == '__main__':
 
     # get_terminal_Position(cmd=scriptquit, position=None, close=False)
     # get_terminal_Position('Johnson —', close=True)
-    get_terminal_Position(clean_terminal[2],close=True)
+    get_terminal_Position(clean_terminal[2], close=True)
     get_terminal_Position(clean_terminal[1], close=True)
     log.info("close Python Launcher")
     s_time = time.time()
