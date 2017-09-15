@@ -97,6 +97,7 @@ def get_wencai_Market_url(filter='国企改革',perpage=1,url=None,):
         # print url
         cache_root="http://www.iwencai.com/stockpick/cache?token=%s&p=1&perpage=%s&showType="
         cache_ends = "[%22%22,%22%22,%22onTable%22,%22onTable%22,%22onTable%22,%22onTable%22,%22onTable%22,%22onTable%22,%22onTable%22,%22onTable%22]"
+#        url="http://www.iwencai.com/stockpick/search?typed=0&preParams=&ts=1&f=1&qs=result_original&selfsectsn=&querytype=&searchfilter=&tid=stockpick&w=%E6%9C%89%E8%89%B2+%E7%85%A4%E7%82%AD"
         data = cct.get_url_data(url,retry_count=1)
         if len(re.findall('系统判断您访问次数过多'.decode('utf8'),data)):
             wencai_count+=1
@@ -287,14 +288,14 @@ def get_wencai_data(dm,market='wencai',days=120):
                 # for x in diff_code:
                 #     if not x in df.code.values:
                 #         print x,dm[x],
-        
+
         if wencai_count < 3:
             wcd_d = get_codelist_df(dm.tolist())
             log.error("dratio:%s diff:%s dm:%s err:%s"%(dratio,len(diff_code),len(dm),wencai_count))
             if len(wcd_d) > 0:
                 df = get_write_wencai_market_to_csv(wcd_d,market=market,renew=True,days=days)
         # else:
-            # dm['category'] = 0 
+            # dm['category'] = 0
 
     else:
         df = get_wencai_Market_url(dm.name)
@@ -399,7 +400,8 @@ if __name__ == '__main__':
 #    df = get_wencai_Market_url('赢时胜,博腾股份,炬华科技,东土科技,华鹏飞,长亮科技,天银机电,润和软件,苏大维格,晶盛机电,掌趣科技,戴维医疗,邦讯技术,汉鼎宇佑,富春通信,三六五网,南通锻压,华昌达,梅安森,尔康制药,雅本化学,卫宁健康,初灵信息,乐金健康,迪安诊断',500)
 
     # df =  get_wcbk_df(filter='城建+一带一路',market='ydyl')
-    df =  get_wcbk_df(filter='新股与次新股',market='cxg')
+#    df =  get_wcbk_df(filter='新股与次新股',market='cxg')
+    df =  get_wcbk_df(filter='有色',market='ys')
     # df =  get_wcbk_df(filter='新能源',market='xny')
 #    df =  get_wcbk_df(filter='混改',market='wencai')
     print df.shape,df[:5]

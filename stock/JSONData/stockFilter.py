@@ -49,7 +49,8 @@ def getBollFilter(df=None, boll=6, duration=ct.PowerCountdl, filter=True, ma5d=T
             per_col = [co for co in df.columns if co.find('per') > -1]
             per_col = list(set(per_col) - set(perc_col) - set(['per1d', 'perlastp']))
             perc_col.remove('percent')
-            da, down_zero, down_dn, percent_l = 1, 0, -1, 1
+            # da, down_zero, down_dn, percent_l = 1, 0, 0, 2
+            # da, down_zero, down_dn, percent_l = 1, 0, -1, 1
             # df['perc_n'] = map((lambda h, lh, l, ll, c, lc: (1 if (h - lh) > 0 else down_dn) + (1 if c - lc > 0 else down_dn) + (1 if (l - ll) > 0 else down_dn) + (2 if (c - lh) > 0 else down_zero) + (2 if (l - lc) > 0 else down_zero) + (0 if (h - lc) > 0 else down_dn)), df['high'], df['lasth%sd' % da], df['low'], df['lastl%sd' % da], df['close'],df['lastp%sd' % da])
             # df['perc_n'] = map((lambda c, lc: (1 if (c - lc) > 0 else down_zero) + (1 if (c - lc) / lc * 100 > 3 else down_zero) +
             # (down_dn if (c - lc) / lc * 100 < -3 else down_zero)), df['close'], df['lastp%sd' % da])

@@ -1805,7 +1805,9 @@ def get_diff_dratio(mainlist, sublist):
 
 def func_compute_percd(c, lp, lc, lh, ll, nh, nl):
     initc = 0
-    down_zero, down_dn, percent_l = 0, -1, 1
+    down_zero, down_dn, percent_l = 0, 0, 2
+    # da, down_zero, down_dn, percent_l = 1, 0, 0, 2
+
     n_p = (c - lc) / lc * 100
     n_hp = nh - lh
     n_lp = nl - ll
