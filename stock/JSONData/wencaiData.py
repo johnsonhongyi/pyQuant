@@ -153,6 +153,12 @@ def get_wencai_Market_url(filter='国企改革',perpage=1,url=None,):
     df = pd.DataFrame()
     if url == None and cct.get_config_value_wencai(config_ini,fname) < 1:
         time_s = time.time()
+        duratime = cct.get_config_value_wencai(config_ini,fname,currvalue=time_s,xtype='time',update=False)
+        if duratime < 15:
+            sleep_t = 15-duratime
+            log.error('timelimit:%s'%(sleep_t))
+            time.sleep(sleep_t)
+        # print "da",duratime
         wencairoot = 'http://www.iwencai.com/stockpick/search?typed=0&preParams=&ts=1&f=1&qs=result_original&selfsectsn=&querytype=&searchfilter=&tid=stockpick&w=%s'
         url = wencairoot%(filter)
         log.debug("url:%s"%(url))
@@ -170,7 +176,7 @@ def get_wencai_Market_url(filter='国企改革',perpage=1,url=None,):
         if data is  None or (len(data) < 10 or len(re.findall('系统判断您访问次数过多'.decode('utf8'),data))):
             wencai_count+=1
             cct.get_config_value_wencai(config_ini,fname,currvalue=wencai_count,update=True)
-            log.error("acces deny:%s"%('系统判断您访问次数过多'))
+            log.error("acces deny:%s %s"%('系统判断您访问次数过多',data))
             return df
         # print data
         # count = re.findall('(\d+)', data, re.S)
@@ -289,6 +295,8 @@ def get_wencai_Market_url(filter='国企改革',perpage=1,url=None,):
             # print type(count[0])
             # print type(list(count[0]))
             # print count[0].decode('unicode-escape')
+    duratime = cct.get_config_value_wencai(config_ini,fname,currvalue=time.time(),xtype='time',update=True)
+
     return df
 
 def get_codelist_df(codelist):
@@ -473,7 +481,7 @@ if __name__ == '__main__':
 
     # df =  get_wcbk_df(filter='城建+一带一路',market='ydyl')
 #    df =  get_wcbk_df(filter='新股与次新股',market='cxg')
-    df =  get_wcbk_df(filter='有色',market='ys')
+    df =  get_wcbk_df(filter='有色',market='yss')
     # df =  get_wcbk_df(filter='新能源',market='xny')
 #    df =  get_wcbk_df(filter='混改',market='wencai')
     print df.shape,df[:5]

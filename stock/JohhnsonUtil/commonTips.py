@@ -1302,16 +1302,33 @@ def get_config_value(fname, classtype, currvalue, limitvalue=1, xtype='limit', r
 
 def get_config_value_wencai(fname, classtype, currvalue=0, xtype='limit', update=False):
     conf_ini = fname
+    # print fname
+    currvalue = int(currvalue)
     if os.path.exists(conf_ini):
         config = ConfigObj(conf_ini, encoding='UTF8')
         if not update:
             if classtype in config.keys():
-                return int(config[classtype][xtype])
+                if not xtype in config[classtype].keys():
+                    config[classtype][xtype] = currvalue
+                    config.write()
+                    if xtype == 'time':
+                        return 1
+                else:
+                    if xtype == 'time' and currvalue <> 0:
+                        time_dif = currvalue - float(config[classtype][xtype])
+                    else:
+                        time_dif = int(config[classtype][xtype])
+                    return time_dif
+
             else:
-                config[classtype][xtype] = currvalue
+                config[classtype][xtype] = 0
                 config.write()
         else:
-            if int(config[classtype][xtype]) <> currvalue:
+            if xtype == 'time':
+                save_value = float(config[classtype][xtype])
+            else:
+                save_value = int(config[classtype][xtype])
+            if save_value <> currvalue:
                 config[classtype][xtype] = currvalue
                 config.write()
     else:
