@@ -765,10 +765,14 @@ def get_market_price_sina_dd_realTime(dp='',vol='0',type='0'):
             # dm.ratio=dm.ratio
             # dm=dm.loc[:,ct.SINA_Market_Clean_UP_Columns]
         else:
-            dp=dp.set_index('code')
-            dp['couts'] = 0
-            dp['prev_p'] = 0
-            dm = dp
+            if len(dp) > 0 and 'code' in dp.columnsobject:
+                dp=dp.set_index('code')
+                dp['couts'] = 0
+                dp['prev_p'] = 0
+                dm = dp
+            else:
+                log.error('dp is None')
+                dm = ''
             # dm=dp.loc[:,ct.SINA_Market_Clean_Columns]
             # dm=dp.loc[:,ct.SINA_Market_Clean_UP_Columns]
             # dm['prev_p']=0.0
