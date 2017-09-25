@@ -13,7 +13,7 @@ import pandas as pd
 from lxml import etree
 from pandas.compat import StringIO
 
-from stock.JohhnsonUtil import johnson_cons as ct
+from stock.JohnsonUtil import johnson_cons as ct
 
 try:
     from urllib.request import urlopen, Request

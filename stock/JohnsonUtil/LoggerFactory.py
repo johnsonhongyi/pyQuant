@@ -16,7 +16,7 @@ import ipykernel.iostream
 #     print "imp",commonTips.get_os_system()
 # except ImportError:
 #     print "a"
-#     cct = sys.modules['/Users/Johnson/Documents/Quant/pyQuant/stock/JohhnsonUtil/' + 'commonTips']
+#     cct = sys.modules['/Users/Johnson/Documents/Quant/pyQuant/stock/JohnsonUtil/' + 'commonTips']
 #     print cct.get_os_system()
     
 # Hack to import something without circular import issue

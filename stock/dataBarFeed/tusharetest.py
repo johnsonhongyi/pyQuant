@@ -16,7 +16,7 @@ import sys
 sys.path.append("..")
 from JSONData import tdx_data_Day as tdd
 import powerTech as ptc
-from JohhnsonUtil import LoggerFactory as LoggerFactory
+from JohnsonUtil import LoggerFactory as LoggerFactory
 # log = LoggerFactory.getLogger("tutest")
 # log.setLevel(LoggerFactory.INFO)
 # log.setLevel(LoggerFactory.WARN)

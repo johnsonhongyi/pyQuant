@@ -13,9 +13,9 @@
 
 # from JSONData import realdatajson as rl
 # from JSONData import wencaiData as wcd
-# from JohhnsonUtil import LoggerFactory
-# from JohhnsonUtil import commonTips as cct
-# from JohhnsonUtil import johnson_cons as ct
+# from JohnsonUtil import LoggerFactory
+# from JohnsonUtil import commonTips as cct
+# from JohnsonUtil import johnson_cons as ct
 # import tushare as ts
 import sina_data
 import StringIO,zipfile

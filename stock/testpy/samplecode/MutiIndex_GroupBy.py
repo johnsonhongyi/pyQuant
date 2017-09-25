@@ -10,6 +10,7 @@ import pandas as pd
 import datetime as DT
 import datetime
 
+# https://stackoverflow.com/questions/15799162/resampling-within-a-pandas-multiindex
 
 def day8_to_day10(start,sep='-'):
     if start:
@@ -41,6 +42,9 @@ def using_Grouper_eval(df, freq='5T', col='low', closed='right', label='right'):
     return eval("(df.groupby([level_values(i) for i in [0]]+[pd.Grouper(freq=freq, level=-1,closed='%s',label='%s')]).agg(%s))" % (closed, label, func))
     # return (df.groupby([level_values(i) for i in [0]] +[pd.Grouper(freq=freq, level=-1)]).agg({'low':'min','close':'mean','volume':'sum'}))
 
+def get_date_range_freq():
+    date_range = pd.date_range(start = '5/3/2005', periods =5+1, freq='1D')
+    new_date_range = pd.date_range(date_range.min(), date_range.max(), freq='30 min')
 
 def using_Grouper(df, freq='5T', col='low', closed='right', label='right'):
     func ={}

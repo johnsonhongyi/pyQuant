@@ -5,9 +5,9 @@ from JSONData import powerCompute as pct
 from JSONData import LineHistogram as lht
 from JSONData import wencaiData as wcd
 from JSONData import get_macd_kdj_rsi as getab
-import JohhnsonUtil.johnson_cons as ct
-from JohhnsonUtil import commonTips as cct
-from JohhnsonUtil import LoggerFactory as LoggerFactory
+import JohnsonUtil.johnson_cons as ct
+from JohnsonUtil import commonTips as cct
+from JohnsonUtil import LoggerFactory as LoggerFactory
 log = LoggerFactory.log
 
 
@@ -22,8 +22,8 @@ def parseArgmain():
         parser.add_argument('-v', action="store", dest="vtype", type=str, choices=['f', 'b'], default='f',help='Price Forward or back')
         parser.add_argument('-p', action="store", dest="ptype", type=str, choices=['high', 'low', 'close'], default='low',help='price type')
         parser.add_argument('-f', action="store", dest="filter", type=str, choices=['y', 'n'], default='y',help='find duration low')
-        parser.add_argument('-l', action="store", dest="dl", type=int, default=30,help='dl default=30')
-        parser.add_argument('-da', action="store", dest="days", type=int, default=0,help='days')
+        parser.add_argument('-l', action="store", dest="dl", type=int, default=ct.PowerCountdl,help='dl default=30')
+        parser.add_argument('-da', action="store", dest="days", type=int, default=ct.Power_last_da,help='days')
         parser.add_argument('-m', action="store", dest="mpl", type=str, default='y',help='mpl show')
         parser.add_argument('-i', action="store", dest="line", type=str, choices=['y', 'n'], default='y', help='LineHis show')
         parser.add_argument('-w', action="store", dest="wencai", type=str, choices=['y', 'n'], default='n',help='WenCai Search')
@@ -74,7 +74,7 @@ if __name__ == "__main__":
             code = raw_input("code:")
             args = parser.parse_args(code.split())
             # print args
-            # print str(args.code)
+            # print str(args.days)
             if not str(args.code) == 'None' and (args.wencai == 'y' or re.match('[ \u4e00 -\u9fa5]+',code) == None):
                 df  = wcd.get_wencai_Market_url(code,200)
                 print df.shape,df[:8]
@@ -166,7 +166,7 @@ if __name__ == "__main__":
                         # args.start), end=cct.day8_to_day10(args.end), filter=args.filter, dl=args.dl)
                 # print "code:%s op:%s ra/days:%s  start:%s" % (code, op, str(ra) + '/' + str(days), st)
                 # 'ra * fibl + rah*(abs(int(%s)-fibl))/fib +ma +kdj+rsi'
-                boll,kdj,macd,rsi,ma,bollCT = getab.get_All_Count(args.code,dl=args.dl*2,start=start, end=end,days=5)
+                boll,kdj,macd,rsi,ma,bollCT = getab.get_All_Count(args.code,dl=args.dl,start=start, end=end,days=ct.Power_Ma_Days,lastday=args.days)
                 # print ""
                 # print "ral,opl,fibl,oph,rah,fib,kdj,macd,rsi,ma=",ral,opl,fibl,oph,rah,fib,kdj,macd,rsi,ma
                 # ra, fibl,rah,fib,ma,kdj,rsi

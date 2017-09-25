@@ -7,8 +7,8 @@ sys.path.append("..")
 from JSONData import tdx_data_Day as tdd
 from JSONData import powerCompute as pct
 from JSONData import get_macd_kdj_rsi as getab
-from JohhnsonUtil import commonTips as cct
-from JohhnsonUtil import LoggerFactory as LoggerFactory
+from JohnsonUtil import commonTips as cct
+from JohnsonUtil import LoggerFactory as LoggerFactory
 import numpy as np
 # import pandas as pd
 from statsmodels import api as sm
@@ -274,7 +274,29 @@ def get_linear_model_rule(code,df=None,dl=30,type='M', nowP=None,days=1,only=Fal
 
 def get_linear_model_status(code, df=None, dtype='d', type='m', start=None, end=None, days=1, filter='n',
                             dl=None, countall=True, ptype='low',power=True):
-
+    """[pct test get_linear_model_status]
+    
+    [description]
+    
+    Arguments:
+        code {[type]} -- [description]
+    
+    Keyword Arguments:
+        df {[type]} -- [description] (default: {None})
+        dtype {str} -- [description] (default: {'d'})
+        type {str} -- [description] (default: {'m'})
+        start {[type]} -- [description] (default: {None})
+        end {[type]} -- [description] (default: {None})
+        days {number} -- [description] (default: {1})
+        filter {str} -- [description] (default: {'n'})
+        dl {[type]} -- [description] (default: {None})
+        countall {bool} -- [description] (default: {True})
+        ptype {str} -- [description] (default: {'low'})
+        power {bool} -- [description] (default: {True})
+    
+    Returns:
+        [type] -- [description]
+    """
     if start is not None and end is None and filter == 'y':
         index_d = cct.day8_to_day10(start)
         start = tdd.get_duration_price_date(code, ptype=ptype, dt=start, df=df,dl=dl,power=power)

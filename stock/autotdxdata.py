@@ -9,14 +9,14 @@ import time
 
 import pandas as pd
 
-import JohhnsonUtil.johnson_cons as ct
+import JohnsonUtil.johnson_cons as ct
 import singleAnalyseUtil as slMon
 from JSONData import powerCompute as pct
 from JSONData import realdatajson as rl
 from JSONData import tdx_data_Day as tdd
 from JSONData import sina_data
-from JohhnsonUtil import LoggerFactory as LoggerFactory
-from JohhnsonUtil import commonTips as cct
+from JohnsonUtil import LoggerFactory as LoggerFactory
+from JohnsonUtil import commonTips as cct
 
 
 if __name__ == "__main__":

@@ -40,11 +40,11 @@ import itertools
 import random
 import re
 import sys
-sys.path.append("..")
+# sys.path.append("..")
 import textwrap
 import unicodedata
 
-from JohnsonUtil import commonTips as cct
+import commonTips as cct
 
 # reload(sys)
 # sys.setdefaultencoding('utf-8')

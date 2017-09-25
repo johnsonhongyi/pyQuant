@@ -3,9 +3,9 @@ import re
 import sys
 import time
 sys.path.append("..")
-import JohhnsonUtil.commonTips as cct
-import JohhnsonUtil.johnson_cons as ct
-import JohhnsonUtil.LoggerFactory as LoggerFactory
+import JohnsonUtil.commonTips as cct
+import JohnsonUtil.johnson_cons as ct
+import JohnsonUtil.LoggerFactory as LoggerFactory
 import tdx_data_Day as tdd
 log = LoggerFactory.getLogger("thsDataUtil")
 # log.setLevel(LoggerFactory.INFO)

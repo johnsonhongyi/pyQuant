@@ -4,7 +4,7 @@ import time
 
 import pandas as pd
 
-import JohhnsonUtil.commonTips as cct
+import JohnsonUtil.commonTips as cct
 # from JSONData import LineHistogram as lrh
 from JSONData import powerCompute as pct
 from JSONData import realdatajson as rl

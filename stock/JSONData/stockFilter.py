@@ -1,13 +1,13 @@
 # -*- coding:utf-8 -*-
 import sys
 sys.path.append("..")
-from JohhnsonUtil import commonTips as cct
-import JohhnsonUtil.johnson_cons as ct
+from JohnsonUtil import commonTips as cct
+import JohnsonUtil.johnson_cons as ct
 from JSONData import powerCompute as pct
 # from JSONData import tdx_data_Day as tdd
 from JSONData import get_macd_kdj_rsi as getab
 import pandas as pd
-from JohhnsonUtil import LoggerFactory
+from JohnsonUtil import LoggerFactory
 log = LoggerFactory.log
 import time
 import random
@@ -108,8 +108,8 @@ def getBollFilter(df=None, boll=6, duration=ct.PowerCountdl, filter=True, ma5d=T
     # if 'nlow' in df.columns and 932 < cct.get_now_time_int() < 1030:
 
     if 'nlow' in df.columns and 945 < cct.get_now_time_int():
-        for col in ['nhigh', 'nclose', 'nlow']:
-            df[col] = df[col].apply(lambda x: round(x, 2))
+        # for col in ['nhigh', 'nclose', 'nlow','nstd']:
+        #     df[col] = df[col].apply(lambda x: round(x, 2))
         if 'nhigh' in df.columns and 'nclose' in df.columns:
             if cct.get_now_time_int() > ct.nlow_limit_time:
                 df = df[(df.low >= df.nlow) & ((df.open > df.llastp * ct.changeRatio) & (df.nclose > df.llastp * ct.changeRatio)) &
@@ -226,11 +226,11 @@ def WriteCountFilter(df, op='op', writecount=ct.writeCount, end=None, duration=1
         if end is None and int(writecount) > 0:
             if int(writecount) < 100 and len(df) > 0 and 'percent' in df.columns:
                 codel = df.index[:int(writecount)].tolist()
-                dd = df[df.percent == 10]
-                df_list = dd.index.tolist()
-                for co in df_list:
-                    if co not in codel:
-                        codel.append(co)
+                # dd = df[df.percent == 10]
+                # df_list = dd.index.tolist()
+                # for co in df_list:
+                #     if co not in codel:
+                #         codel.append(co)
             else:
                 if len(str(writecount)) >= 4:
                     codel.append(str(writecount).zfill(6))

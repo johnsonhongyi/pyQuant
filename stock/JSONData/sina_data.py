@@ -10,9 +10,9 @@ sys.path.append("..")
 import pandas as pd
 import requests
 
-from JohhnsonUtil import johnson_cons as ct
-from JohhnsonUtil import commonTips as cct
-from JohhnsonUtil import LoggerFactory
+from JohnsonUtil import johnson_cons as ct
+from JohnsonUtil import commonTips as cct
+from JohnsonUtil import LoggerFactory
 import trollius as asyncio
 from trollius.coroutines import From
 # log = LoggerFactory.getLogger('Sina_data')
@@ -57,12 +57,12 @@ class StockCode:
 
     def get_stock_codes(self, realtime=False):
         """[summary]
-        
+
         [获取所有股票 ID 到 all_stock_code 目录下]
-        
+
         Keyword Arguments:
             realtime {bool} -- [description] (default: {False})
-        
+
         Returns:
             [type] -- [description]
         """
@@ -88,6 +88,7 @@ class StockCode:
 
 # -*- encoding: utf-8 -*-
 all_func = {'low': 'nlow', 'high': 'nhigh', 'close': 'nclose'}
+
 
 class Sina:
     """新浪免费行情获取"""
@@ -184,9 +185,9 @@ class Sina:
         self.load_stock_codes()
         # print "stocks:",len(self.stock_codes)
         self.stock_codes = [elem for elem in self.stock_codes if elem.startswith(('6', '30', '00'))]
-        time_s=time.time()
+        time_s = time.time()
         h5 = h5a.load_hdf_db(self.hdf_name, self.table, code_l=self.stock_codes, limit_time=self.sina_limit_time)
-        log.info("h5a stocksTime:%0.2f"%(time.time()-time_s))
+        log.info("h5a stocksTime:%0.2f" % (time.time() - time_s))
         if h5 is not None and len(h5) > 0:
             o_time = h5[h5.timel <> 0].timel
             if len(o_time) > 0:
@@ -210,7 +211,7 @@ class Sina:
 
         # self.stock_with_exchange_list = list(
             # map(lambda stock_code: ('sh%s' if stock_code.startswith(('5', '6', '9')) else 'sz%s') % stock_code,
-                # self.stock_codes))
+            # self.stock_codes))
         self.stock_with_exchange_list = list(
             map(lambda stock_code: ('sh%s' if stock_code.startswith(('6')) else 'sz%s') % stock_code,
                 self.stock_codes))
@@ -469,14 +470,22 @@ class Sina:
     #     df = tdd.get_tdx_all_day_LastDF(self.stock_codes)
         # print df
 
-    def get_col_agg_df(self,h5,dd,run_col,all_func,startime,endtime):
-        now_col = [ all_func[co] for co in run_col if co in all_func.keys()]
-        now_func = cct.from_list_to_dict(run_col,all_func)
+    def get_col_agg_df(self, h5, dd, run_col, all_func, startime, endtime, freq=None):
+        if isinstance(run_col, list):
+            now_col = [all_func[co] for co in run_col if co in all_func.keys()]
+        else:
+            now_col = [all_func[co] for co in run_col.keys() if co in all_func.keys()]
+        now_func = cct.from_list_to_dict(run_col, all_func)
         if h5 is not None and len(h5) > len(dd):
             time_n = time.time()
             # h5 = cct.get_limit_multiIndex_Group(h5, freq=freq,end=endtime)
             # import pdb;pdb.set_trace()
-            h5 = cct.get_limit_multiIndex_Row(h5,col=run_col,start=startime, end=endtime)
+            if freq is None:
+                h5 = cct.get_limit_multiIndex_Row(h5, col=run_col, start=startime, end=endtime)
+            else:
+                h5 = cct.get_limit_multiIndex_freq(h5, freq=freq, col=run_col, start=startime, end=endtime)
+                h5 = h5.groupby(level=[0]).tail(1)
+            # h5 = cct.get_limit_multiIndex_Row(h5,col=run_col,start=startime, end=endtime)
             if h5 is not None and len(h5) > 0:
                 h5 = h5.reset_index().set_index('code')
                 h5.rename(columns=now_func, inplace=True)
@@ -484,7 +493,7 @@ class Sina:
                 #h5 = h5.drop(['ticktime'], axis=1)
                 h5 = h5.loc[:, now_col]
                 dd = cct.combine_dataFrame(dd, h5, col=None, compare=None, append=False, clean=True)
-                log.info('agg_df_Row:%.2f h5:%s endtime:%s' % ((time.time() - time_n), len(h5),endtime))
+                log.info('agg_df_Row:%.2f h5:%s endtime:%s' % ((time.time() - time_n), len(h5), endtime))
         return dd
 
     def format_response_data(self, index=False):
@@ -576,7 +585,7 @@ class Sina:
 #        df = df.sort_values(by='code', ascending=0)
         df = df.set_index('code')
         if index:
-            df.index=map((lambda x: str(1000000 - int(x))
+            df.index = map((lambda x: str(1000000 - int(x))
                             if x.startswith('0') else x), df.index)
         # print ("Market-df:%s %s time: %s" % (
         # cct.get_now_time()))
@@ -605,8 +614,8 @@ class Sina:
             h5a.write_hdf_db(h5_fname, df, table=h5_table, index=False, baseCount=500, append=False, MultiIndex=True)
             log.info("hdf5 class all :%s  time:%0.2f" % (len(df), time.time() - time_s))
 
-        if 'nlow' not in df.columns or 'nhigh' not in df.columns or ( cct.get_work_time() and 931 < cct.get_now_time_int() < 1500):
-        # if 'nlow' not in df.columns or 'nhigh' not in df.columns or cct.get_work_time():
+        if 'nlow' not in df.columns or 'nhigh' not in df.columns or (cct.get_work_time() and 931 < cct.get_now_time_int() < 1500):
+            # if 'nlow' not in df.columns or 'nhigh' not in df.columns or cct.get_work_time():
             h5 = h5a.load_hdf_db(h5_fname, h5_table, timelimit=False)
 
             time_s = time.time()
@@ -616,6 +625,16 @@ class Sina:
                 # endtime = '10:00:00'
                 endtime = '09:45:00'
                 dd = self.get_col_agg_df(h5, dd, run_col, all_func, startime, endtime)
+                startime = '09:25:00'
+                # endtime = '10:00:00'
+                endtime = '10:00:00'
+                run_col = {'close': 'std'}
+                dd = self.get_col_agg_df(h5, dd, run_col, run_col, startime, endtime)
+                dd.rename(columns={'std': 'nstd'}, inplace=True)
+                if dd is not None and len(dd) > 0 and  'nclose' in dd.columns and 'nstd' in dd.columns:
+                    for co in ['nclose','nstd']:
+                        dd[co] = dd[co].apply(lambda x: round(x, 2))
+
             else:
                 run_col = ['low', 'high']
                 startime = '09:25:00'
@@ -627,8 +646,15 @@ class Sina:
                 run_col = ['close']
                 # h5 = cct.get_limit_multiIndex_Group(h5, freq='15T', col=run_col,start=startime, end=endtime)
                 dd = self.get_col_agg_df(h5, dd, run_col, all_func, startime, endtime)
-            log.info("agg_df_all_time:%0.2f"%(time.time()-time_s))
-                    # top_temp[:1][['high','nhigh','low','nlow','close','nclose','llastp']]
+
+                run_col = {'close': 'std'}
+                dd = self.get_col_agg_df(h5, dd, run_col, run_col, startime, endtime)
+                dd.rename(columns={'std': 'nstd'}, inplace=True)
+                if dd is not None and len(dd) > 0 and  'nclose' in dd.columns and 'nstd' in dd.columns:
+                    for co in ['nclose','nstd']:
+                        dd[co] = dd[co].apply(lambda x: round(x, 2))
+            log.info("agg_df_all_time:%0.2f" % (time.time() - time_s))
+            # top_temp[:1][['high','nhigh','low','nlow','close','nclose','llastp']]
 
         h5a.write_hdf_db(self.hdf_name, dd, self.table, index=index)
         log.info("wr end:%0.2f" % (time.time() - self.start_t))
@@ -668,46 +694,57 @@ if __name__ == "__main__":
     sina = Sina()
     # print len(df)
     # code='601198'
-    print sina.get_stock_list_data(['999999','399001','399006'],index=True)
-    print sina.get_stock_code_data('999999,399001',index=True)
+    # print sina.get_stock_list_data(['999999','399001','399006'],index=True)
+    # print sina.get_stock_code_data('999999,399001',index=True)
     # df = sina.get_stock_code_data('000001',index=True).set_index('code')
     # df= sina.get_stock_code_data('999999,399001',index=True)
     # sys.exit(0)
-    code_agg = '300310'
-    df = sina.get_stock_code_data([code_agg, '000831', '300306', '600007'])
-    print df.columns
+    code_agg = '603277'
+    dd = sina.get_stock_code_data([code_agg, '000831', '300306', '600007'])
+    print dd.loc[:, ['close', 'nclose', 'nlow', 'nhigh', 'nstd', 'ticktime']], dd.shape
+    # print df.columns
     # df = sina.all
     # print df.nlow[:5]
 #    print sina.get_stock_code_data('002873')
     # print sina.get_stock_code_data('600199,300334',index=False)
     # print len(sina.market('sh'))
 
-    def compute_lastdays_percent(df=None, step=3):
-        if df is not None and len(df) > step:
-            df = df.sort_index(ascending=True)
-            # if cct.get_work_day_status() and 915 < cct.get_now_time_int() < 1500:
-            # df = df[df.index < cct.get_today()]
-            df = df.fillna(0)
-            da = step
-            if 'close' in df.columns:
-                df['lastp%sd' % da] = df['close'].shift(da)
-            if 'volume' in df.columns:
-                df['lastv%sd' % da] = df['volume'].shift(da)
-            if 'close' in df.columns and 'lastp%sd' % da in df.columns:
-                df['per%sd' % da] = ((df['close'] - df['lastp%sd' % da]) / df['lastp%sd' % da]).map(lambda x: round(x * 100, 2))
-            if 'volume' in df.columns and 'lastv%sd' % da in df.columns:
-                df['vol%sd' % da] = ((df['volume'] - df['lastv%sd' % da])).map(lambda x: round(x / 100, 1))
-        else:
-            log.info("compute df is none")
-        return df
+    # def compute_lastdays_percent(df=None, step=3):
+    #     if df is not None and len(df) > step:
+    #         df = df.sort_index(ascending=True)
+    #         # if cct.get_work_day_status() and 915 < cct.get_now_time_int() < 1500:
+    #         # df = df[df.index < cct.get_today()]
+    #         df = df.fillna(0)
+    #         da = step
+    #         if 'close' in df.columns:
+    #             df['lastp%sd' % da] = df['close'].shift(da)
+    #         if 'volume' in df.columns:
+    #             df['lastv%sd' % da] = df['volume'].shift(da)
+    #         if 'close' in df.columns and 'lastp%sd' % da in df.columns:
+    #             df['per%sd' % da] = ((df['close'] - df['lastp%sd' % da]) / df['lastp%sd' % da]).map(lambda x: round(x * 100, 2))
+    #         if 'volume' in df.columns and 'lastv%sd' % da in df.columns:
+    #             df['vol%sd' % da] = ((df['volume'] - df['lastv%sd' % da])).map(lambda x: round(x / 100, 1))
+    #     else:
+    #         log.info("compute df is none")
+    #     return df
 
-    def get_col_agg_df(h5,dd,run_col,all_func,startime,endtime):
-        now_col = [ all_func[co] for co in run_col if co in all_func.keys()]
-        now_func = cct.from_list_to_dict(run_col,all_func)
+    def get_col_agg_df_Test(h5, dd, run_col, all_func, startime, endtime, freq=None):
+        if isinstance(run_col, list):
+            now_col = [all_func[co] for co in run_col if co in all_func.keys()]
+        else:
+            now_col = [all_func[co] for co in run_col.keys() if co in all_func.keys()]
+        now_func = cct.from_list_to_dict(run_col, all_func)
         if h5 is not None and len(h5) > len(dd):
             time_n = time.time()
             # h5 = cct.get_limit_multiIndex_Group(h5, freq=freq,end=endtime)
-            h5 = cct.get_limit_multiIndex_Row(h5,col=run_col,start=startime, end=endtime)
+            ts = time.time()
+            if freq is None:
+                h5 = cct.get_limit_multiIndex_Row(h5, col=run_col, start=startime, end=endtime)
+            else:
+                h5 = cct.get_limit_multiIndex_freq(h5, freq=freq, col=run_col, start=startime, end=endtime)
+                h5 = h5.groupby(level=[0]).tail(1)
+            # h5 = h5.groupby(level=[0]).tail(1)
+            print "s:", round(time.time() - ts, 2), len(h5)
             if h5 is not None and len(h5) > 0:
                 h5 = h5.reset_index().set_index('code')
                 h5.rename(columns=now_func, inplace=True)
@@ -715,31 +752,48 @@ if __name__ == "__main__":
                 #h5 = h5.drop(['ticktime'], axis=1)
                 h5 = h5.loc[:, now_col]
                 dd = cct.combine_dataFrame(dd, h5, col=None, compare=None, append=False, clean=True)
-                log.info('agg_df_Row:%.2f h5:%s endtime:%s' % ((time.time() - time_n), len(h5),endtime))
+                log.info('agg_df_Row:%.2f h5:%s endtime:%s' % ((time.time() - time_n), len(h5), endtime))
         return dd
     h5_fname = 'sina_MultiIndex_data'
     # h5_fname = 'sina_multi_index'
     h5_table = 'all_10'
     time_s = time.time()
     h5 = h5a.load_hdf_db(h5_fname, table=h5_table, code_l=None, timelimit=False, dratio_limit=0.12)
+    print 'h5:', len(h5)
     if cct.get_work_time() and cct.get_now_time_int() <= 1000:
         run_col = ['low', 'high', 'close']
         startime = None
         # endtime = '10:00:00'
         endtime = '09:45:00'
-        dd = get_col_agg_df(h5, df, run_col, all_func, startime, endtime)
+        dd = get_col_agg_df_Test(h5, dd, run_col, all_func, startime, endtime)
     else:
         run_col = ['low', 'high']
         startime = None
         # endtime = '10:00:00'
         endtime = '09:45:00'
-        dd = get_col_agg_df(h5, df, run_col, all_func, startime, endtime)
+        dd = get_col_agg_df_Test(h5, dd, run_col, all_func, startime, endtime)
+
         startime = '09:30:00'
         endtime = '15:01:00'
-        run_col = ['close']
+        # run_col = ['close']
+        # all_func = {'low': 'nlow', 'high': 'nhigh', 'close': 'nclose'}
+
+        # run_col = ['low']
+        # all_func = {'low': 'nlow', 'high': 'nhigh', 'close': 'nclose'}
+
+        # all_func = {'low': 'mean'}
         # h5 = cct.get_limit_multiIndex_Group(h5, freq='15T', col=run_col,start=startime, end=endtime)
-        dd = get_col_agg_df(h5, df, run_col, all_func, startime, endtime)
-    print dd.loc[code_agg],dd
+        run_col = {'close': 'std'}
+        dd = get_col_agg_df_Test(h5, dd, run_col, run_col, startime, endtime)
+        dd.rename(columns={'std': 'nstd'}, inplace=True)
+
+        # dd = get_col_agg_df_Test(h5, df, run_col, all_func, startime, endtime,'15T')
+        # ts =  time.time()
+        # tt = h5.groupby([h5.index.get_level_values(i) for i in [0]] + [pd.Grouper(freq='15T', level=-1, closed='right', label='right')]).mean()
+        # print "tts:",round(time.time()-ts,2),len(tt)
+
+    print dd.loc['600007', ['close', 'nclose', 'nlow', 'nhigh', 'nstd', 'ticktime']], dd.shape
+    print dd.loc[:, ['close', 'nclose', 'nlow', 'nhigh', 'nstd', 'ticktime']], dd.shape
     '''
     if df is not None and len(df) > 0:
         print df[:1]
@@ -785,8 +839,7 @@ if __name__ == "__main__":
         # print df.loc['600581']
         # print len(sina.all)
         print "market:%s %s" % (ma, len(df))
-    
-    
+
     h5_fname = 'sina_multi_index'
     dl = 30
     h5_table = 'all' + '_' + str(10)
@@ -863,7 +916,6 @@ if __name__ == "__main__":
         time_s = time.time()
         h5a.write_hdf_db(h5_fname, df, table=h5_table, index=False, baseCount=500, append=False, MultiIndex=True)
         print("hdf5 main all :%s  time:%0.2f" % (len(df), time.time() - time_s))
-
 
         # print df[df.code == '600581']
         # print sina.get_stock_code_data('999999',index=True)

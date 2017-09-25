@@ -16,14 +16,14 @@ import time
 
 # from pandas import DataFrame
 import pandas as pd
-import JohhnsonUtil.johnson_cons as ct
-import JohhnsonUtil.commonTips as cct
+import JohnsonUtil.johnson_cons as ct
+import JohnsonUtil.commonTips as cct
 import singleAnalyseUtil as sl
-from JSONData import realdatajson as rl
+
 from JSONData import tdx_data_Day as tdd
 from JSONData import powerCompute as pct
 from JSONData import stockFilter as stf
-from JohhnsonUtil import LoggerFactory as LoggerFactory
+from JohnsonUtil import LoggerFactory as LoggerFactory
 
 # log = LoggerFactory.getLogger('SinaMonitor-Gold')
 
@@ -124,10 +124,10 @@ if __name__ == "__main__":
 
     # width, height = 132, 18
     if cct.isMac():
-        width, height = 155, 16
+        width, height = 160, 16
         cct.set_console(width, height)
     else:
-        width, height = 155, 20
+        width, height = 160, 20
         cct.set_console(width, height)
 
     # cct.set_console(width, height)
@@ -236,7 +236,7 @@ if __name__ == "__main__":
                 # print pt.PrettyTable([''] + list(top_all.columns))
                 # print tbl.tabulate(top_all,headers='keys', tablefmt='psql')
                 # print tbl.tabulate(top_all,headers='keys', tablefmt='orgtbl')
-                # print rl.format_for_print(top_all)
+                # print cct.format_for_print(top_all)
                 # print top_all[:10]
 
                 top_temp = top_all[:ct.PowerCount].copy()
@@ -267,9 +267,9 @@ if __name__ == "__main__":
                 # else:
                 #     top_temp = top_temp.loc[:,ct.Monitor_format_trade]
                 ct_MonitorMarket_Values = ct.get_Duration_format_Values(ct.Monitor_format_trade, market_sort_value[:2])
-                print rl.format_for_print(top_temp.loc[:, ct_MonitorMarket_Values][:10])                
+                print cct.format_for_print(top_temp.loc[:, ct_MonitorMarket_Values][:10])                
 
-                # print rl.format_for_print(top_all[:10])
+                # print cct.format_for_print(top_all[:10])
                 if status:
                     for code in top_all[:10].index:
                         code = re.findall('(\d+)', code)
@@ -320,7 +320,7 @@ if __name__ == "__main__":
 
             if len(st) == 0:
                 status = False
-            elif len(st.split()[0]) == 1 and st.split()[0].isdigit():
+            elif (len(st.split()[0]) == 1 and st.split()[0].isdigit()) or st.split()[0].startswith('x'):
                 st_l = st.split()
                 st_k = st_l[0]
                 if st_k in ct.Market_sort_idx.keys() and len(top_all) > 0:

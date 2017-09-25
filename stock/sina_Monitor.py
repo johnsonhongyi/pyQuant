@@ -23,14 +23,14 @@ import pandas as pd
 # from bs4 import BeautifulSoup
 # from pandas import DataFrame
 
-import JohhnsonUtil.commonTips as cct
-import JohhnsonUtil.johnson_cons as ct
+import JohnsonUtil.commonTips as cct
+import JohnsonUtil.johnson_cons as ct
 import singleAnalyseUtil as sl
-from JSONData import realdatajson as rl
+
 from JSONData import tdx_data_Day as tdd
 from JSONData import powerCompute as pct
 from JSONData import stockFilter as stf
-from JohhnsonUtil import LoggerFactory as LoggerFactory
+from JohnsonUtil import LoggerFactory as LoggerFactory
 # cct.set_ctrl_handler()
 
 
@@ -233,10 +233,10 @@ if __name__ == "__main__":
                 # else:
                 #     top_temp = top_temp.loc[:, ct.Monitor_format_trade]
                 ct_MonitorMarket_Values = ct.get_Duration_format_Values(ct.Monitor_format_trade, market_sort_value[:2])
-                print rl.format_for_print(top_temp.loc[:, ct_MonitorMarket_Values][:10])  
-                # print rl.format_for_print(top_temp.loc[:, ct.Sina_Monitor_format][:10])
+                print cct.format_for_print(top_temp.loc[:, ct_MonitorMarket_Values][:10])  
+                # print cct.format_for_print(top_temp.loc[:, ct.Sina_Monitor_format][:10])
 
-                # print rl.format_for_print(top_all[:10])
+                # print cct.format_for_print(top_all[:10])
                 # print "staus",status
                 if status:
                     for code in top_all[:10].index:
@@ -291,7 +291,7 @@ if __name__ == "__main__":
 
             if len(st) == 0:
                 status = False
-            elif len(st.split()[0]) == 1 and st.split()[0].isdigit():
+            elif (len(st.split()[0]) == 1 and st.split()[0].isdigit()) or st.split()[0].startswith('x'):
                 st_l = st.split()
                 st_k = st_l[0]
                 if st_k in ct.Market_sort_idx.keys() and len(top_all) > 0:

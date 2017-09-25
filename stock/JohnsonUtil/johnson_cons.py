@@ -32,20 +32,23 @@ LvolumeSize = 12500
 VolumeMaxR = 100
 VolumeMinR = 0.1
 PowerCount = 500
+duration_diff = 6
+duration_date_l = 60
 PowerCountdl = 21
+Power_Ma_Days = 6
+Power_last_da = 1
 power_update_time = 900
 writeCount = 5
 changeRatio = 0.985
 changeRatioUp = 1.015
 # duration_date = 10
-duration_diff = 6
-duration_date_l = 14
+wencai_delay_time = 60
 resample_dtype = 'd'
 duration_date_up = 60
 duration_date_sort = 21
 lastdays = 5
-bollFilter = -6
-writeblockbakNum = 12
+bollFilter = -5
+writeblockbakNum = 15
 checkfilter = True
 lastPower = False
 checkfilter_end_time = 945
@@ -62,12 +65,13 @@ newdays_limit_days = 30
 big_H5_Size_limit = 10
 sina_limit_time = 10
 h5_time_l_count = 6
-sina_dd_limit_time = 600
+sina_dd_limit_time = 900
 diffcode = 0.2
 dratio_limit = 0.12
 duration_sleep_time = 60
 compute_lastdays = 9
-sort_value_key_perd23 = '2 3'
+sort_value_key_perd23 = '4'
+# sort_value_key_perd23 = '2 3'
 sort_value_key_perd = '2 1'
 idx_perd_1to_2 = 1
 # powerdiff = 'ra * fibl + rah*(abs(float(%s)-fibl))/fib +ma +kdj+rsi'
@@ -133,9 +137,15 @@ Duration_percent_df2dff = ['df2', 'dff', 'percent',
                            'op', 'fib', 'fibl', 'ra', 'ratio', 'volume', 'couts']
 Duration_percent_df2dff_key = [0, 0, 0, 0, 1, 1, 0, 1, 1, 1]
 
-Duration_percent_opra = ['op', 'ra', 'percent',
+Duration_percent_opboll = ['op', 'boll', 'percent',
                          'dff', 'fib', 'fibl', 'ratio', 'volume', 'couts']
-Duration_percent_opra_key = [0, 0, 0, 0, 1, 1, 1, 1, 1]
+Duration_percent_opboll_key = [0, 0, 0, 0, 1, 1, 1, 1, 1]
+
+
+Duration_percent_boll = ['boll','op','ra', 'percent',
+                         'dff', 'fib', 'fibl', 'ratio', 'volume', 'couts']
+Duration_percent_boll_key = [0, 0, 0, 0, 0, 1, 1, 1, 1, 1]
+
 
 Duration_dff_percent = ['dff', 'percent', 'df2', 'ra',
                         'op', 'fib', 'fibl', 'ratio', 'volume', 'couts']
@@ -519,16 +529,19 @@ INDEX_SYMBOL = {"399990": "sz399990", "000006": "sh000006", "399998": "sz399998"
 def RawMenuArgmain():
     raw = 'status:[go(g),clear(c),[d 20150101 [l|h]|[y|n|pn|py],quit(q),W(a),sh]:'
     raw_input_menu = raw + "\n\tNow : %s" + \
-        "\n\t1:Sort By Percent\t2:Sort by per1d\t3:Sort By percd\t\t4:Sort By DFF\n\t5:Sort By Ra_dff\t6:Sort By df2\t7:Sort Pe df2\t\t8:Sort by Count \nplease input:"
+        "\n\t1:Sort By Percent\t2:Sort by per1d\t3:Sort By percd\t\t4:Sort By DFF\n\t5:Sort By Ra_dff\t6:Sort By df2\t7:Sort Pe df2\t\t8:Sort by Count" + \
+        "\n\t9:By perc_vol\t\tx: by_opboll\tx1:by boll_perc\nplease input:"
     return raw_input_menu
 
 # "Sort By Percent\t3:Sort By DFF\n\t2:Sort By OP\t\t4:Sort By Ra\nplease input:"
 
 Market_sort_idx = {'1': 'ct.Duration_percent_dff', '2': 'ct.Duration_sort_per1d', '3': 'ct.Duration_sort_per3d', '4': 'ct.Duration_dff_percent', '5': 'ct.Duration_ra_dff', '6': 'ct.Duration_percent_df2dff',
-                   '7': 'ct.Duration_sort_per_df2', '8': 'ct.Monitor_sort_count'}
+                   '7': 'ct.Duration_sort_per_df2', '8': 'ct.Monitor_sort_count', '9':'ct.Duration_percent_vol',
+                  'x': 'ct.Duration_percent_opboll', 'x1':'ct.Duration_percent_boll'}
 
 Market_sort_idx_perd = {'1': 'ct.Duration_percent_dff', '2': 'ct.Duration_sort_perd', '3': 'ct.Duration_sort_percd', '4': 'ct.Duration_dff_percent', '5': 'ct.Duration_ra_dff', '6': 'ct.Duration_percent_df2dff',
-                        '7': 'ct.Duration_sort_per_df2', '8': 'ct.Monitor_sort_count'}
+                        '7': 'ct.Duration_sort_per_df2', '8': 'ct.Monitor_sort_count','9':'ct.Duration_percent_vol',
+                  'x': 'ct.Duration_percent_opboll', 'x1':'ct.Duration_percent_boll'}
 
 # Market_sort_idx = {'1': 'ct.Duration_percent_dff', '2': 'ct.Duration_dff_percent', '3': 'ct.Duration_ra_dff', '4': 'ct.Duration_percent_df2dff',
 #                    '5': 'ct.Duration_sort_ma', '6': 'ct.Monitor_sort_count', '7': 'ct.Duration_sort_per_ratio', '8': 'ct.Duration_percent_vol'}

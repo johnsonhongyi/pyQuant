@@ -6,6 +6,6 @@ for trading data
 """
 # from pyQuant.stock.emacount import (get_ts_start_date,getdata_ema_trend)
 # from stock.JSONData import emacount
-# from stock.JohhnsonUtil import singleAnalyseUtil
-# import JSONData,JohhnsonUtil
-import JSONData,JohhnsonUtil
+# from stock.JohnsonUtil import singleAnalyseUtil
+# import JSONData,JohnsonUtil
+import JSONData,JohnsonUtil

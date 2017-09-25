@@ -11,14 +11,14 @@ from matplotlib.dates import num2date, date2num
 from matplotlib.lines import Line2D
 from matplotlib.patches import Rectangle
 import datetime
-from JohhnsonUtil import commonTips as cct
-from JohhnsonUtil import johnson_cons as ct
+from JohnsonUtil import commonTips as cct
+from JohnsonUtil import johnson_cons as ct
 from JSONData import tdx_data_Day as tdd
 from JSONData import get_macd_kdj_rsi as getab
 from JSONData import wencaiData as wcd
 from JSONData import tdx_hdf5_api as h5a
-from JohhnsonUtil import zoompan
-from JohhnsonUtil import LoggerFactory as LoggerFactory
+from JohnsonUtil import zoompan
+from JohnsonUtil import LoggerFactory as LoggerFactory
 import time
 # log = LoggerFactory.getLogger("PowerCompute")
 log = LoggerFactory.log
@@ -391,6 +391,7 @@ def get_linear_model_status(code, df=None, dtype='d', type='m', start=None, end=
     # else:
     # log.setLevel(LoggerFactory.ERROR)
     index_d = None
+    days = days if days <> 0 else 1
     if start is not None and end is None and filter == 'y':
         # if code not in ['999999','399006','399001']:
         # index_d,dl=tdd.get_duration_Index_date(dt=start)
@@ -558,6 +559,7 @@ def get_linear_model_status(code, df=None, dtype='d', type='m', start=None, end=
     if len(asset) > 1:
         operationcount = 0
         ratio_l = []
+#        idx = days if days <> 0 else 1
         if countall:
             for co in ['low', 'high', 'close']:
                 assetratio = asset[co]
@@ -965,7 +967,7 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y', tal
             #            if status:
 
 #            h5 = h5[(h5.op <> 0) & (h5.ra <> 0) & (h5.df2 <> 0 )]
-            h5 = h5[(h5.df2 <> 0 )]
+            h5 = h5[(h5.df2 <> 0 ) | (h5.ra <> 0 ) | (h5.ra <> 0 )]
             h5 = h5.drop(
                 [inx for inx in h5.columns if inx not in power_columns], axis=1)
             code_l = list(set(df.index) - set(h5.index))
@@ -1062,18 +1064,19 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y', tal
                 #     dz=dz.to_frame().T
             else:
                 dz = tdd.get_sina_data_df(code)
-
             if len(dz) > 0 and (dz.buy.values > 0 or dz.sell.values > 0):
                 tdx_df = tdd.get_tdx_append_now_df_api(
-                    code, start=start, end=end, type='f', df=None, dm=dz, dl=dl * 2, newdays=5)
+                    code, start=start, end=end, type='f', df=None, dm=dz, dl=dl, newdays=5)
                 # print tdx_df
                 tdx_df = tdx_df.fillna(0)
                 tdx_df = tdx_df.sort_index(ascending=True)
-                if len(df) > days + 1 and days != 0:
-                    print len(tdx_df)
-                    tdx_df = tdx_df[:-days]
-                    print len(tdx_df)
+
+                # if len(df) > days + 1 and days != 0:
+                #     # log.info("tdx_df:%s"%(len(tdx_df)))
+                #     tdx_df = tdx_df[:-days]
+                #     # log.info("tdx_df:%s"%(len(tdx_df)))
                 tdx_days = len(tdx_df)
+
                 if 8 < tdx_days < ct.cxg_limit_days:
                     if tdx_days > 6:
                         top_count = 0
@@ -1142,8 +1145,7 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y', tal
             # sep = '|'
             for ptype in ['low', 'high']:
                 op, ra, st, daysData = get_linear_model_status(
-                    code, df=tdx_df, dtype=dtype, start=start, end=end, dl=dl, filter=filter, ptype=ptype)
-
+                    code, df=tdx_df, dtype=dtype, start=start, end=end,days=days, dl=dl, filter=filter, ptype=ptype)
                 # opc += op
                 # rac += ra
 
@@ -1160,7 +1162,7 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y', tal
                     fib = int(daysData[0])
             # fibl = sep.join(fib)
 
-            tdx_df, operation = getab.Get_BBANDS(tdx_df, dtype='d')
+            tdx_df, operation = getab.Get_BBANDS(tdx_df, dtype='d',lastday=days)
             # opc +=operation
             # if opc > 21:
             #     opc = 21
@@ -1184,12 +1186,12 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y', tal
             df.loc[code, 'ldate'] = stl
             df.loc[code, 'boll'] = operation
 
-            tdx_df, opkdj = getab.Get_KDJ(tdx_df, dtype='d')
-            tdx_df, opmacd = getab.Get_MACD_OP(tdx_df, dtype='d')
-            tdx_df, oprsi = getab.Get_RSI(tdx_df, dtype='d')
+            tdx_df, opkdj = getab.Get_KDJ(tdx_df, dtype='d',lastday=days)
+            tdx_df, opmacd = getab.Get_MACD_OP(tdx_df, dtype='d',lastday=days)
+            tdx_df, oprsi = getab.Get_RSI(tdx_df, dtype='d',lastday=days)
             # opma = getab.algoMultiDay_trends(tdx_df
             opma = getab.algoMultiDay(tdx_df)
-            volstd = getab.powerStd(code=code, df=tdx_df, ptype='vol')
+            volstd = getab.powerStd(code=code, df=tdx_df, ptype='vol',lastday=days)
             df.loc[code, 'kdj'] = opkdj
             df.loc[code, 'macd'] = opmacd
             df.loc[code, 'rsi'] = oprsi
@@ -1306,7 +1308,14 @@ if __name__ == "__main__":
 
     # import sina_data
     # codelist = sina_data.Sina().market('cyb').code.tolist()
-    print powerCompute_df(['000025', '300506', '002171'], days=1, dtype='d', end=None, dl=ct.PowerCountdl, talib=True, filter='y')
+
+    # df = powerCompute_df(['603689', '300506', '002171'], days=ct.Power_last_da, dtype='d', end=None, dl=ct.PowerCountdl, talib=True, filter='y')
+#    df = powerCompute_df(['603689', '300506', '002171'], days=3, dtype='d', end=None, dl=ct.PowerCountdl, talib=True, filter='y')
+    df = powerCompute_df(['603689'], days=1, dtype='d', end=None, dl=ct.PowerCountdl, talib=True, filter='y')
+
+    print "\n",cct.format_for_print(df.loc[:,['op','boll','ma','kdj','macd']])
+    print "\n",cct.format_for_print(df.loc[:,['ra', 'op', 'ma', 'rsi', 'kdj',
+                     'boll', 'rah', 'df2', 'fibl', 'macd', 'vstd', 'oph', 'lvolume']])
     # powerCompute_df(codelist, dtype='d',end=None, dl=ct.PowerCountdl, talib=True,filter='y')
 
     # # print powerCompute_df(['601198', '002791', '000503'], dtype='d', end=None, dl=30, filter='y')

@@ -2,7 +2,7 @@
 import tushare as ts
 # import sys
 # sys.path.append("..")
-# from JohhnsonUtil import commonTips as cct
+# from JohnsonUtil import commonTips as cct
 
 import pandas as pd
 import tables

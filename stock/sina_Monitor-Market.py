@@ -14,13 +14,13 @@ from pandas import DataFrame
 # import sys
 # print sys.path
 
-import JohhnsonUtil.johnson_cons as ct
-from JSONData import realdatajson as rl
+import JohnsonUtil.johnson_cons as ct
+
 from JSONData import tdx_data_Day as tdd
 from JSONData import powerCompute as pct
 from JSONData import stockFilter as stf
-from JohhnsonUtil import LoggerFactory
-from JohhnsonUtil import commonTips as cct
+from JohnsonUtil import LoggerFactory
+from JohnsonUtil import commonTips as cct
 import singleAnalyseUtil as sl
 from JSONData import LineHistogram as lhg
 # from logbook import Logger,StreamHandler,SyslogHandler
@@ -246,9 +246,9 @@ if __name__ == "__main__":
                 # else:
                 #     top_temp = top_temp.loc[:,ct.MonitorMarket_format_buy]
                 ct_MonitorMarket_Values = ct.get_Duration_format_Values(ct.MonitorMarket_format_buy, market_sort_value[:2])
-                print rl.format_for_print(top_temp.loc[:, ct_MonitorMarket_Values][:10])
+                print cct.format_for_print(top_temp.loc[:, ct_MonitorMarket_Values][:10])
 
-                # print rl.format_for_print(top_dif[:10])
+                # print cct.format_for_print(top_dif[:10])
                 # print top_all.loc['000025',:]
                 # print "staus",status
 
@@ -299,7 +299,7 @@ if __name__ == "__main__":
 
             if len(st) == 0:
                 status = False
-            elif len(st.split()[0]) == 1 and st.split()[0].isdigit():
+            elif (len(st.split()[0]) == 1 and st.split()[0].isdigit()) or st.split()[0].startswith('x'):
                 st_l = st.split()
                 st_k = st_l[0]
                 if st_k in ct.Market_sort_idx.keys() and len(top_all) > 0:

@@ -16,9 +16,10 @@ import time
 
 import pandas as pd
 sys.path.append("..")
-# import JohhnsonUtil.johnson_cons as ct
-from JohhnsonUtil import LoggerFactory
-from JohhnsonUtil import commonTips as cct
+# import JohnsonUtil.johnson_cons as ct
+from JohnsonUtil import LoggerFactory
+from JohnsonUtil import commonTips as cct
+from JohnsonUtil import johnson_cons as ct
 # try:
 #     from urllib.request import urlopen, Request
 # except ImportError:
@@ -154,11 +155,12 @@ def get_wencai_Market_url(filter='国企改革',perpage=1,url=None,):
     if url == None and cct.get_config_value_wencai(config_ini,fname) < 1:
         time_s = time.time()
         duratime = cct.get_config_value_wencai(config_ini,fname,currvalue=time_s,xtype='time',update=False)
-        if duratime < 15:
-            sleep_t = 15-duratime
+        if duratime < ct.wencai_delay_time:
+            sleep_t = ct.wencai_delay_time - duratime
             log.error('timelimit:%s'%(sleep_t))
             time.sleep(sleep_t)
-        # print "da",duratime
+        log.info("duratime:%s",duratime)
+        duratime = cct.get_config_value_wencai(config_ini,fname,currvalue=time.time(),xtype='time',update=True)
         wencairoot = 'http://www.iwencai.com/stockpick/search?typed=0&preParams=&ts=1&f=1&qs=result_original&selfsectsn=&querytype=&searchfilter=&tid=stockpick&w=%s'
         url = wencairoot%(filter)
         log.debug("url:%s"%(url))
@@ -177,6 +179,7 @@ def get_wencai_Market_url(filter='国企改革',perpage=1,url=None,):
             wencai_count+=1
             cct.get_config_value_wencai(config_ini,fname,currvalue=wencai_count,update=True)
             log.error("acces deny:%s %s"%('系统判断您访问次数过多',data))
+            log.error("acces deny:%s %s"%('系统判断您访问次数过多',url))
             return df
         # print data
         # count = re.findall('(\d+)', data, re.S)
@@ -295,7 +298,6 @@ def get_wencai_Market_url(filter='国企改革',perpage=1,url=None,):
             # print type(count[0])
             # print type(list(count[0]))
             # print count[0].decode('unicode-escape')
-    duratime = cct.get_config_value_wencai(config_ini,fname,currvalue=time.time(),xtype='time',update=True)
 
     return df
 
@@ -385,7 +387,7 @@ def get_wencai_data(dm,market='wencai',days=120):
 def get_wencai_filepath(market):
     path_sep = os.path.sep
     baser = os.getcwd().split('stock')[0]
-    base = baser  + 'stock' +path_sep + 'JohhnsonUtil' + path_sep +'wencai' + path_sep
+    base = baser  + 'stock' +path_sep + 'JohnsonUtil' + path_sep +'wencai' + path_sep
     filepath = base + market+'.csv'
     return filepath
 

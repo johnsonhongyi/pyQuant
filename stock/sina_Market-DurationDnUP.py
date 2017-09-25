@@ -8,15 +8,15 @@ import sys
 import time
 
 import pandas as pd
-import JohhnsonUtil.johnson_cons as ct
+import JohnsonUtil.johnson_cons as ct
 import singleAnalyseUtil as sl
 from JSONData import powerCompute as pct
 from JSONData import stockFilter as stf
-from JSONData import realdatajson as rl
+
 from JSONData import tdx_data_Day as tdd
 from JSONData import LineHistogram as lhg
-from JohhnsonUtil import LoggerFactory as LoggerFactory
-from JohhnsonUtil import commonTips as cct
+from JohnsonUtil import LoggerFactory as LoggerFactory
+from JohnsonUtil import commonTips as cct
 
 # from logbook import Logger,StreamHandler,SyslogHandler
 # from logbook import StderrHandler
@@ -283,7 +283,7 @@ if __name__ == "__main__":
                             top_dif = top_dif.sort_values(by=['dff', 'percent', 'ratio'], ascending=[1, 0, 1])
 
                     # top_all=top_all.sort_values(by=['percent','dff','couts','ratio'],ascending=[0,0,1,1])
-                    # print rl.format_for_print(top_dif[:10])
+                    # print cct.format_for_print(top_dif[:10])
                     # top_dd = pd.concat([top_dif[:5],top_temp[:3],top_dif[-3:],top_temp[-3:]], axis=0)
                     if percent_status == 'y' and (
                             cct.get_now_time_int() > 935 or cct.get_now_time_int() < 900) and ptype == 'low':
@@ -345,9 +345,9 @@ if __name__ == "__main__":
                         ct_Duration_format_Values = ct.get_Duration_format_Values(ct.Duration_format_trade, market_sort_value[:])
                         top_dd = top_dd.loc[:, ct_Duration_format_Values]
 
-                    print rl.format_for_print(top_dd)
+                    print cct.format_for_print(top_dd)
                 # if cct.get_now_time_int() < 930 or cct.get_now_time_int() > 1505 or (cct.get_now_time_int() > 1125 and cct.get_now_time_int() < 1505):
-                # print rl.format_for_print(top_dif[-10:])
+                # print cct.format_for_print(top_dif[-10:])
                 # print top_all.loc['000025',:]
                 # print "staus",status
 
@@ -392,7 +392,7 @@ if __name__ == "__main__":
 
             if len(st) == 0:
                 status = False
-            elif len(st.split()[0]) == 1 and st.split()[0].isdigit():
+            elif (len(st.split()[0]) == 1 and st.split()[0].isdigit()) or st.split()[0].startswith('x'):
                 st_l = st.split()
                 st_k = st_l[0]
                 if st_k in ct.Market_sort_idx.keys() and len(top_all) > 0:

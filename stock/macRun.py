@@ -2,7 +2,7 @@
 # !/usr/bin/env python
 import subprocess
 import os,time
-from JohhnsonUtil import commonTips as cct
+from JohnsonUtil import commonTips as cct
 
 script = '''tell application "System Events"
     activate

@@ -8,11 +8,11 @@ import time
 import pandas as pd
 from pandas import HDFStore
 sys.path.append("..")
-from JohhnsonUtil import LoggerFactory
-# from JohhnsonUtil.commonTips import get_ramdisk_dir
+from JohnsonUtil import LoggerFactory
+# from JohnsonUtil.commonTips import get_ramdisk_dir
 # print get_ramdisk_dir()
-from JohhnsonUtil import commonTips as cct
-from JohhnsonUtil import johnson_cons as ct
+from JohnsonUtil import commonTips as cct
+from JohnsonUtil import johnson_cons as ct
 import random
 import numpy as np
 import subprocess
@@ -340,6 +340,7 @@ def write_hdf_db(fname, df, table='all', index=False, complib='blosc', baseCount
 #        log.info("NO RamDisk")
 #        return False
     df=df.fillna(0)
+    df=df[~df.index.duplicated(keep='first')]
     code_subdf=df.index.tolist()
     global RAMDISK_KEY
     if not RAMDISK_KEY < 1:
@@ -354,6 +355,8 @@ def write_hdf_db(fname, df, table='all', index=False, complib='blosc', baseCount
             if store is not None:
                 if '/' + table in store.keys():
                     tmpdf=store[table]
+                    tmpdf = tmpdf[~tmpdf.index.duplicated(keep='first')]
+
 
         if not MultiIndex:
             if index:
@@ -415,7 +418,10 @@ def write_hdf_db(fname, df, table='all', index=False, complib='blosc', baseCount
             # mask = totals['dirty']+totals['swap'] > 1e7     result =
             # mask.loc[mask]
             # store.remove('key_name', where='<where clause>')
-
+            
+            
+            # tmpdf = tmpdf[~tmpdf.index.duplicated(keep='first')]
+            # df = df[~df.index.duplicated(keep='first')]
             if tmpdf is not None and len(tmpdf) > 0:
                 # multi_code = tmpdf.index.get_level_values('code').unique().tolist()
                 multi_code=tmpdf.index.get_level_values('code').unique().tolist()
@@ -564,8 +570,21 @@ def load_hdf_db(fname, table='all', code_l=None, timelimit=True, index=False, li
         if table is not None:
             with SafeHDFStore(fname) as store:
                 if store is not None:
-                    if '/' + table in store.keys():
-                        dd=store[table]
+                    try:
+                        if '/' + table in store.keys():
+                            dd=store[table]
+                    except AttributeError, e:
+                        store.close()
+                        os.remove(store.filename)
+                        log.error("AttributeError:%s %s"%(fname,e))
+                        log.error("Remove File:%s"%(fname))
+                    except Exception, e:
+                        print "Exception:%s"%(e)
+                    else:
+                        pass
+                    finally:
+                        pass
+
             if dd is not None and len(dd) > 0:
                 if not MultiIndex:
                     if index:
@@ -667,6 +686,8 @@ def load_hdf_db(fname, table='all', code_l=None, timelimit=True, index=False, li
     log.info("load_hdf_time:%0.2f" % (time.time() - time_t))
     # if df is not None and len(df) > 1:
     # df = df.drop_duplicates()
+    if df is not None:
+        df=df[~df.index.duplicated(keep='first')]
     return df
 
 # def load_hdf_db_old_outdate(fname,table='all',code_l=None,timelimit=True,index=False,limit_time=ct.h5_limit_time):

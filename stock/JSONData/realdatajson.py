@@ -13,16 +13,16 @@ import math
 import re
 import sys
 import time
-
+import os
 import lxml.html
 import pandas as pd
 from lxml import etree
 from pandas.compat import StringIO
 sys.path.append("..")
-import JohhnsonUtil.johnson_cons as ct
-from JohhnsonUtil import LoggerFactory
-from JSONData.prettytable import *
-from JohhnsonUtil import commonTips as cct
+import JohnsonUtil.johnson_cons as ct
+from JohnsonUtil import LoggerFactory
+# from JSONData.prettytable import *
+from JohnsonUtil import commonTips as cct
 import tdx_hdf5_api as h5a
 
 try:
@@ -45,18 +45,18 @@ def set_default_encode(code='utf-8'):
 
 
 # print pt.PrettyTable([''] + list(df.columns))
-def format_for_print(df):
-    table = PrettyTable([''] + list(df.columns))
-    for row in df.itertuples():
-        table.add_row(row)
-    return str(table)
+# def format_for_print(df):
+#     table = PrettyTable([''] + list(df.columns))
+#     for row in df.itertuples():
+#         table.add_row(row)
+#     return str(table)
 
 
-def format_for_print2(df):
-    table = PrettyTable(list(df.columns))
-    for row in df.itertuples():
-        table.add_row(row[1:])
-    return str(table)
+# def format_for_print2(df):
+#     table = PrettyTable(list(df.columns))
+#     for row in df.itertuples():
+#         table.add_row(row[1:])
+#     return str(table)
 
 
 def _parsing_Market_price_json(url):
@@ -131,6 +131,10 @@ def _get_sina_Market_url(market='sh_a', count=None, num='1000'):
 
     # print urllist[0],
     return urllist
+
+config_ini = cct.get_ramdisk_dir() + os.path.sep+ 'h5config.txt'
+jsonfname = 'jsonlimit'
+json_time = cct.get_config_value_wencai(config_ini,jsonfname,currvalue=time.time(),xtype='time',update=False)
 
 
 def get_sina_Market_json(market='all', showtime=True, num='100', retry_count=3, pause=0.001):
@@ -317,6 +321,7 @@ def sina_json_Big_Count(vol='1', type='0', num='10000'):
     url = ct.JSON_DD_CountURL % (ct.DD_VOL_List[vol], type)
     log.info("Big_Count_url:%s"%url)
     data = cct.get_url_data(url)
+    
     count = re.findall('(\d+)', data, re.S)
     log.debug("Big_Count_count:%s"%count)
     if len(count) > 0:
@@ -765,7 +770,7 @@ def get_market_price_sina_dd_realTime(dp='',vol='0',type='0'):
             # dm.ratio=dm.ratio
             # dm=dm.loc[:,ct.SINA_Market_Clean_UP_Columns]
         else:
-            if len(dp) > 0 and 'code' in dp.columnsobject:
+            if len(dp) > 0 and 'code' in dp.columns:
                 dp=dp.set_index('code')
                 dp['couts'] = 0
                 dp['prev_p'] = 0
@@ -798,18 +803,18 @@ if __name__ == '__main__':
     # df = get_market_price_sina_dd_realTime(dp='', vol='1', type='0')
     # print df
     # df = get_sina_all_json_dd(1,0,num=10000)
-    print getconfigBigCount(count=None, write=False)
+    print "getconfigBigCount:",getconfigBigCount(count=None, write=False)
     df = get_sina_Market_json(market='all', showtime=True, num='100', retry_count=3, pause=0.001)
-    print df
+    print df[:1]
     for mk in ['sh','sz','cyb']:
         df=get_sina_Market_json(mk,num=100)
         # print df.loc['600581']
         print "mk:\t",len(df)
     import tushare as ts
     s_t=time.time()
-    df = ts.get_today_all()
-    print "len:%s,time:%0.2f"%(len(df),time.time()-s_t)
-    print df[:1]
+    # df = ts.get_today_all()
+    # print "len:%s,time:%0.2f"%(len(df),time.time()-s_t)
+    # print df[:1]
     # _get_sina_json_dd_url()
     print "Big_Count:",sina_json_Big_Count()
     # print getconfigBigCount(write=True)

@@ -6,13 +6,13 @@ from matplotlib.pyplot import show
 from sklearn.linear_model import LinearRegression
 import sys
 sys.path.append("..")
-from JohhnsonUtil import LoggerFactory as LoggerFactory
+from JohnsonUtil import LoggerFactory as LoggerFactory
 
 # log = LoggerFactory.getLogger('LongSklearn')
 log = LoggerFactory.log
 # log.setLevel(LoggerFactory.DEBUG)
 from JSONData import tdx_data_Day as tdd
-from JohhnsonUtil import zoompan
+from JohnsonUtil import zoompan
 
 
 def LIS(X):

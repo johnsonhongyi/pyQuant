@@ -15,9 +15,9 @@ from sklearn.linear_model import LinearRegression
 from statsmodels import regression
 
 import powerCompute as pct
-from JohhnsonUtil import LoggerFactory as LoggerFactory
-from JohhnsonUtil import commonTips as cct
-from JohhnsonUtil import zoompan
+from JohnsonUtil import LoggerFactory as LoggerFactory
+from JohnsonUtil import commonTips as cct
+from JohnsonUtil import zoompan
 
 # log = LoggerFactory.getLogger('Linehistogram')
 log = LoggerFactory.log

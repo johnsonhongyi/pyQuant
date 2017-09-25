@@ -16,10 +16,13 @@ import trollius as asyncio
 from trollius.coroutines import From
 
 import LoggerFactory
+from prettytable import *
+
 import johnson_cons as ct
 import socket
 from configobj import ConfigObj
 log = LoggerFactory.log
+
 
 # log.setLevel(Log.DEBUG)
 # import numba as nb
@@ -38,6 +41,7 @@ requests.adapters.DEFAULT_RETRIES = 0
 # from JSONData import tdx_data_Day as tdd
 global initGlobalValue
 initGlobalValue = 0
+# clean_terminal = ["Python Launcher", 'Johnson — -bash', 'Johnson — python']
 clean_terminal = ["Python Launcher", 'Johnson — -bash', 'Johnson — python']
 
 
@@ -65,6 +69,17 @@ class GlobalValues:
         except KeyError:
             return defValue
 
+def format_for_print(df):
+    table = PrettyTable([''] + list(df.columns))
+    for row in df.itertuples():
+        table.add_row(row)
+    return str(table)
+
+def format_for_print2(df):
+    table = PrettyTable(list(df.columns))
+    for row in df.itertuples():
+        table.add_row(row[1:])
+    return str(table)
 
 def get_os_system():
     os_sys = get_sys_system()
@@ -327,7 +342,7 @@ def get_work_path(base, dpath, fname):
 def get_rzrq_code(market='all'):
 
     baser = os.getcwd().split('stock')[0]
-    base = baser + 'stock' + path_sep + 'JohhnsonUtil' + path_sep
+    base = baser + 'stock' + path_sep + 'JohnsonUtil' + path_sep
     szrz = base + 'szrzrq.csv'
     shrz = base + 'shrzrq.csv'
     if market in ['all', 'sz', 'sh']:
@@ -376,7 +391,7 @@ def get_tushare_market(market='zxb', renew=False, days=5):
         return df
 
     baser = os.getcwd().split('stock')[0]
-    base = baser + 'stock' + path_sep + 'JohhnsonUtil' + path_sep
+    base = baser + 'stock' + path_sep + 'JohnsonUtil' + path_sep
     filepath = base + market + '.csv'
     if os.path.exists(filepath):
         if renew and creation_date_duration(filepath) > 0:
@@ -576,7 +591,7 @@ def set_console(width=80, height=15, color=3, title=None, closeTerminal=True):
     # set_ctrl_handler()
     if closeTerminal:
         get_terminal_Position(cmd=scriptquit, position=None, close=False)
-        get_terminal_Position(clean_terminal[1], close=True)
+        # get_terminal_Position(clean_terminal[1], close=True)
 
 
 def timeit_time(cmd, num=5):
@@ -1321,6 +1336,7 @@ def get_config_value_wencai(fname, classtype, currvalue=0, xtype='limit', update
                     return time_dif
 
             else:
+                config[classtype] = {}
                 config[classtype][xtype] = 0
                 config.write()
         else:
@@ -1338,7 +1354,7 @@ def get_config_value_wencai(fname, classtype, currvalue=0, xtype='limit', update
         config.write()
     return int(currvalue)
 
-def write_to_blocknew(p_name, data, append=True):
+def write_to_blocknew(p_name, data, append=True,doubleFile=True):
     # index_list = ['1999999','47#IFL0',  '0399006', '27#HSI']
     # index_list = ['1999999','47#IFL0', '27#HSI',  '0399006']
     index_list = ['1999999', '47#IFL0', '27#HSI',  '0159915']
@@ -1448,13 +1464,15 @@ def write_to_blocknew(p_name, data, append=True):
 
     if p_name.find('061.blk') > 0 or p_name.find('062.blk') > 0 or p_name.find('063.blk') > 0:
         writeBlocknew(p_name, data, append)
-        writeBlocknew(blockNew, data)
-        writeBlocknew(blockNewStart, data, append)
+        if doubleFile:
+            writeBlocknew(blockNew, data)
+            writeBlocknew(blockNewStart, data, append)
         # print "write to zxg and 066:%s:%s"%(p_name,len(data))
     elif p_name.find('065.blk') > 0:
         writeBlocknew(p_name, data, append)
-        writeBlocknew(blockNew, data, append)
-        writeBlocknew(blockNewStart, data, append)
+        if doubleFile:
+            writeBlocknew(blockNew, data, append)
+            writeBlocknew(blockNewStart, data, append)
         # print "write to %s:%s"%(p_name,len(data))
     elif p_name.find('068.blk') > 0 or p_name.find('069.blk') > 0:
 
@@ -1462,10 +1480,11 @@ def write_to_blocknew(p_name, data, append=True):
         # print "write to %s:%s"%(p_name,len(data))
     else:
         writeBlocknew(p_name, data, append)
-        writeBlocknew(blockNew, data)
-        # writeBlocknew(blockNewStart, data[:ct.writeCount - 1])
-        writeBlocknew(blockNewStart, data, append)
-        # print "write to other and start:%s :%s"%(p_name,len(data))
+        if doubleFile:
+            writeBlocknew(blockNew, data)
+            # writeBlocknew(blockNewStart, data[:ct.writeCount - 1])
+            writeBlocknew(blockNewStart, data, append)
+            # print "write to other and start:%s :%s"%(p_name,len(data))
 
 
 def getFibonacci(num, days=None):
@@ -1588,8 +1607,9 @@ def select_multiIndex_index(df, index='ticktime', start=None, end=None, datev=No
         df = df[(df.index.get_level_values(index) >= start)]
     elif start is not None and end is not None:
         idx = df.index.get_level_values(index)[0] if len(df.index.get_level_values(index)) > 0 else 0
-        log.info("idx:%s idx<=end:%s" % (idx, idx <= pd.Timestamp(end)))
-        if idx <= pd.Timestamp(end):
+        idx_end = pd.Timestamp(end) if index == 'ticktime' else end
+        log.info("idx:%s idx<=end:%s" % (idx, idx <= idx_end))
+        if idx <= idx_end:
             df = df[(df.index.get_level_values(index) >= start) & (df.index.get_level_values(index) <= end)]
         else:
             df = df[(df.index.get_level_values(index) >= start)]
@@ -1612,18 +1632,46 @@ def from_list_to_dict(col, func_dict):
     return func
 
 
-def get_limit_multiIndex_Row(df, col=multiIndex_func, index='ticktime', start=None, end='10:00:00'):
-    df = select_multiIndex_index(df, index=index, start=start, end=end)
+def get_limit_multiIndex_Row(df, col=None, index='ticktime', start=None, end='10:00:00'):
+    """[summary]
+    
+    [description]
+    
+    Arguments:
+        df {[type]} -- [description]
+    
+    Keyword Arguments:
+        col {[type]} -- [description] (default: {None})
+        index {str} -- [description] (default: {'ticktime'})
+        start {[type]} -- [description] (default: {None})
+        end {str} -- [description] (default: {'10:00:00'})
+    
+    Returns:
+        [type] -- [description]
+    """
+    if df is not None:
+        df = select_multiIndex_index(df, index=index, start=start, end=end)
+    else:
+        log.error("df is None")
     if col is not None:
+        # import pdb;pdb.set_trace()
         func = from_list_to_dict(col, multiIndex_func)
         df = df.groupby(level=[0]).agg(func)
+    else:
+        log.error('col is None')
     return df
 
 
 def get_limit_multiIndex_freq(df, freq='5T', col='low', index='ticktime', start=None, end='10:00:00'):
-    df = select_multiIndex_index(df, index=index, start=start, end=end)
+    if df is not None:
+        df = select_multiIndex_index(df, index=index, start=start, end=end)
+    else:
+        log.error("df is None")
+    # print df.loc['600007',['close','ticktime']]
     if freq is not None and col is not None:
+        # import pdb;pdb.set_trace()
         df = using_Grouper(df, freq=freq, col=col)
+        # print df.loc['600007',['close','low','high','ticktime']]
     else:
         log.info('freq is None')
     # df = select_multiIndex_index(df, index=index, start=start, end=end)
@@ -1851,24 +1899,24 @@ def func_compute_percd(c, lp, lc, lh, ll, nh, nl):
     initc = 0
     down_zero, down_dn, percent_l = 0, 0, 2
     # da, down_zero, down_dn, percent_l = 1, 0, 0, 2
-
-    n_p = (c - lc) / lc * 100
-    n_hp = nh - lh
-    n_lp = nl - ll
-    if n_p >= 0:
-        if n_p > percent_l and n_hp > 0:
-            initc += 2
-        else:
-            initc += 1
-        if lp > 0 and n_lp > 0:
-            initc += 1
-    else:
-        if n_p < -percent_l and n_hp < 0:
-            initc -= 2
-        else:
-            initc -= 1
-        if lp < 0 and n_lp < 0:
-            initc -= 1
+    initc = 1 if (c - lc) >= 0 else down_dn
+    # n_p = (c - lc) / lc * 100
+    # n_hp = nh - lh
+    # n_lp = nl - ll
+    # if n_p >= 0:
+    #     if n_p > percent_l and n_hp > 0:
+    #         initc += 2
+    #     else:
+    #         initc += 1
+    #     if lp > 0 and n_lp > 0:
+    #         initc += 1
+    # else:
+    #     if n_p < -percent_l and n_hp < 0:
+    #         initc -= 2
+    #     else:
+    #         initc -= 1
+    #     if lp < 0 and n_lp < 0:
+    #         initc -= 1
     return initc
 
 

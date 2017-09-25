@@ -8,9 +8,9 @@ import pandas as pd
 import talib as ta
 import tushare as ts
 import tdx_data_Day as tdd
-from JohhnsonUtil import LoggerFactory as LoggerFactory
-from JohhnsonUtil import johnson_cons as ct
-from JohhnsonUtil import commonTips as cct
+from JohnsonUtil import LoggerFactory as LoggerFactory
+from JohnsonUtil import johnson_cons as ct
+from JohnsonUtil import commonTips as cct
 import math
 # log = LoggerFactory.getLogger("get_macd_kdj_rsi")
 log = LoggerFactory.log
@@ -31,8 +31,11 @@ def Get_Stock_List():
     return df
 
 
-def algoMultiDay_trends(df, column='close', days=6, op=0, filter=True):
+def algoMultiDay_trends(df, column='close', days=6, op=0, filter=True,lastday=ct.Power_last_da):
     df = df.sort_index(ascending=True)
+    if len(df) > 1 + lastday:
+        if lastday != 0:
+            df = df[:-lastday]
     if filter:
         dt = tdd.get_duration_price_date(ptype='low', df=df, filter=True)
         df = df[df.index >= dt]
@@ -111,12 +114,15 @@ def algoMultiDay_trends(df, column='close', days=6, op=0, filter=True):
     return op
 
 
-def algoMultiDay(df, column='close', days=6, op=0):
+def algoMultiDay(df, column='close', days=ct.Power_Ma_Days, op=0,lastday=ct.Power_last_da):
     df = df.sort_index(ascending=True)
     # print df[:2],set(df.code)
+    if len(df) > 1 + lastday:
+        if lastday != 0:
+            df = df[:-lastday]
+            
     if len(df) < days + 2:
         days = len(df) - 2
-        # print days
     # if len(df) < 2object0:
     #     days = int(len(df)/2)
     # elif 40 < len(df) < 60:
@@ -191,8 +197,11 @@ def algoMultiDay(df, column='close', days=6, op=0):
     return op
 
 
-def algoMultiTech(df, column='close', days=5, op=0):
+def algoMultiTech(df, column='close', days=ct.Power_Ma_Days, op=0,lastday=ct.Power_last_da):
     df = df.sort_index(ascending=True)
+    if len(df) > 1 + lastday:
+        if lastday != 0:
+            df = df[:-lastday]
     if len(df) < days:
         days = len(df) - 1
     if df is not None:
@@ -213,7 +222,7 @@ def algoMultiTech(df, column='close', days=5, op=0):
     return op
 
 
-def Get_BBANDS_algo(df):
+def Get_BBANDS_algo(df,lastday=ct.Power_last_da):
     if isinstance(df, type(pd.DataFrame())):
         df = df.sort_index(ascending=True)
         upperband, middleband, lowerband = ta.BBANDS(
@@ -221,7 +230,9 @@ def Get_BBANDS_algo(df):
     else:
         upperband, middleband, lowerband = ta.BBANDS(
             np.array(df), timeperiod=20, nbdevdn=2, matype=0)
-
+    if len(df) > 1 + lastday:
+        if lastday != 0:
+            df = df[:-lastday]
     operate = 0
     log.debug('updbb:%s midb:%s close:%s' %
               (df['upbb%s' % dtype][-1], df['midb%s' % dtype][-1], df.close[-1]))
@@ -283,13 +294,18 @@ def Get_BBANDS_algo(df):
     return operate
 
 
-def Get_BBANDS(df, dtype='d', days=5,dl=ct.PowerCountdl,dm=None):
+def Get_BBANDS(df, dtype='d', days=ct.Power_Ma_Days,dl=ct.PowerCountdl,dm=None,lastday=ct.Power_last_da):
     if not isinstance(df,pd.DataFrame):
         code = df
         df = tdd.get_tdx_append_now_df_api(code,dl=dl * 2,dm=dm,newdays=5)
-        # print code,dl,dl*2,len(df)
+        df = df.sort_index(ascending=True)
     else:
-        code = None        
+        code = None
+
+    if len(df) > 1 + lastday:
+        if lastday != 0:
+            df = df[:-lastday]
+
     log.debug("BBANDS:%s" % (len(df)))
     if len(df) < limitCount:
         return (df, 10)
@@ -370,8 +386,11 @@ def Get_BBANDS(df, dtype='d', days=5,dl=ct.PowerCountdl,dm=None):
 # 按照MACD，KDJ等进行分析
 
 
-def Get_TA(df, dtype='d', days=5):
+def Get_TA(df, dtype='d', days=ct.Power_Ma_Days,lastday=ct.Power_last_da):
     df = df.sort_index(ascending=True)
+    if len(df) > 1 + lastday:
+        if lastday != 0:
+            df = df[:-lastday]
     if dtype != 'd':
         # if not dtype == 'd':
         df = tdd.get_tdx_stock_period_to_type(
@@ -416,11 +435,14 @@ def Get_TA(df, dtype='d', days=5):
     return df, op
 
 
-def Get_MACD_OP(df, dtype='d', days=5):
+def Get_MACD_OP(df, dtype='d', days=ct.Power_Ma_Days,lastday=ct.Power_last_da):
     # 参数12,26,9
     if len(df) < limitCount:
         return (df, 1)
     df = df.sort_index(ascending=True)
+    if len(df) > 1 + lastday:
+        if lastday != 0:
+            df = df[:-lastday]
 #    df=df.fillna(0)
     macd, macdsignal, macdhist = ta.MACD(
         np.array(df['close']), fastperiod=12, slowperiod=26, signalperiod=9)
@@ -449,9 +471,12 @@ def Get_MACD_OP(df, dtype='d', days=5):
 # 通过MACD判断买入卖出
 
 
-def Get_MACD(df, dtype='d', days=5):
+def Get_MACD(df, dtype='d', days=ct.Power_Ma_Days,lastday=ct.Power_last_da):
     # 参数12,26,9
     df = df.sort_index(ascending=True)
+    if len(df) > 1 + lastday:
+        if lastday != 0:
+            df = df[:-lastday]
     if len(df) < limitCount:
         return (df, 1)
 #    df=df.fillna(0)
@@ -519,11 +544,15 @@ def Get_MACD(df, dtype='d', days=5):
 
 
 # 通过KDJ判断买入卖出
-def Get_KDJ(df, dtype='d', days=5):
+def Get_KDJ(df, dtype='d', days=ct.Power_Ma_Days,lastday=ct.Power_last_da):
     # 参数9,3,3
     if len(df) < limitCount:
         return (df, 1)
     else:
+        df = df.sort_index(ascending=True)
+        if len(df) > 1 + lastday:
+            if lastday != 0:
+                df = df[:-lastday]
         if not 'ma5d' in df.columns:
             # newstock
             df['ma5d'] = pd.rolling_mean(df.close, 5)
@@ -593,11 +622,14 @@ def Get_KDJ(df, dtype='d', days=5):
 
 
 # 通过RSI判断买入卖出
-def Get_RSI(df, dtype='d', days=5):
+def Get_RSI(df, dtype='d', days=ct.Power_Ma_Days,lastday=ct.Power_last_da):
     # 参数14,5
     if len(df) < limitCount:
         return (df, 1)
     df = df.sort_index(ascending=True)
+    if len(df) > 1 + lastday:
+        if lastday != 0:
+            df = df[:-lastday]
     slowreal = ta.RSI(np.array(df['close']), timeperiod=14)
     fastreal = ta.RSI(np.array(df['close']), timeperiod=5)
 
@@ -683,7 +715,7 @@ def Write_Blog(strinput, Dist):
     time.sleep(1)
 
 
-def get_All_Count(code, dl=None, start=None, end=None, days=5):
+def get_All_Count(code, dl=None, start=None, end=None, days=ct.Power_Ma_Days,lastday=ct.Power_last_da):
     s = time.time()
     if start is not None or end is not None:
         dl = None
@@ -691,31 +723,37 @@ def get_All_Count(code, dl=None, start=None, end=None, days=5):
     #     dl = int(dl*2)
     df = tdd.get_tdx_append_now_df_api(
         code, start=start, end=end, dl=dl).sort_index(ascending=True)
-    dd, boll = Get_BBANDS(df, dtype='d', days=days)
+    if len(df) > 1 + lastday:
+        if lastday != 0:
+            df = df[:-lastday]
+    dd, boll = Get_BBANDS(df, dtype='d', days=days,lastday=lastday)
     print 'boll:%s' % (boll),
-    dd, kdj = Get_KDJ(dd, days=days)
+    dd, kdj = Get_KDJ(dd, days=days,lastday=lastday)
     print 'kdj:', kdj,
-    dd, macd = Get_MACD_OP(dd, days=days)
+    dd, macd = Get_MACD_OP(dd, days=days,lastday=lastday)
     print ' macd:%s' % (macd),
     dd, rsi = Get_RSI(dd, days=days)
     print 'RSI:%s' % (rsi),
-    ma = algoMultiDay(dd, column='close', days=days)
+    ma = algoMultiDay(dd, column='close', days=days,lastday=lastday)
     print 'ma:', ma,
 #    sys.exit()
     # print dd.shape,dd.loc[:,['close','upbbd','midbd','lowbd']][:2]
     dtype = 'd'
     bollCT = 0
     for cl in ['upbb%s' % dtype, 'midb%s' % dtype, 'lowb%s' % dtype]:
-        bollCT += algoMultiTech(dd, column=cl, days=days, op=bollCT)
+        bollCT += algoMultiTech(dd, column=cl, days=days, op=bollCT,lastday=lastday)
     print 'bollCT:', bollCT,
     print "time:%0.3f" % (time.time() - s),
     return boll, kdj, macd, rsi, ma, bollCT
 
 
-def powerStd(code=None, df=None, ptype='close', dl=60):
+def powerStd(code=None, df=None, ptype='close', dl=60,lastday=ct.Power_last_da):
     if df is None and code is not None:
         df = tdd.get_tdx_Exp_day_to_df(code, dl=dl)
-        # print df
+        df = df.sort_index(ascending=True)
+    if len(df) > 1 + lastday:
+        if lastday != 0:
+            df = df[:-lastday]
     nowT = 'df.%s' % (ptype)
     nowS = eval(nowT)
     if ptype in df.columns:
