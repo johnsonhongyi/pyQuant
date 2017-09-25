@@ -178,7 +178,7 @@ def get_wencai_Market_url(filter='国企改革',perpage=1,url=None,):
         if data is  None or (len(data) < 10 or len(re.findall('系统判断您访问次数过多'.decode('utf8'),data))):
             wencai_count+=1
             cct.get_config_value_wencai(config_ini,fname,currvalue=wencai_count,update=True)
-            log.error("acces deny:%s %s"%('系统判断您访问次数过多',data))
+            # log.error("acces deny:%s %s"%('系统判断您访问次数过多',data))
             log.error("acces deny:%s %s"%('系统判断您访问次数过多',url))
             return df
         # print data

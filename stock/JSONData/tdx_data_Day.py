@@ -3184,9 +3184,9 @@ if __name__ == '__main__':
     # log_level = LoggerFactory.DEBUG if args['-d']  else LoggerFactory.ERROR
     log.setLevel(log_level)
     code='999999'
-    print get_tdx_Exp_day_to_df(code, dl=1, newdays=0, resample='d')
+    # print get_tdx_Exp_day_to_df(code, dl=1, newdays=0, resample='d')
     # print get_tdx_day_to_df_last('999999', type=1)
-    sys.exit(0)
+    # sys.exit(0)
     # log.setLevel(LoggerFactory.INFO)
     # print Write_tdx_all_to_hdf('all', h5_fname='tdx_all_df', h5_table='all', dl=300)
     # print Write_tdx_all_to_hdf(tdx_index_code_list, h5_fname='tdx_all_df', h5_table='all', dl=300,index=True)
@@ -3211,7 +3211,7 @@ if __name__ == '__main__':
     time_s = time.time()
     df = search_Tdx_multi_data_duration('tdx_all_df_300', 'all_300', code_l=code_list, start=start, end=None, freq=None, col=None, index='date')
     print "t1:%0.2f"%(time.time()-time_s)
-    if df is not None:print "1:",df[-3:]
+    if df is not None:print "1:",df[-1:]
         # print df[df.index.get_level_values('code')]
     # testnumba(1000)
     # n = 100
@@ -3258,7 +3258,7 @@ if __name__ == '__main__':
     # sys.exit(0)
 #    print write_tdx_tushare_to_file(code)
 
-    hdf5_wri = cct.cct_raw_input("write all tdx data to hdf[y|n]:")
+    hdf5_wri = cct.cct_raw_input("write all tdx data to Multi hdf[y|n]:")
     # hdf5_wri='y'
     if hdf5_wri == 'y':
         Write_tdx_all_to_hdf('all', h5_fname='tdx_all_df', h5_table='all', dl=300)
