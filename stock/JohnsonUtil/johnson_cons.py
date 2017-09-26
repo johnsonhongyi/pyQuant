@@ -12,7 +12,7 @@ Created on 2014/07/31
 @contact: jimmysoa@sina.cn
 """
 import sys
-
+import commonTips as cct
 PY3 = (sys.version_info[0] >= 3)
 
 VERSION = '0.3.6'
@@ -39,7 +39,7 @@ Power_Ma_Days = 6
 Power_last_da = 1
 power_update_time = 900
 writeCount = 5
-changeRatio = 0.985
+changeRatio = 0.975
 changeRatioUp = 1.015
 # duration_date = 10
 wencai_delay_time = 60
@@ -633,6 +633,14 @@ def get_market_sort_value_key(st, top_all=None, perd_d=3):
         # market_sort_value = Market_sort_idx_perd[st]
         market_sort_name = Market_sort_idx_perd[st].replace("ct.", '')
         if st in ['2', '3']:
+            if len(st_l) > 1:
+                if st_l[1].isdigit():
+                    # cct.GlobalValues()
+                    cct.GlobalValues().setkey('market_key',st_l[0])
+                    cct.GlobalValues().setkey('market_value', st_l[1])
+            else:
+                cct.GlobalValues().setkey('market_key',st_l[0])
+                cct.GlobalValues().setkey('market_value', 1)
             idx_value = eval(market_sort_name)[0]
             market_sort_value_key = eval(market_sort_name + '_key')
             if st_count > 1 and st_l[1].isdigit():

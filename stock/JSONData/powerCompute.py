@@ -977,7 +977,8 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y', tal
                          (len(df), len(h5), len(code_l)))
                 return df
             else:
-                if len(drop_cxg) <> 0 and ((not (915 < cct.get_now_time_int() < 932)) or not cct.get_work_day_status()):
+                # if len(drop_cxg) <> 0 and ((not (915 < cct.get_now_time_int() < 932)) or not cct.get_work_day_status()):
+                if len(drop_cxg) <> 0 and (not cct.get_work_day_status()):
                     log.info(
                         "code_l not none:%s and drop_cxg <> 0 and not 915-932" % (code_l))
                     temp_l = list(set(code_l) - set(drop_cxg))

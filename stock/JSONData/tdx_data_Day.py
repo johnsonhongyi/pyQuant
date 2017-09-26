@@ -3259,7 +3259,6 @@ if __name__ == '__main__':
 #    print write_tdx_tushare_to_file(code)
 
     hdf5_wri = cct.cct_raw_input("write all tdx data to Multi hdf[y|n]:")
-    # hdf5_wri='y'
     if hdf5_wri == 'y':
         Write_tdx_all_to_hdf('all', h5_fname='tdx_all_df', h5_table='all', dl=300)
 
