@@ -390,6 +390,7 @@ def get_linear_model_status(code, df=None, dtype='d', type='m', start=None, end=
     # log.setLevel(LoggerFactory.DEBUG)
     # else:
     # log.setLevel(LoggerFactory.ERROR)
+    
     index_d = None
     days = days if days <> 0 else 1
     if start is not None and end is None and filter == 'y':

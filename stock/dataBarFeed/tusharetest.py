@@ -694,5 +694,5 @@ def turtle_test(code,start=None,plot=True,dl=20):
 
 if __name__ == '__main__':
     #vwap(True)
-    code='600435'
+    code='999999'
     turtle_test(code,'2016-06-01',dl=30)

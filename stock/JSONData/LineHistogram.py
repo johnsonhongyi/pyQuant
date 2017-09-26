@@ -241,7 +241,8 @@ def get_linear_model_histogramDouble(code, ptype='low', dtype='d', start=None, e
     # print start, end, len(asset)
     # print ticks, ticks[:-1]
     # (ticks[:-1] if len(asset) > end else np.append(ticks[:-1], len(asset) - 1))
-    ax1.set_xticklabels([dates[i] for i in (np.append(ticks[:-1], len(asset) - 1))],
+
+    ax1.set_xticklabels([dates[int(i)] for i in (np.append(ticks[:-1], len(asset) - 1))],
                         rotation=15)  # Label x-axis with dates
     # 拟合
     X = np.arange(len(asset))
@@ -290,7 +291,7 @@ def get_linear_model_histogramDouble(code, ptype='low', dtype='d', start=None, e
         ax3.plot(asset)
         plt.plot(distance)
         ticks = ax3.get_xticks()
-        ax3.set_xticklabels([dates[i] for i in (np.append(ticks[:-1], len(asset) - 1))], rotation=15)
+        ax3.set_xticklabels([dates[int(i)] for i in (np.append(ticks[:-1], len(asset) - 1))], rotation=15)
         n = 5
         d = (-c_high + c_low) / n
         c = c_high
@@ -307,7 +308,7 @@ def get_linear_model_histogramDouble(code, ptype='low', dtype='d', start=None, e
         ax3.plot(as3)
         ticks = ax3.get_xticks()
         ax3.plot(asset1, '-r', linewidth=2)
-        ax3.set_xticklabels([dates[i] for i in (np.append(ticks[:-1], len(asset) - 1))], rotation=15)
+        ax3.set_xticklabels([dates[int(i)] for i in (np.append(ticks[:-1], len(asset) - 1))], rotation=15)
         plt.grid(True)
         zp3 = zoompan.ZoomPan()
         figZoom = zp3.zoom_factory(ax3, base_scale=scale)
@@ -321,7 +322,7 @@ def get_linear_model_histogramDouble(code, ptype='low', dtype='d', start=None, e
     ax2 = fig.add_subplot(323)
     # ax2.plot(asset)
     # ticks = ax2.get_xticks()
-    ax2.set_xticklabels([dates[i] for i in (np.append(ticks[:-1], len(asset) - 1))], rotation=15)
+    ax2.set_xticklabels([dates[int(i)] for i in (np.append(ticks[:-1], len(asset) - 1))], rotation=15)
     # plt.plot(X, Y_hat, 'k', alpha=0.9)
     n = 5
     d = (-c_high + c_low) / n
@@ -560,7 +561,7 @@ def get_linear_model_histogram(code, ptype='low', dtype='d', start=None, end=Non
     # print start, end, len(asset)
     # print ticks, ticks[:-1]
     # (ticks[:-1] if len(asset) > end else np.append(ticks[:-1], len(asset) - 1))
-    ax1.set_xticklabels([dates[i] for i in (np.append(ticks[:-1], len(asset) - 1))],
+    ax1.set_xticklabels([dates[int(i)] for i in (np.append(ticks[:-1], len(asset) - 1))],
                         rotation=15)  # Label x-axis with dates
     # 拟合
     X = np.arange(len(asset))
@@ -609,7 +610,7 @@ def get_linear_model_histogram(code, ptype='low', dtype='d', start=None, end=Non
         ax3.plot(asset)
         plt.plot(distance)
         ticks = ax3.get_xticks()
-        ax3.set_xticklabels([dates[i] for i in (np.append(ticks[:-1], len(asset) - 1))], rotation=15)
+        ax3.set_xticklabels([dates[int(i)] for i in (np.append(ticks[:-1], len(asset) - 1))], rotation=15)
         n = 5
         d = (-c_high + c_low) / n
         c = c_high
