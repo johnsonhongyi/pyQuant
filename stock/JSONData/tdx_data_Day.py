@@ -1699,6 +1699,8 @@ def getSinaJsondf(market='cyb', vol=ct.json_countVol, vtype=ct.json_countType):
 
 def getSinaAlldf(market='cyb', vol=ct.json_countVol, vtype=ct.json_countType, filename='mnbk', table='top_now'):
     market_all = False
+    import pdb;pdb.set_trace();
+
     if market == 'rzrq':
         df = cct.get_rzrq_code()
     elif market == 'cx':
@@ -1712,11 +1714,11 @@ def getSinaAlldf(market='cyb', vol=ct.json_countVol, vtype=ct.json_countType, fi
             df = cct.get_tushare_market(market=market, renew=True, days=5)
         else:
             df = cct.get_tushare_market(market, renew=False, days=5)
-    elif market.find('blk') > 0:
+    elif market.find('blk') > 0 or market.isdigit():
             # blkname = '061.blk'
-        block_path = tdd.get_tdx_dir_blocknew() + blkname
+        code_l = cct.read_to_blocknew(market)
+        df = sina_data.Sina().get_stock_list_data(code_l)   
         # df = pd.read_csv(block_path,dtype={'code':str},encoding = 'gbk')
-        df = pd.read_csv(block_path)
     elif market in ['sh', 'sz', 'cyb']:
         df = rl.get_sina_Market_json(market)
         # df = sina_data.Sina().market(market)

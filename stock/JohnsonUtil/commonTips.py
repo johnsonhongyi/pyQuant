@@ -1229,6 +1229,17 @@ def code_to_tdxblk(code):
         else:
             return '1%s' % code if code[:1] in ['5', '6'] else '0%s' % code
 
+def tdxblk_to_code(code):
+    """
+        生成symbol代码标志
+    """
+    if code in ct.INDEX_LABELS:
+        return ct.INDEX_LIST[code]
+    else:
+        if len(code) != 7:
+            return ''
+        else:
+            return code[1:] if code[:1] in ['1','0'] else code
 
 def code_to_index(code):
     if not code.startswith('999') or not code.startswith('399'):
@@ -1354,10 +1365,10 @@ def get_config_value_wencai(fname, classtype, currvalue=0, xtype='limit', update
         config.write()
     return int(currvalue)
 
-def write_to_blocknew(p_name, data, append=True,doubleFile=True):
+def write_to_blocknew(p_name, data, append=True,doubleFile=True,keep_last=15):
     # index_list = ['1999999','47#IFL0',  '0399006', '27#HSI']
     # index_list = ['1999999','47#IFL0', '27#HSI',  '0399006']
-    index_list = ['1999999', '47#IFL0', '27#HSI',  '0159915']
+    index_list = ['1999999','0399001','47#IFL0', '27#HSI',  '0159915']
     # index_list = ['1999999', '27#HSI',  '0159915']
 
     def writeBlocknew(p_name, data, append=True):
@@ -1393,9 +1404,13 @@ def write_to_blocknew(p_name, data, append=True,doubleFile=True):
                 # print "File:%s end not %s"%(p_name[-7:],str(flist[-1]))
             # print "flist", flist
         else:
-            fout = open(p_name, 'rb+')
-            flist_t = fout.readlines()
-            flist = []
+            if int(keep_last) > 0:
+                fout = open(p_name, 'rb+')
+                flist_t = fout.readlines()
+                flist = []
+            else:
+                flist_t = []
+                flist = []
             # flist_t = file(p_name, mode='rb+', buffering=None)
             if len(flist_t) > 4:
                 # errstatus=False
@@ -1410,10 +1425,12 @@ def write_to_blocknew(p_name, data, append=True,doubleFile=True):
                     flist.append(code)
                 # if errstatus:
                 fout.close()
-                if p_name.find('066.blk') > 0:
-                    writecount = ct.writeblockbakNum
-                else:
-                    writecount = 9
+                # if p_name.find('066.blk') > 0:
+                #     writecount = ct.writeblockbakNum
+                # else:
+                #     writecount = 9
+
+                writecount = keep_last
                 flist = flist[:writecount]
 
                 for co in index_list:
@@ -1425,7 +1442,7 @@ def write_to_blocknew(p_name, data, append=True,doubleFile=True):
                 for code in flist:
                     fout.write(code)
             else:
-                fout.close()
+                # fout.close()
                 fout = open(p_name, 'wb+')
                 # index_list.reverse()
                 for i in index_list:
@@ -1487,6 +1504,41 @@ def write_to_blocknew(p_name, data, append=True,doubleFile=True):
             writeBlocknew(blockNewStart, data, append)
         # print "write to append:%s :%s :%s"%(append,p_name,len(data))
 
+def read_to_blocknew(p_name):
+    index_list = ['1999999','0399001','47#IFL0', '27#HSI',  '0159915']
+    def read_block(p_name):
+        fout = open(p_name, 'rb')
+        # fout = open(p_name)
+        flist_t = fout.readlines()
+        flist = []
+        for code in flist_t:
+            if len(code) <= 6 or len(code) > 12:
+                continue
+            if code.endswith('\r\n'):
+                if len(code) <= 6:
+                    # errstatus = True
+                    continue
+                else:
+                    code = code.replace('\r\n','')
+                    if code not in index_list:
+                        code = tdxblk_to_code(code)
+            else:
+                continue
+            if len(code) == 6:
+                flist.append(code)
+        fout.close()
+        return flist
+
+    if not p_name.endswith("blk"):
+        blockNew = get_tdx_dir_blocknew() + p_name + '.blk'
+        if not os.path.exists(blockNew):
+            log.error("path error:%s"%(blockNew))
+    else:
+        blockNew = get_tdx_dir_blocknew() + p_name
+    # blockNewStart = get_tdx_dir_blocknew() + '066.blk'
+    # writeBlocknew(blockNew, data)
+    # p_data = ['zxg', '069', '068', '067', '061']
+    return read_block(blockNew)
 
 def getFibonacci(num, days=None):
     res = [0, 1]
@@ -2024,9 +2076,13 @@ if __name__ == '__main__':
     else:
         log_level = LoggerFactory.ERROR
     # log_level = LoggerFactory.DEBUG if args['-d']  else LoggerFactory.ERROR
-    log_level = LoggerFactory.DEBUG
-    log.setLevel(log_level)
-
+    
+    
+    # log_level = LoggerFactory.DEBUG
+    # log.setLevel(log_level)
+    # print tdxblk_to_code('1399001')
+    print tdxblk_to_code('0399001')
+    print read_to_blocknew('066')
     # get_terminal_Position(cmd=scriptquit, position=None, close=False)
     # get_terminal_Position('Johnson —', close=True)
     get_terminal_Position(clean_terminal[2], close=True)

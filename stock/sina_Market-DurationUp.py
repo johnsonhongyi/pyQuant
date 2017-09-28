@@ -129,6 +129,7 @@ if __name__ == "__main__":
         try:
             # df = sina_data.Sina().all
             time_Rt = time.time()
+            # top_now = tdd.getSinaAlldf(market='060.blk', vol=ct.json_countVol, vtype=ct.json_countType)
             top_now = tdd.getSinaAlldf(market='all', vol=ct.json_countVol, vtype=ct.json_countType)
 
             top_dif = top_now
