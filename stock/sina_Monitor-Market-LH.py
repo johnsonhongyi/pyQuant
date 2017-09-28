@@ -131,7 +131,9 @@ if __name__ == "__main__":
     resample = ct.resample_dtype
     end_date = cct.last_tddate(days=3)
     # all_diffpath = tdd.get_tdx_dir_blocknew() + '062.blk'
-    market_sort_value, market_sort_value_key = ct.get_market_sort_value_key('1')
+    
+    market_sort_value, market_sort_value_key = ct.get_market_sort_value_key(ct.sort_value_key_perd)
+    
     while 1:
         try:
             # top_now = tdd.getSinaAlldf(market='sh', vol=ct.json_countVol, vtype=ct.json_countType)

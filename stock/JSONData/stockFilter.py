@@ -108,11 +108,13 @@ def getBollFilter(df=None, boll=6, duration=ct.PowerCountdl, filter=True, ma5d=T
     # df['df2'] = (map(func_compute_df2, df.close.values, df.llastp.values,df.high.values, df.low.values,df.ratio.values))
     # df['df2'] = (map(func_compute_df2, df.close.values, df.llastp.values,df.high.values, df.low.values))
 
-    if 'ma5d' in df.columns:
-        if 'ma20d' in df.columns:
-            df = df[(df.buy > df.ma20d) & (df.ma5d >= df.ma20d)]
+    filter_up = 'ma5d'
+    filter_dn = 'ma10d'
+    if filter_up in df.columns:
+        if filter_dn in df.columns:
+            df = df[(df.buy > df[filter_dn]) & (df[filter_up] >= df[filter_dn])]
         else:
-            df = df[df.buy > df.ma5d * ct.changeRatio]
+            df = df[df.buy > df[filter_up] * ct.changeRatio]
 
     # if 'nlow' in df.columns and 932 < cct.get_now_time_int() < 1030:
 
@@ -132,17 +134,17 @@ def getBollFilter(df=None, boll=6, duration=ct.PowerCountdl, filter=True, ma5d=T
     if filter:
 
         if cct.get_now_time_int() > 915 and cct.get_now_time_int() <= 1000:
-            df = df[df.buy > df.hmax * ct.changeRatio]
-            # df = df[df.buy > df.cmean * ct.changeRatioUp ]
+            # df = df[df.buy > df.hmax * ct.changeRatio]
+            df = df[df.buy > df.cmean * ct.changeRatioUp ]
             # df = df[df.buy > df.cmean]
 
         elif cct.get_now_time_int() > 1000 and cct.get_now_time_int() <= 1430:
-            df = df[df.buy > df.hmax * ct.changeRatio]
-            # df = df[df.buy > df.cmean * ct.changeRatioUp]
+            # df = df[df.buy > df.hmax * ct.changeRatio]
+            df = df[df.buy > df.cmean * ct.changeRatioUp]
             # df = df[df.buy > df.cmean]
         else:
-            df = df[df.buy > df.hmax * ct.changeRatio]
-            # df = df[df.buy > df.cmean]
+            # df = df[df.buy > df.hmax * ct.changeRatio]
+            df = df[df.buy > df.cmean]
 
         # if ma5d:
         #     # op, ra, st, days = pct.get_linear_model_status('999999', filter='y', dl=dl, ptype='low')

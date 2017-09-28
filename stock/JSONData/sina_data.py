@@ -614,7 +614,7 @@ class Sina:
             h5a.write_hdf_db(h5_fname, df, table=h5_table, index=False, baseCount=500, append=False, MultiIndex=True)
             log.info("hdf5 class all :%s  time:%0.2f" % (len(df), time.time() - time_s))
 
-        if 'nlow' not in df.columns or 'nhigh' not in df.columns or (cct.get_work_time() and 931 < cct.get_now_time_int() < 1500):
+        if 'nlow' not in df.columns or 'nhigh' not in df.columns or (cct.get_work_time() and 925 < cct.get_now_time_int() < 1500):
             # if 'nlow' not in df.columns or 'nhigh' not in df.columns or cct.get_work_time():
             h5 = h5a.load_hdf_db(h5_fname, h5_table, timelimit=False)
 
@@ -639,9 +639,9 @@ class Sina:
                 run_col = ['low', 'high']
                 startime = '09:25:00'
                 # endtime = '10:00:00'
-                endtime = '09:45:00'
+                endtime = '09:40:00'
                 dd = self.get_col_agg_df(h5, dd, run_col, all_func, startime, endtime)
-                startime = '09:30:00'
+                startime = '09:25:00'
                 endtime = '15:01:00'
                 run_col = ['close']
                 # h5 = cct.get_limit_multiIndex_Group(h5, freq='15T', col=run_col,start=startime, end=endtime)

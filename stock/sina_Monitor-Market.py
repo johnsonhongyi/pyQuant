@@ -96,7 +96,7 @@ if __name__ == "__main__":
     block_path = tdd.get_tdx_dir_blocknew() + blkname
     # all_diffpath = tdd.get_tdx_dir_blocknew() + '062.blk'
     lastpTDX_DF = pd.DataFrame()
-    market_sort_value, market_sort_value_key = ct.get_market_sort_value_key('1')
+    market_sort_value, market_sort_value_key = ct.get_market_sort_value_key(ct.sort_value_key_perd)
     while 1:
         try:
             # df = rl.get_sina_Market_json('all')
