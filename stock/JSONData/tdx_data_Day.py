@@ -1699,8 +1699,6 @@ def getSinaJsondf(market='cyb', vol=ct.json_countVol, vtype=ct.json_countType):
 
 def getSinaAlldf(market='cyb', vol=ct.json_countVol, vtype=ct.json_countType, filename='mnbk', table='top_now'):
     market_all = False
-    import pdb;pdb.set_trace();
-
     if market == 'rzrq':
         df = cct.get_rzrq_code()
     elif market == 'cx':
