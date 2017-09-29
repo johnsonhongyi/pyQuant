@@ -1309,7 +1309,7 @@ def get_config_value(fname, classtype, currvalue, limitvalue=1, xtype='limit', r
 
             else:
 
-                log.error("f_size:%s > read_limit:%s" % (currvalue, config[classtype][xtype]))
+                log.error("file:%s f_size:%s > read_limit:%s" % (fname,currvalue, config[classtype][xtype]))
                 config[classtype][xtype] = limitvalue
                 config.write()
                 return True
@@ -1940,6 +1940,25 @@ def sort_by_value(df, column='dff', file=None, count=5, num=5, asc=0):
             write_to_blocknew(file, dd.index.tolist()[:int(count)], append=True)
         print "file:%s" % (file)
 
+def get_col_in_columns(df,idx_value,key):
+    """[summary]
+    
+    [description]
+    
+    Arguments:
+        df {[type]} -- [description]
+        idx_value {[type]} -- [perc%sd]
+        key {[type]} -- [9]
+    
+    Returns:
+        [type] -- [description]
+    """
+    idx_k = 1
+    for inx in range(int(key) - 1, 1, -1):
+        if idx_value % inx in df.columns:
+            idx_k = inx
+            break 
+    return idx_k
 
 def get_diff_dratio(mainlist, sublist):
     dif_co = list(set(mainlist) & set(sublist))

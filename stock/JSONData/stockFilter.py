@@ -101,7 +101,8 @@ def getBollFilter(df=None, boll=6, duration=ct.PowerCountdl, filter=True, ma5d=T
     if market_key is not None and market_key == '3':
         market_value = int(market_value)
         log.info("stf market_key:%s"%(market_key))
-        df = df[df["perc%sd"%(market_value)] >= market_value]
+        idx_k = cct.get_col_in_columns(df, 'perc%sd', market_value)
+        df = df[df["perc%sd"%(idx_k)] >= idx_k]
         # log.error("perc%sd"%(market_value))
 
     # df['df2'] = (map(lambda x, y, z: w=round((x - y) / z * 100, 1), df.high.values, df.low.values, df.llastp.values))

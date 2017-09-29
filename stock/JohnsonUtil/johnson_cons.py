@@ -34,7 +34,7 @@ VolumeMinR = 0.1
 PowerCount = 500
 duration_diff = 6
 duration_date_l = 14
-duration_date_up = 60
+duration_date_up = 34
 duration_date_sort = 21
 PowerCountdl = 21
 Power_Ma_Days = 6
@@ -73,7 +73,7 @@ duration_sleep_time = 60
 compute_lastdays = 9
 sort_value_key_perd23 = '4'
 # sort_value_key_perd23 = '2 3'
-sort_value_key_perd = '2 3'
+sort_value_key_perd = '2 2'
 idx_perd_1to_2 = 1
 # powerdiff = 'ra * fibl + rah*(abs(float(%s)-fibl))/fib +ma +kdj+rsi'
 '''

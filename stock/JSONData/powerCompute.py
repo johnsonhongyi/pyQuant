@@ -968,7 +968,7 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y', tal
             #            if status:
 
 #            h5 = h5[(h5.op <> 0) & (h5.ra <> 0) & (h5.df2 <> 0 )]
-            h5 = h5[(h5.df2 <> 0 ) | (h5.ra <> 0 ) | (h5.ra <> 0 )]
+            h5 = h5[(h5.df2 <> 0 ) & (h5.ra <> 0 ) & (h5.boll <> 0 )]
             h5 = h5.drop(
                 [inx for inx in h5.columns if inx not in power_columns], axis=1)
             code_l = list(set(df.index) - set(h5.index))
