@@ -1,11 +1,11 @@
-d# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 from datetime import datetime
 # from merge_line_dto import MergeLineDTO
 # from k_line_dto import KLineDTO
 # from sql_lite_util import *
 __author__ = 'SUM'
 
-
+from numpy import nan
 
 
 # 入的开高低收都是ndarray格式的一个向量
@@ -17,6 +17,7 @@ def Kplot(Open,High,Low,Close):
     ax1 = plt.axes([0,0,3,2])
 
     X=np.array(range(0, length))
+    print "nan:%s"%(nan)
     pad_nan=X+nan
 
     #计算上 下影线
@@ -72,9 +73,9 @@ def Kplot(Open,High,Low,Close):
 
     #Close_handle=plt.plot(pad_X,line_up,color='k')
 
-    vertices_up=array([box_X,pad_box_up]).T
-    vertices_down=array([box_X,pad_box_down]).T
-    vertices_even=array([box_X,pad_box_even]).T
+    vertices_up=np.array([box_X,pad_box_up]).T
+    vertices_down=np.array([box_X,pad_box_down]).T
+    vertices_even=np.array([box_X,pad_box_even]).T
 
     handle_box_up=mat.patches.Polygon(vertices_up,color='r',zorder=1)
     handle_box_down=mat.patches.Polygon(vertices_down,color='g',zorder=1)
@@ -92,7 +93,7 @@ def Kplot(Open,High,Low,Close):
 
     v=[0,length,Open.min()-0.5,Open.max()+0.5]
     plt.axis(v)
-
+    # plt.show()
 
 # K线DTO
 class KLineDTO(object):
@@ -538,7 +539,9 @@ def run_test():
     # k_line_list = get_stock_30min_data_by_time("601318", "2015-12-21 10:00:00", "2016-04-02 13:30:00")
     # k_line_list = get_stock_week_data_by_time("999999", "2009-07-17", "2015-05-15")
     df = tdd.get_tdx_Exp_day_to_df("999999", "2015-07-17").sort_index(ascending=True)
+    # print df.index
     # df.index = df.index.astype('datetime64')
+    # print df.index
     k_line_list = dftok_line_list(df)
     # print k_line_list
     # [u'code', u'open', u'high', u'low', u'close',
@@ -551,10 +554,12 @@ def run_test():
     fenbi_result,final_result_array,fenbi_seq_list = fen_bi(merge_line_list)
     print "1",fenbi_result
     print "2",final_result_array
-    print "all:%s 3:%s"%(len(df),fenbi_seq_list)
+    print "all:%s 3:%s"%(len(df),fenbi_seq_list[5])
     print df.index[:2]
-    print df.iloc[288,1:5]
-#    Kplot(Open, High, Low, Close)
+    print df.iloc[288,1:5][:5]
+    # Kplot(Open, High, Low, Close)
+
+    Kplot(df.open, df.high, df.low, df.close)
 
 if __name__ == "__main__":
     # from chan_lun_util import *

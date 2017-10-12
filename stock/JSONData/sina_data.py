@@ -623,7 +623,7 @@ class Sina:
                 run_col = ['low', 'high', 'close']
                 startime = '09:25:00'
                 # endtime = '10:00:00'
-                endtime = '09:45:00'
+                endtime = '09:50:00'
                 dd = self.get_col_agg_df(h5, dd, run_col, all_func, startime, endtime)
                 startime = '09:25:00'
                 # endtime = '10:00:00'
@@ -639,7 +639,7 @@ class Sina:
                 run_col = ['low', 'high']
                 startime = '09:25:00'
                 # endtime = '10:00:00'
-                endtime = '09:40:00'
+                endtime = '09:50:00'
                 dd = self.get_col_agg_df(h5, dd, run_col, all_func, startime, endtime)
                 startime = '09:25:00'
                 endtime = '15:01:00'

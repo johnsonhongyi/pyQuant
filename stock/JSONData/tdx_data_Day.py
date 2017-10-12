@@ -311,7 +311,7 @@ def get_tdx_Exp_day_to_df(code, start=None, end=None, dl=None, newdays=None, typ
                 # write_tdx_sina_data_to_file(code, df=df)
             df = df.fillna(0)
             df = df.sort_index(ascending=False)
-        return df
+        # return df
     elif dl is not None and int(dl) == 1:
         fileSize = os.path.getsize(file_path)
         if newstockdayl <> 0:
@@ -336,17 +336,17 @@ def get_tdx_Exp_day_to_df(code, start=None, end=None, dl=None, newdays=None, typ
                 log.debug("day 1 tdate:%s" % tdate)
                 # tdate = str(a[0])[:4] + '-' + str(a[0])[4:6] + '-' + str(a[0])[6:8]
                 # tdate=dt.strftime('%Y-%m-%d')
-                topen = float(a[1])
-                thigh = float(a[2])
-                tlow = float(a[3])
-                tclose = float(a[4])
+                topen = round(float(a[1]), 2)
+                thigh = round(float(a[2]), 2)
+                tlow = round(float(a[3]), 2)
+                tclose = round(float(a[4]), 2)
                 # tvol = round(float(a[5]) / 10, 2)
-                tvol = float(a[5])
+                tvol = round(float(a[5]), 2)
                 amount = round(float(a[6].replace('\r\n', '')), 1)  # int
                 # tpre = int(a[7])  # back
                 if int(topen) == 0 or int(amount) == 0:
                     continue
-                dt_list = Series(
+                df = Series(
                     {'code': code, 'date': tdate, 'open': topen, 'high': thigh, 'low': tlow, 'close': tclose,
                      'amount': amount,
                      'vol': tvol})
@@ -357,7 +357,7 @@ def get_tdx_Exp_day_to_df(code, start=None, end=None, dl=None, newdays=None, typ
                 #     break
         # df = pd.DataFrame(dt_list, columns=ct.TDX_Day_columns)
         # df = df.set_index('date')
-        return dt_list
+        # return dt_list
 
     else:
         if df is None or len(df) == 0:
@@ -392,10 +392,10 @@ def get_tdx_Exp_day_to_df(code, start=None, end=None, dl=None, newdays=None, typ
                         continue
                     # tdate = str(a[0])[:4] + '-' + str(a[0])[4:6] + '-' + str(a[0])[6:8]
                     # tdate=dt.strftime('%Y-%m-%d')
-                    topen = float(a[1])
-                    thigh = float(a[2])
-                    tlow = float(a[3])
-                    tclose = float(a[4])
+                    topen = round(float(a[1]), 2)
+                    thigh = round(float(a[2]), 2)
+                    tlow = round(float(a[3]), 2)
+                    tclose = round(float(a[4]), 2)
                     tvol = round(float(a[5]), 2)
                     amount = round(float(a[6].replace('\r\n', '')), 1)  # int
                     # tpre = int(a[7])  # back
@@ -463,7 +463,7 @@ def get_tdx_Exp_day_to_df(code, start=None, end=None, dl=None, newdays=None, typ
                 # write_tdx_sina_data_to_file(code, df=df)
             df = df.fillna(0)
             df = df.sort_index(ascending=False)
-        return df
+    return df
 
 
 INDEX_LIST = {'sh': 'sh000001', 'sz': 'sz399001', 'hs300': 'sz399300',
@@ -3022,8 +3022,11 @@ def get_tdx_search_day_DF(market='cyb'):
     return results
 
 
-def get_tdx_stock_period_to_type(stock_data, period_day='w', periods=5):
+def get_tdx_stock_period_to_type(stock_data, period_day='w', periods=5,ncol=None):
     period_type = period_day
+    #默认的index类型:
+    indextype = True if stock_data.index.dtype == 'datetime64[ns]' else False
+    #
     # 转换周最后一日变量
     if cct.get_work_day_status() and 915 < cct.get_now_time_int() < 1500:
         stock_data = stock_data[stock_data.index < cct.get_today()]
@@ -3053,24 +3056,34 @@ def get_tdx_stock_period_to_type(stock_data, period_day='w', periods=5):
     period_stock_data['low'] = stock_data[
         'low'].resample(period_type, how='min')
     # volume等于所有数据和
-    period_stock_data['amount'] = stock_data[
-        'amount'].resample(period_type, how='sum')
-    period_stock_data['vol'] = stock_data[
-        'vol'].resample(period_type, how='sum')
+    if ncol is not None:
+        for co in ncol:
+            period_stock_data[co] = stock_data[co].resample(period_type, how='sum')
+    else:
+        period_stock_data['amount'] = stock_data[
+            'amount'].resample(period_type, how='sum')
+        period_stock_data['vol'] = stock_data[
+            'vol'].resample(period_type, how='sum')
     # 计算周线turnover,【traded_market_value】 流通市值【market_value】 总市值【turnover】 换手率，成交量/流通股本
     # period_stock_data['turnover']=period_stock_data['vol']/(period_stock_data['traded_market_value'])/period_stock_data['close']
     # 去除无交易纪录
-    period_stock_data.index = stock_data['date'].resample(period_type, how='last')
+    period_stock_data.index = stock_data['date'].resample(period_type, how='last').index
     # print period_stock_data.index[:1]
     if 'code' in period_stock_data.columns:
         period_stock_data = period_stock_data[period_stock_data['code'].notnull()]
+    period_stock_data = period_stock_data.dropna()
     # period_stock_data.reset_index(inplace=True)
     # period_stock_data.set_index('date',inplace=True)
     # print period_stock_data.columns,period_stock_data.index.name
-    if period_stock_data.index.name == 'date':
+    #and period_stock_data.index.dtype != 'datetime64[ns]')
+    
+    if not indextype  and period_stock_data.index.name == 'date':
         # stock_data.index = pd.to_datetime(stock_data.index, format='%Y-%m-%d')
         period_stock_data.index = map(lambda x: str(x)[:10], period_stock_data.index)
         period_stock_data.index.name = 'date'
+    else:
+        if 'date' in period_stock_data.columns:
+            period_stock_data = period_stock_data.drop(['date'], axis=1)
     # print period_stock_data
     return period_stock_data
 

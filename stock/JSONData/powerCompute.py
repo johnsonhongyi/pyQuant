@@ -52,6 +52,7 @@ else:
     mpl.rcParams['font.sans-serif'] = ['SimHei']
     mpl.rcParams['axes.unicode_minus'] = False
 
+# print mpl.rcParams
 
 # import signal
 # def signal_handler(sig, frame):

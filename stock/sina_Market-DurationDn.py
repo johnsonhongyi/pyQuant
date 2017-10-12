@@ -45,10 +45,10 @@ def evalcmd(dir_mo):
                 if not cmd.find(' =') < 0:
                     exec(cmd)
                 else:
-                    print eval(cmd)
-                print ''
-            except Exception, e:
-                print e
+                    print ("%s"%(eval(cmd)))
+                print ('')
+            except Exception as e:
+                print (e)
                 # evalcmd(dir_mo)
                 # break
 
@@ -106,8 +106,8 @@ if __name__ == "__main__":
     resample = ct.resample_dtype
     # print cct.last_tddate(2)
     # end_date = cct.last_tddate(days=int(duration_date/4))
-    end_date = cct.last_tddate(days=ct.lastdays)
-    # end_date = None
+    # end_date = cct.last_tddate(days=ct.lastdays)
+    end_date = None
     ptype = 'high'
     filter = 'y'
     if len(str(duration_date)) < 4:
@@ -125,7 +125,7 @@ if __name__ == "__main__":
     parser = cct.MoniterArgmain()
     parserDuraton = cct.DurationArgmain()
     market_sort_value, market_sort_value_key = ct.get_market_sort_value_key(ct.sort_value_key_perd)
-    
+
     while 1:
         try:
             '''
@@ -158,7 +158,7 @@ if __name__ == "__main__":
                     cct.get_terminal_Position(position=sys.argv[0])
 
                     # time_Rt = time.time()
-                    print "term:%s" % (cct.get_terminal_Position(cmd='DurationDn.py')),
+                    print ("term:%s" % (cct.get_terminal_Position(cmd='DurationDn.py')),)
                     if cct.get_terminal_Position(cmd='DurationDn.py') > 1:
                         top_all, lastpTDX_DF = tdd.get_append_lastp_to_df(
                             top_now, lastpTDX_DF=None, dl=duration_date, end=end_date, ptype=ptype, filter=filter, power=ct.lastPower, lastp=lastp, newdays=newdays, resample=resample)
@@ -257,7 +257,7 @@ if __name__ == "__main__":
                 # top_dif = top_dif[top_dif.volume > 1]
 
                 if len(top_dif) == 0:
-                    print "No G,DataFrame is Empty!!!!!!"
+                    print ("No G,DataFrame is Empty!!!!!!")
                 else:
                     log.debug('dif6 vol:%s' % (top_dif[:1].volume))
                     log.debug('dif6 vol>lvol:%s' % len(top_dif))
@@ -337,7 +337,7 @@ if __name__ == "__main__":
                     print("N:%s K:%s %s G:%s" % (
                         now_count, len(top_all[top_all['buy'] > 0]),
                         len(top_now[top_now['volume'] <= 0]), goldstock)),
-                    print "Rt:%0.1f dT:%s N:%s T:%s %s%%" % (float(time.time() - time_Rt), cct.get_time_to_date(time_s), cct.get_now_time(), len(top_temp), round(len(top_temp) / float(ct.PowerCount) * 100, 1))
+                    print ("Rt:%0.1f dT:%s N:%s T:%s %s%%" % (float(time.time() - time_Rt), cct.get_time_to_date(time_s), cct.get_now_time(), len(top_temp), round(len(top_temp) / float(ct.PowerCount) * 100, 1)))
                     # print round(len(top_temp)/now_count*100,1)
                     # print len(top_temp)/now_count*100
 
@@ -385,7 +385,7 @@ if __name__ == "__main__":
                         ct_Duration_format_Values = ct.get_Duration_format_Values(ct.Duration_format_trade, market_sort_value[:])
                         top_dd = top_dd.loc[:, ct_Duration_format_Values]
 
-                    print cct.format_for_print(top_dd)
+                    print (cct.format_for_print(top_dd))
                 # if cct.get_now_time_int() < 930 or cct.get_now_time_int() > 1505 or (cct.get_now_time_int() > 1125 and cct.get_now_time_int() < 1505):
                 # print cct.format_for_print(top_dif[-10:])
                 # print top_all.loc['000025',:]
@@ -402,7 +402,7 @@ if __name__ == "__main__":
                             # else:
                             #     print "\t No RealTime Data"
             else:
-                print "\tNo Data"
+                print ("\tNo Data")
             int_time = cct.get_now_time_int()
             if cct.get_work_time():
                 if int_time < ct.open_time:
@@ -417,13 +417,13 @@ if __name__ == "__main__":
                 while 1:
                     cct.sleep(ct.duration_sleep_time)
                     if cct.get_work_duration():
-                        print ".",
+                        print ("."),
                         cct.sleep(ct.duration_sleep_time)
                     else:
                         # top_all = pd.DataFrame()
                         cct.sleeprandom(60)
                         time_s = time.time()
-                        print "."
+                        print (".")
                         break
             else:
                 raise KeyboardInterrupt("StopTime")
@@ -482,7 +482,7 @@ if __name__ == "__main__":
                 else:
                     cct.write_to_blocknew(block_path, codew, False)
                     # sl.write_to_blocknew(all_diffpath, codew, False)
-                print "wri ok:%s" % block_path
+                print ("wri ok:%s" % block_path)
                 cct.sleeprandom(ct.duration_sleep_time / 2)
             elif st.startswith('sh'):
                 while 1:
@@ -500,10 +500,10 @@ if __name__ == "__main__":
                     else:
                         pass
             elif st.startswith('q') or st.startswith('e'):
-                print "exit:%s" % (st)
+                print ("exit:%s" % (st))
                 sys.exit(0)
             else:
-                print "input error:%s" % (st)
+                print ("input error:%s" % (st))
         except (IOError, EOFError, Exception) as e:
             #            print "Error", e
             import traceback

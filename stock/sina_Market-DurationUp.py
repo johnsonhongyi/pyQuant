@@ -132,7 +132,7 @@ if __name__ == "__main__":
             # top_now = tdd.getSinaAlldf(market='060.blk', vol=ct.json_countVol, vtype=ct.json_countType)
             top_now = tdd.getSinaAlldf(market='all', vol=ct.json_countVol, vtype=ct.json_countType)
 
-            top_dif = top_now
+            #top_dif = top_now
             # top_now.to_hdf("testhdf5", 'marketDD', format='table', complevel=9)
             now_count = len(top_now)
             radio_t = cct.get_work_time_ratio()
