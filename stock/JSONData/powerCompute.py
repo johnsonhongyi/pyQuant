@@ -1123,18 +1123,18 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y', tal
                     continue
 
             else:
-                df.loc[code, 'op'] = 0
-                df.loc[code, 'ra'] = 0
-                df.loc[code, 'fib'] = 0
-                df.loc[code, 'fibl'] = 0
-                df.loc[code, 'ldate'] = 0
-                df.loc[code, 'boll'] = 0
-                df.loc[code, 'kdj'] = 0
-                df.loc[code, 'macd'] = 0
-                df.loc[code, 'rsi'] = 0
-                df.loc[code, 'ma'] = 0
-                df.loc[code, 'oph'] = 0
-                df.loc[code, 'rah'] = 0
+                df.loc[code, 'op'] = 1
+                df.loc[code, 'ra'] = 1
+                df.loc[code, 'fib'] = 1
+                df.loc[code, 'fibl'] = 1
+                df.loc[code, 'ldate'] = 1
+                df.loc[code, 'boll'] = 1
+                df.loc[code, 'kdj'] = 1
+                df.loc[code, 'macd'] = 1
+                df.loc[code, 'rsi'] = 1
+                df.loc[code, 'ma'] = 1
+                df.loc[code, 'oph'] = 1
+                df.loc[code, 'rah'] = 1
                 continue
     #        tdx_df = tdd.get_tdx_power_now_df(code, start=start, end=end, type='f', df=None, dm=dz, dl=dl*2)
             opc = 0
