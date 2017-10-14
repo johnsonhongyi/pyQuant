@@ -145,7 +145,9 @@ global null,wencai_count
 config_ini = cct.get_ramdisk_dir() + os.path.sep+ 'h5config.txt'
 fname = 'wencai_count'
 null = None
-wencai_count = cct.get_config_value_wencai(config_ini,fname)
+# wencai_count = cct.get_config_value_wencai(config_ini,fname)
+wencai_count = cct.get_config_value_wencai(config_ini,fname,1,update=True)
+
 # cct.get_config_value_wencai(config_ini,fname)
 
 def get_wencai_Market_url(filter='国企改革',perpage=1,url=None,):

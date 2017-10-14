@@ -90,7 +90,7 @@ day_dir_sz = basedir + r'/Vipdoc/sz/lday/'
 exp_path = basedir + \
     "/T0002/export/".replace('/', path_sep).replace('\\', path_sep)
 day_path = {'sh': day_dir_sh, 'sz': day_dir_sz}
-
+resample_dtype = ['d', 'w', 'm']
 # http://www.douban.com/note/504811026/
 
 
@@ -190,7 +190,7 @@ def get_tdx_Exp_day_to_df(code, start=None, end=None, dl=None, newdays=None, typ
     else:
         df = None
 
-    resample_dtype = ['d', 'w', 'm']
+
     start = cct.day8_to_day10(start)
     end = cct.day8_to_day10(end)
     if dl is not None and dl < 70:
@@ -763,7 +763,6 @@ def get_tdx_append_now_df_api(code, start=None, end=None, type='f', df=None, dm=
 
     # if not writedm and cct.get_now_time_int() > 1530 or cct.get_now_time_int() < 925:
     #     return df
-
     if dm is not None and df is not None and not dm.empty and len(df) > 0:
         dm.rename(columns={'volume': 'vol',
                            'turnover': 'amount'}, inplace=True)
@@ -797,7 +796,7 @@ def get_tdx_append_now_df_api(code, start=None, end=None, type='f', df=None, dm=
         dm_code = dm_code.set_index('date')
         # log.debug("df.open:%s dm.open%s" % (df.open[-1], round(dm.open[-1], 2)))
         # print df.close[-1],round(dm.close[-1],2)
-        if end is None and ((df is not None and not dm.empty) or (round(df.open[-1], 2) != round(dm.open[-1], 2)) or (round(df.close[-1], 2) != round(dm.close[-1], 2))):
+        if end is None and ((df is not None and not dm.empty) and (round(df.open[-1], 2) != round(dm.open[-1], 2)) and (round(df.close[-1], 2) != round(dm.close[-1], 2))):
             if dm.open[0] > 0 and len(df) > 0:
                 if dm_code.index == df.index[-1]:
                     log.debug("app_api_dm.Index:%s df:%s" %
@@ -1021,7 +1020,7 @@ def get_tdx_append_now_df_api_tofile(code, dm=None, newdays=0, start=None, end=N
         dm_code = dm_code.set_index('date')
         # log.debug("df.open:%s dm.open%s" % (df.open[-1], round(dm.open[-1], 2)))
         # print df.close[-1],round(dm.close[-1],2)
-        if end is None and ((df is not None and not dm.empty) or (round(df.open[-1], 2) != round(dm.open[-1], 2)) or (round(df.close[-1], 2) != round(dm.close[-1], 2))):
+        if end is None and ((df is not None and not dm.empty) and (round(df.open[-1], 2) != round(dm.open[-1], 2)) and (round(df.close[-1], 2) != round(dm.close[-1], 2))):
             if dm.open[0] > 0 and len(df) > 0:
                 if dm_code.index[-1] == df.index[-1]:
                     log.debug("app_api_dm.Index:%s df:%s" %
@@ -1649,12 +1648,7 @@ def get_tdx_power_now_df(code, start=None, end=None, type='f', df=None, dm=None,
         # print df.close[-1],round(dm.close[-1],2)
         # if df.close[-1] != round(dm.close[-1], 2) and end is None:
 
-        # if (df is not None and not dm.empty) or (df.open[-1] != round(dm.open[-1], 2) and end is None):
-        #     # print (dm),(df)
-        #     if dm.open[0] > 0:
-        #         df = df.append(dm_code)
-        #         df = df.astype(float)
-        if end is None and ((df is not None and not dm.empty) or (round(df.open[-1], 2) != round(dm.open[-1], 2)) or (round(df.close[-1], 2) != round(dm.close[-1], 2))):
+        if end is None and ((df is not None and not dm.empty) and (round(df.open[-1], 2) != round(dm.open[-1], 2)) and (round(df.close[-1], 2) and round(dm.close[-1], 2))):
             if dm.open[0] > 0:
                 if dm_code.index == df.index[-1]:
                     log.debug("app_api_dm.Index:%s df:%s" %

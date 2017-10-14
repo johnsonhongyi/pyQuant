@@ -101,7 +101,7 @@ def testlog():
     logger.addHandler(fh)
     logger.addHandler(ch)
 
-def getLogger(name=None,logpath=None,writemode='a'):
+def getLogger(name=None,logpath=None,writemode='a',show_detail=True):
 
     if logpath is None:
         log_f = get_log_file(log_n='stock.log')
@@ -133,21 +133,28 @@ def getLogger(name=None,logpath=None,writemode='a'):
     # handler = logging.FileHandler(log_f)
     # handler.setLevel(logging.DEBUG)
     # create console handler with a higher log level
+    '''
     if len(logger.handlers) > 0:
         ch = logger.handlers[0].stream
         # print "name:%s handlers:%s stdout:%s"%(name,logger.handlers[0],sys.stdout)
     else:
         ch = logging.StreamHandler()
+    '''
+    ch = logging.StreamHandler()
     # ch.setLevel(logging.ERROR)
     # create formatter and add it to the handlers
-
+    # print "handeer",len(logger.handlers)
     # formatter = logging.Formatter(name + ': LINE %(lineno)-4d : %(levelname)-8s %(message)s');
     # formatter = logging.Formatter( '%(levelname)-5s %(message)s');
     handler = RotatingFileHandler(log_f, maxBytes=2*1000*1000, 
                                  backupCount=1, encoding=None, delay=0)
     # fh_formatter = logging.Formatter( '%(filename)s(%(funcName)s:%(lineno)s):%(levelname)-5s %(message)s');
-    handler_logformat = logging.Formatter("[%(asctime)s] %(levelname)s:%(filename)s(%(funcName)s:%(lineno)s): %(message)s")
-    ch_formatter = logging.Formatter("[%(asctime)s] %(levelname)s:%(filename)s(%(funcName)s:%(lineno)s): %(message)s");
+    if show_detail:
+        handler_logformat = logging.Formatter("[%(asctime)s] %(levelname)s:%(filename)s(%(funcName)s:%(lineno)s): %(message)s")
+        ch_formatter = logging.Formatter("[%(asctime)s] %(levelname)s:%(filename)s(%(funcName)s:%(lineno)s): %(message)s");
+    else:
+        handler_logformat = logging.Formatter("(%(funcName)s:%(lineno)s): %(message)s")
+        ch_formatter = logging.Formatter("%(funcName)s:%(lineno)s): %(message)s");
     
     handler.setFormatter(handler_logformat)
     ch.setFormatter(ch_formatter)
@@ -155,7 +162,7 @@ def getLogger(name=None,logpath=None,writemode='a'):
     logger.addHandler(handler)
     return logger
 
-log = getLogger()
+log = getLogger(show_detail=False)
 # sys.stdout = log.handlers[0].stream
 # sys.stderr = log.handlers[0].stream
 # def log_format(record, handler):
