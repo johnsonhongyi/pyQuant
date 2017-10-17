@@ -42,9 +42,10 @@ def parse2ChanKTMP(k_data, k_values, in_chan=False,chan_kdf=True):
         if in_chan and (k_data['enddate'][dt] == 0 or i == 0):
             continue
         # 非包含情况
-        log.debug("in_chan:%s dt:%s dt_bf:%s h:%s %s l:%s %s"%(in_chan,str(dt)[:10],str(dt_bf)[:10],str(k_data['high'][dt]),str(dfbao['high'][dt_bf]), str(k_data['low'][dt]),str(dfbao['low'][dt_bf])))
+        # log.debug("dt:%s dt_bf:%s dth:%s bh:%s dtl:%s bl%s"%(str(dt)[:10],str(dt_bf)[:10],str(k_data['high'][dt]),str(dfbao['high'][dt_bf]), str(k_data['low'][dt]),str(dfbao['low'][dt_bf])))
         if (k_data['high'][dt] > dfbao['high'][dt_bf] and k_data['low'][dt] > dfbao['low'][dt_bf])\
                 or (k_data['high'][dt] < dfbao['high'][dt_bf] and k_data['low'][dt] < dfbao['low'][dt_bf]):
+            # log.debug("bao dt:%s dt_bf:%s dth:%s dtl%s bl:%s %s"%(str(dt)[:10],str(dt_bf)[:10],str(k_data['high'][dt]),str(dfbao['high'][dt_bf]), str(k_data['low'][dt]),str(dfbao['low'][dt_bf])))
             if in_chan:
                 dt_bf_n2 = dt_bf
                 dt_bf = dt
@@ -113,21 +114,33 @@ def parse2ChanFen(chanK, recursion=False):
             log.debug("chanK:%s hi+1:%s hi:%s hi-1:%s" % (str(chanK.index[i])[:10], chanK['high'][i + 1], chanK['high'][i], chanK['high'][i - 1]))
             if i == 1:
                 # if chanK['high'][i] > chanK['high'][i - 1] and chanK['low'][i] >
-                # chanK['low'][i - 1] and chanK['close'][i] < ((chanK['high'][i] +
-                # chanK['low'][i]) / 2):
+                # chanK['low'][i - 1] and chanK['close'][i] < ((chanK['high'][i] + chanK['low'][i]) / 2):
                 if chanK['high'][i] > chanK['high'][i - 1] and chanK['low'][i] > chanK['low'][i - 1] and chanK['close'][i] > chanK['close'][i - 1]:
-                    log.debug("firstLow:%s dt:%s hi:%s cl:%s cl-1:%s" %
-                              (i, str(chanK.index[i])[:10], chanK['high'][i], chanK['close'][i], chanK['close'][i - 1]))
+                    log.debug("firstLow:%s dt:%s hi-1:%s cl-1:%s cl:%s" %
+                              (i-1, str(chanK.index[i-1])[:10], chanK['high'][i-1], chanK['close'][i-1], chanK['close'][i]))
                     appendFen(-1, i - 1)
                 # 底分型
                 # print chanK['low'][i+1],chanK['low'][i],chanK['low'][i-1]
                 # if chanK['low'][i] < chanK['low'][i - 1] and chanK['high'][i] <
                 # chanK['high'][i - 1] and chanK['close'][i] < ((chanK['high'][i] +
                 # chanK['low'][i]) / 2):
-                if chanK['low'][i] < chanK['low'][i - 1] and chanK['high'][i] < chanK['high'][i - 1] and chanK['close'][i] < chanK['close'][i - 1]:
-                    log.debug("firstTop:%s dt:%s lo:%s cl:%s cl-1:%s" %
-                              (i, str(chanK.index[i])[:10], chanK['low'][i], chanK['close'][i], chanK['close'][i - 1]))
+                elif chanK['low'][i] < chanK['low'][i - 1] and chanK['high'][i] < chanK['high'][i - 1] and chanK['close'][i] < chanK['close'][i - 1]:
+                    log.debug("firstTop:%s dt:%s lo-1:%s cl-1:%s cl:%s" %
+                              (i-1, str(chanK.index[i-1])[:10], chanK['low'][i-1], chanK['close'][i-1], chanK['close'][i]))
                     appendFen(1, i - 1)
+
+                else:
+                    chan_h = chanK['high'][i-1:i+1]
+                    chan_l = chanK['low'][i-1:i+1]
+                    if chan_h.index(max(chan_h)) == chan_l.index(max(chan_l)):
+                        appendFen(1, chan_h.index(max(chan_h)))
+                        log.debug("Lis-firstTop:%s dt:%s lo-1:%s cl-1:%s cl:%s" %
+                              (i-1, str(chanK.index[i-1])[:10], chanK['low'][i-1], chanK['close'][i-1], chanK['close'][i]))                    
+                    elif chan_h.index(min(chan_h)) == chan_l.index(min(chan_l)):
+                        appendFen(-1, chan_h.index(min(chan_h)))        
+                        log.debug("Lis-firstLow:%s dt:%s hi-1:%s cl-1:%s cl:%s" %
+                              (i-1, str(chanK.index[i-1])[:10], chanK['high'][i-1], chanK['close'][i-1], chanK['close'][i]))
+
             else:
                 if chanK['high'][i + 1] < chanK['high'][i] > chanK['high'][i - 1]:
                     log.debug("Top:%s dt:%s cl+1:%s cl:%s cl-1:%s" % (i, str(chanK.index[i])
@@ -154,7 +167,7 @@ def parse2ChanFen(chanK, recursion=False):
             else:
                 continue
 
-    print "fenTypes", fenTypes, fenIdx, len(chanK), recursion
+    print ("fenTypes:%s fenIdx:%s cuts:%s recurs:%s lastD:%s"%(fenTypes, fenIdx, len(chanK), recursion,str(chanK.index[-1])[:10]))
     return fenTypes, fenIdx
 # fenTypes, fenIdx = parse2ChanFen(chanK)
 

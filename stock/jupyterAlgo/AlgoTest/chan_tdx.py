@@ -5,17 +5,20 @@ import logging
 stdout = sys.stdout
 sys.path.append('../../')
 import JSONData.tdx_data_Day as tdd
-# from JohnsonUtil import commonTips as cct
+from JohnsonUtil import commonTips as cct
+import JohnsonUtil.johnson_cons as ct
+from JohnsonUtil import zoompan
 import my_chan2 as chan
 import matplotlib as mat
 import numpy as np
-import datetime as dt
 import datetime
 import matplotlib.pyplot as plt
+# import matplotlib
+# matplotlib.use('Qt4Agg')
 from JohnsonUtil import LoggerFactory
 log = LoggerFactory.log
 # log = LoggerFactory.getLogger('chan',show_detail=False)
-# log.setLevel(LoggerFactory.DEBUG)
+log.setLevel(LoggerFactory.DEBUG)
 # log.setLevel(LoggerFactory.INFO)
 # log.setLevel(LoggerFactory.WARNING)
 # log.setLevel(LoggerFactory.ERROR)
@@ -28,105 +31,15 @@ from numpy import nan
 from bokeh.models import ColumnDataSource, Rect, HoverTool, Range1d, LinearAxis, WheelZoomTool, PanTool, ResetTool, ResizeTool, PreviewSaveTool
 # ================需要修改的参数==============
 
-def get_least_khl_num(resample,idx=0):
-    init = 3
-    return init if resample == 'd' else init-idx if resample == 'w' else 0\
-            if resample == 'm' else 3
-
-def con2Cxianduan(stock, k_data, chanK, frsBiType, biIdx, end_date, cur_ji=1, recursion=False, dl=None,chanK_flag=False):
-    max_k_num = 4
-    if cur_ji >= 6 or len(biIdx) == 0 or recursion:
-        return biIdx
-    idx = biIdx[len(biIdx) - 1]
-    k_data_dts = list(k_data.index)
-    st_data = chanK['enddate'][idx]
-    if st_data not in k_data_dts:
-        return biIdx
-    # 重构次级别线段的点到本级别的chanK中
-
-    def refactorXd(biIdx, xdIdxc, chanK, chanKc, cur_ji):
-        new_biIdx = []
-        biIdxB = biIdx[len(biIdx) - 1] if len(biIdx) > 0 else 0
-        for xdIdxcn in xdIdxc:
-            for chanKidx in range(len(chanK.index))[biIdxB:]:
-                if judge_day_bao(chanK, chanKidx, chanKc, xdIdxcn, cur_ji):
-                    new_biIdx.append(chanKidx)
-                    break
-        return new_biIdx
-    # 判断次级别日期是否被包含
-
-    def judge_day_bao(chanK, chanKidx, chanKc, xdIdxcn, cur_ji):
-        _end_date = chanK['enddate'][chanKidx] + datetime.timedelta(hours=15) if cur_ji == 1 else chanK['enddate'][chanKidx]
-        _start_date = chanK.index[chanKidx] if chanKidx == 0\
-            else chanK['enddate'][chanKidx - 1] + datetime.timedelta(minutes=1)
-        return _start_date <= chanKc.index[xdIdxcn] <= _end_date
-    # cur_ji = 1 #当前级别
-    # 符合k线根数大于4根 1日级别， 2 30分钟， 3 5分钟， 4 一分钟
-    if not recursion:
-        resample = 'd' if cur_ji + 1 == 2 else '5m' if cur_ji + 1 == 3 else \
-            'd' if cur_ji + 1 == 5 else 'w' if cur_ji + 1 == 6 else 'd'
-    least_khl_num = get_least_khl_num(resample,1)
-    print "次级:%s st_data:%s k_data_dts:%s least_khl_num:%s" % (len(k_data_dts) - k_data_dts.index(st_data), str(st_data)[:10], len(k_data_dts),least_khl_num)
-    if cur_ji + 1 != 2 and len(k_data_dts) - k_data_dts.index(st_data) >= least_khl_num +1:
-        frequency = '30m' if cur_ji+1==2 else '5m' if cur_ji+1==3 else '1m'
-        # else:
-            # frequency = 'd' if cur_ji+1==2 else '5m' if cur_ji+1==3 else \
-            #                 'd' if cur_ji+1==5 else 'w' if cur_ji+1==6 else 'd'
-
-        start_lastday = str(chanK.index[biIdx[-1]])[0:10]
-        print "次级别为:%s cur_ji:%s %s" % (resample, cur_ji, start_lastday)
-        # print [chanK.index[x] for x in biIdx]
-        k_data_c = get_quotes_tdx(stock, start=start_lastday, end=end_date, dl=dl, resample=resample)
-        print k_data_c.index[0],k_data_c.index[-1]
-        chanKc = chan.parse2ChanK(k_data_c, k_data_c.values) if chanK_flag else k_data_c
-        fenTypesc, fenIdxc = chan.parse2ChanFen(chanKc, recursion=True)
-        if len(fenTypesc) == 0:
-            return biIdx
-        biIdxc, frsBiTypec = chan.parse2ChanBi(fenTypesc, fenIdxc, chanKc, least_khl_num=least_khl_num-1)
-        if len(biIdxc) == 0:
-            return biIdx
-        print "biIdxc:", [round(k_data_c.high[x], 2) for x in biIdxc], [str(k_data_c.index[x])[:10] for x in biIdxc]
-        xdIdxc, xdTypec = chan.parse2Xianduan(biIdxc, chanKc, least_windows=1 if least_khl_num > 0 else 0)
-        biIdxc = con2Cxianduan(stock, k_data_c, chanKc, frsBiTypec, biIdxc, end_date, cur_ji + 1, recursion=True)
-        print "xdIdxc:%s xdTypec:%s biIdxc:%s" % (xdIdxc, xdTypec, biIdxc)
-        if len(xdIdxc) == 0:
-            return biIdx
-        # 连接线段位为上级别的bi
-        lastBiType = frsBiType if len(biIdx) % 2 == 0 else -frsBiType
-        if len(biIdx) == 0:
-            return refactorXd(biIdx, xdIdxc, chanK, chanKc, cur_ji)
-        lastbi = biIdx.pop()
-        firstbic = xdIdxc.pop(0)
-        # 同向连接
-        if lastBiType == xdTypec:
-            biIdx = biIdx + refactorXd(biIdx, xdIdxc, chanK, chanKc, cur_ji)
-        # 逆向连接
-        else:
-            #             print '开始逆向连接'
-            _mid = [lastbi] if (lastBiType == -1 and chanK['low'][lastbi] <= chanKc['low'][firstbic])\
-                or (lastBiType == 1 and chanK['high'][lastbi] >= chanKc['high'][firstbic]) else\
-                [chanKidx for chanKidx in range(len(chanK.index))[biIdx[len(biIdx) - 1]:]
-                 if judge_day_bao(chanK, chanKidx, chanKc, firstbic, cur_ji)]
-            biIdx = biIdx + [_mid[0]] + refactorXd(biIdx, xdIdxc, chanK, chanKc, cur_ji)
-        # print "次级:",len(biIdx),biIdx,[str(k_data_c.index[x])[:10] for x in biIdx]
-    return biIdx
-
-def get_quotes_tdx(code, start=None, end=None, dl=120, resample='d'):
-    quotes = tdd.get_tdx_append_now_df_api(code=stock_code, start=start, end=end, dl=dl).sort_index(ascending=True)
-    if not resample == 'd' and resample in tdd.resample_dtype:
-        quotes = tdd.get_tdx_stock_period_to_type(quotes, period_day=resample)
-    quotes.index = quotes.index.astype('datetime64')
-    quotes = quotes.loc[:, ['open', 'close', 'high', 'low', 'vol', 'amount']]
-    # quotes = quotes.round(2)
-    return quotes
 
 
-stock_code = '000791'  # 股票代码
+'''
+stock_code = '603058'  # 股票代码
 # stock_code = '002176' # 股票代码
-# start_date = '2017-09-05'
-start_date = None
-end_date = '2017-10-10 15:00:00'  # 最后生成k线日期
-# end_date = None
+start_date = '2017-09-05'
+# start_date = None
+# end_date = '2017-10-12 15:00:00'  # 最后生成k线日期
+end_date = None
 stock_days = 60  # 看几天/分钟前的k线
 resample = 'd'
 # resample = 'w'
@@ -139,7 +52,7 @@ chanK_flag = False  # True 看缠论K线， False 看k线
 show_mpl = True
 # show_mpl = False
 # ============结束==================
-
+'''
 
 '''
 以下代码拷贝自https://www.joinquant.com/post/1756
@@ -150,286 +63,503 @@ show_mpl = True
 #                    frequency=stock_frequency,skip_paused=False,fq='pre')
 
 
-
-quotes = get_quotes_tdx(stock_code, start_date, end_date, dl=stock_days, resample=resample)
-# quotes.rename(columns={'amount': 'money'}, inplace=True)
-# quotes.rename(columns={'vol': 'vol'}, inplace=True)
-# print quotes[-2:]
-# print quotes[:1]
-# 缠论k线
-#         open  close   high    low    volume      money
-# 2017-05-03  15.69  15.66  15.73  15.53  10557743  165075887
-# 2017-05-04  15.66  15.63  15.70  15.52   8343270  130330396
-# 2017-05-05  15.56  15.65  15.68  15.41  18384031  285966842
-# 2017-05-08  15.62  15.75  15.76  15.54  12598891  197310688
-quotes = chan.parse2ChanK(quotes, quotes.values) if chanK_flag else quotes
-# print quotes[:1].index
-# print quotes[-1:].index
-
-quotes[quotes['vol'] == 0] = np.nan
-quotes = quotes.dropna()
-Close = quotes['close']
-Open = quotes['open']
-High = quotes['high']
-Low = quotes['low']
-T0 = quotes.index.values
-# T0 =  mdates.date2num(T0)
-length = len(Close)
-
-
-initial_trend = "down"
-cur_ji = 1 if stock_frequency == 'd' else \
-    2 if stock_frequency == '30m' else \
-    3 if stock_frequency == '5m' else \
-    4 if stock_frequency == 'w' else \
-    5 if stock_frequency == 'm' else 6
-
-
-print '======笔形成最后一段未完成段判断是否是次级别的走势形成笔=======', stock_frequency, cur_ji
+def show_chan_mpl(code,start_date,end_date,stock_days,resample,show_mpl=True,least_init=3,chanK_flag=False):
+    def get_least_khl_num(resample,idx=0,init_num=3):
+        # init = 3
+        return init_num if resample == 'd' else init_num-idx if resample == 'w' else 0\
+                if resample == 'm' else 5
+    stock_code = code # 股票代码
+    # stock_code = '002176' # 股票代码
+    # start_date = '2017-09-05'
+    # start_date = None
+    # end_date = '2017-10-12 15:00:00'  # 最后生成k线日期
+    # end_date = None
+    # stock_days = 60  # 看几天/分钟前的k线
+    # resample = 'd'
+    # resample = 'w'
+    x_jizhun = 3  # window 周期 x轴展示的时间距离  5：日，40:30分钟， 48： 5分钟
+    least_khl_num = get_least_khl_num(resample,init_num=least_init)
+    # stock_frequency = '5m' # 1d日线， 30m 30分钟， 5m 5分钟，1m 1分钟
+    stock_frequency = resample  # 1d日线， 30m 30分钟， 5m 5分钟，1m 1分钟 w:week
+    # chanK_flag = chanK  # True 看缠论K线， False 看k线
+    # chanK_flag = True  # True 看缠论K线， False 看k线
+    show_mpl = show_mpl
 
 
 
-# ht = HoverTool(tooltips=[
-#             ("date", "@date"),
-#             ("open", "@open"),
-#             ("close", "@close"),
-#             ("high", "@high"),
-#             ("low", "@low"),
-#             ("volume", "@volume"),
-#             ("money", "@money"),])
-# TOOLS = [ht, WheelZoomTool(dimensions=['width']),\
-#          ResizeTool(), ResetTool(),\
-#          PanTool(dimensions=['width']), PreviewSaveTool()]
 
-fig = plt.figure(figsize=(8, 5))
-ax1 = plt.subplot2grid((10, 4), (0, 0), rowspan=10, colspan=4)
-#fig = plt.figure()
-#ax1 = plt.axes([0,0,3,2])
+    def con2Cxianduan(stock, k_data, chanK, frsBiType, biIdx, end_date, cur_ji=1, recursion=False, dl=None,chanK_flag=False,least_init=3):
+        max_k_num = 4
+        if cur_ji >= 6 or len(biIdx) == 0 or recursion:
+            return biIdx
+        idx = biIdx[len(biIdx) - 1]
+        k_data_dts = list(k_data.index)
+        st_data = chanK['enddate'][idx]
+        if st_data not in k_data_dts:
+            return biIdx
+        # 重构次级别线段的点到本级别的chanK中
 
-X = np.array(range(0, length))
-pad_nan = X + nan
+        def refactorXd(biIdx, xdIdxc, chanK, chanKc, cur_ji):
+            new_biIdx = []
+            biIdxB = biIdx[len(biIdx) - 1] if len(biIdx) > 0 else 0
+            for xdIdxcn in xdIdxc:
+                for chanKidx in range(len(chanK.index))[biIdxB:]:
+                    if judge_day_bao(chanK, chanKidx, chanKc, xdIdxcn, cur_ji):
+                        new_biIdx.append(chanKidx)
+                        break
+            return new_biIdx
+        # 判断次级别日期是否被包含
 
-# 计算上 下影线
-max_clop = Close.copy()
-max_clop[Close < Open] = Open[Close < Open]
-min_clop = Close.copy()
-min_clop[Close > Open] = Open[Close > Open]
+        def judge_day_bao(chanK, chanKidx, chanKc, xdIdxcn, cur_ji):
+            _end_date = chanK['enddate'][chanKidx] + datetime.timedelta(hours=15) if cur_ji == 1 else chanK['enddate'][chanKidx]
+            _start_date = chanK.index[chanKidx] if chanKidx == 0\
+                else chanK['enddate'][chanKidx - 1] + datetime.timedelta(minutes=1)
+            return _start_date <= chanKc.index[xdIdxcn] <= _end_date
+        # cur_ji = 1 #当前级别
+        # 符合k线根数大于4根 1日级别， 2 30分钟， 3 5分钟， 4 一分钟
+        if not recursion:
+            resample = 'd' if cur_ji + 1 == 2 else '5m' if cur_ji + 1 == 3 else \
+                'd' if cur_ji + 1 == 5 else 'w' if cur_ji + 1 == 6 else 'd'
+        least_khl_num = get_least_khl_num(resample,1,init_num=least_init)
+        print "次级:%s st_data:%s k_data_dts:%s least_khl_num:%s" % (len(k_data_dts) - k_data_dts.index(st_data), str(st_data)[:10], len(k_data_dts),least_khl_num)
+        if cur_ji + 1 != 2 and len(k_data_dts) - k_data_dts.index(st_data) >= least_khl_num +1:
+            frequency = '30m' if cur_ji+1==2 else '5m' if cur_ji+1==3 else '1m'
+            # else:
+                # frequency = 'd' if cur_ji+1==2 else '5m' if cur_ji+1==3 else \
+                #                 'd' if cur_ji+1==5 else 'w' if cur_ji+1==6 else 'd'
 
-# 上影线
-line_up = np.array([High, max_clop, pad_nan])
-line_up = np.ravel(line_up, 'F')
-# 下影线
-line_down = np.array([Low, min_clop, pad_nan])
-line_down = np.ravel(line_down, 'F')
+            start_lastday = str(chanK.index[biIdx[-1]])[0:10]
+            print "次级别为:%s cur_ji:%s %s" % (resample, cur_ji, start_lastday)
+            # print [chanK.index[x] for x in biIdx]
+            k_data_c = get_quotes_tdx(stock, start=start_lastday, end=end_date, dl=dl, resample=resample)
+            print k_data_c.index[0],k_data_c.index[-1]
+            chanKc = chan.parse2ChanK(k_data_c, k_data_c.values) if chanK_flag else k_data_c
+            fenTypesc, fenIdxc = chan.parse2ChanFen(chanKc, recursion=True)
+            if len(fenTypesc) == 0:
+                return biIdx
+            biIdxc, frsBiTypec = chan.parse2ChanBi(fenTypesc, fenIdxc, chanKc, least_khl_num=least_khl_num-1)
+            if len(biIdxc) == 0:
+                return biIdx
+            print "biIdxc:", [round(k_data_c.high[x], 2) for x in biIdxc], [str(k_data_c.index[x])[:10] for x in biIdxc]
+            xdIdxc, xdTypec = chan.parse2Xianduan(biIdxc, chanKc, least_windows=1 if least_khl_num > 0 else 0)
+            biIdxc = con2Cxianduan(stock, k_data_c, chanKc, frsBiTypec, biIdxc, end_date, cur_ji + 1, recursion=True)
+            print "xdIdxc:%s xdTypec:%s biIdxc:%s" % (xdIdxc, xdTypec, biIdxc)
+            if len(xdIdxc) == 0:
+                return biIdx
+            # 连接线段位为上级别的bi
+            lastBiType = frsBiType if len(biIdx) % 2 == 0 else -frsBiType
+            if len(biIdx) == 0:
+                return refactorXd(biIdx, xdIdxc, chanK, chanKc, cur_ji)
+            lastbi = biIdx.pop()
+            firstbic = xdIdxc.pop(0)
+            # 同向连接
+            if lastBiType == xdTypec:
+                biIdx = biIdx + refactorXd(biIdx, xdIdxc, chanK, chanKc, cur_ji)
+            # 逆向连接
+            else:
+                #             print '开始逆向连接'
+                _mid = [lastbi] if (lastBiType == -1 and chanK['low'][lastbi] <= chanKc['low'][firstbic])\
+                    or (lastBiType == 1 and chanK['high'][lastbi] >= chanKc['high'][firstbic]) else\
+                    [chanKidx for chanKidx in range(len(chanK.index))[biIdx[len(biIdx) - 1]:]
+                     if judge_day_bao(chanK, chanKidx, chanKc, firstbic, cur_ji)]
+                biIdx = biIdx + [_mid[0]] + refactorXd(biIdx, xdIdxc, chanK, chanKc, cur_ji)
+            # print "次级:",len(biIdx),biIdx,[str(k_data_c.index[x])[:10] for x in biIdx]
+        return biIdx
 
-# 计算上下影线对应的X坐标
-pad_nan = nan + X
-pad_X = np.array([X, X, X])
-pad_X = np.ravel(pad_X, 'F')
+    def get_quotes_tdx(code, start=None, end=None, dl=120, resample='d'):
+        quotes = tdd.get_tdx_append_now_df_api(code=stock_code, start=start, end=end, dl=dl).sort_index(ascending=True)
+        if not resample == 'd' and resample in tdd.resample_dtype:
+            quotes = tdd.get_tdx_stock_period_to_type(quotes, period_day=resample)
+        quotes.index = quotes.index.astype('datetime64')
+        quotes = quotes.loc[:, ['open', 'close', 'high', 'low', 'vol', 'amount']]
+        # quotes = quotes.round(2)
+        return quotes
 
-# 画出实体部分,先画收盘价在上的部分
-up_cl = Close.copy()
-up_cl[Close <= Open] = nan
-up_op = Open.copy()
-up_op[Close <= Open] = nan
 
-down_cl = Close.copy()
-down_cl[Open <= Close] = nan
-down_op = Open.copy()
-down_op[Open <= Close] = nan
+    quotes = get_quotes_tdx(stock_code, start_date, end_date, dl=stock_days, resample=resample)
+    # quotes.rename(columns={'amount': 'money'}, inplace=True)
+    # quotes.rename(columns={'vol': 'vol'}, inplace=True)
+    # print quotes[-2:]
+    # print quotes[:1]
+    # 缠论k线
+    #         open  close   high    low    volume      money
+    # 2017-05-03  15.69  15.66  15.73  15.53  10557743  165075887
+    # 2017-05-04  15.66  15.63  15.70  15.52   8343270  130330396
+    # 2017-05-05  15.56  15.65  15.68  15.41  18384031  285966842
+    # 2017-05-08  15.62  15.75  15.76  15.54  12598891  197310688
+    quotes = chan.parse2ChanK(quotes, quotes.values) if chanK_flag else quotes
+    # print quotes[:1].index
+    # print quotes[-1:].index
 
-even = Close.copy()
-even[Close != Open] = nan
+    quotes[quotes['vol'] == 0] = np.nan
+    quotes = quotes.dropna()
+    Close = quotes['close']
+    Open = quotes['open']
+    High = quotes['high']
+    Low = quotes['low']
+    T0 = quotes.index.values
+    # T0 =  mdates.date2num(T0)
+    length = len(Close)
 
-# 画出收红的实体部分
-pad_box_up = np.array([up_op, up_op, up_cl, up_cl, pad_nan])
-pad_box_up = np.ravel(pad_box_up, 'F')
-pad_box_down = np.array([down_cl, down_cl, down_op, down_op, pad_nan])
-pad_box_down = np.ravel(pad_box_down, 'F')
-pad_box_even = np.array([even, even, even, even, pad_nan])
-pad_box_even = np.ravel(pad_box_even, 'F')
 
-# X的nan可以不用与y一一对应
-X_left = X - 0.25
-X_right = X + 0.25
-box_X = np.array([X_left, X_right, X_right, X_left, pad_nan])
-# print box_X
-box_X = np.ravel(box_X, 'F')
-# print box_X
-# Close_handle=plt.plot(pad_X,line_up,color='k')
+    initial_trend = "down"
+    cur_ji = 1 if stock_frequency == 'd' else \
+        2 if stock_frequency == '30m' else \
+        3 if stock_frequency == '5m' else \
+        4 if stock_frequency == 'w' else \
+        5 if stock_frequency == 'm' else 6
 
-vertices_up = np.array([box_X, pad_box_up]).T
-vertices_down = np.array([box_X, pad_box_down]).T
-vertices_even = np.array([box_X, pad_box_even]).T
 
-handle_box_up = mat.patches.Polygon(vertices_up, color='r', zorder=1)
-handle_box_down = mat.patches.Polygon(vertices_down, color='g', zorder=1)
-handle_box_even = mat.patches.Polygon(vertices_even, color='k', zorder=1)
+    print '======笔形成最后一段未完成段判断是否是次级别的走势形成笔=======', stock_frequency, cur_ji
 
-ax1.add_patch(handle_box_up)
-ax1.add_patch(handle_box_down)
-ax1.add_patch(handle_box_even)
 
-handle_line_up = mat.lines.Line2D(pad_X, line_up, color='k', linestyle='solid', zorder=0)
-handle_line_down = mat.lines.Line2D(pad_X, line_down, color='k', linestyle='solid', zorder=0)
 
-ax1.add_line(handle_line_up)
-ax1.add_line(handle_line_down)
+    # ht = HoverTool(tooltips=[
+    #             ("date", "@date"),
+    #             ("open", "@open"),
+    #             ("close", "@close"),
+    #             ("high", "@high"),
+    #             ("low", "@low"),
+    #             ("volume", "@volume"),
+    #             ("money", "@money"),])
+    # TOOLS = [ht, WheelZoomTool(dimensions=['width']),\
+    #          ResizeTool(), ResetTool(),\
+    #          PanTool(dimensions=['width']), PreviewSaveTool()]
 
-v = [0, length, Open.min() - 0.5, Open.max() + 0.5]
-plt.axis(v)
+    fig = plt.figure(figsize=(12, 7))
+    ax1 = plt.subplot2grid((10, 4), (0, 0), rowspan=10, colspan=4)
+    #fig = plt.figure()
+    #ax1 = plt.axes([0,0,3,2])
 
-# print  T0[-len(T0):].astype(dt.date)
-T1 = T0[-len(T0):].astype(dt.date) / 1000000000
-Ti = []
-for i in range(len(T0) / x_jizhun):
-    # print "len(T0)/x_jizhun:",len(T0)/x_jizhun
-    a = i * x_jizhun
-    d = dt.date.fromtimestamp(T1[a])
-    # print d
-    T2 = d.strftime('$%Y-%m-%d$')
-    Ti.append(T2)
-    # print tab
-d1 = dt.date.fromtimestamp(T1[len(T0) - 1])
-d2 = (d1 + datetime.timedelta(days=1)).strftime('$%Y-%m-%d$')
-Ti.append(d2)
+    X = np.array(range(0, length))
+    pad_nan = X + nan
 
-ax1.set_xticks(np.linspace(-2, len(Close) + 2, len(Ti)))
+    # 计算上 下影线
+    max_clop = Close.copy()
+    max_clop[Close < Open] = Open[Close < Open]
+    min_clop = Close.copy()
+    min_clop[Close > Open] = Open[Close > Open]
 
-ll = Low.min() * 0.97
-hh = High.max() * 1.03
-ax1.set_ylim(ll, hh)
+    # 上影线
+    line_up = np.array([High, max_clop, pad_nan])
+    line_up = np.ravel(line_up, 'F')
+    # 下影线
+    line_down = np.array([Low, min_clop, pad_nan])
+    line_down = np.ravel(line_down, 'F')
 
-ax1.set_xticklabels(Ti)
+    # 计算上下影线对应的X坐标
+    pad_nan = nan + X
+    pad_X = np.array([X, X, X])
+    pad_X = np.ravel(pad_X, 'F')
 
-plt.grid(True)
-plt.setp(plt.gca().get_xticklabels(), rotation=45, horizontalalignment='right')
+    # 画出实体部分,先画收盘价在上的部分
+    up_cl = Close.copy()
+    up_cl[Close <= Open] = nan
+    up_op = Open.copy()
+    up_op[Close <= Open] = nan
 
-'''
-以上代码拷贝自https://www.joinquant.com/post/1756
-感谢alpha-smart-dog
+    down_cl = Close.copy()
+    down_cl[Open <= Close] = nan
+    down_op = Open.copy()
+    down_op[Open <= Close] = nan
 
-K线图绘制完毕
-'''
-x_date_list = quotes.index.values.tolist()
-# for x_date in x_date_list:
-#     d = datetime.datetime.fromtimestamp(x_date/1000000000)
-#     print d.strftime("%Y-%m-%d %H:%M:%S.%f")
-# print x_date_list
-k_data = quotes
-k_values = k_data.values
-# 缠论k线
-chanK = quotes if chanK_flag else chan.parse2ChanK(k_data, k_values,chan_kdf=chanK_flag)
+    even = Close.copy()
+    even[Close != Open] = nan
 
-fenTypes, fenIdx = chan.parse2ChanFen(chanK)
-print "ChanFen fenTypes:%s fenIdx:%s k_data:%s" % (fenTypes, fenIdx, len(k_data))
-biIdx, frsBiType = chan.parse2ChanBi(fenTypes, fenIdx, chanK, least_khl_num=least_khl_num)
-print "biIdx1:%s chanK:%s" % (biIdx, len(chanK))
+    # 画出收红的实体部分
+    pad_box_up = np.array([up_op, up_op, up_cl, up_cl, pad_nan])
+    pad_box_up = np.ravel(pad_box_up, 'F')
+    pad_box_down = np.array([down_cl, down_cl, down_op, down_op, pad_nan])
+    pad_box_down = np.ravel(pad_box_down, 'F')
+    pad_box_even = np.array([even, even, even, even, pad_nan])
+    pad_box_even = np.ravel(pad_box_even, 'F')
 
-biIdx = con2Cxianduan(stock_code, k_data, chanK, frsBiType, biIdx, end_date, cur_ji)
-print "con2Cxianduan:%s chanK:%s %s" % (biIdx, len(chanK), [str(chanK.index[x])[:10] for x in biIdx])
-# print quotes['close'].apply(lambda x:round(x,2))
+    # X的nan可以不用与y一一对应
+    X_left = X - 0.25
+    X_right = X + 0.25
+    box_X = np.array([X_left, X_right, X_right, X_left, pad_nan])
+    # print box_X
+    box_X = np.ravel(box_X, 'F')
+    # print box_X
+    # Close_handle=plt.plot(pad_X,line_up,color='k')
 
-# print '股票代码', get_security_info(stock_code).display_name
-print '股票代码', (stock_code), resample, least_khl_num
-#  3.得到分笔结果，计算坐标显示
+    vertices_up = np.array([box_X, pad_box_up]).T
+    vertices_down = np.array([box_X, pad_box_down]).T
+    vertices_even = np.array([box_X, pad_box_even]).T
 
-def plot_fenbi_seq(biIdx,frsBiType,plt,color=None):
-    x_fenbi_seq = []
-    y_fenbi_seq = []
-    for i in range(len(biIdx)):
-        if biIdx[i] is not None:
-            fenType = -frsBiType if i % 2 == 0 else frsBiType
+    handle_box_up = mat.patches.Polygon(vertices_up, color='r', zorder=1)
+    handle_box_down = mat.patches.Polygon(vertices_down, color='g', zorder=1)
+    handle_box_even = mat.patches.Polygon(vertices_even, color='k', zorder=1)
+
+    ax1.add_patch(handle_box_up)
+    ax1.add_patch(handle_box_down)
+    ax1.add_patch(handle_box_even)
+
+    handle_line_up = mat.lines.Line2D(pad_X, line_up, color='k', linestyle='solid', zorder=0)
+    handle_line_down = mat.lines.Line2D(pad_X, line_down, color='k', linestyle='solid', zorder=0)
+
+    ax1.add_line(handle_line_up)
+    ax1.add_line(handle_line_down)
+
+    v = [0, length, Open.min() - 0.5, Open.max() + 0.5]
+    plt.axis(v)
+
+    # print  T0[-len(T0):].astype(dt.date)
+    T1 = T0[-len(T0):].astype(datetime.date) / 1000000000
+    Ti = []
+    for i in range(len(T0) / x_jizhun):
+        # print "len(T0)/x_jizhun:",len(T0)/x_jizhun
+        a = i * x_jizhun
+        d = datetime.date.fromtimestamp(T1[a])
+        # print d
+        T2 = d.strftime('$%Y-%m-%d$')
+        Ti.append(T2)
+        # print tab
+    d1 = datetime.date.fromtimestamp(T1[len(T0) - 1])
+    d2 = (d1 + datetime.timedelta(days=1)).strftime('$%Y-%m-%d$')
+    Ti.append(d2)
+
+    ax1.set_xticks(np.linspace(-2, len(Close) + 2, len(Ti)))
+
+    ll = Low.min() * 0.97
+    hh = High.max() * 1.03
+    ax1.set_ylim(ll, hh)
+
+    ax1.set_xticklabels(Ti)
+
+    plt.grid(True)
+    plt.setp(plt.gca().get_xticklabels(), rotation=45, horizontalalignment='right')
+
+    '''
+    以上代码拷贝自https://www.joinquant.com/post/1756
+    感谢alpha-smart-dog
+
+    K线图绘制完毕
+    '''
+    x_date_list = quotes.index.values.tolist()
+    # for x_date in x_date_list:
+    #     d = datetime.datetime.fromtimestamp(x_date/1000000000)
+    #     print d.strftime("%Y-%m-%d %H:%M:%S.%f")
+    # print x_date_list
+    k_data = quotes
+    k_values = k_data.values
+    # 缠论k线
+    chanK = quotes if chanK_flag else chan.parse2ChanK(k_data, k_values,chan_kdf=chanK_flag)
+
+    fenTypes, fenIdx = chan.parse2ChanFen(chanK)
+    log.debug("code:%s ChanFen fenTypes:%s fenIdx:%s k_data:%s" % (stock_code,fenTypes, fenIdx, len(k_data)))
+    biIdx, frsBiType = chan.parse2ChanBi(fenTypes, fenIdx, chanK, least_khl_num=least_khl_num)
+    log.debug("biIdx1:%s chanK:%s" % (biIdx, len(chanK)))
+
+    biIdx = con2Cxianduan(stock_code, k_data, chanK, frsBiType, biIdx, end_date, cur_ji,least_init=least_init)
+    log.debug("con2Cxianduan:%s chanK:%s %s" % (biIdx, len(chanK), [str(chanK.index[x])[:10] for x in biIdx]))
+    # print quotes['close'].apply(lambda x:round(x,2))
+
+    # print '股票代码', get_security_info(stock_code).display_name
+    # print '股票代码', (stock_code), resample, least_khl_num
+    #  3.得到分笔结果，计算坐标显示
+
+    def plot_fenbi_seq(biIdx,frsBiType,plt,color=None):
+        x_fenbi_seq = []
+        y_fenbi_seq = []
+        for i in range(len(biIdx)):
+            if biIdx[i] is not None:
+                fenType = -frsBiType if i % 2 == 0 else frsBiType
+        #         dt = chanK['enddate'][biIdx[i]]
+                # 缠论k线
+                dt = chanK.index[biIdx[i]] if chanK_flag else chanK['enddate'][biIdx[i]]
+                # print i,k_data['high'][dt], k_data['low'][dt]
+                time_long = long(time.mktime((dt + datetime.timedelta(hours=8)).timetuple()) * 1000000000)
+                # print x_date_list.index(time_long) if time_long in x_date_list else 0
+                if fenType == 1:
+                    if color is None:
+                        plt.text(x_date_list.index(time_long), k_data['high'][dt],
+                                 str(k_data['high'][dt]), ha='left', fontsize=12)
+                    else:
+                        col_v = color[0] if fenType > 0 else color[1]
+                        plt.text(x_date_list.index(time_long), k_data['high'][dt],
+                                 str(k_data['high'][dt]), ha='left', fontsize=12,bbox=dict(facecolor=col_v, alpha=0.5))
+
+                    x_fenbi_seq.append(x_date_list.index(time_long))
+                    y_fenbi_seq.append(k_data['high'][dt])
+                if fenType == -1:
+                    if color is None:
+                        plt.text(x_date_list.index(time_long), k_data['low'][dt],
+                                 str(k_data['low'][dt]), va='bottom', fontsize=12)
+                    else:
+                        col_v = color[0] if fenType > 0 else color[1]
+                        plt.text(x_date_list.index(time_long), k_data['low'][dt],
+                                 str(k_data['low'][dt]), va='bottom', fontsize=12,bbox=dict(facecolor=col_v, alpha=0.5))
+
+                    x_fenbi_seq.append(x_date_list.index(time_long))
+                    y_fenbi_seq.append(k_data['low'][dt])
+    #             bottom_time = None
+    #             for k_line_dto in m_line_dto.member_list[::-1]:
+    #                 if k_line_dto.low == m_line_dto.low:
+    #                     # get_price返回的日期，默认时间是08:00:00
+    #                     bottom_time = k_line_dto.begin_time.strftime('%Y-%m-%d') +' 08:00:00'
+    #                     break
+    #             x_fenbi_seq.append(x_date_list.index(long(time.mktime(datetime.strptime(bottom_time, "%Y-%m-%d %H:%M:%S").timetuple())*1000000000)))
+    #             y_fenbi_seq.append(m_line_dto.low)
+        return x_fenbi_seq,y_fenbi_seq
+
+    x_fenbi_seq,y_fenbi_seq = plot_fenbi_seq(biIdx, frsBiType, plt)
+    plot_fenbi_seq(fenIdx,fenTypes[0], plt,color=['red','green'])
+    #  在原图基础上添加分笔蓝线
+    inx_value = chanK.high.values
+    inx_va = [round(inx_value[x], 2) for x in biIdx]
+    log.debug("inx_va:%s count:%s"%(inx_va, len(quotes.high)))
+    log.debug("yfenbi:%s count:%s"%([round(y, 2) for y in y_fenbi_seq], len(chanK)))
+    print "笔     :", biIdx
+    print "BiType :", [-frsBiType if i % 2 == 0 else frsBiType for i in range(len(biIdx))]
+    print "图笔 :", x_fenbi_seq,
+    plt.plot(x_fenbi_seq, y_fenbi_seq)
+    plt.legend([stock_code], loc=0)
+    plt.title(stock_code + " | " + str(quotes.index[-1])[:10], fontsize=14)
+
+    # 线段画到笔上
+    xdIdxs, xfenTypes = chan.parse2ChanXD(frsBiType, biIdx, chanK)
+    print '线段', xdIdxs, xfenTypes
+    x_xd_seq = []
+    y_xd_seq = []
+    for i in range(len(xdIdxs)):
+        if xdIdxs[i] is not None:
+            fenType = xfenTypes[i]
     #         dt = chanK['enddate'][biIdx[i]]
             # 缠论k线
-            dt = chanK.index[biIdx[i]] if chanK_flag else chanK['enddate'][biIdx[i]]
-            # print i,k_data['high'][dt], k_data['low'][dt]
+            dt = chanK.index[xdIdxs[i]] if chanK_flag else chanK['enddate'][xdIdxs[i]]
+    #         print k_data['high'][dt], k_data['low'][dt]
             time_long = long(time.mktime((dt + datetime.timedelta(hours=8)).timetuple()) * 1000000000)
-            # print x_date_list.index(time_long) if time_long in x_date_list else 0
+    #         print x_date_list.index(time_long) if time_long in x_date_list else 0
             if fenType == 1:
-                if color is None:
-                    plt.text(x_date_list.index(time_long), k_data['high'][dt],
-                             str(k_data['high'][dt]), ha='left', fontsize=12)
-                else:
-                    col_v = color[0] if fenType > 0 else color[1]
-                    plt.text(x_date_list.index(time_long), k_data['high'][dt],
-                             str(k_data['high'][dt]), ha='left', fontsize=12,bbox=dict(facecolor=col_v, alpha=0.5))
-
-                x_fenbi_seq.append(x_date_list.index(time_long))
-                y_fenbi_seq.append(k_data['high'][dt])
+                x_xd_seq.append(x_date_list.index(time_long))
+                y_xd_seq.append(k_data['high'][dt])
             if fenType == -1:
-                if color is None:
-                    plt.text(x_date_list.index(time_long), k_data['low'][dt],
-                             str(k_data['low'][dt]), va='bottom', fontsize=12)
+                x_xd_seq.append(x_date_list.index(time_long))
+                y_xd_seq.append(k_data['low'][dt])
+    #             bottom_time = None
+    #             for k_line_dto in m_line_dto.member_list[::-1]:
+    #                 if k_line_dto.low == m_line_dto.low:
+    #                     # get_price返回的日期，默认时间是08:00:00
+    #                     bottom_time = k_line_dto.begin_time.strftime('%Y-%m-%d') +' 08:00:00'
+    #                     break
+    #             x_fenbi_seq.append(x_date_list.index(long(time.mktime(datetime.strptime(bottom_time, "%Y-%m-%d %H:%M:%S").timetuple())*1000000000)))
+    #             y_fenbi_seq.append(m_line_dto.low)
+
+    #  在原图基础上添加分笔蓝线
+    print "线段   :", x_xd_seq
+    print "笔值 :", [str(x) for x in (y_xd_seq)],
+    plt.plot(x_xd_seq, y_xd_seq)
+
+    if show_mpl:
+        zp = zoompan.ZoomPan()
+        figZoom = zp.zoom_factory(ax1, base_scale=1.1)
+        figPan = zp.pan_factory(ax1)
+        plt.xticks(rotation=30, horizontalalignment='center')
+        # plt.setp( axs[1].xaxis.get_majorticklabels(), rotation=70 )
+        # plt.show()
+        plt.show(block=False)
+    
+import argparse
+def parseArgmain():
+    try:
+        parser = argparse.ArgumentParser()
+        parser.add_argument('code', type=str, nargs='?', help='999999')
+        parser.add_argument('start', nargs='?', type=str, help='20150612')
+        parser.add_argument('end', nargs='?', type=str, help='20160101')
+        parser.add_argument('-d', action="store", dest="dtype", type=str, nargs='?', choices=['d', 'w', 'm'], default='d',help='DateType')
+        parser.add_argument('-v', action="store", dest="vtype", type=str, choices=['f', 'b'], default='f',help='Price Forward or back')
+        parser.add_argument('-p', action="store", dest="ptype", type=str, choices=['high', 'low', 'close'], default='low',help='price type')
+        parser.add_argument('-f', action="store", dest="filter", type=str, choices=['y', 'n'], default='y',help='find duration low')
+        parser.add_argument('-l', action="store", dest="dl", type=int, default=60,help='dl default=30')
+        parser.add_argument('-da', action="store", dest="days", type=int, default=ct.Power_last_da,help='days')
+        parser.add_argument('-m', action="store", dest="mpl", type=str, default='y',help='mpl show')
+        parser.add_argument('-i', action="store", dest="line", type=str, choices=['y', 'n'], default='y', help='LineHis show')
+        parser.add_argument('-w', action="store", dest="wencai", type=str, choices=['y', 'n'], default='n',help='WenCai Search')
+        parser.add_argument('-k', action="store", dest="chanK_flag", type=bool, choices=[1, 0], default=0,help='WenCai Search')
+        parser.add_argument('-le', action="store", dest="least", type=int,default=2,help='least_init 2')
+        return parser
+    except Exception, e:
+        # print 'Eerror:',e
+        pass
+        # raise "Error"
+    else:
+        # print 'Eerror:'
+        pass
+    finally:
+        # print 'Eerror:'
+        pass
+
+
+def maintest(code, start=None, type='m', filter='y'):
+    import timeit
+    run = 1
+    strip_tx = timeit.timeit(lambda: get_linear_model_status(
+        code, start=start, type=type, filter=filter), number=run)
+    print("ex Read:", strip_tx)
+
+
+if __name__ == "__main__":
+    # print get_linear_model_status('600671', filter='y', dl=10, ptype='low')
+    # print get_linear_model_status('600671', filter='y', dl=10, ptype='high')
+    # print get_linear_model_status('600671', filter='y', start='20160329', ptype='low')
+    # print get_linear_model_status('600671', filter='y', start='20160329', ptype='high')
+    # print get_linear_model_status('999999', filter='y', dl=30, ptype='high')
+    # print get_linear_model_status('999999', filter='y', dl=30, ptype='low')
+    # print powerCompute_df(['300134','002171'], dtype='d',end=None, dl=10, filter='y')
+    # # print powerCompute_df(['601198', '002791', '000503'], dtype='d', end=None, dl=30, filter='y')
+    # print get_linear_model_status('999999', filter='y', dl=34, ptype='low', days=1)
+    # print get_linear_model_status('399006', filter='y', dl=34, ptype='low', days=1)
+    # sys.exit()
+    # import re
+    if cct.isMac():
+        cct.set_console(80, 19)
+    else:
+        cct.set_console(80, 19)
+    parser = parseArgmain()
+    parser.print_help()
+    # show_chan_mpl('999999', None, None, 60, 'd', show_mpl=True)
+    # code = raw_input("code:")
+    while 1:
+        try:
+            # log.setLevel(LoggerFactory.INFO)
+            # log.setLevel(LoggerFactory.DEBUG)
+            code = raw_input("code:")
+            args = parser.parse_args(code.split())
+            # print args
+            # print str(args.days)
+
+            if len(str(args.code)) == 6:
+                if args.start is not None and len(args.start) < 4:
+                    args.dl = int(args.start)
+                    args.start = None
+                start = cct.day8_to_day10(args.start)
+                end = cct.day8_to_day10(args.end)
+
+                if args.mpl == 'y':
+                    show_chan_mpl(args.code, args.start, args.end, args.dl, args.dtype, show_mpl=True,least_init=args.least,chanK_flag=args.chanK_flag)
                 else:
-                    col_v = color[0] if fenType > 0 else color[1]
-                    plt.text(x_date_list.index(time_long), k_data['low'][dt],
-                             str(k_data['low'][dt]), va='bottom', fontsize=12,bbox=dict(facecolor=col_v, alpha=0.5))
+                    show_chan_mpl(args.code, args.start, args.end, args.dl, args.dtype, show_mpl=False,least_init=args.least,chanK_flag=args.chanK_flag)
+                cct.sleep(0.1)
+                print ''
+                # ts=time.time()
+                # time.sleep(5)
+                # print "%0.5f"%(time.time()-ts)
+            elif code == 'q':
+                sys.exit(0)
 
-                x_fenbi_seq.append(x_date_list.index(time_long))
-                y_fenbi_seq.append(k_data['low'][dt])
-#             bottom_time = None
-#             for k_line_dto in m_line_dto.member_list[::-1]:
-#                 if k_line_dto.low == m_line_dto.low:
-#                     # get_price返回的日期，默认时间是08:00:00
-#                     bottom_time = k_line_dto.begin_time.strftime('%Y-%m-%d') +' 08:00:00'
-#                     break
-#             x_fenbi_seq.append(x_date_list.index(long(time.mktime(datetime.strptime(bottom_time, "%Y-%m-%d %H:%M:%S").timetuple())*1000000000)))
-#             y_fenbi_seq.append(m_line_dto.low)
-    return x_fenbi_seq,y_fenbi_seq
+            elif code == 'h' or code == 'help':
+                parser.print_help()
+            else:
+                pass
+        except (KeyboardInterrupt) as e:
+            # print "key"
+            print "KeyboardInterrupt:", e
+        except (IOError, EOFError, Exception) as e:
+            print "Error", e
 
-x_fenbi_seq,y_fenbi_seq = plot_fenbi_seq(biIdx, frsBiType, plt)
-plot_fenbi_seq(fenIdx,fenTypes[0], plt,color=['red','green'])
-#  在原图基础上添加分笔蓝线
-inx_value = chanK.high.values
-inx_va = [round(inx_value[x], 2) for x in biIdx]
-print "inx_va:",inx_va, len(quotes.high)
-print "yfenbi:",[round(y, 2) for y in y_fenbi_seq], len(chanK)
-print "笔     :", biIdx
-print "BiType :", [-frsBiType if i % 2 == 0 else frsBiType for i in range(len(biIdx))]
-print "图笔 :", x_fenbi_seq,
-plt.plot(x_fenbi_seq, y_fenbi_seq)
-plt.legend([stock_code], loc=0)
-plt.title(stock_code + " | " + str(quotes.index[-1])[:10], fontsize=14)
-
-# 线段画到笔上
-xdIdxs, xfenTypes = chan.parse2ChanXD(frsBiType, biIdx, chanK)
-print '线段', xdIdxs, xfenTypes
-x_xd_seq = []
-y_xd_seq = []
-for i in range(len(xdIdxs)):
-    if xdIdxs[i] is not None:
-        fenType = xfenTypes[i]
-#         dt = chanK['enddate'][biIdx[i]]
-        # 缠论k线
-        dt = chanK.index[xdIdxs[i]] if chanK_flag else chanK['enddate'][xdIdxs[i]]
-#         print k_data['high'][dt], k_data['low'][dt]
-        time_long = long(time.mktime((dt + datetime.timedelta(hours=8)).timetuple()) * 1000000000)
-#         print x_date_list.index(time_long) if time_long in x_date_list else 0
-        if fenType == 1:
-            x_xd_seq.append(x_date_list.index(time_long))
-            y_xd_seq.append(k_data['high'][dt])
-        if fenType == -1:
-            x_xd_seq.append(x_date_list.index(time_long))
-            y_xd_seq.append(k_data['low'][dt])
-#             bottom_time = None
-#             for k_line_dto in m_line_dto.member_list[::-1]:
-#                 if k_line_dto.low == m_line_dto.low:
-#                     # get_price返回的日期，默认时间是08:00:00
-#                     bottom_time = k_line_dto.begin_time.strftime('%Y-%m-%d') +' 08:00:00'
-#                     break
-#             x_fenbi_seq.append(x_date_list.index(long(time.mktime(datetime.strptime(bottom_time, "%Y-%m-%d %H:%M:%S").timetuple())*1000000000)))
-#             y_fenbi_seq.append(m_line_dto.low)
-
-#  在原图基础上添加分笔蓝线
-print "线段   :", x_xd_seq
-print "笔值 :", [str(x) for x in (y_xd_seq)],
-plt.plot(x_xd_seq, y_xd_seq)
-
-if show_mpl:
-    plt.show()
-
-
+'''
+#old chan
 def label_k_func(df):
     # 进行K线的包含关系处理，再原dataframe数据表中增加label列进行是否有效的标记，增加两列记录合并K线后的最值
     h = df['high'].values
@@ -473,7 +603,7 @@ def label_k_func(df):
     df['high_k'] = pd.Series(high_new, index=df.index)
     df['low_k'] = pd.Series(low_new, index=df.index)
     return df
-
+'''
 #  在原图基础上添加分笔蓝线
 # plt.plot(x_fenbi_seq,y_fenbi_seq)
 

@@ -76,7 +76,7 @@ if __name__ == "__main__":
             # print args
             # print str(args.days)
             if not str(args.code) == 'None' and (args.wencai == 'y' or re.match('[ \u4e00 -\u9fa5]+',code) == None):
-                df  = wcd.get_wencai_Market_url(code,200)
+                df  = wcd.get_wencai_Market_url(code,200,pct=False)
                 print df.shape,df[:8]
                 if len(df) == 1:
                     start = cct.day8_to_day10(args.start)

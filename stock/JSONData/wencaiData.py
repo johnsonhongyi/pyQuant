@@ -141,20 +141,23 @@ def retry_post_data(root='http://upass.10jqka.com.cn/login',key='国企改革'):
     # get_wencai_Market_url(url=None)
 
 
-global null,wencai_count
+global null,wencai_count,pct_status
+pct_status = True
 config_ini = cct.get_ramdisk_dir() + os.path.sep+ 'h5config.txt'
 fname = 'wencai_count'
 null = None
-# wencai_count = cct.get_config_value_wencai(config_ini,fname)
-wencai_count = cct.get_config_value_wencai(config_ini,fname,1,update=True)
+wencai_count = cct.get_config_value_wencai(config_ini,fname)
+# wencai_count = cct.get_config_value_wencai(config_ini,fname,1,update=True)
 
 # cct.get_config_value_wencai(config_ini,fname)
 
-def get_wencai_Market_url(filter='国企改革',perpage=1,url=None,):
+def get_wencai_Market_url(filter='国企改革',perpage=1,url=None,pct=None):
     urllist = []
-    global null,wencai_count
+    global null,wencai_count,pct_status
+    if pct is not None:
+        pct_status = pct
     df = pd.DataFrame()
-    if url == None and cct.get_config_value_wencai(config_ini,fname) < 1:
+    if ((not pct_status) or  (pct_status and 925 < cct.get_now_time_int() < 940)) and url == None and cct.get_config_value_wencai(config_ini,fname) < 1:
         time_s = time.time()
         duratime = cct.get_config_value_wencai(config_ini,fname,currvalue=time_s,xtype='time',update=False)
         if duratime < ct.wencai_delay_time:
@@ -329,9 +332,11 @@ def get_codelist_df(codelist):
         log.warn("wcdf:%s"%(len(wcdf)))
     return wcdf
 
-def get_wencai_data(dm,market='wencai',days=120):
+def get_wencai_data(dm,market='wencai',days=120,pct=True):
 #    if isinstance(codelist,list):
     global wencai_count
+    global pct_status
+    pct_status = pct
     if len(dm) > 1:
         # code_l = []
         # wcd_o = get_write_wencai_market_to_csv(market=market)
@@ -371,6 +376,7 @@ def get_wencai_data(dm,market='wencai',days=120):
                 #         print x,dm[x],
 
         if wencai_count < 1:
+            # if (pct and cct.get_now_time_int() < 940) or not pct:
             wcd_d = get_codelist_df(dm.tolist())
             log.error("dratio:%s diff:%s dm:%s err:%s"%(dratio,len(diff_code),len(dm),wencai_count))
             if len(wcd_d) > 0:
