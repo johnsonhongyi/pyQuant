@@ -251,6 +251,7 @@ def get_sina_Market_json(market='all', showtime=True, num='100', retry_count=3, 
         return df
     else:
         if showtime:print ("no data Market-df:%s" % (format((time.time() - start_t), '.2f')))
+        log.error("no data Market-df:%s"%(url_list[0]))
         return []
 from configobj import ConfigObj
 import os
@@ -818,13 +819,13 @@ if __name__ == '__main__':
     # _get_sina_json_dd_url()
     print "Big_Count:",sina_json_Big_Count()
     # print getconfigBigCount(write=True)
-    sys.exit(0)
+    # sys.exit(0)
     # post_login()
     # get_wencai_Market_url(filter='热门股')
     df = get_sina_Market_json('all')
-    print df[df.code == '600581']
+    # print df[df.code == '600581']
     print df[:1],df.shape
-    sys.exit()
+    # sys.exit()
     top_now = get_market_price_sina_dd_realTime(df, '2', type)
     print top_now[:1]
     # _parsing_Market_price_json('cyb')

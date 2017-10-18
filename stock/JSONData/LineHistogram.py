@@ -10,6 +10,7 @@ from statsmodels import api as sm
 from matplotlib.dates import num2date, date2num
 from matplotlib.lines import Line2D
 from matplotlib.patches import Rectangle
+from matplotlib import transforms
 from pylab import plt, mpl
 from sklearn.linear_model import LinearRegression
 from statsmodels import regression
@@ -25,7 +26,8 @@ log = LoggerFactory.log
 from JSONData import tdx_data_Day as tdd
 
 if cct.isMac():
-    mpl.rcParams['font.sans-serif'] = ['STHeiti']
+    # mpl.rcParams['font.sans-serif'] = ['STHeiti']
+    mpl.rcParams['font.sans-serif'] = ['SimHei']
     mpl.rcParams['axes.unicode_minus'] = False
 else:
     mpl.rcParams['font.sans-serif'] = ['SimHei']
@@ -273,6 +275,21 @@ def get_linear_model_histogramDouble(code, ptype='low', dtype='d', start=None, e
     plt.legend([asset.iat[-1]], fontsize=12, loc=4)
     plt.grid(True)
 
+
+    # #plot volume
+    # pad = 0.25
+    # yl = ax1.get_ylim()
+    # ax1.set_ylim(yl[0]-(yl[1]-yl[0])*pad,yl[1])
+    # axx = ax1.twinx()
+    # axx.set_position(transforms.Bbox([[0.125,0.1],[0.9,0.32]]))
+    # volume = np.asarray(df.vol)
+    # pos = df['open']-df['close']<0
+    # neg = df['open']-df['close']>=0
+    # idx = np.asarray([x for x in range(len(df))])
+    # axx.bar(idx[pos],volume[pos],color='red',width=1,align='center')
+    # axx.bar(idx[neg],volume[neg],color='green',width=1,align='center')
+
+    
     # plt.legend([code]);
     # plt.legend([code, 'Value center line', 'Value interval line']);
     # fig=plt.fig()
@@ -753,7 +770,22 @@ def Candlestick(ax, bars=None, quotes=None, width=0.5, colorup='k', colordown='r
     new_xticks = [bars.index[d] for d in ax.get_xticks()]
     ax.set_xticklabels(new_xticks, rotation=30, horizontalalignment='right')
     # fig.autofmt_xdate()
-    ax.autoscale_view()
+    # ax.autoscale_view()
+    #plot volume
+    pad = 0.25
+    yl = ax.get_ylim()
+    ax.set_ylim(yl[0]-(yl[1]-yl[0])*pad,yl[1])
+    axx = ax.twinx()
+    axx.set_position(transforms.Bbox([[0.125,0.1],[0.9,0.32]]))
+    volume = np.asarray(df.vol)
+    pos = df['open']-df['close']<0
+    neg = df['open']-df['close']>=0
+    idx = np.asarray([x for x in range(len(dates))])
+    # print len(dates),len(df),ax.get_xlim(),ax.get_xticks()
+    axx.bar(idx[pos],volume[pos],color='red',width=1,align='center')
+    axx.bar(idx[neg],volume[neg],color='green',width=1,align='center')
+
+
     # Create the candle sticks
     fooCandlestick(ax, data2, width=width, colorup='r', colordown='g')
 

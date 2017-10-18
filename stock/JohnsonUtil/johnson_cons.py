@@ -73,7 +73,8 @@ duration_sleep_time = 60
 compute_lastdays = 9
 sort_value_key_perd23 = '4'
 # sort_value_key_perd23 = '2 3'
-sort_value_key_perd = '2 2'
+# sort_value_key_perd = '2 2'
+sort_value_key_perd = 'x'
 idx_perd_1to_2 = 1
 # powerdiff = 'ra * fibl + rah*(abs(float(%s)-fibl))/fib +ma +kdj+rsi'
 '''

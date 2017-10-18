@@ -9,6 +9,7 @@ import statsmodels.api as sm
 from pylab import plt, mpl
 from matplotlib.dates import num2date, date2num
 from matplotlib.lines import Line2D
+from matplotlib import transforms
 from matplotlib.patches import Rectangle
 import datetime
 from JohnsonUtil import commonTips as cct
@@ -46,7 +47,8 @@ if not cct.isMac():
     set_ctrl_handler()
 
 if cct.isMac():
-    mpl.rcParams['font.sans-serif'] = ['STHeiti']
+    # mpl.rcParams['font.sans-serif'] = ['STHeiti']
+    mpl.rcParams['font.sans-serif'] = ['SimHei']
     mpl.rcParams['axes.unicode_minus'] = False
 else:
     mpl.rcParams['font.sans-serif'] = ['SimHei']
@@ -144,7 +146,7 @@ def Candlestick(ax, bars=None, quotes=None, width=0.5, colorup='k', colordown='r
             ax.add_line(vline_lo)
             ax.add_line(vline_hi)
             ax.add_patch(rect)
-        ax.autoscale_view()
+        # ax.autoscale_view()
 
         return lines, boxes
 
@@ -217,7 +219,7 @@ def Candlestick(ax, bars=None, quotes=None, width=0.5, colorup='k', colordown='r
     # ax.set_xticklabels(new_xticks, rotation=30, horizontalalignment='right')
 
     # fig.autofmt_xdate()
-    ax.autoscale_view()
+    # ax.autoscale_view()
     # Create the candle sticks
     fooCandlestick(ax, data2, width=width, colorup='r', colordown='g')
 
@@ -654,7 +656,6 @@ def get_linear_model_status(code, df=None, dtype='d', type='m', start=None, end=
     #     else:
     #         return -10, -10, cct.get_today(), [len(df),df[:1]]
 
-
 def get_linear_model_candles(code, ptype='low', dtype='d', start=None, end=None, filter='n',
                              df=None, dl=None, days=1, opa=False):
     if start is not None and filter == 'y':
@@ -689,58 +690,9 @@ def get_linear_model_candles(code, ptype='low', dtype='d', start=None, end=None,
     asset = asset.dropna()
     dates = asset.index
 
-    '''
-    if not code.startswith('999') and not code.startswith('399'):
-        # print "code:",code
-        if code[:1] in ['5', '6', '9']:
-            code2 = '999999'
-        elif code[:2] in ['30']:
-            # print "cyb"
-            code2 = '399006'
-        else:
-            code2 = '399001'
-        df1 = tdd.get_tdx_append_now_df_api(
-            code2, ptype, start, end).sort_index(ascending=True)
-        # df1 = tdd.get_tdx_append_now_df(code2, ptype, start, end).sort_index(ascending=True)
-        if not dtype == 'd':
-            df1 = tdd.get_tdx_stock_period_to_type(
-                df1, dtype).sort_index(ascending=True)
-        asset1 = df1.loc[df.index, ptype]
-        startv = asset1[:1]
-        # asset_v=asset[:1]
-        # print startv,asset_v
-        asset1 = asset1.apply(lambda x: round(x / asset1[:1], 2))
-    else:
-        if code.startswith('399001'):
-            code2 = '999999'
-        elif code.startswith('399006'):
-            code2 = '399005'
-        else:
-            code2 = '399001'
-        df1 = tdd.get_tdx_append_now_df_api(
-            code2, ptype, start, end).sort_index(ascending=True)
-        # print df1[:1]
-        # df1 = tdd.get_tdx_append_now_df(code2, ptype, start, end).sort_index(ascending=True)
-        if not dtype == 'd':
-            df1 = tdd.get_tdx_stock_period_to_type(
-                df1, dtype).sort_index(ascending=True)
-        if len(df) < len(df1):
-            asset1 = df1.loc[df.index, ptype]
-            startv = asset1[:1]
-            asset1 = asset1.apply(lambda x: round(x / asset1[:1], 2))
-        else:
-            df = df.loc[df1.index]
-            df = df.dropna()
-            asset = df[ptype]
-            asset = asset.dropna()
-            dates = asset.index
-            asset1 = df1[ptype]
-            asset1 = asset1.apply(lambda x: round(x / asset1[:1], 2))
-    '''
-
     fig = plt.figure(figsize=(10, 6))
-    plt.subplots_adjust(left=0.05, bottom=0.08, right=0.95,
-                        top=0.95, wspace=0.15, hspace=0.25)
+    # plt.subplots_adjust(left=0.05, bottom=0.08, right=0.95,
+    #                     top=0.95, wspace=0.15, hspace=0.25)
     ax = fig.add_subplot(111)
     Candlestick(ax, df)
 
@@ -784,7 +736,7 @@ def get_linear_model_candles(code, ptype='low', dtype='d', start=None, end=None,
             directColor = 'r'
         else:
             directionX = 0.8
-            directionY = 0.1
+            directionY = 0.5
             # directColor = 'cyan' m
             directColor = 'g'
         plt.annotate('Hat:%0.2f' % (Y_hat[-1]), (X[-1], Y_hat[-1]),
@@ -860,7 +812,7 @@ def get_linear_model_candles(code, ptype='low', dtype='d', start=None, end=None,
     # plt.title(code + " | " + str(dates[-1])[:11], fontsize=14)
     fib = cct.getFibonacci(len(asset) * 5, len(asset))
     plt.legend(["Now:%s" % df.close[-1], "Hi:%s" % df.high[-1], "Lo:%0.2f" % (asset.iat[-1]), "day:%s" %
-                len(asset), "fib:%s" % (fib)], fontsize=12, loc=8)
+                len(asset), "fib:%s" % (fib)], fontsize=12, loc=0)
     plt.grid(True)
     if filter:
 
@@ -923,10 +875,28 @@ def get_linear_model_candles(code, ptype='low', dtype='d', start=None, end=None,
     # fig=plt.fig()
     # fig.figsize = [14,8]
     # scale = 1.1
+    # 
+    #plot volume
+    plt.xticks(rotation=15, horizontalalignment='center')
+    
+    pad = 0.25
+    yl = ax.get_ylim()
+    ax.set_ylim(yl[0]-(yl[1]-yl[0])*pad,yl[1])
+    axx = ax.twinx()
+    axx.set_position(transforms.Bbox([[0.125,0.1],[0.9,0.32]]))
+    volume = np.asarray(df.vol)
+    pos = df['open']-df['close']<0
+    neg = df['open']-df['close']>=0
+    idx = np.asarray([x for x in range(len(dates))])
+    # print len(dates),len(df),ax.get_xlim(),ax.get_xticks()
+    axx.bar(idx[pos],volume[pos],color='red',width=1,align='center')
+    axx.bar(idx[neg],volume[neg],color='green',width=1,align='center')
+    ax.autoscale_view()
+    
     zp = zoompan.ZoomPan()
     figZoom = zp.zoom_factory(ax, base_scale=1.1)
     figPan = zp.pan_factory(ax)
-    plt.xticks(rotation=15, horizontalalignment='center')
+    # plt.xticks(rotation=30, horizontalalignment='center')
     # plt.setp( axs[1].xaxis.get_majorticklabels(), rotation=70 )
     plt.show(block=False)
     return df

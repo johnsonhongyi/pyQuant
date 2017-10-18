@@ -112,7 +112,7 @@ def parse2ChanFen(chanK, recursion=False):
         if i != len(chanK.index) - 1:
             # 顶分型
             log.debug("chanK:%s hi+1:%s hi:%s hi-1:%s" % (str(chanK.index[i])[:10], chanK['high'][i + 1], chanK['high'][i], chanK['high'][i - 1]))
-            if i == 1:
+            if i == 1 and len(chanK.index) >= i+2:
                 # if chanK['high'][i] > chanK['high'][i - 1] and chanK['low'][i] >
                 # chanK['low'][i - 1] and chanK['close'][i] < ((chanK['high'][i] + chanK['low'][i]) / 2):
                 if chanK['high'][i] > chanK['high'][i - 1] and chanK['low'][i] > chanK['low'][i - 1] and chanK['close'][i] > chanK['close'][i - 1]:
@@ -130,8 +130,8 @@ def parse2ChanFen(chanK, recursion=False):
                     appendFen(1, i - 1)
 
                 else:
-                    chan_h = chanK['high'][i-1:i+1]
-                    chan_l = chanK['low'][i-1:i+1]
+                    chan_h = chanK['high'][:i+2].values.tolist()
+                    chan_l = chanK['low'][:i+2].values.tolist()
                     if chan_h.index(max(chan_h)) == chan_l.index(max(chan_l)):
                         appendFen(1, chan_h.index(max(chan_h)))
                         log.debug("Lis-firstTop:%s dt:%s lo-1:%s cl-1:%s cl:%s" %

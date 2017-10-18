@@ -130,7 +130,7 @@ sys.exit(0)
 # r['date'][i+1] = r['date'][i] + datetime.timedelta(days=1)
 # r.index.to_datetime()
 candlesticks = zip(date2num(r.index.tolist()), r['open'], r[
-    'close'], r['high'], r['low'], r['volume'])
+    'close'], r['high'], r['low'], r['vol'])
 
 fig = plt.figure()
 ax = fig.add_subplot(1, 1, 1)

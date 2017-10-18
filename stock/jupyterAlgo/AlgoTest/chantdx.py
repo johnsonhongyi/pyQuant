@@ -12,7 +12,17 @@ import my_chan2 as chan
 import matplotlib as mat
 import numpy as np
 import datetime
-import matplotlib.pyplot as plt
+import pandas as pd
+# import matplotlib.pyplot as plt
+from pylab import plt,mpl
+if cct.isMac():
+    mpl.rcParams['font.sans-serif'] = ['SimHei']
+    # mpl.rcParams['font.sans-serif'] = ['STHeiti']
+    mpl.rcParams['axes.unicode_minus'] = False
+else:
+    mpl.rcParams['font.sans-serif'] = ['SimHei']
+    mpl.rcParams['axes.unicode_minus'] = False
+
 # import matplotlib
 # matplotlib.use('Qt4Agg')
 from JohnsonUtil import LoggerFactory
@@ -62,11 +72,17 @@ show_mpl = True
 # quotes = get_price(stock_code, datetime.datetime.strptime(end_date, "%Y-%m-%d %H:%M:%S")-datetime.timedelta(days=stock_days) , end_date,\
 #                    frequency=stock_frequency,skip_paused=False,fq='pre')
 
+global cname_g
+cname_g ='-'
 
-def show_chan_mpl(code,start_date,end_date,stock_days,resample,show_mpl=True,least_init=3,chanK_flag=False):
+def show_chan_mpl(code,start_date,end_date,stock_days,resample,show_mpl=True,least_init=3,chanK_flag=False,windows=20):
     def get_least_khl_num(resample,idx=0,init_num=3):
         # init = 3
-        return init_num if resample == 'd' else init_num-idx if resample == 'w' else 0\
+        if init_num-idx >0:
+            initw = init_num-idx 
+        else:
+            initw =  0
+        return init_num if resample == 'd' else initw if resample == 'w' else init_num-idx-1 if init_num-idx-1 >0 else 0\
                 if resample == 'm' else 5
     stock_code = code # 股票代码
     # stock_code = '002176' # 股票代码
@@ -131,7 +147,7 @@ def show_chan_mpl(code,start_date,end_date,stock_days,resample,show_mpl=True,lea
             start_lastday = str(chanK.index[biIdx[-1]])[0:10]
             print "次级别为:%s cur_ji:%s %s" % (resample, cur_ji, start_lastday)
             # print [chanK.index[x] for x in biIdx]
-            k_data_c = get_quotes_tdx(stock, start=start_lastday, end=end_date, dl=dl, resample=resample)
+            k_data_c,cname = get_quotes_tdx(stock, start=start_lastday, end=end_date, dl=dl, resample=resample)
             print k_data_c.index[0],k_data_c.index[-1]
             chanKc = chan.parse2ChanK(k_data_c, k_data_c.values) if chanK_flag else k_data_c
             fenTypesc, fenIdxc = chan.parse2ChanFen(chanKc, recursion=True)
@@ -167,16 +183,22 @@ def show_chan_mpl(code,start_date,end_date,stock_days,resample,show_mpl=True,lea
         return biIdx
 
     def get_quotes_tdx(code, start=None, end=None, dl=120, resample='d'):
+        
         quotes = tdd.get_tdx_append_now_df_api(code=stock_code, start=start, end=end, dl=dl).sort_index(ascending=True)
         if not resample == 'd' and resample in tdd.resample_dtype:
             quotes = tdd.get_tdx_stock_period_to_type(quotes, period_day=resample)
         quotes.index = quotes.index.astype('datetime64')
+        global cname_g
+        if 'name' in quotes.columns:
+            cname = quotes.name[0]
+            cname_g =cname
+        else:
+            cname = cname_g
         quotes = quotes.loc[:, ['open', 'close', 'high', 'low', 'vol', 'amount']]
-        # quotes = quotes.round(2)
-        return quotes
+        return quotes,cname
 
 
-    quotes = get_quotes_tdx(stock_code, start_date, end_date, dl=stock_days, resample=resample)
+    quotes,cname = get_quotes_tdx(stock_code, start_date, end_date, dl=stock_days, resample=resample)
     # quotes.rename(columns={'amount': 'money'}, inplace=True)
     # quotes.rename(columns={'vol': 'vol'}, inplace=True)
     # print quotes[-2:]
@@ -226,8 +248,9 @@ def show_chan_mpl(code,start_date,end_date,stock_days,resample,show_mpl=True,lea
     #          ResizeTool(), ResetTool(),\
     #          PanTool(dimensions=['width']), PreviewSaveTool()]
 
-    fig = plt.figure(figsize=(12, 7))
-    ax1 = plt.subplot2grid((10, 4), (0, 0), rowspan=10, colspan=4)
+    fig = plt.figure(figsize=(10, 6))
+    # ax1 = plt.subplot2grid((10, 1), (0, 0), rowspan=10, colspan=1)
+    ax1 = fig.add_subplot(1,1,1)
     #fig = plt.figure()
     #ax1 = plt.axes([0,0,3,2])
 
@@ -307,6 +330,8 @@ def show_chan_mpl(code,start_date,end_date,stock_days,resample,show_mpl=True,lea
     # print  T0[-len(T0):].astype(dt.date)
     T1 = T0[-len(T0):].astype(datetime.date) / 1000000000
     Ti = []
+    if len(T0) / x_jizhun > 12:
+        x_jizhun = len(T0) / 12
     for i in range(len(T0) / x_jizhun):
         # print "len(T0)/x_jizhun:",len(T0)/x_jizhun
         a = i * x_jizhun
@@ -328,7 +353,7 @@ def show_chan_mpl(code,start_date,end_date,stock_days,resample,show_mpl=True,lea
     ax1.set_xticklabels(Ti)
 
     plt.grid(True)
-    plt.setp(plt.gca().get_xticklabels(), rotation=45, horizontalalignment='right')
+    plt.setp(plt.gca().get_xticklabels(), rotation=30, horizontalalignment='right')
 
     '''
     以上代码拷贝自https://www.joinquant.com/post/1756
@@ -414,8 +439,8 @@ def show_chan_mpl(code,start_date,end_date,stock_days,resample,show_mpl=True,lea
     print "BiType :", [-frsBiType if i % 2 == 0 else frsBiType for i in range(len(biIdx))]
     print "图笔 :", x_fenbi_seq,
     plt.plot(x_fenbi_seq, y_fenbi_seq)
-    plt.legend([stock_code], loc=0)
-    plt.title(stock_code + " | " + str(quotes.index[-1])[:10], fontsize=14)
+    plt.legend([stock_code,cname], loc=0)
+    plt.title(stock_code + " | "+ cname+ " | " + str(quotes.index[-1])[:10], fontsize=14)
 
     # 线段画到笔上
     xdIdxs, xfenTypes = chan.parse2ChanXD(frsBiType, biIdx, chanK)
@@ -450,15 +475,52 @@ def show_chan_mpl(code,start_date,end_date,stock_days,resample,show_mpl=True,lea
     print "线段   :", x_xd_seq
     print "笔值 :", [str(x) for x in (y_xd_seq)],
     plt.plot(x_xd_seq, y_xd_seq)
+    if len(quotes) > windows:
+        roll_mean = pd.rolling_mean(quotes.close, window=windows)
+        plt.plot(roll_mean, 'r')
 
     if show_mpl:
         zp = zoompan.ZoomPan()
         figZoom = zp.zoom_factory(ax1, base_scale=1.1)
         figPan = zp.pan_factory(ax1)
-        plt.xticks(rotation=30, horizontalalignment='center')
+        '''#subplot2 bar
+        ax2 = plt.subplot2grid((10, 1), (8, 0), rowspan=2, colspan=1)
+        # ax2.plot(quotes.vol)
+        # ax2.set_xticks(np.linspace(-2, len(quotes) + 2, len(Ti)))
+        ll = min(quotes.vol.values.tolist()) * 0.97
+        hh = max(quotes.vol.values.tolist()) * 1.03
+        ax2.set_ylim(ll, hh)
+        # ax2.set_xticklabels(Ti)
+        # plt.hist(quotes.vol, histtype='bar', rwidth=0.8)
+        plt.bar(x_date_list,quotes.vol, label="Volume", color='b')
+        '''
+
+        #画Volume
+        #
+        pad = 0.25
+        yl = ax1.get_ylim()
+        ax1.set_ylim(yl[0]-(yl[1]-yl[0])*pad,yl[1])
+        ax2 = ax1.twinx()
+        ax2.set_position(mat.transforms.Bbox([[0.125,0.1],[0.9,0.32]]))
+        volume = np.asarray(quotes.vol)
+        pos = quotes['open']-quotes['close']<0
+        neg = quotes['open']-quotes['close']>=0
+        idx = quotes.reset_index().index
+        ax2.bar(idx[pos],volume[pos],color='red',width=1,align='center')
+        ax2.bar(idx[neg],volume[neg],color='green',width=1,align='center')
+        #scale the x-axis tight
+        # ax2.set_xlim(min(x_date_list),max(x_date_list))
+        # the y-ticks for the bar were too dense, keep only every third one
+        # yticks = ax2.get_yticks()
+        # ax2.set_yticks(yticks[::3])        
+        # plt.bar(x_date_list,quotes.vol, label="Volume", color='b')
+
+
+        # plt.grid(True)
+        # plt.xticks(rotation=30, horizontalalignment='center')
         # plt.setp( axs[1].xaxis.get_majorticklabels(), rotation=70 )
-        # plt.show()
-        plt.show(block=False)
+        plt.show()
+        # plt.show(block=False)
     
 import argparse
 def parseArgmain():
