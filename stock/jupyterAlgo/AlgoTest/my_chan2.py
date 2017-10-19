@@ -2,6 +2,8 @@
 import pandas as pd
 import numpy as np
 import datetime
+import sys
+sys.path.append('../../')
 from JohnsonUtil import LoggerFactory
 log = LoggerFactory.log
 # log = LoggerFactory.getLogger('chan',show_detail=False)
@@ -167,7 +169,7 @@ def parse2ChanFen(chanK, recursion=False):
             else:
                 continue
 
-    print ("fenTypes:%s fenIdx:%s cuts:%s recurs:%s lastD:%s"%(fenTypes, fenIdx, len(chanK), recursion,str(chanK.index[-1])[:10]))
+    log.debug("fenTypes:%s fenIdx:%s cuts:%s recurs:%s lastD:%s"%(fenTypes[:3], fenIdx[:3], len(chanK), recursion,str(chanK.index[-1])[:10]))
     return fenTypes, fenIdx
 # fenTypes, fenIdx = parse2ChanFen(chanK)
 
@@ -437,15 +439,16 @@ def parse2Xianduan(biIdx, chanK, least_windows=2):
                 lowIdx = idx
 
         # 构成简易线段
-#         print biIdx, xdIdx, lowIdx, highIdx
-        xdDiff = biIdx.index(lowIdx) - biIdx.index(highIdx)
-        # print least_windows
-        if abs(xdDiff) > least_windows:
-            if lenXd == 0:
-                xdType = 1 if xdDiff < 0 else -1
-            appendXd(lowIdx, highIdx, xdType)
-#             print lowIdx, highIdx, xdIdx
-            genXianduan(biIdx[biIdx.index(xdIdx[len(xdIdx) - 1]):], chanK, xdType)
+        print biIdx, xdIdx, lowIdx, highIdx
+        if lowIdx <> -1:
+            xdDiff = biIdx.index(lowIdx) - biIdx.index(highIdx)
+            # print least_windows
+            if abs(xdDiff) > least_windows:
+                if lenXd == 0:
+                    xdType = 1 if xdDiff < 0 else -1
+                appendXd(lowIdx, highIdx, xdType)
+    #             print lowIdx, highIdx, xdIdx
+                genXianduan(biIdx[biIdx.index(xdIdx[len(xdIdx) - 1]):], chanK, xdType)
         return xdType
     xdType = genXianduan(biIdx, chanK)
     return xdIdx, xdType

@@ -693,7 +693,8 @@ def get_linear_model_candles(code, ptype='low', dtype='d', start=None, end=None,
     fig = plt.figure(figsize=(10, 6))
     # plt.subplots_adjust(left=0.05, bottom=0.08, right=0.95,
     #                     top=0.95, wspace=0.15, hspace=0.25)
-    ax = fig.add_subplot(111)
+    # ax = fig.add_subplot(111)
+    ax = plt.subplot2grid((10, 1), (0, 0), rowspan=8, colspan=1)
     Candlestick(ax, df)
 
     # print len(df),len(asset)
@@ -879,6 +880,8 @@ def get_linear_model_candles(code, ptype='low', dtype='d', start=None, end=None,
     #plot volume
     plt.xticks(rotation=15, horizontalalignment='center')
     
+    '''
+    #old
     pad = 0.25
     yl = ax.get_ylim()
     ax.set_ylim(yl[0]-(yl[1]-yl[0])*pad,yl[1])
@@ -892,7 +895,30 @@ def get_linear_model_candles(code, ptype='low', dtype='d', start=None, end=None,
     axx.bar(idx[pos],volume[pos],color='red',width=1,align='center')
     axx.bar(idx[neg],volume[neg],color='green',width=1,align='center')
     ax.autoscale_view()
-    
+    '''
+
+    plt.subplots_adjust(left=0.05, bottom=0.08, right=0.95, top=0.95, wspace=0.15, hspace=0.00)
+    plt.setp(ax.get_xticklabels(), visible=False)
+    yl = ax.get_ylim()
+    ax2 = plt.subplot2grid((10, 1), (8, 0), rowspan=2, colspan=1,sharex=ax)
+    # ax2.set_position(mat.transforms.Bbox([[0.125,0.1],[0.9,0.32]]))
+    volume = np.asarray(df.amount)
+    pos = df['open']-df['close']<0
+    neg = df['open']-df['close']>=0
+    import pdb;pdb.set_trace();
+    if 'date' in df.columns:
+        df = df.drop(['date'],axis=1)
+    idx = df.reset_index().index
+    ax2.bar(idx[pos],volume[pos],color='red',width=1,align='center')
+    ax2.bar(idx[neg],volume[neg],color='green',width=1,align='center')
+    yticks = ax2.get_yticks()
+    ax2.set_yticks(yticks[::3])
+    # plt.tight_layout()  
+    # plt.subplots_adjust(hspace=0.00, bottom=0.08) 
+    plt.xticks(rotation=15, horizontalalignment='center')
+
+
+
     zp = zoompan.ZoomPan()
     figZoom = zp.zoom_factory(ax, base_scale=1.1)
     figPan = zp.pan_factory(ax)

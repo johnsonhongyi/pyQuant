@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 # 缠论K线图展示完整版
-import sys
 import logging
+import sys
 stdout = sys.stdout
 sys.path.append('../../')
 import JSONData.tdx_data_Day as tdd
@@ -28,7 +28,7 @@ else:
 from JohnsonUtil import LoggerFactory
 log = LoggerFactory.log
 # log = LoggerFactory.getLogger('chan',show_detail=False)
-log.setLevel(LoggerFactory.DEBUG)
+# log.setLevel(LoggerFactory.DEBUG)
 # log.setLevel(LoggerFactory.INFO)
 # log.setLevel(LoggerFactory.WARNING)
 # log.setLevel(LoggerFactory.ERROR)
@@ -236,6 +236,75 @@ def show_chan_mpl(code,start_date,end_date,stock_days,resample,show_mpl=True,lea
 
 
 
+
+    x_date_list = quotes.index.values.tolist()
+    # for x_date in x_date_list:
+    #     d = datetime.datetime.fromtimestamp(x_date/1000000000)
+    #     print d.strftime("%Y-%m-%d %H:%M:%S.%f")
+    # print x_date_list
+    k_data = quotes
+    k_values = k_data.values
+    # 缠论k线
+    chanK = quotes if chanK_flag else chan.parse2ChanK(k_data, k_values,chan_kdf=chanK_flag)
+
+    fenTypes, fenIdx = chan.parse2ChanFen(chanK)
+    log.debug("code:%s fenTypes:%s fenIdx:%s k_data:%s" % (stock_code,fenTypes[3], fenIdx[3], len(k_data)))
+    biIdx, frsBiType = chan.parse2ChanBi(fenTypes, fenIdx, chanK, least_khl_num=least_khl_num)
+    log.debug("biIdx1:%s chanK:%s" % (biIdx, len(chanK)))
+
+    biIdx = con2Cxianduan(stock_code, k_data, chanK, frsBiType, biIdx, end_date, cur_ji,least_init=least_init)
+    log.debug("con2Cxianduan:%s chanK:%s %s" % (biIdx, len(chanK), [str(chanK.index[x])[:10] for x in biIdx]))
+    # print quotes['close'].apply(lambda x:round(x,2))
+
+    # print '股票代码', get_security_info(stock_code).display_name
+    # print '股票代码', (stock_code), resample, least_khl_num
+    #  3.得到分笔结果，计算坐标显示
+
+    def plot_fenbi_seq(biIdx,frsBiType,plt,color=None):
+        x_fenbi_seq = []
+        y_fenbi_seq = []
+        for i in range(len(biIdx)):
+            if biIdx[i] is not None:
+                fenType = -frsBiType if i % 2 == 0 else frsBiType
+        #         dt = chanK['enddate'][biIdx[i]]
+                # 缠论k线
+                dt = chanK.index[biIdx[i]] if chanK_flag else chanK['enddate'][biIdx[i]]
+                # print i,k_data['high'][dt], k_data['low'][dt]
+                time_long = long(time.mktime((dt + datetime.timedelta(hours=8)).timetuple()) * 1000000000)
+                # print x_date_list.index(time_long) if time_long in x_date_list else 0
+                if fenType == 1:
+                    if color is None:
+                        plt.text(x_date_list.index(time_long), k_data['high'][dt],
+                                 str(k_data['high'][dt]), ha='left', fontsize=12)
+                    else:
+                        col_v = color[0] if fenType > 0 else color[1]
+                        plt.text(x_date_list.index(time_long), k_data['high'][dt],
+                                 str(k_data['high'][dt]), ha='left', fontsize=12,bbox=dict(facecolor=col_v, alpha=0.5))
+
+                    x_fenbi_seq.append(x_date_list.index(time_long))
+                    y_fenbi_seq.append(k_data['high'][dt])
+                if fenType == -1:
+                    if color is None:
+                        plt.text(x_date_list.index(time_long), k_data['low'][dt],
+                                 str(k_data['low'][dt]), va='bottom', fontsize=12)
+                    else:
+                        col_v = color[0] if fenType > 0 else color[1]
+                        plt.text(x_date_list.index(time_long), k_data['low'][dt],
+                                 str(k_data['low'][dt]), va='bottom', fontsize=12,bbox=dict(facecolor=col_v, alpha=0.5))
+
+                    x_fenbi_seq.append(x_date_list.index(time_long))
+                    y_fenbi_seq.append(k_data['low'][dt])
+    #             bottom_time = None
+    #             for k_line_dto in m_line_dto.member_list[::-1]:
+    #                 if k_line_dto.low == m_line_dto.low:
+    #                     # get_price返回的日期，默认时间是08:00:00
+    #                     bottom_time = k_line_dto.begin_time.strftime('%Y-%m-%d') +' 08:00:00'
+    #                     break
+    #             x_fenbi_seq.append(x_date_list.index(long(time.mktime(datetime.strptime(bottom_time, "%Y-%m-%d %H:%M:%S").timetuple())*1000000000)))
+    #             y_fenbi_seq.append(m_line_dto.low)
+        return x_fenbi_seq,y_fenbi_seq
+
+
     # ht = HoverTool(tooltips=[
     #             ("date", "@date"),
     #             ("open", "@open"),
@@ -249,8 +318,8 @@ def show_chan_mpl(code,start_date,end_date,stock_days,resample,show_mpl=True,lea
     #          PanTool(dimensions=['width']), PreviewSaveTool()]
 
     fig = plt.figure(figsize=(10, 6))
-    # ax1 = plt.subplot2grid((10, 1), (0, 0), rowspan=10, colspan=1)
-    ax1 = fig.add_subplot(1,1,1)
+    ax1 = plt.subplot2grid((10, 1), (0, 0), rowspan=8, colspan=1)
+    # ax1 = fig.add_subplot(2,1,1)
     #fig = plt.figure()
     #ax1 = plt.axes([0,0,3,2])
 
@@ -361,83 +430,23 @@ def show_chan_mpl(code,start_date,end_date,stock_days,resample,show_mpl=True,lea
 
     K线图绘制完毕
     '''
-    x_date_list = quotes.index.values.tolist()
-    # for x_date in x_date_list:
-    #     d = datetime.datetime.fromtimestamp(x_date/1000000000)
-    #     print d.strftime("%Y-%m-%d %H:%M:%S.%f")
-    # print x_date_list
-    k_data = quotes
-    k_values = k_data.values
-    # 缠论k线
-    chanK = quotes if chanK_flag else chan.parse2ChanK(k_data, k_values,chan_kdf=chanK_flag)
 
-    fenTypes, fenIdx = chan.parse2ChanFen(chanK)
-    log.debug("code:%s ChanFen fenTypes:%s fenIdx:%s k_data:%s" % (stock_code,fenTypes, fenIdx, len(k_data)))
-    biIdx, frsBiType = chan.parse2ChanBi(fenTypes, fenIdx, chanK, least_khl_num=least_khl_num)
-    log.debug("biIdx1:%s chanK:%s" % (biIdx, len(chanK)))
-
-    biIdx = con2Cxianduan(stock_code, k_data, chanK, frsBiType, biIdx, end_date, cur_ji,least_init=least_init)
-    log.debug("con2Cxianduan:%s chanK:%s %s" % (biIdx, len(chanK), [str(chanK.index[x])[:10] for x in biIdx]))
-    # print quotes['close'].apply(lambda x:round(x,2))
-
-    # print '股票代码', get_security_info(stock_code).display_name
-    # print '股票代码', (stock_code), resample, least_khl_num
-    #  3.得到分笔结果，计算坐标显示
-
-    def plot_fenbi_seq(biIdx,frsBiType,plt,color=None):
-        x_fenbi_seq = []
-        y_fenbi_seq = []
-        for i in range(len(biIdx)):
-            if biIdx[i] is not None:
-                fenType = -frsBiType if i % 2 == 0 else frsBiType
-        #         dt = chanK['enddate'][biIdx[i]]
-                # 缠论k线
-                dt = chanK.index[biIdx[i]] if chanK_flag else chanK['enddate'][biIdx[i]]
-                # print i,k_data['high'][dt], k_data['low'][dt]
-                time_long = long(time.mktime((dt + datetime.timedelta(hours=8)).timetuple()) * 1000000000)
-                # print x_date_list.index(time_long) if time_long in x_date_list else 0
-                if fenType == 1:
-                    if color is None:
-                        plt.text(x_date_list.index(time_long), k_data['high'][dt],
-                                 str(k_data['high'][dt]), ha='left', fontsize=12)
-                    else:
-                        col_v = color[0] if fenType > 0 else color[1]
-                        plt.text(x_date_list.index(time_long), k_data['high'][dt],
-                                 str(k_data['high'][dt]), ha='left', fontsize=12,bbox=dict(facecolor=col_v, alpha=0.5))
-
-                    x_fenbi_seq.append(x_date_list.index(time_long))
-                    y_fenbi_seq.append(k_data['high'][dt])
-                if fenType == -1:
-                    if color is None:
-                        plt.text(x_date_list.index(time_long), k_data['low'][dt],
-                                 str(k_data['low'][dt]), va='bottom', fontsize=12)
-                    else:
-                        col_v = color[0] if fenType > 0 else color[1]
-                        plt.text(x_date_list.index(time_long), k_data['low'][dt],
-                                 str(k_data['low'][dt]), va='bottom', fontsize=12,bbox=dict(facecolor=col_v, alpha=0.5))
-
-                    x_fenbi_seq.append(x_date_list.index(time_long))
-                    y_fenbi_seq.append(k_data['low'][dt])
-    #             bottom_time = None
-    #             for k_line_dto in m_line_dto.member_list[::-1]:
-    #                 if k_line_dto.low == m_line_dto.low:
-    #                     # get_price返回的日期，默认时间是08:00:00
-    #                     bottom_time = k_line_dto.begin_time.strftime('%Y-%m-%d') +' 08:00:00'
-    #                     break
-    #             x_fenbi_seq.append(x_date_list.index(long(time.mktime(datetime.strptime(bottom_time, "%Y-%m-%d %H:%M:%S").timetuple())*1000000000)))
-    #             y_fenbi_seq.append(m_line_dto.low)
-        return x_fenbi_seq,y_fenbi_seq
 
     x_fenbi_seq,y_fenbi_seq = plot_fenbi_seq(biIdx, frsBiType, plt)
-    plot_fenbi_seq(fenIdx,fenTypes[0], plt,color=['red','green'])
+    # plot_fenbi_seq(fenIdx,fenTypes[0], plt,color=['red','green'])
+    plot_fenbi_seq(fenIdx,frsBiType, plt,color=['red','green'])
     #  在原图基础上添加分笔蓝线
     inx_value = chanK.high.values
     inx_va = [round(inx_value[x], 2) for x in biIdx]
     log.debug("inx_va:%s count:%s"%(inx_va, len(quotes.high)))
     log.debug("yfenbi:%s count:%s"%([round(y, 2) for y in y_fenbi_seq], len(chanK)))
-    print "笔     :", biIdx
-    print "BiType :", [-frsBiType if i % 2 == 0 else frsBiType for i in range(len(biIdx))]
-    print "图笔 :", x_fenbi_seq,
+    j_BiType = [-frsBiType if i % 2 == 0 else frsBiType for i in range(len(biIdx))]
+    bi_price = [str(chanK.low[idx]) if i % 2 == 0 else str(chanK.high[idx])  for i,idx in enumerate(biIdx)]
+    # print ("笔     :%s %s"%(biIdx,bi_price))
+    print ("BiType :%s frsBiType:%s"%(j_BiType,frsBiType))
+    tb_price = [str(quotes.low[idx]) if i % 2 == 0 else str(quotes.high[idx])  for i,idx in enumerate(x_fenbi_seq)]
+    print "图笔 :", x_fenbi_seq,tb_price
+
     plt.plot(x_fenbi_seq, y_fenbi_seq)
     plt.legend([stock_code,cname], loc=0)
     plt.title(stock_code + " | "+ cname+ " | " + str(quotes.index[-1])[:10], fontsize=14)
@@ -472,8 +481,10 @@ def show_chan_mpl(code,start_date,end_date,stock_days,resample,show_mpl=True,lea
     #             y_fenbi_seq.append(m_line_dto.low)
 
     #  在原图基础上添加分笔蓝线
-    print "线段   :", x_xd_seq
-    print "笔值 :", [str(x) for x in (y_xd_seq)],
+    print ("线段   :%s"%(x_xd_seq))
+    print ("笔值  :%s"%([str(x) for x in (y_xd_seq)]))
+    # Y_hat = X * b + a
+
     plt.plot(x_xd_seq, y_xd_seq)
     if len(quotes) > windows:
         roll_mean = pd.rolling_mean(quotes.close, window=windows)
@@ -495,33 +506,61 @@ def show_chan_mpl(code,start_date,end_date,stock_days,resample,show_mpl=True,lea
         plt.bar(x_date_list,quotes.vol, label="Volume", color='b')
         '''
 
-        #画Volume
-        #
+        #画Volume no tight_layout() 
+        '''
         pad = 0.25
         yl = ax1.get_ylim()
         ax1.set_ylim(yl[0]-(yl[1]-yl[0])*pad,yl[1])
         ax2 = ax1.twinx()
         ax2.set_position(mat.transforms.Bbox([[0.125,0.1],[0.9,0.32]]))
-        volume = np.asarray(quotes.vol)
+        volume = np.asarray(quotes.amount)
         pos = quotes['open']-quotes['close']<0
         neg = quotes['open']-quotes['close']>=0
         idx = quotes.reset_index().index
         ax2.bar(idx[pos],volume[pos],color='red',width=1,align='center')
         ax2.bar(idx[neg],volume[neg],color='green',width=1,align='center')
-        #scale the x-axis tight
-        # ax2.set_xlim(min(x_date_list),max(x_date_list))
-        # the y-ticks for the bar were too dense, keep only every third one
-        # yticks = ax2.get_yticks()
-        # ax2.set_yticks(yticks[::3])        
+        yticks = ax2.get_yticks()
+        ax2.set_yticks(yticks[::3])        
+        '''
+
+
+        # same sharex
+        plt.subplots_adjust(left=0.05, bottom=0.08, right=0.95, top=0.95, wspace=0.15, hspace=0.00)
+        plt.setp(ax1.get_xticklabels(), visible=False)
+        yl = ax1.get_ylim()
+        # ax2 = plt.subplot(212, sharex=ax1)
+        ax2 = plt.subplot2grid((10, 1), (8, 0), rowspan=2, colspan=1,sharex=ax1)
+        # ax2.set_position(mat.transforms.Bbox([[0.125,0.1],[0.9,0.32]]))
+        volume = np.asarray(quotes.amount)
+        pos = quotes['open']-quotes['close']<0
+        neg = quotes['open']-quotes['close']>=0
+        idx = quotes.reset_index().index
+        ax2.bar(idx[pos],volume[pos],color='red',width=1,align='center')
+        ax2.bar(idx[neg],volume[neg],color='green',width=1,align='center')
+        yticks = ax2.get_yticks()
+        ax2.set_yticks(yticks[::3])
+        # plt.tight_layout()  
+        # plt.subplots_adjust(hspace=0.00, bottom=0.08) 
+        plt.xticks(rotation=15, horizontalalignment='center')
         # plt.bar(x_date_list,quotes.vol, label="Volume", color='b')
 
 
+        # quotes['vol'].plot(kind='bar', ax=ax2, color='g', alpha=0.1)
+        # ax2.set_ylim([0, ax2.get_ylim()[1] * 2])
+        # plt.gcf().subplots_adjust(bottom=0.15)
+        # fig.subplots_adjust(left=0.05, bottom=0.08, right=0.95, top=0.95, wspace=0.15, hspace=0.25)
+        #scale the x-axis tight
+        # ax2.set_xlim(min(x_date_list),max(x_date_list))
+        # the y-ticks for the bar were too dense, keep only every third one
         # plt.grid(True)
         # plt.xticks(rotation=30, horizontalalignment='center')
         # plt.setp( axs[1].xaxis.get_majorticklabels(), rotation=70 )
+        # plt.legend()
+        # plt.tight_layout()
+        # plt.draw()
         plt.show()
         # plt.show(block=False)
-    
+    # 
 import argparse
 def parseArgmain():
     try:
@@ -584,7 +623,7 @@ if __name__ == "__main__":
     # code = raw_input("code:")
     while 1:
         try:
-            # log.setLevel(LoggerFactory.INFO)
+            log.setLevel(LoggerFactory.INFO)
             # log.setLevel(LoggerFactory.DEBUG)
             code = raw_input("code:")
             args = parser.parse_args(code.split())
@@ -618,7 +657,9 @@ if __name__ == "__main__":
             # print "key"
             print "KeyboardInterrupt:", e
         except (IOError, EOFError, Exception) as e:
-            print "Error", e
+            # print "Error", e
+            import traceback
+            traceback.print_exc()
 
 '''
 #old chan

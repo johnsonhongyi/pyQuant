@@ -1750,23 +1750,6 @@ def getSinaAlldf(market='cyb', vol=ct.json_countVol, vtype=ct.json_countType, fi
 #    h5 = top_hdf_api(fname=h5_fname,table=h5_table,df=None)
     h5_fname = 'tdx_now'
     h5_table = 'all'
-    # h5 = h5a.load_hdf_db(h5_fname, table=h5_table, code_l=codelist)
-    # if h5 is not None and not h5.empty:
-    #     log.info("return %s %s hdf"%(h5_fname,h5_table))
-    #     return h5
-    # else:
-    #     log.info("init start %s %s hdf"%(h5_fname,h5_table))
-
-#        o_time = h5[h5.timel <> 0].timel
-#        if len(o_time) > 0:
-#            o_time = o_time[0]
-# print time.time() - o_time
-#            if not cct.get_work_time() or (not (915 < cct.get_now_time_int() < 930) and time.time() - o_time < ct.h5_limit_time):
-#                log.info("load hdf data ok:%s %s %s"%(h5_fname,h5_table,len(h5)))
-#                return h5
-
-    # index_status=False
-    # if isinstance(codelist, list):
     time_s = time.time()
     if not market_all:
         dm = sina_data.Sina().get_stock_list_data(codelist)
@@ -1847,6 +1830,8 @@ def getSinaAlldf(market='cyb', vol=ct.json_countVol, vtype=ct.json_countType, fi
     #             top_now = h5
     #             return h5
     print "in:%s b1>:%s it:%s" % (initTdxdata, len(top_now), round(time.time() - time_s, 1)),
+    if top_now is  None or len(top_now) ==0:
+        log.error("top_all is None :%s"%(top_now))
     return top_now
 
 
@@ -2629,6 +2614,7 @@ def get_tdx_all_day_LastDF(codeList, dt=None, ptype='close'):
 
 
 def get_append_lastp_to_df(top_all, lastpTDX_DF=None, dl=ct.PowerCountdl, end=None, ptype='low', filter='y', power=True, lastp=False, newdays=None, checknew=False, resample='d'):
+
     codelist = top_all.index.tolist()
 #    codelist = ['603169']
     log.info('toTDXlist:%s dl=%s end=%s ptype=%s' % (len(codelist), dl, end, ptype))

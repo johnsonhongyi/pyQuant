@@ -27,13 +27,14 @@ ax = fig.add_subplot(211)
 ax.plot(df.close)
 ax.set_xticklabels(df.index)
 plt.xticks(rotation=30, horizontalalignment='center')
-
+# plt.subplots_adjust(left=0.05, bottom=0.08, right=0.95, top=0.95, wspace=0.15, hspace=0.25)
 
 pad = 0.25
 yl = ax.get_ylim()
 ax.set_ylim(yl[0]-(yl[1]-yl[0])*pad,yl[1])
-ax2 = ax.twinx()
-ax2.set_position(matplotlib.transforms.Bbox([[0.125,0.1],[0.9,0.32]]))
+# ax2 = ax.twinx()
+ax2 = fig.add_subplot(211,sharex=ax)
+# ax2.set_position(matplotlib.transforms.Bbox([[0.125,0.1],[0.9,0.32]]))
 
 # ax2.bar([x for x in range(len(df.index))],df.vol)
 volume = np.asarray(df.vol)
@@ -42,7 +43,7 @@ neg = df['open']-df['close']>=0
 idx = df.reset_index().index
 ax2.bar(idx[pos],volume[pos],color='red',width=1,align='center')
 ax2.bar(idx[neg],volume[neg],color='green',width=1,align='center')
-
+# plt.subplots_adjust(left=0.05, bottom=0.08, right=0.95, top=0.95, wspace=0.15, hspace=0.25)
 
 # ax2 = ax.twinx() 
 # width = 0.4
@@ -50,7 +51,7 @@ ax2.bar(idx[neg],volume[neg],color='green',width=1,align='center')
 # df.vol.plot(kind='bar', color='red', ax=ax, width=width, position=1)
 # df.close.plot(kind='bar', color='blue', ax=ax2, width=width, position=0, sharex=False, sharey=False)
 
-ax_2 = fig.add_subplot(212, sharex=None, sharey=None) 
+ax_2 = fig.add_subplot(212, sharex=ax, sharey=None) 
 ax_22 = ax_2.twinx()
 ax_2.plot([1, 3, 5, 7, 9])
 ax_22.plot([1.0/x for x in [1, 3, 5, 7, 9]])

@@ -192,7 +192,9 @@ if __name__ == "__main__":
             # print "key"
             print "KeyboardInterrupt:", e
         except (IOError, EOFError, Exception) as e:
-            print "Error", e
+            # print "Error", e
+            import traceback
+            traceback.print_exc()
             # sys.exit(0)
     # log.setLevel(LoggerFactory.DEBUG)
     log.setLevel(LoggerFactory.INFO)
