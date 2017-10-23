@@ -72,8 +72,8 @@ show_mpl = True
 # quotes = get_price(stock_code, datetime.datetime.strptime(end_date, "%Y-%m-%d %H:%M:%S")-datetime.timedelta(days=stock_days) , end_date,\
 #                    frequency=stock_frequency,skip_paused=False,fq='pre')
 
-global cname_g
-cname_g ='-'
+# global dm
+# dm = []
 
 def show_chan_mpl(code,start_date,end_date,stock_days,resample,show_mpl=True,least_init=3,chanK_flag=False,windows=20):
     def get_least_khl_num(resample,idx=0,init_num=3):
@@ -182,18 +182,24 @@ def show_chan_mpl(code,start_date,end_date,stock_days,resample,show_mpl=True,lea
             # print "次级:",len(biIdx),biIdx,[str(k_data_c.index[x])[:10] for x in biIdx]
         return biIdx
 
-    def get_quotes_tdx(code, start=None, end=None, dl=120, resample='d'):
+    def get_quotes_tdx(code, start=None, end=None, dl=120, resample='d',show_name=True):
         
         quotes = tdd.get_tdx_append_now_df_api(code=stock_code, start=start, end=end, dl=dl).sort_index(ascending=True)
         if not resample == 'd' and resample in tdd.resample_dtype:
             quotes = tdd.get_tdx_stock_period_to_type(quotes, period_day=resample)
         quotes.index = quotes.index.astype('datetime64')
-        global cname_g
-        if 'name' in quotes.columns:
-            cname = quotes.name[0]
-            cname_g =cname
+        if show_name:
+            if 'name' in quotes.columns:
+                cname = quotes.name[0]
+                # cname_g =cname
+            else:
+                dm = tdd.get_sina_data_df(code)
+                if 'name' in dm.columns:
+                    cname = dm.name[0]
+                else:
+                    cname = '-'
         else:
-            cname = cname_g
+            cname = '-'
         if quotes is not None and len(quotes) >0:
             quotes = quotes.loc[:, ['open', 'close', 'high', 'low', 'vol', 'amount']]
         else:
@@ -202,7 +208,7 @@ def show_chan_mpl(code,start_date,end_date,stock_days,resample,show_mpl=True,lea
         return quotes,cname
 
 
-    quotes,cname = get_quotes_tdx(stock_code, start_date, end_date, dl=stock_days, resample=resample)
+    quotes,cname = get_quotes_tdx(stock_code, start_date, end_date, dl=stock_days, resample=resample,show_name=show_mpl)
     # quotes.rename(columns={'amount': 'money'}, inplace=True)
     # quotes.rename(columns={'vol': 'vol'}, inplace=True)
     # print quotes[-2:]
@@ -235,7 +241,7 @@ def show_chan_mpl(code,start_date,end_date,stock_days,resample,show_mpl=True,lea
         4 if stock_frequency == 'w' else \
         5 if stock_frequency == 'm' else 6
 
-    print '======笔形成最后一段未完成段判断是否是次级别的走势形成笔=======', stock_frequency, cur_ji
+    log.debug ('======笔形成最后一段未完成段判断是否是次级别的走势形成笔=======:%s %s'%(stock_frequency, cur_ji))
 
     x_date_list = quotes.index.values.tolist()
     # for x_date in x_date_list:
@@ -255,7 +261,12 @@ def show_chan_mpl(code,start_date,end_date,stock_days,resample,show_mpl=True,lea
     biIdx = con2Cxianduan(stock_code, k_data, chanK, frsBiType, biIdx, end_date, cur_ji,least_init=least_init)
     # log.debug("biIdx2:%s chanK:%s" % (biIdx, len(biIdx)))
     chanKIdx = [(chanK.index[x]) for x in biIdx]
-    log.debug("con2Cxianduan:%s chanK:%s %s" % (biIdx, len(chanK), chanKIdx[-1]))
+
+    if len(biIdx) == 0 and len(chanKIdx) ==0:
+        print "BiIdx is None and chanKidx is None:%s"%(code)
+        return None
+
+    log.debug("con2Cxianduan:%s chanK:%s %s" % (biIdx, len(chanK), chanKIdx[-1] if len(chanKIdx) >0 else None))
     # print quotes['close'].apply(lambda x:round(x,2))
 
     # print '股票代码', get_security_info(stock_code).display_name
@@ -436,7 +447,7 @@ def show_chan_mpl(code,start_date,end_date,stock_days,resample,show_mpl=True,lea
     K线图绘制完毕
     '''
 
-    print "biIdx:%s chankIdx:%s"%(biIdx,chanKIdx[-1])
+    # print "biIdx:%s chankIdx:%s"%(biIdx,str(chanKIdx[-1])[:10])
     if show_mpl:
         x_fenbi_seq,y_fenbi_seq = plot_fenbi_seq(biIdx, frsBiType, plt)
         # plot_fenbi_seq(fenIdx,fenTypes[0], plt,color=['red','green'])
@@ -485,12 +496,13 @@ def show_chan_mpl(code,start_date,end_date,stock_days,resample,show_mpl=True,lea
     kdh=k_data.loc[high_fen].high
     kdh_mode = dataframe_mode_round(kdh)
 
-    print "kdl:%s kdh:%s"%(kdl.values,kdh.values)
-    print "kdl_mode:%s kdh_mode%s chanKidx:%s"%(kdl_mode.values,kdh_mode.values,chanKIdx[-1])
+    print ("kdl:%s"%(kdl.values))
+    print ("kdh:%s"%(kdh.values))
+    print ("kdl_mode:%s kdh_mode%s chanKidx:%s"%(kdl_mode.values,kdh_mode.values,str(chanKIdx[-1])[:10]))
 
     lastdf = k_data[k_data.index >= chanKIdx[-1]]
-    keydf  = lastdf[(lastdf.close >= kdh_mode.max())|(lastdf.low >=kdh_mode.min())]
-    print "keydf:%s key:%s"%(None if len(keydf) == 0 else str(keydf.index.values[0])[:10],len(keydf))
+    keydf  = lastdf[((lastdf.close >= kdh_mode.max()) & (lastdf.low >=kdh_mode.min())) | ((lastdf.close <= kdl_mode.min()) & (lastdf.low <=kdl_mode.min()))]
+    print ("keydf:%s key:%s"%(None if len(keydf) == 0 else str(keydf.index.values[0])[:10],len(keydf)))
     # import ipdb;ipdb.set_trace()
 
     log.debug ("Fentype:%s "%(fenTypes))
@@ -704,7 +716,7 @@ if __name__ == "__main__":
                     args.start = None
                 start = cct.day8_to_day10(args.start)
                 end = cct.day8_to_day10(args.end)
-                print "chank:%s"%(args.chanK_flag)
+                # print "chank:%s"%(args.chanK_flag)
                 if args.mpl == 'y':
                     show_chan_mpl(args.code, args.start, args.end, args.dl, args.dtype, show_mpl=True,least_init=args.least,chanK_flag=args.chanK_flag)
                 else:
