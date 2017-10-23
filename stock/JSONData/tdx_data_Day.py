@@ -37,7 +37,8 @@ global initTdxdata, initTushareCsv
 initTdxdata = 0
 initTushareCsv = 0
 atomStockSize = 50
-tdx_index_code_list = ['999999', '399006', '399005', '399001']
+tdx_index_code_list = ['999999', '399001']
+# tdx_index_code_list = ['999999', '399006', '399005', '399001']
 # win7rootAsus = r'D:\Program Files\gfzq'
 # win10Lengend = r'D:\Program\gfzq'
 # win7rootXunji = r'E:\DOC\Parallels\WinTools\zd_pazq'
@@ -1252,13 +1253,13 @@ def write_tdx_sina_data_to_file(code, dm=None, df=None, dl=2, type='f'):
             tdate = date
             if len(tdate) != 10:
                 continue
-            topen = str(td.open)
-            thigh = str(td.high)
-            tlow = str(td.low)
-            tclose = str(td.close)
+            topen = str(round(td.open,2))
+            thigh = str(round(td.high,2))
+            tlow = str(round(td.low,2))
+            tclose = str(round(td.close,2))
             # tvol = round(float(a[5]) / 10, 2)
-            tvol = str(td.vol)
-            amount = str(td.amount)
+            tvol = str(round(td.vol,2))
+            amount = str(round(td.amount,2))
             tdata = tdate + ',' + topen + ',' + thigh + ',' + tlow + \
                 ',' + tclose + ',' + tvol + ',' + amount + '\r\n'
             w_data.append(tdata)

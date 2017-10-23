@@ -752,7 +752,8 @@ def get_market_price_sina_dd_realTime(dp='',vol='0',type='0'):
 
         dp['dff']=0
         df=get_sina_all_json_dd(vol,type)
-        if len(df)>10:
+
+        if len(df)>5:
 
             # print df[df.couts>0][:2]
             dm = cct.combine_dataFrame(dp,df)
@@ -771,8 +772,9 @@ def get_market_price_sina_dd_realTime(dp='',vol='0',type='0'):
             # dm.ratio=dm.ratio
             # dm=dm.loc[:,ct.SINA_Market_Clean_UP_Columns]
         else:
-            if len(dp) > 0 and 'code' in dp.columns:
-                dp=dp.set_index('code')
+            # if len(dp) > 0 and 'code' in dp.columns:
+            if len(dp) > 0:
+                if 'code' in dp.columns:dp=dp.set_index('code')
                 dp['couts'] = 0
                 dp['prev_p'] = 0
                 dm = dp

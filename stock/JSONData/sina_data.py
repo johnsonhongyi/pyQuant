@@ -699,9 +699,10 @@ if __name__ == "__main__":
     # df = sina.get_stock_code_data('000001',index=True).set_index('code')
     # df= sina.get_stock_code_data('999999,399001',index=True)
     # sys.exit(0)
-    code_agg = '603277'
+    code_agg = '399006'
     dd = sina.get_stock_code_data([code_agg, '000831', '300306', '600007'])
     print dd.loc[:, ['close', 'nclose', 'nlow', 'nhigh', 'nstd', 'ticktime']], dd.shape
+    print dd.loc[code_agg].T
     # print df.columns
     # df = sina.all
     # print df.nlow[:5]

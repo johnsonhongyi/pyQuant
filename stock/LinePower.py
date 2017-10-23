@@ -91,7 +91,7 @@ if __name__ == "__main__":
 
 
             elif len(str(args.code)) == 6:
-                if args.start is not None and len(args.start) < 4:
+                if args.start is not None and len(args.start) <= 4:
                     args.dl = int(args.start)
                     args.start = None
                 start = cct.day8_to_day10(args.start)

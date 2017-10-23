@@ -905,7 +905,6 @@ def get_linear_model_candles(code, ptype='low', dtype='d', start=None, end=None,
     volume = np.asarray(df.amount)
     pos = df['open']-df['close']<0
     neg = df['open']-df['close']>=0
-    import pdb;pdb.set_trace();
     if 'date' in df.columns:
         df = df.drop(['date'],axis=1)
     idx = df.reset_index().index
@@ -1335,7 +1334,7 @@ if __name__ == "__main__":
             code = raw_input("code:")
             args = parser.parse_args(code.split())
             if len(str(args.code)) == 6:
-                if args.start is not None and len(args.start) < 4:
+                if args.start is not None and len(args.start) <= 4:
                     args.dl = int(args.start)
                     args.start = None
                 # ptype='f', df=None, dtype='d', type='m', start=None, end=None, days=1, filter='n'):

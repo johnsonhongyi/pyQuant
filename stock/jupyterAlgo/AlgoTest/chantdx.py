@@ -194,7 +194,11 @@ def show_chan_mpl(code,start_date,end_date,stock_days,resample,show_mpl=True,lea
             cname_g =cname
         else:
             cname = cname_g
-        quotes = quotes.loc[:, ['open', 'close', 'high', 'low', 'vol', 'amount']]
+        if quotes is not None and len(quotes) >0:
+            quotes = quotes.loc[:, ['open', 'close', 'high', 'low', 'vol', 'amount']]
+        else:
+            # log.error("quotes is None check:%s"%(code))
+            raise Exception("Code:%s error, df is None%s"%(code))
         return quotes,cname
 
 
@@ -231,11 +235,7 @@ def show_chan_mpl(code,start_date,end_date,stock_days,resample,show_mpl=True,lea
         4 if stock_frequency == 'w' else \
         5 if stock_frequency == 'm' else 6
 
-
     print '======笔形成最后一段未完成段判断是否是次级别的走势形成笔=======', stock_frequency, cur_ji
-
-
-
 
     x_date_list = quotes.index.values.tolist()
     # for x_date in x_date_list:
@@ -248,19 +248,21 @@ def show_chan_mpl(code,start_date,end_date,stock_days,resample,show_mpl=True,lea
     chanK = quotes if chanK_flag else chan.parse2ChanK(k_data, k_values,chan_kdf=chanK_flag)
 
     fenTypes, fenIdx = chan.parse2ChanFen(chanK)
-    log.debug("code:%s fenTypes:%s fenIdx:%s k_data:%s" % (stock_code,fenTypes[3], fenIdx[3], len(k_data)))
+    # log.debug("code:%s fenTypes:%s fenIdx:%s k_data:%s" % (stock_code,fenTypes, fenIdx, len(k_data)))
     biIdx, frsBiType = chan.parse2ChanBi(fenTypes, fenIdx, chanK, least_khl_num=least_khl_num)
-    log.debug("biIdx1:%s chanK:%s" % (biIdx, len(chanK)))
+    # log.debug("biIdx1:%s chanK:%s" % (biIdx, len(chanK)))
 
     biIdx = con2Cxianduan(stock_code, k_data, chanK, frsBiType, biIdx, end_date, cur_ji,least_init=least_init)
-    log.debug("con2Cxianduan:%s chanK:%s %s" % (biIdx, len(chanK), [str(chanK.index[x])[:10] for x in biIdx]))
+    # log.debug("biIdx2:%s chanK:%s" % (biIdx, len(biIdx)))
+    chanKIdx = [(chanK.index[x]) for x in biIdx]
+    log.debug("con2Cxianduan:%s chanK:%s %s" % (biIdx, len(chanK), chanKIdx[-1]))
     # print quotes['close'].apply(lambda x:round(x,2))
 
     # print '股票代码', get_security_info(stock_code).display_name
     # print '股票代码', (stock_code), resample, least_khl_num
     #  3.得到分笔结果，计算坐标显示
 
-    def plot_fenbi_seq(biIdx,frsBiType,plt,color=None):
+    def plot_fenbi_seq(biIdx,frsBiType,plt=None,color=None):
         x_fenbi_seq = []
         y_fenbi_seq = []
         for i in range(len(biIdx)):
@@ -273,24 +275,26 @@ def show_chan_mpl(code,start_date,end_date,stock_days,resample,show_mpl=True,lea
                 time_long = long(time.mktime((dt + datetime.timedelta(hours=8)).timetuple()) * 1000000000)
                 # print x_date_list.index(time_long) if time_long in x_date_list else 0
                 if fenType == 1:
-                    if color is None:
-                        plt.text(x_date_list.index(time_long), k_data['high'][dt],
-                                 str(k_data['high'][dt]), ha='left', fontsize=12)
-                    else:
-                        col_v = color[0] if fenType > 0 else color[1]
-                        plt.text(x_date_list.index(time_long), k_data['high'][dt],
-                                 str(k_data['high'][dt]), ha='left', fontsize=12,bbox=dict(facecolor=col_v, alpha=0.5))
+                    if plt is not None:
+                        if color is None:
+                            plt.text(x_date_list.index(time_long), k_data['high'][dt],
+                                     str(k_data['high'][dt]), ha='left', fontsize=12)
+                        else:
+                            col_v = color[0] if fenType > 0 else color[1]
+                            plt.text(x_date_list.index(time_long), k_data['high'][dt],
+                                     str(k_data['high'][dt]), ha='left', fontsize=12,bbox=dict(facecolor=col_v, alpha=0.5))
 
                     x_fenbi_seq.append(x_date_list.index(time_long))
                     y_fenbi_seq.append(k_data['high'][dt])
                 if fenType == -1:
-                    if color is None:
-                        plt.text(x_date_list.index(time_long), k_data['low'][dt],
-                                 str(k_data['low'][dt]), va='bottom', fontsize=12)
-                    else:
-                        col_v = color[0] if fenType > 0 else color[1]
-                        plt.text(x_date_list.index(time_long), k_data['low'][dt],
-                                 str(k_data['low'][dt]), va='bottom', fontsize=12,bbox=dict(facecolor=col_v, alpha=0.5))
+                    if plt is not None:
+                        if color is None:
+                            plt.text(x_date_list.index(time_long), k_data['low'][dt],
+                                     str(k_data['low'][dt]), va='bottom', fontsize=12)
+                        else:
+                            col_v = color[0] if fenType > 0 else color[1]
+                            plt.text(x_date_list.index(time_long), k_data['low'][dt],
+                                     str(k_data['low'][dt]), va='bottom', fontsize=12,bbox=dict(facecolor=col_v, alpha=0.5))
 
                     x_fenbi_seq.append(x_date_list.index(time_long))
                     y_fenbi_seq.append(k_data['low'][dt])
@@ -303,98 +307,6 @@ def show_chan_mpl(code,start_date,end_date,stock_days,resample,show_mpl=True,lea
     #             x_fenbi_seq.append(x_date_list.index(long(time.mktime(datetime.strptime(bottom_time, "%Y-%m-%d %H:%M:%S").timetuple())*1000000000)))
     #             y_fenbi_seq.append(m_line_dto.low)
         return x_fenbi_seq,y_fenbi_seq
-
-
-    # ht = HoverTool(tooltips=[
-    #             ("date", "@date"),
-    #             ("open", "@open"),
-    #             ("close", "@close"),
-    #             ("high", "@high"),
-    #             ("low", "@low"),
-    #             ("volume", "@volume"),
-    #             ("money", "@money"),])
-    # TOOLS = [ht, WheelZoomTool(dimensions=['width']),\
-    #          ResizeTool(), ResetTool(),\
-    #          PanTool(dimensions=['width']), PreviewSaveTool()]
-
-    fig = plt.figure(figsize=(10, 6))
-    ax1 = plt.subplot2grid((10, 1), (0, 0), rowspan=8, colspan=1)
-    # ax1 = fig.add_subplot(2,1,1)
-    #fig = plt.figure()
-    #ax1 = plt.axes([0,0,3,2])
-
-    X = np.array(range(0, length))
-    pad_nan = X + nan
-
-    # 计算上 下影线
-    max_clop = Close.copy()
-    max_clop[Close < Open] = Open[Close < Open]
-    min_clop = Close.copy()
-    min_clop[Close > Open] = Open[Close > Open]
-
-    # 上影线
-    line_up = np.array([High, max_clop, pad_nan])
-    line_up = np.ravel(line_up, 'F')
-    # 下影线
-    line_down = np.array([Low, min_clop, pad_nan])
-    line_down = np.ravel(line_down, 'F')
-
-    # 计算上下影线对应的X坐标
-    pad_nan = nan + X
-    pad_X = np.array([X, X, X])
-    pad_X = np.ravel(pad_X, 'F')
-
-    # 画出实体部分,先画收盘价在上的部分
-    up_cl = Close.copy()
-    up_cl[Close <= Open] = nan
-    up_op = Open.copy()
-    up_op[Close <= Open] = nan
-
-    down_cl = Close.copy()
-    down_cl[Open <= Close] = nan
-    down_op = Open.copy()
-    down_op[Open <= Close] = nan
-
-    even = Close.copy()
-    even[Close != Open] = nan
-
-    # 画出收红的实体部分
-    pad_box_up = np.array([up_op, up_op, up_cl, up_cl, pad_nan])
-    pad_box_up = np.ravel(pad_box_up, 'F')
-    pad_box_down = np.array([down_cl, down_cl, down_op, down_op, pad_nan])
-    pad_box_down = np.ravel(pad_box_down, 'F')
-    pad_box_even = np.array([even, even, even, even, pad_nan])
-    pad_box_even = np.ravel(pad_box_even, 'F')
-
-    # X的nan可以不用与y一一对应
-    X_left = X - 0.25
-    X_right = X + 0.25
-    box_X = np.array([X_left, X_right, X_right, X_left, pad_nan])
-    # print box_X
-    box_X = np.ravel(box_X, 'F')
-    # print box_X
-    # Close_handle=plt.plot(pad_X,line_up,color='k')
-
-    vertices_up = np.array([box_X, pad_box_up]).T
-    vertices_down = np.array([box_X, pad_box_down]).T
-    vertices_even = np.array([box_X, pad_box_even]).T
-
-    handle_box_up = mat.patches.Polygon(vertices_up, color='r', zorder=1)
-    handle_box_down = mat.patches.Polygon(vertices_down, color='g', zorder=1)
-    handle_box_even = mat.patches.Polygon(vertices_even, color='k', zorder=1)
-
-    ax1.add_patch(handle_box_up)
-    ax1.add_patch(handle_box_down)
-    ax1.add_patch(handle_box_even)
-
-    handle_line_up = mat.lines.Line2D(pad_X, line_up, color='k', linestyle='solid', zorder=0)
-    handle_line_down = mat.lines.Line2D(pad_X, line_down, color='k', linestyle='solid', zorder=0)
-
-    ax1.add_line(handle_line_up)
-    ax1.add_line(handle_line_down)
-
-    v = [0, length, Open.min() - 0.5, Open.max() + 0.5]
-    plt.axis(v)
 
     # print  T0[-len(T0):].astype(dt.date)
     T1 = T0[-len(T0):].astype(datetime.date) / 1000000000
@@ -413,16 +325,109 @@ def show_chan_mpl(code,start_date,end_date,stock_days,resample,show_mpl=True,lea
     d2 = (d1 + datetime.timedelta(days=1)).strftime('$%Y-%m-%d$')
     Ti.append(d2)
 
-    ax1.set_xticks(np.linspace(-2, len(Close) + 2, len(Ti)))
 
     ll = Low.min() * 0.97
     hh = High.max() * 1.03
-    ax1.set_ylim(ll, hh)
 
-    ax1.set_xticklabels(Ti)
+    # ht = HoverTool(tooltips=[
+    #             ("date", "@date"),
+    #             ("open", "@open"),
+    #             ("close", "@close"),
+    #             ("high", "@high"),
+    #             ("low", "@low"),
+    #             ("volume", "@volume"),
+    #             ("money", "@money"),])
+    # TOOLS = [ht, WheelZoomTool(dimensions=['width']),\
+    #          ResizeTool(), ResetTool(),\
+    #          PanTool(dimensions=['width']), PreviewSaveTool()]
+    if show_mpl:
+        fig = plt.figure(figsize=(10, 6))
+        ax1 = plt.subplot2grid((10, 1), (0, 0), rowspan=8, colspan=1)
+        # ax1 = fig.add_subplot(2,1,1)
+        #fig = plt.figure()
+        #ax1 = plt.axes([0,0,3,2])
 
-    plt.grid(True)
-    plt.setp(plt.gca().get_xticklabels(), rotation=30, horizontalalignment='right')
+        X = np.array(range(0, length))
+        pad_nan = X + nan
+
+        # 计算上 下影线
+        max_clop = Close.copy()
+        max_clop[Close < Open] = Open[Close < Open]
+        min_clop = Close.copy()
+        min_clop[Close > Open] = Open[Close > Open]
+
+        # 上影线
+        line_up = np.array([High, max_clop, pad_nan])
+        line_up = np.ravel(line_up, 'F')
+        # 下影线
+        line_down = np.array([Low, min_clop, pad_nan])
+        line_down = np.ravel(line_down, 'F')
+
+        # 计算上下影线对应的X坐标
+        pad_nan = nan + X
+        pad_X = np.array([X, X, X])
+        pad_X = np.ravel(pad_X, 'F')
+
+        # 画出实体部分,先画收盘价在上的部分
+        up_cl = Close.copy()
+        up_cl[Close <= Open] = nan
+        up_op = Open.copy()
+        up_op[Close <= Open] = nan
+
+        down_cl = Close.copy()
+        down_cl[Open <= Close] = nan
+        down_op = Open.copy()
+        down_op[Open <= Close] = nan
+
+        even = Close.copy()
+        even[Close != Open] = nan
+
+        # 画出收红的实体部分
+        pad_box_up = np.array([up_op, up_op, up_cl, up_cl, pad_nan])
+        pad_box_up = np.ravel(pad_box_up, 'F')
+        pad_box_down = np.array([down_cl, down_cl, down_op, down_op, pad_nan])
+        pad_box_down = np.ravel(pad_box_down, 'F')
+        pad_box_even = np.array([even, even, even, even, pad_nan])
+        pad_box_even = np.ravel(pad_box_even, 'F')
+
+        # X的nan可以不用与y一一对应
+        X_left = X - 0.25
+        X_right = X + 0.25
+        box_X = np.array([X_left, X_right, X_right, X_left, pad_nan])
+        # print box_X
+        box_X = np.ravel(box_X, 'F')
+        # print box_X
+        # Close_handle=plt.plot(pad_X,line_up,color='k')
+
+        vertices_up = np.array([box_X, pad_box_up]).T
+        vertices_down = np.array([box_X, pad_box_down]).T
+        vertices_even = np.array([box_X, pad_box_even]).T
+
+        handle_box_up = mat.patches.Polygon(vertices_up, color='r', zorder=1)
+        handle_box_down = mat.patches.Polygon(vertices_down, color='g', zorder=1)
+        handle_box_even = mat.patches.Polygon(vertices_even, color='k', zorder=1)
+
+        ax1.add_patch(handle_box_up)
+        ax1.add_patch(handle_box_down)
+        ax1.add_patch(handle_box_even)
+
+        handle_line_up = mat.lines.Line2D(pad_X, line_up, color='k', linestyle='solid', zorder=0)
+        handle_line_down = mat.lines.Line2D(pad_X, line_down, color='k', linestyle='solid', zorder=0)
+
+        ax1.add_line(handle_line_up)
+        ax1.add_line(handle_line_down)
+
+        v = [0, length, Open.min() - 0.5, Open.max() + 0.5]
+        plt.axis(v)
+
+        ax1.set_xticks(np.linspace(-2, len(Close) + 2, len(Ti)))
+
+        ax1.set_ylim(ll, hh)
+
+        ax1.set_xticklabels(Ti)
+
+        plt.grid(True)
+        plt.setp(plt.gca().get_xticklabels(), rotation=30, horizontalalignment='right')
 
     '''
     以上代码拷贝自https://www.joinquant.com/post/1756
@@ -431,25 +436,84 @@ def show_chan_mpl(code,start_date,end_date,stock_days,resample,show_mpl=True,lea
     K线图绘制完毕
     '''
 
-
-    x_fenbi_seq,y_fenbi_seq = plot_fenbi_seq(biIdx, frsBiType, plt)
-    # plot_fenbi_seq(fenIdx,fenTypes[0], plt,color=['red','green'])
-    plot_fenbi_seq(fenIdx,frsBiType, plt,color=['red','green'])
+    print "biIdx:%s chankIdx:%s"%(biIdx,chanKIdx[-1])
+    if show_mpl:
+        x_fenbi_seq,y_fenbi_seq = plot_fenbi_seq(biIdx, frsBiType, plt)
+        # plot_fenbi_seq(fenIdx,fenTypes[0], plt,color=['red','green'])
+        plot_fenbi_seq(fenIdx,frsBiType, plt,color=['red','green'])
+    else:
+        x_fenbi_seq,y_fenbi_seq = plot_fenbi_seq(biIdx, frsBiType, plt=None)
+        plot_fenbi_seq(fenIdx,frsBiType, plt=None,color=['red','green'])
     #  在原图基础上添加分笔蓝线
     inx_value = chanK.high.values
     inx_va = [round(inx_value[x], 2) for x in biIdx]
     log.debug("inx_va:%s count:%s"%(inx_va, len(quotes.high)))
     log.debug("yfenbi:%s count:%s"%([round(y, 2) for y in y_fenbi_seq], len(chanK)))
     j_BiType = [-frsBiType if i % 2 == 0 else frsBiType for i in range(len(biIdx))]
-    bi_price = [str(chanK.low[idx]) if i % 2 == 0 else str(chanK.high[idx])  for i,idx in enumerate(biIdx)]
+    # bi_price = [str(chanK.low[idx]) if i % 2 == 0 else str(chanK.high[idx])  for i,idx in enumerate(biIdx)]
     # print ("笔     :%s %s"%(biIdx,bi_price))
-    print ("BiType :%s frsBiType:%s"%(j_BiType,frsBiType))
-    tb_price = [str(quotes.low[idx]) if i % 2 == 0 else str(quotes.high[idx])  for i,idx in enumerate(x_fenbi_seq)]
-    print "图笔 :", x_fenbi_seq,tb_price
+    # fen_dt = [str(chanK.index[fenIdx[i]])[:10] if chanK_flag else str(chanK['enddate'][fenIdx[i]])[:10]for i in range(len(fenIdx))]
+    fen_dt = [(chanK.index[fenIdx[i]]) if chanK_flag else (chanK['enddate'][fenIdx[i]]) for i in range(len(fenIdx))]
+    if len(fenTypes)>0:
+        if fenTypes[0] == -1:
+            # fen_price = [str(k_data.low[idx]) if i % 2 == 0 else str(k_data.high[idx])  for i,idx in enumerate(fen_dt)]
+            low_fen = [ idx for i,idx in enumerate(fen_dt)  if i % 2 == 0 ]
+            high_fen = [ idx  for i,idx in enumerate(fen_dt) if i % 2 <> 0  ]
+        else:
+            # fen_price = [str(k_data.high[idx]) if i % 2 == 0 else str(k_data.low[idx])  for i,idx in enumerate(fen_dt)]    
+            high_fen = [idx for i,idx in enumerate(fen_dt)  if i % 2 == 0  ]
+            low_fen = [ idx for i,idx in enumerate(fen_dt)  if i % 2 <> 0 ]
+        # fen_duration =[fenIdx[i] - fenIdx[i -1 ] if i >0 else 0 for i,idx in enumerate(fenIdx)]
+    else:
+        # fen_price = fenTypes
+        # fen_duration = fenTypes
+        low_fen = []
+        high_fen = []
+    # fen_dt = [str(k_data.index[idx])[:10] for i,idx in enumerate(fenIdx)]
+    # print low_fen,high_fen
+    def dataframe_mode_round(df):
+        roundlist = [1,0]
+        df_mode = []
+        for i in roundlist:
+            df_mode = df.apply(lambda x:round(x,i)).mode()
+            if len(df_mode) > 0:
+                break
+        return df_mode
+     
+    kdl= k_data.loc[low_fen].low
+    kdl_mode = dataframe_mode_round(kdl)
+    kdh=k_data.loc[high_fen].high
+    kdh_mode = dataframe_mode_round(kdh)
 
-    plt.plot(x_fenbi_seq, y_fenbi_seq)
-    plt.legend([stock_code,cname], loc=0)
-    plt.title(stock_code + " | "+ cname+ " | " + str(quotes.index[-1])[:10], fontsize=14)
+    print "kdl:%s kdh:%s"%(kdl.values,kdh.values)
+    print "kdl_mode:%s kdh_mode%s chanKidx:%s"%(kdl_mode.values,kdh_mode.values,chanKIdx[-1])
+
+    lastdf = k_data[k_data.index >= chanKIdx[-1]]
+    keydf  = lastdf[(lastdf.close >= kdh_mode.max())|(lastdf.low >=kdh_mode.min())]
+    print "keydf:%s key:%s"%(None if len(keydf) == 0 else str(keydf.index.values[0])[:10],len(keydf))
+    # import ipdb;ipdb.set_trace()
+
+    log.debug ("Fentype:%s "%(fenTypes))
+    log.debug ("fenIdx:%s "%(fenIdx))
+    # print ("fen_duration:%s "%(fen_duration))
+    # print ("fen_price:%s "%(fen_price))
+    # print ("fendt:%s "%(fen_dt))
+
+    print ("BiType :%s frsBiType:%s"%(j_BiType,frsBiType))
+
+    if len(j_BiType) >0:
+        if j_BiType[0] == -1:
+            tb_price = [str(quotes.low[idx]) if i % 2 == 0 else str(quotes.high[idx])  for i,idx in enumerate(x_fenbi_seq)]
+        else:
+            tb_price = [str(quotes.high[idx]) if i % 2 == 0 else str(quotes.low[idx])  for i,idx in enumerate(x_fenbi_seq)]
+        tb_duration =[x_fenbi_seq[i] - x_fenbi_seq[i -1 ] if i >0 else 0 for i,idx in enumerate(x_fenbi_seq)]
+        
+    else:
+        tb_price = j_BiType
+        tb_duration = j_BiType
+    print "图笔 :", x_fenbi_seq,tb_price
+    print "图笔dura :", tb_duration
+
 
     # 线段画到笔上
     xdIdxs, xfenTypes = chan.parse2ChanXD(frsBiType, biIdx, chanK)
@@ -485,12 +549,16 @@ def show_chan_mpl(code,start_date,end_date,stock_days,resample,show_mpl=True,lea
     print ("笔值  :%s"%([str(x) for x in (y_xd_seq)]))
     # Y_hat = X * b + a
 
-    plt.plot(x_xd_seq, y_xd_seq)
-    if len(quotes) > windows:
-        roll_mean = pd.rolling_mean(quotes.close, window=windows)
-        plt.plot(roll_mean, 'r')
 
     if show_mpl:
+        plt.plot(x_fenbi_seq, y_fenbi_seq)
+        plt.legend([stock_code,cname], loc=0)
+        plt.title(stock_code + " | "+ cname+ " | " + str(quotes.index[-1])[:10], fontsize=14)
+       
+        plt.plot(x_xd_seq, y_xd_seq)
+        if len(quotes) > windows:
+            roll_mean = pd.rolling_mean(quotes.close, window=windows)
+            plt.plot(roll_mean, 'r')
         zp = zoompan.ZoomPan()
         figZoom = zp.zoom_factory(ax1, base_scale=1.1)
         figPan = zp.pan_factory(ax1)
@@ -558,8 +626,8 @@ def show_chan_mpl(code,start_date,end_date,stock_days,resample,show_mpl=True,lea
         # plt.legend()
         # plt.tight_layout()
         # plt.draw()
-        plt.show()
-        # plt.show(block=False)
+        # plt.show()
+        plt.show(block=False)
     # 
 import argparse
 def parseArgmain():
@@ -577,7 +645,7 @@ def parseArgmain():
         parser.add_argument('-m', action="store", dest="mpl", type=str, default='y',help='mpl show')
         parser.add_argument('-i', action="store", dest="line", type=str, choices=['y', 'n'], default='y', help='LineHis show')
         parser.add_argument('-w', action="store", dest="wencai", type=str, choices=['y', 'n'], default='n',help='WenCai Search')
-        parser.add_argument('-k', action="store", dest="chanK_flag", type=bool, choices=[1, 0], default=0,help='WenCai Search')
+        parser.add_argument('-k', action="store", dest="chanK_flag", type=int, choices=[1, 0], default=0,help='WenCai Search')
         parser.add_argument('-le', action="store", dest="least", type=int,default=2,help='least_init 2')
         return parser
     except Exception, e:
@@ -631,12 +699,12 @@ if __name__ == "__main__":
             # print str(args.days)
 
             if len(str(args.code)) == 6:
-                if args.start is not None and len(args.start) < 4:
+                if args.start is not None and len(args.start) <= 4:
                     args.dl = int(args.start)
                     args.start = None
                 start = cct.day8_to_day10(args.start)
                 end = cct.day8_to_day10(args.end)
-
+                print "chank:%s"%(args.chanK_flag)
                 if args.mpl == 'y':
                     show_chan_mpl(args.code, args.start, args.end, args.dl, args.dtype, show_mpl=True,least_init=args.least,chanK_flag=args.chanK_flag)
                 else:
