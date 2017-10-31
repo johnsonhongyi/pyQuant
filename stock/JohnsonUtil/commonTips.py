@@ -1368,7 +1368,8 @@ def get_config_value_wencai(fname, classtype, currvalue=0, xtype='limit', update
 def write_to_blocknew(p_name, data, append=True,doubleFile=True,keep_last=15):
     # index_list = ['1999999','47#IFL0',  '0399006', '27#HSI']
     # index_list = ['1999999','47#IFL0', '27#HSI',  '0399006']
-    index_list = ['1999999','0399001','47#IFL0', '27#HSI',  '0159915']
+    # index_list = ['1999999','0399001','47#IFL0', '27#HSI',  '0159915']
+    index_list = ['1999999','0399001', '0159915']
     # index_list = ['1999999', '27#HSI',  '0159915']
 
     def writeBlocknew(p_name, data, append=True):
@@ -1424,7 +1425,8 @@ def write_to_blocknew(p_name, data, append=True,doubleFile=True,keep_last=15):
                             code = code + '\r\n'
                     flist.append(code)
                 # if errstatus:
-                fout.close()
+                if int(keep_last) > 0:
+                    fout.close()
                 # if p_name.find('066.blk') > 0:
                 #     writecount = ct.writeblockbakNum
                 # else:

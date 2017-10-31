@@ -37,8 +37,8 @@ global initTdxdata, initTushareCsv
 initTdxdata = 0
 initTushareCsv = 0
 atomStockSize = 50
-tdx_index_code_list = ['999999', '399001']
-# tdx_index_code_list = ['999999', '399006', '399005', '399001']
+# tdx_index_code_list = ['999999', '399001']
+tdx_index_code_list = ['999999', '399006', '399005', '399001']
 # win7rootAsus = r'D:\Program Files\gfzq'
 # win10Lengend = r'D:\Program\gfzq'
 # win7rootXunji = r'E:\DOC\Parallels\WinTools\zd_pazq'
