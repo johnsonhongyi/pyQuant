@@ -1061,12 +1061,14 @@ def show_chan_mpl(code,start_date,end_date,stock_days,resample,show_mpl=True,lea
 
     print ("kdl:%s"%(kdl.values))
     print ("kdh:%s"%(kdh.values))
-    print ("kdl_mode:%s kdh_mode%s chanKidx:%s"%(kdl_mode.values,kdh_mode.values,str(chanKIdx[-1])[:10]))
+    print ("kdl_modeX1:%s kdh_mode%s chanKidx:%s"%(kdl_mode.values,kdh_mode.values,str(chanKIdx[-1])[:10]))
 
     lkdl,lkdlidx = LIS(kdl)
     lkdh,lkdhidx = LIS(kdh)
-    print ("Lkdl:%s Lkdh:%s"%(len(kdl) - len(lkdl),len(kdh) - len(lkdh)))
-    print ("Gkdl:%s Gkdh:%s"%(grouby_list(kdl.values),grouby_list(kdh.values)))
+    l_status = len(kdl) - len(lkdl)
+    h_status = len(kdh) - len(lkdh)
+    print ("LkdlX2:%s Lkdh:%s UP:%s "%(l_status,h_status,h_status - l_status))
+    print ("Gkdl:%s Gkdh:%s"%(grouby_list(kdl.values)[:2],grouby_list(kdh.values)[:2]))
 
 
     lastdf = k_data[k_data.index >= chanKIdx[-1]]
@@ -1076,7 +1078,7 @@ def show_chan_mpl(code,start_date,end_date,stock_days,resample,show_mpl=True,lea
         keydf  = lastdf[((lastdf.close >= kdh_mode.max()) & (lastdf.high >=kdh_mode.min()))]
     else:
         keydf  = lastdf[((lastdf.close >= kdh_mode.max()) & (lastdf.high >=kdh_mode.min())) | ((lastdf.close <= kdl_mode.min()) & (lastdf.low <=kdl_mode.min()))]
-    print ("BiType_s:%s keydf:%s key:%s"%(BiType_s, None if len(keydf) == 0 else str(keydf.index.values[0])[:10],len(keydf)))
+    print ("BiType_sX3:%s keydf:%s key:%s"%(BiType_s, None if len(keydf) == 0 else str(keydf.index.values[0])[:10],len(keydf)))
     
     # return BiType_s,None if len(keydf) == 0 else str(keydf.index.values[0])[:10],len(keydf)
     # import ipdb;ipdb.set_trace()

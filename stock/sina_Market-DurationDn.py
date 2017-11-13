@@ -106,8 +106,8 @@ if __name__ == "__main__":
     resample = ct.resample_dtype
     # print cct.last_tddate(2)
     # end_date = cct.last_tddate(days=int(duration_date/4))
-    # end_date = cct.last_tddate(days=ct.lastdays)
-    end_date = None
+    end_date = cct.last_tddate(days=ct.lastdays)
+    # end_date = None
     ptype = 'high'
     filter = 'y'
     if len(str(duration_date)) < 4:

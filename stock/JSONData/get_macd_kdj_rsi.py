@@ -341,23 +341,21 @@ def Get_BBANDS(df, dtype='d', days=ct.Power_Ma_Days,dl=ct.PowerCountdl,dm=None,l
 #                    operate+=1
 #                else:
 #                    operate+=0.5
-#
-# elif lnowp > llastp:
-
+        top_v,high_v = 5,5
         if hnowp == lnowp and cnowp > clastp:
             operate += 1
         if cnowp == hnowp and cnowp >= openp:
             if cnowp >= clastp:
-                operate += 10
+                operate += top_v
         if cnowp >= hnowp * ct.changeRatio and cnowp > openp and openp >= lnowp * ct.changeRatio:
-            operate += 10
-        if cnowp >= openp * 1.04 and openp >= lnowp * ct.changeRatio:
-            operate += 5
+            operate += top_v
+        if cnowp >= openp * 1.02 and openp >= lnowp * ct.changeRatio:
+            operate += high_v
         # if cnowp > clastp and cnowp > upbbp:
         if cnowp > clastp and lnowp > upbbp:
-            operate += 10
+            operate += top_v
         elif hnowp > upbbp:
-            operate += 5
+            operate += high_v
     else:
         # print 'low'
         operate = -1
