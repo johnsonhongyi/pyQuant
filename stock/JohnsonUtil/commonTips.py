@@ -1956,7 +1956,8 @@ def get_col_in_columns(df,idx_value,key):
         [type] -- [description]
     """
     idx_k = 1
-    for inx in range(int(key) - 1, 1, -1):
+    # for inx in range(int(key) - 1, 1, -1): stock_filter
+    for inx in range(int(key), 1, -1):
         if idx_value % inx in df.columns:
             idx_k = inx
             break 

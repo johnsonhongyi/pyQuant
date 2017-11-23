@@ -1074,8 +1074,9 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y', tal
                 #     tdx_df = tdx_df[:-days]
                 #     # log.info("tdx_df:%s"%(len(tdx_df)))
                 tdx_days = len(tdx_df)
-
-                if 8 < tdx_days < ct.cxg_limit_days:
+                # if 8 < tdx_days < ct.cxg_limit_days:
+                if df.loc[code].per3d > 20 and 8 < tdx_days:
+                    # print code,df.loc[code].per2d
                     if tdx_days > 6:
                         top_count = 0
                         for day in range(len(tdx_df), 0, -1):

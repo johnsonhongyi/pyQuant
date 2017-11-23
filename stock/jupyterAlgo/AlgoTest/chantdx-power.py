@@ -122,7 +122,7 @@ def grouby_list(lst,div=None):
     return l
 # global dm
 # dm = []
-def show_chan_mpl_power(code,start_date,end_date,stock_days,resample,show_mpl=True,least_init=3,chanK_flag=False,windows=20,power=True):
+def show_chan_mpl_power(code,start_date,end_date,stock_days,resample,show_mpl=True,least_init=3,chanK_flag=False,windows=20,power=True,fb_show=0):
     def get_least_khl_num(resample,idx=0,init_num=3):
         # init = 3
         if init_num-idx >0:
@@ -291,7 +291,7 @@ def show_chan_mpl_power(code,start_date,end_date,stock_days,resample,show_mpl=Tr
     # print '股票代码', (stock_code), resample, least_khl_num
     #  3.得到分笔结果，计算坐标显示
 
-    def plot_fenbi_seq(biIdx,frsBiType,plt=None,color=None):
+    def plot_fenbi_seq(biIdx,frsBiType,plt=None,color=None,fb_show=0):
         x_fenbi_seq = []
         y_fenbi_seq = []
         for i in range(len(biIdx)):
@@ -308,7 +308,7 @@ def show_chan_mpl_power(code,start_date,end_date,stock_days,resample,show_mpl=Tr
                         if color is None:
                             plt.text(x_date_list.index(time_long), k_data['high'][dt],
                                      str(k_data['high'][dt]), ha='left', fontsize=12)
-                        else:
+                        elif fb_show:
                             col_v = color[0] if fenType > 0 else color[1]
                             plt.text(x_date_list.index(time_long), k_data['high'][dt],
                                      str(k_data['high'][dt]), ha='left', fontsize=12,bbox=dict(facecolor=col_v, alpha=0.5))
@@ -320,7 +320,7 @@ def show_chan_mpl_power(code,start_date,end_date,stock_days,resample,show_mpl=Tr
                         if color is None:
                             plt.text(x_date_list.index(time_long), k_data['low'][dt],
                                      str(k_data['low'][dt]), va='bottom', fontsize=12)
-                        else:
+                        elif fb_show:
                             col_v = color[0] if fenType > 0 else color[1]
                             plt.text(x_date_list.index(time_long), k_data['low'][dt],
                                      str(k_data['low'][dt]), va='bottom', fontsize=12,bbox=dict(facecolor=col_v, alpha=0.5))
@@ -469,10 +469,10 @@ def show_chan_mpl_power(code,start_date,end_date,stock_days,resample,show_mpl=Tr
     if show_mpl:
         x_fenbi_seq,y_fenbi_seq = plot_fenbi_seq(biIdx, frsBiType, plt)
         # plot_fenbi_seq(fenIdx,fenTypes[0], plt,color=['red','green'])
-        plot_fenbi_seq(fenIdx,frsBiType, plt,color=['red','green'])
+        plot_fenbi_seq(fenIdx,frsBiType, plt,color=['red','green'],fb_show=fb_show)
     else:
         x_fenbi_seq,y_fenbi_seq = plot_fenbi_seq(biIdx, frsBiType, plt=None)
-        plot_fenbi_seq(fenIdx,frsBiType, plt=None,color=['red','green'])
+        plot_fenbi_seq(fenIdx,frsBiType, plt=None,color=['red','green'],fb_show=fb_show)
     #  在原图基础上添加分笔蓝线
     inx_value = chanK.high.values
     inx_va = [round(inx_value[x], 2) for x in biIdx]
@@ -586,7 +586,12 @@ def show_chan_mpl_power(code,start_date,end_date,stock_days,resample,show_mpl=Tr
 
     if show_mpl:
         plt.plot(x_fenbi_seq, y_fenbi_seq)
-        plt.legend([stock_code,cname], loc=0)
+        # plt.legend([stock_code,cname], loc=0)
+        plt.legend([stock_code,cname,"Now:%s" % quotes.close[-1],'kdl:%s'%(kdl_mode.values),'kdh:%s'%(kdh_mode.values)], fontsize=12, loc=0)
+        if len(kdl_mode)>0:
+            plt.axhline(y=np.mean(kdl_mode.values),linewidth=2,color='red',linestyle="--")
+        if len(kdh_mode)>0:
+            plt.axhline(y=np.mean(kdh_mode.values),linewidth=2,color='green',linestyle="--")
         plt.title(stock_code + " | "+ cname+ " | " + str(quotes.index[-1])[:10], fontsize=14)
        
         plt.plot(x_xd_seq, y_xd_seq)
@@ -636,7 +641,7 @@ def show_chan_mpl_power(code,start_date,end_date,stock_days,resample,show_mpl=Tr
     # 
 
 
-def show_chan_mpl(code,start_date,end_date,stock_days,resample,show_mpl=True,least_init=3,chanK_flag=False,windows=20):
+def show_chan_mpl(code,start_date,end_date,stock_days,resample,show_mpl=True,least_init=3,chanK_flag=False,windows=20,fb_show=0):
     def get_least_khl_num(resample,idx=0,init_num=3):
         # init = 3
         if init_num-idx >0:
@@ -835,7 +840,7 @@ def show_chan_mpl(code,start_date,end_date,stock_days,resample,show_mpl=True,lea
     # print '股票代码', (stock_code), resample, least_khl_num
     #  3.得到分笔结果，计算坐标显示
 
-    def plot_fenbi_seq(biIdx,frsBiType,plt=None,color=None):
+    def plot_fenbi_seq(biIdx,frsBiType,plt=None,color=None,fb_show=0):
         x_fenbi_seq = []
         y_fenbi_seq = []
         for i in range(len(biIdx)):
@@ -852,7 +857,7 @@ def show_chan_mpl(code,start_date,end_date,stock_days,resample,show_mpl=True,lea
                         if color is None:
                             plt.text(x_date_list.index(time_long), k_data['high'][dt],
                                      str(k_data['high'][dt]), ha='left', fontsize=12)
-                        else:
+                        elif fb_show:
                             col_v = color[0] if fenType > 0 else color[1]
                             plt.text(x_date_list.index(time_long), k_data['high'][dt],
                                      str(k_data['high'][dt]), ha='left', fontsize=12,bbox=dict(facecolor=col_v, alpha=0.5))
@@ -864,7 +869,7 @@ def show_chan_mpl(code,start_date,end_date,stock_days,resample,show_mpl=True,lea
                         if color is None:
                             plt.text(x_date_list.index(time_long), k_data['low'][dt],
                                      str(k_data['low'][dt]), va='bottom', fontsize=12)
-                        else:
+                        elif fb_show:
                             col_v = color[0] if fenType > 0 else color[1]
                             plt.text(x_date_list.index(time_long), k_data['low'][dt],
                                      str(k_data['low'][dt]), va='bottom', fontsize=12,bbox=dict(facecolor=col_v, alpha=0.5))
@@ -1013,10 +1018,10 @@ def show_chan_mpl(code,start_date,end_date,stock_days,resample,show_mpl=True,lea
     if show_mpl:
         x_fenbi_seq,y_fenbi_seq = plot_fenbi_seq(biIdx, frsBiType, plt)
         # plot_fenbi_seq(fenIdx,fenTypes[0], plt,color=['red','green'])
-        plot_fenbi_seq(fenIdx,frsBiType, plt,color=['red','green'])
+        plot_fenbi_seq(fenIdx,frsBiType, plt,color=['red','green'],fb_show=fb_show)
     else:
         x_fenbi_seq,y_fenbi_seq = plot_fenbi_seq(biIdx, frsBiType, plt=None)
-        plot_fenbi_seq(fenIdx,frsBiType, plt=None,color=['red','green'])
+        plot_fenbi_seq(fenIdx,frsBiType, plt=None,color=['red','green'],fb_show=fb_show)
     #  在原图基础上添加分笔蓝线
     inx_value = chanK.high.values
     inx_va = [round(inx_value[x], 2) for x in biIdx]
@@ -1142,9 +1147,13 @@ def show_chan_mpl(code,start_date,end_date,stock_days,resample,show_mpl=True,lea
 
     if show_mpl:
         plt.plot(x_fenbi_seq, y_fenbi_seq)
-        plt.legend([stock_code,cname], loc=0)
+        # plt.legend([stock_code,cname], loc=0)
+        plt.legend([stock_code,cname,"Now:%s" % quotes.close[-1],'kdl:%s'%(kdl_mode.values),'kdh:%s'%(kdh_mode.values)], fontsize=12, loc=0)
+        if len(kdl_mode)>0:
+            plt.axhline(y=np.mean(kdl_mode.values),linewidth=2,color='red',linestyle="--")
+        if len(kdh_mode)>0:
+            plt.axhline(y=np.mean(kdh_mode.values),linewidth=2,color='green',linestyle="--")
         plt.title(stock_code + " | "+ cname+ " | " + str(quotes.index[-1])[:10], fontsize=14)
-       
         plt.plot(x_xd_seq, y_xd_seq)
         if len(quotes) > windows:
             roll_mean = pd.rolling_mean(quotes.close, window=windows)
@@ -1237,6 +1246,7 @@ def parseArgmain():
         parser.add_argument('-w', action="store", dest="wencai", type=str, choices=['y', 'n'], default='n',help='WenCai Search')
         parser.add_argument('-k', action="store", dest="chanK_flag", type=int, choices=[1, 0], default=0,help='WenCai Search')
         parser.add_argument('-le', action="store", dest="least", type=int,default=2,help='least_init 2')
+        parser.add_argument('-fb', action="store", dest="fb", type=int,choices=[1, 0], default=0,help='fb show')
         return parser
     except Exception, e:
         # print 'Eerror:',e
@@ -1297,10 +1307,10 @@ if __name__ == "__main__":
                 end = cct.day8_to_day10(args.end)
                 # print "chank:%s"%(args.chanK_flag)
                 if args.mpl == 'y':
-                    show_chan_mpl(args.code, args.start, args.end, args.dl, args.dtype, show_mpl=True,least_init=args.least,chanK_flag=args.chanK_flag)
+                    show_chan_mpl(args.code, args.start, args.end, args.dl, args.dtype, show_mpl=True,least_init=args.least,chanK_flag=args.chanK_flag,fb_show=args.fb)
                     # show_chan_mpl_power(args.code, args.start, args.end, args.dl, args.dtype, show_mpl=True,least_init=args.least,chanK_flag=args.chanK_flag)
                 else:
-                    show_chan_mpl_power(args.code, args.start, args.end, args.dl, args.dtype, show_mpl=False,least_init=args.least,chanK_flag=args.chanK_flag)
+                    show_chan_mpl_power(args.code, args.start, args.end, args.dl, args.dtype, show_mpl=False,least_init=args.least,chanK_flag=args.chanK_flag,fb_show=args.fb)
                 cct.sleep(0.1)
                 print ''
                 # ts=time.time()

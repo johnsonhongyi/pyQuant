@@ -41,7 +41,7 @@ def getBollFilter(df=None, boll=6, duration=ct.PowerCountdl, filter=True, ma5d=T
         return None
     else:
         df.loc[df.percent >= 9.94, 'percent'] = 10
-        if resample == 'd':
+        if resample in ['d' ,'w']:
             df.loc[df.per1d >= 9.94, 'per1d'] = 10
             df['percent'] = df['percent'].apply(lambda x: round(x, 1))
             # time_ss = time.time()
@@ -59,6 +59,8 @@ def getBollFilter(df=None, boll=6, duration=ct.PowerCountdl, filter=True, ma5d=T
             # print "idx_rnd",idx_rnd,df.ix[idx_rnd].lastp0d ,df.ix[idx_rnd].close,df.ix[idx_rnd].lastp0d != df.ix[idx_rnd].close
             if cct.get_work_time() or df.ix[idx_rnd].lastp0d <> df.ix[idx_rnd].close:
                 nowd, per1d = 0, 1
+                # import pdb;pdb.set_trace();
+                # print nowd,df['lastp%sd' %(nowd)]
                 df['perc_n'] = map(cct.func_compute_percd, df['close'], df['per%sd' % per1d], df['lastp%sd' %
                                                                                                  (nowd)], df['lasth%sd' % (nowd)], df['lastl%sd' % (nowd)], df['high'], df['low'])
             else:
@@ -141,18 +143,24 @@ def getBollFilter(df=None, boll=6, duration=ct.PowerCountdl, filter=True, ma5d=T
 
     if filter:
 
-        if cct.get_now_time_int() > 915 and cct.get_now_time_int() <= 1000:
-            # df = df[df.buy > df.hmax * ct.changeRatio]
-            df = df[df.buy > df.cmean * ct.changeRatioUp ]
-            # df = df[df.buy > df.cmean]
+        #filter
+        
+        # if cct.get_now_time_int() > 915 and cct.get_now_time_int() <= 1000:
+        #     # df = df[df.buy > df.hmax * ct.changeRatio]
+        #     df = df[df.buy > df.cmean * ct.changeRatioUp ]
+        #     # df = df[df.buy > df.cmean]
 
-        elif cct.get_now_time_int() > 1000 and cct.get_now_time_int() <= 1430:
-            # df = df[df.buy > df.hmax * ct.changeRatio]
-            df = df[df.buy > df.cmean * ct.changeRatioUp]
-            # df = df[df.buy > df.cmean]
-        else:
-            # df = df[df.buy > df.hmax * ct.changeRatio]
-            df = df[df.buy > df.cmean]
+        # elif cct.get_now_time_int() > 1000 and cct.get_now_time_int() <= 1430:
+        #     # df = df[df.buy > df.hmax * ct.changeRatio]
+        #     df = df[df.buy > df.cmean * ct.changeRatioUp]
+        #     # df = df[df.buy > df.cmean]
+        # else:
+        #     # df = df[df.buy > df.hmax * ct.changeRatio]
+        #     df = df[df.buy > df.cmean]
+
+
+
+
 
         # if ma5d:
         #     # op, ra, st, days = pct.get_linear_model_status('999999', filter='y', dl=dl, ptype='low')
