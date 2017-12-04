@@ -122,6 +122,7 @@ def grouby_list(lst,div=None):
     return l
 # global dm
 # dm = []
+# no show mpl
 def show_chan_mpl_power(code,start_date,end_date,stock_days,resample,show_mpl=True,least_init=3,chanK_flag=False,windows=20,power=True,fb_show=0):
     def get_least_khl_num(resample,idx=0,init_num=3):
         # init = 3
@@ -182,7 +183,7 @@ def show_chan_mpl_power(code,start_date,end_date,stock_days,resample,show_mpl=Tr
             print "次级别为:%s cur_ji:%s %s" % (resample, cur_ji, start_lastday)
             # print [chanK.index[x] for x in biIdx]
             k_data_c,cname = get_quotes_tdx(stock, start=start_lastday, end=end_date, dl=dl, resample=resample)
-            print k_data_c.index[0],k_data_c.index[-1]
+            # print k_data_c.index[0],k_data_c.index[-1]
             chanKc = chan.parse2ChanK(k_data_c, k_data_c.values) if chanK_flag else k_data_c
             fenTypesc, fenIdxc = chan.parse2ChanFen(chanKc, recursion=True)
             if len(fenTypesc) == 0:
@@ -190,10 +191,10 @@ def show_chan_mpl_power(code,start_date,end_date,stock_days,resample,show_mpl=Tr
             biIdxc, frsBiTypec = chan.parse2ChanBi(fenTypesc, fenIdxc, chanKc, least_khl_num=least_khl_num-1)
             if len(biIdxc) == 0:
                 return biIdx
-            print "biIdxc:", [round(k_data_c.high[x], 2) for x in biIdxc], [str(k_data_c.index[x])[:10] for x in biIdxc]
+            # print "biIdxc:", [round(k_data_c.high[x], 2) for x in biIdxc], [str(k_data_c.index[x])[:10] for x in biIdxc]
             xdIdxc, xdTypec = chan.parse2Xianduan(biIdxc, chanKc, least_windows=1 if least_khl_num > 0 else 0)
             biIdxc = con2Cxianduan(stock, k_data_c, chanKc, frsBiTypec, biIdxc, end_date, cur_ji + 1, recursion=True)
-            print "xdIdxc:%s xdTypec:%s biIdxc:%s" % (xdIdxc, xdTypec, biIdxc)
+            # print "xdIdxc:%s xdTypec:%s biIdxc:%s" % (xdIdxc, xdTypec, biIdxc)
             if len(xdIdxc) == 0:
                 return biIdx
             # 连接线段位为上级别的bi
@@ -515,14 +516,14 @@ def show_chan_mpl_power(code,start_date,end_date,stock_days,resample,show_mpl=Tr
     kdh=k_data.loc[high_fen].high
     kdh_mode = dataframe_mode_round(kdh)
 
-    print ("kdl:%s"%(kdl.values))
-    print ("kdh:%s"%(kdh.values))
-    print ("kdl_mode:%s kdh_mode%s chanKidx:%s"%(kdl_mode.values,kdh_mode.values,str(chanKIdx[-1])[:10]))
+    # print ("kdl:%s"%(kdl.values))
+    # print ("kdh:%s"%(kdh.values))
+    log.debug("kdl_mode:%s kdh_mode%s chanKidx:%s"%(kdl_mode.values,kdh_mode.values,str(chanKIdx[-1])[:10]))
   
     lkdl,lkdlidx = LIS(kdl)
     lkdh,lkdhidx = LIS(kdh)
-    print ("Lkdl:%s Lkdh:%s"%(len(kdl) - len(lkdl),len(kdh) - len(lkdh)))
-    print ("Gkdl:%s Gkdh:%s"%(grouby_list(kdl.values),grouby_list(kdh.values)))
+    log.debug("Lkdl:%s Lkdh:%s"%(len(kdl) - len(lkdl),len(kdh) - len(lkdh)))
+    # print ("Gkdl:%s Gkdh:%s"%(grouby_list(kdl.values),grouby_list(kdh.values)))
 
     lastdf = k_data[k_data.index >= chanKIdx[-1]]
     if BiType_s == -1:
@@ -531,18 +532,18 @@ def show_chan_mpl_power(code,start_date,end_date,stock_days,resample,show_mpl=Tr
         keydf  = lastdf[((lastdf.close >= kdh_mode.max()) & (lastdf.high >=kdh_mode.min()))]
     else:
         keydf  = lastdf[((lastdf.close >= kdh_mode.max()) & (lastdf.high >=kdh_mode.min())) | ((lastdf.close <= kdl_mode.min()) & (lastdf.low <=kdl_mode.min()))]
-    print ("BiType_s:%s keydf:%s key:%s"%(BiType_s, None if len(keydf) == 0 else str(keydf.index.values[0])[:10],len(keydf)))
+    log.debug("BiType_s:%s keydf:%s key:%s"%(BiType_s, None if len(keydf) == 0 else str(keydf.index.values[0])[:10],len(keydf)))
     
     if power:
         return BiType_s,None if len(keydf) == 0 else str(keydf.index.values[0])[:10],len(keydf)
 
-    log.debug ("Fentype:%s "%(fenTypes))
-    log.debug ("fenIdx:%s "%(fenIdx))
+    log.debug("Fentype:%s "%(fenTypes))
+    log.debug("fenIdx:%s "%(fenIdx))
     # print ("fen_duration:%s "%(fen_duration))
     # print ("fen_price:%s "%(fen_price))
     # print ("fendt:%s "%(fen_dt))
 
-    print ("BiType :%s frsBiType:%s"%(j_BiType,frsBiType))
+    log.debug("BiType :%s frsBiType:%s"%(j_BiType,frsBiType))
 
     if len(j_BiType) >0:
         if j_BiType[0] == -1:
@@ -554,13 +555,13 @@ def show_chan_mpl_power(code,start_date,end_date,stock_days,resample,show_mpl=Tr
     else:
         tb_price = j_BiType
         tb_duration = j_BiType
-    print "图笔 :", x_fenbi_seq,tb_price
-    print "图笔dura :", tb_duration
+    log.debug("图笔 :%s"%x_fenbi_seq,tb_price)
+    log.debug("图笔dura :%s"%tb_duration)
 
 
     # 线段画到笔上
     xdIdxs, xfenTypes = chan.parse2ChanXD(frsBiType, biIdx, chanK)
-    print '线段', xdIdxs, xfenTypes
+    log.debug('线段%s'%(xdIdxs, xfenTypes))
     x_xd_seq = []
     y_xd_seq = []
     for i in range(len(xdIdxs)):
@@ -579,8 +580,8 @@ def show_chan_mpl_power(code,start_date,end_date,stock_days,resample,show_mpl=Tr
                 x_xd_seq.append(x_date_list.index(time_long))
                 y_xd_seq.append(k_data['low'][dt])
     #  在原图基础上添加分笔蓝线
-    print ("线段   :%s"%(x_xd_seq))
-    print ("笔值  :%s"%([str(x) for x in (y_xd_seq)]))
+    log.debug("线段   :%s"%(x_xd_seq))
+    log.debug("笔值  :%s"%([str(x) for x in (y_xd_seq)]))
     # Y_hat = X * b + a
 
 
@@ -589,9 +590,9 @@ def show_chan_mpl_power(code,start_date,end_date,stock_days,resample,show_mpl=Tr
         # plt.legend([stock_code,cname], loc=0)
         plt.legend([stock_code,cname,"Now:%s" % quotes.close[-1],'kdl:%s'%(kdl_mode.values),'kdh:%s'%(kdh_mode.values)], fontsize=12, loc=0)
         if len(kdl_mode)>0:
-            plt.axhline(y=np.mean(kdl_mode.values),linewidth=2,color='red',linestyle="--")
+            plt.axhline(y=np.median(kdl_mode.values),linewidth=2,color='red',linestyle="--")
         if len(kdh_mode)>0:
-            plt.axhline(y=np.mean(kdh_mode.values),linewidth=2,color='green',linestyle="--")
+            plt.axhline(y=np.median(kdh_mode.values),linewidth=2,color='green',linestyle="--")
         plt.title(stock_code + " | "+ cname+ " | " + str(quotes.index[-1])[:10], fontsize=14)
        
         plt.plot(x_xd_seq, y_xd_seq)
@@ -641,7 +642,8 @@ def show_chan_mpl_power(code,start_date,end_date,stock_days,resample,show_mpl=Tr
     # 
 
 
-def show_chan_mpl(code,start_date,end_date,stock_days,resample,show_mpl=True,least_init=3,chanK_flag=False,windows=20,fb_show=0):
+# show mpl
+def show_chan_mpl(code,start_date,end_date,stock_days,resample,show_mpl=True,least_init=3,chanK_flag=False,windows=20,fb_show=0):    
     def get_least_khl_num(resample,idx=0,init_num=3):
         # init = 3
         if init_num-idx >0:
@@ -722,10 +724,10 @@ def show_chan_mpl(code,start_date,end_date,stock_days,resample,show_mpl=True,lea
             biIdxc, frsBiTypec = chan.parse2ChanBi(fenTypesc, fenIdxc, chanKc, least_khl_num=least_khl_num-1)
             if len(biIdxc) == 0:
                 return biIdx
-            print "biIdxc:", [round(k_data_c.high[x], 2) for x in biIdxc], [str(k_data_c.index[x])[:10] for x in biIdxc]
+            # print "biIdxc:", [round(k_data_c.high[x], 2) for x in biIdxc], [str(k_data_c.index[x])[:10] for x in biIdxc]
             xdIdxc, xdTypec = chan.parse2Xianduan(biIdxc, chanKc, least_windows=1 if least_khl_num > 0 else 0)
             biIdxc = con2Cxianduan(stock, k_data_c, chanKc, frsBiTypec, biIdxc, end_date, cur_ji + 1, recursion=True)
-            print "xdIdxc:%s xdTypec:%s biIdxc:%s" % (xdIdxc, xdTypec, biIdxc)
+            # print "xdIdxc:%s xdTypec:%s biIdxc:%s" % (xdIdxc, xdTypec, biIdxc)
             if len(xdIdxc) == 0:
                 return biIdx
             # 连接线段位为上级别的bi
@@ -823,14 +825,14 @@ def show_chan_mpl(code,start_date,end_date,stock_days,resample,show_mpl=True,lea
     # log.debug("code:%s fenTypes:%s fenIdx:%s k_data:%s" % (stock_code,fenTypes, fenIdx, len(k_data)))
     biIdx, frsBiType = chan.parse2ChanBi(fenTypes, fenIdx, chanK, least_khl_num=least_khl_num)
     # log.debug("biIdx1:%s chanK:%s" % (biIdx, len(chanK)))
-    print ("biIdx1:%s %s chanK:%s" % (biIdx, str(chanK.index.values[biIdx[-1]])[:10],len(chanK)))
+    # print ("biIdx1:%s %s chanK:%s" % (biIdx, str(chanK.index.values[biIdx[-1]])[:10],len(chanK)))
 
     biIdx = con2Cxianduan(stock_code, k_data, chanK, frsBiType, biIdx, end_date, cur_ji,least_init=least_init)
     # log.debug("biIdx2:%s chanK:%s" % (biIdx, len(biIdx)))
     chanKIdx = [(chanK.index[x]) for x in biIdx]
 
     if len(biIdx) == 0 and len(chanKIdx) ==0:
-        print "BiIdx is None and chanKidx is None:%s"%(code)
+        # print "BiIdx is None and chanKidx is None:%s"%(code)
         return None
 
     log.debug("con2Cxianduan:%s chanK:%s %s" % (biIdx, len(chanK), chanKIdx[-1] if len(chanKIdx) >0 else None))
@@ -1004,6 +1006,11 @@ def show_chan_mpl(code,start_date,end_date,stock_days,resample,show_mpl=True,lea
 
         ax1.set_xticklabels(Ti)
 
+        assvol = quotes['vol']
+        # assvol = assvol.apply(lambda x: round(x / assvol[:1]*quotes.close[:1], 2))
+        assvol = assvol.apply(lambda x: round(x / assvol[:1]+quotes.close[:1], 2))
+        ax1.plot(assvol, '-g', linewidth=0.5)
+
         plt.grid(True)
         plt.setp(plt.gca().get_xticklabels(), rotation=30, horizontalalignment='right')
 
@@ -1025,8 +1032,8 @@ def show_chan_mpl(code,start_date,end_date,stock_days,resample,show_mpl=True,lea
     #  在原图基础上添加分笔蓝线
     inx_value = chanK.high.values
     inx_va = [round(inx_value[x], 2) for x in biIdx]
-    log.debug("inx_va:%s count:%s"%(inx_va, len(quotes.high)))
-    log.debug("yfenbi:%s count:%s"%([round(y, 2) for y in y_fenbi_seq], len(chanK)))
+    log.info("inx_va:%s count:%s"%(inx_va, len(quotes.high)))
+    log.info("yfenbi:%s count:%s"%([round(y, 2) for y in y_fenbi_seq], len(chanK)))
     j_BiType = [-frsBiType if i % 2 == 0 else frsBiType for i in range(len(biIdx))]
     BiType_s = j_BiType[-1] if len(j_BiType) >0 else -2
     # bi_price = [str(chanK.low[idx]) if i % 2 == 0 else str(chanK.high[idx])  for i,idx in enumerate(biIdx)]
@@ -1064,16 +1071,17 @@ def show_chan_mpl(code,start_date,end_date,stock_days,resample,show_mpl=True,lea
     kdh=k_data.loc[high_fen].high
     kdh_mode = dataframe_mode_round(kdh)
 
-    print ("kdl:%s"%(kdl.values))
-    print ("kdh:%s"%(kdh.values))
-    print ("kdl_modeX1:%s kdh_mode%s chanKidx:%s"%(kdl_mode.values,kdh_mode.values,str(chanKIdx[-1])[:10]))
+    log.info("kdl:%s"%(kdl.values))
+    log.info("kdh:%s"%(kdh.values))
+    print("kdl_modeX1:%s kdh_mode%s chanKidx:%s"%(kdl_mode.values,kdh_mode.values,str(chanKIdx[-1])[:10]))
 
     lkdl,lkdlidx = LIS(kdl)
     lkdh,lkdhidx = LIS(kdh)
     l_status = len(kdl) - len(lkdl)
     h_status = len(kdh) - len(lkdh)
-    print ("LkdlX2:%s Lkdh:%s UP:%s "%(l_status,h_status,h_status - l_status))
-    print ("Gkdl:%s Gkdh:%s"%(grouby_list(kdl.values)[:2],grouby_list(kdh.values)[:2]))
+    print ("LkdlX2:%s Lkdh:%s UP:%s fb:%s"%(l_status,h_status,h_status - l_status,len(kdl)-len(kdh)))
+
+    # print ("Gkdl:%s Gkdh:%s"%(grouby_list(kdl.values)[:2],grouby_list(kdh.values)[:2]))
 
 
     lastdf = k_data[k_data.index >= chanKIdx[-1]]
@@ -1083,7 +1091,7 @@ def show_chan_mpl(code,start_date,end_date,stock_days,resample,show_mpl=True,lea
         keydf  = lastdf[((lastdf.close >= kdh_mode.max()) & (lastdf.high >=kdh_mode.min()))]
     else:
         keydf  = lastdf[((lastdf.close >= kdh_mode.max()) & (lastdf.high >=kdh_mode.min())) | ((lastdf.close <= kdl_mode.min()) & (lastdf.low <=kdl_mode.min()))]
-    print ("BiType_sX3:%s keydf:%s key:%s"%(BiType_s, None if len(keydf) == 0 else str(keydf.index.values[0])[:10],len(keydf)))
+    # print ("BiType_sX3:%s keydf:%s key:%s"%(BiType_s, None if len(keydf) == 0 else str(keydf.index.values[0])[:10],len(keydf)))
     
     # return BiType_s,None if len(keydf) == 0 else str(keydf.index.values[0])[:10],len(keydf)
     # import ipdb;ipdb.set_trace()
@@ -1094,7 +1102,7 @@ def show_chan_mpl(code,start_date,end_date,stock_days,resample,show_mpl=True,lea
     # print ("fen_price:%s "%(fen_price))
     # print ("fendt:%s "%(fen_dt))
 
-    print ("BiType :%s frsBiType:%s"%(j_BiType,frsBiType))
+    # print ("BiType :%s frsBiType:%s"%(j_BiType,frsBiType))
 
     if len(j_BiType) >0:
         if j_BiType[0] == -1:
@@ -1106,13 +1114,13 @@ def show_chan_mpl(code,start_date,end_date,stock_days,resample,show_mpl=True,lea
     else:
         tb_price = j_BiType
         tb_duration = j_BiType
-    print "图笔 :", x_fenbi_seq,tb_price
-    print "图笔dura :", tb_duration
+    # print "图笔 :", x_fenbi_seq,tb_price
+    # print "图笔dura :", tb_duration
 
 
     # 线段画到笔上
     xdIdxs, xfenTypes = chan.parse2ChanXD(frsBiType, biIdx, chanK)
-    print '线段', xdIdxs, xfenTypes
+    # print '线段', xdIdxs, xfenTypes
     x_xd_seq = []
     y_xd_seq = []
     for i in range(len(xdIdxs)):
@@ -1140,8 +1148,12 @@ def show_chan_mpl(code,start_date,end_date,stock_days,resample,show_mpl=True,lea
     #             y_fenbi_seq.append(m_line_dto.low)
 
     #  在原图基础上添加分笔蓝线
-    print ("线段   :%s"%(x_xd_seq))
-    print ("笔值  :%s"%([str(x) for x in (y_xd_seq)]))
+
+    print("线段   :%s type:%s"%(x_xd_seq,[str(quotes.index[x])[:10] for x in x_xd_seq]))
+    print("笔值  :%s"%([str(x) for x in (y_xd_seq)]))
+    if len(x_xd_seq)==0:
+        st_data = str(chanK['enddate'][biIdx[len(biIdx) - 1]])[:10]
+        print ("stdate:%s"%(st_data))
     # Y_hat = X * b + a
 
 
@@ -1150,9 +1162,9 @@ def show_chan_mpl(code,start_date,end_date,stock_days,resample,show_mpl=True,lea
         # plt.legend([stock_code,cname], loc=0)
         plt.legend([stock_code,cname,"Now:%s" % quotes.close[-1],'kdl:%s'%(kdl_mode.values),'kdh:%s'%(kdh_mode.values)], fontsize=12, loc=0)
         if len(kdl_mode)>0:
-            plt.axhline(y=np.mean(kdl_mode.values),linewidth=2,color='red',linestyle="--")
+            plt.axhline(y=np.median(kdl_mode.values),linewidth=2,color='red',linestyle="--")
         if len(kdh_mode)>0:
-            plt.axhline(y=np.mean(kdh_mode.values),linewidth=2,color='green',linestyle="--")
+            plt.axhline(y=np.median(kdh_mode.values),linewidth=2,color='green',linestyle="--")
         plt.title(stock_code + " | "+ cname+ " | " + str(quotes.index[-1])[:10], fontsize=14)
         plt.plot(x_xd_seq, y_xd_seq)
         if len(quotes) > windows:
@@ -1292,9 +1304,10 @@ if __name__ == "__main__":
     while 1:
         try:
             # log.setLevel(LoggerFactory.INFO)
-            log.setLevel(LoggerFactory.ERROR)
+            # log.setLevel(LoggerFactory.ERROR)
             # log.setLevel(LoggerFactory.DEBUG)
             code = raw_input("code:")
+            # code == '000830'
             args = parser.parse_args(code.split())
             # print args
             # print str(args.days)
@@ -1312,7 +1325,7 @@ if __name__ == "__main__":
                 else:
                     show_chan_mpl_power(args.code, args.start, args.end, args.dl, args.dtype, show_mpl=False,least_init=args.least,chanK_flag=args.chanK_flag,fb_show=args.fb)
                 cct.sleep(0.1)
-                print ''
+                # print ''
                 # ts=time.time()
                 # time.sleep(5)
                 # print "%0.5f"%(time.time()-ts)

@@ -82,6 +82,7 @@ if __name__ == "__main__":
             cct.set_console(width, height)
         else:
             cct.set_console(width, height, title=str(duration_date))
+
     status = False
     vol = ct.json_countVol
     type = ct.json_countType
@@ -105,10 +106,10 @@ if __name__ == "__main__":
     du_date = duration_date
     resample = ct.resample_dtype
     # print cct.last_tddate(2)
-    # end_date = cct.last_tddate(days=int(duration_date/4))
-    end_date = cct.last_tddate(days=ct.lastdays)
-    # end_date = None
-    ptype = 'high'
+    # end_date = cct.last_tddate(days=ct.lastdays)
+    end_date = None
+    # ptype = 'high'
+    ptype = 'low'
     filter = 'y'
     if len(str(duration_date)) < 4:
         # duration_date = tdd.get_duration_price_date('999999', dl=duration_date, end=end_date, ptype='dutype')
@@ -138,8 +139,10 @@ if __name__ == "__main__":
             '''
             # top_now = tdd.getSinaAlldf(market='cyb', vol=ct.json_countVol, vtype=ct.json_countType)
             time_Rt = time.time()
-            top_now = tdd.getSinaAlldf(
-                market='all', vol=ct.json_countVol, vtype=ct.json_countType)
+            top_now = tdd.getSinaAlldf(market='all', vol=ct.json_countVol, vtype=ct.json_countType)
+            # top_now = tdd.getSinaAlldf(market='rzrq', vol=ct.json_countVol, vtype=ct.json_countType)
+            # top_now = tdd.getSinaAlldf(market='060', vol=ct.json_countVol, vtype=ct.json_countType)
+
 #            top_now = tdd.getSinaAlldf(market=u'次新股',filename='cxg', vol=ct.json_countVol, vtype=ct.json_countType)
             now_count = len(top_now)
             radio_t = cct.get_work_time_ratio()

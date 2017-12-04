@@ -2137,6 +2137,7 @@ def get_duration_price_date(code=None, ptype='low', dt=None, df=None, dl=None, e
 
 
 def compute_lastdays_percent(df=None, lastdays=3, resample='d'):
+    
     if df is not None and len(df) > lastdays:
         if resample <> 'd':
             df = df[:-1]
@@ -2150,22 +2151,25 @@ def compute_lastdays_percent(df=None, lastdays=3, resample='d'):
         if cct.get_work_day_status() and 915 < cct.get_now_time_int() < 1500:
             df = df[df.index < cct.get_today()]
         df = df.fillna(0)
+        # min_vol=min(df.vol)
         for da in range(1, lastdays + 1, 1):
             df['lastp%sd' % da] = df['close'].shift(da)
             df['lasth%sd' % da] = df['high'].shift(da)
             df['lastl%sd' % da] = df['low'].shift(da)
+            # df['lastv%sd' % da] = (df['vol'].shift(da)/min_vol)
             # lasp_percent = df['per%sd' % (da - 1)][da-1] if (da - 1) > 0 else 0
             df['per%sd' % da] = ((df['close'] - df['lastp%sd' % da]) / df['lastp%sd' % da]).map(lambda x: round(x * 100, 2))
             if da == 1:
                 df['lastp%sd' % 0] = df['close'][-1]
                 df['lasth%sd' % 0] = df['high'][-1]
                 df['lastl%sd' % 0] = df['low'][-1]
+                # df['lastv%sd' % 0] = (df['vol'][-1]/min_vol)
                 # df['perlastp'] = df['per%sd' % da]
                 # df['perlastp'] = (df['per%sd' % da]).map(lambda x: 1 if x >= -0.1 else 0)
                 # down_zero, down_dn = 0, -1
                 down_zero, down_dn, percent_l = 0, 0, 2
                 # df['perlastp'] = map((lambda c,lc,lp: (1 if (c - lc) >= 0 else down_dn) + (2 if (c - lc)/lc*100 > percent_l and lp > 0 else down_zero)), df['close'] ,df['lastp%sd' % da],df['per%sd' % da])
-                df['perlastp'] = map((lambda c, lc: (1 if (c - lc) >= 0 else down_dn)), df['close'], df['lastp%sd' % da])
+                df['perlastp'] = map((lambda c, lc: (1 if (c - lc)/lc*100 >= 1 else down_dn)), df['close'], df['lastp%sd' % da])
 
                 # nowd,per1d = 1 ,2
                 # df['per%sd' % per1d] = ((df['lastp%sd' % da] - df['close'].shift(per1d)) / df['close'].shift(per1d)).map(lambda x: round(x * 100, 2))
@@ -2183,6 +2187,7 @@ def compute_lastdays_percent(df=None, lastdays=3, resample='d'):
             df['lasth%sd' % da] = df['lasth%sd' % da][-1]
             df['lastl%sd' % da] = df['lastl%sd' % da][-1]
             df['mean%sd' % da] = df['mean%sd' % da][-1]
+            # df['lastv%sd' % da] = df['lastv%sd' % da][-1]
             # break
             # reg_data_f = reg_data.ix(reg_data['uid'] == reg_data['uid0']
         # df['perc%sd' % da] = 1 if df['per%sd' % da][da] > 0 else 0

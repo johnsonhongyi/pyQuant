@@ -325,6 +325,13 @@ def get_linear_model_histogramDouble(code, ptype='low', dtype='d', start=None, e
         ax3.plot(as3)
         ticks = ax3.get_xticks()
         ax3.plot(asset1, '-r', linewidth=2)
+
+
+        assvol = df.loc[asset.index]['vol']
+        assvol = assvol.apply(lambda x: round(x / assvol[:1], 2))
+        ax3.plot(assvol, '-g', linewidth=0.5)
+
+
         ax3.set_xticklabels([dates[int(i)] for i in (np.append(ticks[:-1], len(asset) - 1))], rotation=15)
         plt.grid(True)
         zp3 = zoompan.ZoomPan()
@@ -643,6 +650,11 @@ def get_linear_model_histogram(code, ptype='low', dtype='d', start=None, end=Non
         as3 = asset.apply(lambda x: round(x / asset[:1], 2))
         ax3.plot(as3)
         ax3.plot(asset1, '-r', linewidth=2)
+
+        # assvol = df.loc[asset.index]['vol']
+        # assvol = assvol.apply(lambda x: round(x / assvol[:1], 2))
+        # ax3.plot(assvol, '-g', linewidth=2)
+
         plt.grid(True)
         zp3 = zoompan.ZoomPan()
         figZoom = zp3.zoom_factory(ax3, base_scale=scale)

@@ -75,6 +75,7 @@ def getBollFilter(df=None, boll=6, duration=ct.PowerCountdl, filter=True, ma5d=T
             for co in per_col:
                 df[co] = (df[co] + df['percent']).map(lambda x: x)
             # print "percT:%.2f"%(time.time()-time_ss)
+
     if 'fib' not in df.columns:
         df['fib'] = 0
     else:
@@ -115,9 +116,9 @@ def getBollFilter(df=None, boll=6, duration=ct.PowerCountdl, filter=True, ma5d=T
     filter_dn = 'ma10d'
     if filter_up in df.columns:
         if filter_dn in df.columns:
-            df = df[(df.buy > df[filter_dn]) & (df[filter_up] >= df[filter_dn])]
+            df = df[(df.buy >= df[filter_dn]) & (df[filter_up] >= df[filter_dn])]
         else:
-            df = df[df.buy > df[filter_up] * ct.changeRatio]
+            df = df[df.buy >= df[filter_up] * ct.changeRatio]
 
     # if 'nlow' in df.columns and 932 < cct.get_now_time_int() < 1030:
 

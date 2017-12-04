@@ -107,7 +107,6 @@ if __name__ == "__main__":
     status_change = False
     lastpTDX_DF = pd.DataFrame()
     # dl=60
-    ptype = 'high'
     # op, ra, duration_date, days = pct.get_linear_model_status('999999', filter='y', dl=dl, ptype=ptype, days=1)
     # duration_date = ct.duration_date
     duration_date = ct.duration_date_up
@@ -117,9 +116,9 @@ if __name__ == "__main__":
     resample = 'd'
     newdays = 18
     # print cct.last_tddate(2)
-    # end_date = cct.last_tddate(days=int(duration_date/4))
-    end_date = cct.last_tddate(days=ct.lastdays)
-    ptype = 'high'
+    # end_date = cct.last_tddate(days=ct.lastdays)
+    end_date = None
+    ptype = 'low'
     filter = 'y'
     if len(str(duration_date)) < 4:
         # duration_date = tdd.get_duration_price_date('999999', dl=duration_date, end=end_date, ptype='dutype')

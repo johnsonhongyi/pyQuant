@@ -275,7 +275,7 @@ def get_wencai_Market_url(filter='国企改革',perpage=1,url=None,pct=None):
 
                         # index = code_t[4]
                         category = ";".join(x for x in code_t[4].split(';')[:3])
-                        category = category[:20] if len(category) > 20 else category
+                        category = category[:15] if len(category) > 15 else category
                         if len(key_t) > 0:
                             # print key_t[0]
                             title1 = key_t[0]
@@ -347,7 +347,7 @@ def get_wencai_data(dm,market='wencai',days=120,pct=True):
         #     wcd_d = get_codelist_df(code_l)
         #     get_write_wencai_market_to_csv(wcd_d,market=market)
         df = get_write_wencai_market_to_csv(None,market,renew=True,days=days)
-        if len(df) > 0:
+        if df is not None and len(df) > 0:
 #            if  set(codelist) <= set(df.name.values):
 #            if  set(dm.index) <= set(df.code.values) :
 #            if  len(dm) - len(set(dm.index) & set(df.index.values)) < 10 :
@@ -378,17 +378,17 @@ def get_wencai_data(dm,market='wencai',days=120,pct=True):
         if wencai_count < 1:
             # if (pct and cct.get_now_time_int() < 940) or not pct:
             wcd_d = get_codelist_df(dm.tolist())
-            log.error("dratio:%s diff:%s dm:%s err:%s"%(dratio,len(diff_code),len(dm),wencai_count))
-            if len(wcd_d) > 0:
+            if wcd_d is not None and len(wcd_d) > 0:
+                log.error("dratio:%s diff:%s dm:%s err:%s"%(dratio,len(diff_code),len(dm),wencai_count))
                 df = get_write_wencai_market_to_csv(wcd_d,market=market,renew=True,days=days)
         # else:
             # dm['category'] = 0
 
     else:
         df = get_wencai_Market_url(dm.name)
-    if 'code' in df.columns:
+    if df is not None and 'code' in df.columns:
         df = df.set_index('code')
-    if len(df) > 1:
+    if df is not None and len(df) > 1:
         df = df.drop_duplicates()
     return df
 
@@ -402,12 +402,12 @@ def get_wencai_filepath(market):
 def get_write_wencai_market_to_csv(df=None,market='wcbk',renew=False,days=60):
 
     def wencaiwrite_to_csv(df,filename,renew=False):
-        if len(df) == 0 :
+        if df is None or len(df) == 0 :
             log.warn("df is None")
 #        else:
             # log.warn('market not found')
             # return pd.DataFrame()
-        if len(df)>0 and 'code' in df.columns:
+        if df is not None and len(df)>0 and 'code' in df.columns:
             df.drop_duplicates('code',inplace=True)
             df = df.set_index('code')
             if not renew and os.path.exists(filepath) :
@@ -415,7 +415,7 @@ def get_write_wencai_market_to_csv(df=None,market='wcbk',renew=False,days=60):
             else:
                 df.to_csv(filename,mode='w',encoding='utf8')
         else:
-            log.warn("df.columns:%s"%(df.columns))
+            # log.warn("df.columns:%s"%(df))
             return df
 #        log.warn("Wr%s :%s"%(market,len(df)))
         print ("wencaimarket :%s"%(len(df))),
@@ -458,7 +458,7 @@ def get_write_wencai_market_to_csv(df=None,market='wcbk',renew=False,days=60):
         df = df.drop_duplicates()
     else:
         log.error('wencaiErr:%s'%(market))
-    if 'code' in df.columns:
+    if df is not None and 'code' in df.columns:
         df=df.set_index('code')
     return df
 

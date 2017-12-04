@@ -295,9 +295,10 @@ def Get_BBANDS_algo(df,lastday=ct.Power_last_da):
 
 
 def Get_BBANDS(df, dtype='d', days=ct.Power_Ma_Days,dl=ct.PowerCountdl,dm=None,lastday=ct.Power_last_da):
+    # dl = dl *2 if dl < 20 else dl
     if not isinstance(df,pd.DataFrame):
         code = df
-        df = tdd.get_tdx_append_now_df_api(code,dl=dl * 2,dm=dm,newdays=5)
+        df = tdd.get_tdx_append_now_df_api(code,dl=dl,dm=dm,newdays=5)
         df = df.sort_index(ascending=True)
     else:
         code = None
@@ -771,7 +772,7 @@ if __name__ == '__main__':
     import sys
     # print powerStd('600208',ptype='vol')
     code = '002160'
-    codel=['000737','002695','601555','002486','600321','002437','399006','999999']
+    codel=['601766','300638','002695','601555','002486','600321','002437','399006','999999']
     # codel = ['300661', '600212', '300153', '603580']
     # codel=['600212']
     # dl = 21
@@ -799,7 +800,7 @@ if __name__ == '__main__':
     dl = 60
     # for x in range(9,30):
     # for x in ['000737','002695','601555','002486','600321','002437','399006','999999']:get_All_Count(x,9)
-    sys.exit(0)
+    # sys.exit(0)
     for code in codel:
         df = tdd.get_tdx_append_now_df_api(
             code, dl=int(dl * 1.5)).sort_index(ascending=True)
@@ -820,7 +821,8 @@ if __name__ == '__main__':
         print 'bollcalgoMultiTech:', operate,
         operate = algoMultiDay(df, column='close', days=days)
         print 'ma:', operate,
-        dd, op = Get_MACD_OP(df, days=days)
+        # dd, op = Get_MACD_OP(df, days=days)
+        dd, op = Get_MACD(df, days=days)
         print ' macd:%s' % (op),
         dd, op = Get_RSI(df, days=days)
         print 'RSI:%s' % (op),

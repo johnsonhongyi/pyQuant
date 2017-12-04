@@ -917,6 +917,11 @@ def get_linear_model_candles(code, ptype='low', dtype='d', start=None, end=None,
     plt.xticks(rotation=15, horizontalalignment='center')
 
 
+    assvol = df['vol']
+    # assvol = assvol.apply(lambda x: round(x / assvol[:1]*asset[:1], 2))
+    assvol = assvol.apply(lambda x: round(x / assvol[:1]+asset[:1], 2))
+    ax.plot(assvol, '-g', linewidth=0.5)
+    # print assvol
 
     zp = zoompan.ZoomPan()
     figZoom = zp.zoom_factory(ax, base_scale=1.1)
@@ -1023,7 +1028,7 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y', tal
     #    cname = ",".join(x for x in dm.name)
         dmname = dm.name
         wcdf = wcd.get_wencai_data(dmname, 'wencai')
-        wcdf_code = wcdf.index.tolist()
+        wcdf_code = None if wcdf is None else wcdf.index.tolist()
         # col_co = df.columns.tolist()
         # col_co.extend([ 'ra', 'op', 'fib', 'ma5d', 'ma10d', 'ldate', 'hmax', 'lmin', 'cmean'])
         # print col_ra_op,col_co
@@ -1198,7 +1203,7 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y', tal
             df.loc[code, 'vstd'] = volstd
             df.loc[code, 'lvolume'] = tdx_df.vol[1]
 
-            if code in wcdf_code:
+            if wcdf_code is not None and code in wcdf_code:
                 df.loc[code, 'category'] = wcdf.loc[code, 'category']
             else:
                 wencai_drop.append(code)
@@ -1220,6 +1225,7 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y', tal
                      df['ra'].values, df['fibl'].values, df[
                          'rah'].values, df['fib'].values, df['ma'].values,
                      df['kdj'].values, df['rsi'].values))
+           df['df2'] = df['df2'].apply(lambda x:round(x,1))
            return df
         if len(df) <> len(code_l):
             dd = df.loc[code_l]

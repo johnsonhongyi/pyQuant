@@ -1974,7 +1974,7 @@ def func_compute_percd(c, lp, lc, lh, ll, nh, nl):
     initc = 0
     down_zero, down_dn, percent_l = 0, 0, 2
     # da, down_zero, down_dn, percent_l = 1, 0, 0, 2
-    initc = 1 if (c - lc) >= 0 else down_dn
+    initc = 1 if (c - lc)/lc*100 >= 1   else down_dn
     # n_p = (c - lc) / lc * 100
     # n_hp = nh - lh
     # n_lp = nl - ll
