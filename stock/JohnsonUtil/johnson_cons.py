@@ -33,7 +33,7 @@ VolumeMaxR = 100
 VolumeMinR = 0.1
 PowerCount = 500
 duration_diff = 6
-duration_date_l = 30
+duration_date_l = 21
 duration_date_up = 60
 duration_date_sort = duration_date_l
 PowerCountdl = duration_date_l * 2 if duration_date_l < 20 else duration_date_l
@@ -48,7 +48,7 @@ wencai_delay_time = 60
 resample_dtype = 'd'
 
 
-bollFilter = -5
+bollFilter = -10
 writeblockbakNum = 15
 checkfilter = True
 lastPower = False
@@ -77,6 +77,7 @@ sort_value_key_perd23 = '2 3 d f'
 # sort_value_key_perd = '2 2'
 lastdays = 3
 sort_value_key_perd = '3 %s'%(lastdays)
+# sort_value_key_perd = 'x1'
 # sort_value_key_perd = 'x1'
 idx_perd_1to_2 = 1
 # powerdiff = 'ra * fibl + rah*(abs(float(%s)-fibl))/fib +ma +kdj+rsi'
@@ -142,13 +143,24 @@ Duration_percent_df2dff = ['df2', 'dff', 'percent',
                            'op', 'fib', 'fibl', 'ra', 'ratio', 'volume', 'couts']
 Duration_percent_df2dff_key = [0, 0, 0, 0, 1, 1, 0, 1, 1, 1]
 
-Duration_percent_opboll = ['op', 'boll', 'percent',
+# Duration_percent_opboll = ['op', 'boll', 'percent',
+#                          'dff', 'fib', 'fibl', 'ratio', 'volume', 'couts']
+# Duration_percent_opboll_key = [0, 0, 0, 0, 1, 1, 1, 1, 1]
+
+# Duration_percent_boll = ['boll','op','ra', 'percent',
+#                          'dff', 'fib', 'fibl', 'ratio', 'volume', 'couts']
+                         
+# Duration_percent_boll_key = [0, 0, 0, 0, 0, 1, 1, 1, 1, 1]
+
+Duration_percent_opboll = ['op', 'perc3d', 'percent',
                          'dff', 'fib', 'fibl', 'ratio', 'volume', 'couts']
 Duration_percent_opboll_key = [0, 0, 0, 0, 1, 1, 1, 1, 1]
 
 
-Duration_percent_boll = ['boll','op','ra', 'percent',
+
+Duration_percent_boll = ['boll','perc3d','ra', 'percent',
                          'dff', 'fib', 'fibl', 'ratio', 'volume', 'couts']
+
 Duration_percent_boll_key = [0, 0, 0, 0, 0, 1, 1, 1, 1, 1]
 
 
@@ -698,6 +710,8 @@ def get_market_sort_value_key(st, top_all=None, perd_d=3):
                         market_sort_value_key = negate_boolean_list(market_sort_value_key)
         else:
             market_sort_value_key = eval(market_sort_name + '_key')
+            cct.GlobalValues().setkey('market_key',None)
+            cct.GlobalValues().setkey('market_value', None)
             if f_count >= 2:
                 market_sort_value_key = negate_boolean_list(market_sort_value_key)
                 market_sort_value_key = negate_boolean_list(market_sort_value_key, idx=1, position=True)

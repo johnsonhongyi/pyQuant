@@ -116,7 +116,10 @@ def getBollFilter(df=None, boll=6, duration=ct.PowerCountdl, filter=True, ma5d=T
     filter_dn = 'ma10d'
     if filter_up in df.columns:
         if filter_dn in df.columns:
-            df = df[(df.buy >= df[filter_dn]) & (df[filter_up] >= df[filter_dn])]
+            if market_key is not None and market_key == '3': 
+                df = df[(df.buy >= df[filter_dn]) & (df[filter_up] >= df[filter_dn])]
+            else:
+                df = df[(df.buy >= df[filter_dn])]
         else:
             df = df[df.buy >= df[filter_up] * ct.changeRatio]
 
@@ -146,18 +149,18 @@ def getBollFilter(df=None, boll=6, duration=ct.PowerCountdl, filter=True, ma5d=T
 
         #filter
         
-        # if cct.get_now_time_int() > 915 and cct.get_now_time_int() <= 1000:
-        #     # df = df[df.buy > df.hmax * ct.changeRatio]
-        #     df = df[df.buy > df.cmean * ct.changeRatioUp ]
-        #     # df = df[df.buy > df.cmean]
+        if cct.get_now_time_int() > 915 and cct.get_now_time_int() <= 1000:
+            # df = df[df.buy > df.hmax * ct.changeRatio]
+            df = df[df.buy > df.cmean * ct.changeRatioUp ]
+            # df = df[df.buy > df.cmean]
 
-        # elif cct.get_now_time_int() > 1000 and cct.get_now_time_int() <= 1430:
-        #     # df = df[df.buy > df.hmax * ct.changeRatio]
-        #     df = df[df.buy > df.cmean * ct.changeRatioUp]
-        #     # df = df[df.buy > df.cmean]
-        # else:
-        #     # df = df[df.buy > df.hmax * ct.changeRatio]
-        #     df = df[df.buy > df.cmean]
+        elif cct.get_now_time_int() > 1000 and cct.get_now_time_int() <= 1430:
+            # df = df[df.buy > df.hmax * ct.changeRatio]
+            df = df[df.buy > df.cmean * ct.changeRatioUp]
+            # df = df[df.buy > df.cmean]
+        else:
+            # df = df[df.buy > df.hmax * ct.changeRatio]
+            df = df[df.buy > df.cmean]
 
 
 
