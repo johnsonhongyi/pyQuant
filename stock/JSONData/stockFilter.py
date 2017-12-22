@@ -151,13 +151,13 @@ def getBollFilter(df=None, boll=6, duration=ct.PowerCountdl, filter=True, ma5d=T
         
         if cct.get_now_time_int() > 915 and cct.get_now_time_int() <= 1000:
             # df = df[df.buy > df.hmax * ct.changeRatio]
-            df = df[df.buy > df.cmean * ct.changeRatioUp ]
-            # df = df[df.buy > df.cmean]
+            # df = df[df.buy > df.cmean * ct.changeRatioUp ]
+            df = df[df.buy > df.cmean]
 
         elif cct.get_now_time_int() > 1000 and cct.get_now_time_int() <= 1430:
             # df = df[df.buy > df.hmax * ct.changeRatio]
-            df = df[df.buy > df.cmean * ct.changeRatioUp]
-            # df = df[df.buy > df.cmean]
+            # df = df[df.buy > df.cmean * ct.changeRatioUp]
+            df = df[df.buy > df.cmean]
         else:
             # df = df[df.buy > df.hmax * ct.changeRatio]
             df = df[df.buy > df.cmean]
@@ -198,16 +198,18 @@ def getBollFilter(df=None, boll=6, duration=ct.PowerCountdl, filter=True, ma5d=T
         # df = cct.combine_dataFrame(df, bolldf)
         # print "bollt:%0.2f"%(time.time()-time_ss),
         per3d_l = 2
-        percent_l = 0
+        percent_l = -1
         op_l = 3
-        # if 'boll' in df.columns:
-        #     if 915 < cct.get_now_time_int() < 926:
-        #         # df = df[(df.boll >= boll) | ((df.percent > percent_l) & (df.op > 4)) | ((df.percent > percent_l) & (df.per3d > per3d_l))]
-        #         # df = df[((df.percent > percent_l) & (df.op > 4)) | ((df.percent > percent_l) & (df.per3d > per3d_l))]
-        #         pass
-        #     elif 926 < cct.get_now_time_int() < 1501:
-        #         df = df[(df.boll >= boll) | ((df.low <> 0) & (df.open == df.low) & (((df.percent > percent_l) & (df.op > op_l)) | ((df.percent > percent_l) & (df.per3d > per3d_l))))]
-        #     else:
+        if 'boll' in df.columns:
+            if 915 < cct.get_now_time_int() < 950:
+                # df = df[(df.boll >= boll) | ((df.percent > percent_l) & (df.op > 4)) | ((df.percent > percent_l) & (df.per3d > per3d_l))]
+                # df = df[((df.percent > percent_l) & (df.op > 4)) | ((df.percent > percent_l) & (df.per3d > per3d_l))]
+                pass
+            elif 950 < cct.get_now_time_int() < 1501:
+                # df = df[(df.boll >= boll) | ((df.low <> 0) & (df.open == df.low) & (((df.percent > percent_l) & (df.op > op_l)) | ((df.percent > percent_l) & (df.per3d > per3d_l))))]
+                # df = df[(df.boll >= boll) & ((df.low <> 0) & (df.open >= df.low * ct.changeRatio) & (((df.percent > percent_l)) | ((df.percent > percent_l) & (df.per3d > per3d_l))))]
+                df = df[(df.boll >= boll)]
+            # else:
         # df = df[(df.boll >= boll) | ((df.low <> 0) & (df.open == df.low) &
         # (((df.percent > percent_l) & (df.op > op_l)) | ((df.percent > percent_l)
         # & (df.per3d > per3d_l))))]

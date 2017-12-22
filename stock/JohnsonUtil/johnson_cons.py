@@ -48,7 +48,7 @@ wencai_delay_time = 60
 resample_dtype = 'd'
 
 
-bollFilter = -10
+bollFilter = -2
 writeblockbakNum = 15
 checkfilter = True
 lastPower = False
@@ -75,8 +75,8 @@ sort_value_key_perd23 = '2 3 d f'
 # sort_value_key_perd23 = '4'
 # sort_value_key_perd23 = '2 3'
 # sort_value_key_perd = '2 2'
-lastdays = 3
-sort_value_key_perd = '3 %s'%(lastdays)
+lastdays = 2
+sort_value_key_perd = '2 %s'%(lastdays)
 # sort_value_key_perd = 'x1'
 # sort_value_key_perd = 'x1'
 idx_perd_1to_2 = 1
