@@ -128,7 +128,8 @@ Duration_sort_percd_key = [0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1]
 # Duration_sort_per3d_key = [0, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1]
 
 
-Duration_percent_dff = ['percent', 'b1_v', 'dff', 'df2', 'op',
+# Duration_percent_dff = ['percent', 'b1_v', 'dff', 'df2', 'op',
+Duration_percent_dff = ['percent', 'ra', 'dff', 'df2', 'op',
                         'fib', 'fibl', 'ra', 'ratio', 'volume', 'couts']
 Duration_percent_dff_key = [0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 1]
 
