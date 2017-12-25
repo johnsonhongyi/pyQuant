@@ -2152,6 +2152,7 @@ def compute_lastdays_percent(df=None, lastdays=3, resample='d'):
             df = df[df.index < cct.get_today()]
         df = df.fillna(0)
         # min_vol=min(df.vol)
+        df['ma5d'] = pd.rolling_mean(df.close, 5)
         for da in range(1, lastdays + 1, 1):
             df['lastp%sd' % da] = df['close'].shift(da)
             df['lasth%sd' % da] = df['high'].shift(da)
@@ -2169,7 +2170,7 @@ def compute_lastdays_percent(df=None, lastdays=3, resample='d'):
                 # down_zero, down_dn = 0, -1
                 down_zero, down_dn, percent_l = 0, 0, 2
                 # df['perlastp'] = map((lambda c,lc,lp: (1 if (c - lc) >= 0 else down_dn) + (2 if (c - lc)/lc*100 > percent_l and lp > 0 else down_zero)), df['close'] ,df['lastp%sd' % da],df['per%sd' % da])
-                df['perlastp'] = map((lambda c, lc: (1 if (c - lc)/lc*100 >= 1 else down_dn)), df['close'], df['lastp%sd' % da])
+                df['perlastp'] = map((lambda c, lc,op,m5a: (1 if ((c - lc)/lc*100 >= 0 or c >= op or c >=m5a) else down_dn)), df['close'], df['lastp%sd' % da],df['open'],df['ma5d'])
 
                 # nowd,per1d = 1 ,2
                 # df['per%sd' % per1d] = ((df['lastp%sd' % da] - df['close'].shift(per1d)) / df['close'].shift(per1d)).map(lambda x: round(x * 100, 2))
@@ -3182,8 +3183,8 @@ if __name__ == '__main__':
         log_level = LoggerFactory.ERROR
     # log_level = LoggerFactory.DEBUG if args['-d']  else LoggerFactory.ERROR
     log.setLevel(log_level)
-    code='999999'
-    # print get_tdx_Exp_day_to_df(code, dl=1, newdays=0, resample='d')
+    code='600903'
+    print get_tdx_Exp_day_to_df(code, dl=20, newdays=0, resample='d')
     # print get_tdx_day_to_df_last('999999', type=1)
     # sys.exit(0)
     # log.setLevel(LoggerFactory.INFO)
@@ -3229,7 +3230,7 @@ if __name__ == '__main__':
     # code = '600581'
     # code = '300609'
     # code = '000916'
-    code = '600326'
+    code = '600903'
     resample = 'd'
     # code = '000001'
     # code = '000916'
