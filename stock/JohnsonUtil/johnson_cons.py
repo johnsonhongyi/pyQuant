@@ -111,6 +111,7 @@ Duration_sort_per_ratio_key = [0, 1, 0, 1, 1, 0, 0, 1, 1]
 #                        'fib', 'fibl', 'ra', 'percent', 'volume', 'couts']
 # Duration_sort_per1d_key = [0, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1]
 
+# Duration_sort_perd = ['per%sd', 'dff', 'perc%sd', 'percent', 'b1_v', 'ratio', 'op',
 Duration_sort_perd = ['per%sd', 'dff', 'perc%sd', 'percent', 'b1_v', 'ratio', 'op',
                       'fib', 'fibl', 'ra', 'volume', 'couts']
 Duration_sort_perd_key = [0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 1, 1]
@@ -658,7 +659,7 @@ def get_market_sort_value_key(st, top_all=None, perd_d=3):
                     cct.GlobalValues().setkey('market_value', st_l[1])
             else:
                 cct.GlobalValues().setkey('market_key',st_l[0])
-                cct.GlobalValues().setkey('market_value', 1)
+                cct.GlobalValues().setkey('market_value', '1')
             idx_value = eval(market_sort_name)[0]
             market_sort_value_key = eval(market_sort_name + '_key')
             if st_count > 1 and st_l[1].isdigit():

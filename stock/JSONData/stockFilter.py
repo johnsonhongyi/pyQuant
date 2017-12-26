@@ -41,7 +41,7 @@ def getBollFilter(df=None, boll=6, duration=ct.PowerCountdl, filter=True, ma5d=T
         return None
     else:
         df.loc[df.percent >= 9.94, 'percent'] = 10
-        if resample in ['d' ,'w']:
+        if resample in ['d', 'w']:
             df.loc[df.per1d >= 9.94, 'per1d'] = 10
             df['percent'] = df['percent'].apply(lambda x: round(x, 1))
             # time_ss = time.time()
@@ -103,11 +103,13 @@ def getBollFilter(df=None, boll=6, duration=ct.PowerCountdl, filter=True, ma5d=T
 
     if market_key is not None and market_key == '3':
         market_value = int(market_value)
-        log.info("stf market_key:%s"%(market_key))
+        log.info("stf market_key:%s" % (market_key))
         idx_k = cct.get_col_in_columns(df, 'perc%sd', market_value)
-        df = df[df["perc%sd"%(idx_k)] >= idx_k]
+        df = df[df["perc%sd" % (idx_k)] >= idx_k]
         # log.error("perc%sd"%(market_value))
-
+    elif market_key is not None and market_key == '2':
+        if market_value in ['1','2']:
+            df['dff'] = (map(lambda x, y, z: round((x + (y if z > 20 else 3 * y)), 1), df.dff.values, df.volume.values, df.ratio.values))
     # df['df2'] = (map(lambda x, y, z: w=round((x - y) / z * 100, 1), df.high.values, df.low.values, df.llastp.values))
     # df['df2'] = (map(func_compute_df2, df.close.values, df.llastp.values,df.high.values, df.low.values,df.ratio.values))
     # df['df2'] = (map(func_compute_df2, df.close.values, df.llastp.values,df.high.values, df.low.values))
@@ -116,7 +118,7 @@ def getBollFilter(df=None, boll=6, duration=ct.PowerCountdl, filter=True, ma5d=T
     filter_dn = 'ma10d'
     if filter_up in df.columns:
         if filter_dn in df.columns:
-            if market_key is not None and market_key == '3': 
+            if market_key is not None and market_key == '3':
                 df = df[(df.buy >= df[filter_dn]) & (df[filter_up] >= df[filter_dn])]
             else:
                 df = df[(df.buy >= df[filter_dn])]
@@ -129,12 +131,12 @@ def getBollFilter(df=None, boll=6, duration=ct.PowerCountdl, filter=True, ma5d=T
         # for col in ['nhigh', 'nclose', 'nlow','nstd']:
         #     df[col] = df[col].apply(lambda x: round(x, 2))
         if 'nhigh' in df.columns and 'nclose' in df.columns:
-            ncloseRatio = map(lambda x, y: x * ct.changeRatio if x * ct.changeRatio > y else y, df.nclose , df.nlow)
-            nhighRatio = map(lambda x, y: x * ct.changeRatio if x * ct.changeRatio > y else y, df.nhigh , df.nclose)
+            ncloseRatio = map(lambda x, y: x * ct.changeRatio if x * ct.changeRatio > y else y, df.nclose, df.nlow)
+            nhighRatio = map(lambda x, y: x * ct.changeRatio if x * ct.changeRatio > y else y, df.nhigh, df.nclose)
             # if cct.get_now_time_int() > ct.nlow_limit_time:
             df = df[(((df.low >= df.nlow) & (df.close >= ncloseRatio)) | ((df.close >= ncloseRatio) & (df.close > nhighRatio)))]
             # else:
-                # df = df[(((df.low >= df.nlow) & (df.close >= ncloseRatio)) | ((df.close >= ncloseRatio) & (df.close > nhighRatio)))]
+            # df = df[(((df.low >= df.nlow) & (df.close >= ncloseRatio)) | ((df.close >= ncloseRatio) & (df.close > nhighRatio)))]
         else:
             df = df[((df.low >= df.nlow) & (df.close > df.llastp * ct.changeRatio))]
         # if 'nhigh' in df.columns and 'nclose' in df.columns:
@@ -149,11 +151,11 @@ def getBollFilter(df=None, boll=6, duration=ct.PowerCountdl, filter=True, ma5d=T
 
     if filter:
 
-        #filter
-        
+        # filter
+
         if cct.get_now_time_int() > 915 and cct.get_now_time_int() <= 1000:
             # df = df[df.buy > df.hmax * ct.changeRatio]
-            df = df[df.buy > df.cmean * ct.changeRatioUp ]
+            df = df[df.buy > df.cmean * ct.changeRatioUp]
             # df = df[df.buy > df.cmean]
 
         elif cct.get_now_time_int() > 1000 and cct.get_now_time_int() <= 1430:
@@ -164,10 +166,6 @@ def getBollFilter(df=None, boll=6, duration=ct.PowerCountdl, filter=True, ma5d=T
             # df = df[df.buy > df.hmax * ct.changeRatio]
             df = df[df.buy > df.cmean * ct.changeRatioUp]
             # df = df[df.buy > df.cmean]
-
-
-
-
 
         # if ma5d:
         #     # op, ra, st, days = pct.get_linear_model_status('999999', filter='y', dl=dl, ptype='low')
@@ -181,7 +179,7 @@ def getBollFilter(df=None, boll=6, duration=ct.PowerCountdl, filter=True, ma5d=T
         if 'vstd' in df.columns:
             # df = df[(df.lvol * df.volume > (df.vstd + df.lvol)) | ((df.percent > -10) & (df.hv / df.lv > 1.5))]
 
-            df = df[(df.lvol * df.volume > (df.vstd + df.lvol)) | ((df.percent > -5) & (df.hv/df.lv > 3))]
+            df = df[(df.lvol * df.volume > (df.vstd + df.lvol)) | ((df.percent > -5) & (df.hv / df.lv > 3))]
             # [dd.lvol * dd.volume > (dd.vstd + dd.lvol) | dd.lvol * dd.volume >(dd.ldvolume + dd.vstd]
         # print df.loc['000801']
 
@@ -208,7 +206,9 @@ def getBollFilter(df=None, boll=6, duration=ct.PowerCountdl, filter=True, ma5d=T
                 pass
             elif 950 < cct.get_now_time_int() < 1501:
                 # df = df[(df.boll >= boll) | ((df.low <> 0) & (df.open == df.low) & (((df.percent > percent_l) & (df.op > op_l)) | ((df.percent > percent_l) & (df.per3d > per3d_l))))]
-                # df = df[(df.boll >= boll) & ((df.low <> 0) & (df.open >= df.low * ct.changeRatio) & (((df.percent > percent_l)) | ((df.percent > percent_l) & (df.per3d > per3d_l))))]
+                # df = df[(df.boll >= boll) & ((df.low <> 0) & (df.open >= df.low *
+                # ct.changeRatio) & (((df.percent > percent_l)) | ((df.percent >
+                # percent_l) & (df.per3d > per3d_l))))]
                 df = df[(df.boll >= boll)]
             # else:
         # df = df[(df.boll >= boll) | ((df.low <> 0) & (df.open == df.low) &
@@ -260,11 +260,11 @@ def WriteCountFilter(df, op='op', writecount=ct.writeCount, end=None, duration=1
         if end is None and int(writecount) > 0:
             if int(writecount) < 100 and len(df) > 0 and 'percent' in df.columns:
                 codel = df.index[:int(writecount)].tolist()
-                # dd = df[df.percent == 10]
-                # df_list = dd.index.tolist()
-                # for co in df_list:
-                #     if co not in codel:
-                #         codel.append(co)
+                dd = df[df.percent == 10]
+                df_list = dd.index.tolist()
+                for co in df_list:
+                    if co not in codel:
+                        codel.append(co)
             else:
                 if len(str(writecount)) >= 4:
                     codel.append(str(writecount).zfill(6))
