@@ -162,7 +162,7 @@ def getLogger(name=None,logpath=None,writemode='a',show_detail=True):
     logger.addHandler(handler)
     return logger
 
-log = getLogger(show_detail=False)
+log = getLogger(show_detail=True)
 # sys.stdout = log.handlers[0].stream
 # sys.stderr = log.handlers[0].stream
 # def log_format(record, handler):

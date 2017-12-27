@@ -98,7 +98,8 @@ def get_dfcfw_fund_flow(market):
         # end_inx = start_inx + (i+1)*24
         if len(data_s) > 0:
             data = data_s.split(',')
-            dd['zlr'] = round(float(data[5+i*25])/10000, 1)
+
+            dd['zlr'] = round(float(data[5+i*25] if data[5+i*25] != '-' else 0)/10000, 1)
             dd['zzb'] = round(float(data[23+i*25].replace("%","")), 1)
             dd['sjlr'] = round(float(data[9+i*25])/10000, 1)
             dd['sjzb'] = round(float(data[10+i*25].replace("%","")), 1)
