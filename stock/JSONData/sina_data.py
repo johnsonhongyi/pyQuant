@@ -700,7 +700,10 @@ if __name__ == "__main__":
     # df= sina.get_stock_code_data('999999,399001',index=True)
     # sys.exit(0)
     code_agg = '399006'
-    dd = sina.get_stock_code_data([code_agg, '000831', '300306', '600007'])
+    dd = sina.get_stock_code_data([code_agg, '600243', '002339', '600007'])
+    print dd.T
+    import ipdb;ipdb.set_trace()
+    
     print dd.loc[:, ['close', 'nclose', 'nlow', 'nhigh', 'nstd', 'ticktime']], dd.shape
     print dd.loc[code_agg].T
     # print df.columns

@@ -124,7 +124,7 @@ def getBollFilter(df=None, boll=6, duration=ct.PowerCountdl, filter=True, ma5d=T
                 df = df[(df.buy >= df[filter_dn])]
         else:
             df = df[df.buy >= df[filter_up] * ct.changeRatio]
-
+        df = df[(df.lvolume > df.lvol * 1.2) & (df.lvol > df.lowvol * 1.1)]
     # if 'nlow' in df.columns and 932 < cct.get_now_time_int() < 1030:
 
     if 'nlow' in df.columns and 935 < cct.get_now_time_int():

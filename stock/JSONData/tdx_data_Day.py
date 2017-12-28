@@ -2275,7 +2275,7 @@ def get_tdx_exp_low_or_high_price(code, dt=None, ptype='close', dl=None, end=Non
         return dd
 
 
-def get_tdx_exp_low_or_high_power(code, dt=None, ptype='close', dl=None, end=None, power=False, lastp=False, newdays=None, resample='d'):
+def get_tdx_exp_low_or_high_power(code, dt=None, ptype='close', dl=None, end=None, power=False, lastp=False, newdays=None, resample='d',lvoldays=ct.lastdays*2):
     '''
     :param code:999999
     :param dayl:Duration Days
@@ -2370,6 +2370,7 @@ def get_tdx_exp_low_or_high_power(code, dt=None, ptype='close', dl=None, end=Non
                     lowp = dz.close.min()
                     lowdate = dz[dz.close == lowp].index.values[-1]
                     log.debug("low:%s" % lowdate)
+                lastvol = dz.vol[:lvoldays].min()
 
                 log.debug("date:%s %s:%s" % (lowdate, ptype, lowp))
                 # log.debug("date:%s %s:%s" % (dt, ptype, lowp))
@@ -2387,7 +2388,9 @@ def get_tdx_exp_low_or_high_power(code, dt=None, ptype='close', dl=None, end=Non
                     dt = dd.index.values[0]
                     dd = dd.T[dt]
                     dd['date'] = dt
-                    # print dd
+                dd['lowvol'] = dd.vol
+                dd['vol'] = lastvol
+
                 if 'ma5d' in df.columns and 'ma10d' in df.columns:
                     #                    print df[:1],code
                     if len(df.ma5d) > 0 and df[:1].ma5d.values[0] is not None and df[:1].ma5d.values[0] != 0:
