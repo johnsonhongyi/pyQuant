@@ -613,21 +613,22 @@ class Sina:
             df = df.set_index(['code', 'ticktime'])
             h5a.write_hdf_db(h5_fname, df, table=h5_table, index=False, baseCount=500, append=False, MultiIndex=True)
             log.info("hdf5 class all :%s  time:%0.2f" % (len(df), time.time() - time_s))
+        import pdb;pdb.set_trace();
 
         if 'nlow' not in df.columns or 'nhigh' not in df.columns or (cct.get_work_time() and 925 < cct.get_now_time_int() < 1500):
             # if 'nlow' not in df.columns or 'nhigh' not in df.columns or cct.get_work_time():
             h5 = h5a.load_hdf_db(h5_fname, h5_table, timelimit=False)
 
             time_s = time.time()
-            if cct.get_work_time() and cct.get_now_time_int() <= 1000:
+            if cct.get_work_time() and cct.get_now_time_int() <= 945:
                 run_col = ['low', 'high', 'close']
                 startime = '09:25:00'
                 # endtime = '10:00:00'
-                endtime = '09:50:00'
+                endtime = '09:45:00'
                 dd = self.get_col_agg_df(h5, dd, run_col, all_func, startime, endtime)
                 startime = '09:25:00'
                 # endtime = '10:00:00'
-                endtime = '10:00:00'
+                endtime = '09:45:00'
                 run_col = {'close': 'std'}
                 dd = self.get_col_agg_df(h5, dd, run_col, run_col, startime, endtime)
                 dd.rename(columns={'std': 'nstd'}, inplace=True)
@@ -639,7 +640,7 @@ class Sina:
                 run_col = ['low', 'high']
                 startime = '09:25:00'
                 # endtime = '10:00:00'
-                endtime = '09:50:00'
+                endtime = '09:45:00'
                 dd = self.get_col_agg_df(h5, dd, run_col, all_func, startime, endtime)
                 startime = '09:25:00'
                 endtime = '15:01:00'
@@ -699,13 +700,15 @@ if __name__ == "__main__":
     # df = sina.get_stock_code_data('000001',index=True).set_index('code')
     # df= sina.get_stock_code_data('999999,399001',index=True)
     # sys.exit(0)
-    code_agg = '399006'
-    dd = sina.get_stock_code_data([code_agg, '600243', '002339', '600007'])
+    code_agg = '601939'
+    dd = sina.get_stock_code_data([code_agg,'600050','002350', '601899',\
+      '603363','000868','603917','600392','300713','000933','002505','603676'])
     print dd.T
-    import ipdb;ipdb.set_trace()
     
-    print dd.loc[:, ['close', 'nclose', 'nlow', 'nhigh', 'nstd', 'ticktime']], dd.shape
-    print dd.loc[code_agg].T
+    print dd.loc[:, ['name','open','low','high','close', 'nclose', 'nlow', 'nhigh', 'nstd', 'ticktime']], dd.shape
+    # print dd.loc[code_agg].T
+    import ipdb;ipdb.set_trace()
+
     # print df.columns
     # df = sina.all
     # print df.nlow[:5]

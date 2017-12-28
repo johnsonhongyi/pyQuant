@@ -26,7 +26,7 @@ def func_compute_df2(c, lc, h, l):
     return du_p
 
 
-def getBollFilter(df=None, boll=6, duration=ct.PowerCountdl, filter=True, ma5d=True, dl=14, percent=False, resample='d'):
+def getBollFilter(df=None, boll=6, duration=ct.PowerCountdl, filter=True, ma5d=True, dl=14, percent=True, resample='d'):
 
     # drop_cxg = cct.GlobalValues().getkey('dropcxg')
     # if len(drop_cxg) >0:
@@ -108,7 +108,7 @@ def getBollFilter(df=None, boll=6, duration=ct.PowerCountdl, filter=True, ma5d=T
         df = df[df["perc%sd" % (idx_k)] >= idx_k]
         # log.error("perc%sd"%(market_value))
     elif market_key is not None and market_key == '2':
-        if market_value in ['1','2']:
+        if market_value in ['1', '2']:
             df['dff'] = (map(lambda x, y, z: round((x + (y if z > 20 else 3 * y)), 1), df.dff.values, df.volume.values, df.ratio.values))
     # df['df2'] = (map(lambda x, y, z: w=round((x - y) / z * 100, 1), df.high.values, df.low.values, df.llastp.values))
     # df['df2'] = (map(func_compute_df2, df.close.values, df.llastp.values,df.high.values, df.low.values,df.ratio.values))
@@ -119,22 +119,47 @@ def getBollFilter(df=None, boll=6, duration=ct.PowerCountdl, filter=True, ma5d=T
     if filter_up in df.columns:
         if filter_dn in df.columns:
             if market_key is not None and market_key == '3':
-                df = df[(df.buy >= df[filter_dn]) & (df[filter_up] >= df[filter_dn])]
+                df = df[(df.buy >= df[filter_dn]) & (df[filter_up] * 1.03 >= df[filter_dn])]
             else:
                 df = df[(df.buy >= df[filter_dn])]
         else:
             df = df[df.buy >= df[filter_up] * ct.changeRatio]
-        df = df[(df.lvolume > df.lvol * 1.2) & (df.lvol > df.lowvol * 1.1)]
+
+        df = df[(df.lvolume > df.lvol * 0.9) & (df.lvolume > df.lowvol * 1.1)]
     # if 'nlow' in df.columns and 932 < cct.get_now_time_int() < 1030:
 
-    if 'nlow' in df.columns and 935 < cct.get_now_time_int():
+    if 'nlow' in df.columns and 930 < cct.get_now_time_int():
         # for col in ['nhigh', 'nclose', 'nlow','nstd']:
         #     df[col] = df[col].apply(lambda x: round(x, 2))
         if 'nhigh' in df.columns and 'nclose' in df.columns:
-            ncloseRatio = map(lambda x, y: x * ct.changeRatio if x * ct.changeRatio > y else y, df.nclose, df.nlow)
-            nhighRatio = map(lambda x, y: x * ct.changeRatio if x * ct.changeRatio > y else y, df.nhigh, df.nclose)
+            # ncloseRatio = map(lambda x, y: x * ct.changeRatio if x * ct.changeRatio > y else y, df.nclose, df.nlow)
+            ncloseRatio = map(lambda x: x * 0.99, df.nclose)
+            nopenRatio = map(lambda x: x * 0.99, df.open)
+            # nhighRatio = map(lambda x, y: x * ct.changeRatio if x * ct.changeRatio > y else y, df.nhigh, df.nclose)
             # if cct.get_now_time_int() > ct.nlow_limit_time:
-            df = df[(((df.low >= df.nlow) & (df.close >= ncloseRatio)) | ((df.close >= ncloseRatio) & (df.close > nhighRatio)))]
+
+            #           name   open    low   high  close  nclose   nlow  nhigh  nstd  ticktime
+            # code
+            # 601899  紫金矿业   4.25   4.24   4.69   4.69    4.52   4.24   4.42  0.12  15:00:00
+            # 603917  合力科技  27.95  27.69  31.54  31.54   30.46  27.69  30.00  0.70  15:00:00
+            # 300713   英可瑞  81.00  81.00  89.82  89.77   87.53  80.90  86.36  1.75  15:02:03
+            # 000933  神火股份   9.07   9.02  10.00  10.00    9.71   9.02   9.44  0.24  15:02:03
+            # 600050  中国联通   6.49   6.37   6.51   6.41    6.44   6.44   6.51  0.02  15:00:00
+            # 002350  北京科锐  10.17  10.17  10.75  10.23   10.31  10.17  10.75  0.07  15:02:03
+            # 603363  傲农生物  17.49  16.91  18.35  18.35   17.35  17.18  18.00  0.34  15:00:00
+            # 000868  安凯客车   8.77   8.53   8.82   8.82    8.82   8.53   8.82  0.01  15:02:03
+            # 002505  大康农业   2.91   2.86   2.99   2.89    2.91   2.90   2.99  0.02  15:02:03
+            # 601939  建设银行   7.50   7.41   7.61   7.55    7.50   7.43   7.52  0.05  15:00:00
+            # 600392  盛和资源  16.85  16.81  18.63  18.63   17.84  16.81  17.51  0.69  15:00:00 (11, 41)
+            # 603676   卫信康  17.44  16.95  17.96  17.82   17.34  17.03  17.77  0.18  15:00:00
+            df['stdv'] = map(lambda x, y: round(x / y * 100, 1), df.nstd, df.open)
+            # top_temp[:40][['nstd','stdv','name','volume','dff','percent']]
+            # top_temp.loc['603363'][['nstd','stdv','name','volume','high','nhigh','percent','open','nclose']]
+
+            # df['stdv'] = map(lambda x, y, z: round(z / (x / y * 100), 1), df.nstd, df.open, df.volume)
+
+            df = df[(((df.open <= df.nclose) & (df.low >= df.nlow) & (df.close >= ncloseRatio)) |
+                     ((df.open <= df.nclose) & (df.close >= ncloseRatio) & (df.high > df.nhigh)))]
             # else:
             # df = df[(((df.low >= df.nlow) & (df.close >= ncloseRatio)) | ((df.close >= ncloseRatio) & (df.close > nhighRatio)))]
         else:
@@ -180,12 +205,16 @@ def getBollFilter(df=None, boll=6, duration=ct.PowerCountdl, filter=True, ma5d=T
             # df = df[(df.lvol * df.volume > (df.vstd + df.lvol)) | ((df.percent > -10) & (df.hv / df.lv > 1.5))]
 
             df = df[(df.lvol * df.volume > (df.vstd + df.lvol)) | ((df.percent > -5) & (df.hv / df.lv > 3))]
+
             # [dd.lvol * dd.volume > (dd.vstd + dd.lvol) | dd.lvol * dd.volume >(dd.ldvolume + dd.vstd]
         # print df.loc['000801']
 
         if percent:
-            if cct.get_now_time_int() > 930 and cct.get_now_time_int() <= 1430:
-                df = df[(df.volume > 1.5 * cct.get_work_time_ratio()) & (df.percent > -5)]
+            # if cct.get_now_time_int() > 930 and cct.get_now_time_int() <= 1430:
+            #     df = df[(df.volume > 1.5 * cct.get_work_time_ratio()) & (df.percent > -5)]
+
+            df = df[((df.volume > 1.5 * cct.get_work_time_ratio()) & (df.percent > -2) | (df.stdv < 1) & (df.percent > 2))]
+
             # df = df[(df.per1d > 9) | (df.per2d > 4) | (df.per3d > 6)]
             # df = df[(df.per1d > 0) | (df.per2d > 4) | (df.per3d > 6)]
         # time_ss=time.time()

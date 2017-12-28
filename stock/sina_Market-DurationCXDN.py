@@ -109,12 +109,12 @@ if __name__ == "__main__":
     # dl=60
     # op, ra, duration_date, days = pct.get_linear_model_status('999999', filter='y', dl=dl, ptype=ptype, days=1)
     # duration_date = ct.duration_date
-    duration_date = ct.duration_date_up
+    duration_date = int(ct.duration_date_up / 2)
     # duration_date = 30
     du_date = duration_date
     # resample = ct.resample_dtype
     resample = 'd'
-    newdays = 18
+    newdays = 8
     # print cct.last_tddate(2)
     # end_date = cct.last_tddate(days=ct.lastdays)
     end_date = None
@@ -132,7 +132,8 @@ if __name__ == "__main__":
     # all_diffpath = tdd.get_tdx_dir_blocknew() + '062.blk'
     parser = cct.MoniterArgmain()
     parserDuraton = cct.DurationArgmain()
-    market_sort_value, market_sort_value_key = ct.get_market_sort_value_key(ct.sort_value_key_perd)
+    # market_sort_value, market_sort_value_key = ct.get_market_sort_value_key(ct.sort_value_key_perd)
+    market_sort_value, market_sort_value_key = ct.get_market_sort_value_key('1')
     
     while 1:
         try:
@@ -147,7 +148,8 @@ if __name__ == "__main__":
             # top_now = tdd.getSinaAlldf(market='cx', vol=ct.json_countVol, vtype=ct.json_countType)
             # top_now = tdd.getSinaAlldf(market='央企',filename='yqg', vol=ct.json_countVol, vtype=ct.json_countType)
             # top_now = tdd.getSinaAlldf(market=u'一带一路',filename='ydyl', vol=ct.json_countVol, vtype=ct.json_countType)
-            top_now = tdd.getSinaAlldf(market='次新股',filename='cxg', vol=ct.json_countVol, vtype=ct.json_countType)
+            top_now = tdd.getSinaAlldf(market='all', vol=ct.json_countVol, vtype=ct.json_countType)
+            # top_now = tdd.getSinaAlldf(market='次新股',filename='cxg', vol=ct.json_countVol, vtype=ct.json_countType)
             time_Rt = time.time()
             # top_now = tdd.getSinaAlldf(market='有色+煤炭', filename='mfsw', vol=ct.json_countVol, vtype=ct.json_countType)
             # top_now = tdd.getSinaAlldf(market='雄安新区', filename='xaxq', vol=ct.json_countVol, vtype=ct.json_countType)
