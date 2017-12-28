@@ -114,7 +114,7 @@ if __name__ == "__main__":
     du_date = duration_date
     # resample = ct.resample_dtype
     resample = 'd'
-    newdays = 8
+    newdays = 18
     # print cct.last_tddate(2)
     # end_date = cct.last_tddate(days=ct.lastdays)
     end_date = None
@@ -171,10 +171,21 @@ if __name__ == "__main__":
                 time_Rt = time.time()
                 if len(top_all) == 0 and len(lastpTDX_DF) == 0:
                     cct.get_terminal_Position(position=sys.argv[0])
-
                     time_Rt = time.time()
-                    top_all, lastpTDX_DF = tdd.get_append_lastp_to_df(
-                        top_now, lastpTDX_DF=None, dl=duration_date, end=end_date, ptype=ptype, filter=filter, power=False, lastp=False, newdays=newdays, resample=resample)
+
+
+                    print ("term:%s" % (cct.get_terminal_Position(cmd='DurationDn.py')),)
+                    if cct.get_terminal_Position(cmd='DurationDn.py') > 1:
+                        top_all, lastpTDX_DF = tdd.get_append_lastp_to_df(
+                            top_now, lastpTDX_DF=None, dl=duration_date, end=end_date, ptype=ptype, filter=filter, power=ct.lastPower, lastp=False, newdays=newdays, resample=resample)
+                    else:
+                        newdays = 15
+                        top_all, lastpTDX_DF = tdd.get_append_lastp_to_df(
+                            top_now, lastpTDX_DF=None, dl=duration_date, end=end_date, ptype=ptype, filter=filter, power=ct.lastPower, lastp=False, newdays=newdays, checknew=True, resample=resample)
+
+
+                    # top_all, lastpTDX_DF = tdd.get_append_lastp_to_df(
+                         # top_now, lastpTDX_DF=None, dl=duration_date, end=end_date, ptype=ptype, filter=filter, power=False, lastp=False, newdays=newdays, resample=resample)
 
                 elif len(top_all) == 0 and len(lastpTDX_DF) > 0:
                     time_Rt = time.time()
