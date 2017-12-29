@@ -378,6 +378,8 @@ if __name__ == "__main__":
                         top_dd = pd.concat([top_temp[:10], top_end], axis=0)
                         # top_dd = top_dd.drop_duplicates()
                         ct_Duration_format_Values = ct.get_Duration_format_Values(ct.Duration_format_buy, market_sort_value[:])
+                        ct_Duration_format_Values = ct.get_Duration_format_Values(ct_Duration_format_Values,replace='couts',dest='stdv')
+                        
                         top_dd = top_dd.loc[:, ct_Duration_format_Values]
                     else:
                         # top_temp = top_temp[top_temp['trade'] > top_temp['ma10d']]
@@ -387,6 +389,8 @@ if __name__ == "__main__":
                         top_dd = pd.concat([top_temp[:10], top_end], axis=0)
                         # top_dd = top_dd.drop_duplicates()
                         ct_Duration_format_Values = ct.get_Duration_format_Values(ct.Duration_format_trade, market_sort_value[:])
+                        ct_Duration_format_Values = ct.get_Duration_format_Values(ct_Duration_format_Values,replace='couts',dest='stdv')
+                        
                         top_dd = top_dd.loc[:, ct_Duration_format_Values]
 
                     print (cct.format_for_print(top_dd))

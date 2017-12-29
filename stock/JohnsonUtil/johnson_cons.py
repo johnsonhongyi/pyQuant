@@ -590,18 +590,21 @@ def negate_boolean_list(negate_list, idx=1, position=False):
     return sort_negate_l
 
 
-def get_Duration_format_Values(duration_format, column=None, replace='per3d'):
-    if column is not None:
+def get_Duration_format_Values(duration_format, column=None, replace='per3d',dest='b1_v'):
+    if column is not None or dest <>'b1_v':
         t_list = []
 #        perd_l = ['per%sd','perc%sd']
-        column = column[:]
+        if column is None:
+          column = [dest]
+        else:
+          column = column[:]
         if 'percent' in column:
             column.remove('percent')
 #        idx_list = eval(market_sort_value)[:]
 #        idx_key = [ idx_list.index(x) for x in perd_l if x in idx_list]
         idx_key = [column.index(x) for x in column if x.find('per') > -1]
         if len(idx_key) == 0:
-            idx_key = [column.index(x) for x in column if x.find('b1_v') > -1]
+            idx_key = [column.index(x) for x in column if x.find(dest) > -1]
         if isinstance(column, list):
             #            for i,co in enumerate(idx_key):
             for co in (idx_key):
@@ -635,7 +638,7 @@ def get_Duration_format_Values(duration_format, column=None, replace='per3d'):
                         t_list.append(v)
         if len(t_list) == len(duration_format):
             duration_format = t_list
-        if not 'b1_v' in duration_format:
+        if not dest in duration_format:
             duration_format = get_Duration_format_Values(duration_format, column='b1_v', replace='volume')
 
     return duration_format
