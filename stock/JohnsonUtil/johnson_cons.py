@@ -609,7 +609,7 @@ def get_Duration_format_Values(duration_format, column=None, replace='per3d',des
             #            for i,co in enumerate(idx_key):
             for co in (idx_key):
                 if replace in column or column[co] not in duration_format:
-                    if column[co].find('per') > -1:
+                    if len(column) > 1 and column[co].find('per') > -1:
                         if column[co].find('perc') > -1:
                             replace = 'per3d'
                         else:

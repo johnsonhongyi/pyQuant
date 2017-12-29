@@ -653,6 +653,9 @@ class Sina:
                 if dd is not None and len(dd) > 0 and  'nclose' in dd.columns and 'nstd' in dd.columns:
                     for co in ['nclose','nstd']:
                         dd[co] = dd[co].apply(lambda x: round(x, 2))
+                        
+            dd['stdv'] = map(lambda x, y: round(x / y * 100, 1), dd.nstd, dd.open)
+            
             log.info("agg_df_all_time:%0.2f" % (time.time() - time_s))
             # top_temp[:1][['high','nhigh','low','nlow','close','nclose','llastp']]
 

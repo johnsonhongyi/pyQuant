@@ -70,10 +70,10 @@ def getBollFilter(df=None, boll=6, duration=ct.PowerCountdl, filter=True, ma5d=T
                                                                                                  (nowd)], df['lasth%sd' % (nowd)], df['lastl%sd' % (nowd)], df['high'], df['low'])
 
             for co in perc_col:
-                df[co] = (df[co] + df['perc_n']).map(lambda x:int(x))
+                df[co] = (df[co] + df['perc_n']).map(lambda x: int(x))
 
             for co in per_col:
-                df[co] = (df[co] + df['percent']).map(lambda x:int(x))
+                df[co] = (df[co] + df['percent']).map(lambda x: int(x))
             # print "percT:%.2f"%(time.time()-time_ss)
 
     if 'fib' not in df.columns:
@@ -126,8 +126,7 @@ def getBollFilter(df=None, boll=6, duration=ct.PowerCountdl, filter=True, ma5d=T
             df = df[df.buy >= df[filter_up] * ct.changeRatio]
 
         # df = df[(df.lvolume > df.lvol * 0.9) & (df.lvolume > df.lowvol * 1.1)]
-        
-        
+
     # if 'nlow' in df.columns and 932 < cct.get_now_time_int() < 1030:
 
     if 'nlow' in df.columns and 930 < cct.get_now_time_int():
@@ -154,7 +153,10 @@ def getBollFilter(df=None, boll=6, duration=ct.PowerCountdl, filter=True, ma5d=T
             # 601939  建设银行   7.50   7.41   7.61   7.55    7.50   7.43   7.52  0.05  15:00:00
             # 600392  盛和资源  16.85  16.81  18.63  18.63   17.84  16.81  17.51  0.69  15:00:00 (11, 41)
             # 603676   卫信康  17.44  16.95  17.96  17.82   17.34  17.03  17.77  0.18  15:00:00
-            df['stdv'] = map(lambda x, y: round(x / y * 100, 1), df.nstd, df.open)
+
+            if 'stdv' not in df.columns:
+                df['stdv'] = map(lambda x, y: round(x / y * 100, 1), df.nstd, df.open)
+
             # top_temp[:40][['nstd','stdv','name','volume','dff','percent']]
             # top_temp.loc['603363'][['nstd','stdv','name','volume','high','nhigh','percent','open','nclose']]
 
@@ -216,10 +218,16 @@ def getBollFilter(df=None, boll=6, duration=ct.PowerCountdl, filter=True, ma5d=T
             #     df = df[(df.volume > 1.5 * cct.get_work_time_ratio()) & (df.percent > -5)]
             # df = df[(df.lvolume > df.lvol * 0.9) & (df.lvolume > df.lowvol * 1.1)]
             if 'stdv' in df.columns and 930 < cct.get_now_time_int():
-                df = df[((df.volume > 1.5 * cct.get_work_time_ratio()) & (df.percent > -2)) | ((df.stdv < 1) & (df.percent > 2)) | ((df.lvolume > df.lvol * 0.9) & (df.lvolume > df.lowvol * 1.1))]
+                df = df[((df.volume > 1.5 * cct.get_work_time_ratio()) & (df.percent > -2)) | ((df.stdv < 1) &
+                                                                                               (df.percent > 2)) | ((df.lvolume > df.lvol * 0.9) & (df.lvolume > df.lowvol * 1.1))]
             else:
                 df = df[((df.volume > 1.5 * cct.get_work_time_ratio()) & (df.percent > -2)) | ((df.lvolume > df.lvol * 0.9) & (df.lvolume > df.lowvol * 1.1))]
 
+            df['upper'] = map(lambda x: round((1 + 11.0 / 100) * x, 1), df.ma10d)
+            df['lower'] = map(lambda x: round((1 - 9.0 / 100) * x, 1), df.ma10d)
+            df['ene'] = map(lambda x, y: round((x + y) / 2, 1), df.upper, df.lower)
+            # df = df[((df['buy'] >= df['ene'])) | ((df['buy'] < df['ene']) & (df['low'] > df['lower'])) | ((df['buy'] > df['upper']) & (df['low'] > df['upper']))]
+            df = df[((df['buy'] >= df['ene'])) | ((df['buy'] > df['upper']) & (df['low'] > df['upper']))]
             # df = df[(df.per1d > 9) | (df.per2d > 4) | (df.per3d > 6)]
             # df = df[(df.per1d > 0) | (df.per2d > 4) | (df.per3d > 6)]
         # time_ss=time.time()
@@ -230,9 +238,9 @@ def getBollFilter(df=None, boll=6, duration=ct.PowerCountdl, filter=True, ma5d=T
         # bolldf = bolldf.set_index('code')
         # df = cct.combine_dataFrame(df, bolldf)
         # print "bollt:%0.2f"%(time.time()-time_ss),
-        per3d_l = 2
-        percent_l = -1
-        op_l = 3
+        per3d_l=2
+        percent_l=-1
+        op_l=3
         if 'boll' in df.columns:
             if 915 < cct.get_now_time_int() < 950:
                 # df = df[(df.boll >= boll) | ((df.percent > percent_l) & (df.op > 4)) | ((df.percent > percent_l) & (df.per3d > per3d_l))]
@@ -243,7 +251,7 @@ def getBollFilter(df=None, boll=6, duration=ct.PowerCountdl, filter=True, ma5d=T
                 # df = df[(df.boll >= boll) & ((df.low <> 0) & (df.open >= df.low *
                 # ct.changeRatio) & (((df.percent > percent_l)) | ((df.percent >
                 # percent_l) & (df.per3d > per3d_l))))]
-                df = df[(df.boll >= boll)]
+                df=df[(df.boll >= boll)]
             # else:
         # df = df[(df.boll >= boll) | ((df.low <> 0) & (df.open == df.low) &
         # (((df.percent > percent_l) & (df.op > op_l)) | ((df.percent > percent_l)
@@ -288,14 +296,14 @@ def getBollFilter(df=None, boll=6, duration=ct.PowerCountdl, filter=True, ma5d=T
     # if 'ra' in df.columns and 'op' in df.columns:
     #     df = df[ (df.ma > 0 ) & (df.diff > 1) & (df.ra > 1) & (df.op >= 5) ]
 
-def WriteCountFilter(df, op='op', writecount=ct.writeCount, end=None, duration=10):
-    codel = []
+def WriteCountFilter(df, op = 'op', writecount = ct.writeCount, end = None, duration = 10):
+    codel=[]
     if str(writecount) <> 'all':
         if end is None and int(writecount) > 0:
             if int(writecount) < 100 and len(df) > 0 and 'percent' in df.columns:
-                codel = df.index[:int(writecount)].tolist()
-                dd = df[df.percent == 10]
-                df_list = dd.index.tolist()
+                codel=df.index[:int(writecount)].tolist()
+                dd=df[df.percent == 10]
+                df_list=dd.index.tolist()
                 for co in df_list:
                     if co not in codel:
                         codel.append(co)
@@ -306,25 +314,25 @@ def WriteCountFilter(df, op='op', writecount=ct.writeCount, end=None, duration=1
                     print "writeCount DF is None or Wri:%s" % (writecount)
         else:
             if end is None:
-                writecount = int(writecount)
+                writecount=int(writecount)
                 if writecount > 0:
                     writecount -= 1
                 codel.append(df.index.tolist()[writecount])
             else:
-                writecount, end = int(writecount), int(end)
+                writecount, end=int(writecount), int(end)
 
                 if writecount > end:
-                    writecount, end = end, writecount
+                    writecount, end=end, writecount
                 if end < -1:
                     end += 1
-                    codel = df.index.tolist()[writecount:end]
+                    codel=df.index.tolist()[writecount:end]
                 elif end == -1:
-                    codel = df.index.tolist()[writecount::]
+                    codel=df.index.tolist()[writecount::]
                 else:
                     if writecount > 0 and end > 0:
                         writecount -= 1
                         end -= 1
-                    codel = df.index.tolist()[writecount:end]
+                    codel=df.index.tolist()[writecount:end]
     else:
-        codel = df.index.tolist()
+        codel=df.index.tolist()
     return codel

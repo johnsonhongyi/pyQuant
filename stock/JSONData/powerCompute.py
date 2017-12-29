@@ -1070,7 +1070,7 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y', tal
             if len(dz) > 0 and (dz.buy.values > 0 or dz.sell.values > 0):
                 tdx_df = tdd.get_tdx_append_now_df_api(
                     code, start=start, end=end, type='f', df=None, dm=dz, dl=dl, newdays=5)
-                # print tdx_df
+
                 tdx_df = tdx_df.fillna(0)
                 tdx_df = tdx_df.sort_index(ascending=True)
 
