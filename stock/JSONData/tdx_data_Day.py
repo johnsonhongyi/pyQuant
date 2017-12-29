@@ -2159,7 +2159,7 @@ def compute_lastdays_percent(df=None, lastdays=3, resample='d'):
             df['lastl%sd' % da] = df['low'].shift(da)
             # df['lastv%sd' % da] = (df['vol'].shift(da)/min_vol)
             # lasp_percent = df['per%sd' % (da - 1)][da-1] if (da - 1) > 0 else 0
-            df['per%sd' % da] = ((df['close'] - df['lastp%sd' % da]) / df['lastp%sd' % da]).map(lambda x: round(x * 100, 2))
+            df['per%sd' % da] = ((df['close'] - df['lastp%sd' % da]) / df['lastp%sd' % da]).map(lambda x: round(x * 100, 1))
             if da == 1:
                 df['lastp%sd' % 0] = df['close'][-1]
                 df['lasth%sd' % 0] = df['high'][-1]
@@ -2177,7 +2177,7 @@ def compute_lastdays_percent(df=None, lastdays=3, resample='d'):
                 # df['perlastp'] = map(cct.func_compute_percd,df['close'], df['per%sd' % per1d], df['lastp%sd' % (nowd)], df['lasth%sd' % (nowd)], df['lastl%sd' % (nowd)], df['high'], df['low'])
 
             df['mean%sd' % da] = (
-                (df['lasth%sd' % da] + df['lastl%sd' % da]) / 2).map(lambda x: round(x, 2))
+                (df['lasth%sd' % da] + df['lastl%sd' % da]) / 2).map(lambda x: round(x, 1))
             df['per%sd' % da] = df['per%sd' % da][-1]
             df['perc%sd' % da] = int(df['perlastp'][-da:].sum())
             # print df['perlastp'][-da:]

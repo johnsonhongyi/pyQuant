@@ -613,7 +613,6 @@ class Sina:
             df = df.set_index(['code', 'ticktime'])
             h5a.write_hdf_db(h5_fname, df, table=h5_table, index=False, baseCount=500, append=False, MultiIndex=True)
             log.info("hdf5 class all :%s  time:%0.2f" % (len(df), time.time() - time_s))
-        import pdb;pdb.set_trace();
 
         if 'nlow' not in df.columns or 'nhigh' not in df.columns or (cct.get_work_time() and 925 < cct.get_now_time_int() < 1500):
             # if 'nlow' not in df.columns or 'nhigh' not in df.columns or cct.get_work_time():

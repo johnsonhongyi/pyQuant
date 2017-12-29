@@ -70,10 +70,10 @@ def getBollFilter(df=None, boll=6, duration=ct.PowerCountdl, filter=True, ma5d=T
                                                                                                  (nowd)], df['lasth%sd' % (nowd)], df['lastl%sd' % (nowd)], df['high'], df['low'])
 
             for co in perc_col:
-                df[co] = (df[co] + df['perc_n']).map(lambda x: x)
+                df[co] = (df[co] + df['perc_n']).map(lambda x:int(x))
 
             for co in per_col:
-                df[co] = (df[co] + df['percent']).map(lambda x: x)
+                df[co] = (df[co] + df['percent']).map(lambda x:int(x))
             # print "percT:%.2f"%(time.time()-time_ss)
 
     if 'fib' not in df.columns:
@@ -125,7 +125,9 @@ def getBollFilter(df=None, boll=6, duration=ct.PowerCountdl, filter=True, ma5d=T
         else:
             df = df[df.buy >= df[filter_up] * ct.changeRatio]
 
-        df = df[(df.lvolume > df.lvol * 0.9) & (df.lvolume > df.lowvol * 1.1)]
+        # df = df[(df.lvolume > df.lvol * 0.9) & (df.lvolume > df.lowvol * 1.1)]
+        
+        
     # if 'nlow' in df.columns and 932 < cct.get_now_time_int() < 1030:
 
     if 'nlow' in df.columns and 930 < cct.get_now_time_int():
@@ -212,8 +214,11 @@ def getBollFilter(df=None, boll=6, duration=ct.PowerCountdl, filter=True, ma5d=T
         if percent:
             # if cct.get_now_time_int() > 930 and cct.get_now_time_int() <= 1430:
             #     df = df[(df.volume > 1.5 * cct.get_work_time_ratio()) & (df.percent > -5)]
-
-            df = df[((df.volume > 1.5 * cct.get_work_time_ratio()) & (df.percent > -2) | (df.stdv < 1) & (df.percent > 2))]
+            # df = df[(df.lvolume > df.lvol * 0.9) & (df.lvolume > df.lowvol * 1.1)]
+            if 'stdv' in df.columns and 930 < cct.get_now_time_int():
+                df = df[((df.volume > 1.5 * cct.get_work_time_ratio()) & (df.percent > -2)) | ((df.stdv < 1) & (df.percent > 2)) | ((df.lvolume > df.lvol * 0.9) & (df.lvolume > df.lowvol * 1.1))]
+            else:
+                df = df[((df.volume > 1.5 * cct.get_work_time_ratio()) & (df.percent > -2)) | ((df.lvolume > df.lvol * 0.9) & (df.lvolume > df.lowvol * 1.1))]
 
             # df = df[(df.per1d > 9) | (df.per2d > 4) | (df.per3d > 6)]
             # df = df[(df.per1d > 0) | (df.per2d > 4) | (df.per3d > 6)]
