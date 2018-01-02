@@ -948,6 +948,10 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y', tal
         h5_combine_status = True
         statuslist = False
 
+    # if '999999' not in code_l:
+    #     code_l.append('999999')
+    #     code_l.append('399001')
+        
     # code_src = code_l
     global Power_CXG_Error, drop_cxg, wencai_drop
 #    drop_cxg
@@ -958,6 +962,7 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y', tal
                      'boll', 'rah', 'df2', 'fibl', 'macd', 'vstd', 'oph', 'lvolume']
     # [['ma' ,'rsi' ,'kdj' ,'boll', 'ra','rah', 'df2' ,'fibl','fib' ,'macd' ,'oph']]
     # [['ma' ,'rsi' ,'kdj' ,'boll', 'ra',rah', 'df2' ,'fibl','fib' ,'macd' ,'vstd', 'oph']]
+
     h5 = h5a.load_hdf_db(h5_fname, h5_table, code_l=code_l, limit_time=ct.h5_power_limit_time)
     if h5 is not None:
         log.info("power hdf5 data:%s" % (len(h5)))
@@ -972,7 +977,8 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y', tal
             h5 = h5[(h5.df2 <> 0 ) & (h5.ra <> 0 ) & (h5.boll <> 0 )]
             h5 = h5.drop(
                 [inx for inx in h5.columns if inx not in power_columns], axis=1)
-            code_l = list(set(df.index) - set(h5.index))
+
+            code_l = list(set(code_l) - set(h5.index))
             df = cct.combine_dataFrame(df, h5, col=None)
             if len(code_l) == 0:
                 log.info("return df:%s h5:%s diff 0:%s" %

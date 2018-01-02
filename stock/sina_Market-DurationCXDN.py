@@ -174,8 +174,8 @@ if __name__ == "__main__":
                     time_Rt = time.time()
 
 
-                    print ("term:%s" % (cct.get_terminal_Position(cmd='DurationDn.py')),)
-                    if cct.get_terminal_Position(cmd='DurationDn.py') > 1:
+                    print ("term:%s" % (cct.get_terminal_Position(cmd='DurationCXDN.py')),)
+                    if cct.get_terminal_Position(cmd='DurationCXDN.py') > 1:
                         top_all, lastpTDX_DF = tdd.get_append_lastp_to_df(
                             top_now, lastpTDX_DF=None, dl=duration_date, end=end_date, ptype=ptype, filter=filter, power=ct.lastPower, lastp=False, newdays=newdays, resample=resample)
                     else:

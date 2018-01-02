@@ -698,10 +698,11 @@ if __name__ == "__main__":
     # print len(df)
     # code='601198'
     # print sina.get_stock_list_data(['999999','399001','399006'],index=True)
-    # print sina.get_stock_code_data('999999,399001',index=True)
+    df = sina.get_stock_code_data('999999,399001,399006',index=True)
+    print df.volume
     # df = sina.get_stock_code_data('000001',index=True).set_index('code')
     # df= sina.get_stock_code_data('999999,399001',index=True)
-    # sys.exit(0)
+    sys.exit(0)
     code_agg = '601939'
     dd = sina.get_stock_code_data([code_agg,'600050','002350', '601899',\
       '603363','000868','603917','600392','300713','000933','002505','603676'])

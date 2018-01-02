@@ -60,11 +60,11 @@ def get_tdx_dir():
 #         log.info("Windows:%s" % os_sys)
 #         if os_platform.find('XP') == 0:
 #             log.info("XP:%s" % os_platform)
-#             basedir = xproot.replace('/', path_sep).replace('\\',path_sep)  # å¦‚æœä½ çš„å®‰è£…è·¯å¾„ä¸åŒ,è¯·æ”¹è¿™é‡Œ
+#             basedir = xproot.replace('/', path_sep).replace('\\',path_sep)  # Èç¹ûÄãµÄ°²×°Â·¾¶²»Í¬,Çë¸ÄÕâÀï
 #         else:
 #             log.info("Win7O:%s" % os_platform)
 #             for root in win7rootList:
-#                 basedir = root.replace('/', path_sep).replace('\\',path_sep)  # å¦‚æœä½ çš„å®‰è£…è·¯å¾„ä¸åŒ,è¯·æ”¹è¿™é‡Œ
+#                 basedir = root.replace('/', path_sep).replace('\\',path_sep)  # Èç¹ûÄãµÄ°²×°Â·¾¶²»Í¬,Çë¸ÄÕâÀï
 #                 if os.path.exists(basedir):
 #                     log.info("%s : path:%s" % (os_platform,basedir))
 #                     break
@@ -1691,6 +1691,20 @@ def getSinaJsondf(market='cyb', vol=ct.json_countVol, vtype=ct.json_countType):
     top_now = rl.get_market_price_sina_dd_realTime(df, vol, vtype)
     return top_now
 
+def getSinaIndexdf():
+    # '''
+    # # return index df,no work
+    # '''
+    # dm_index = sina_data.Sina().get_stock_code_data('999999,399001,399006',index=True)
+    # # dm = get_sina_data_df(dm_index.index.tolist())
+    # dm = cct.combine_dataFrame(dm, dm_index, col=None, compare=None, append=True, clean=True)
+    dm = getSinaAlldf(market='index')
+    # tdxdata = get_tdx_exp_all_LastDF_DL(
+    #             dm.index.tolist(), dt=30,power=True)
+    top_all, lastpTDX_DF = get_append_lastp_to_df(dm,None, dl=30,power=ct.lastPower) 
+    if 'lvolume' not in top_all.columns:
+        top_all.rename(columns={'lvol': 'lvolume'}, inplace=True)
+    return top_all
 
 def getSinaAlldf(market='cyb', vol=ct.json_countVol, vtype=ct.json_countType, filename='mnbk', table='top_now'):
     market_all = False
@@ -1707,6 +1721,11 @@ def getSinaAlldf(market='cyb', vol=ct.json_countVol, vtype=ct.json_countType, fi
             df = cct.get_tushare_market(market=market, renew=True, days=5)
         else:
             df = cct.get_tushare_market(market, renew=False, days=5)
+    elif market == 'index':
+            # blkname = '061.blk'
+        # df = sina_data.Sina().get_stock_code_data('999999,399001,399006',index=True)
+        df = sina_data.Sina().get_stock_code_data('999999',index=True)
+
     elif market.find('blk') > 0 or market.isdigit():
             # blkname = '061.blk'
         code_l = cct.read_to_blocknew(market)
@@ -1752,10 +1771,12 @@ def getSinaAlldf(market='cyb', vol=ct.json_countVol, vtype=ct.json_countType, fi
     h5_fname = 'tdx_now'
     h5_table = 'all'
     time_s = time.time()
-    if not market_all:
+
+    if not market_all and market <> 'index':
         dm = sina_data.Sina().get_stock_list_data(codelist)
     else:
         dm = df
+
     # if cct.get_work_time() or (cct.get_now_time_int() > 915) :
     dm['percent'] = map(lambda x, y: round(
         (x - y) / y * 100, 2), dm.close.values, dm.llastp.values)
@@ -1763,28 +1784,26 @@ def getSinaAlldf(market='cyb', vol=ct.json_countVol, vtype=ct.json_countType, fi
     # dm['volume'] = map(lambda x: round(x / 100, 1), dm.volume.values)
     dm['trade'] = dm['close']
 
-    if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 926:
-        # print dm[dm.code=='000001'].b1
-        # print dm[dm.code=='000001'].a1
-        # print dm[dm.code=='000001'].a1_v
-        # print dm[dm.code=='000001'].b1_v
-        dm['volume'] = map(lambda x, y: x + y, dm.b1_v.values, dm.b2_v.values)
-        dm = dm[(dm.b1 > 0) | (dm.a1 > 0)]
-        dm['b1_v'] = ((dm['b1_v'] + dm['b2_v']) / 100 / 10000).map(lambda x: round(x, 1) + 0.01)
+    if market <> 'index':
+        if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 926:
+            # print dm[dm.code=='000001'].b1
+            # print dm[dm.code=='000001'].a1
+            # print dm[dm.code=='000001'].a1_v
+            # print dm[dm.code=='000001'].b1_v
+            dm['volume'] = map(lambda x, y: x + y, dm.b1_v.values, dm.b2_v.values)
+            dm = dm[(dm.b1 > 0) | (dm.a1 > 0)]
+            dm['b1_v'] = ((dm['b1_v'] + dm['b2_v']) / 100 / 10000).map(lambda x: round(x, 1) + 0.01)
 
-    elif cct.get_now_time_int() > 926:
-        # dm = dm[dm.open > 0]
-        dm = dm[(dm.b1 > 0) | (dm.a1 > 0)]
-        dm['b1_v'] = ((dm['b1_v']) / dm['volume'] * 100).map(lambda x: round(x, 1))
+        elif cct.get_now_time_int() > 926:
+            # dm = dm[dm.open > 0]
+            dm = dm[(dm.b1 > 0) | (dm.a1 > 0)]
+            dm['b1_v'] = ((dm['b1_v']) / dm['volume'] * 100).map(lambda x: round(x, 1))
 
-        # dm['b1_v'] = map(lambda x, y: round(x / y * 100, 1), dm['b1_v'], dm['volume'])
+            # dm['b1_v'] = map(lambda x, y: round(x / y * 100, 1), dm['b1_v'], dm['volume'])
 
-    else:
-        dm = dm[dm.buy > 0]
-#        dm['b1_v'] = map(lambda x: round(x / 100 / 10000, 1) + 0.01, dm['b1_v'])
-        dm['b1_v'] = ((dm['b1_v']) / dm['volume'] * 100).map(lambda x: round(x, 1))
-
-
+        else:
+            dm = dm[dm.buy > 0]
+            dm['b1_v'] = ((dm['b1_v']) / dm['volume'] * 100).map(lambda x: round(x, 1))
 
     # print 'ratio' in dm.columns
     # print time.time()-time_s
@@ -1808,7 +1827,7 @@ def getSinaAlldf(market='cyb', vol=ct.json_countVol, vtype=ct.json_countType, fi
         log.info("dm combine_df ratio:%s %s" % (len(dm), len(df))),
         dm = dm.fillna(0)
 
-    if cct.get_now_time_int() > 935 or not cct.get_work_time():
+    if market <> 'index' and (cct.get_now_time_int() > 935 or not cct.get_work_time()):
         top_now = rl.get_market_price_sina_dd_realTime(dm, vol, vtype)
     else:
         if 'code' in dm.columns:
@@ -1838,25 +1857,25 @@ def getSinaAlldf(market='cyb', vol=ct.json_countVol, vtype=ct.json_countType, fi
 
 def get_tdx_day_to_df(code):
     """
-        è·å–ä¸ªè‚¡å†å²äº¤æ˜“è®°å½•
+        »ñÈ¡¸ö¹ÉÀúÊ·½»Ò×¼ÇÂ¼
     Parameters
     ------
       code:string
-                  è‚¡ç¥¨ä»£ç  e.g. 600848
+                  ¹ÉÆ±´úÂë e.g. 600848
       start:string
-                  å¼€å§‹æ—¥æœŸ formatï¼šYYYY-MM-DD ä¸ºç©ºæ—¶å–åˆ°APIæ‰€æä¾›çš„æœ€æ—©æ—¥æœŸæ•°æ®
+                  ¿ªÊ¼ÈÕÆÚ format£ºYYYY-MM-DD Îª¿ÕÊ±È¡µ½APIËùÌá¹©µÄ×îÔçÈÕÆÚÊı¾İ
       end:string
-                  ç»“æŸæ—¥æœŸ formatï¼šYYYY-MM-DD ä¸ºç©ºæ—¶å–åˆ°æœ€è¿‘ä¸€ä¸ªäº¤æ˜“æ—¥æ•°æ®
-      ktypeï¼šstring
-                  æ•°æ®ç±»å‹ï¼ŒD=æ—¥kçº¿ W=å‘¨ M=æœˆ 5=5åˆ†é’Ÿ 15=15åˆ†é’Ÿ 30=30åˆ†é’Ÿ 60=60åˆ†é’Ÿï¼Œé»˜è®¤ä¸ºD
-      retry_count : int, é»˜è®¤ 3
-                 å¦‚é‡ç½‘ç»œç­‰é—®é¢˜é‡å¤æ‰§è¡Œçš„æ¬¡æ•°
-      pause : int, é»˜è®¤ 0
-                é‡å¤è¯·æ±‚æ•°æ®è¿‡ç¨‹ä¸­æš‚åœçš„ç§’æ•°ï¼Œé˜²æ­¢è¯·æ±‚é—´éš”æ—¶é—´å¤ªçŸ­å‡ºç°çš„é—®é¢˜
+                  ½áÊøÈÕÆÚ format£ºYYYY-MM-DD Îª¿ÕÊ±È¡µ½×î½üÒ»¸ö½»Ò×ÈÕÊı¾İ
+      ktype£ºstring
+                  Êı¾İÀàĞÍ£¬D=ÈÕkÏß W=ÖÜ M=ÔÂ 5=5·ÖÖÓ 15=15·ÖÖÓ 30=30·ÖÖÓ 60=60·ÖÖÓ£¬Ä¬ÈÏÎªD
+      retry_count : int, Ä¬ÈÏ 3
+                 ÈçÓöÍøÂçµÈÎÊÌâÖØ¸´Ö´ĞĞµÄ´ÎÊı
+      pause : int, Ä¬ÈÏ 0
+                ÖØ¸´ÇëÇóÊı¾İ¹ı³ÌÖĞÔİÍ£µÄÃëÊı£¬·ÀÖ¹ÇëÇó¼ä¸ôÊ±¼äÌ«¶Ì³öÏÖµÄÎÊÌâ
     return
     -------
       DataFrame
-          å±æ€§:æ—¥æœŸ ï¼Œå¼€ç›˜ä»·ï¼Œ æœ€é«˜ä»·ï¼Œ æ”¶ç›˜ä»·ï¼Œ æœ€ä½ä»·ï¼Œ æˆäº¤é‡ï¼Œ ä»·æ ¼å˜åŠ¨ ï¼Œæ¶¨è·Œå¹…ï¼Œ5æ—¥å‡ä»·ï¼Œ10æ—¥å‡ä»·ï¼Œ20æ—¥å‡ä»·ï¼Œ5æ—¥å‡é‡ï¼Œ10æ—¥å‡é‡ï¼Œ20æ—¥å‡é‡ï¼Œæ¢æ‰‹ç‡
+          ÊôĞÔ:ÈÕÆÚ £¬¿ªÅÌ¼Û£¬ ×î¸ß¼Û£¬ ÊÕÅÌ¼Û£¬ ×îµÍ¼Û£¬ ³É½»Á¿£¬ ¼Û¸ñ±ä¶¯ £¬ÕÇµø·ù£¬5ÈÕ¾ù¼Û£¬10ÈÕ¾ù¼Û£¬20ÈÕ¾ù¼Û£¬5ÈÕ¾ùÁ¿£¬10ÈÕ¾ùÁ¿£¬20ÈÕ¾ùÁ¿£¬»»ÊÖÂÊ
     """
     # time_s=time.time()
     # print code
@@ -2575,7 +2594,7 @@ def get_tdx_exp_low_or_high_power(code, dt=None, ptype='close', dl=None, end=Non
 
 
 #############################################################
-# usage ä½¿ç”¨è¯´æ˜
+# usage Ê¹ÓÃËµÃ÷
 #
 #############################################################
 def get_tdx_all_day_LastDF(codeList, dt=None, ptype='close'):
@@ -3014,10 +3033,10 @@ def get_tdx_search_day_DF(market='cyb'):
 
 def get_tdx_stock_period_to_type(stock_data, period_day='w', periods=5,ncol=None):
     period_type = period_day
-    #é»˜è®¤çš„indexç±»å‹:
+    #Ä¬ÈÏµÄindexÀàĞÍ:
     indextype = True if stock_data.index.dtype == 'datetime64[ns]' else False
     #
-    # è½¬æ¢å‘¨æœ€åä¸€æ—¥å˜é‡
+    # ×ª»»ÖÜ×îºóÒ»ÈÕ±äÁ¿
     if cct.get_work_day_status() and 915 < cct.get_now_time_int() < 1500:
         stock_data = stock_data[stock_data.index < cct.get_today()]
     stock_data['date'] = stock_data.index
@@ -3031,21 +3050,21 @@ def get_tdx_stock_period_to_type(stock_data, period_day='w', periods=5,ncol=None
         log.error("index.name not date,pls check:%s" % (stock_data[:1]))
 
     period_stock_data = stock_data.resample(period_type, how='last')
-    # å‘¨æ•°æ®çš„æ¯æ—¥changeè¿ç»­ç›¸ä¹˜
+    # ÖÜÊı¾İµÄÃ¿ÈÕchangeÁ¬ĞøÏà³Ë
     # period_stock_data['percent']=stock_data['percent'].resample(period_type,how=lambda x:(x+1.0).prod()-1.0)
-    # å‘¨æ•°æ®openç­‰äºç¬¬ä¸€æ—¥
+    # ÖÜÊı¾İopenµÈÓÚµÚÒ»ÈÕ
     # print stock_data.index[0],stock_data.index[-1]
     # period_stock_data.index =
     # pd.DatetimeIndex(start=stock_data.index.values[0],end=stock_data.index.values[-1],freq='BM')
 
     period_stock_data['open'] = stock_data[
         'open'].resample(period_type, how='first')
-    # å‘¨highç­‰äºMax high
+    # ÖÜhighµÈÓÚMax high
     period_stock_data['high'] = stock_data[
         'high'].resample(period_type, how='max')
     period_stock_data['low'] = stock_data[
         'low'].resample(period_type, how='min')
-    # volumeç­‰äºæ‰€æœ‰æ•°æ®å’Œ
+    # volumeµÈÓÚËùÓĞÊı¾İºÍ
     if ncol is not None:
         for co in ncol:
             period_stock_data[co] = stock_data[co].resample(period_type, how='sum')
@@ -3054,9 +3073,9 @@ def get_tdx_stock_period_to_type(stock_data, period_day='w', periods=5,ncol=None
             'amount'].resample(period_type, how='sum')
         period_stock_data['vol'] = stock_data[
             'vol'].resample(period_type, how='sum')
-    # è®¡ç®—å‘¨çº¿turnover,ã€traded_market_valueã€‘ æµé€šå¸‚å€¼ã€market_valueã€‘ æ€»å¸‚å€¼ã€turnoverã€‘ æ¢æ‰‹ç‡ï¼Œæˆäº¤é‡/æµé€šè‚¡æœ¬
+    # ¼ÆËãÖÜÏßturnover,¡¾traded_market_value¡¿ Á÷Í¨ÊĞÖµ¡¾market_value¡¿ ×ÜÊĞÖµ¡¾turnover¡¿ »»ÊÖÂÊ£¬³É½»Á¿/Á÷Í¨¹É±¾
     # period_stock_data['turnover']=period_stock_data['vol']/(period_stock_data['traded_market_value'])/period_stock_data['close']
-    # å»é™¤æ— äº¤æ˜“çºªå½•
+    # È¥³ıÎŞ½»Ò×¼ÍÂ¼
     period_stock_data.index = stock_data['date'].resample(period_type, how='last').index
     # print period_stock_data.index[:1]
     if 'code' in period_stock_data.columns:
@@ -3082,7 +3101,7 @@ def usage(p=None):
     import timeit
 #     print """
 # python %s [-t txt|zip] stkid [from] [to]
-# -t txt è¡¨ç¤ºä»txt files è¯»å–æ•°æ®ï¼Œå¦åˆ™ä»zip file è¯»å–(è¿™ä¹Ÿæ˜¯é»˜è®¤æ–¹å¼)
+# -t txt ±íÊ¾´Ótxt files ¶ÁÈ¡Êı¾İ£¬·ñÔò´Ózip file ¶ÁÈ¡(ÕâÒ²ÊÇÄ¬ÈÏ·½Ê½)
 # for example :
 # python %s 999999 20070101 20070302
 # python %s -t txt 999999 20070101 20070302

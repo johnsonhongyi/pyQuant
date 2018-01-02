@@ -6,6 +6,7 @@ import JohnsonUtil.johnson_cons as ct
 from JSONData import powerCompute as pct
 # from JSONData import tdx_data_Day as tdd
 from JSONData import get_macd_kdj_rsi as getab
+from JSONData import tdx_data_Day as tdd
 import pandas as pd
 from JohnsonUtil import LoggerFactory
 log = LoggerFactory.log
@@ -90,6 +91,11 @@ def getBollFilter(df=None, boll=6, duration=ct.PowerCountdl, filter=True, ma5d=T
     radio_t = cct.get_work_time_ratio()
     df['lvolr%s' % (resample)] = df['volume']
     df['volume'] = (map(lambda x, y: round(x / y / radio_t, 1), df.nvol.values, df.lvolume.values))
+
+
+
+
+
     if (cct.get_now_time_int() > 915 and cct.get_now_time_int() < 926):
         df['b1_v'] = df['volume']
     else:
@@ -107,9 +113,12 @@ def getBollFilter(df=None, boll=6, duration=ct.PowerCountdl, filter=True, ma5d=T
         idx_k = cct.get_col_in_columns(df, 'perc%sd', market_value)
         df = df[df["perc%sd" % (idx_k)] >= idx_k]
         # log.error("perc%sd"%(market_value))
-    elif market_key is not None and market_key == '2':
-        if market_value in ['1', '2']:
-            df['dff'] = (map(lambda x, y, z: round((x + (y if z > 20 else 3 * y)), 1), df.dff.values, df.volume.values, df.ratio.values))
+
+    # elif market_key is not None and market_key == '2':
+    #     if market_value in ['1', '2']:
+    #         df['dff'] = (map(lambda x, y, z: round((x + (y if z > 20 else 3 * y)), 1), df.dff.values, df.volume.values, df.ratio.values))
+    
+
     # df['df2'] = (map(lambda x, y, z: w=round((x - y) / z * 100, 1), df.high.values, df.low.values, df.llastp.values))
     # df['df2'] = (map(func_compute_df2, df.close.values, df.llastp.values,df.high.values, df.low.values,df.ratio.values))
     # df['df2'] = (map(func_compute_df2, df.close.values, df.llastp.values,df.high.values, df.low.values))
@@ -216,17 +225,32 @@ def getBollFilter(df=None, boll=6, duration=ct.PowerCountdl, filter=True, ma5d=T
             # if cct.get_now_time_int() > 930 and cct.get_now_time_int() <= 1430:
             #     df = df[(df.volume > 1.5 * cct.get_work_time_ratio()) & (df.percent > -5)]
             # df = df[(df.lvolume > df.lvol * 0.9) & (df.lvolume > df.lowvol * 1.1)]
-            if 'stdv' in df.columns and 930 < cct.get_now_time_int():
+            if 'stdv' in df.columns and 926 < cct.get_now_time_int():
                 df = df[((df.volume > 1.5 * cct.get_work_time_ratio()) & (df.percent > -2)) | ((df.stdv < 1) &
                                                                                                (df.percent > 2)) | ((df.lvolume > df.lvol * 0.9) & (df.lvolume > df.lowvol * 1.1))]
+                df_index = tdd.getSinaIndexdf()
+                df_index['volume'] = (map(lambda x, y: round(x / y / radio_t, 1), df_index.nvol.values, df_index.lvolume.values))
+                index_vol = df_index.loc['999999'].volume
+                index_percent = df_index.loc['999999'].percent
+                df = df[((df.percent > 6) | (df.volume > index_vol)) & (df.percent >  index_percent)]
+
             else:
                 df = df[((df.volume > 1.5 * cct.get_work_time_ratio()) & (df.percent > -2)) | ((df.lvolume > df.lvol * 0.9) & (df.lvolume > df.lowvol * 1.1))]
 
+            
             df['upper'] = map(lambda x: round((1 + 11.0 / 100) * x, 1), df.ma10d)
             df['lower'] = map(lambda x: round((1 - 9.0 / 100) * x, 1), df.ma10d)
             df['ene'] = map(lambda x, y: round((x + y) / 2, 1), df.upper, df.lower)
             # df = df[((df['buy'] >= df['ene'])) | ((df['buy'] < df['ene']) & (df['low'] > df['lower'])) | ((df['buy'] > df['upper']) & (df['low'] > df['upper']))]
-            df = df[((df['buy'] >= df['ene'])) | ((df['buy'] > df['upper']) & (df['low'] > df['upper']))]
+            # df = df[(( df['ene'] * ct.changeRatio < df['open']) & (df['buy'] > df['ene'] * ct.changeRatioUp)) | ((df['low'] > df['upper']) & (df['close'] > df['ene']))]
+            df = df[((df['buy'] > df['ene'] * ct.changeRatioUp)) | ((df['low'] > df['upper']) & (df['close'] > df['ene']))]
+            
+            # import ipdb;ipdb.set_trace()
+
+
+
+            # df = df[(( df['ene'] < df['open']) & (df['buy'] < df['ene'] * ct.changeRatioUp))]
+            
             # df = df[(df.per1d > 9) | (df.per2d > 4) | (df.per3d > 6)]
             # df = df[(df.per1d > 0) | (df.per2d > 4) | (df.per3d > 6)]
         # time_ss=time.time()
