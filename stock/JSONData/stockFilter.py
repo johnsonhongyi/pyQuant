@@ -153,8 +153,7 @@ def getBollFilter(df=None, boll=6, duration=ct.PowerCountdl, filter=True, ma5d=T
             # 601939  建设银行   7.50   7.41   7.61   7.55    7.50   7.43   7.52  0.05  15:00:00
             # 600392  盛和资源  16.85  16.81  18.63  18.63   17.84  16.81  17.51  0.69  15:00:00 (11, 41)
             # 603676   卫信康  17.44  16.95  17.96  17.82   17.34  17.03  17.77  0.18  15:00:00
-
-            if 'stdv' not in df.columns:
+            if 'nstd' in df.columns:
                 df['stdv'] = map(lambda x, y: round(x / y * 100, 1), df.nstd, df.open)
 
             # top_temp[:40][['nstd','stdv','name','volume','dff','percent']]
