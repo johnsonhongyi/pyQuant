@@ -106,6 +106,7 @@ def parse2ChanFen(chanK, recursion=False):
                 or (ft == -1 and chanK['low'][fenIdx_bf] < chanK['low'][fidx]) else fidx
         fenTypes.append(ft)
         fenIdx.append(fidx)
+    
     for i, dt in enumerate(chanK.index):
         # if i==0 or i==len(chanK.index)-1:continue
         if i == 0:
@@ -439,7 +440,7 @@ def parse2Xianduan(biIdx, chanK, least_windows=2):
                 lowIdx = idx
 
         # 构成简易线段
-        print biIdx, xdIdx, lowIdx, highIdx
+        # print biIdx, xdIdx, lowIdx, highIdx
         if lowIdx <> -1:
             xdDiff = biIdx.index(lowIdx) - biIdx.index(highIdx)
             # print least_windows

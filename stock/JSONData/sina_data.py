@@ -602,6 +602,8 @@ class Sina:
             df.ticktime = pd.to_datetime(df.ticktime, format='%Y-%m-%d %H:%M:%S')
             # df = df.loc[:, ['open', 'high', 'low', 'close', 'llastp', 'volume', 'ticktime']]
             df = df.loc[:, ['close', 'high', 'low', 'llastp', 'volume', 'ticktime']]
+            # df['muclose'] = df['close']
+
             if 'code' not in df.columns:
                 df = df.reset_index()
             if 'dt' in df.columns:

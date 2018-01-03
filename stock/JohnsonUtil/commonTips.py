@@ -69,17 +69,20 @@ class GlobalValues:
         except KeyError:
             return defValue
 
+
 def format_for_print(df):
     table = PrettyTable([''] + list(df.columns))
     for row in df.itertuples():
         table.add_row(row)
     return str(table)
 
+
 def format_for_print2(df):
     table = PrettyTable(list(df.columns))
     for row in df.itertuples():
         table.add_row(row[1:])
     return str(table)
+
 
 def get_os_system():
     os_sys = get_sys_system()
@@ -1229,6 +1232,7 @@ def code_to_tdxblk(code):
         else:
             return '1%s' % code if code[:1] in ['5', '6'] else '0%s' % code
 
+
 def tdxblk_to_code(code):
     """
         生成symbol代码标志
@@ -1239,7 +1243,8 @@ def tdxblk_to_code(code):
         if len(code) != 7:
             return ''
         else:
-            return code[1:] if code[:1] in ['1','0'] else code
+            return code[1:] if code[:1] in ['1', '0'] else code
+
 
 def code_to_index(code):
     if not code.startswith('999') or not code.startswith('399'):
@@ -1309,7 +1314,7 @@ def get_config_value(fname, classtype, currvalue, limitvalue=1, xtype='limit', r
 
             else:
 
-                log.error("file:%s f_size:%s > read_limit:%s" % (fname,currvalue, config[classtype][xtype]))
+                log.error("file:%s f_size:%s > read_limit:%s" % (fname, currvalue, config[classtype][xtype]))
                 config[classtype][xtype] = limitvalue
                 config.write()
                 return True
@@ -1325,6 +1330,7 @@ def get_config_value(fname, classtype, currvalue, limitvalue=1, xtype='limit', r
         config[classtype][xtype] = limitvalue
         config.write()
     return False
+
 
 def get_config_value_wencai(fname, classtype, currvalue=0, xtype='limit', update=False):
     conf_ini = fname
@@ -1365,11 +1371,12 @@ def get_config_value_wencai(fname, classtype, currvalue=0, xtype='limit', update
         config.write()
     return int(currvalue)
 
-def write_to_blocknew(p_name, data, append=True,doubleFile=True,keep_last=15):
+
+def write_to_blocknew(p_name, data, append=True, doubleFile=True, keep_last=15):
     # index_list = ['1999999','47#IFL0',  '0399006', '27#HSI']
     # index_list = ['1999999','47#IFL0', '27#HSI',  '0399006']
     # index_list = ['1999999','0399001','47#IFL0', '27#HSI',  '0159915']
-    index_list = ['1999999','0399001', '0159915']
+    index_list = ['1999999', '0399001', '0159915']
     # index_list = ['1999999', '27#HSI',  '0159915']
 
     def writeBlocknew(p_name, data, append=True):
@@ -1506,8 +1513,10 @@ def write_to_blocknew(p_name, data, append=True,doubleFile=True,keep_last=15):
             writeBlocknew(blockNewStart, data, append)
         # print "write to append:%s :%s :%s"%(append,p_name,len(data))
 
+
 def read_to_blocknew(p_name):
-    index_list = ['1999999','0399001','47#IFL0', '27#HSI',  '0159915']
+    index_list = ['1999999', '0399001', '47#IFL0', '27#HSI',  '0159915']
+
     def read_block(p_name):
         fout = open(p_name, 'rb')
         # fout = open(p_name)
@@ -1521,7 +1530,7 @@ def read_to_blocknew(p_name):
                     # errstatus = True
                     continue
                 else:
-                    code = code.replace('\r\n','')
+                    code = code.replace('\r\n', '')
                     if code not in index_list:
                         code = tdxblk_to_code(code)
             else:
@@ -1534,13 +1543,14 @@ def read_to_blocknew(p_name):
     if not p_name.endswith("blk"):
         blockNew = get_tdx_dir_blocknew() + p_name + '.blk'
         if not os.path.exists(blockNew):
-            log.error("path error:%s"%(blockNew))
+            log.error("path error:%s" % (blockNew))
     else:
         blockNew = get_tdx_dir_blocknew() + p_name
     # blockNewStart = get_tdx_dir_blocknew() + '066.blk'
     # writeBlocknew(blockNew, data)
     # p_data = ['zxg', '069', '068', '067', '061']
     return read_block(blockNew)
+
 
 def getFibonacci(num, days=None):
     res = [0, 1]
@@ -1595,12 +1605,20 @@ def varnamestr(obj, namespace=globals()):
             return n
     return None
 
-multiIndex_func = {'close': 'mean', 'low': 'min', 'high': 'max', 'volume': 'sum'}
+multiIndex_func = {'close': 'mean', 'low': 'min', 'high': 'max', 'volume': 'sum', 'open': 'first'}
 
 
 def using_Grouper_eval(df, freq='5T', col='low', closed='right', label='right'):
     func = {}
-    if isinstance(col, list):
+    if col == 'all':
+        for k in df.columns:
+            if k in multiIndex_func.keys():
+                if k == 'close':
+                    func[k] = 'first'
+                else:
+                    func[k] = multiIndex_func[k]
+
+    elif isinstance(col, list):
         for k in col:
             if k in multiIndex_func.keys():
                 func[k] = multiIndex_func[k]
@@ -1613,7 +1631,15 @@ def using_Grouper_eval(df, freq='5T', col='low', closed='right', label='right'):
 
 def using_Grouper(df, freq='5T', col='low', closed='right', label='right'):
     func = {}
-    if isinstance(col, list):
+    if col == 'all':
+        for k in df.columns:
+            if k in multiIndex_func.keys():
+                if k == 'close':
+                    func[k] = 'last'
+                else:
+                    func[k] = multiIndex_func[k]
+
+    elif isinstance(col, list):
         for k in col:
             if k in multiIndex_func.keys():
                 func[k] = multiIndex_func[k]
@@ -1624,8 +1650,8 @@ def using_Grouper(df, freq='5T', col='low', closed='right', label='right'):
     return (df.groupby([level_values(i) for i in [0]] + [pd.Grouper(freq=freq, level=-1, closed=closed, label=label)]).agg(func))
 
 
-def select_multiIndex_index(df, index='ticktime', start=None, end=None, datev=None):
-    if index <> 'date':
+def select_multiIndex_index(df, index='ticktime', start=None, end=None, datev=None, code=None):
+    if index <> 'date' and code is None:
         if start is not None and len(start) < 10:
             if datev is None:
                 start = get_today() + ' ' + start
@@ -1656,6 +1682,7 @@ def select_multiIndex_index(df, index='ticktime', start=None, end=None, datev=No
     else:
         start = day8_to_day10(start)
         end = day8_to_day10(end)
+
     if start is None and end is not None:
         df = df[(df.index.get_level_values(index) <= end)]
     elif start is not None and end is None:
@@ -1669,7 +1696,14 @@ def select_multiIndex_index(df, index='ticktime', start=None, end=None, datev=No
         else:
             df = df[(df.index.get_level_values(index) >= start)]
     else:
-        log.error("start end is None")
+        if code is not None:
+            if start is None:
+                start = get_today(sep='-') + ' ' + '09:27:00'
+            else:
+                start = day8_to_day10(start) + ' ' + '09:27:00'
+            df = df[(df.index.get_level_values('code') == code) & (df.index.get_level_values(index) > start)]
+        else:
+            log.error("start end is None")
     return df
 
 
@@ -1689,18 +1723,18 @@ def from_list_to_dict(col, func_dict):
 
 def get_limit_multiIndex_Row(df, col=None, index='ticktime', start=None, end='10:00:00'):
     """[summary]
-    
+
     [description]
-    
+
     Arguments:
         df {[type]} -- [description]
-    
+
     Keyword Arguments:
         col {[type]} -- [description] (default: {None})
         index {str} -- [description] (default: {'ticktime'})
         start {[type]} -- [description] (default: {None})
         end {str} -- [description] (default: {'10:00:00'})
-    
+
     Returns:
         [type] -- [description]
     """
@@ -1717,9 +1751,16 @@ def get_limit_multiIndex_Row(df, col=None, index='ticktime', start=None, end='10
     return df
 
 
-def get_limit_multiIndex_freq(df, freq='5T', col='low', index='ticktime', start=None, end='10:00:00'):
+def get_limit_multiIndex_freq(df, freq='5T', col='low', index='ticktime', start=None, end='10:00:00', code=None):
     if df is not None:
-        df = select_multiIndex_index(df, index=index, start=start, end=end)
+        dd = select_multiIndex_index(df, index=index, start=start, end=end, code=code)
+        if code is not None:
+            df = dd.copy()
+            df['open'] =  dd['close']  
+            df['high'] =  dd['close']  
+            df['low'] =  dd['close']  
+        else:
+            df = dd  
     else:
         log.error("df is None")
     # print df.loc['600007',['close','ticktime']]
@@ -1942,16 +1983,17 @@ def sort_by_value(df, column='dff', file=None, count=5, num=5, asc=0):
             write_to_blocknew(file, dd.index.tolist()[:int(count)], append=True)
         print "file:%s" % (file)
 
-def get_col_in_columns(df,idx_value,key):
+
+def get_col_in_columns(df, idx_value, key):
     """[summary]
-    
+
     [description]
-    
+
     Arguments:
         df {[type]} -- [description]
         idx_value {[type]} -- [perc%sd]
         key {[type]} -- [9]
-    
+
     Returns:
         [type] -- [description]
     """
@@ -1960,8 +2002,9 @@ def get_col_in_columns(df,idx_value,key):
     for inx in range(int(key), 1, -1):
         if idx_value % inx in df.columns:
             idx_k = inx
-            break 
+            break
     return idx_k
+
 
 def get_diff_dratio(mainlist, sublist):
     dif_co = list(set(mainlist) & set(sublist))
@@ -1974,7 +2017,7 @@ def func_compute_percd(c, lp, lc, lh, ll, nh, nl):
     initc = 0
     down_zero, down_dn, percent_l = 0, 0, 2
     # da, down_zero, down_dn, percent_l = 1, 0, 0, 2
-    initc = 1 if (c - lc)/lc*100 >= 1   else down_dn
+    initc = 1 if (c - lc) / lc * 100 >= 1 else down_dn
     # n_p = (c - lc) / lc * 100
     # n_hp = nh - lh
     # n_lp = nl - ll
@@ -2098,8 +2141,7 @@ if __name__ == '__main__':
     else:
         log_level = LoggerFactory.ERROR
     # log_level = LoggerFactory.DEBUG if args['-d']  else LoggerFactory.ERROR
-    
-    
+
     # log_level = LoggerFactory.DEBUG
     # log.setLevel(log_level)
     # print tdxblk_to_code('1399001')
