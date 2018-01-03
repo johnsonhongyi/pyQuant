@@ -1353,7 +1353,7 @@ def show_chan_mpl_fb(code, start_date, end_date, stock_days, resample, show_mpl=
             #     'd' if cur_ji + 1 == 5 else 'w' if cur_ji + 1 == 6 else 'd'
             resample = get_resample_ciji(resample)
 
-        if resample <> 1 and  cur_ji + 1 != 2 and len(k_data_dts) - k_data_dts.index(st_data) >= least_khl_num + 1:
+        if get_resample_ciji(resample) <> 1 and  cur_ji + 1 != 2 and len(k_data_dts) - k_data_dts.index(st_data) >= least_khl_num + 1:
             frequency = '30m' if cur_ji + 1 == 2 else '5m' if cur_ji + 1 == 3 else '1m'
             # else:
                 # frequency = 'd' if cur_ji+1==2 else '5m' if cur_ji+1==3 else \
