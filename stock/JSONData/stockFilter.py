@@ -192,16 +192,17 @@ def getBollFilter(df=None, boll=6, duration=ct.PowerCountdl, filter=True, ma5d=T
 
         if cct.get_now_time_int() > 915 and cct.get_now_time_int() <= 1000:
             # df = df[df.buy > df.hmax * ct.changeRatio]
-            df = df[df.buy > df.cmean * ct.changeRatioUp]
+            # 
+            df = df[(df.buy > df.cmean * ct.changeRatioUp) | (df.open > df.llastp)]
             # df = df[df.buy > df.cmean]
 
         elif cct.get_now_time_int() > 1000 and cct.get_now_time_int() <= 1430:
             # df = df[df.buy > df.hmax * ct.changeRatio]
-            df = df[df.buy > df.cmean * ct.changeRatioUp]
+            df = df[(df.buy > df.cmean * ct.changeRatioUp) | (df.open > df.llastp)]
             # df = df[df.buy > df.cmean]
         else:
             # df = df[df.buy > df.hmax * ct.changeRatio]
-            df = df[df.buy > df.cmean * ct.changeRatioUp]
+            df = df[(df.buy > df.cmean * ct.changeRatioUp) | (df.open > df.llastp)]
             # df = df[df.buy > df.cmean]
 
         # if ma5d:
@@ -232,7 +233,7 @@ def getBollFilter(df=None, boll=6, duration=ct.PowerCountdl, filter=True, ma5d=T
                 df_index['volume'] = (map(lambda x, y: round(x / y / radio_t, 1), df_index.nvol.values, df_index.lvolume.values))
                 index_vol = df_index.loc['999999'].volume
                 index_percent = df_index.loc['999999'].percent
-                df = df[((df.percent > 6) | (df.volume > index_vol)) & (df.percent >  index_percent)]
+                df = df[((df.percent > 5) | (df.volume > index_vol)) & (df.percent >  index_percent)]
 
             else:
                 df = df[((df.volume > 1.5 * cct.get_work_time_ratio()) & (df.percent > -2)) | ((df.lvolume > df.lvol * 0.9) & (df.lvolume > df.lowvol * 1.1))]

@@ -327,7 +327,8 @@ def show_chan_mpl_power(code, start_date, end_date, stock_days, resample, show_m
     # log.debug("code:%s fenTypes:%s fenIdx:%s k_data:%s" % (stock_code,fenTypes, fenIdx, len(k_data)))
     biIdx, frsBiType = chan.parse2ChanBi(fenTypes, fenIdx, chanK, least_khl_num=least_khl_num)
     # log.debug("biIdx1:%s chanK:%s" % (biIdx, len(chanK)))
-    log.debug("biIdx1:%s %s chanK:%s" % (biIdx, str(chanK.index.values[biIdx[-1]])[:10], len(chanK)))
+    if len(biIdx) > 0:
+        log.debug("biIdx1:%s %s chanK:%s" % (biIdx, str(chanK.index.values[biIdx[-1]])[:10], len(chanK)))
     
     biIdx = con2Cxianduan(stock_code, k_data, chanK, frsBiType, biIdx, end_date, cur_ji, least_init=least_init,resample=resample)
     # log.debug("biIdx2:%s chanK:%s" % (biIdx, len(biIdx)))
@@ -1502,7 +1503,8 @@ def show_chan_mpl_fb(code, start_date, end_date, stock_days, resample, show_mpl=
 
     if len(biIdx) == 0 and len(chanKIdx) == 0:
         # print "BiIdx is None and chanKidx is None:%s"%(code)
-        return None
+        # return None
+        log.error("biIdx is None")
 
     log.debug("con2Cxianduan:%s chanK:%s %s" % (biIdx, len(chanK), chanKIdx[-1] if len(chanKIdx) > 0 else None))
     # print quotes['close'].apply(lambda x:round(x,2))
@@ -1742,7 +1744,8 @@ def show_chan_mpl_fb(code, start_date, end_date, stock_days, resample, show_mpl=
 
     log.info("kdl:%s" % (kdl.values))
     log.info("kdh:%s" % (kdh.values))
-    print("kdl_modeX1:%s kdh_mode%s chanKidx:%s" % (kdl_mode.values, kdh_mode.values, str(chanKIdx[-1])[:10]))
+    if len(kdl_mode) >0:
+        print("kdl_modeX1:%s kdh_mode%s chanKidx:%s" % (kdl_mode.values, kdh_mode.values, str(chanKIdx[-1])[:10]))
 
     lkdl, lkdlidx=LIS(kdl)
     lkdh, lkdhidx=LIS(kdh)
@@ -1752,14 +1755,14 @@ def show_chan_mpl_fb(code, start_date, end_date, stock_days, resample, show_mpl=
 
     # print ("Gkdl:%s Gkdh:%s"%(grouby_list(kdl.values)[:2],grouby_list(kdh.values)[:2]))
 
-
-    lastdf=k_data[k_data.index >= chanKIdx[-1]]
-    if BiType_s == -1:
-        keydf=lastdf[((lastdf.close >= kdl_mode.max()) & (lastdf.low >= kdl_mode.max()))]
-    elif BiType_s == 1:
-        keydf=lastdf[((lastdf.close >= kdh_mode.max()) & (lastdf.high >= kdh_mode.min()))]
-    else:
-        keydf=lastdf[((lastdf.close >= kdh_mode.max()) & (lastdf.high >= kdh_mode.min())) | ((lastdf.close <= kdl_mode.min()) & (lastdf.low <= kdl_mode.min()))]
+    if len(chanKIdx) > 0:
+        lastdf=k_data[k_data.index >= chanKIdx[-1]]
+        if BiType_s == -1:
+            keydf=lastdf[((lastdf.close >= kdl_mode.max()) & (lastdf.low >= kdl_mode.max()))]
+        elif BiType_s == 1:
+            keydf=lastdf[((lastdf.close >= kdh_mode.max()) & (lastdf.high >= kdh_mode.min()))]
+        else:
+            keydf=lastdf[((lastdf.close >= kdh_mode.max()) & (lastdf.high >= kdh_mode.min())) | ((lastdf.close <= kdl_mode.min()) & (lastdf.low <= kdl_mode.min()))]
     # print ("BiType_sX3:%s keydf:%s key:%s"%(BiType_s, None if len(keydf) == 0 else str(keydf.index.values[0])[:10],len(keydf)))
 
     # return BiType_s,None if len(keydf) == 0 else str(keydf.index.values[0])[:10],len(keydf)
@@ -1824,7 +1827,8 @@ def show_chan_mpl_fb(code, start_date, end_date, stock_days, resample, show_mpl=
             print("线段   :%s x_xd:%s" % (x_xd_seq, [str(quotes.index[x]) for x in x_xd_seq][-1]))
     
     print("笔值  :%s" % ([str(x) for x in (y_xd_seq)][:-2]))
-    if len(x_xd_seq) == 0 or resample not in ['d','w','m']:
+
+    if len(biIdx) > 0 and (len(x_xd_seq) == 0 or resample not in ['d','w','m']):
         if resample in ['d','w','m']:
             st_data=str(chanK['enddate'][biIdx[len(biIdx) - 1]])[:10]
         else:
