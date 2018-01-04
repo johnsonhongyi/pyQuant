@@ -1683,6 +1683,14 @@ def select_multiIndex_index(df, index='ticktime', start=None, end=None, datev=No
         start = day8_to_day10(start)
         end = day8_to_day10(end)
 
+    if code is not None:
+        if start is None:
+            start = get_today(sep='-') + ' ' + '09:27:00'
+        else:
+            start = day8_to_day10(start) + ' ' + '09:27:00'
+        # df = df[(df.index.get_level_values('code') == code) & (df.index.get_level_values(index) > start)]
+        df = df[(df.index.get_level_values('code') == code)]
+
     if start is None and end is not None:
         df = df[(df.index.get_level_values(index) <= end)]
     elif start is not None and end is None:
@@ -1696,14 +1704,7 @@ def select_multiIndex_index(df, index='ticktime', start=None, end=None, datev=No
         else:
             df = df[(df.index.get_level_values(index) >= start)]
     else:
-        if code is not None:
-            if start is None:
-                start = get_today(sep='-') + ' ' + '09:27:00'
-            else:
-                start = day8_to_day10(start) + ' ' + '09:27:00'
-            df = df[(df.index.get_level_values('code') == code) & (df.index.get_level_values(index) > start)]
-        else:
-            log.error("start end is None")
+        log.info("start end is None")
     return df
 
 

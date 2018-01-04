@@ -262,7 +262,7 @@ def show_chan_mpl_power(code, start_date, end_date, stock_days, resample, show_m
             h5_table = 'all_10'
             time_s = time.time()
             h5 = h5a.load_hdf_db(h5_fname, table=h5_table, code_l=None, timelimit=False, dratio_limit=0.12)
-            quotes = cct.get_limit_multiIndex_freq(h5, freq=resample.upper(), col='all', start=None, end=None, code=code)
+            quotes = cct.get_limit_multiIndex_freq(h5, freq=resample.upper(), col='all', start=start, end=end, code=code)
             quotes = quotes.reset_index().set_index('ticktime')
             # period_stock_data['close'] = stock_data['close'].resample(period_type, how='last')
             if 'volume' in quotes.columns:
@@ -1410,7 +1410,7 @@ def show_chan_mpl_fb(code, start_date, end_date, stock_days, resample, show_mpl=
             h5_table = 'all_10'
             time_s = time.time()
             h5 = h5a.load_hdf_db(h5_fname, table=h5_table, code_l=None, timelimit=False, dratio_limit=0.12)
-            quotes = cct.get_limit_multiIndex_freq(h5, freq=resample.upper(), col='all', start=None, end=None, code=code)
+            quotes = cct.get_limit_multiIndex_freq(h5, freq=resample.upper(), col='all', start=start, end=end, code=code)
             quotes = quotes.reset_index().set_index('ticktime')
             # period_stock_data['close'] = stock_data['close'].resample(period_type, how='last')
             if 'volume' in quotes.columns:
