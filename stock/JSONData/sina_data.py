@@ -647,8 +647,9 @@ class Sina:
                 endtime = '15:01:00'
                 run_col = ['close']
                 # h5 = cct.get_limit_multiIndex_Group(h5, freq='15T', col=run_col,start=startime, end=endtime)
+                # time_s=time.time()
                 dd = self.get_col_agg_df(h5, dd, run_col, all_func, startime, endtime)
-
+                # print "time:%s"%(time.time()-time_s)
                 run_col = {'close': 'std'}
                 dd = self.get_col_agg_df(h5, dd, run_col, run_col, startime, endtime)
                 dd.rename(columns={'std': 'nstd'}, inplace=True)
@@ -699,6 +700,7 @@ if __name__ == "__main__":
     sina = Sina()
     # print len(df)
     # code='601198'
+    sina.all
     # print sina.get_stock_list_data(['999999','399001','399006'],index=True)
     df = sina.get_stock_code_data('999999,399001,399006',index=True)
     print df.volume

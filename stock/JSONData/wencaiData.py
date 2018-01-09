@@ -140,6 +140,16 @@ def retry_post_data(root='http://upass.10jqka.com.cn/login',key='国企改革'):
     # print info
     # get_wencai_Market_url(url=None)
 
+import js2py
+def js2py_test(url):
+    # jsurl = 'http://s.thsi.cn/js/chameleon/chameleon.min.1515059.js'
+    jsurl='http://www.iwencai.com/stockpick/search?typed=0&preParams=&ts=1&f=1&qs=result_original&selfsectsn=&querytype=&searchfilter=&tid=stockpick&w=%E5%9B%BD%E4%BC%81%E6%94%B9%E9%9D%A9'
+    x = """pyimport urllib;
+           var result = urllib.urlopen('%s').read();
+           console.log(result)
+           console.log(result.length)
+        """%(jsurl)
+    js2py.eval_js(x)
 
 global null,wencai_count,pct_status
 pct_status = True
@@ -151,13 +161,15 @@ wencai_count = cct.get_config_value_wencai(config_ini,fname)
 
 # cct.get_config_value_wencai(config_ini,fname)
 
-def get_wencai_Market_url(filter='国企改革',perpage=1,url=None,pct=None):
+def get_wencai_Market_url(filter='国企改革',perpage=1,url=None,pct=False):
     urllist = []
     global null,wencai_count,pct_status
     if pct is not None:
         pct_status = pct
     df = pd.DataFrame()
-    if ((not pct_status) or  (pct_status and 925 < cct.get_now_time_int() < 940)) and url == None and cct.get_config_value_wencai(config_ini,fname) < 1:
+    # import ipdb;ipdb.set_trace()
+
+    if ((pct_status) or  ( pct_status and not(925 < cct.get_now_time_int() < 1000)) ) and url == None and cct.get_config_value_wencai(config_ini,fname) < 1:
         time_s = time.time()
         duratime = cct.get_config_value_wencai(config_ini,fname,currvalue=time_s,xtype='time',update=False)
         if duratime < ct.wencai_delay_time:
@@ -170,7 +182,7 @@ def get_wencai_Market_url(filter='国企改革',perpage=1,url=None,pct=None):
         url = wencairoot%(filter)
         log.debug("url:%s"%(url))
         # url = ct.get_url_data_R % (market)
-        # print url
+
         cache_root="http://www.iwencai.com/stockpick/cache?token=%s&p=1&perpage=%s&showType="
         cache_ends = "[%22%22,%22%22,%22onTable%22,%22onTable%22,%22onTable%22,%22onTable%22,%22onTable%22,%22onTable%22,%22onTable%22,%22onTable%22]"
 #        url="http://www.iwencai.com/stockpick/search?typed=0&preParams=&ts=1&f=1&qs=result_original&selfsectsn=&querytype=&searchfilter=&tid=stockpick&w=%E6%9C%89%E8%89%B2+%E7%85%A4%E7%82%AD"
@@ -179,7 +191,7 @@ def get_wencai_Market_url(filter='国企改革',perpage=1,url=None,pct=None):
                'Connection': 'keep-alive',
                'Cookie':'v=AZaxA_wZ09rYlOd-tO91dApK4U2ZN9pxLHsO1QD_gnkUwzj_aMcqgfwLXuTQ',}
         data = cct.get_url_data(url,retry_count=1,headers=headers)
-        # data = None
+
         if data is  None or (len(data) < 10 or len(re.findall('系统判断您访问次数过多'.decode('utf8'),data))):
             wencai_count+=1
             cct.get_config_value_wencai(config_ini,fname,currvalue=wencai_count,update=True)
@@ -206,14 +218,27 @@ def get_wencai_Market_url(filter='国企改革',perpage=1,url=None,pct=None):
             log.info( cacheurl)
             time_s = time.time()
             html = cct.get_url_data(cacheurl)
+            # js2py_test(cacheurl)
+            
+            
             # count = re.findall('"(\d{6})\.S', data, re.S)
             # count = re.findall('result":(\[[\D\d]+\]),"oriColPos', data, re.S)
             # count = re.findall('result":(\[[\D\d]+\]),"oriIndexID', data, re.S)
 #            html = data.decode('unicode-escape')
 #            html = data.decode('unicode-escape')
+           
+            # href = re.findall('(http:\/\/[\D\d]+)";', html, re.S)
+            # if len(href) >0:
+            #     import ipdb;ipdb.set_trace()
+            #     html = cct.get_url_data(href[0])
+    
             count = re.findall('(\[\["[0-9]{6}\.S[HZ][\D\d]+\]\]),"oriIndexID', html, re.S)
+            
             # count = grep_stock_codes.findall(data,re.S)
-            log.info("count: len:%s"%(len(count)))
+            if len(count) == 0:
+                # import ipdb;ipdb.set_trace()
+                log.info("count: len:%s url:%s"%(len(count),url))
+
             # print html
 
             log.info( time.time()-time_s)
@@ -303,6 +328,10 @@ def get_wencai_Market_url(filter='国企改革',perpage=1,url=None,pct=None):
             # print type(count[0])
             # print type(list(count[0]))
             # print count[0].decode('unicode-escape')
+            if len(df) == 0:
+                log.error('df is None:%s'%(url))
+        else:
+            log.error('count is 0')
 
     return df
 
@@ -482,8 +511,8 @@ if __name__ == '__main__':
     # print getconfigBigCount(write=True)
     # sys.exit(0)
     # post_login()
-#    log.setLevel(LoggerFactory.INFO)
-#    df = get_wencai_Market_url(filter='国企改革',perpage=1000)
+    log.setLevel(LoggerFactory.DEBUG)
+    print get_wencai_Market_url(filter='国企改革',perpage=1000)
 #    df = get_wencai_Market_url('湖南发展,天龙集团,浙报传媒,中珠医疗,多喜爱',500)
 #    type='TMT'
 #    type='国企改革'
@@ -491,10 +520,10 @@ if __name__ == '__main__':
 
     # df =  get_wcbk_df(filter='城建+一带一路',market='ydyl')
 #    df =  get_wcbk_df(filter='新股与次新股',market='cxg')
-    df =  get_wcbk_df(filter='有色',market='yss')
+    # df =  get_wcbk_df(filter='雄安特区',market='xatq')
     # df =  get_wcbk_df(filter='新能源',market='xny')
 #    df =  get_wcbk_df(filter='混改',market='wencai')
-    print df.shape,df[:5]
+    # print df.shape,df[:5]
     # df = get_wencai_Market_url('农业',10000)
 #    df = get_write_wencai_market_to_csv(df,'wcbk')
 
@@ -508,8 +537,8 @@ if __name__ == '__main__':
     #     df.percent = df.percent.astype(float)
 #    df = df.sort_values(by='percent',ascending=[0])
 
-    print "%s %s"%(type,len(df))
-    print "%s "%(df[:5])
+    # print "%s %s"%(type,len(df))
+    # print "%s "%(df[:5])
     # import dfgui
     # dfgui.show(df)
     # get_wencai_Market_url()

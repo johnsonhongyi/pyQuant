@@ -1439,7 +1439,7 @@ def show_chan_mpl_fb(code, start_date, end_date, stock_days, resample, show_mpl=
             quotes= quotes.loc[:, ['open', 'close', 'high', 'low', 'vol', 'amount']]
         else:
             # log.error("quotes is None check:%s"%(code))
-            raise Exception("Code:%s error, df is None%s" % (code))
+            raise Exception("Code:%s error, df is None" % (code))
         return quotes, cname
 
 

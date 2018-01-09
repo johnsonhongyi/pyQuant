@@ -1014,7 +1014,7 @@ def get_url_data(url, retry_count=5, pause=0.05, timeout=10, headers=None):
     for _ in range(retry_count):
         time.sleep(pause)
         try:
-            data = requests.get(url, headers=headers, timeout=timeout)
+            data = requests.get(url, headers=headers, timeout=timeout,allow_redirects=False)
         except (socket.timeout, socket.error) as e:
             data = ''
             log.error('socket timed out error:%s - URL %s ' % (e, url))
@@ -1494,7 +1494,7 @@ def write_to_blocknew(p_name, data, append=True, doubleFile=True, keep_last=15):
             writeBlocknew(blockNew, data)
             writeBlocknew(blockNewStart, data, append)
         # print "write to :%s:%s"%(p_name,len(data))
-    elif p_name.find('065.blk') > 0:
+    elif p_name.find('064.blk') > 0:
         writeBlocknew(p_name, data, append)
         if doubleFile:
             writeBlocknew(blockNew, data, append)

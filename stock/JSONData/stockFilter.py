@@ -37,6 +37,7 @@ def getBollFilter(df=None, boll=6, duration=ct.PowerCountdl, filter=True, ma5d=T
         # if len(drop_t) > 0:
             # df = df.drop(drop_t,axis=0)top
             # log.error("stf drop_cxg:%s"%(len(drop_t)))
+    
     if df is None:
         print "dataframe is None"
         return None
@@ -143,8 +144,8 @@ def getBollFilter(df=None, boll=6, duration=ct.PowerCountdl, filter=True, ma5d=T
         #     df[col] = df[col].apply(lambda x: round(x, 2))
         if 'nhigh' in df.columns and 'nclose' in df.columns:
             # ncloseRatio = map(lambda x, y: x * ct.changeRatio if x * ct.changeRatio > y else y, df.nclose, df.nlow)
-            ncloseRatio = map(lambda x: x * 0.99, df.nclose)
-            nopenRatio = map(lambda x: x * 0.99, df.open)
+            df['ncloseRatio'] = map(lambda x: x * 0.99, df.nclose)
+            df['nopenRatio'] = map(lambda x: x * 0.99, df.open)
             # nhighRatio = map(lambda x, y: x * ct.changeRatio if x * ct.changeRatio > y else y, df.nhigh, df.nclose)
             # if cct.get_now_time_int() > ct.nlow_limit_time:
 
@@ -170,8 +171,8 @@ def getBollFilter(df=None, boll=6, duration=ct.PowerCountdl, filter=True, ma5d=T
 
             # df['stdv'] = map(lambda x, y, z: round(z / (x / y * 100), 1), df.nstd, df.open, df.volume)
 
-            df = df[(((df.open <= df.nclose) & (df.low >= df.nlow) & (df.close >= ncloseRatio)) |
-                     ((df.open <= df.nclose) & (df.close >= ncloseRatio) & (df.high > df.nhigh)))]
+            df = df[(((df.open <= df.nclose) & (df.low >= df.nlow) & (df.close >= df.ncloseRatio)) |
+                     ((df.open <= df.nclose) & (df.close >= df.ncloseRatio) & (df.high >= df.nhigh)))]
             # else:
             # df = df[(((df.low >= df.nlow) & (df.close >= ncloseRatio)) | ((df.close >= ncloseRatio) & (df.close > nhighRatio)))]
         else:
@@ -191,18 +192,20 @@ def getBollFilter(df=None, boll=6, duration=ct.PowerCountdl, filter=True, ma5d=T
         # filter
 
         if cct.get_now_time_int() > 915 and cct.get_now_time_int() <= 1000:
-            # df = df[df.buy > df.hmax * ct.changeRatio]
-            # 
-            df = df[(df.buy > df.cmean * ct.changeRatioUp) | (df.open > df.llastp)]
+            df = df[(df.buy > df.hmax * ct.changeRatio) | (df.open > df.llastp)]
+            
+            # df = df[(df.buy > df.cmean * ct.changeRatioUp) | (df.open > df.llastp)]
             # df = df[df.buy > df.cmean]
 
         elif cct.get_now_time_int() > 1000 and cct.get_now_time_int() <= 1430:
-            # df = df[df.buy > df.hmax * ct.changeRatio]
-            df = df[(df.buy > df.cmean * ct.changeRatioUp) | (df.open > df.llastp)]
+            df = df[(df.buy > df.hmax * ct.changeRatio) | (df.open > df.llastp)]
+
+            # df = df[(df.buy > df.cmean * ct.changeRatioUp) | (df.open > df.llastp)]
             # df = df[df.buy > df.cmean]
         else:
-            # df = df[df.buy > df.hmax * ct.changeRatio]
-            df = df[(df.buy > df.cmean * ct.changeRatioUp) | (df.open > df.llastp)]
+            df = df[(df.buy > df.hmax * ct.changeRatio) | (df.open > df.llastp)]
+            
+            # df = df[(df.buy > df.cmean * ct.changeRatioUp) | (df.open > df.llastp)]
             # df = df[df.buy > df.cmean]
 
         # if ma5d:
@@ -244,7 +247,9 @@ def getBollFilter(df=None, boll=6, duration=ct.PowerCountdl, filter=True, ma5d=T
             df['ene'] = map(lambda x, y: round((x + y) / 2, 1), df.upper, df.lower)
             # df = df[((df['buy'] >= df['ene'])) | ((df['buy'] < df['ene']) & (df['low'] > df['lower'])) | ((df['buy'] > df['upper']) & (df['low'] > df['upper']))]
             # df = df[(( df['ene'] * ct.changeRatio < df['open']) & (df['buy'] > df['ene'] * ct.changeRatioUp)) | ((df['low'] > df['upper']) & (df['close'] > df['ene']))]
-            df = df[((df['buy'] > df['ene'] * ct.changeRatioUp)) | ((df['low'] > df['upper']) & (df['close'] > df['ene']))]
+            if 'nclose' in df.columns:
+                df = df[((df['nclose'] > df['ene'] * ct.changeRatio) & (df['percent'] > 2) & (df.volume > 3) ) |\
+                 ((df['nclose'] > df['upper'] * ct.changeRatio) & (df['buy'] < df['upper'] * ct.changeRatioUp)) | ((df['llastp'] > df['upper']) & (df['nclose'] > df['upper']))]
             
             # import ipdb;ipdb.set_trace()
 
