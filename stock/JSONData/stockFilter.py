@@ -27,7 +27,7 @@ def func_compute_df2(c, lc, h, l):
     return du_p
 
 
-def getBollFilter(df=None, boll=6, duration=ct.PowerCountdl, filter=True, ma5d=True, dl=14, percent=True, resample='d'):
+def getBollFilter(df=None, boll=6, duration=ct.PowerCountdl, filter=True, ma5d=True, dl=14, percent=True, resample='d', ene=False):
 
     # drop_cxg = cct.GlobalValues().getkey('dropcxg')
     # if len(drop_cxg) >0:
@@ -37,7 +37,7 @@ def getBollFilter(df=None, boll=6, duration=ct.PowerCountdl, filter=True, ma5d=T
         # if len(drop_t) > 0:
             # df = df.drop(drop_t,axis=0)top
             # log.error("stf drop_cxg:%s"%(len(drop_t)))
-    
+
     if df is None:
         print "dataframe is None"
         return None
@@ -93,10 +93,6 @@ def getBollFilter(df=None, boll=6, duration=ct.PowerCountdl, filter=True, ma5d=T
     df['lvolr%s' % (resample)] = df['volume']
     df['volume'] = (map(lambda x, y: round(x / y / radio_t, 1), df.nvol.values, df.lvolume.values))
 
-
-
-
-
     if (cct.get_now_time_int() > 915 and cct.get_now_time_int() < 926):
         df['b1_v'] = df['volume']
     else:
@@ -118,7 +114,6 @@ def getBollFilter(df=None, boll=6, duration=ct.PowerCountdl, filter=True, ma5d=T
     # elif market_key is not None and market_key == '2':
     #     if market_value in ['1', '2']:
     #         df['dff'] = (map(lambda x, y, z: round((x + (y if z > 20 else 3 * y)), 1), df.dff.values, df.volume.values, df.ratio.values))
-    
 
     # df['df2'] = (map(lambda x, y, z: w=round((x - y) / z * 100, 1), df.high.values, df.low.values, df.llastp.values))
     # df['df2'] = (map(func_compute_df2, df.close.values, df.llastp.values,df.high.values, df.low.values,df.ratio.values))
@@ -138,153 +133,177 @@ def getBollFilter(df=None, boll=6, duration=ct.PowerCountdl, filter=True, ma5d=T
         # df = df[(df.lvolume > df.lvol * 0.9) & (df.lvolume > df.lowvol * 1.1)]
 
     # if 'nlow' in df.columns and 932 < cct.get_now_time_int() < 1030:
+    if not ene:
+        if 'nlow' in df.columns and 930 < cct.get_now_time_int():
+            # for col in ['nhigh', 'nclose', 'nlow','nstd']:
+            #     df[col] = df[col].apply(lambda x: round(x, 2))
+            if 'nhigh' in df.columns and 'nclose' in df.columns:
+                # ncloseRatio = map(lambda x, y: x * ct.changeRatio if x * ct.changeRatio > y else y, df.nclose, df.nlow)
+                df['ncloseRatio'] = map(lambda x: x * 0.99, df.nclose)
+                df['nopenRatio'] = map(lambda x: x * 0.99, df.open)
+                # nhighRatio = map(lambda x, y: x * ct.changeRatio if x * ct.changeRatio > y else y, df.nhigh, df.nclose)
+                # if cct.get_now_time_int() > ct.nlow_limit_time:
 
-    if 'nlow' in df.columns and 930 < cct.get_now_time_int():
-        # for col in ['nhigh', 'nclose', 'nlow','nstd']:
-        #     df[col] = df[col].apply(lambda x: round(x, 2))
-        if 'nhigh' in df.columns and 'nclose' in df.columns:
-            # ncloseRatio = map(lambda x, y: x * ct.changeRatio if x * ct.changeRatio > y else y, df.nclose, df.nlow)
-            df['ncloseRatio'] = map(lambda x: x * 0.99, df.nclose)
-            df['nopenRatio'] = map(lambda x: x * 0.99, df.open)
-            # nhighRatio = map(lambda x, y: x * ct.changeRatio if x * ct.changeRatio > y else y, df.nhigh, df.nclose)
-            # if cct.get_now_time_int() > ct.nlow_limit_time:
+                #           name   open    low   high  close  nclose   nlow  nhigh  nstd  ticktime
+                # code
+                # 601899  紫金矿业   4.25   4.24   4.69   4.69    4.52   4.24   4.42  0.12  15:00:00
+                # 603917  合力科技  27.95  27.69  31.54  31.54   30.46  27.69  30.00  0.70  15:00:00
+                # 300713   英可瑞  81.00  81.00  89.82  89.77   87.53  80.90  86.36  1.75  15:02:03
+                # 000933  神火股份   9.07   9.02  10.00  10.00    9.71   9.02   9.44  0.24  15:02:03
+                # 600050  中国联通   6.49   6.37   6.51   6.41    6.44   6.44   6.51  0.02  15:00:00
+                # 002350  北京科锐  10.17  10.17  10.75  10.23   10.31  10.17  10.75  0.07  15:02:03
+                # 603363  傲农生物  17.49  16.91  18.35  18.35   17.35  17.18  18.00  0.34  15:00:00
+                # 000868  安凯客车   8.77   8.53   8.82   8.82    8.82   8.53   8.82  0.01  15:02:03
+                # 002505  大康农业   2.91   2.86   2.99   2.89    2.91   2.90   2.99  0.02  15:02:03
+                # 601939  建设银行   7.50   7.41   7.61   7.55    7.50   7.43   7.52  0.05  15:00:00
+                # 600392  盛和资源  16.85  16.81  18.63  18.63   17.84  16.81  17.51  0.69  15:00:00 (11, 41)
+                # 603676   卫信康  17.44  16.95  17.96  17.82   17.34  17.03  17.77  0.18  15:00:00
+                if 'nstd' in df.columns:
+                    df['stdv'] = map(lambda x, y: round(x / y * 100, 1), df.nstd, df.open)
 
-            #           name   open    low   high  close  nclose   nlow  nhigh  nstd  ticktime
-            # code
-            # 601899  紫金矿业   4.25   4.24   4.69   4.69    4.52   4.24   4.42  0.12  15:00:00
-            # 603917  合力科技  27.95  27.69  31.54  31.54   30.46  27.69  30.00  0.70  15:00:00
-            # 300713   英可瑞  81.00  81.00  89.82  89.77   87.53  80.90  86.36  1.75  15:02:03
-            # 000933  神火股份   9.07   9.02  10.00  10.00    9.71   9.02   9.44  0.24  15:02:03
-            # 600050  中国联通   6.49   6.37   6.51   6.41    6.44   6.44   6.51  0.02  15:00:00
-            # 002350  北京科锐  10.17  10.17  10.75  10.23   10.31  10.17  10.75  0.07  15:02:03
-            # 603363  傲农生物  17.49  16.91  18.35  18.35   17.35  17.18  18.00  0.34  15:00:00
-            # 000868  安凯客车   8.77   8.53   8.82   8.82    8.82   8.53   8.82  0.01  15:02:03
-            # 002505  大康农业   2.91   2.86   2.99   2.89    2.91   2.90   2.99  0.02  15:02:03
-            # 601939  建设银行   7.50   7.41   7.61   7.55    7.50   7.43   7.52  0.05  15:00:00
-            # 600392  盛和资源  16.85  16.81  18.63  18.63   17.84  16.81  17.51  0.69  15:00:00 (11, 41)
-            # 603676   卫信康  17.44  16.95  17.96  17.82   17.34  17.03  17.77  0.18  15:00:00
-            if 'nstd' in df.columns:
-                df['stdv'] = map(lambda x, y: round(x / y * 100, 1), df.nstd, df.open)
+                # top_temp[:40][['nstd','stdv','name','volume','dff','percent']]
+                # top_temp.loc['603363'][['nstd','stdv','name','volume','high','nhigh','percent','open','nclose']]
 
-            # top_temp[:40][['nstd','stdv','name','volume','dff','percent']]
-            # top_temp.loc['603363'][['nstd','stdv','name','volume','high','nhigh','percent','open','nclose']]
+                # df['stdv'] = map(lambda x, y, z: round(z / (x / y * 100), 1), df.nstd, df.open, df.volume)
 
-            # df['stdv'] = map(lambda x, y, z: round(z / (x / y * 100), 1), df.nstd, df.open, df.volume)
+                # df.loc['002906'][['open','nclose','close','ncloseRatio','nopenRatio','low','nlow']]
 
-            df = df[(((df.open <= df.nclose) & (df.low >= df.nlow) & (df.close >= df.ncloseRatio)) |
-                     ((df.open <= df.nclose) & (df.close >= df.ncloseRatio) & (df.high >= df.nhigh)))]
-            # else:
-            # df = df[(((df.low >= df.nlow) & (df.close >= ncloseRatio)) | ((df.close >= ncloseRatio) & (df.close > nhighRatio)))]
-        else:
-            df = df[((df.low >= df.nlow) & (df.close > df.llastp * ct.changeRatio))]
-        # if 'nhigh' in df.columns and 'nclose' in df.columns:
-        #     if cct.get_now_time_int() > ct.nlow_limit_time:
-        #         df = df[(df.low >= df.nlow) & ((df.open > df.llastp * ct.changeRatio) & (df.nclose > df.llastp * ct.changeRatio)) &
-        #                 (((df.low >= df.nlow) & (df.close >= df.nclose)) | ((df.close >= df.nclose) & (df.close > df.nhigh * ct.changeRatio) & (df.high >= df.nhigh)))]
-        #     else:
-        #         df = df[((df.open > df.llastp * ct.changeRatio) & (df.close > df.llastp * ct.changeRatio)) &
-        #                 (((df.low >= df.nlow) & (df.close >= df.nclose)) | ((df.close >= df.nclose) & (df.close > df.nhigh * ct.changeRatio)))]
-        # else:
-        #     df = df[((df.low >= df.nlow) & (df.close > df.llastp))]
-
-    if filter:
-
-        # filter
-
-        if cct.get_now_time_int() > 915 and cct.get_now_time_int() <= 1000:
-            df = df[(df.buy > df.hmax * ct.changeRatio) | (df.open > df.llastp)]
-            
-            # df = df[(df.buy > df.cmean * ct.changeRatioUp) | (df.open > df.llastp)]
-            # df = df[df.buy > df.cmean]
-
-        elif cct.get_now_time_int() > 1000 and cct.get_now_time_int() <= 1430:
-            df = df[(df.buy > df.hmax * ct.changeRatio) | (df.open > df.llastp)]
-
-            # df = df[(df.buy > df.cmean * ct.changeRatioUp) | (df.open > df.llastp)]
-            # df = df[df.buy > df.cmean]
-        else:
-            df = df[(df.buy > df.hmax * ct.changeRatio) | (df.open > df.llastp)]
-            
-            # df = df[(df.buy > df.cmean * ct.changeRatioUp) | (df.open > df.llastp)]
-            # df = df[df.buy > df.cmean]
-
-        # if ma5d:
-        #     # op, ra, st, days = pct.get_linear_model_status('999999', filter='y', dl=dl, ptype='low')
-        #     oph, rah, sth, daysh = pct.get_linear_model_status('999999', filter='y', dl=dl, ptype='high')
-        #     # fibl = str(days[0])
-        #     fibh = str(daysh[0])
-        #     # if 1 < fibl < dl / 2 and fibh > dl / 3:
-        #     if fibh > dl / 3:
-        #         df = df[ ((df.ma5d * ct.changeRatio < df.low) & (df.low < df.ma5d * (2 - ct.changeRatio))) | ((df.percent > 1) & (df.volume > 3))]
-        # print df.loc['000801']
-        if 'vstd' in df.columns:
-            # df = df[(df.lvol * df.volume > (df.vstd + df.lvol)) | ((df.percent > -10) & (df.hv / df.lv > 1.5))]
-
-            df = df[(df.lvol * df.volume > (df.vstd + df.lvol)) | ((df.percent > -5) & (df.hv / df.lv > 3))]
-
-            # [dd.lvol * dd.volume > (dd.vstd + dd.lvol) | dd.lvol * dd.volume >(dd.ldvolume + dd.vstd]
-        # print df.loc['000801']
-
-        if percent:
-            # if cct.get_now_time_int() > 930 and cct.get_now_time_int() <= 1430:
-            #     df = df[(df.volume > 1.5 * cct.get_work_time_ratio()) & (df.percent > -5)]
-            # df = df[(df.lvolume > df.lvol * 0.9) & (df.lvolume > df.lowvol * 1.1)]
-            if 'stdv' in df.columns and 926 < cct.get_now_time_int():
-                df = df[((df.volume > 1.5 * cct.get_work_time_ratio()) & (df.percent > -2)) | ((df.stdv < 1) &
-                                                                                               (df.percent > 2)) | ((df.lvolume > df.lvol * 0.9) & (df.lvolume > df.lowvol * 1.1))]
-                df_index = tdd.getSinaIndexdf()
-                df_index['volume'] = (map(lambda x, y: round(x / y / radio_t, 1), df_index.nvol.values, df_index.lvolume.values))
-                index_vol = df_index.loc['999999'].volume
-                index_percent = df_index.loc['999999'].percent
-                df = df[((df.percent > 5) | (df.volume > index_vol)) & (df.percent >  index_percent)]
-
+                df = df[(((df.nopenRatio <= df.nclose) & (df.low >= df.nlow) & (df.close >= df.ncloseRatio)) |
+                         ((df.nopenRatio <= df.nclose) & (df.close >= df.ncloseRatio) & (df.high >= df.nhigh)))]
+                # else:
+                # df = df[(((df.low >= df.nlow) & (df.close >= ncloseRatio)) | ((df.close >= ncloseRatio) & (df.close > nhighRatio)))]
             else:
-                df = df[((df.volume > 1.5 * cct.get_work_time_ratio()) & (df.percent > -2)) | ((df.lvolume > df.lvol * 0.9) & (df.lvolume > df.lowvol * 1.1))]
-
-            
-            df['upper'] = map(lambda x: round((1 + 11.0 / 100) * x, 1), df.ma10d)
-            df['lower'] = map(lambda x: round((1 - 9.0 / 100) * x, 1), df.ma10d)
-            df['ene'] = map(lambda x, y: round((x + y) / 2, 1), df.upper, df.lower)
-            # df = df[((df['buy'] >= df['ene'])) | ((df['buy'] < df['ene']) & (df['low'] > df['lower'])) | ((df['buy'] > df['upper']) & (df['low'] > df['upper']))]
-            # df = df[(( df['ene'] * ct.changeRatio < df['open']) & (df['buy'] > df['ene'] * ct.changeRatioUp)) | ((df['low'] > df['upper']) & (df['close'] > df['ene']))]
-            if 'nclose' in df.columns:
-                df = df[((df['nclose'] > df['ene'] * ct.changeRatio) & (df['percent'] > 2) & (df.volume > 3) ) |\
-                 ((df['nclose'] > df['upper'] * ct.changeRatio) & (df['buy'] < df['upper'] * ct.changeRatioUp)) | ((df['llastp'] > df['upper']) & (df['nclose'] > df['upper']))]
-            
-            # import ipdb;ipdb.set_trace()
-
-
-
-            # df = df[(( df['ene'] < df['open']) & (df['buy'] < df['ene'] * ct.changeRatioUp))]
-            
-            # df = df[(df.per1d > 9) | (df.per2d > 4) | (df.per3d > 6)]
-            # df = df[(df.per1d > 0) | (df.per2d > 4) | (df.per3d > 6)]
-        # time_ss=time.time()
-        # codel = df.index.tolist()
-        # dm = tdd.get_sina_data_df(codel)
-        # results = cct.to_mp_run_async(getab.Get_BBANDS, codel,'d',5,duration,dm)
-        # bolldf = pd.DataFrame(results, columns=['code','boll'])
-        # bolldf = bolldf.set_index('code')
-        # df = cct.combine_dataFrame(df, bolldf)
-        # print "bollt:%0.2f"%(time.time()-time_ss),
-        per3d_l=2
-        percent_l=-1
-        op_l=3
-        if 'boll' in df.columns:
-            if 915 < cct.get_now_time_int() < 950:
-                # df = df[(df.boll >= boll) | ((df.percent > percent_l) & (df.op > 4)) | ((df.percent > percent_l) & (df.per3d > per3d_l))]
-                # df = df[((df.percent > percent_l) & (df.op > 4)) | ((df.percent > percent_l) & (df.per3d > per3d_l))]
-                pass
-            elif 950 < cct.get_now_time_int() < 1501:
-                # df = df[(df.boll >= boll) | ((df.low <> 0) & (df.open == df.low) & (((df.percent > percent_l) & (df.op > op_l)) | ((df.percent > percent_l) & (df.per3d > per3d_l))))]
-                # df = df[(df.boll >= boll) & ((df.low <> 0) & (df.open >= df.low *
-                # ct.changeRatio) & (((df.percent > percent_l)) | ((df.percent >
-                # percent_l) & (df.per3d > per3d_l))))]
-                df=df[(df.boll >= boll)]
+                df = df[((df.low >= df.nlow) & (df.close > df.llastp * ct.changeRatio))]
+            # if 'nhigh' in df.columns and 'nclose' in df.columns:
+            #     if cct.get_now_time_int() > ct.nlow_limit_time:
+            #         df = df[(df.low >= df.nlow) & ((df.open > df.llastp * ct.changeRatio) & (df.nclose > df.llastp * ct.changeRatio)) &
+            #                 (((df.low >= df.nlow) & (df.close >= df.nclose)) | ((df.close >= df.nclose) & (df.close > df.nhigh * ct.changeRatio) & (df.high >= df.nhigh)))]
+            #     else:
+            #         df = df[((df.open > df.llastp * ct.changeRatio) & (df.close > df.llastp * ct.changeRatio)) &
+            #                 (((df.low >= df.nlow) & (df.close >= df.nclose)) | ((df.close >= df.nclose) & (df.close > df.nhigh * ct.changeRatio)))]
             # else:
-        # df = df[(df.boll >= boll) | ((df.low <> 0) & (df.open == df.low) &
-        # (((df.percent > percent_l) & (df.op > op_l)) | ((df.percent > percent_l)
-        # & (df.per3d > per3d_l))))]
+            #     df = df[((df.low >= df.nlow) & (df.close > df.llastp))]
+
+        if filter:
+
+            # filter
+
+            if cct.get_now_time_int() > 915 and cct.get_now_time_int() <= 1000:
+                # df = df[(df.buy > df.hmax * ct.changeRatio) | (df.open > df.llastp)]
+
+                df = df[(df.buy > df.cmean * ct.changeRatioUp) | (df.open > df.llastp)]
+                # df = df[df.buy > df.cmean]
+
+            elif cct.get_now_time_int() > 1000 and cct.get_now_time_int() <= 1430:
+                # df = df[(df.buy > df.hmax * ct.changeRatio) | (df.open > df.llastp)]
+
+                df = df[(df.buy > df.cmean * ct.changeRatioUp) | (df.open > df.llastp)]
+                # df = df[df.buy > df.cmean]
+            else:
+                # df = df[(df.buy > df.hmax * ct.changeRatio) | (df.open > df.llastp)]
+
+                df = df[(df.buy > df.cmean * ct.changeRatioUp) | (df.open > df.llastp)]
+                # df = df[df.buy > df.cmean]
+
+            # if ma5d:
+            #     # op, ra, st, days = pct.get_linear_model_status('999999', filter='y', dl=dl, ptype='low')
+            #     oph, rah, sth, daysh = pct.get_linear_model_status('999999', filter='y', dl=dl, ptype='high')
+            #     # fibl = str(days[0])
+            #     fibh = str(daysh[0])
+            #     # if 1 < fibl < dl / 2 and fibh > dl / 3:
+            #     if fibh > dl / 3:
+            #         df = df[ ((df.ma5d * ct.changeRatio < df.low) & (df.low < df.ma5d * (2 - ct.changeRatio))) | ((df.percent > 1) & (df.volume > 3))]
+            # print df.loc['000801']
+
+            if 'vstd' in df.columns:
+                # df = df[(df.lvol * df.volume > (df.vstd + df.lvol)) | ((df.percent > -10) & (df.hv / df.lv > 1.5))]
+                # dd = df.loc['000760'] dd.hv/dd.lv,dd.volume
+                df['hvRatio'] = map(lambda x, y: round(x / y / cct.get_work_time_ratio(), 1), df.hv, df.lv)
+                df['volRatio'] = (map(lambda x, y: round(x / y / radio_t, 1), df.nvol.values, df.lv.values))
+
+                # df = df[(df.lvol * df.volume > (df.vstd + df.lvol)) | ((df.percent > -5) & (df.hv / df.lv > 3))]
+
+                # if 1000 < cct.get_now_time_int() < 1450:
+                #     df = df[ (3 < df.ratio) & (df.ratio < 20)]
+
+                df = df[((df.hvRatio > df.volRatio) & ((df.close > df.lastp) & (df.nclose > df.lastp))) | ((
+                    (df.percent > -5) & ((df.vstd + df.lvol) * 1.5 < df.nvol) & (df.nvol > (df.vstd + df.lvol))))]
+                # [dd.lvol * dd.volume > (dd.vstd + dd.lvol) | dd.lvol * dd.volume >(dd.ldvolume + dd.vstd]
+            # print df.loc['000801']
+
+            if percent:
+                # if cct.get_now_time_int() > 930 and cct.get_now_time_int() <= 1430:
+                #     df = df[(df.volume > 1.5 * cct.get_work_time_ratio()) & (df.percent > -5)]
+                # df = df[(df.lvolume > df.lvol * 0.9) & (df.lvolume > df.lowvol * 1.1)]
+                if 'stdv' in df.columns and 926 < cct.get_now_time_int():
+                    df = df[((df.volume > 2 * cct.get_work_time_ratio()) & (df.percent > -3)) | ((df.stdv < 1) &
+                                                                                                 (df.percent > 2)) | ((df.lvolume > df.lvol * 0.9) & (df.lvolume > df.lowvol * 1.1))]
+                    df_index = tdd.getSinaIndexdf()
+                    df_index['volume'] = (map(lambda x, y: round(x / y / radio_t, 1), df_index.nvol.values, df_index.lvolume.values))
+                    index_vol = df_index.loc['999999'].volume
+                    index_percent = df_index.loc['999999'].percent
+                    df = df[((df.percent > -3) | (df.volume > index_vol)) & (df.percent > index_percent)]
+
+                else:
+                    df = df[((df.volume > 1.2 * cct.get_work_time_ratio()) & (df.percent > -3))
+                            | ((df.lvolume > df.lvol * 0.8) & (df.lvolume > df.lowvol * 1.1))]
+
+                df['upper'] = map(lambda x: round((1 + 11.0 / 100) * x, 1), df.ma10d)
+                df['lower'] = map(lambda x: round((1 - 9.0 / 100) * x, 1), df.ma10d)
+                df['ene'] = map(lambda x, y: round((x + y) / 2, 1), df.upper, df.lower)
+                # df = df[((df['buy'] >= df['ene'])) | ((df['buy'] < df['ene']) & (df['low'] > df['lower'])) | ((df['buy'] > df['upper']) & (df['low'] > df['upper']))]
+                # df = df[(( df['ene'] * ct.changeRatio < df['open']) & (df['buy'] > df['ene'] * ct.changeRatioUp)) | ((df['low'] > df['upper']) & (df['close'] > df['ene']))]
+                if 'nclose' in df.columns:
+                    df = df[((df['nclose'] > df['ene'] * ct.changeRatio) & (df['percent'] > -3) & (df.volume > 1.5)) |
+                            ((df['nclose'] > df['upper'] * ct.changeRatio) & (df['buy'] > df['upper'] * ct.changeRatioUp)) | ((df['llastp'] > df['upper']) & (df['nclose'] > df['upper']))]
+
+                # import ipdb;ipdb.set_trace()
+
+                # df = df[(( df['ene'] < df['open']) & (df['buy'] < df['ene'] * ct.changeRatioUp))]
+
+                # df = df[(df.per1d > 9) | (df.per2d > 4) | (df.per3d > 6)]
+                # df = df[(df.per1d > 0) | (df.per2d > 4) | (df.per3d > 6)]
+            # time_ss=time.time()
+            # codel = df.index.tolist()
+            # dm = tdd.get_sina_data_df(codel)
+            # results = cct.to_mp_run_async(getab.Get_BBANDS, codel,'d',5,duration,dm)
+            # bolldf = pd.DataFrame(results, columns=['code','boll'])
+            # bolldf = bolldf.set_index('code')
+            # df = cct.combine_dataFrame(df, bolldf)
+            # print "bollt:%0.2f"%(time.time()-time_ss),
+            per3d_l = 2
+            percent_l = -1
+            op_l = 3
+            if 'boll' in df.columns:
+                if 915 < cct.get_now_time_int() < 950:
+                    # df = df[(df.boll >= boll) | ((df.percent > percent_l) & (df.op > 4)) | ((df.percent > percent_l) & (df.per3d > per3d_l))]
+                    # df = df[((df.percent > percent_l) & (df.op > 4)) | ((df.percent > percent_l) & (df.per3d > per3d_l))]
+                    pass
+                elif 950 < cct.get_now_time_int() < 1501:
+                    # df = df[(df.boll >= boll) | ((df.low <> 0) & (df.open == df.low) & (((df.percent > percent_l) & (df.op > op_l)) | ((df.percent > percent_l) & (df.per3d > per3d_l))))]
+                    # df = df[(df.boll >= boll) & ((df.low <> 0) & (df.open >= df.low *
+                    # ct.changeRatio) & (((df.percent > percent_l)) | ((df.percent >
+                    # percent_l) & (df.per3d > per3d_l))))]
+                    df = df[(df.boll >= boll)]
+                # else:
+            # df = df[(df.boll >= boll) | ((df.low <> 0) & (df.open == df.low) &
+            # (((df.percent > percent_l) & (df.op > op_l)) | ((df.percent > percent_l)
+            # & (df.per3d > per3d_l))))]
+
+        if market_key is None:
+            df.loc[df.percent >= 9.94, 'percent'] = -10
+    else:
+        df['upper'] = map(lambda x: round((1 + 11.0 / 100) * x, 1), df.ma10d)
+        df['lower'] = map(lambda x: round((1 - 9.0 / 100) * x, 1), df.ma10d)
+        df['ene'] = map(lambda x, y: round((x + y) / 2, 1), df.upper, df.lower)
+        # df = df[((df['buy'] >= df['ene'])) | ((df['buy'] < df['ene']) & (df['low'] > df['lower'])) | ((df['buy'] > df['upper']) & (df['low'] > df['upper']))]
+        # df = df[(( df['ene'] * ct.changeRatio < df['open']) & (df['buy'] > df['ene'] * ct.changeRatioUp)) | ((df['low'] > df['upper']) & (df['close'] > df['ene']))]
+        if 'nclose' in df.columns:
+            # df = df[((df['nclose'] > df['ene'] * ct.changeRatio) & (df['percent'] > -3) & (df.volume > 1.5)) |
+            #         ((df['nclose'] > df['upper'] * ct.changeRatio) & (df['buy'] > df['upper'] * ct.changeRatioUp)) | ((df['llastp'] > df['upper']) & (df['nclose'] > df['upper']))]
+            df = df[(df.nclose > df.upper)]
+        else:
+            df = df[(df.buy > df.upper)]
 
     return df
 
@@ -325,12 +344,12 @@ def getBollFilter(df=None, boll=6, duration=ct.PowerCountdl, filter=True, ma5d=T
     # if 'ra' in df.columns and 'op' in df.columns:
     #     df = df[ (df.ma > 0 ) & (df.diff > 1) & (df.ra > 1) & (df.op >= 5) ]
 
-def WriteCountFilter(df, op = 'op', writecount = ct.writeCount, end = None, duration = 10):
-    codel=[]
+def WriteCountFilter(df, op='op', writecount=ct.writeCount, end=None, duration=10):
+    codel = []
     if str(writecount) <> 'all':
         if end is None and int(writecount) > 0:
             if int(writecount) < 100 and len(df) > 0 and 'percent' in df.columns:
-                codel=df.index[:int(writecount)].tolist()
+                codel = df.index[:int(writecount)].tolist()
                 # dd=df[df.percent == 10]
                 # df_list=dd.index.tolist()
                 # for co in df_list:
@@ -343,25 +362,25 @@ def WriteCountFilter(df, op = 'op', writecount = ct.writeCount, end = None, dura
                     print "writeCount DF is None or Wri:%s" % (writecount)
         else:
             if end is None:
-                writecount=int(writecount)
+                writecount = int(writecount)
                 if writecount > 0:
                     writecount -= 1
                 codel.append(df.index.tolist()[writecount])
             else:
-                writecount, end=int(writecount), int(end)
+                writecount, end = int(writecount), int(end)
 
                 if writecount > end:
-                    writecount, end=end, writecount
+                    writecount, end = end, writecount
                 if end < -1:
                     end += 1
-                    codel=df.index.tolist()[writecount:end]
+                    codel = df.index.tolist()[writecount:end]
                 elif end == -1:
-                    codel=df.index.tolist()[writecount::]
+                    codel = df.index.tolist()[writecount::]
                 else:
                     if writecount > 0 and end > 0:
                         writecount -= 1
                         end -= 1
-                    codel=df.index.tolist()[writecount:end]
+                    codel = df.index.tolist()[writecount:end]
     else:
-        codel=df.index.tolist()
+        codel = df.index.tolist()
     return codel
