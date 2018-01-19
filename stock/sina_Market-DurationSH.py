@@ -125,8 +125,8 @@ if __name__ == "__main__":
             # df = sina_data.Sina().all
             time_Rt = time.time()
             # top_now = tdd.getSinaAlldf(market='060', vol=ct.json_countVol, vtype=ct.json_countType)
-            top_now = tdd.getSinaAlldf(market='rzrq', vol=ct.json_countVol, vtype=ct.json_countType)
-#            top_now = tdd.getSinaAlldf(market='all', vol=ct.json_countVol, vtype=ct.json_countType)
+            # top_now = tdd.getSinaAlldf(market='rzrq', vol=ct.json_countVol, vtype=ct.json_countType)
+            top_now = tdd.getSinaAlldf(market='all', vol=ct.json_countVol, vtype=ct.json_countType)
 
             # top_dif = top_now
             # top_now.to_hdf("testhdf5", 'marketDD', format='table', complevel=9)
@@ -145,11 +145,18 @@ if __name__ == "__main__":
                 # time_Rt = time.time()
                 if len(top_all) == 0 and len(lastpTDX_DF) == 0:
                     cct.get_terminal_Position(position=sys.argv[0])
-
-                    # time_Rt = time.time()
-                    top_all, lastpTDX_DF = tdd.get_append_lastp_to_df(
-                        top_now, lastpTDX_DF=None, dl=duration_date, end=end_date, ptype=ptype, filter=filter, power=ct.lastPower, lastp=False, resample=resample)
-                    log.debug("len:%s" % (len(top_all)))
+                    print ("term:%s" % (cct.get_terminal_Position(cmd='DurationSH.py')),)
+                    if cct.get_terminal_Position(cmd='DurationSH.py') > 1:
+                        top_all, lastpTDX_DF = tdd.get_append_lastp_to_df(
+                            top_now, lastpTDX_DF=None, dl=duration_date, end=end_date, ptype=ptype, filter=filter, power=ct.lastPower, lastp=False, newdays=newdays, resample=resample)
+                    else:
+                        newdays = 15
+                        top_all, lastpTDX_DF = tdd.get_append_lastp_to_df(
+                            top_now, lastpTDX_DF=None, dl=duration_date, end=end_date, ptype=ptype, filter=filter, power=ct.lastPower, lastp=False, newdays=newdays, checknew=True, resample=resample)
+                    # top_all, lastpTDX_DF = tdd.get_append_lastp_to_df(
+                    #     top_now, lastpTDX_DF=None, dl=duration_date, end=end_date, ptype=ptype, filter=filter, power=ct.lastPower, lastp=False, resample=resample)
+                    # log.debug("len:%s" % (len(top_all)))
+                    
                     # codelist = top_all.index.tolist()
                     # log.info('toTDXlist:%s' % len(codelist))
                     # # tdxdata = tdd.get_tdx_all_day_LastDF(codelist,dt=duration_date,ptype=ptype)

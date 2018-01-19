@@ -302,13 +302,27 @@ def get_tdx_Exp_day_to_df(code, start=None, end=None, dl=None, newdays=None, typ
                 df['hv'] = df.vol[-tdx_max_int:max_int_end].max()
                 df['lv'] = df.vol[-tdx_max_int:max_int_end].min()
             if resample == 'd' and df.close[-5:].max() > df.open[-5:].min() * 1.6:
-                # if initTdxdata < 3:
-                log.error("%s dl None outdata!" % (code))
-                initTdxdata += 1
-                if write_k_data_status:
-                    write_all_kdata_to_file(code, f_path=file_path)
-                    df = get_tdx_Exp_day_to_df(
-                        code, start=start, end=end, dl=dl, newdays=newdays, type='f', wds=False, MultiIndex=MultiIndex)
+
+                tdx_err_code = cct.GlobalValues().getkey('tdx_err_code')
+                if tdx_err_code is None:
+                    tdx_err_code = [code]
+                    cct.GlobalValues().setkey('tdx_err_code',tdx_err_code)
+                    log.error("%s dl None outdata!" % (code))
+                    initTdxdata += 1
+                    if write_k_data_status:
+                        write_all_kdata_to_file(code, f_path=file_path)
+                        df = get_tdx_Exp_day_to_df(
+                            code, start=start, end=end, dl=dl, newdays=newdays, type='f', wds=False, MultiIndex=MultiIndex)
+                else:
+                    if not code in tdx_err_code:
+                        tdx_err_code.append(code)
+                        cct.GlobalValues().setkey('tdx_err_code',tdx_err_code)
+                        log.error("%s dl None outdata!" % (code))
+                        initTdxdata += 1
+                        if write_k_data_status:
+                            write_all_kdata_to_file(code, f_path=file_path)
+                            df = get_tdx_Exp_day_to_df(
+                                code, start=start, end=end, dl=dl, newdays=newdays, type='f', wds=False, MultiIndex=MultiIndex)
                 # write_tdx_sina_data_to_file(code, df=df)
             df = df.fillna(0)
             df = df.sort_index(ascending=False)
@@ -452,14 +466,28 @@ def get_tdx_Exp_day_to_df(code, start=None, end=None, dl=None, newdays=None, typ
             dratio = (dl - len(df)) / float(dl)
             if resample == 'd' and dratio < 0.2 and df.close[-5:].max() > df.open[-5:].min() * 1.6:
 
-                # if initTdxdata < 3:
-                log.error("%s start:%s df:%s dl:%s outdata!" %
-                          (code, start, len(df), dl))
-                initTdxdata += 1
-                if write_k_data_status:
-                    write_all_kdata_to_file(code, file_path)
-                    df = get_tdx_Exp_day_to_df(
-                        code, start=start, end=end, dl=dl, newdays=newdays, type='f', wds=False, MultiIndex=MultiIndex)
+                tdx_err_code = cct.GlobalValues().getkey('tdx_err_code')
+                if tdx_err_code is None:
+                    tdx_err_code = [code]
+                    cct.GlobalValues().setkey('tdx_err_code',tdx_err_code)
+                    log.error("%s start:%s df:%s dl:%s outdata!" %
+                              (code, start, len(df), dl))
+                    initTdxdata += 1
+                    if write_k_data_status:
+                        write_all_kdata_to_file(code, file_path)
+                        df = get_tdx_Exp_day_to_df(
+                            code, start=start, end=end, dl=dl, newdays=newdays, type='f', wds=False, MultiIndex=MultiIndex)
+                else:
+                    if not code in tdx_err_code:
+                        tdx_err_code.append(code)
+                        cct.GlobalValues().setkey('tdx_err_code',tdx_err_code)
+                        log.error("%s start:%s df:%s dl:%s outdata!" %
+                                  (code, start, len(df), dl))
+                        initTdxdata += 1
+                        if write_k_data_status:
+                            write_all_kdata_to_file(code, file_path)
+                            df = get_tdx_Exp_day_to_df(
+                                code, start=start, end=end, dl=dl, newdays=newdays, type='f', wds=False, MultiIndex=MultiIndex)
 
                 # write_tdx_sina_data_to_file(code, df=df)
             df = df.fillna(0)
@@ -3207,8 +3235,9 @@ if __name__ == '__main__':
     log.setLevel(log_level)
     code='600903'
     print get_tdx_Exp_day_to_df(code, dl=20, newdays=0, resample='d')
+    # print get_tdx_Exp_day_to_df(code, dl=20, newdays=0, resample='d')
     # print get_tdx_day_to_df_last('999999', type=1)
-    # sys.exit(0)
+    sys.exit(0)
     # log.setLevel(LoggerFactory.INFO)
     # print Write_tdx_all_to_hdf('all', h5_fname='tdx_all_df', h5_table='all', dl=300)
     # print Write_tdx_all_to_hdf(tdx_index_code_list, h5_fname='tdx_all_df', h5_table='all', dl=300,index=True)

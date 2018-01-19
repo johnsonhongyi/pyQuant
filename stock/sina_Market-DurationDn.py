@@ -126,7 +126,7 @@ if __name__ == "__main__":
     parser = cct.MoniterArgmain()
     parserDuraton = cct.DurationArgmain()
     # market_sort_value, market_sort_value_key = ct.get_market_sort_value_key(ct.sort_value_key_perd)
-    market_sort_value, market_sort_value_key = ct.get_market_sort_value_key('2 2')
+    market_sort_value, market_sort_value_key = ct.get_market_sort_value_key('2 3')
 
     while 1:
         try:
@@ -276,6 +276,7 @@ if __name__ == "__main__":
                     ## goldstock=len(top_dif[top_dif.buy >(top_dif.high-top_dif.low)/2])
                     if ptype == 'low':
                         #                        top_dif = top_dif[top_dif.lvol > ct.LvolumeSize]
+                        
                         if cct.get_now_time_int() > 925 and cct.get_work_time():
                             top_dif = top_dif[(top_dif.volume > ct.VolumeMinR) & (
                                 top_dif.volume < ct.VolumeMaxR)]

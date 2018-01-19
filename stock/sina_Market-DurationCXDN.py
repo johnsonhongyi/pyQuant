@@ -148,8 +148,8 @@ if __name__ == "__main__":
             # top_now = tdd.getSinaAlldf(market='cx', vol=ct.json_countVol, vtype=ct.json_countType)
             # top_now = tdd.getSinaAlldf(market='央企',filename='yqg', vol=ct.json_countVol, vtype=ct.json_countType)
             # top_now = tdd.getSinaAlldf(market=u'一带一路',filename='ydyl', vol=ct.json_countVol, vtype=ct.json_countType)
-            top_now = tdd.getSinaAlldf(market='all', vol=ct.json_countVol, vtype=ct.json_countType)
-            # top_now = tdd.getSinaAlldf(market='次新股',filename='cxg', vol=ct.json_countVol, vtype=ct.json_countType)
+            # top_now = tdd.getSinaAlldf(market='all', vol=ct.json_countVol, vtype=ct.json_countType)
+            top_now = tdd.getSinaAlldf(market='次新股',filename='cxg', vol=ct.json_countVol, vtype=ct.json_countType)
             time_Rt = time.time()
             # top_now = tdd.getSinaAlldf(market='有色+煤炭', filename='mfsw', vol=ct.json_countVol, vtype=ct.json_countType)
             # top_now = tdd.getSinaAlldf(market='雄安新区', filename='xaxq', vol=ct.json_countVol, vtype=ct.json_countType)
@@ -172,7 +172,6 @@ if __name__ == "__main__":
                 if len(top_all) == 0 and len(lastpTDX_DF) == 0:
                     cct.get_terminal_Position(position=sys.argv[0])
                     time_Rt = time.time()
-
 
                     print ("term:%s" % (cct.get_terminal_Position(cmd='DurationCXDN.py')),)
                     if cct.get_terminal_Position(cmd='DurationCXDN.py') > 1:
