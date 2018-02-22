@@ -303,7 +303,7 @@ def get_hdf5_file(fpath, wr_mode='r', complevel=9, complib='blosc', mutiindx=Fal
     # return store
 
 
-def write_hdf_db(fname, df, table='all', index=False, complib='blosc', baseCount=500, append=True, MultiIndex=False):
+def write_hdf_db(fname, df, table='all', index=False, complib='blosc', baseCount=500, append=True, MultiIndex=False,rewrite=False):
     """[summary]
     
     [description]
@@ -422,7 +422,7 @@ def write_hdf_db(fname, df, table='all', index=False, complib='blosc', baseCount
             
             # tmpdf = tmpdf[~tmpdf.index.duplicated(keep='first')]
             # df = df[~df.index.duplicated(keep='first')]
-            if tmpdf is not None and len(tmpdf) > 0:
+            if not rewrite and tmpdf is not None and len(tmpdf) > 0:
                 # multi_code = tmpdf.index.get_level_values('code').unique().tolist()
                 multi_code=tmpdf.index.get_level_values('code').unique().tolist()
                 df_multi_code = df.index.get_level_values('code').unique().tolist()
@@ -443,7 +443,7 @@ def write_hdf_db(fname, df, table='all', index=False, complib='blosc', baseCount
                     log.error("dratio:%s main:%s new:%s %s %s Multi All Wri" % (dratio,len(multi_code),len(df_multi_code),fname, table))
                 # da.drop(('000001','2017-05-11'))
             else:
-                pass
+                log.error("%s %s Multi rewrite:%s Wri!!!" % (fname, table, rewrite))
 
     time_t=time.time()
     if df is not None and not df.empty and table is not None:

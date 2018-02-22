@@ -1299,7 +1299,7 @@ def write_tdx_sina_data_to_file(code, dm=None, df=None, dl=2, type='f'):
     return "NTrue"
 
 
-def Write_tdx_all_to_hdf(market, h5_fname='tdx_all_df', h5_table='all', dl=300,index=False):
+def Write_tdx_all_to_hdf(market, h5_fname='tdx_all_df', h5_table='all', dl=300,index=False,rewrite=False):
     """[summary]
 
     [Write all code tdx to h5]
@@ -1324,7 +1324,7 @@ def Write_tdx_all_to_hdf(market, h5_fname='tdx_all_df', h5_table='all', dl=300,i
         log.error("start write index tdx data:%s"%(tdx_index_code_list))
     if market == 'all':
         index_key = tdx_index_code_list
-        Write_tdx_all_to_hdf(index_key,h5_fname=h5_fname, h5_table=h5_table, dl=dl,index=True)
+        Write_tdx_all_to_hdf(index_key,h5_fname=h5_fname, h5_table=h5_table, dl=dl,index=True,rewrite=rewrite)
         index = False
         market = ['cyb', 'sh', 'sz']
     if not isinstance(market, list):
@@ -1416,8 +1416,8 @@ def Write_tdx_all_to_hdf(market, h5_fname='tdx_all_df', h5_table='all', dl=300,i
                 Closing remaining open files:/Volumes/RamDisk/tdx_all_df_30.h5...done
                 '''
         concat_t = time.time() - time_s
-        print("dd.concat all :%s  time:%0.2f" % (len(dfcode), concat_t))
-        status = h5a.write_hdf_db(h5_fname, dd, table=h5_table, index=False, baseCount=500, append=False, MultiIndex=True)
+        print("rewrite:%s dd.concat all :%s  time:%0.2f" % (rewrite,len(dfcode), concat_t))
+        status = h5a.write_hdf_db(h5_fname, dd, table=h5_table, index=False, baseCount=500, append=False, MultiIndex=True,rewrite=rewrite)
         if status:
             print("hdf5 write all ok:%s  atime:%0.2f wtime:%0.2f" % (len(dfcode), time.time() - time_a, time.time() - time_s - concat_t))
         else:
@@ -3234,10 +3234,10 @@ if __name__ == '__main__':
     # log_level = LoggerFactory.DEBUG if args['-d']  else LoggerFactory.ERROR
     log.setLevel(log_level)
     code='600903'
-    print get_tdx_Exp_day_to_df(code, dl=20, newdays=0, resample='d')
+    print get_tdx_Exp_day_to_df(code, dl=10, newdays=0, resample='d')
     # print get_tdx_Exp_day_to_df(code, dl=20, newdays=0, resample='d')
     # print get_tdx_day_to_df_last('999999', type=1)
-    sys.exit(0)
+    # sys.exit(0)
     # log.setLevel(LoggerFactory.INFO)
     # print Write_tdx_all_to_hdf('all', h5_fname='tdx_all_df', h5_table='all', dl=300)
     # print Write_tdx_all_to_hdf(tdx_index_code_list, h5_fname='tdx_all_df', h5_table='all', dl=300,index=True)
@@ -3309,8 +3309,10 @@ if __name__ == '__main__':
     # sys.exit(0)
 #    print write_tdx_tushare_to_file(code)
 
-    hdf5_wri = cct.cct_raw_input("write all tdx data to Multi hdf[y|n]:")
-    if hdf5_wri == 'y':
+    hdf5_wri = cct.cct_raw_input("write all Tdx data to Multi hdf[rw|y|n]:")
+    if hdf5_wri == 'rw':
+        Write_tdx_all_to_hdf('all', h5_fname='tdx_all_df', h5_table='all', dl=300,rewrite=True)
+    elif hdf5_wri == 'y':
         Write_tdx_all_to_hdf('all', h5_fname='tdx_all_df', h5_table='all', dl=300)
 
     # hdf5_wri = cct.cct_raw_input("write all index tdx data to hdf[y|n]:")
@@ -3323,7 +3325,7 @@ if __name__ == '__main__':
 
         # st.close()
 
-    market = cct.cct_raw_input("write all data [all,sh,sz,cyb,alla] :")
+    market = cct.cct_raw_input("write all data append [all,sh,sz,cyb,alla] :")
     if market in ['all', 'sh', 'sz', 'cyb', 'alla']:
         if market != 'all':
             Write_market_all_day_mp(market, rewrite=True)
