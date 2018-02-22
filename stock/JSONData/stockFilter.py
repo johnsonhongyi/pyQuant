@@ -37,6 +37,7 @@ def getBollFilter(df=None, boll=6, duration=ct.PowerCountdl, filter=True, ma5d=T
         # if len(drop_t) > 0:
             # df = df.drop(drop_t,axis=0)top
             # log.error("stf drop_cxg:%s"%(len(drop_t)))
+            
     if df is None:
         print "dataframe is None"
         return None
@@ -133,6 +134,9 @@ def getBollFilter(df=None, boll=6, duration=ct.PowerCountdl, filter=True, ma5d=T
         # df = df[(df.lvolume > df.lvol * 0.9) & (df.lvolume > df.lowvol * 1.1)]
 
     # if 'nlow' in df.columns and 932 < cct.get_now_time_int() < 1030:
+    df['upper'] = map(lambda x: round((1 + 11.0 / 100) * x, 1), df.ma10d)
+    df['lower'] = map(lambda x: round((1 - 9.0 / 100) * x, 1), df.ma10d)
+    df['ene'] = map(lambda x, y: round((x + y) / 2, 1), df.upper, df.lower)
 
     if not ene:
         if 'nlow' in df.columns and 930 < cct.get_now_time_int():
@@ -169,7 +173,7 @@ def getBollFilter(df=None, boll=6, duration=ct.PowerCountdl, filter=True, ma5d=T
 
                 # df.loc['002906'][['open','nclose','close','ncloseRatio','nopenRatio','low','nlow']]
 
-                df = df[(((df.nopenRatio <= df.nclose) & (df.low >= df.nlow) & (df.close >= df.ncloseRatio)) |
+                df = df[(df.low > df.upper) | (((df.nopenRatio <= df.nclose) & (df.low >= df.nlow) & (df.close >= df.ncloseRatio)) |
                          ((df.nopenRatio <= df.nclose) & (df.close >= df.ncloseRatio) & (df.high >= df.nhigh)))]
                 # else:
                 # df = df[(((df.low >= df.nlow) & (df.close >= ncloseRatio)) | ((df.close >= ncloseRatio) & (df.close > nhighRatio)))]
@@ -190,16 +194,24 @@ def getBollFilter(df=None, boll=6, duration=ct.PowerCountdl, filter=True, ma5d=T
             # filter
 
             if cct.get_now_time_int() > 915 and cct.get_now_time_int() <= 1000:
-                df = df[(df.buy > df.hmax * ct.changeRatio) | (df.low > df.llastp)]
+                df = df[(df.buy > df.hmax * ct.changeRatio) | (df.buy < df.lmin * ct.changeRatioUp)]
+                # df = df[(df.buy > df.hmax * ct.changeRatio) & (df.low > df.llastp)]
                 # df = df[(df.buy > df.cmean * ct.changeRatioUp) | (df.open > df.llastp)]
                 # df = df[df.buy > df.cmean]
 
             elif cct.get_now_time_int() > 1000 and cct.get_now_time_int() <= 1430:
-                df = df[(df.buy > df.hmax * ct.changeRatio) | (df.low > df.llastp)]
+                df = df[(df.buy > df.hmax * ct.changeRatio) | (df.buy < df.lmin * ct.changeRatioUp)]
+                # df = df[(df.buy > df.hmax * ct.changeRatio) | (df.low > df.llastp)]
+                # df = df[(df.buy > df.hmax * ct.changeRatio) & (df.low > df.llastp)]
+                
                 # df = df[(df.buy > df.cmean * ct.changeRatioUp) | (df.open > df.llastp)]
                 # df = df[df.buy > df.cmean]
             else:
-                df = df[(df.buy > df.hmax * ct.changeRatio) | (df.low > df.llastp)]
+                df = df[(df.buy > df.hmax * ct.changeRatio) | (df.buy < df.lmin * ct.changeRatioUp)]
+
+                # df = df[(df.buy > df.hmax * ct.changeRatio) | (df.low > df.llastp)]
+                # df = df[(df.buy > df.hmax * ct.changeRatio) & (df.low > df.llastp)]
+                
                 # df = df[(df.buy > df.cmean * ct.changeRatioUp) | (df.open > df.llastp)]
                 # df = df[df.buy > df.cmean]
 
@@ -224,10 +236,12 @@ def getBollFilter(df=None, boll=6, duration=ct.PowerCountdl, filter=True, ma5d=T
                 # if 1000 < cct.get_now_time_int() < 1450:
                 #     df = df[ (3 < df.ratio) & (df.ratio < 20)]
                 if 'nclose' in df.columns:
-                    df = df[((df.hvRatio > df.volRatio) & ((df.buy > df.lastp) & (df.nclose > df.lastp))) | ((
+                    # df = df[((df.hvRatio > df.volRatio) & ((df.buy > df.lastp) & (df.nclose > df.lastp))) | ((
+                    df = df[( ((df.buy > df.lastp) & (df.nclose > df.lastp))) | ((
                         (df.percent > -5) & ((df.vstd + df.lvol) * 1.5 < df.nvol) & (df.nvol > (df.vstd + df.lvol))))]
                 else:
-                    df = df[((df.hvRatio > df.volRatio) & ((df.buy > df.lastp))) | ((
+                    # df = df[((df.hvRatio > df.volRatio) & ((df.buy > df.lastp))) | ((
+                    df = df[( ((df.buy > df.lastp))) | ((
                         (df.percent > -5) & ((df.vstd + df.lvol) * 1.5 < df.nvol) & (df.nvol > (df.vstd + df.lvol))))]
                 # [dd.lvol * dd.volume > (dd.vstd + dd.lvol) | dd.lvol * dd.volume >(dd.ldvolume + dd.vstd]
             # print df.loc['000801']
@@ -249,9 +263,8 @@ def getBollFilter(df=None, boll=6, duration=ct.PowerCountdl, filter=True, ma5d=T
                     df = df[((df.volume > 1.2 * cct.get_work_time_ratio()) & (df.percent > -3))
                             | ((df.lvolume > df.lvol * 0.8) & (df.lvolume > df.lowvol * 1.1))]
 
-                df['upper'] = map(lambda x: round((1 + 11.0 / 100) * x, 1), df.ma10d)
-                df['lower'] = map(lambda x: round((1 - 9.0 / 100) * x, 1), df.ma10d)
-                df['ene'] = map(lambda x, y: round((x + y) / 2, 1), df.upper, df.lower)
+
+
                 # df = df[((df['buy'] >= df['ene'])) | ((df['buy'] < df['ene']) & (df['low'] > df['lower'])) | ((df['buy'] > df['upper']) & (df['low'] > df['upper']))]
                 # df = df[(( df['ene'] * ct.changeRatio < df['open']) & (df['buy'] > df['ene'] * ct.changeRatioUp)) | ((df['low'] > df['upper']) & (df['close'] > df['ene']))]
                 if 'nclose' in df.columns:

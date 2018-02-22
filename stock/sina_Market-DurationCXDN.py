@@ -114,7 +114,7 @@ if __name__ == "__main__":
     du_date = duration_date
     # resample = ct.resample_dtype
     resample = 'd'
-    newdays = 18
+    newdays = 15
     # print cct.last_tddate(2)
     # end_date = cct.last_tddate(days=ct.lastdays)
     end_date = None
@@ -148,8 +148,8 @@ if __name__ == "__main__":
             # top_now = tdd.getSinaAlldf(market='cx', vol=ct.json_countVol, vtype=ct.json_countType)
             # top_now = tdd.getSinaAlldf(market='央企',filename='yqg', vol=ct.json_countVol, vtype=ct.json_countType)
             # top_now = tdd.getSinaAlldf(market=u'一带一路',filename='ydyl', vol=ct.json_countVol, vtype=ct.json_countType)
-            # top_now = tdd.getSinaAlldf(market='all', vol=ct.json_countVol, vtype=ct.json_countType)
-            top_now = tdd.getSinaAlldf(market='次新股',filename='cxg', vol=ct.json_countVol, vtype=ct.json_countType)
+            top_now = tdd.getSinaAlldf(market='all', vol=ct.json_countVol, vtype=ct.json_countType)
+            # top_now = tdd.getSinaAlldf(market='次新股',filename='cxg', vol=ct.json_countVol, vtype=ct.json_countType)
             time_Rt = time.time()
             # top_now = tdd.getSinaAlldf(market='有色+煤炭', filename='mfsw', vol=ct.json_countVol, vtype=ct.json_countType)
             # top_now = tdd.getSinaAlldf(market='雄安新区', filename='xaxq', vol=ct.json_countVol, vtype=ct.json_countType)
@@ -176,7 +176,7 @@ if __name__ == "__main__":
                     print ("term:%s" % (cct.get_terminal_Position(cmd='DurationCXDN.py')),)
                     if cct.get_terminal_Position(cmd='DurationCXDN.py') > 1:
                         top_all, lastpTDX_DF = tdd.get_append_lastp_to_df(
-                            top_now, lastpTDX_DF=None, dl=duration_date, end=end_date, ptype=ptype, filter=filter, power=ct.lastPower, lastp=False, newdays=newdays, resample=resample)
+                            top_now, lastpTDX_DF=None, dl=duration_date, end=end_date, ptype=ptype, filter=filter, power=ct.lastPower, lastp=False, newdays=newdays, checknew=True,resample=resample)
                     else:
                         newdays = 15
                         top_all, lastpTDX_DF = tdd.get_append_lastp_to_df(

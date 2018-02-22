@@ -710,6 +710,7 @@ def detect_peaks(x, mph=None, mpd=1, threshold=0, edge='rising',
         plt.plot(ind,x[ind],'r*',markersize=9)
         # plt.axes()
         plt.show(block=True)
+        # plt.show(block=False)
 
     return ind,x[ind]
 
@@ -718,15 +719,23 @@ if __name__ == "__main__":
     # df = tdd.get_tdx_append_now_df_api('399006',start=20160912)
 #    df = tdd.get_tdx_append_now_df_api('399006',dl=30)
     # print df[-1:]
-    code = '002024'
+    code = '999999'
     # code = '999999'
-    df = tdd.get_tdx_append_now_df_api(code,dl=30).sort_index(ascending=True)
+    df = tdd.get_tdx_append_now_df_api(code,dl=60).sort_index(ascending=True)
     # ind = detect_peaks(df.close, mph=0,mpd=10,edge='falling',show=True)
+    
+    
     print detect_peaks(df.close, mph=0,mpd=2,valley=False,show=True)
     print detect_peaks(df.close, mph=0,mpd=2,valley=True,show=True)
+    sys.exit(0)
     print LDS(df.close)
+    
     # print detect_peaks(df.close, mph=0,mpd=3,threshold=0,valley=False,show=False)
+    
+
     print detect_peaks_lis(df)
+
+
     # ind = detect_peaks(df.close,show=True)
     # print get_diff_index(code,dl=10)
     # print get_linear_model_status(code,dl=30,days=1)

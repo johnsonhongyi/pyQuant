@@ -29,7 +29,7 @@ DD_VOL_List = {'0': '40000', '1': '100000',
                '2': '100000', '3': '200000', '4': '1000000'}
 # LvolumeSize = 125000
 LvolumeSize = 12500
-VolumeMaxR = 200
+VolumeMaxR = 5000
 VolumeMinR = 0.1
 PowerCount = 500
 duration_diff = 6
