@@ -59,8 +59,6 @@ if __name__ == "__main__":
     # parsehtml(downloadpage(url_s))
     # StreamHandler(sys.stdout).push_application()
     # log = LoggerFactory.getLogger('sina_Market-DurationSH')
-    import search_Tdx_multi_data_duration250 as search250
-    search250.get_roll_mean_all(single=True, tdx=False, app=False)
     from docopt import docopt
     log = LoggerFactory.log
     args = docopt(cct.sina_doc, version='sina_cxdn')
@@ -118,6 +116,10 @@ if __name__ == "__main__":
             print("duaration: %s duration_date:%s" % (cct.get_today_duration(du_date), duration_date))
         log.info("duaration: %s duration_date:%s" % (cct.get_today_duration(du_date), duration_date))
     set_duration_console(du_date)
+
+    import search_Tdx_multi_data_duration250 as search250
+    search250.get_roll_mean_all(single=True, tdx=False, app=False)
+
     # all_diffpath = tdd.get_tdx_dir_blocknew() + '062.blk'
     parser = cct.MoniterArgmain()
     parserDuraton = cct.DurationArgmain()

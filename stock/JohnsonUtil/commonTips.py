@@ -1474,7 +1474,10 @@ def write_to_blocknew(p_name, data, append=True, doubleFile=True, keep_last=15):
         fout.flush()
         fout.close()
         # if p_name.find('066.blk') >= 0:
-        print "all write to %s:%s" % (p_name, counts)
+        if counts == 0:
+            log.error("data is None:%s"%(p_name))
+        else:
+            print "all write to %s:%s" % (p_name, counts)
 
     blockNew = get_tdx_dir_blocknew() + 'zxg.blk'
     blockNewStart = get_tdx_dir_blocknew() + '066.blk'
