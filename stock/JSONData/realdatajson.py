@@ -183,6 +183,9 @@ def get_sina_Market_json(market='all', showtime=True, num='100', retry_count=3, 
                     co_inx = [inx for inx in h5.index if str(inx).startswith(('30'))]
                 else:
                     log.error('market is not Find:%s'%(market))
+                    import ipdb;ipdb.set_trace()
+                    
+                    co_inx = cct.read_to_blocknew(market)
                 dd = h5.loc[co_inx]
                 if len(dd) > 100:
                     log.info("return sina_ratio:%s"%(len(dd)))

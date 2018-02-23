@@ -1757,6 +1757,7 @@ def getSinaAlldf(market='cyb', vol=ct.json_countVol, vtype=ct.json_countType, fi
     elif market.find('blk') > 0 or market.isdigit():
             # blkname = '061.blk'
         code_l = cct.read_to_blocknew(market)
+
         df = sina_data.Sina().get_stock_list_data(code_l)   
         # df = pd.read_csv(block_path,dtype={'code':str},encoding = 'gbk')
     elif market in ['sh', 'sz', 'cyb']:

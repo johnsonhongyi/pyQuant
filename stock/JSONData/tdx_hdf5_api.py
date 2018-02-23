@@ -591,8 +591,11 @@ def load_hdf_db(fname, table='all', code_l=None, timelimit=True, index=False, li
                         code_l=map((lambda x: str(1000000 - int(x))
                                       if x.startswith('0') else x), code_l)
                     dif_co=list(set(dd.index) & set(code_l))
-                    dratio=(float(len(code_l)) - float(len(dif_co))) / \
-                        float(len(code_l))
+                    if len(code_l) > 0:
+                        dratio=(float(len(code_l)) - float(len(dif_co))) / \
+                            float(len(code_l))
+                    else:
+                        dratio = 0
                     # if dratio < 0.1 or len(dd) > 3100:
                     if dratio < dratio_limit:
                         log.info("find all:%s :%s %0.2f" %
