@@ -137,7 +137,6 @@ def getBollFilter(df=None, boll=6, duration=ct.PowerCountdl, filter=True, ma5d=T
     df['upper'] = map(lambda x: round((1 + 11.0 / 100) * x, 1), df.ma10d)
     df['lower'] = map(lambda x: round((1 - 9.0 / 100) * x, 1), df.ma10d)
     df['ene'] = map(lambda x, y: round((x + y) / 2, 1), df.upper, df.lower)
-
     if not ene:
         if 'nlow' in df.columns and 930 < cct.get_now_time_int():
             # for col in ['nhigh', 'nclose', 'nlow','nstd']:
@@ -194,20 +193,20 @@ def getBollFilter(df=None, boll=6, duration=ct.PowerCountdl, filter=True, ma5d=T
             # filter
 
             if cct.get_now_time_int() > 915 and cct.get_now_time_int() <= 1000:
-                df = df[(df.buy > df.hmax * ct.changeRatio) | (df.buy < df.lmin * ct.changeRatioUp)]
+                df = df[(df.buy > df.hmax * ct.changeRatio) | (df.buy < df.lmin * ct.changeRatioUp) | (df.per3d > 5)]
                 # df = df[(df.buy > df.hmax * ct.changeRatio) & (df.low > df.llastp)]
                 # df = df[(df.buy > df.cmean * ct.changeRatioUp) | (df.open > df.llastp)]
                 # df = df[df.buy > df.cmean]
 
             elif cct.get_now_time_int() > 1000 and cct.get_now_time_int() <= 1430:
-                df = df[(df.buy > df.hmax * ct.changeRatio) | (df.buy < df.lmin * ct.changeRatioUp)]
+                df = df[(df.buy > df.hmax * ct.changeRatio) | (df.buy < df.lmin * ct.changeRatioUp) | (df.per3d > 5)]
                 # df = df[(df.buy > df.hmax * ct.changeRatio) | (df.low > df.llastp)]
                 # df = df[(df.buy > df.hmax * ct.changeRatio) & (df.low > df.llastp)]
                 
                 # df = df[(df.buy > df.cmean * ct.changeRatioUp) | (df.open > df.llastp)]
                 # df = df[df.buy > df.cmean]
             else:
-                df = df[(df.buy > df.hmax * ct.changeRatio) | (df.buy < df.lmin * ct.changeRatioUp)]
+                df = df[(df.buy > df.hmax * ct.changeRatio) | (df.buy < df.lmin * ct.changeRatioUp) | (df.per3d > 5)]
 
                 # df = df[(df.buy > df.hmax * ct.changeRatio) | (df.low > df.llastp)]
                 # df = df[(df.buy > df.hmax * ct.changeRatio) & (df.low > df.llastp)]

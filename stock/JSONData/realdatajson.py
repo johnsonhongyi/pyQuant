@@ -183,9 +183,8 @@ def get_sina_Market_json(market='all', showtime=True, num='100', retry_count=3, 
                     co_inx = [inx for inx in h5.index if str(inx).startswith(('30'))]
                 else:
                     log.error('market is not Find:%s'%(market))
-                    import ipdb;ipdb.set_trace()
-                    
-                    co_inx = cct.read_to_blocknew(market)
+                    codel = cct.read_to_blocknew(market)
+                    co_inx = [inx for inx in codel if inx in h5.index]
                 dd = h5.loc[co_inx]
                 if len(dd) > 100:
                     log.info("return sina_ratio:%s"%(len(dd)))
@@ -362,7 +361,7 @@ def _get_sina_json_dd_url(vol='0', type='0', num='10000', count=None):
                 url = ct.JSON_DD_Data_URL_Page % (count, '1', ct.DD_VOL_List[vol], type)
                 urllist.append(url)
         else:
-            log.error("url Count error:%s"%(url))
+            log.error("url Count error:%s count:%s"%(url,count))
             return []
     else:
         url = ct.JSON_DD_CountURL % (ct.DD_VOL_List[vol], type)
@@ -808,7 +807,8 @@ if __name__ == '__main__':
     # print df.couts.sum()
     # df = get_market_price_sina_dd_realTime(dp='', vol='1', type='0')
     # print df
-    # df = get_sina_all_json_dd(1,0,num=10000)
+    df = get_sina_all_json_dd(1,0,num=10000)
+    print len(df)
     print "getconfigBigCount:",getconfigBigCount(count=None, write=False)
     df = get_sina_Market_json(market='all', showtime=True, num='100', retry_count=3, pause=0.001)
     print df[:1]
