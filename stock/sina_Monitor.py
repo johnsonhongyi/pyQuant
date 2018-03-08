@@ -195,8 +195,17 @@ if __name__ == "__main__":
                         top_all = top_all[(top_all.volume > ct.VolumeMinR) & (
                             top_all.volume < ct.VolumeMaxR)]
 
+                if st_key_sort.split()[0] == '4' and cct.get_now_time_int() > 925 and 'lastbuy' in top_all.columns:
+                    top_all['dff'] = (map(lambda x, y: round((x - y) / y * 100, 1),
+                                          top_all['buy'].values, top_all['lastbuy'].values))
+                else:
+                    top_all['dff'] = (map(lambda x, y: round((x - y) / y * 100, 1),
+                                          top_all['buy'].values, top_all['lastp'].values))
+
+
                 top_all = top_all.sort_values(
-                    by=ct.Monitor_sort_count, ascending=[0, 0, 0, 0, 1])
+                        by=['dff', 'percent', 'volume', 'couts', 'ratio'],ascending=[0, 0, 0, 1, 1])
+#                    by=ct.Monitor_sort_count, ascending=[0, 0, 0, 0, 1])
                 # top_all = top_all.sort_values(by=['dff', 'couts', 'volume', 'ratio'], ascending=[0, 0, 0, 1])
                 # top_all=top_all.sort_values(by=['percent','dff','couts','ratio'],ascending=[0,0,1,1])
                 if cct.get_now_time_int() > 930 and 'llastp' in top_all.columns:
@@ -207,12 +216,6 @@ if __name__ == "__main__":
                                 'G:%s' % len(top_all), 'zx %s' % (blkname)])
 
 
-                if cct.get_now_time_int() > 925 and 'lastbuy' in top_all.columns:
-                    top_all['dff'] = (map(lambda x, y: round((x - y) / y * 100, 1),
-                                          top_all['buy'].values, top_all['lastbuy'].values))
-                else:
-                    top_all['dff'] = (map(lambda x, y: round((x - y) / y * 100, 1),
-                                          top_all['buy'].values, top_all['lastp'].values))
 
                 # if len(top_all[top_all.dff > 0]) == 0:
                 #     top_all['dff'] = (map(lambda x, y: round((x - y) / y * 100, 1),
@@ -228,7 +231,7 @@ if __name__ == "__main__":
                 # top_temp = stf.getBollFilter(df=top_temp, boll=ct.bollFilter, duration=ct.PowerCountdl, filter=False, ma5d=False, dl=14, percent=False, resample='d')
                 top_temp = stf.getBollFilter(df=top_temp, boll=ct.bollFilter, duration=ct.PowerCountdl, filter=True, ma5d=True, dl=14, percent=False, resample='d')
                 print "G:%s Rt:%0.1f dT:%s N:%s T:%s" % (goldstock, float(time.time() - time_Rt), cct.get_time_to_date(time_s), cct.get_now_time(), len(top_temp))
- 
+
                 top_temp = top_temp.sort_values(by=(market_sort_value),
                                                     ascending=market_sort_value_key)
                 ct_MonitorMarket_Values = ct.get_Duration_format_Values(ct.Monitor_format_trade, market_sort_value[:2])
@@ -240,7 +243,7 @@ if __name__ == "__main__":
                 top_dd = pd.concat([top_temp.loc[:, ct_MonitorMarket_Values][:7], top_temp2.loc[:, ct_MonitorMarket_Values2][:3]], axis=0)
 
 
-                print cct.format_for_print(top_dd)  
+                print cct.format_for_print(top_dd)
                 # print cct.format_for_print(top_temp.loc[:, ct.Sina_Monitor_format][:10])
 
                 # print cct.format_for_print(top_all[:10])
