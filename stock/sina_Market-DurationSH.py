@@ -118,7 +118,7 @@ if __name__ == "__main__":
     set_duration_console(du_date)
 
     import search_Tdx_multi_data_duration250 as search250
-    search250.get_roll_mean_all(single=True, tdx=True, app=False)
+    search250.get_roll_mean_all(single=False, tdx=True, app=False)
 
     # all_diffpath = tdd.get_tdx_dir_blocknew() + '062.blk'
     parser = cct.MoniterArgmain()

@@ -60,11 +60,11 @@ def get_tdx_dir():
 #         log.info("Windows:%s" % os_sys)
 #         if os_platform.find('XP') == 0:
 #             log.info("XP:%s" % os_platform)
-#             basedir = xproot.replace('/', path_sep).replace('\\',path_sep)  # 如果你的安装路径不同,请改这里
+#             basedir = xproot.replace('/', path_sep).replace('\\',path_sep)  # 脠莽鹿没脛茫碌脛掳虏脳掳脗路戮露虏禄脥卢,脟毛赂脛脮芒脌茂
 #         else:
 #             log.info("Win7O:%s" % os_platform)
 #             for root in win7rootList:
-#                 basedir = root.replace('/', path_sep).replace('\\',path_sep)  # 如果你的安装路径不同,请改这里
+#                 basedir = root.replace('/', path_sep).replace('\\',path_sep)  # 脠莽鹿没脛茫碌脛掳虏脳掳脗路戮露虏禄脥卢,脟毛赂脛脮芒脌茂
 #                 if os.path.exists(basedir):
 #                     log.info("%s : path:%s" % (os_platform,basedir))
 #                     break
@@ -1734,7 +1734,7 @@ def getSinaIndexdf():
         top_all.rename(columns={'lvol': 'lvolume'}, inplace=True)
     return top_all
 
-def getSinaAlldf(market='cyb', vol=ct.json_countVol, vtype=ct.json_countType, filename='mnbk', table='top_now'):
+def getSinaAlldf(market='cyb', vol=ct.json_countVol, vtype=ct.json_countType, filename='mnbk', table='top_now',trend=False):
     market_all = False
     if market == 'rzrq':
         df = cct.get_rzrq_code()
@@ -1772,6 +1772,20 @@ def getSinaAlldf(market='cyb', vol=ct.json_countVol, vtype=ct.json_countType, fi
         if 'code' in df.columns:
             df = df.set_index('code')
         df = sina_data.Sina().get_stock_list_data(df.index.tolist())
+
+    if trend:
+        code_l = cct.read_to_blocknew('060')
+        if market == 'all':
+            co_inx = [inx for inx in code_l if inx in df.index and str(inx).startswith(('6','30','00'))]
+        elif market == 'sh':
+            co_inx = [inx for inx in code_l if inx in df.index and str(inx).startswith(('6'))]
+        elif market == 'sz':
+            co_inx = [inx for inx in code_l if inx in df.index and str(inx).startswith(('00'))]
+        elif market == 'cyb':
+            co_inx = [inx for inx in code_l if inx in df.index and str(inx).startswith(('30'))]
+        else:
+            co_inx = [inx for inx in code_l if inx in df.index]
+        df = df.loc[co_inx]   
     # codelist=df.code.tolist()
     # cct._write_to_csv(df,'codeall')
     # top_now = get_mmarket='all'arket_price_sina_dd_realTime(df, vol, type)
@@ -1805,7 +1819,7 @@ def getSinaAlldf(market='cyb', vol=ct.json_countVol, vtype=ct.json_countType, fi
         dm = sina_data.Sina().get_stock_list_data(codelist)
     else:
         dm = df
-
+    
     # if cct.get_work_time() or (cct.get_now_time_int() > 915) :
     dm['percent'] = map(lambda x, y: round(
         (x - y) / y * 100, 2), dm.close.values, dm.llastp.values)
@@ -1886,25 +1900,25 @@ def getSinaAlldf(market='cyb', vol=ct.json_countVol, vtype=ct.json_countType, fi
 
 def get_tdx_day_to_df(code):
     """
-        获取个股历史交易记录
+        禄帽脠隆赂枚鹿脡脌煤脢路陆禄脪脳录脟脗录
     Parameters
     ------
       code:string
-                  股票代码 e.g. 600848
+                  鹿脡脝卤麓煤脗毛 e.g. 600848
       start:string
-                  开始日期 format：YYYY-MM-DD 为空时取到API所提供的最早日期数据
+                  驴陋脢录脠脮脝脷 format拢潞YYYY-MM-DD 脦陋驴脮脢卤脠隆碌陆API脣霉脤谩鹿漏碌脛脳卯脭莽脠脮脝脷脢媒戮脻
       end:string
-                  结束日期 format：YYYY-MM-DD 为空时取到最近一个交易日数据
-      ktype：string
-                  数据类型，D=日k线 W=周 M=月 5=5分钟 15=15分钟 30=30分钟 60=60分钟，默认为D
-      retry_count : int, 默认 3
-                 如遇网络等问题重复执行的次数
-      pause : int, 默认 0
-                重复请求数据过程中暂停的秒数，防止请求间隔时间太短出现的问题
+                  陆谩脢酶脠脮脝脷 format拢潞YYYY-MM-DD 脦陋驴脮脢卤脠隆碌陆脳卯陆眉脪禄赂枚陆禄脪脳脠脮脢媒戮脻
+      ktype拢潞string
+                  脢媒戮脻脌脿脨脥拢卢D=脠脮k脧脽 W=脰脺 M=脭脗 5=5路脰脰脫 15=15路脰脰脫 30=30路脰脰脫 60=60路脰脰脫拢卢脛卢脠脧脦陋D
+      retry_count : int, 脛卢脠脧 3
+                 脠莽脫枚脥酶脗莽碌脠脦脢脤芒脰脴赂麓脰麓脨脨碌脛麓脦脢媒
+      pause : int, 脛卢脠脧 0
+                脰脴赂麓脟毛脟贸脢媒戮脻鹿媒鲁脤脰脨脭脻脥拢碌脛脙毛脢媒拢卢路脌脰鹿脟毛脟贸录盲赂么脢卤录盲脤芦露脤鲁枚脧脰碌脛脦脢脤芒
     return
     -------
       DataFrame
-          属性:日期 ，开盘价， 最高价， 收盘价， 最低价， 成交量， 价格变动 ，涨跌幅，5日均价，10日均价，20日均价，5日均量，10日均量，20日均量，换手率
+          脢么脨脭:脠脮脝脷 拢卢驴陋脜脤录脹拢卢 脳卯赂脽录脹拢卢 脢脮脜脤录脹拢卢 脳卯碌脥录脹拢卢 鲁脡陆禄脕驴拢卢 录脹赂帽卤盲露炉 拢卢脮脟碌酶路霉拢卢5脠脮戮霉录脹拢卢10脠脮戮霉录脹拢卢20脠脮戮霉录脹拢卢5脠脮戮霉脕驴拢卢10脠脮戮霉脕驴拢卢20脠脮戮霉脕驴拢卢禄禄脢脰脗脢
     """
     # time_s=time.time()
     # print code
@@ -2218,7 +2232,7 @@ def compute_lastdays_percent(df=None, lastdays=3, resample='d'):
                 # down_zero, down_dn = 0, -1
                 down_zero, down_dn, percent_l = 0, 0, 2
                 # df['perlastp'] = map((lambda c,lc,lp: (1 if (c - lc) >= 0 else down_dn) + (2 if (c - lc)/lc*100 > percent_l and lp > 0 else down_zero)), df['close'] ,df['lastp%sd' % da],df['per%sd' % da])
-                df['perlastp'] = map((lambda c, lc,op,m5a: (1 if ((c - lc)/lc*100 >= 0 or c >= op or c >=m5a) else down_dn)), df['close'], df['lastp%sd' % da],df['open'],df['ma5d'])
+                df['perlastp'] = map((lambda c, lc,op,m5a: (1 if ( ((c >= op) and ((c - lc)/lc*100 >= 0)) or (c >= op and c >=m5a) ) else down_dn)), df['close'], df['lastp%sd' % da],df['open'],df['ma5d'])
 
                 # nowd,per1d = 1 ,2
                 # df['per%sd' % per1d] = ((df['lastp%sd' % da] - df['close'].shift(per1d)) / df['close'].shift(per1d)).map(lambda x: round(x * 100, 2))
@@ -2323,7 +2337,7 @@ def get_tdx_exp_low_or_high_price(code, dt=None, ptype='close', dl=None, end=Non
         return dd
 
 
-def get_tdx_exp_low_or_high_power(code, dt=None, ptype='close', dl=None, end=None, power=False, lastp=False, newdays=None, resample='d',lvoldays=ct.lastdays*2):
+def get_tdx_exp_low_or_high_power(code, dt=None, ptype='close', dl=None, end=None, power=False, lastp=False, newdays=None, resample='d',lvoldays=ct.lastdays*3):
     '''
     :param code:999999
     :param dayl:Duration Days
@@ -2418,7 +2432,8 @@ def get_tdx_exp_low_or_high_power(code, dt=None, ptype='close', dl=None, end=Non
                     lowp = dz.close.min()
                     lowdate = dz[dz.close == lowp].index.values[-1]
                     log.debug("low:%s" % lowdate)
-                lastvol = dz.vol[:lvoldays].min()
+
+                lastvol = dz.vol[:lvoldays].mean()
 
                 log.debug("date:%s %s:%s" % (lowdate, ptype, lowp))
                 # log.debug("date:%s %s:%s" % (dt, ptype, lowp))
@@ -2623,7 +2638,7 @@ def get_tdx_exp_low_or_high_power(code, dt=None, ptype='close', dl=None, end=Non
 
 
 #############################################################
-# usage 使用说明
+# usage 脢鹿脫脙脣碌脙梅
 #
 #############################################################
 def get_tdx_all_day_LastDF(codeList, dt=None, ptype='close'):
@@ -3062,10 +3077,10 @@ def get_tdx_search_day_DF(market='cyb'):
 
 def get_tdx_stock_period_to_type(stock_data, period_day='w', periods=5,ncol=None):
     period_type = period_day
-    #默认的index类型:
+    #脛卢脠脧碌脛index脌脿脨脥:
     indextype = True if stock_data.index.dtype == 'datetime64[ns]' else False
     #
-    # 转换周最后一日变量
+    # 脳陋禄禄脰脺脳卯潞贸脪禄脠脮卤盲脕驴
     if cct.get_work_day_status() and 915 < cct.get_now_time_int() < 1500:
         stock_data = stock_data[stock_data.index < cct.get_today()]
     stock_data['date'] = stock_data.index
@@ -3079,21 +3094,21 @@ def get_tdx_stock_period_to_type(stock_data, period_day='w', periods=5,ncol=None
         log.error("index.name not date,pls check:%s" % (stock_data[:1]))
 
     period_stock_data = stock_data.resample(period_type, how='last')
-    # 周数据的每日change连续相乘
+    # 脰脺脢媒戮脻碌脛脙驴脠脮change脕卢脨酶脧脿鲁脣
     # period_stock_data['percent']=stock_data['percent'].resample(period_type,how=lambda x:(x+1.0).prod()-1.0)
-    # 周数据open等于第一日
+    # 脰脺脢媒戮脻open碌脠脫脷碌脷脪禄脠脮
     # print stock_data.index[0],stock_data.index[-1]
     # period_stock_data.index =
     # pd.DatetimeIndex(start=stock_data.index.values[0],end=stock_data.index.values[-1],freq='BM')
 
     period_stock_data['open'] = stock_data[
         'open'].resample(period_type, how='first')
-    # 周high等于Max high
+    # 脰脺high碌脠脫脷Max high
     period_stock_data['high'] = stock_data[
         'high'].resample(period_type, how='max')
     period_stock_data['low'] = stock_data[
         'low'].resample(period_type, how='min')
-    # volume等于所有数据和
+    # volume碌脠脫脷脣霉脫脨脢媒戮脻潞脥
     if ncol is not None:
         for co in ncol:
             period_stock_data[co] = stock_data[co].resample(period_type, how='sum')
@@ -3102,9 +3117,9 @@ def get_tdx_stock_period_to_type(stock_data, period_day='w', periods=5,ncol=None
             'amount'].resample(period_type, how='sum')
         period_stock_data['vol'] = stock_data[
             'vol'].resample(period_type, how='sum')
-    # 计算周线turnover,【traded_market_value】 流通市值【market_value】 总市值【turnover】 换手率，成交量/流通股本
+    # 录脝脣茫脰脺脧脽turnover,隆戮traded_market_value隆驴 脕梅脥篓脢脨脰碌隆戮market_value隆驴 脳脺脢脨脰碌隆戮turnover隆驴 禄禄脢脰脗脢拢卢鲁脡陆禄脕驴/脕梅脥篓鹿脡卤戮
     # period_stock_data['turnover']=period_stock_data['vol']/(period_stock_data['traded_market_value'])/period_stock_data['close']
-    # 去除无交易纪录
+    # 脠楼鲁媒脦脼陆禄脪脳录脥脗录
     period_stock_data.index = stock_data['date'].resample(period_type, how='last').index
     # print period_stock_data.index[:1]
     if 'code' in period_stock_data.columns:
@@ -3130,7 +3145,7 @@ def usage(p=None):
     import timeit
 #     print """
 # python %s [-t txt|zip] stkid [from] [to]
-# -t txt 表示从txt files 读取数据，否则从zip file 读取(这也是默认方式)
+# -t txt 卤铆脢戮麓脫txt files 露脕脠隆脢媒戮脻拢卢路帽脭貌麓脫zip file 露脕脠隆(脮芒脪虏脢脟脛卢脠脧路陆脢陆)
 # for example :
 # python %s 999999 20070101 20070302
 # python %s -t txt 999999 20070101 20070302

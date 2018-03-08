@@ -162,10 +162,14 @@ if __name__ == "__main__":
                 # top_all = top_all[top_all.percent >= 0]
 
                 # if cct.get_now_time_int() < 1500:
-
+                
                 top_dif = top_all.copy()
-                top_dif['dff'] = (map(lambda x, y: round((x - y) / y * 100, 1),
-                                      top_dif['buy'].values, top_dif['lastp'].values))
+                if cct.get_now_time_int() > 925 and 'lastbuy' in top_dif.columns:
+                    top_dif['dff'] = (map(lambda x, y: round((x - y) / y * 100, 1),
+                                          top_dif['buy'].values, top_dif['lastbuy'].values))
+                else:
+                    top_dif['dff'] = (map(lambda x, y: round((x - y) / y * 100, 1),
+                                          top_dif['buy'].values, top_dif['lastp'].values))
 
                 log.info('dif1:%s' % len(top_dif))
                 if cct.get_now_time_int() > 915 and cct.get_now_time_int() < ct.checkfilter_end_time:

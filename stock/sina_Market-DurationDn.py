@@ -126,7 +126,7 @@ if __name__ == "__main__":
     parser = cct.MoniterArgmain()
     parserDuraton = cct.DurationArgmain()
     # market_sort_value, market_sort_value_key = ct.get_market_sort_value_key(ct.sort_value_key_perd)
-    market_sort_value, market_sort_value_key = ct.get_market_sort_value_key('2 2')
+    market_sort_value, market_sort_value_key = ct.get_market_sort_value_key('2 3')
 
     while 1:
         try:
@@ -372,6 +372,7 @@ if __name__ == "__main__":
                         else:
                             top_temp = top_temp.sort_values(by=(market_sort_value),
                                                             ascending=market_sort_value_key)
+                    
                     if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935:
                         # top_temp = top_temp[top_temp['buy'] > top_temp['ma10d']]
                         # top_temp = top_temp[top_temp['ma5d'] > top_temp['ma10d']][:10]

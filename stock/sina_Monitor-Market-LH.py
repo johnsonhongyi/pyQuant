@@ -139,7 +139,7 @@ if __name__ == "__main__":
             # top_now = tdd.getSinaAlldf(market='sh', vol=ct.json_countVol, vtype=ct.json_countType)
             time_Rt = time.time()
             # top_now = tdd.getSinaAlldf(market='次新股',filename='cxg', vol=ct.json_countVol, vtype=ct.json_countType)
-            top_now = tdd.getSinaAlldf(market='cyb', filename=None, vol=ct.json_countVol, vtype=ct.json_countType)
+            top_now = tdd.getSinaAlldf(market='cyb', filename=None, vol=ct.json_countVol, vtype=ct.json_countType,trend=True)
             # print top_now.loc['300208','name']
             df_count = len(top_now)
             now_count = len(top_now)
@@ -243,7 +243,8 @@ if __name__ == "__main__":
 
                     top_all = tdd.get_powerdf_to_all(top_all, top_temp)
                     # top_temp = stf.getBollFilter(df=top_temp, boll=ct.bollFilter,duration=ct.PowerCountdl)
-                    top_temp = stf.getBollFilter(df=top_temp, boll=-10, duration=ct.PowerCountdl,resample=resample)
+                    # top_temp = stf.getBollFilter(df=top_temp, boll=-10, duration=ct.PowerCountdl,resample=resample)
+                    top_temp = stf.getBollFilter(  df=top_temp, boll=ct.bollFilter, duration=ct.PowerCountdl, filter=False, ma5d=False, dl=14, percent=False, resample='d', ene=True)
                     print("A:%s N:%s K:%s %s G:%s" % (
                         df_count, now_count, len(top_all[top_all['buy'] > 0]),
                         len(top_now[top_now['volume'] <= 0]), goldstock)),

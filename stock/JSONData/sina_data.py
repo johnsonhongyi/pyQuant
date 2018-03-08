@@ -593,15 +593,41 @@ class Sina:
         dd = df.copy()
         h5_fname = 'sina_MultiIndex_data'
         h5_table = 'all' + '_' + str(ct.sina_limit_time)
-        if cct.get_now_time_int() >= 925 and not index and len(df) > 3000 and cct.get_work_time():
+        fname = 'sina_logtime'
+        logtime = cct.get_config_value_ramfile(fname)
+
+        if cct.get_now_time_int() > 926 and not index and len(df) > 3000 and cct.get_work_time():
             time_s = time.time()
             df.index = df.index.astype(str)
             df.ticktime = df.ticktime.astype(str)
             # df.ticktime = map(lambda x: int(x.replace(':', '')), df.ticktime)
             df.ticktime = map(lambda x, y: str(x) + ' ' + str(y), df.dt, df.ticktime)
             df.ticktime = pd.to_datetime(df.ticktime, format='%Y-%m-%d %H:%M:%S')
+
+
             # df = df.loc[:, ['open', 'high', 'low', 'close', 'llastp', 'volume', 'ticktime']]
-            df = df.loc[:, ['close', 'high', 'low', 'llastp', 'volume', 'ticktime']]
+            # config_ini = cct.get_ramdisk_dir() + os.path.sep+ 'h5config.txt'
+            
+            if logtime == 0:
+                duratime = cct.get_config_value_ramfile(fname,currvalue=time.time(),xtype='time',update=True)
+                # duratime = cct.get_config_value_ramfile(fname,currvalue=cct.get_now_time_int(),xtype='time',update=True)
+                # if cct.GlobalValues().getkey('logtime') is None:
+                    # logtime = cct.get_now_time_int()
+                    # cct.GlobalValues().setkey('logtime',logtime)
+                df['lastbuy'] = df['close']
+            else:
+                if time.time() - float(logtime) > float(ct.logtime):
+                # if cct.get_now_time_int() - cct.GlobalValues().getkey('logtime') > ct.logtime:
+                    duratime = cct.get_config_value_ramfile(fname,currvalue=time.time(),xtype='time',update=True)
+                    df['lastbuy'] = df['close']
+                else:
+                    h5 = h5a.load_hdf_db(h5_fname, h5_table, timelimit=False)
+                    if h5 is not None and 'lastbuy' in h5.columns:
+                        lastbuycol = h5.lastbuy.groupby(level=[0]).tail(1).reset_index().set_index('code')            
+                        df = cct.combine_dataFrame(df,lastbuycol)
+            #top_temp.loc['600903'][['lastbuy','now']]
+            dd = df.copy()
+            df = df.loc[:, ['close', 'high', 'low', 'llastp', 'volume', 'ticktime','lastbuy']]
             # df['muclose'] = df['close']
 
             if 'code' not in df.columns:
@@ -619,7 +645,7 @@ class Sina:
         if 'nlow' not in df.columns or 'nhigh' not in df.columns or (cct.get_work_time() and 927 < cct.get_now_time_int() <= 1500):
             # if 'nlow' not in df.columns or 'nhigh' not in df.columns or cct.get_work_time():
             h5 = h5a.load_hdf_db(h5_fname, h5_table, timelimit=False)
-
+           
             time_s = time.time()
             if cct.get_work_time() and cct.get_now_time_int() <= 945:
                 run_col = ['low', 'high', 'close']
@@ -658,12 +684,21 @@ class Sina:
                         dd[co] = dd[co].apply(lambda x: round(x, 2))
             if 'nstd' in dd.columns:            
                 dd['stdv'] = map(lambda x, y: round(x / y * 100, 1), dd.nstd, dd.open)
-            
+
+            # if h5 is not None and 'lastbuy' in h5.columns:
+            #     lastbuycol = h5.lastbuy.groupby(level=[0]).tail(1).reset_index().set_index('code')            
+            #     dd = cct.combine_dataFrame(dd,lastbuycol)
+
             log.info("agg_df_all_time:%0.2f" % (time.time() - time_s))
             # top_temp[:1][['high','nhigh','low','nlow','close','nclose','llastp']]
 
         h5a.write_hdf_db(self.hdf_name, dd, self.table, index=index)
         log.info("wr end:%0.2f" % (time.time() - self.start_t))
+        # print df['lastbuy','close'][-5:].to_frame().T
+        # print "logtime:",time.strftime("%H:%M:%S",time.localtime(logtime)),"time:",time.time() - float(logtime)
+        # if 'lastbuy' in df.columns:
+        #     print df[-5:][['lastbuy','close']].T
+
         return dd
         # df = pd.DataFrame.from_dict(stock_dict, orient='columns',
         #                             columns=['name', 'open', 'close', 'now', 'high', 'low', 'buy', 'sell', 'turnover',
@@ -700,7 +735,11 @@ if __name__ == "__main__":
     sina = Sina()
     # print len(df)
     # code='601198'
-    sina.all
+    df =sina.all
+    # print df.lastbuy[-5:].to_frame().T
+
+    print df[-5:][['lastbuy','close']].T
+    
     # print sina.get_stock_list_data(['999999','399001','399006'],index=True)
     df = sina.get_stock_code_data('999999,399001,399006',index=True)
     print df.volume
@@ -714,7 +753,6 @@ if __name__ == "__main__":
     
     print dd.loc[:, ['name','open','low','high','close', 'nclose', 'nlow', 'nhigh', 'nstd', 'ticktime']], dd.shape
     # print dd.loc[code_agg].T
-    import ipdb;ipdb.set_trace()
 
     # print df.columns
     # df = sina.all

@@ -31,7 +31,7 @@ DD_VOL_List = {'0': '40000', '1': '100000',
 LvolumeSize = 12500
 VolumeMaxR = 5000
 VolumeMinR = 0.1
-PowerCount = 500
+PowerCount = 800
 duration_diff = 6
 duration_date_l = 21
 duration_date_up = 60
@@ -46,9 +46,9 @@ changeRatioUp = 1.025
 # duration_date = 10
 wencai_delay_time = 60
 resample_dtype = 'd'
+logtime = 2700
 
-
-bollFilter = -2
+bollFilter = -10
 writeblockbakNum = 15
 checkfilter = True
 lastPower = False

@@ -875,6 +875,7 @@ def get_now_time_int():
 
 
 def get_work_time():
+    # return True
     now_t = str(get_now_time()).replace(':', '')
     now_t = int(now_t)
     if not get_work_day_status():
@@ -1330,6 +1331,51 @@ def get_config_value(fname, classtype, currvalue, limitvalue=1, xtype='limit', r
         config[classtype][xtype] = limitvalue
         config.write()
     return False
+
+
+def get_config_value_ramfile(fname, currvalue=0, xtype='time', update=False,cfgfile='h5config.txt'):
+    classtype = fname
+    conf_ini = get_ramdisk_dir() + os.path.sep+ cfgfile
+    currvalue = int(currvalue)
+    if os.path.exists(conf_ini):
+        config = ConfigObj(conf_ini, encoding='UTF8')
+        if not update:
+            if classtype in config.keys():
+                if not xtype in config[classtype].keys():
+                    config[classtype][xtype] = currvalue
+                    config.write()
+                    if xtype == 'time':
+                        return 1
+                else:
+                    if xtype == 'time' and currvalue <> 0:
+                        time_dif = currvalue - float(config[classtype][xtype])
+                    else:
+                        time_dif = int(config[classtype][xtype])
+                    return time_dif
+
+            else:
+                config[classtype] = {}
+                config[classtype][xtype] = 0
+                config.write()
+        else:
+            if xtype == 'time':
+                save_value = float(config[classtype][xtype])
+            else:
+                save_value = int(config[classtype][xtype])
+            if save_value <> currvalue:
+                config[classtype][xtype] = currvalue
+                if xtype == 'time':
+                    config[classtype]['otime'] = time.strftime("%H:%M:%S",time.localtime(currvalue))
+                config.write()
+    else:
+        config = ConfigObj(conf_ini, encoding='UTF8')
+        config[classtype] = {}
+        config[classtype][xtype] = currvalue
+        if xtype == 'time':
+            config[classtype]['otime'] = currvalue
+            # time.strftime("%H:%M:%S",time.localtime(now))
+        config.write()
+    return int(currvalue)
 
 
 def get_config_value_wencai(fname, classtype, currvalue=0, xtype='limit', update=False):

@@ -69,7 +69,7 @@ if __name__ == "__main__":
         width, height = 166, 16
         cct.set_console(width, height)
     else:
-        width, height = 166, 18
+        width, height = 166, 16
         cct.set_console(width, height)
 
     # cct.set_console(width, height)
@@ -91,7 +91,9 @@ if __name__ == "__main__":
     blkname = '064.blk'
     block_path = tdd.get_tdx_dir_blocknew() + blkname
     lastpTDX_DF = pd.DataFrame()
-    market_sort_value, market_sort_value_key = ct.get_market_sort_value_key('8')
+    # market_sort_value, market_sort_value_key = ct.get_market_sort_value_key('8')
+    st_key_sort = '4'
+    market_sort_value, market_sort_value_key = ct.get_market_sort_value_key(st_key_sort)
     while 1:
         try:
             # df = rl.get_sina_all_json_dd(vol, type)
@@ -204,9 +206,17 @@ if __name__ == "__main__":
                 cct.set_console(width, height, title=[
                                 'G:%s' % len(top_all), 'zx %s' % (blkname)])
 
-                if len(top_all[top_all.dff > 0]) == 0:
+
+                if cct.get_now_time_int() > 925 and 'lastbuy' in top_all.columns:
+                    top_all['dff'] = (map(lambda x, y: round((x - y) / y * 100, 1),
+                                          top_all['buy'].values, top_all['lastbuy'].values))
+                else:
                     top_all['dff'] = (map(lambda x, y: round((x - y) / y * 100, 1),
                                           top_all['buy'].values, top_all['lastp'].values))
+
+                # if len(top_all[top_all.dff > 0]) == 0:
+                #     top_all['dff'] = (map(lambda x, y: round((x - y) / y * 100, 1),
+                #                           top_all['buy'].values, top_all['lastp'].values))
 
                 top_temp = top_all[:ct.PowerCount].copy()
                 top_temp = pct.powerCompute_df(top_temp, dl=ct.PowerCountdl)
@@ -215,26 +225,22 @@ if __name__ == "__main__":
                 top_all = tdd.get_powerdf_to_all(top_all, top_temp)
 
                 # top_temp = stf.getBollFilter(df=top_temp, boll=ct.bollFilter, duration=ct.PowerCountdl, filter=False)
-                top_temp = stf.getBollFilter(df=top_temp, boll=-6, duration=ct.PowerCountdl, filter=False, ma5d=False, dl=14, percent=False, resample='d')
+                # top_temp = stf.getBollFilter(df=top_temp, boll=ct.bollFilter, duration=ct.PowerCountdl, filter=False, ma5d=False, dl=14, percent=False, resample='d')
+                top_temp = stf.getBollFilter(df=top_temp, boll=ct.bollFilter, duration=ct.PowerCountdl, filter=True, ma5d=True, dl=14, percent=False, resample='d')
                 print "G:%s Rt:%0.1f dT:%s N:%s T:%s" % (goldstock, float(time.time() - time_Rt), cct.get_time_to_date(time_s), cct.get_now_time(), len(top_temp))
-                if 'op' in top_temp.columns:
-                    # top_temp = top_temp.sort_values(by=['ra','percent','couts'],ascending=[0, 0,0])
-
-                    # top_temp = top_temp.sort_values(by=ct.Monitor_sort_op,
-                                                    # ascending=ct.Monitor_sort_op_key)
-
-                    # top_temp = top_temp.sort_values(by=ct.Duration_percent_op,
-                                        # ascending=ct.Duration_percent_op_key)
-                    top_temp = top_temp.sort_values(by=(market_sort_value),
+ 
+                top_temp = top_temp.sort_values(by=(market_sort_value),
                                                     ascending=market_sort_value_key)
-
-                    # top_temp = top_temp.sort_values(by=['op','ra','dff', 'percent', 'ratio'], ascending=[0,0,0, 0, 1])
-                # if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935:
-                #     top_temp = top_temp.loc[:, ct.Monitor_format_trade]
-                # else:
-                #     top_temp = top_temp.loc[:, ct.Monitor_format_trade]
                 ct_MonitorMarket_Values = ct.get_Duration_format_Values(ct.Monitor_format_trade, market_sort_value[:2])
-                print cct.format_for_print(top_temp.loc[:, ct_MonitorMarket_Values][:10])  
+
+                market_sort_value2, market_sort_value_key2 = ct.get_market_sort_value_key(st_key_sort.split()[0]+' f', top_all=top_all)
+                ct_MonitorMarket_Values2 = ct.get_Duration_format_Values(ct.Monitor_format_trade, market_sort_value2[:2])
+                top_temp2 = top_temp.sort_values(by=(market_sort_value2), ascending=market_sort_value_key2)
+
+                top_dd = pd.concat([top_temp.loc[:, ct_MonitorMarket_Values][:7], top_temp2.loc[:, ct_MonitorMarket_Values2][:3]], axis=0)
+
+
+                print cct.format_for_print(top_dd)  
                 # print cct.format_for_print(top_temp.loc[:, ct.Sina_Monitor_format][:10])
 
                 # print cct.format_for_print(top_all[:10])
@@ -296,7 +302,8 @@ if __name__ == "__main__":
                 st_l = st.split()
                 st_k = st_l[0]
                 if st_k in ct.Market_sort_idx.keys() and len(top_all) > 0:
-                    market_sort_value, market_sort_value_key = ct.get_market_sort_value_key(st, top_all=top_all)
+                    st_key_sort = st
+                    market_sort_value, market_sort_value_key = ct.get_market_sort_value_key(st_key_sort, top_all=top_all)
                 else:
                     log.error("market_sort key error:%s" % (st))
                     cct.sleeprandom(5)
