@@ -2090,6 +2090,11 @@ def func_compute_percd(c, lp, lc, lh, ll, nh, nl):
 
 def combine_dataFrame(maindf, subdf, col=None, compare=None, append=False, clean=True):
     times = time.time()
+    if (isinstance(maindf,pd.Series)):
+        maindf = maindf.to_frame()
+    if (isinstance(subdf,pd.Series)):
+        subdf = subdf.to_frame()
+        
     maindf_co = maindf.columns
     subdf_co = subdf.columns
     maindf = maindf.fillna(0)

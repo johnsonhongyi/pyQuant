@@ -138,7 +138,7 @@ def getBollFilter(df=None, boll=6, duration=ct.PowerCountdl, filter=True, ma5d=T
     df['lower'] = map(lambda x: round((1 - 9.0 / 100) * x, 1), df.ma10d)
     df['ene'] = map(lambda x, y: round((x + y) / 2, 1), df.upper, df.lower)
     if not ene:
-        df = df[(df.buy > df.ene) & (df.volume > 1.5)]
+        df = df[ ((df.buy > df.ene) & (df.volume > 1.2)) | ((df.buy > df.upper) & (df.low > df.cmean))]
         if 'nlow' in df.columns and 930 < cct.get_now_time_int():
             # for col in ['nhigh', 'nclose', 'nlow','nstd']:
             #     df[col] = df[col].apply(lambda x: round(x, 2))

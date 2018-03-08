@@ -160,7 +160,7 @@ if __name__ == "__main__":
                     # top_all, lastpTDX_DF = tdd.get_append_lastp_to_df(
                     #     top_now, lastpTDX_DF=None, dl=duration_date, end=end_date, ptype=ptype, filter=filter, power=ct.lastPower, lastp=False, resample=resample)
                     # log.debug("len:%s" % (len(top_all)))
-                    
+
                     # codelist = top_all.index.tolist()
                     # log.info('toTDXlist:%s' % len(codelist))
                     # # tdxdata = tdd.get_tdx_all_day_LastDF(codelist,dt=duration_date,ptype=ptype)
@@ -357,8 +357,8 @@ if __name__ == "__main__":
                         ct_Duration_format_Values = ct.get_Duration_format_Values(ct.Duration_format_trade, market_sort_value[:])
                     # ct_Duration_format_Values = ct.get_Duration_format_Values(ct_Duration_format_Values,replace='couts',dest='stdv')
                     ct_Duration_format_Values = ct.get_Duration_format_Values(ct_Duration_format_Values,replace='couts',dest='volume')
-                    ct_Duration_format_Values = ct.get_Duration_format_Values(ct_Duration_format_Values,replace='boll',dest='upper')
-                    ct_Duration_format_Values = ct.get_Duration_format_Values(ct_Duration_format_Values,replace='op',dest='boll')
+                    ct_Duration_format_Values = ct.get_Duration_format_Values(ct_Duration_format_Values,replace='b1_v',dest='upper')
+                    # ct_Duration_format_Values = ct.get_Duration_format_Values(ct_Duration_format_Values,replace='op',dest='boll')
                     top_dd = top_dd.loc[:, ct_Duration_format_Values]
                     print cct.format_for_print(top_dd)
                 # if cct.get_now_time_int() < 930 or cct.get_now_time_int() > 1505 or (cct.get_now_time_int() > 1125 and cct.get_now_time_int() < 1505):

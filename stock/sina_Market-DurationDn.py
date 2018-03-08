@@ -392,7 +392,7 @@ if __name__ == "__main__":
                     # ct_Duration_format_Values = ct.get_Duration_format_Values(ct_Duration_format_Values,replace='couts',dest='stdv')
                     ct_Duration_format_Values = ct.get_Duration_format_Values(ct_Duration_format_Values,replace='couts',dest='volume')
                     ct_Duration_format_Values = ct.get_Duration_format_Values(ct_Duration_format_Values,replace='op',dest='boll')
-                    ct_Duration_format_Values = ct.get_Duration_format_Values(ct_Duration_format_Values,replace='boll',dest='upper')
+                    ct_Duration_format_Values = ct.get_Duration_format_Values(ct_Duration_format_Values,replace='b1_v',dest='upper')
                     
                     top_dd = top_dd.loc[:, ct_Duration_format_Values]
 

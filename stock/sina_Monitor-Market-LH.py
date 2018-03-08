@@ -106,7 +106,7 @@ if __name__ == "__main__":
     # log=LoggerFactory.JohnsonLoger('SinaMarket').setLevel(LoggerFactory.DEBUG)
     # log.setLevel(LoggerFactory.DEBUG)
     if cct.isMac():
-        width, height = 174, 16
+        width, height = 174, 18
         cct.set_console(width, height)
     else:
         width, height = 174, 18
@@ -132,8 +132,9 @@ if __name__ == "__main__":
     end_date = cct.last_tddate(days=3)
     # all_diffpath = tdd.get_tdx_dir_blocknew() + '062.blk'
     
-    market_sort_value, market_sort_value_key = ct.get_market_sort_value_key(ct.sort_value_key_perd)
-    
+    # market_sort_value, market_sort_value_key = ct.get_market_sort_value_key(ct.sort_value_key_perd)
+    st_key_sort = ct.sort_value_key_perd
+    market_sort_value, market_sort_value_key = ct.get_market_sort_value_key(st_key_sort)
     while 1:
         try:
             # top_now = tdd.getSinaAlldf(market='sh', vol=ct.json_countVol, vtype=ct.json_countType)
@@ -208,9 +209,14 @@ if __name__ == "__main__":
                     # if 'volumn' in top_dif.columns and 'lvol' in top_dif.columns:
                 top_dif['volume'] = (map(lambda x, y: round(x / y / radio_t, 1), top_dif['volume'], top_dif['lvol']))
 
-                # if 'lastp' in top_dif.columns and 'buy' in top_dif.columns:
-                top_dif['dff'] = map(lambda x, y: round((x - y) / y * 100, 1),
-                                     top_dif['buy'].values, top_dif['lastp'].values)
+                # top_dif['dff'] = map(lambda x, y: round((x - y) / y * 100, 1),
+                #                      top_dif['buy'].values, top_dif['lastp'].values)
+                if st_key_sort.split()[0] == '4' and cct.get_now_time_int() > 925 and 'lastbuy' in top_dif.columns:
+                    top_dif['dff'] = (map(lambda x, y: round((x - y) / y * 100, 1),
+                                          top_dif['buy'].values, top_dif['lastbuy'].values))
+                else:
+                    top_dif['dff'] = (map(lambda x, y: round((x - y) / y * 100, 1),
+                                          top_dif['buy'].values, top_dif['lastp'].values))
 
                 if len(top_dif) == 0:
                     print "No G,DataFrame is Empty!!!!!!"
@@ -234,7 +240,11 @@ if __name__ == "__main__":
                     # top_all=top_all.sort_values(by=['percent','dff','couts','ratio'],ascending=[0,0,1,1])
 
                     top_temp = top_dif[:ct.PowerCount].copy()
+                    top_end = top_all[-int((ct.PowerCount)/10):].copy()
+
                     top_temp = pct.powerCompute_df(top_temp, dl=ct.PowerCountdl, talib=True)
+                    top_end = pct.powerCompute_df(top_end, dl=ct.PowerCountdl)
+
                     goldstock = len(top_dif[(top_dif.buy >= top_dif.lhigh * 0.99)
                                             & (top_dif.buy >= top_dif.llastp * 0.99)])
 
@@ -264,8 +274,25 @@ if __name__ == "__main__":
                     # else:
                     #     # top_temp = top_temp[ (top_temp['ma5d'] > top_temp['ma10d']) & (top_temp['buy'] > top_temp['ma10d']) ]
                     #     top_temp = top_temp.loc[:,ct.MonitorMarket_format_buy]
+                    # import ipdb;ipdb.set_trace()
+
                     ct_MonitorMarket_Values = ct.get_Duration_format_Values(ct.MonitorMarket_format_buy, market_sort_value[:2])
-                    print cct.format_for_print(top_temp.loc[:, ct_MonitorMarket_Values][:10])
+                    # ' '.join(x for x in '3 2 3'.split()[1:])
+                    if len(st_key_sort.split()) < 2:
+                        f_sort = (st_key_sort.split()[0]+' f ')
+                    else:
+                        if st_key_sort.find('f') > 0:
+                            f_sort = st_key_sort
+                        else:
+                            f_sort = ' '.join(x for x in st_key_sort.split()[:2]) + ' f ' + ' '.join(x for x in st_key_sort.split()[2:])
+                    
+                    market_sort_value2, market_sort_value_key2 = ct.get_market_sort_value_key(f_sort, top_all=top_all)
+                    ct_MonitorMarket_Values2 = ct.get_Duration_format_Values(ct.MonitorMarket_format_buy, market_sort_value2[:2])
+                    top_temp2 = top_end.sort_values(by=(market_sort_value2), ascending=market_sort_value_key2)
+
+                    top_dd = pd.concat([top_temp.loc[:, ct_MonitorMarket_Values][:10], top_temp2.loc[:, ct_MonitorMarket_Values2][:3]], axis=0)
+                    # print cct.format_for_print(top_temp.loc[:, ct_MonitorMarket_Values][:10])
+                    print cct.format_for_print(top_dd)
 
                 # print cct.format_for_print(top_dif[:10])
                 # print top_all.loc['000025',:]
@@ -325,7 +352,8 @@ if __name__ == "__main__":
                 st_l = st.split()
                 st_k = st_l[0]
                 if st_k in ct.Market_sort_idx.keys() and len(top_all) > 0:
-                    market_sort_value, market_sort_value_key = ct.get_market_sort_value_key(st, top_all=top_all)
+                    st_key_sort = st
+                    market_sort_value, market_sort_value_key = ct.get_market_sort_value_key(st_key_sort, top_all=top_all)
                 else:
                     log.error("market_sort key error:%s" % (st))
                     cct.sleeprandom(5)

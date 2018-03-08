@@ -46,7 +46,7 @@ changeRatioUp = 1.025
 # duration_date = 10
 wencai_delay_time = 60
 resample_dtype = 'd'
-logtime = 2700
+logtime = 3600
 
 bollFilter = -10
 writeblockbakNum = 15
