@@ -134,7 +134,7 @@ if __name__ == "__main__":
     parserDuraton = cct.DurationArgmain()
     # market_sort_value, market_sort_value_key = ct.get_market_sort_value_key(ct.sort_value_key_perd)
     # market_sort_value, market_sort_value_key = ct.get_market_sort_value_key('1')
-    st_key_sort = '1'
+    st_key_sort = '4'
     market_sort_value, market_sort_value_key = ct.get_market_sort_value_key(st_key_sort)
     while 1:
         try:

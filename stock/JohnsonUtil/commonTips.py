@@ -70,10 +70,16 @@ class GlobalValues:
             return defValue
 
 
-def format_for_print(df):
-    table = PrettyTable([''] + list(df.columns))
+def format_for_print(df,header=True):
+    if header:
+        table = PrettyTable([''] + list(df.columns))
+    else:
+        table = PrettyTable(field_names=[''] + list(df.columns),header=False)
+
     for row in df.itertuples():
+
         table.add_row(row)
+
     return str(table)
 
 

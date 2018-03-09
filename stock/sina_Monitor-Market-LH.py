@@ -106,10 +106,10 @@ if __name__ == "__main__":
     # log=LoggerFactory.JohnsonLoger('SinaMarket').setLevel(LoggerFactory.DEBUG)
     # log.setLevel(LoggerFactory.DEBUG)
     if cct.isMac():
-        width, height = 174, 18
+        width, height = 174, 19
         cct.set_console(width, height)
     else:
-        width, height = 174, 18
+        width, height = 174, 19
         cct.set_console(width, height)
     status = False
     vol = ct.json_countVol
@@ -285,14 +285,16 @@ if __name__ == "__main__":
                             f_sort = st_key_sort
                         else:
                             f_sort = ' '.join(x for x in st_key_sort.split()[:2]) + ' f ' + ' '.join(x for x in st_key_sort.split()[2:])
-                    
+
                     market_sort_value2, market_sort_value_key2 = ct.get_market_sort_value_key(f_sort, top_all=top_all)
                     ct_MonitorMarket_Values2 = ct.get_Duration_format_Values(ct.MonitorMarket_format_buy, market_sort_value2[:2])
                     top_temp2 = top_end.sort_values(by=(market_sort_value2), ascending=market_sort_value_key2)
 
                     top_dd = pd.concat([top_temp.loc[:, ct_MonitorMarket_Values][:10], top_temp2.loc[:, ct_MonitorMarket_Values2][:3]], axis=0)
-                    # print cct.format_for_print(top_temp.loc[:, ct_MonitorMarket_Values][:10])
-                    print cct.format_for_print(top_dd)
+                    # print cct.format_for_print(topdd)
+                    print cct.format_for_print(top_temp.loc[:, ct_MonitorMarket_Values][:8])
+                    print cct.format_for_print(top_temp2.loc[:, ct_MonitorMarket_Values][:3],header=False)
+                    # print cct.format_for_print(top_dd)
 
                 # print cct.format_for_print(top_dif[:10])
                 # print top_all.loc['000025',:]

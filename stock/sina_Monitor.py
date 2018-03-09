@@ -257,6 +257,8 @@ if __name__ == "__main__":
 
 
                 print cct.format_for_print(top_dd)
+                # print cct.format_for_print(top_temp.loc[:, ct_MonitorMarket_Values][:10])
+                # print cct.format_for_print(top_temp2.loc[:, ct_MonitorMarket_Values2][:3])
                 # print cct.format_for_print(top_temp.loc[:, ct.Sina_Monitor_format][:10])
 
                 # print cct.format_for_print(top_all[:10])

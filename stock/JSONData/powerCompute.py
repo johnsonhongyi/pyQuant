@@ -1003,7 +1003,7 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y', tal
     else:
         #        log.info("init power hdf5")
         if len(code_l) > 50:
-            print("intP:"),
+            print("intP:%s"%(len(code_l))),
 #    if not isinstance(df,list) and 'boll' in df.columns:
 #            if 'time' in df.columns:
 #                # if df[:1].boll.values <> 0 and time.time()- df[df.time <> 0].time[0] < ct.power_update_time:
@@ -1264,7 +1264,7 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y', tal
 
     h5 = h5a.write_hdf_db(h5_fname, df.loc[code_l], table=h5_table, append=True)
 
-    print "Power:%s:%0.2f" % (len(code_l), time.time() - ts),
+    print "Power:%0.2f" % (time.time() - ts),
 
     return df
 
