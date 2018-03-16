@@ -2155,8 +2155,9 @@ def combine_dataFrame(maindf, subdf, col=None, compare=None, append=False, clean
         #        if len(maindf) < len(subdf):
         #            maindf,subdf =subdf,maindf
         maindf = maindf.drop([col for col in maindf.index if col in subdf.index], axis=0)
+        co_mod = maindf.dtypes[maindf.dtypes == int]
 
-        for co_t in maindf.dtypes.keys():
+        for co_t in co_mod.keys():
             if co_t in subdf.columns:
                 if maindf.dtypes[co_t] <> subdf.dtypes[co_t]:
                     subdf[co_t] = subdf[co_t].astype(maindf.dtypes[co_t])
