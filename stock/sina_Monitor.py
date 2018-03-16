@@ -66,10 +66,10 @@ if __name__ == "__main__":
     log = LoggerFactory.getLogger('SinaMarket')
     # log.setLevel(LoggerFactory.DEBUG)
     if cct.isMac():
-        width, height = 166, 18
+        width, height = 166, 20
         cct.set_console(width, height)
     else:
-        width, height = 166, 18
+        width, height = 166, 20
         cct.set_console(width, height)
 
     # cct.set_console(width, height)
@@ -196,7 +196,7 @@ if __name__ == "__main__":
                         top_all = top_all[(top_all.volume > ct.VolumeMinR) & (
                             top_all.volume < ct.VolumeMaxR)]
 
-                if st_key_sort.split()[0] == '4' and cct.get_now_time_int() > 925 and 'lastbuy' in top_all.columns:
+                if st_key_sort.split()[0] == '4' and cct.get_now_time_int() > 926 and 'lastbuy' in top_all.columns:
                     top_all['dff'] = (map(lambda x, y: round((x - y) / y * 100, 1),
                                           top_all['buy'].values, top_all['lastbuy'].values))
                 else:
@@ -210,7 +210,6 @@ if __name__ == "__main__":
                 # top_all = top_all.sort_values(by=['dff', 'couts', 'volume', 'ratio'], ascending=[0, 0, 0, 1])
                 # top_all=top_all.sort_values(by=['percent','dff','couts','ratio'],ascending=[0,0,1,1])
                 if cct.get_now_time_int() > 930 and 'llastp' in top_all.columns:
-
                     top_all = top_all[top_all.trade >= top_all.llastp * ct.changeRatio]
 
                 cct.set_console(width, height, title=[
@@ -232,15 +231,17 @@ if __name__ == "__main__":
 
                 # top_temp = stf.getBollFilter(df=top_temp, boll=ct.bollFilter, duration=ct.PowerCountdl, filter=False)
                 # top_temp = stf.getBollFilter(df=top_temp, boll=ct.bollFilter, duration=ct.PowerCountdl, filter=False, ma5d=False, dl=14, percent=False, resample='d')
-                top_temp = stf.getBollFilter(df=top_temp, boll=ct.bollFilter, duration=ct.PowerCountdl, filter=True, ma5d=True, dl=14, percent=False, resample=resample)
-                # top_end = stf.getBollFilter(df=top_end, boll=ct.bollFilter, duration=ct.PowerCountdl, filter=False, ma5d=False, dl=14, percent=False, resample=resample)
+                # top_temp = stf.getBollFilter(df=top_temp, boll=ct.bollFilter, duration=ct.PowerCountdl, filter=True, ma5d=True, dl=14, percent=False, resample=resample)
+                top_temp = stf.getBollFilter(df=top_temp,resample=resample, down=True)
+                # top_end = stf.getBollFilter(df=top_end,resample=resample, down=True)
+
                 print "G:%s Rt:%0.1f dT:%s N:%s T:%s" % (goldstock, float(time.time() - time_Rt), cct.get_time_to_date(time_s), cct.get_now_time(), len(top_temp))
 
                 top_temp = top_temp.sort_values(by=(market_sort_value),
                                                     ascending=market_sort_value_key)
                 ct_MonitorMarket_Values = ct.get_Duration_format_Values(ct.Monitor_format_trade, market_sort_value[:2])
 
-                
+
                 if len(st_key_sort.split()) < 2:
                     f_sort = (st_key_sort.split()[0]+' f ')
                 else:
@@ -248,15 +249,18 @@ if __name__ == "__main__":
                         f_sort = st_key_sort
                     else:
                         f_sort = ' '.join(x for x in st_key_sort.split()[:2]) + ' f ' + ' '.join(x for x in st_key_sort.split()[2:])
-                
+
                 market_sort_value2, market_sort_value_key2 = ct.get_market_sort_value_key(f_sort, top_all=top_all)
                 ct_MonitorMarket_Values2 = ct.get_Duration_format_Values(ct.Monitor_format_trade, market_sort_value2[:2])
                 top_temp2 = top_end.sort_values(by=(market_sort_value2), ascending=market_sort_value_key2)
 
-                top_dd = pd.concat([top_temp.loc[:, ct_MonitorMarket_Values][:10], top_temp2.loc[:, ct_MonitorMarket_Values2][:3]], axis=0)
+                top_dd =  cct.combine_dataFrame(top_temp.loc[:, ct_MonitorMarket_Values][:10], top_temp2.loc[:, ct_MonitorMarket_Values2][:5],append=True, clean=True)
+                # print cct.format_for_print(top_dd)
 
+                table,widths = cct.format_for_print(top_dd[:10],widths=True)
+                print table
+                print cct.format_for_print(top_dd[-4:],header=False,widths=widths)
 
-                print cct.format_for_print(top_dd)
                 # print cct.format_for_print(top_temp.loc[:, ct_MonitorMarket_Values][:10])
                 # print cct.format_for_print(top_temp2.loc[:, ct_MonitorMarket_Values2][:3])
                 # print cct.format_for_print(top_temp.loc[:, ct.Sina_Monitor_format][:10])
@@ -330,6 +334,7 @@ if __name__ == "__main__":
                 status = True
             elif st.lower() == 'clear' or st.lower() == 'c':
                 top_all = pd.DataFrame()
+                cct.set_clear_logtime()
                 status = False
             elif st.startswith('w') or st.startswith('a'):
                 args = cct.writeArgmain().parse_args(st.split())

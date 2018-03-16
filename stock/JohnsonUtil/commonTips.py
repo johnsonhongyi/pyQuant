@@ -70,7 +70,7 @@ class GlobalValues:
             return defValue
 
 
-def format_for_print(df,header=True):
+def format_for_print(df,header=True,widths=False):
     if header:
         table = PrettyTable([''] + list(df.columns))
     else:
@@ -80,7 +80,15 @@ def format_for_print(df,header=True):
 
         table.add_row(row)
 
-    return str(table)
+    if not widths:
+        return str(table)
+    else:
+        if isinstance(widths,list):
+            table.set_widths(widths)
+            # table.get_string()
+            # print table.get_widths()
+            return str(table)
+        return str(table),table.get_widths()
 
 
 def format_for_print2(df):
@@ -569,7 +577,13 @@ def set_ctrl_handler():
         return 0  # chain to the next handler
     win32api.SetConsoleCtrlHandler(handler, 1)
 
-
+def set_clear_logtime(time_t=1):
+    h5_fname = 'sina_MultiIndex_data'
+    h5_table = 'all' + '_' + str(ct.sina_limit_time)
+    fname = 'sina_logtime'
+    logtime = get_config_value_ramfile(fname)
+    write_t = get_config_value_ramfile(fname,currvalue=time_t,xtype='time',update=True)
+    
 def set_console(width=80, height=15, color=3, title=None, closeTerminal=True):
     # mode con cp select=936
     # os.system("mode con: cols=%s lines=%s"%(width,height))
@@ -2141,10 +2155,15 @@ def combine_dataFrame(maindf, subdf, col=None, compare=None, append=False, clean
         #        if len(maindf) < len(subdf):
         #            maindf,subdf =subdf,maindf
         maindf = maindf.drop([col for col in maindf.index if col in subdf.index], axis=0)
+
+        for co_t in maindf.dtypes.keys():
+            if co_t in subdf.columns:
+                if maindf.dtypes[co_t] <> subdf.dtypes[co_t]:
+                    subdf[co_t] = subdf[co_t].astype(maindf.dtypes[co_t])
+                    # log.error("col to types:%s" % (maindf.dtypes[co_t]))
+
         maindf = pd.concat([maindf, subdf], axis=0)
-        # if 'timel' in maindf.columns:
-        #     time_list = set(maindf.timel)
-        #     log.info("times:%s"%(time_list))
+
         if not 'code' in maindf.columns:
             if not maindf.index.name == 'code':
                 maindf.index.name = 'code'

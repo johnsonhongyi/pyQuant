@@ -387,7 +387,7 @@ def write_hdf_db(fname, df, table='all', index=False, complib='blosc', baseCount
                         o_time=[time.time() - t_x for t_x in o_time]
                         o_timel=len(o_time)
                         o_time=np.mean(o_time)
-                        if o_time > ct.h5_power_limit_time * 1.5:
+                        if o_time > ct.h5_power_limit_time:
                             df['timel']=time.time()
                             log.error("%s %s o_time:%.1f timel:%s" % (fname, table, o_time, o_timel))
 
@@ -435,7 +435,8 @@ def write_hdf_db(fname, df, table='all', index=False, complib='blosc', baseCount
                         now_time=df.loc[inx_key].index[-1]
                         tmp_time=tmpdf.loc[inx_key].index[-1]
                         if now_time == tmp_time:
-                            log.error("%s %s Multi out %s hdf5:%s No Wri!!!" % (fname, table,inx_key, now_time))
+                            log.error("%s %s Multi out %s hdf5:%s No Wri!!!" % (fname, table,inx_key
+                                , now_time))
                             return False
                 elif dratio == 1:
                     print ("newData ratio:%s all:%s"%(dratio,len(df)))
@@ -579,7 +580,7 @@ def load_hdf_db(fname, table='all', code_l=None, timelimit=True, index=False, li
                         log.error("AttributeError:%s %s"%(fname,e))
                         log.error("Remove File:%s"%(fname))
                     except Exception, e:
-                        print "Exception:%s"%(e)
+                        print "Exception:%s name:%s"%(fname,e)
                     else:
                         pass
                     finally:
@@ -597,41 +598,82 @@ def load_hdf_db(fname, table='all', code_l=None, timelimit=True, index=False, li
                     else:
                         dratio = 0
                     # if dratio < 0.1 or len(dd) > 3100:
-                    if dratio < dratio_limit:
-                        log.info("find all:%s :%s %0.2f" %
-                                 (len(code_l), len(code_l) - len(dif_co), dratio))
-                        if timelimit and len(dd) > 0:
-                            dd=dd.loc[dif_co]
-                            o_time=dd[dd.timel <> 0].timel.tolist()
-    #                        if fname == 'powerCompute':
-    #                            o_time = sorted(set(o_time),reverse=True)
-                            o_time=sorted(set(o_time), reverse=False)
-                            o_time=[time.time() - t_x for t_x in o_time]
 
-                            if len(dd) > 0:
-                                # if len(dd) > 0 and (not cct.get_work_time() or len(o_time) <= ct.h5_time_l_count):
-                                l_time=np.mean(o_time)
-                                return_hdf_status=(not cct.get_work_time()) or (
-                                    cct.get_work_time() and l_time < limit_time)
-                                # return_hdf_status = l_time < limit_time
-                                # print return_hdf_status,l_time,limit_time
-                                if return_hdf_status:
-                                    df=dd
-                                    log.info("return hdf: %s timel:%s l_t:%s hdf ok:%s" % (
-                                        fname, len(o_time), l_time, len(df)))
-                            else:
-                                log.error("%s %s o_time:%s %s" % (fname, table, len(
-                                    o_time), [time.time() - t_x for t_x in o_time[:3]]))
-                            log.info('fname:%s l_time:%s' %
-                                     (fname, [time.time() - t_x for t_x in o_time]))
+                    log.info("find all:%s :%s %0.2f" %
+                            (len(code_l), len(code_l) - len(dif_co), dratio))
+                    if timelimit and len(dd) > 0:
+                       dd=dd.loc[dif_co]
+                       o_time=dd[dd.timel <> 0].timel.tolist()
+                    #                        if fname == 'powerCompute':
+                    #                            o_time = sorted(set(o_time),reverse=True)
+                       o_time=sorted(set(o_time), reverse=False)
+                       o_time=[time.time() - t_x for t_x in o_time]
 
-                        else:
-                            df=dd.loc[dif_co]
+                       if len(dd) > 0:
+                           # if len(dd) > 0 and (not cct.get_work_time() or len(o_time) <= ct.h5_time_l_count):
+                           l_time=np.mean(o_time)
+                           return_hdf_status=(not cct.get_work_time()) or (
+                               cct.get_work_time() and l_time < limit_time)
+                           # return_hdf_status = l_time < limit_time
+                           # print return_hdf_status,l_time,limit_time
+                           if return_hdf_status:
+                               # df=dd
+                               df = dd.loc[dif_co]
+                               log.info("return hdf: %s timel:%s l_t:%s hdf ok:%s" % (
+                                   fname, len(o_time), l_time, len(df)))
+                       else:
+                           log.error("%s %s o_time:%s %s" % (fname, table, len(
+                               o_time), [time.time() - t_x for t_x in o_time[:3]]))
+                       log.info('fname:%s l_time:%s' %
+                                (fname, [time.time() - t_x for t_x in o_time]))
+
                     else:
-                        if len(code_l) > ct.h5_time_l_count * 10 and INIT_LOG_Error < 5:
-                            # INIT_LOG_Error += 1
-                            log.error("fn:%s cl:%s h5:%s don't find:%s dra:%0.2f log_err:%s" % (
-                                fname, len(code_l), len(dd), len(code_l) - len(dif_co), dratio, INIT_LOG_Error))
+                       df=dd.loc[dif_co]
+                       
+                    if dratio > dratio_limit:
+                       if len(code_l) > ct.h5_time_l_count * 10 and INIT_LOG_Error < 5:
+                           # INIT_LOG_Error += 1
+                           log.error("fn:%s cl:%s h5:%s don't find:%s dra:%0.2f log_err:%s" % (
+                               fname, len(code_l), len(dd), len(code_l) - len(dif_co), dratio, INIT_LOG_Error))
+
+
+
+    #                 if dratio < dratio_limit:
+    #                     log.info("find all:%s :%s %0.2f" %
+    #                              (len(code_l), len(code_l) - len(dif_co), dratio))
+    #                     if timelimit and len(dd) > 0:
+    #                         dd=dd.loc[dif_co]
+    #                         o_time=dd[dd.timel <> 0].timel.tolist()
+    # #                        if fname == 'powerCompute':
+    # #                            o_time = sorted(set(o_time),reverse=True)
+    #                         o_time=sorted(set(o_time), reverse=False)
+    #                         o_time=[time.time() - t_x for t_x in o_time]
+
+    #                         if len(dd) > 0:
+    #                             # if len(dd) > 0 and (not cct.get_work_time() or len(o_time) <= ct.h5_time_l_count):
+    #                             l_time=np.mean(o_time)
+    #                             return_hdf_status=(not cct.get_work_time()) or (
+    #                                 cct.get_work_time() and l_time < limit_time)
+    #                             # return_hdf_status = l_time < limit_time
+    #                             # print return_hdf_status,l_time,limit_time
+    #                             if return_hdf_status:
+    #                                 # df=dd
+    #                                 dd.loc[dif_co]
+    #                                 log.info("return hdf: %s timel:%s l_t:%s hdf ok:%s" % (
+    #                                     fname, len(o_time), l_time, len(df)))
+    #                         else:
+    #                             log.error("%s %s o_time:%s %s" % (fname, table, len(
+    #                                 o_time), [time.time() - t_x for t_x in o_time[:3]]))
+    #                         log.info('fname:%s l_time:%s' %
+    #                                  (fname, [time.time() - t_x for t_x in o_time]))
+
+    #                     else:
+    #                         df=dd.loc[dif_co]
+    #                 else:
+    #                     if len(code_l) > ct.h5_time_l_count * 10 and INIT_LOG_Error < 5:
+    #                         # INIT_LOG_Error += 1
+    #                         log.error("fn:%s cl:%s h5:%s don't find:%s dra:%0.2f log_err:%s" % (
+    #                             fname, len(code_l), len(dd), len(code_l) - len(dif_co), dratio, INIT_LOG_Error))
                 else:
                     df = dd.loc[dd.index.isin(code_l, level='code')]
         else:

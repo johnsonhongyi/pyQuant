@@ -139,6 +139,7 @@ class PrettyTable(object):
         self._valign = {}
         self._max_width = {}
         self._rows = []
+        self._widths = []
         self.system = cct.get_os_system()
         if field_names:
             self.field_names = field_names
@@ -473,6 +474,12 @@ class PrettyTable(object):
         for field in self._field_names:
             self._valign[field] = val
     valign = property(_get_valign, _set_valign)
+
+    def get_widths(self):
+        return self._widths
+
+    def set_widths(self, val):
+        self._widths = val
 
     def _get_max_width(self):
         return self._max_width
@@ -924,7 +931,10 @@ class PrettyTable(object):
             widths = [_get_size(field)[0] for field in self._field_names]
         else:
             if self._field_names:
-                widths = [_get_size(field)[0] for field in self._field_names]
+                if self._widths:
+                    widths = self._widths
+                else:
+                    widths = [_get_size(field)[0] for field in self._field_names]
             else:
                 widths = len(self.field_names) * [0]
         for row in rows:

@@ -393,7 +393,7 @@ def get_linear_model_status(code, df=None, dtype='d', type='m', start=None, end=
     # log.setLevel(LoggerFactory.DEBUG)
     # else:
     # log.setLevel(LoggerFactory.ERROR)
-    
+
     index_d = None
     days = days if days <> 0 else 1
     if start is not None and end is None and filter == 'y':
@@ -876,10 +876,10 @@ def get_linear_model_candles(code, ptype='low', dtype='d', start=None, end=None,
     # fig=plt.fig()
     # fig.figsize = [14,8]
     # scale = 1.1
-    # 
+    #
     #plot volume
     plt.xticks(rotation=15, horizontalalignment='center')
-    
+
     '''
     #old
     pad = 0.25
@@ -912,8 +912,8 @@ def get_linear_model_candles(code, ptype='low', dtype='d', start=None, end=None,
     ax2.bar(idx[neg],volume[neg],color='green',width=1,align='center')
     yticks = ax2.get_yticks()
     ax2.set_yticks(yticks[::3])
-    # plt.tight_layout()  
-    # plt.subplots_adjust(hspace=0.00, bottom=0.08) 
+    # plt.tight_layout()
+    # plt.subplots_adjust(hspace=0.00, bottom=0.08)
     plt.xticks(rotation=15, horizontalalignment='center')
 
 
@@ -939,6 +939,7 @@ wencai_drop = []
 
 def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y', talib=False, newdays=None, days=0):
     ts = time.time()
+
     if isinstance(df, list):
         h5_combine_status = False
         code_l = df
@@ -951,7 +952,7 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y', tal
     # if '999999' not in code_l:
     #     code_l.append('999999')
     #     code_l.append('399001')
-        
+
     # code_src = code_l
     global Power_CXG_Error, drop_cxg, wencai_drop
 #    drop_cxg
@@ -959,7 +960,7 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y', tal
     h5_fname = 'powerCompute'
     h5_table = dtype + '_' + str(dl) + '_' + filter + '_' + 'all'
     power_columns = ['ra', 'op', 'category', 'ma', 'rsi', 'kdj',
-                     'boll', 'rah', 'df2', 'fibl', 'macd', 'vstd', 'oph', 'lvolume']
+                     'boll', 'rah', 'df2','fib', 'fibl', 'macd', 'vstd', 'oph', 'lvolume']
     # [['ma' ,'rsi' ,'kdj' ,'boll', 'ra','rah', 'df2' ,'fibl','fib' ,'macd' ,'oph']]
     # [['ma' ,'rsi' ,'kdj' ,'boll', 'ra',rah', 'df2' ,'fibl','fib' ,'macd' ,'vstd', 'oph']]
 
@@ -1000,6 +1001,7 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y', tal
                             len(df), len(drop_cxg), len(drop_t)))
                         return df
             log.info("add power hdf5 code_l:%s" % (len(code_l)))
+            print("intP:%s"%(len(code_l))),
     else:
         #        log.info("init power hdf5")
         if len(code_l) > 50:
@@ -1221,6 +1223,7 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y', tal
             #'volume', 'ratio', 'couts','ldate' -> 'ma','macd','rsi','kdj'
             # df = df.drop_duplicates()
         df = df.fillna(0)
+
         # df['df2'] = (map(lambda ra, fibl,rah,fib,ma,kdj,rsi:round(eval(ct.powerdiff%(ct.PowerCountdl)),1),\
         #                  df['ra'].values, df['fibl'].values,df['rah'].values,df['fib'].values,df['ma'].values,\
         #                  df['kdj'].values,df['rsi'].values))

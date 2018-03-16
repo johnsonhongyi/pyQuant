@@ -162,12 +162,12 @@ if __name__ == "__main__":
                     cct.get_terminal_Position(position=sys.argv[0])
 
                     # time_Rt = time.time()
-                    print ("term:%s" % (cct.get_terminal_Position(cmd='DurationDn.py')),)
+                    print "term:%s" % (cct.get_terminal_Position(cmd='DurationDn.py')),
                     if cct.get_terminal_Position(cmd='DurationDn.py') > 1:
                         top_all, lastpTDX_DF = tdd.get_append_lastp_to_df(
                             top_now, lastpTDX_DF=None, dl=duration_date, end=end_date, ptype=ptype, filter=filter, power=ct.lastPower, lastp=lastp, newdays=newdays, resample=resample)
                     else:
-                        newdays = 15
+                        newdays = 0
                         top_all, lastpTDX_DF = tdd.get_append_lastp_to_df(
                             top_now, lastpTDX_DF=None, dl=duration_date, end=end_date, ptype=ptype, filter=filter, power=ct.lastPower, lastp=lastp, newdays=newdays, checknew=True, resample=resample)
                     # codelist = top_all.index.tolist()
@@ -377,7 +377,7 @@ if __name__ == "__main__":
                         # top_temp = top_temp[top_temp['buy'] > top_temp['ma10d']]
                         # top_temp = top_temp[top_temp['ma5d'] > top_temp['ma10d']][:10]
                         # top_temp = top_temp[ (top_temp['ma5d'] > top_temp['ma10d']) & (top_temp['buy'] > top_temp['ma10d']) ][:10]
-                        top_dd = pd.concat([top_temp[:10], top_end], axis=0)
+                        top_dd =  cct.combine_dataFrame(top_temp[:10], top_end,append=True, clean=True)
                         # top_dd = top_dd.drop_duplicates()
                         ct_Duration_format_Values = ct.get_Duration_format_Values(ct.Duration_format_buy, market_sort_value[:])
                         
@@ -386,7 +386,8 @@ if __name__ == "__main__":
                         # top_temp = top_temp[top_temp['ma5d'] > top_temp['ma10d']][:10]
                         # top_temp = top_temp[ (top_temp['ma5d'] > top_temp['ma10d']) & (top_temp['trade'] > top_temp['ma10d']) ][:10]
 
-                        top_dd = pd.concat([top_temp[:10], top_end], axis=0)
+                        top_dd =  cct.combine_dataFrame(top_temp[:10], top_end,append=True, clean=True)
+                        # top_dd = pd.concat([top_temp[:10], top_end], axis=0)
                         # top_dd = top_dd.drop_duplicates()
                         ct_Duration_format_Values = ct.get_Duration_format_Values(ct.Duration_format_trade, market_sort_value[:])
                     # ct_Duration_format_Values = ct.get_Duration_format_Values(ct_Duration_format_Values,replace='couts',dest='stdv')
@@ -396,7 +397,11 @@ if __name__ == "__main__":
                     
                     top_dd = top_dd.loc[:, ct_Duration_format_Values]
 
-                    print (cct.format_for_print(top_dd))
+                    table,widths = cct.format_for_print(top_dd[:9],widths=True)
+                    print table
+                    print cct.format_for_print(top_dd[-4:],header=False,widths=widths)
+
+                    # print (cct.format_for_print(top_dd))
                 # if cct.get_now_time_int() < 930 or cct.get_now_time_int() > 1505 or (cct.get_now_time_int() > 1125 and cct.get_now_time_int() < 1505):
                 # print cct.format_for_print(top_dif[-10:])
                 # print top_all.loc['000025',:]

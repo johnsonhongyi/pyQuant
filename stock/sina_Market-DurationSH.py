@@ -344,7 +344,7 @@ if __name__ == "__main__":
                     if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935:
                         # top_temp = top_temp[top_temp['ma5d'] > top_temp['ma10d']][:10]
                         # top_temp = top_temp[ (top_temp['ma5d'] > top_temp['ma10d']) & (top_temp['buy'] > top_temp['ma10d']) ][:10]
-                        top_dd = pd.concat([top_temp[:10], top_end], axis=0)
+                        top_dd =  cct.combine_dataFrame(top_temp[:10], top_end,append=True, clean=True)
                         # top_dd = top_dd.drop_duplicates()
                         ct_Duration_format_Values = ct.get_Duration_format_Values(ct.Duration_format_buy, market_sort_value[:])
                     else:
@@ -352,7 +352,7 @@ if __name__ == "__main__":
                         # top_temp = top_temp[top_temp['ma5d'] > top_temp['ma10d']][:10]
                         # top_temp = top_temp[ (top_temp['ma5d'] > top_temp['ma10d']) & (top_temp['trade'] > top_temp['ma10d']) ][:10]
 
-                        top_dd = pd.concat([top_temp[:10], top_end], axis=0)
+                        top_dd =  cct.combine_dataFrame(top_temp[:10], top_end,append=True, clean=True)
                         # top_dd = top_dd.drop_duplicates()
                         ct_Duration_format_Values = ct.get_Duration_format_Values(ct.Duration_format_trade, market_sort_value[:])
                     # ct_Duration_format_Values = ct.get_Duration_format_Values(ct_Duration_format_Values,replace='couts',dest='stdv')
@@ -360,7 +360,10 @@ if __name__ == "__main__":
                     ct_Duration_format_Values = ct.get_Duration_format_Values(ct_Duration_format_Values,replace='b1_v',dest='upper')
                     # ct_Duration_format_Values = ct.get_Duration_format_Values(ct_Duration_format_Values,replace='op',dest='boll')
                     top_dd = top_dd.loc[:, ct_Duration_format_Values]
-                    print cct.format_for_print(top_dd)
+                    # print cct.format_for_print(top_dd)
+                    table,widths = cct.format_for_print(top_dd[:9],widths=True)
+                    print table
+                    print cct.format_for_print(top_dd[-4:],header=False,widths=widths)
                 # if cct.get_now_time_int() < 930 or cct.get_now_time_int() > 1505 or (cct.get_now_time_int() > 1125 and cct.get_now_time_int() < 1505):
                 # print cct.format_for_print(top_dif[-10:])
                 # print top_all.loc['000025',:]

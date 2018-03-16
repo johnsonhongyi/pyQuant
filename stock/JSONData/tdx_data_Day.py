@@ -198,7 +198,8 @@ def get_tdx_Exp_day_to_df(code, start=None, end=None, dl=None, newdays=None, typ
         tdx_max_int = dl
     else:
         tdx_max_int = ct.tdx_max_int
-    max_int_end = -1 if int(tdx_max_int) > 10 else None
+    # max_int_end = -1 if int(tdx_max_int) > 10 else None
+    max_int_end = None if int(tdx_max_int) > 10 else None
     if newdays is not None:
         newstockdayl = newdays
     else:
@@ -297,7 +298,9 @@ def get_tdx_Exp_day_to_df(code, start=None, end=None, dl=None, newdays=None, typ
                 df['ma60d'] = pd.rolling_mean(df.close, 60)
                 # df['msg'] = df.high[-tdx_max_int:].max()
                 df['hmax'] = df.close[-tdx_max_int:max_int_end].max()
+                df['max5'] = df.close[-5:max_int_end].max()
                 df['lmin'] = df.low[-tdx_max_int:max_int_end].min()
+                df['min5'] = df.low[-5:max_int_end].min()
                 df['cmean'] = round(df.close[-tdx_max_int:max_int_end].mean(), 2)
                 df['hv'] = df.vol[-tdx_max_int:max_int_end].max()
                 df['lv'] = df.vol[-tdx_max_int:max_int_end].min()
@@ -457,9 +460,10 @@ def get_tdx_Exp_day_to_df(code, start=None, end=None, dl=None, newdays=None, typ
                 df['ma10d'] = pd.rolling_mean(df.close, 10)
                 df['ma20d'] = pd.rolling_mean(df.close, 20)
                 df['ma60d'] = pd.rolling_mean(df.close, 60)
-                # df['hmax'] = df.high[-tdx_max_int:].max()
                 df['hmax'] = df.close[-tdx_max_int:max_int_end].max()
+                df['max5'] = df.close[-5:max_int_end].max()
                 df['lmin'] = df.low[-tdx_max_int:max_int_end].min()
+                df['min5'] = df.low[-5:max_int_end].min()
                 df['cmean'] = round(df.close[-tdx_max_int:max_int_end].mean(), 2)
                 df['hv'] = df.vol[-tdx_max_int:max_int_end].max()
                 df['lv'] = df.vol[-tdx_max_int:max_int_end].min()
@@ -1735,6 +1739,7 @@ def getSinaIndexdf():
     return top_all
 
 def getSinaAlldf(market='cyb', vol=ct.json_countVol, vtype=ct.json_countType, filename='mnbk', table='top_now',trend=False):
+    print "initdx",
     market_all = False
     if market == 'rzrq':
         df = cct.get_rzrq_code()
@@ -1892,7 +1897,7 @@ def getSinaAlldf(market='cyb', vol=ct.json_countVol, vtype=ct.json_countType, fi
     #         if time.time() - o_time < h5_limit_time:
     #             top_now = h5
     #             return h5
-    print "in:%s b1>:%s it:%s" % (initTdxdata, len(top_now), round(time.time() - time_s, 1)),
+    print ":%s b1>:%s it:%s" % (initTdxdata, len(top_now), round(time.time() - time_s, 1)),
     if top_now is  None or len(top_now) ==0:
         log.error("top_all is None :%s"%(top_now))
     return top_now
@@ -2686,7 +2691,7 @@ def get_tdx_all_day_LastDF(codeList, dt=None, ptype='close'):
     return df
 
 
-def get_append_lastp_to_df(top_all, lastpTDX_DF=None, dl=ct.PowerCountdl, end=None, ptype='low', filter='y', power=True, lastp=False, newdays=None, checknew=False, resample='d'):
+def get_append_lastp_to_df(top_all, lastpTDX_DF=None, dl=ct.PowerCountdl, end=None, ptype='low', filter='y', power=True, lastp=False, newdays=None, checknew=True, resample='d'):
 
     codelist = top_all.index.tolist()
 #    codelist = ['603169']
@@ -2709,7 +2714,6 @@ def get_append_lastp_to_df(top_all, lastpTDX_DF=None, dl=ct.PowerCountdl, end=No
     # codelist.extend(tdx_index_code_list)
     # search_Tdx_multi_data_duration(cct.tdx_hd5_name, 'all_300',code_l=codelist, start=60, end=None, index='date')
 
-
     if lastpTDX_DF is None or len(lastpTDX_DF) == 0:
         # h5 = top_hdf_api(fname=h5_fname,table=market,df=None)
         h5 = h5a.load_hdf_db(h5_fname, table=h5_table,
@@ -2726,8 +2730,8 @@ def get_append_lastp_to_df(top_all, lastpTDX_DF=None, dl=ct.PowerCountdl, end=No
         else:
             log.info("no hdf data:%s %s" % (h5_fname, h5_table))
             # tdxdata = get_tdx_all_day_LastDF(codelist) '''only get lastp no
-            # powerCompute'''
-            print "TD.",
+            print ("TDD:%s"%(len(codelist)),)
+
             tdxdata = get_tdx_exp_all_LastDF_DL(
                 codelist, dt=dl, end=end, ptype=ptype, filter=filter, power=power, lastp=lastp, newdays=newdays, resample=resample)
             # if checknew:
@@ -2759,6 +2763,8 @@ def get_append_lastp_to_df(top_all, lastpTDX_DF=None, dl=ct.PowerCountdl, end=No
         tdxdata = lastpTDX_DF
     log.debug("TdxLastP: %s %s" %
               (len(tdxdata), tdxdata.columns.values))
+
+
     if checknew:
         tdx_list = tdxdata.index.tolist()
         diff_code = list(set(codelist) - set(tdx_list))
@@ -2767,9 +2773,9 @@ def get_append_lastp_to_df(top_all, lastpTDX_DF=None, dl=ct.PowerCountdl, end=No
         # tdx_diff = None
         if len(diff_code) > 0:
             log.error("tdx Out:%s code:%s" % (len(diff_code), diff_code[:2]))
-            log.debug("diff_code:%s" % (diff_code))
+            # log.debug("diff_code:%s" % (diff_code[-2]))
             tdx_diff = get_tdx_exp_all_LastDF_DL(
-                diff_code, dt=dl, end=end, ptype=ptype, filter=filter, power=power, lastp=lastp, newdays=0, resample=resample)
+                diff_code, dt=dl, end=end, ptype=ptype, filter=filter, power=power, lastp=lastp, newdays=newdays, resample=resample)
             if tdx_diff is not None and len(tdx_diff) > 0:
                 tdx_diff.rename(columns={'open': 'lopen'}, inplace=True)
                 tdx_diff.rename(columns={'high': 'lhigh'}, inplace=True)
@@ -2778,8 +2784,9 @@ def get_append_lastp_to_df(top_all, lastpTDX_DF=None, dl=ct.PowerCountdl, end=No
                 tdx_diff.rename(columns={'low': 'llow'}, inplace=True)
                 tdx_diff.rename(columns={'vol': 'lvol'}, inplace=True)
                 tdx_diff.rename(columns={'amount': 'lamount'}, inplace=True)
+                if newdays is None or newdays > 0:
+                    h5 = h5a.write_hdf_db(h5_fname, tdx_diff, table=h5_table, append=True)
                 tdxdata = pd.concat([tdxdata, tdx_diff], axis=0)
-                # h5 = h5a.write_hdf_db(h5_fname, tdxdata, table=h5_table)
 
     top_all = cct.combine_dataFrame(
         top_all, tdxdata, col=None, compare=None, append=False)
@@ -2821,7 +2828,7 @@ def get_powerdf_to_all(top_all, powerdf):
     #         # 'oph', u'rah', u'fibl', u'boll', u'kdj',u'macd', u'rsi', u'ma', u'vstd', u'lvolume', u'category'
     #         # top_all = top_all.merge(p_t, left_index=True, right_index=True, how='left')
     #         top_all = pd.concat([top_all, powerdf],axis=0)
-    #         # top_dd = pd.concat([top_temp[:10], top_end], axis=0)
+    #         # top_dd =  cct.combine_dataFrame(top_temp[:10], top_end,append=True, clean=True)
     #         # for symbol in p_t.index:
     #         #     if symbol in top_all.index:
     #         #         # top_all.loc[symbol, 'oph':'category'] = p_t.loc[symbol, 'oph':'category']
@@ -3249,8 +3256,11 @@ if __name__ == '__main__':
         log_level = LoggerFactory.ERROR
     # log_level = LoggerFactory.DEBUG if args['-d']  else LoggerFactory.ERROR
     log.setLevel(log_level)
-    code='600903'
-    print get_tdx_Exp_day_to_df(code, dl=10, newdays=0, resample='d')
+    code='002266'
+    df = get_tdx_Exp_day_to_df(code, dl=60, newdays=0, resample='d')
+    print df[:2].hmax,df[:2].cmean
+    # import ipdb;ipdb.set_trace()
+
     # print get_tdx_Exp_day_to_df(code, dl=20, newdays=0, resample='d')
     # print get_tdx_day_to_df_last('999999', type=1)
     # sys.exit(0)

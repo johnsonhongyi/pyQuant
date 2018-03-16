@@ -133,14 +133,16 @@ if __name__ == "__main__":
     # all_diffpath = tdd.get_tdx_dir_blocknew() + '062.blk'
     
     # market_sort_value, market_sort_value_key = ct.get_market_sort_value_key(ct.sort_value_key_perd)
-    st_key_sort = ct.sort_value_key_perd
+    st_key_sort = '4'
+    # st_key_sort = ct.sort_value_key_perd
     market_sort_value, market_sort_value_key = ct.get_market_sort_value_key(st_key_sort)
     while 1:
         try:
             # top_now = tdd.getSinaAlldf(market='sh', vol=ct.json_countVol, vtype=ct.json_countType)
             time_Rt = time.time()
             # top_now = tdd.getSinaAlldf(market='次新股',filename='cxg', vol=ct.json_countVol, vtype=ct.json_countType)
-            top_now = tdd.getSinaAlldf(market='cyb', filename=None, vol=ct.json_countVol, vtype=ct.json_countType,trend=True)
+            # top_now = tdd.getSinaAlldf(market='cyb', filename=None, vol=ct.json_countVol, vtype=ct.json_countType,trend=True)
+            top_now = tdd.getSinaAlldf(market='cyb', filename=None, vol=ct.json_countVol, vtype=ct.json_countType,trend=False)
             # print top_now.loc['300208','name']
             df_count = len(top_now)
             now_count = len(top_now)
@@ -211,7 +213,7 @@ if __name__ == "__main__":
 
                 # top_dif['dff'] = map(lambda x, y: round((x - y) / y * 100, 1),
                 #                      top_dif['buy'].values, top_dif['lastp'].values)
-                if st_key_sort.split()[0] == '4' and cct.get_now_time_int() > 925 and 'lastbuy' in top_dif.columns:
+                if st_key_sort.split()[0] == '4' and cct.get_now_time_int() > 926 and 'lastbuy' in top_dif.columns:
                     top_dif['dff'] = (map(lambda x, y: round((x - y) / y * 100, 1),
                                           top_dif['buy'].values, top_dif['lastbuy'].values))
                 else:
@@ -255,6 +257,7 @@ if __name__ == "__main__":
                     # top_temp = stf.getBollFilter(df=top_temp, boll=ct.bollFilter,duration=ct.PowerCountdl)
                     # top_temp = stf.getBollFilter(df=top_temp, boll=-10, duration=ct.PowerCountdl,resample=resample)
                     top_temp = stf.getBollFilter(  df=top_temp, boll=ct.bollFilter, duration=ct.PowerCountdl, filter=False, ma5d=False, dl=14, percent=False, resample='d', ene=True)
+                    # top_end = stf.getBollFilter(  df=top_end, down=True)
                     print("A:%s N:%s K:%s %s G:%s" % (
                         df_count, now_count, len(top_all[top_all['buy'] > 0]),
                         len(top_now[top_now['volume'] <= 0]), goldstock)),
@@ -289,11 +292,15 @@ if __name__ == "__main__":
                     market_sort_value2, market_sort_value_key2 = ct.get_market_sort_value_key(f_sort, top_all=top_all)
                     ct_MonitorMarket_Values2 = ct.get_Duration_format_Values(ct.MonitorMarket_format_buy, market_sort_value2[:2])
                     top_temp2 = top_end.sort_values(by=(market_sort_value2), ascending=market_sort_value_key2)
+                    
+                    top_dd = cct.combine_dataFrame(top_temp.loc[:, ct_MonitorMarket_Values][:9], top_temp2.loc[:, ct_MonitorMarket_Values2][:4],append=True, clean=True)
+                    
+                    # top_dd = pd.concat([top_temp.loc[:, ct_MonitorMarket_Values][:9], top_temp.loc[:, ct_MonitorMarket_Values][-4:]], axis=0)
 
-                    top_dd = pd.concat([top_temp.loc[:, ct_MonitorMarket_Values][:10], top_temp2.loc[:, ct_MonitorMarket_Values2][:3]], axis=0)
                     # print cct.format_for_print(topdd)
-                    print cct.format_for_print(top_temp.loc[:, ct_MonitorMarket_Values][:8])
-                    print cct.format_for_print(top_temp2.loc[:, ct_MonitorMarket_Values][:3],header=False)
+                    table,widths = cct.format_for_print(top_dd[:9],widths=True)
+                    print table
+                    print cct.format_for_print(top_dd[-4:],header=False,widths=widths)
                     # print cct.format_for_print(top_dd)
 
                 # print cct.format_for_print(top_dif[:10])
@@ -372,6 +379,7 @@ if __name__ == "__main__":
                         kind = sl.get_multiday_ave_compare_silent(code)
             elif st.lower() == 'clear' or st.lower() == 'c':
                 top_all = pd.DataFrame()
+                cct.set_clear_logtime()
                 status = False
             elif st.startswith('w') or st.startswith('a'):
                 args = cct.writeArgmain().parse_args(st.split())

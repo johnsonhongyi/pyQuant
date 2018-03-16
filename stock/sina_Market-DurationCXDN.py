@@ -134,7 +134,7 @@ if __name__ == "__main__":
     parserDuraton = cct.DurationArgmain()
     # market_sort_value, market_sort_value_key = ct.get_market_sort_value_key(ct.sort_value_key_perd)
     # market_sort_value, market_sort_value_key = ct.get_market_sort_value_key('1')
-    st_key_sort = '4'
+    st_key_sort = '1'
     market_sort_value, market_sort_value_key = ct.get_market_sort_value_key(st_key_sort)
     while 1:
         try:
@@ -216,7 +216,7 @@ if __name__ == "__main__":
                 if cct.get_now_time_int() > 915:
                     top_dif = top_dif[top_dif.buy > 0]
 
-                if st_key_sort.split()[0] == '4' and cct.get_now_time_int() > 925 and 'lastbuy' in top_dif.columns:
+                if st_key_sort.split()[0] == '4' and cct.get_now_time_int() > 926 and 'lastbuy' in top_dif.columns:
                     top_dif['dff'] = (map(lambda x, y: round((x - y) / y * 100, 1),
                                           top_dif['buy'].values, top_dif['lastbuy'].values))
                 else:
@@ -288,7 +288,6 @@ if __name__ == "__main__":
 
                     # top_all=top_all.sort_values(by=['percent','dff','couts','ratio'],ascending=[0,0,1,1])
                     # print cct.format_for_print(top_dif[:10])
-                    # top_dd = pd.concat([top_dif[:5],top_temp[:3],top_dif[-3:],top_temp[-3:]], axis=0)
                     if percent_status == 'y' and (
                             cct.get_now_time_int() > 935 or cct.get_now_time_int() < 900) and ptype == 'low':
                         top_dif = top_dif[top_dif.percent >= 0]
@@ -360,7 +359,8 @@ if __name__ == "__main__":
                         # top_temp = top_temp[top_temp['buy'] > top_temp['ma10d']]
                         # top_temp = top_temp[top_temp['ma5d'] > top_temp['ma10d']][:10]
                         # top_temp = top_temp[ (top_temp['ma5d'] > top_temp['ma10d']) & (top_temp['buy'] > top_temp['ma10d']) ][:10]
-                        top_dd = pd.concat([top_temp[:10], top_end[:5]], axis=0)
+                        top_dd = cct.combine_dataFrame(top_temp[:10], top_end[:5],append=True, clean=True)
+
                         # top_dd = top_dd.drop_duplicates()
                         ct_Duration_format_Values = ct.get_Duration_format_Values(ct.Duration_format_buy, market_sort_value[:])
 
@@ -369,18 +369,19 @@ if __name__ == "__main__":
                         # top_temp = top_temp[top_temp['ma5d'] > top_temp['ma10d']][:10]
                         # top_temp = top_temp[ (top_temp['ma5d'] > top_temp['ma10d']) & (top_temp['trade'] > top_temp['ma10d']) ][:10]
 
-                        top_dd = pd.concat([top_temp[:10], top_end[:5]], axis=0)
+                        top_dd = cct.combine_dataFrame(top_temp[:10], top_end[:5],append=True, clean=True)
                         ct_Duration_format_Values = ct.get_Duration_format_Values(ct.Duration_format_trade, market_sort_value[:])
 
                     # ct_Duration_format_Values = ct.get_Duration_format_Values(ct_Duration_format_Values,replace='couts',dest='stdv')
-                    ct_Duration_format_Values = ct.get_Duration_format_Values(ct_Duration_format_Values,replace='couts',dest='volume')
-
                     # ct_Duration_format_Values = ct.get_Duration_format_Values(ct_Duration_format_Values,replace='boll',dest='upper')
+                    ct_Duration_format_Values = ct.get_Duration_format_Values(ct_Duration_format_Values,replace='couts',dest='volume')
                     ct_Duration_format_Values = ct.get_Duration_format_Values(ct_Duration_format_Values,replace='b1_v',dest='upper')
-                    # ct_Duration_format_Values = ct.get_Duration_format_Values(ct_Duration_format_Values,replace='op',dest='upper')
                     top_dd = top_dd.loc[:, ct_Duration_format_Values]
-
-                    print cct.format_for_print(top_dd)
+                    # ct_Duration_format_Values = ct.get_Duration_format_Values(ct_Duration_format_Values,replace='op',dest='upper')
+                    table,widths = cct.format_for_print(top_dd[:9],widths=True)
+                    print table
+                    print cct.format_for_print(top_dd[-4:],header=False,widths=widths)
+                    # print cct.format_for_print(top_dd)
                 # if cct.get_now_time_int() < 930 or cct.get_now_time_int() > 1505 or (cct.get_now_time_int() > 1125 and cct.get_now_time_int() < 1505):
                 # print cct.format_for_print(top_dif[-10:])
                 # print top_all.loc['000025',:]
@@ -452,6 +453,7 @@ if __name__ == "__main__":
             elif st.lower() == 'clear' or st.lower() == 'c':
                 top_all = pd.DataFrame()
                 time_s = time.time()
+                cct.set_clear_logtime()
                 status = False
             elif st.startswith('d') or st.startswith('dt'):
                 args = parserDuraton.parse_args(st.split()[1:])

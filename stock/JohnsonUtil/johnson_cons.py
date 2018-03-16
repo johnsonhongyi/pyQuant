@@ -31,24 +31,24 @@ DD_VOL_List = {'0': '40000', '1': '100000',
 LvolumeSize = 12500
 VolumeMaxR = 5000
 VolumeMinR = 0.1
-PowerCount = 800
+PowerCount = 500
 duration_diff = 6
-duration_date_l = 21
-duration_date_up = 60
+duration_date_l = 60
+duration_date_up = 120
 duration_date_sort = duration_date_l
 PowerCountdl = duration_date_l * 2 if duration_date_l < 20 else duration_date_l
 Power_Ma_Days = 6
 Power_last_da = 1
-power_update_time = 900
+# power_update_time = 900
 writeCount = 5
 changeRatio = 0.975
 changeRatioUp = 1.025
 # duration_date = 10
 wencai_delay_time = 60
 resample_dtype = 'd'
-logtime = 3600
+logtime = 4200
 
-bollFilter = -10
+bollFilter = -2
 writeblockbakNum = 15
 checkfilter = True
 lastPower = False
@@ -60,7 +60,7 @@ sleep_time = 6
 tdx_max_int = 10
 wcd_limit_day = 30
 h5_limit_time = 180
-h5_power_limit_time = 3600
+h5_power_limit_time = 36000
 cxg_limit_days = 20
 newdays_limit_days = 30
 big_H5_Size_limit = 10
@@ -130,6 +130,7 @@ Duration_sort_percd_key = [0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1]
 
 
 # Duration_percent_dff = ['percent', 'b1_v', 'dff', 'df2', 'op',
+# Duration_percent_dff = ['percent','per2d','b1_v', 'dff', 'df2', 'op',
 Duration_percent_dff = ['percent','per2d','b1_v', 'dff', 'df2', 'op',
                         'fib', 'fibl', 'ra', 'ratio', 'volume', 'couts']
 Duration_percent_dff_key = [0, 0,0, 0, 0, 0, 1, 1, 0, 1, 1, 1]
@@ -175,7 +176,7 @@ Duration_ra_dff = ['ra', 'dff', 'couts', 'percent',
 
 Duration_ra_dff_key = [0, 0, 0, 0, 0, 1, 1, 1, 1]
 
-Duration_sort_per_df2 = ['percent', 'df2', 'ma', 'dff', 'ratio', 'volume']
+Duration_sort_per_df2 = ['percent', 'b1_v', 'ma', 'dff', 'ratio', 'volume']
 Duration_sort_per_df2_key = [0, 0, 0, 0, 0, 0]
 
 # Duration_ra_goldop=['ra','percent','dff','boll','op','fib','fibl','ratio','volume','couts']
@@ -210,15 +211,15 @@ MonitorMarket_sort_op_key = [0, 0, 1, 0, 0, 0, 1, 1, 1]
 # MonitorMarket_format_buy=['name', 'buy', 'ma5d', 'boll','dff','df2','couts','percent', 'ra','op', 'ratio','ma','volume','date','category']
 
 Duration_format_buy = ['name', 'buy', 'boll', 'dff', 'df2', 'percent', 'per1d', 'per3d',
-                       'ra', 'op', 'ratio', 'couts',  'volume', 'date', 'category']
+                       'ra', 'op', 'ratio', 'couts',  'volume', 'fib','fibl', 'category']
 Duration_format_trade = ['name', 'trade', 'boll', 'dff', 'df2',
-                         'percent', 'per1d',  'per3d',  'ra', 'op', 'ratio', 'couts', 'volume', 'date', 'category']
+                         'percent', 'per1d',  'per3d',  'ra', 'op', 'ratio', 'couts', 'volume', 'fib','fibl', 'category']
 
 
 Monitor_format_trade = ['name', 'trade', 'boll', 'dff', 'df2', 'couts',
-                        'percent', 'per1d', 'per3d', 'ra', 'op', 'fib', 'ratio',  'volume', 'category']
+                        'percent', 'per1d', 'per3d', 'ra', 'op', 'fib','fibl', 'ratio',  'volume', 'category']
 MonitorMarket_format_buy = ['name', 'buy', 'boll', 'dff', 'df2',
-                            'couts', 'percent', 'per1d', 'per3d', 'ra', 'op', 'ratio',  'volume', 'date', 'category']
+                            'couts', 'percent', 'per1d', 'per3d', 'ra', 'op', 'ratio',  'volume', 'fib','fibl', 'category']
 
 # Sina_Monitor_format =['name', 'trade', 'ma5d','boll','dff','df2','couts','percent', 'ra','op', 'fib','ratio','ma','volume','category']
 # MonitorMarket_format_buy=['name', 'buy', 'ma5d', 'boll','dff','percent', 'ra','op', 'fib','fibl','ma','macd','rsi','kdj','volume','date']
@@ -548,7 +549,7 @@ INDEX_SYMBOL = {"399990": "sz399990", "000006": "sh000006", "399998": "sz399998"
 def RawMenuArgmain():
     raw = 'status:[go(g),clear(c),[d 20150101 [l|h]|[y|n|pn|py],quit(q),W(a),sh]:'
     raw_input_menu = raw + "\n\tNow : %s" + \
-        "\n\t1:Sort By Percent\t2:Sort by per1d\t3:Sort By percd\t\t4:Sort By DFF\n\t5:Sort By Ra_dff\t6:Sort By df2\t7:Sort Pe df2\t\t8:Sort by Count" + \
+        "\n\t1:Sort By Percent\t2:Sort by per1d\t3:Sort By percd\t\t4:Sort By DFF\n\t5:Sort By Ra_dff\t6:Sort By df2\t7:Sort Per b1V\t\t8:Sort by Count" + \
         "\n\t9:By perc_vol\t\tx: by_opboll\tx1:by boll_perc\nplease input:"
     return raw_input_menu
 
