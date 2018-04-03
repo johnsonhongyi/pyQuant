@@ -137,7 +137,8 @@ class GenericRowParser(RowParser):
         self.__highColName = columnNames["high"]
         self.__lowColName = columnNames["low"]
         self.__closeColName = columnNames["close"]
-        self.__volumeColName = columnNames["volume"]
+        self.__volumeColName = columnNames["vol"]
+        self.__volumeColName = columnNames["amount"]
         self.__adjCloseColName = columnNames["adj_close"]
 
     def _parseDate(self, dateString):

@@ -2005,7 +2005,8 @@ def get_duration_Index_date(code='999999', dt=None, ptype='low', dl=None, power=
                 code, start=dt, power=power).sort_index(ascending=False)
             # dl = len(get_tdx_Exp_day_to_df(code, start=dt)) + changedays
             dl = len(df) + changedays
-            dt = df[df.index <= dt].index.values[changedays]
+
+            dt = df[df.index <= dt].index.values[changedays] if len(df[df.index <= dt]) > 0 else df.index.values[-1]
             log.info("LastDF:%s,%s" % (dt, dl))
         return dt, dl
     if dl is not None:
@@ -2078,7 +2079,7 @@ def get_duration_date(code, ptype='low', dt=None, df=None, dl=None):
         log.debug("high:%s" % lowdate)
     else:
         lowp = dz.low.min()
-        lowdate = dz[dz.low == lowp].index.values[-1]
+        lowdate = dz[dz.close == lowp].index.values[-1]
         log.debug("low:%s" % lowdate)
     # if ptype == 'high':
     #     lowp = dz.close.max()
@@ -2181,8 +2182,8 @@ def get_duration_price_date(code=None, ptype='low', dt=None, df=None, dl=None, e
             lowdate = dz[dz.close == lowp].index.values[-1]
             log.debug("high:%s" % lowdate)
         else:
-            lowp = dz.low.min()
-            lowdate = dz[dz.low == lowp].index.values[-1]
+            lowp = dz.close.min()
+            lowdate = dz[dz.close == lowp].index.values[-1]
             log.debug("low:%s" % lowdate)
         log.debug("date:%s %s:%s" % (lowdate, ptype, lowp))
     else:
@@ -2235,10 +2236,12 @@ def compute_lastdays_percent(df=None, lastdays=3, resample='d'):
                 # df['perlastp'] = df['per%sd' % da]
                 # df['perlastp'] = (df['per%sd' % da]).map(lambda x: 1 if x >= -0.1 else 0)
                 # down_zero, down_dn = 0, -1
-                down_zero, down_dn, percent_l = 0, 0, 2
-                # df['perlastp'] = map((lambda c,lc,lp: (1 if (c - lc) >= 0 else down_dn) + (2 if (c - lc)/lc*100 > percent_l and lp > 0 else down_zero)), df['close'] ,df['lastp%sd' % da],df['per%sd' % da])
-                df['perlastp'] = map((lambda c, lc,op,m5a: (1 if ( ((c >= op) and ((c - lc)/lc*100 >= 0)) or (c >= op and c >=m5a) ) else down_dn)), df['close'], df['lastp%sd' % da],df['open'],df['ma5d'])
+                
+                # down_zero, down_dn, percent_l = 0, 0, 2
+                # df['perlastp'] = map((lambda c, lc,op,m5a,lh,ll,nh,nl: (1 if ( ((c >= op) and ((c - lc)/lc*100 >= 0)) or (c >= op and c >=m5a) ) else down_dn)), df['close'], df['lastp%sd' % da],df['open'],df['ma5d'])
 
+                df['perlastp'] = map(cct.func_compute_percd2, df['close'], df['lastp%sd' % da],df['open'],df['lasth%sd' % da],df['lastl%sd' % da],df['high'],df['low'])
+                # close, lastp, op, lasth, lastl, nowh, nowl
                 # nowd,per1d = 1 ,2
                 # df['per%sd' % per1d] = ((df['lastp%sd' % da] - df['close'].shift(per1d)) / df['close'].shift(per1d)).map(lambda x: round(x * 100, 2))
                 # df['perlastp'] = map(cct.func_compute_percd,df['close'], df['per%sd' % per1d], df['lastp%sd' % (nowd)], df['lasth%sd' % (nowd)], df['lastl%sd' % (nowd)], df['high'], df['low'])
@@ -2315,8 +2318,8 @@ def get_tdx_exp_low_or_high_price(code, dt=None, ptype='close', dl=None, end=Non
                     lowdate = dz[dz.close == lowp].index.values[-1]
                     log.debug("close:%s" % lowdate)
                 else:
-                    lowp = dz.low.min()
-                    lowdate = dz[dz.low == lowp].index.values[-1]
+                    lowp = dz.close.min()
+                    lowdate = dz[dz.close == lowp].index.values[-1]
                     log.debug("low:%s" % lowdate)
 
                 log.debug("date:%s %s:%s" % (lowdate, ptype, lowp))
@@ -2704,7 +2707,7 @@ def get_append_lastp_to_df(top_all, lastpTDX_DF=None, dl=ct.PowerCountdl, end=No
             '_' + end.replace('-', '') + '_' + 'all'
     else:
         h5_table = ptype + '_' + resample + '_' + str(dl) + '_' + filter + '_' + 'all'
-
+    
     # if newdays is not None:
     #     h5_table = h5_table + '_'+ str(newdays)
 

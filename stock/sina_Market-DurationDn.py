@@ -126,7 +126,7 @@ if __name__ == "__main__":
     parser = cct.MoniterArgmain()
     parserDuraton = cct.DurationArgmain()
     # market_sort_value, market_sort_value_key = ct.get_market_sort_value_key(ct.sort_value_key_perd)
-    market_sort_value, market_sort_value_key = ct.get_market_sort_value_key('2 3')
+    st_key_sort = '3 %s'%(cct.get_index_fibl())
 
     while 1:
         try:
@@ -163,13 +163,15 @@ if __name__ == "__main__":
 
                     # time_Rt = time.time()
                     print "term:%s" % (cct.get_terminal_Position(cmd='DurationDn.py')),
-                    if cct.get_terminal_Position(cmd='DurationDn.py') > 1:
-                        top_all, lastpTDX_DF = tdd.get_append_lastp_to_df(
-                            top_now, lastpTDX_DF=None, dl=duration_date, end=end_date, ptype=ptype, filter=filter, power=ct.lastPower, lastp=lastp, newdays=newdays, resample=resample)
-                    else:
-                        newdays = 0
-                        top_all, lastpTDX_DF = tdd.get_append_lastp_to_df(
-                            top_now, lastpTDX_DF=None, dl=duration_date, end=end_date, ptype=ptype, filter=filter, power=ct.lastPower, lastp=lastp, newdays=newdays, checknew=True, resample=resample)
+                    # if cct.get_terminal_Position(cmd='DurationDn.py') > 1:
+                    #     top_all, lastpTDX_DF = tdd.get_append_lastp_to_df(
+                    #         top_now, lastpTDX_DF=None, dl=duration_date, end=end_date, ptype=ptype, filter=filter, power=ct.lastPower, lastp=lastp, newdays=newdays, resample=resample)
+                    # else:
+                    newdays = 0
+                    top_all, lastpTDX_DF = tdd.get_append_lastp_to_df(
+                        top_now, lastpTDX_DF=None, dl=duration_date, end=end_date, ptype=ptype, filter=filter, power=ct.lastPower, lastp=lastp, newdays=newdays, checknew=True, resample=resample)
+                    
+
                     # codelist = top_all.index.tolist()
                     # log.info('toTDXlist:%s' % len(codelist))
                     # # tdxdata = tdd.get_tdx_all_day_LastDF(codelist,dt=duration_date,ptype=ptype)
@@ -216,6 +218,8 @@ if __name__ == "__main__":
                     top_all = cct.combine_dataFrame(top_all, top_now, col=None)
 
                 top_dif = top_all.copy()
+                market_sort_value, market_sort_value_key = ct.get_market_sort_value_key(st_key_sort, top_all=top_all)
+
                 if 'trade' in top_dif.columns:
                     top_dif['buy'] = (
                         map(lambda x, y: y if int(x) == 0 else x, top_dif['buy'].values, top_dif['trade'].values))
@@ -277,10 +281,10 @@ if __name__ == "__main__":
                     if ptype == 'low':
                         #                        top_dif = top_dif[top_dif.lvol > ct.LvolumeSize]
                         
-                        if cct.get_now_time_int() > 925 and cct.get_work_time():
-                            top_dif = top_dif[(top_dif.volume > ct.VolumeMinR) & (
-                                top_dif.volume < ct.VolumeMaxR)]
-                        # top_dif = top_dif[top_dif.lvol > 12000]
+                        # if cct.get_now_time_int() > 925 and cct.get_work_time():
+                        #     top_dif = top_dif[(top_dif.volume > ct.VolumeMinR) & (
+                        #         top_dif.volume < ct.VolumeMaxR)]
+
                         if 'couts' in top_dif.columns.values:
                             top_dif = top_dif.sort_values(by=['dff', 'percent', 'volume', 'couts', 'ratio'],
                                                           ascending=[0, 0, 0, 1, 1])
@@ -302,6 +306,7 @@ if __name__ == "__main__":
                     # top_all=top_all.sort_values(by=['percent','dff','couts','ratio'],ascending=[0,0,1,1])
                     # print cct.format_for_print(top_dif[:10])
                     # top_dd = pd.concat([top_dif[:5],top_temp[:3],top_dif[-3:],top_temp[-3:]], axis=0)
+                    
                     if percent_status == 'y' and (
                             cct.get_now_time_int() > 935 or cct.get_now_time_int() < 900) and ptype == 'low':
                         # top_dif = top_dif[top_dif.percent >= 0]
@@ -397,7 +402,7 @@ if __name__ == "__main__":
                     
                     top_dd = top_dd.loc[:, ct_Duration_format_Values]
 
-                    table,widths = cct.format_for_print(top_dd[:9],widths=True)
+                    table,widths = cct.format_for_print(top_dd[:10],widths=True)
                     print table
                     print cct.format_for_print(top_dd[-4:],header=False,widths=widths)
 
@@ -452,7 +457,8 @@ if __name__ == "__main__":
                 st_l = st.split()
                 st_k = st_l[0]
                 if st_k in ct.Market_sort_idx.keys() and len(top_all) > 0:
-                    market_sort_value, market_sort_value_key = ct.get_market_sort_value_key(st, top_all=top_all)
+                    st_key_sort = st
+                    market_sort_value, market_sort_value_key = ct.get_market_sort_value_key(st_key_sort, top_all=top_all)
                 else:
                     log.error("market_sort key error:%s" % (st))
                     cct.sleeprandom(5)

@@ -3,6 +3,7 @@
 
 import sys
 from feedutil import dataFramefeed
+import chantdxpower as chant
 sys.path.append("..")
 from JSONData import tdx_data_Day as tdd
 from JSONData import powerCompute as pct
@@ -18,9 +19,10 @@ log = LoggerFactory.log
 # log.setLevel(LoggerFactory.INFO)
 log.setLevel(LoggerFactory.WARN)
 
-def get_tdx_barfeed(code,start=None):
 
-    df = tdd.get_tdx_append_now_df_api(code,start=start)
+def get_tdx_barfeed(code, start=None, dl=30):
+    df = tdd.get_tdx_append_now_df_api(code, start=start)
+    # df2 = get_tdx_append_now_df_api(code=stock_code, start=start, end=end, dl=dl).sort_index(ascending=True)
     df.rename(columns={'vol': 'volume'}, inplace=True)
     df = df.sort_index(ascending=True)
     barfeed = dataFramefeed.Feed()
@@ -28,26 +30,27 @@ def get_tdx_barfeed(code,start=None):
     # print barfeed.get_dataFrame()
     return barfeed
 
-def get_power_status(code,tdx_df=None,dtype='d',start=None, end=None, filter='y',
-                            dl=60,ptype='low'):
-    opc,rac=0,0
+
+def get_power_status(code, tdx_df=None, dtype='d', start=None, end=None, filter='y',
+                     dl=60, ptype='low'):
+    opc, rac = 0, 0
     fib = 0
     # for ptype in ['low', 'high']:
     for ptype in ['low']:
-            op, ra, st, daysData  = pct.get_linear_model_status(
-                code, df=tdx_df, dtype=dtype, start=start, end=end, dl=dl, filter=filter, ptype=ptype)
-            # fib.append(str(daysData[0]))
-            opc += op
-            # print ra
-            rac += ra
-            if ptype == 'low':
-                stl = st
-                fibl = str(daysData[0])
-            else:
-                fib = str(daysData[0])
-        # fibl = sep.join(fib)
+        op, ra, st, daysData = pct.get_linear_model_status(
+            code, df=tdx_df, dtype=dtype, start=start, end=end, dl=dl, filter=filter, ptype=ptype)
+        # fib.append(str(daysData[0]))
+        opc += op
+        # print ra
+        rac += ra
+        if ptype == 'low':
+            stl = st
+            fibl = str(daysData[0])
+        else:
+            fib = str(daysData[0])
+    # fibl = sep.join(fib)
 
-    tdx_df,operation = getab.Get_BBANDS(tdx_df, dtype='d')
+    tdx_df, operation = getab.Get_BBANDS(tdx_df, dtype='d')
     # opc +=operation
     # if opc > 21:
     #     opc = 21
@@ -56,27 +59,28 @@ def get_power_status(code,tdx_df=None,dtype='d',start=None, end=None, filter='y'
     # df.loc[code,'ma5'] = daysData[1].ma5d[0]
     # print tdx_df[:1].ma5d[0],daysData[1].ma5d[0]
 
-    tdx_df,opkdj = getab.Get_KDJ(tdx_df, dtype='d')
-    tdx_df,opmacd = getab.Get_MACD_OP(tdx_df, dtype='d')
-    tdx_df,oprsi = getab.Get_RSI(tdx_df, dtype='d')
+    tdx_df, opkdj = getab.Get_KDJ(tdx_df, dtype='d')
+    tdx_df, opmacd = getab.Get_MACD_OP(tdx_df, dtype='d')
+    tdx_df, oprsi = getab.Get_RSI(tdx_df, dtype='d')
     opma = getab.algoMultiDay(tdx_df)
     # df = getab.Get_BBANDS(df, dtype='d')
     #'volume', 'ratio', 'counts','ldate' -> 'ma','macd','rsi','kdj'
-    return int(opc),(rac),int(fib),int(fibl),stl,int(operation),int(opkdj),int(opmacd),int(oprsi),int(opma)
+    return int(opc), (rac), int(fib), int(fibl), stl, int(operation), int(opkdj), int(opmacd), int(oprsi), int(opma)
 
 # status
 stock_up = 1
 stock_down = 0
 
-def get_duration_filter(code, df=None, dtype='d', start=None, end=None,dl=None, filter=True,ptype='low',power=True):
+
+def get_duration_filter(code, df=None, dtype='d', start=None, end=None, dl=None, filter=True, ptype='low', power=True):
     if start is not None and end is None and filter:
         index_d = cct.day8_to_day10(start)
-        start = tdd.get_duration_price_date(code, ptype=ptype, dt=start, df=df,dl=dl,power=power)
+        start = tdd.get_duration_price_date(code, ptype=ptype, dt=start, df=df, dl=dl, power=power)
         log.debug("start is not None start: %s  index_d:%s" % (start, index_d))
     elif end is not None and filter:
-        df = tdd.get_tdx_append_now_df_api(code, start=start, end=end,df=df,dl=dl,power=power).sort_index(ascending=True)
+        df = tdd.get_tdx_append_now_df_api(code, start=start, end=end, df=df, dl=dl, power=power).sort_index(ascending=True)
         index_d = cct.day8_to_day10(start)
-        start = tdd.get_duration_price_date(code, ptype=ptype, dt=start, df=df,dl=dl, power=power)
+        start = tdd.get_duration_price_date(code, ptype=ptype, dt=start, df=df, dl=dl, power=power)
         df = df[df.index >= start]
         if len(df) > 2 and dl is None:
             if df.index.values[0] < index_d:
@@ -84,22 +88,22 @@ def get_duration_filter(code, df=None, dtype='d', start=None, end=None,dl=None, 
     if dl is not None:
         if power:
             start, index_d, df = tdd.get_duration_price_date(
-                code, ptype=ptype, dl=dl, filter=False, df=df,power=True)
+                code, ptype=ptype, dl=dl, filter=False, df=df, power=True)
         else:
             start, index_d = tdd.get_duration_price_date(
-                code, ptype=ptype, dl=dl, filter=False, df=df,power=False)
+                code, ptype=ptype, dl=dl, filter=False, df=df, power=False)
         log.debug("dl not None code:%s start: %s  index_d:%s" % (code, start, index_d))
 
-    if len(df) > 0 and  df is not None:
+    if len(df) > 0 and df is not None:
         df = df.sort_index(ascending=True)
         df = df[df.index >= start]
 
-    if len(df) ==0 or df is None :
+    if len(df) == 0 or df is None:
         if start is not None and len(start) > 8 and int(start[:4]) > 2500:
             log.warn("code:%s ERROR:%s" % (code, start))
             start = '2016-01-01'
         df = tdd.get_tdx_append_now_df_api(
-            code, start,end).sort_index(ascending=True)
+            code, start, end).sort_index(ascending=True)
         if start is None:
             start = df.index.values[0]
         if len(df) > 2 and dl is None and start is not None and filter:
@@ -111,7 +115,8 @@ def get_duration_filter(code, df=None, dtype='d', start=None, end=None,dl=None, 
             df, dtype).sort_index(ascending=True)
     return df
 
-def get_linear_model_ratio(asset, type='M', nowP=None,days=1,only=False):
+
+def get_linear_model_ratio(asset, type='M', nowP=None, days=1, only=False):
     asset = asset.sort_index(ascending=True)
     price_status = stock_down
     if only and days > 0:
@@ -130,22 +135,22 @@ def get_linear_model_ratio(asset, type='M', nowP=None,days=1,only=False):
         ratio = 0
     operation = 0
     if Y_hat[-1] > Y_hat[0]:
-        log.info("status up np:%0.2f now:%.2f head:%.2f dt:%s"%(asset[-1],Y_hat[-1],Y_hat[0],asset.index[-1]))
+        log.info("status up np:%0.2f now:%.2f head:%.2f dt:%s" % (asset[-1], Y_hat[-1], Y_hat[0], asset.index[-1]))
         price_status = stock_up
         if type.upper() == 'M':
             Y_Future = X * b + a
-            log.info("mid:%.2f"%(Y_Future[-1]))
+            log.info("mid:%.2f" % (Y_Future[-1]))
         elif type.upper() == 'L':
             i = (asset.values.T - Y_hat).argmin()
             c_low = X[i] * b + a - asset.values[i]
             Y_Future = X * b + a - c_low
-            log.info("Bottom:%.2f"%(Y_Future[-1]))
+            log.info("Bottom:%.2f" % (Y_Future[-1]))
 
         elif type.upper() == 'H':
             i = (asset.values.T - Y_hat).argmax()
             c_high = X[i] * b + a - asset.values[i]
             Y_Future = X * b + a - c_high
-            log.info("Top:%.2f"%(Y_Future[-1]))
+            log.info("Top:%.2f" % (Y_Future[-1]))
 
         if nowP is not None:
             diff = nowP - Y_Future[-1]
@@ -153,9 +158,9 @@ def get_linear_model_ratio(asset, type='M', nowP=None,days=1,only=False):
             diff = asset[-1] - Y_Future[-1]
         if diff > 0:
             operation += 1
-        return operation, ratio,price_status
+        return operation, ratio, price_status
     else:
-        log.info("status down np:%0.2f now:%.2f head:%.2f dt:%s"%(asset[-1],Y_hat[-1],Y_hat[0],asset.index[-1]))
+        log.info("status down np:%0.2f now:%.2f head:%.2f dt:%s" % (asset[-1], Y_hat[-1], Y_hat[0], asset.index[-1]))
         price_status = stock_down
 
         if type.upper() == 'M':
@@ -177,31 +182,30 @@ def get_linear_model_ratio(asset, type='M', nowP=None,days=1,only=False):
             pass
         else:
             operation -= 1
-        return operation, ratio,price_status
+        return operation, ratio, price_status
 
 
-def get_linear_model_rule(code,df=None,dl=30,type='M', nowP=None,days=1,only=False,ptype='low'):
+def get_linear_model_rule(code, df=None, dl=30, type='M', nowP=None, days=1, only=False, ptype='low'):
 
     # if isinstance(code,str) or isinstance(code,int):
     dd = []
     if ptype == 'high':
-        dd = get_duration_filter(code,df=df,dl=dl,ptype=ptype)
+        dd = get_duration_filter(code, df=df, dl=dl, ptype=ptype)
         if len(dd) == 1:
-            df = get_duration_filter(code,df=df,dl=dl,ptype='low')
+            df = get_duration_filter(code, df=df, dl=dl, ptype='low')
         else:
             df = dd
     else:
-        df = get_duration_filter(code,df=df,dl=dl,ptype=ptype)
+        df = get_duration_filter(code, df=df, dl=dl, ptype=ptype)
 
     if len(df) < 2:
-        return 10,10,10,len(df)
-
+        return 10, 10, 10, len(df)
 
     if ptype == 'high':
         if len(dd) == 1:
             statusdl = len(dd)
         else:
-            statusdl  = len(df)
+            statusdl = len(df)
     else:
         statusdl = len(df)
 
@@ -227,18 +231,18 @@ def get_linear_model_rule(code,df=None,dl=30,type='M', nowP=None,days=1,only=Fal
             ratio = 0
 
         Y_FutureM = X * b + a
-        log.debug("mid:%.2f"%(Y_FutureM[-1]))
+        log.debug("mid:%.2f" % (Y_FutureM[-1]))
 
         i = (asset.values.T - Y_hat).argmin()
         c_low = X[i] * b + a - asset.values[i]
         Y_FutureL = X * b + a - c_low
-        log.debug("Bottom:%.2f"%(Y_FutureL[-1]))
+        log.debug("Bottom:%.2f" % (Y_FutureL[-1]))
 
         i = (asset.values.T - Y_hat).argmax()
         c_high = X[i] * b + a - asset.values[i]
         Y_FutureH = X * b + a - c_high
 
-        log.debug("Top:%.2f"%(Y_FutureH[-1]))
+        log.debug("Top:%.2f" % (Y_FutureH[-1]))
 
         if nowP is not None:
             diff = nowP - Y_FutureM[-1]
@@ -252,35 +256,36 @@ def get_linear_model_rule(code,df=None,dl=30,type='M', nowP=None,days=1,only=Fal
         if Y_hat[-1] > Y_hat[0]:
             if diff > 0:
                 operation += 1
-            if diff_h > 0 :
+            if diff_h > 0:
                 operation += 1
-            if diff_l > 0 :
+            if diff_l > 0:
                 operation += 1
-            log.debug("status up nowp:%0.2f nY_hat:%.2f head:%.2f dt:%s"%(asset[-1],Y_hat[-1],Y_hat[0],asset.index[-1]))
+            log.debug("status up nowp:%0.2f nY_hat:%.2f head:%.2f dt:%s" % (asset[-1], Y_hat[-1], Y_hat[0], asset.index[-1]))
             price_status = stock_up
         else:
             if statusdl > 1 and diff < 0:
                 operation -= 1
-            if statusdl > 1 and diff_h < 0 :
+            if statusdl > 1 and diff_h < 0:
                 operation -= 1
-            if statusdl > 1 and diff_l < 0 :
+            if statusdl > 1 and diff_l < 0:
                 operation -= 1
                 # log.debug("status down nowp:%0.2f nY_hat:%.2f head:%.2f dt:%s"%(asset[-1],Y_hat[-1],Y_hat[0],asset.index[-1]))
                 # log.debug("nowdfp:%.2f start:%s end:%s"%(df[-1],asset.index[0],asset.index[-1]))
                 # log.debug("Yhat ra:%0.2f X:%s b:%.3f a:%.2f c_low:%.2f c_high:%.2f dt:%s"%(ratio,[-1],b,a,c_low,c_high,asset.index[0]))
 
     # return price_status,round(ratio,2),statusdl
-    return operation,round(ratio,2),price_status,statusdl
+    return operation, round(ratio, 2), price_status, statusdl
+
 
 def get_linear_model_status(code, df=None, dtype='d', type='m', start=None, end=None, days=1, filter='n',
-                            dl=None, countall=True, ptype='low',power=True):
+                            dl=None, countall=True, ptype='low', power=True):
     """[pct test get_linear_model_status]
-    
+
     [description]
-    
+
     Arguments:
         code {[type]} -- [description]
-    
+
     Keyword Arguments:
         df {[type]} -- [description] (default: {None})
         dtype {str} -- [description] (default: {'d'})
@@ -293,18 +298,18 @@ def get_linear_model_status(code, df=None, dtype='d', type='m', start=None, end=
         countall {bool} -- [description] (default: {True})
         ptype {str} -- [description] (default: {'low'})
         power {bool} -- [description] (default: {True})
-    
+
     Returns:
         [type] -- [description]
     """
     if start is not None and end is None and filter == 'y':
         index_d = cct.day8_to_day10(start)
-        start = tdd.get_duration_price_date(code, ptype=ptype, dt=start, df=df,dl=dl,power=power)
+        start = tdd.get_duration_price_date(code, ptype=ptype, dt=start, df=df, dl=dl, power=power)
         log.debug("start is not None start: %s  index_d:%s" % (start, index_d))
     elif end is not None and filter == 'y':
-        df = tdd.get_tdx_append_now_df_api(code, start=start, end=end,df=df,dl=dl,power=power).sort_index(ascending=True)
+        df = tdd.get_tdx_append_now_df_api(code, start=start, end=end, df=df, dl=dl, power=power).sort_index(ascending=True)
         index_d = cct.day8_to_day10(start)
-        start = tdd.get_duration_price_date(code, ptype=ptype, dt=start, df=df,dl=dl, power=power)
+        start = tdd.get_duration_price_date(code, ptype=ptype, dt=start, df=df, dl=dl, power=power)
         df = df[df.index >= start]
         if len(df) > 2 and dl is None:
             if df.index.values[0] < index_d:
@@ -312,22 +317,22 @@ def get_linear_model_status(code, df=None, dtype='d', type='m', start=None, end=
     if dl is not None:
         if power:
             start, index_d, df = tdd.get_duration_price_date(
-                code, ptype=ptype, dl=dl, filter=False, df=df,power=power)
+                code, ptype=ptype, dl=dl, filter=False, df=df, power=power)
         else:
             start, index_d = tdd.get_duration_price_date(
-                code, ptype=ptype, dl=dl, filter=False, df=df,power=power)
+                code, ptype=ptype, dl=dl, filter=False, df=df, power=power)
         log.debug("dl not None code:%s start: %s  index_d:%s" % (code, start, index_d))
 
-    if len(df) > 0 and  df is not None:
+    if len(df) > 0 and df is not None:
         df = df.sort_index(ascending=True)
         df = df[df.index >= start]
 
-    if len(df) ==0 or df is None :
+    if len(df) == 0 or df is None:
         if start is not None and len(start) > 8 and int(start[:4]) > 2500:
             log.warn("code:%s ERROR:%s" % (code, start))
             start = '2016-01-01'
         df = tdd.get_tdx_append_now_df_api(
-            code, start,end).sort_index(ascending=True)
+            code, start, end).sort_index(ascending=True)
         if start is None:
             start = df.index.values[0]
         if len(df) > 2 and dl is None and start is not None and filter == 'y':
@@ -337,7 +342,6 @@ def get_linear_model_status(code, df=None, dtype='d', type='m', start=None, end=
     if not dtype == 'd':
         df = tdd.get_tdx_stock_period_to_type(
             df, dtype).sort_index(ascending=True)
-
 
     df = df.fillna(0)
     if len(df) > 1 + days:
@@ -354,55 +358,86 @@ def get_linear_model_status(code, df=None, dtype='d', type='m', start=None, end=
             assetratio = asset
             nowpratio = df['close'][-days] if len(df) > 1 + days else None
             # print assetratio
-            op, ratio_l,status,sdl= get_linear_model_rule(code,df=assetratio, nowP=nowpratio,ptype=ptype)
+            op, ratio_l, status, sdl = get_linear_model_rule(code, df=assetratio, nowP=nowpratio, ptype=ptype)
             # print op,ratio,status,sdl
             # ratio_l.append(round(ratio, 2))
             operationcount += op
         else:
             assetratio = asset
             nowpratio = df['close'][-days] if len(df) > 1 + days else None
-            op, ratio_l,status,sdl = get_linear_model_rule(code,df=assetratio, nowP=nowpratio,ptype=ptype)
+            op, ratio_l, status, sdl = get_linear_model_rule(code, df=assetratio, nowP=nowpratio, ptype=ptype)
             # ratio_l.append(round(ratio, 2))
             operationcount += op
 
-        return operationcount, (ratio_l), df[:1].index.values[0], [len(df),df[:1]]
+        return operationcount, (ratio_l), df[:1].index.values[0], [len(df), df[:1]]
 
     elif len(asset) == 1:
         ## log.error("powerCompute code:%s"%(code))
         if ptype == 'high':
             if df.close[-1] >= df.high[-1] * 0.99 and df.close[-1] >= df.open[-1]:
-                return 12, 0, df.index.values[0], [len(df),df[:1]]
+                return 12, 0, df.index.values[0], [len(df), df[:1]]
 
             elif df.close[-1] > df.open[-1]:
                 if df.close[-1] > df.high[-1] * 0.97:
                     if len(df) > 2 and df.close[-1] > df.close[-2]:
-                        return 10, 0, df.index.values[0], [len(df),df[:1]]
+                        return 10, 0, df.index.values[0], [len(df), df[:1]]
                     else:
-                        return 11, 0, df.index.values[0], [len(df),df[:1]]
+                        return 11, 0, df.index.values[0], [len(df), df[:1]]
                 else:
-                    return 9, 0, df.index.values[0], [len(df),df[:1]]
+                    return 9, 0, df.index.values[0], [len(df), df[:1]]
             else:
                 if len(df) >= 2:
                     if df.close[-1] > df.close[-2] * 1.01:
-                        return 9, 0, df.index.values[0], [len(df),df[:1]]
+                        return 9, 0, df.index.values[0], [len(df), df[:1]]
                     elif df.close[-1] > df.close[-2]:
-                        return 8, 0, df.index.values[0], [len(df),df[:1]]
+                        return 8, 0, df.index.values[0], [len(df), df[:1]]
                     elif df.low[-1] > df.low[-2]:
-                        return 6, 0, df.index.values[0], [len(df),df[:1]]
+                        return 6, 0, df.index.values[0], [len(df), df[:1]]
                     else:
-                        return 3, 0, df.index.values[0], [len(df),df[:1]]
+                        return 3, 0, df.index.values[0], [len(df), df[:1]]
                 else:
-                    return 1, 0, df.index.values[0], [len(df),df[:1]]
+                    return 1, 0, df.index.values[0], [len(df), df[:1]]
         else:
-            return -10, 0, df.index.values[0], [len(df),df[:1]]
+            return -10, 0, df.index.values[0], [len(df), df[:1]]
     else:
         if ptype == 'high':
-            return 13, 1, cct.get_today(), [len(df),df[:1]]
+            return 13, 1, cct.get_today(), [len(df), df[:1]]
         else:
-            return -10, -10, cct.get_today(), [len(df),df[:1]]
+            return -10, -10, cct.get_today(), [len(df), df[:1]]
 
-def get_diff_index(code,df=None,start=None,end=None,dl=None,dtype='d',ptype='close'):
-    df = get_duration_filter(code,df=df,dl=dl,ptype=ptype)
+
+def get_ene_status(code, df=None, start=None, end=None, dl=None, dtype='d', ptype='close'):
+
+    # df = get_duration_filter(code,df=df,dl=dl,ptype=ptype)
+    if not dtype == 'd':
+        df = tdd.get_tdx_stock_period_to_type(df, dtype).sort_index(ascending=True)
+
+    chan_status = chant.show_chan_mpl_power(code, resample=dtype, show_mpl=False, least_init=2, chanK_flag=False, windows=20, power=True, fb_show=0, df=df)
+    
+    df['upper'] = map(lambda x: round((1 + 11.0 / 100) * x, 1), df.ma10d)
+    df['lower'] = map(lambda x: round((1 - 9.0 / 100) * x, 1), df.ma10d)
+    df['ene'] = map(lambda x, y: round((x + y) / 2, 1), df.upper, df.lower)
+
+    stsc = df[-1:][df.close > df.ene]
+    
+    # stsh = df[-1:][df.high > df.ene]
+    # stsl = df[-1:][df.low > df.ene]
+    # if len(stsc) > 0 and len(stsh) > 0 and len(stsl) > 0:
+    if len(stsc) > 0:
+        print "stsc1:", len(stsc)
+        return 1
+    else:
+        stsc2 = df[-2:][df.close > df.upper]
+        stsc = df[-1:][df.close > df.upper]
+        print "dn stsc1:", len(stsc),len(stsc2)
+        # stsh = df[-1:][df.high > df.upper]
+        # stsl = df[-1:][df.low > df.upper] 
+        if len(stsc2) > 0 and len(stsc) == 0:
+            return 0
+
+
+def get_diff_index(code, df=None, start=None, end=None, dl=None, dtype='d', ptype='close'):
+    df = get_duration_filter(code, df=df, dl=dl, ptype=ptype)
     if not dtype == 'd':
         df = tdd.get_tdx_stock_period_to_type(df, dtype).sort_index(ascending=True)
 
@@ -426,7 +461,7 @@ def get_diff_index(code,df=None,start=None,end=None,dl=None,dtype='d',ptype='clo
             code2 = '399001'
         start = asset.index[0]
         # print start,end
-        df1 = tdd.get_tdx_append_now_df_api(code2,start=start,end=end).sort_index(ascending=True)
+        df1 = tdd.get_tdx_append_now_df_api(code2, start=start, end=end).sort_index(ascending=True)
         if not dtype == 'd':
             df1 = tdd.get_tdx_stock_period_to_type(df1, dtype).sort_index(ascending=True)
         # print df1,asset
@@ -451,10 +486,10 @@ def get_diff_index(code,df=None,start=None,end=None,dl=None,dtype='d',ptype='clo
             code2 = '399006'
         if code2.startswith('3990'):
             start = asset.index[0]
-            df1 = tdd.get_tdx_append_now_df_api(code2, start=start,end=end).sort_index(ascending=True)
+            df1 = tdd.get_tdx_append_now_df_api(code2, start=start, end=end).sort_index(ascending=True)
             if len(df1) < int(len(df) / 4):
                 code2 = '399001'
-                df1 = tdd.get_tdx_append_now_df_api(code2, start=start,end=end).sort_index(ascending=True)
+                df1 = tdd.get_tdx_append_now_df_api(code2, start=start, end=end).sort_index(ascending=True)
 
         if not dtype == 'd':
             df1 = tdd.get_tdx_stock_period_to_type(df1, dtype).sort_index(ascending=True)
@@ -472,16 +507,19 @@ def get_diff_index(code,df=None,start=None,end=None,dl=None,dtype='d',ptype='clo
     # log.info("code2:%s"%(code2))
     asset2 = asset.apply(lambda x: round(x / asset[:1], 3))
     # print asset.index[-1],asset1.index[-1]
-    log.info("code:%s codeR:%s index:%s coden:%s codeRn:%s indexn:%s"%(round(asset[0],2),asset2[0],asset1[0],round(asset[-1],2),round(asset2[-1],2),asset1[-1]))
+    log.info("code:%s codeR:%s index:%s coden:%s codeRn:%s indexn:%s" %
+             (round(asset[0], 2), asset2[0], asset1[0], round(asset[-1], 2), round(asset2[-1], 2), asset1[-1]))
 
-    return round(asset2[-1],3),round(asset1[-1],3)
+    return round(asset2[-1], 3), round(asset1[-1], 3)
     # return False
-def LDS( A ):
-    m = [0] * len( A ) # starting with m = [1] * len( A ) is not necessary
-    for x in range( len( A ) - 2, -1, -1 ):
-        for y in range( len( A ) - 1, x, -1 ):
-          if m[x] <= m[y] and A[x] > A[y]:
-            m[x] = m[y] + 1 # or use m[x]+=1
+
+
+def LDS(A):
+    m = [0] * len(A)  # starting with m = [1] * len( A ) is not necessary
+    for x in range(len(A) - 2, -1, -1):
+        for y in range(len(A) - 1, x, -1):
+            if m[x] <= m[y] and A[x] > A[y]:
+                m[x] = m[y] + 1  # or use m[x]+=1
 
     #===================================================================
     # Use the following snippet or the one line below to get max_value
@@ -490,15 +528,16 @@ def LDS( A ):
     #  if max_value < m[i]:
     #    max_value = m[i]
     #===================================================================
-    max_value = max( m )
+    max_value = max(m)
 
     result = []
-    for i in range( len( m ) ):
+    for i in range(len(m)):
         if max_value == m[i]:
-          result.append( A[i] )
-          max_value -= 1
+            result.append(A[i])
+            max_value -= 1
 
     return result
+
 
 def LIS(X):
     N = len(X)
@@ -549,7 +588,7 @@ def detect_peaks_lis(df):
     bP = []
     for i in range(1, len(highp) - 1):
         if highp[i] <= highp[i - 1] and highp[i] < highp[i + 1] and lowp[i] <= lowp[i - 1] and lowp[i] < lowp[
-                    i + 1]:
+                i + 1]:
             bV.append(lowp[i])
             bP.append(i)
 
@@ -559,11 +598,11 @@ def detect_peaks_lis(df):
     for i in range(len(p)):
         idx.append(bP[p[i]])
 
-    return d,idx
+    return d, idx
+
 
 def detect_peaks(x, mph=None, mpd=1, threshold=0, edge='rising',
                  kpsh=False, valley=False, show=False, ax=None):
-
     """Detect peaks in data based on their amplitude and other features.
 
     Parameters
@@ -665,18 +704,18 @@ def detect_peaks(x, mph=None, mpd=1, threshold=0, edge='rising',
     # handle NaN's
     if ind.size and indnan.size:
         # NaN's and values close to NaN's cannot be peaks
-        ind = ind[np.in1d(ind, np.unique(np.hstack((indnan, indnan-1, indnan+1))), invert=True)]
+        ind = ind[np.in1d(ind, np.unique(np.hstack((indnan, indnan - 1, indnan + 1))), invert=True)]
     # first and last values of x cannot be peaks
     if ind.size and ind[0] == 0:
         ind = ind[1:]
-    if ind.size and ind[-1] == x.size-1:
+    if ind.size and ind[-1] == x.size - 1:
         ind = ind[:-1]
     # remove peaks < minimum peak height
     if not valley and ind.size and mph is not None:
         ind = ind[x[ind] >= mph]
     # remove peaks - neighbors < threshold
     if ind.size and threshold > 0:
-        dx = np.min(np.vstack([x[ind]-x[ind-1], x[ind]-x[ind+1]]), axis=0)
+        dx = np.min(np.vstack([x[ind] - x[ind - 1], x[ind] - x[ind + 1]]), axis=0)
         ind = np.delete(ind, np.where(dx < threshold)[0])
     # detect small peaks closer than minimum peak distance
     if ind.size and mpd > 1:
@@ -697,7 +736,7 @@ def detect_peaks(x, mph=None, mpd=1, threshold=0, edge='rising',
         if valley:
             x = -x
         from pylab import plt
-        print x ,x[ind]
+        print x, x[ind]
         # fig = plt.figure(figsize=(4,4))
         # ax = fig.add_subplot(111)
         # plt.plot(x, mph, mpd, threshold, edge, valley, ax, ind)
@@ -706,42 +745,39 @@ def detect_peaks(x, mph=None, mpd=1, threshold=0, edge='rising',
         # ax.plot(intx,'k', alpha=0.9)
         # ax.annotate(r'xx',xy = (ind,intx[ind]))
         # ax.plot([ind,intx[ind]],'k')
-        plt.plot(x,'b-')
-        plt.plot(ind,x[ind],'r*',markersize=9)
+        plt.plot(x, 'b-')
+        plt.plot(ind, x[ind], 'r*', markersize=9)
         # plt.axes()
         plt.show(block=True)
         # plt.show(block=False)
 
-    return ind,x[ind]
+    return ind, x[ind]
 
 
 if __name__ == "__main__":
     # df = tdd.get_tdx_append_now_df_api('399006',start=20160912)
-#    df = tdd.get_tdx_append_now_df_api('399006',dl=30)
+    #    df = tdd.get_tdx_append_now_df_api('399006',dl=30)
     # print df[-1:]
     code = '999999'
     # code = '999999'
-    df = tdd.get_tdx_append_now_df_api(code,dl=60).sort_index(ascending=True)
+    df = tdd.get_tdx_append_now_df_api(code, dl=60).sort_index(ascending=True)
     # ind = detect_peaks(df.close, mph=0,mpd=10,edge='falling',show=True)
-    
-    
-    print detect_peaks(df.close, mph=0,mpd=2,valley=False,show=True)
-    print detect_peaks(df.close, mph=0,mpd=2,valley=True,show=True)
+
+    print detect_peaks(df.close, mph=0, mpd=2, valley=False, show=True)
+    print detect_peaks(df.close, mph=0, mpd=2, valley=True, show=True)
     sys.exit(0)
     print LDS(df.close)
-    
+
     # print detect_peaks(df.close, mph=0,mpd=3,threshold=0,valley=False,show=False)
-    
 
     print detect_peaks_lis(df)
-
 
     # ind = detect_peaks(df.close,show=True)
     # print get_diff_index(code,dl=10)
     # print get_linear_model_status(code,dl=30,days=1)
     # print get_linear_model_status(code,dl=30,days=1,ptype='high')
-    print get_linear_model_rule(code,days=1,dl=10,only=False,ptype='low')
-    print get_linear_model_rule(code,days=1,dl=10,only=False,ptype='high')
+    print get_linear_model_rule(code, days=1, dl=10, only=False, ptype='low')
+    print get_linear_model_rule(code, days=1, dl=10, only=False, ptype='high')
 
     # print get_duration_filter(code,dl=20,ptype='low')[-1:]
 #    print get_linear_model_rule(df.close,type='M',days=1,only=True)

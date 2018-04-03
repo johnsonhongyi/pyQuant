@@ -133,9 +133,8 @@ if __name__ == "__main__":
     # all_diffpath = tdd.get_tdx_dir_blocknew() + '062.blk'
     
     # market_sort_value, market_sort_value_key = ct.get_market_sort_value_key(ct.sort_value_key_perd)
-    st_key_sort = '4'
+    st_key_sort = '3 %s'%(cct.get_index_fibl())
     # st_key_sort = ct.sort_value_key_perd
-    market_sort_value, market_sort_value_key = ct.get_market_sort_value_key(st_key_sort)
     while 1:
         try:
             # top_now = tdd.getSinaAlldf(market='sh', vol=ct.json_countVol, vtype=ct.json_countType)
@@ -198,7 +197,8 @@ if __name__ == "__main__":
                     #                 symbol, 'buy':'low']
                     top_all = cct.combine_dataFrame(top_all, top_now, col=None)
                 top_dif = top_all.copy()
-
+                market_sort_value, market_sort_value_key = ct.get_market_sort_value_key(st_key_sort, top_all=top_all)
+                
                 top_dif = top_dif[top_dif.lvol > ct.LvolumeSize]
                 # if top_dif[:1].llow.values <> 0:
                 # if not (cct.get_now_time_int() > 915 and cct.get_now_time_int() <= 925):
@@ -294,7 +294,7 @@ if __name__ == "__main__":
                     top_temp2 = top_end.sort_values(by=(market_sort_value2), ascending=market_sort_value_key2)
                     
                     top_dd = cct.combine_dataFrame(top_temp.loc[:, ct_MonitorMarket_Values][:9], top_temp2.loc[:, ct_MonitorMarket_Values2][:4],append=True, clean=True)
-                    
+
                     # top_dd = pd.concat([top_temp.loc[:, ct_MonitorMarket_Values][:9], top_temp.loc[:, ct_MonitorMarket_Values][-4:]], axis=0)
 
                     # print cct.format_for_print(topdd)

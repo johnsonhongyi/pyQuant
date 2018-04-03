@@ -14,7 +14,7 @@ from pyalgotrade.broker.backtesting import TradePercentage
 from pyalgotrade.technical import bollinger
 import sys
 sys.path.append("..")
-from JSONData import tdx_data_Day as tdd
+# from JSONData import tdx_data_Day as tdd
 import powerTech as ptc
 from JohnsonUtil import LoggerFactory as LoggerFactory
 # log = LoggerFactory.getLogger("tutest")
@@ -67,10 +67,9 @@ class BBands(strategy.BacktestingStrategy):
     def getFeed(self,dt=None):
         if dt is None:
             dt = self.getlastDate()
-        # df = self.feed
-        dd = self.feed[self.feed.index <= str(dt)]
-        # print "df:%s dt:%s"%(len(dd),dt)
+        dd = self.feed[self.feed.index <= str(dt)][-self.dl:]
         return dd
+
     def getlastDate(self):
         return str(self.datetime[-1])[:10]
 
@@ -106,47 +105,41 @@ class BBands(strategy.BacktestingStrategy):
         #     else:
         #         return 2
     def trendstatus(self):
-        opl, ral,statusl,statusdl = ptc.get_linear_model_rule(self.__instrument,self.getFeed(),dl=self.dl,ptype='low')
-        self.ral.append(ral)
-        self.statusl.append(statusdl)
-        oph, rah,statush,statusdh = ptc.get_linear_model_rule(self.__instrument,self.getFeed(),dl=int(self.dl*0.618),ptype='high')
-        self.rah.append(rah)
-        self.statush.append(statusdh)
-        print ("opl:%s oph:%s ral:%s rah:%s sl:%s sh:%s sdl:%s sdh:%s %s %.2f"%(opl,oph,ral,rah,statusl,statush,statusdl,statusdh,self.getlastDate(),self.close[-1]))
-        if statusl and opl > 0 and len(self.ral) > 1 and len(self.statush) > 1:
-            if opl > 0:
-                if ral > 0 :
-                    # if self.statush[-1] < self.statush[-2] and self.rah[-1] > self.rah[-2]:
-                    if self.statush[-1] < self.statush[-2] :
-                        if oph < 0:
-                            return 1
-                    elif self.statush[-1] == 1:
-                        return 2
-                    elif self.statush[-1] > self.statush[-2] and self.rah[-1] < self.rah[-2] and opl < 6:
-                        return 0
-                    # and ras[-1] > ras[-2] and ras[-2] > ras[-3]
-                    # if len(self.rah) > 1:
-                        # log.debug("ral:%s  %s  %s rah:%s %s %s"%(self.ral[-1],self.ral[-2],self.ral[-3],self.rah[-1],self.rah[-2],self.rah[-3]))
-                    # else:
-                    # if len(self.rah) > 2:
-                    #     self.debug("ral:%s  %s  %s rah:%s %s %s"%(self.ral[-1],self.ral[-2],self.ral[-3],self.rah[-1],self.rah[-2],self.rah[-3]))
-                    # else:
-                    #     self.debug("ral:%s  %s  %s "%(self.ral[-1],self.ral[-2],self.ral[-3]))
+        # opl, ral,statusl,statusdl = ptc.get_linear_model_rule(self.__instrument,self.getFeed(),dl=self.dl,ptype='low')
+        # self.ral.append(ral)
+        # self.statusl.append(statusdl)
+        # oph, rah,statush,statusdh = ptc.get_linear_model_rule(self.__instrument,self.getFeed(),dl=int(self.dl*0.618),ptype='high')
+        # self.rah.append(rah)
+        # self.statush.append(statusdh)
+        # print ("opl:%s oph:%s ral:%s rah:%s sl:%s sh:%s sdl:%s sdh:%s %s %.2f"%(opl,oph,ral,rah,statusl,statush,statusdl,statusdh,self.getlastDate(),self.close[-1]))
+        
+        # if statusl and opl > 0 and len(self.ral) > 1 and len(self.statush) > 1:
+        #     if opl > 0:
+        #         if ral > 0 :
+        #             # if self.statush[-1] < self.statush[-2] and self.rah[-1] > self.rah[-2]:
+        #             if self.statush[-1] < self.statush[-2] :
+        #                 if oph < 0:
+        #                     return 1
+        #             elif self.statush[-1] == 1:
+        #                 return 2
+        #             elif self.statush[-1] > self.statush[-2] and self.rah[-1] < self.rah[-2] and opl < 6:
+        #                 return 0
 
-                else:
-                    self.info("status 1 ra < 0  :%s  %s %s"%(self.ral[-1],self.ral[-2],self.ral[-3]))
-                    return 0
-        else:
-            # if len(self.ral) > 2 and statusdh < 4:
-            #     if ral > 0 and abs(ral)  > abs(rah):
-            #         self.info("status 0 ra >0 :%s  %s %s"%(self.ral[-1],self.ral[-2],self.ral[-3]))
-            #         return  2
-            #     else:
-            #         self.info("status 0 ra < 0 :%s  %s %s"%(self.ral[-1],self.ral[-2],self.ral[-3]))
-            #         return 0
-            # else:
-            return 0
+        #         else:
+        #             self.info("status 1 ra < 0  :%s  %s %s"%(self.ral[-1],self.ral[-2],self.ral[-3]))
+        #             return 0
+        # else:
+        #     return 0
 
+        # df['upper'] = map(lambda x: round((1 + 11.0 / 100) * x, 1), df.ma10d)
+        # df['lower'] = map(lambda x: round((1 - 9.0 / 100) * x, 1), df.ma10d)
+        # df['ene'] = map(lambda x, y: round((x + y) / 2, 1), df.upper, df.lower)
+        # get_ene_status(self.__instrument,self.getFeed(),dl=self.dl,ptype='low')
+
+        ene_stats = ptc.get_ene_status(self.__instrument,self.getFeed(),end=self.getlastDate(),dl=int(self.dl))
+        # if  len(ene_stats) > 0:
+        return ene_stats
+        
     def buyCon1(self):
         buyC2 = self.buyCon2()
         if buyC2 == 1:
@@ -211,7 +204,8 @@ class BBands(strategy.BacktestingStrategy):
 #            return True
 
     def sellCon1(self):
-        if cross.cross_below(self.__ma1, self.__ma2) > 0:
+        # if cross.cross_below(self.__ma1, self.__ma2) > 0:
+        if self.trendstatus() == 0:
             return True
 
     def onBars(self, bars):
@@ -694,5 +688,5 @@ def turtle_test(code,start=None,plot=True,dl=20):
 
 if __name__ == '__main__':
     #vwap(True)
-    code='999999'
+    code='600689'
     turtle_test(code,'2016-06-01',dl=30)

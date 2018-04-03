@@ -700,6 +700,8 @@ def get_linear_model_candles(code, ptype='low', dtype='d', start=None, end=None,
     # print len(df),len(asset)
 
     def setRegLinearPlt(asset, xaxis=None, status=None):
+        if len(asset) < 2:
+            return None
         X = np.arange(len(asset))
         if xaxis is not None:
             X = X + xaxis
@@ -770,7 +772,7 @@ def get_linear_model_candles(code, ptype='low', dtype='d', start=None, end=None,
                 idx = df[df[ptype] == sp].index.values[-1]
                 print "New %s  %s !!! start:%s" % (ptype, assetL[-1], idx)
             else:
-                idx = assertL.index[-1]
+                idx = assetL.index[-1]
                 print "NTop %s  %s !!! start:%s" % (ptype, assetL[-1], idx)
             assetL = df[df.index >= idx][ptype]
             dt = idx
@@ -827,11 +829,11 @@ def get_linear_model_candles(code, ptype='low', dtype='d', start=None, end=None,
                 sb = round(mlist[-1], 2)
                 X = np.arange(len(df))
                 df[type] = df[type].apply(lambda x: round(x, 2))
-                aid = df[df[type] == sa].index.values[-1][:10]
+                aid = df[df[type] == sa].index.values[-1][:10] if str(sa) <> 'nan' else df.index.values[0][:10]
                 ida = len(df[df.index <= aid])
                 aX = X[ida - 1]
 
-                bid = df[df[type] == sb].index.values[-1][:10]
+                bid = df[df[type] == sb].index.values[-1][:10] if str(sb) <> 'nan' else df.index.values[-1][:10]
                 # print df[df[type] == sb].index.values
                 idb = len(df[df.index <= bid])
                 bX = X[idb - 1]
@@ -937,7 +939,7 @@ drop_cxg = []
 wencai_drop = []
 
 
-def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y', talib=False, newdays=None, days=0):
+def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y', talib=False, newdays=None, days=0,index=False):
     ts = time.time()
 
     if isinstance(df, list):
@@ -965,6 +967,7 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y', tal
     # [['ma' ,'rsi' ,'kdj' ,'boll', 'ra',rah', 'df2' ,'fibl','fib' ,'macd' ,'vstd', 'oph']]
 
     h5 = h5a.load_hdf_db(h5_fname, h5_table, code_l=code_l, limit_time=ct.h5_power_limit_time)
+
     if h5 is not None:
         log.info("power hdf5 data:%s" % (len(h5)))
         if h5_combine_status:
@@ -1002,6 +1005,11 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y', tal
                         return df
             log.info("add power hdf5 code_l:%s" % (len(code_l)))
             print("intP:%s"%(len(code_l))),
+        else:
+            if index and len(h5) == len(code_l):
+                if len(h5[(h5.fibl <> 0 ) | (h5.fib <> 0 )]) >0:
+                    return h5
+
     else:
         #        log.info("init power hdf5")
         if len(code_l) > 50:
@@ -1075,7 +1083,7 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y', tal
                 #     dz=dz.to_frame().T
             else:
                 dz = tdd.get_sina_data_df(code)
-            if len(dz) > 0 and (dz.buy.values > 0 or dz.sell.values > 0):
+            if len(dz) > 0 and (index or dz.buy.values > 0 or dz.sell.values > 0):
                 tdx_df = tdd.get_tdx_append_now_df_api(
                     code, start=start, end=end, type='f', df=None, dm=dz, dl=dl, newdays=5)
 
@@ -1088,7 +1096,7 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y', tal
                 #     # log.info("tdx_df:%s"%(len(tdx_df)))
                 tdx_days = len(tdx_df)
                 # if 8 < tdx_days < ct.cxg_limit_days:
-                if df.loc[code].per3d > 20 and 8 < tdx_days:
+                if "per3d" in df.columns and df.loc[code].per3d > 20 and 8 < tdx_days:
                     # print code,df.loc[code].per2d
                     if tdx_days > 6:
                         top_count = 0
@@ -1325,11 +1333,15 @@ if __name__ == "__main__":
 
     # df = powerCompute_df(['603689', '300506', '002171'], days=ct.Power_last_da, dtype='d', end=None, dl=ct.PowerCountdl, talib=True, filter='y')
 #    df = powerCompute_df(['603689', '300506', '002171'], days=3, dtype='d', end=None, dl=ct.PowerCountdl, talib=True, filter='y')
-    df = powerCompute_df(['603689'], days=1, dtype='d', end=None, dl=ct.PowerCountdl, talib=True, filter='y')
+    # df = powerCompute_df(['999999','399006'], days=0, dtype='d', end=None, dl=ct.PowerCountdl, talib=True, filter='y')
+    df = powerCompute_df(['999999','399006','399001'], days=0, dtype='d', end=None, dl=10, talib=True, filter='y',index=True)
 
-    print "\n",cct.format_for_print(df.loc[:,['op','boll','ma','kdj','macd']])
     print "\n",cct.format_for_print(df.loc[:,['ra', 'op', 'ma', 'rsi', 'kdj',
                      'boll', 'rah', 'df2', 'fibl', 'macd', 'vstd', 'oph', 'lvolume']])
+    # print "\n",df.fibl,df.fib
+    print "\n",cct.format_for_print(df.loc[:,['op','boll','ma','kdj','macd','ldate','fibl','fib','timel']])
+    # import ipdb;ipdb.set_trace()
+
     # powerCompute_df(codelist, dtype='d',end=None, dl=ct.PowerCountdl, talib=True,filter='y')
 
     # # print powerCompute_df(['601198', '002791', '000503'], dtype='d', end=None, dl=30, filter='y')

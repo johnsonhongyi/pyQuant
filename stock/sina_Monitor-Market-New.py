@@ -317,7 +317,8 @@ if __name__ == "__main__":
                 st_l = st.split()
                 st_k = st_l[0]
                 if st_k in ct.Market_sort_idx.keys() and len(top_all) > 0:
-                    market_sort_value, market_sort_value_key = ct.get_market_sort_value_key(st, top_all=top_all)
+                    st_key_sort = st
+                    market_sort_value, market_sort_value_key = ct.get_market_sort_value_key(st_key_sort, top_all=top_all)
                 else:
                     log.error("market_sort key error:%s" % (st))
                     cct.sleeprandom(5)

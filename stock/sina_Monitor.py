@@ -94,7 +94,6 @@ if __name__ == "__main__":
     # market_sort_value, market_sort_value_key = ct.get_market_sort_value_key('8')
     resample = 'd'
     st_key_sort = '4'
-    market_sort_value, market_sort_value_key = ct.get_market_sort_value_key(st_key_sort)
     while 1:
         try:
             # df = rl.get_sina_all_json_dd(vol, type)
@@ -156,6 +155,8 @@ if __name__ == "__main__":
                 # top_all=top_all.sort_values(by=['dff','percent','couts','ratio'],ascending=[0,0,1,1])
 
                 top_bak = top_all
+                market_sort_value, market_sort_value_key = ct.get_market_sort_value_key(st_key_sort, top_all=top_all)
+                
                 codelist = top_all.index.tolist()
                 if len(codelist) > 0:
                     # log.info('toTDXlist:%s' % len(codelist))
@@ -284,7 +285,7 @@ if __name__ == "__main__":
                 if int_time < 930:
                     while 1:
                         cct.sleep(60)
-                        if cct.get_now_time_int() < 931:
+                        if cct.get_now_time_int() < 930:
                             cct.sleep(60)
                             print ".",
                         else:

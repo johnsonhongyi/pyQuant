@@ -33,7 +33,7 @@ VolumeMaxR = 5000
 VolumeMinR = 0.1
 PowerCount = 500
 duration_diff = 6
-duration_date_l = 30
+duration_date_l = 21
 duration_date_up = 120
 duration_date_sort = duration_date_l
 PowerCountdl = duration_date_l * 2 if duration_date_l < 20 else duration_date_l
@@ -49,6 +49,7 @@ resample_dtype = 'd'
 logtime = 4200
 
 bollFilter = -2
+keep_lastnum = 9
 writeblockbakNum = 15
 checkfilter = True
 lastPower = False
@@ -152,7 +153,7 @@ Duration_percent_df2dff_key = [0, 0, 0, 0, 1, 1, 0, 1, 1, 1]
 
 # Duration_percent_boll = ['boll','op','ra', 'percent',
 #                          'dff', 'fib', 'fibl', 'ratio', 'volume', 'couts']
-                         
+
 # Duration_percent_boll_key = [0, 0, 0, 0, 0, 1, 1, 1, 1, 1]
 
 Duration_percent_opboll = ['op', 'perc3d', 'percent',
@@ -217,7 +218,7 @@ Duration_format_trade = ['name', 'trade', 'boll', 'dff', 'df2',
 
 
 Monitor_format_trade = ['name', 'trade', 'boll', 'dff', 'df2', 'couts',
-                        'percent', 'per1d', 'per3d', 'ra', 'op', 'fib','fibl', 'ratio',  'volume', 'category']
+                        'percent', 'per1d', 'per3d', 'ra', 'op', 'ratio',  'volume', 'fib','fibl', 'category']
 MonitorMarket_format_buy = ['name', 'buy', 'boll', 'dff', 'df2',
                             'couts', 'percent', 'per1d', 'per3d', 'ra', 'op', 'ratio',  'volume', 'fib','fibl', 'category']
 
@@ -598,7 +599,10 @@ def get_Duration_format_Values(duration_format, column=None, replace='per3d',des
         if column is None:
           column = [dest]
         else:
-          column = column[:]
+            if isinstance(column, list):
+                column = column[:2]
+            else:
+                column = [column]
         if 'percent' in column:
             column.remove('percent')
 #        idx_list = eval(market_sort_value)[:]
@@ -609,7 +613,8 @@ def get_Duration_format_Values(duration_format, column=None, replace='per3d',des
         if isinstance(column, list):
             #            for i,co in enumerate(idx_key):
             for co in (idx_key):
-                if replace in column or column[co] not in duration_format:
+
+                if (co <> 0 or column[co] <> replace) and (replace in column or column[co] not in duration_format):
                     if len(column) > 1 and column[co].find('per') > -1:
                         if column[co].find('perc') > -1:
                             replace = 'per3d'

@@ -1437,8 +1437,20 @@ def get_config_value_wencai(fname, classtype, currvalue=0, xtype='limit', update
         config.write()
     return int(currvalue)
 
+def get_index_fibl():
+    import sys
+    sys.path.append("..")
+    from JSONData import powerCompute as pct
+    df = pct.powerCompute_df(['999999','399006','399001'], days=0, dtype='d', end=None, dl=10, talib=True, filter='y',index=True)
+    if len(df) >0 and 'fibl' in df.columns:
+        fibl = int(df.fibl.max())
+        return fibl if fibl < 5 else 2
+    else:
+        return 1
 
-def write_to_blocknew(p_name, data, append=True, doubleFile=True, keep_last=15):
+def write_to_blocknew(p_name, data, append=True, doubleFile=True, keep_last=None):
+    if keep_last is None:
+        keep_last = ct.keep_lastnum
     # index_list = ['1999999','47#IFL0',  '0399006', '27#HSI']
     # index_list = ['1999999','47#IFL0', '27#HSI',  '0399006']
     # index_list = ['1999999','0399001','47#IFL0', '27#HSI',  '0159915']
@@ -2083,7 +2095,8 @@ def get_diff_dratio(mainlist, sublist):
     return dratio
 
 
-def func_compute_percd(c, lp, lc, lh, ll, nh, nl):
+# def func_compute_percd(c, lp, lc, lh, ll, nh, nl,llp):
+def func_compute_percd(close, lastp, op, lasth, lastl, nowh, nowl):
     initc = 0
     down_zero, down_dn, percent_l = 0, 0, 2
     # da, down_zero, down_dn, percent_l = 1, 0, 0, 2
@@ -2107,14 +2120,99 @@ def func_compute_percd(c, lp, lc, lh, ll, nh, nl):
     #         initc -= 1
     return initc
 
+def func_compute_percd2(close, lastp, op, lasth, lastl, nowh, nowl):
+    # down_zero, down_dn, percent_l = 0, 0, 2
+     # (1 if ( ((c >= op) and ((c - lc)/lc*100 >= 0)) or (c >= op and c >=m5a) ) else down_dn)
+    initc = 0
+    
+    if nowl == op:
+        initc +=1
+        if  nowh > lasth or nowl > lastl:
+            initc +=1
+            if nowh == close:
+                initc +=1
+    if  op > lastp and nowl > lastp:
+            initc +=1
+
+    if ((close - lastp)/lastp*100 >= 0):
+        if op > lastp:
+            initc +=1
+            if nowh == nowl:
+                initc +=1
+            if nowl > lastp:
+                initc +=1
+                if nowl > lasth:
+                    initc +=1
+
+            if close > nowh * ct.changeRatio:
+                initc +=1
+                if lastp == lasth:
+                    initc +=1
+
+            if (close >= op):
+                initc +=1
+                if (nowh > lasth):
+                    initc +=1
+                    if (nowl >= lastl):
+                        initc +=1
+            else:
+                initc -=1
+                if (nowh < lasth):
+                    initc -=1
+                    if  nowl < lastl:
+                        initc -=1
+        else:
+            initc +=1
+            if op >= nowl*0.995:
+                initc +=1
+                if (nowh > lasth):
+                    initc +=1
+                    if close > nowh * ct.changeRatio:
+                        initc +=1
+                        if (nowl >= lastl):
+                            initc +=1
+
+    else:
+        if op < lastp:
+            if (close >= op):
+                if  nowl > lastl:
+                    initc +=1
+            else:
+                initc -=1
+                if (nowh < lasth):
+                    initc -=1
+                    if  nowl < lastl:
+                        initc -=1
+        else:
+            if (close < op):
+                if (nowh < lasth):
+                    initc -=1
+                if  nowl < lastl:
+                    initc -=1
+            else:
+                if (nowh < lasth):
+                    initc -=1
+                    if  nowl < lastl:
+                        initc -=1
+        if nowh < lastp:
+            initc -=1
+            if nowh < lastl:
+                initc -=1
+
+
+    return initc
+                    
 
 def combine_dataFrame(maindf, subdf, col=None, compare=None, append=False, clean=True):
     times = time.time()
+    if subdf is  None or len(subdf) == 0:
+        return maindf
+
     if (isinstance(maindf,pd.Series)):
         maindf = maindf.to_frame()
     if (isinstance(subdf,pd.Series)):
         subdf = subdf.to_frame()
-        
+    
     maindf_co = maindf.columns
     subdf_co = subdf.columns
     maindf = maindf.fillna(0)
@@ -2155,11 +2253,14 @@ def combine_dataFrame(maindf, subdf, col=None, compare=None, append=False, clean
         #        if len(maindf) < len(subdf):
         #            maindf,subdf =subdf,maindf
         maindf = maindf.drop([col for col in maindf.index if col in subdf.index], axis=0)
-        co_mod = maindf.dtypes[maindf.dtypes == int]
-
+        co_mod = maindf.dtypes[(maindf.dtypes == int) & (maindf.dtypes.keys() <> 'ldate') & (maindf.dtypes.keys() <> 'kind')]
         for co_t in co_mod.keys():
             if co_t in subdf.columns:
                 if maindf.dtypes[co_t] <> subdf.dtypes[co_t]:
+                    # print maindf.dtypes[co_t] , subdf.dtypes[co_t]
+                    # print maindf[co_t],subdf[co_t]
+                    # import ipdb;ipdb.set_trace()
+                    # print co_t,maindf.dtypes[co_t]
                     subdf[co_t] = subdf[co_t].astype(maindf.dtypes[co_t])
                     # log.error("col to types:%s" % (maindf.dtypes[co_t]))
 
@@ -2205,6 +2306,7 @@ def combine_dataFrame(maindf, subdf, col=None, compare=None, append=False, clean
     return maindf
 
 if __name__ == '__main__':
+    print (get_index_fib())
     GlobalValues()
     GlobalValues().setkey('key', 'GlobalValuesvalue')
     print GlobalValues().getkey('key', defValue=None)

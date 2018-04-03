@@ -123,7 +123,7 @@ if __name__ == "__main__":
     # all_diffpath = tdd.get_tdx_dir_blocknew() + '062.blk'
     parser = cct.MoniterArgmain()
     parserDuraton = cct.DurationArgmain()
-    market_sort_value, market_sort_value_key = ct.get_market_sort_value_key(ct.sort_value_key_perd)
+    st_key_sort = ct.sort_value_key_perd
     while 1:
         try:
             # df = sina_data.Sina().all
@@ -204,6 +204,8 @@ if __name__ == "__main__":
                     top_all = cct.combine_dataFrame(top_all, top_now, col=None)
 
                 top_dif = top_all.copy()
+                market_sort_value, market_sort_value_key = ct.get_market_sort_value_key(st_key_sort, top_all=top_all)
+
                 log.debug('top_dif:%s' % (len(top_dif)))
                 if 'trade' in top_dif.columns:
                     top_dif['buy'] = (
@@ -405,7 +407,8 @@ if __name__ == "__main__":
                 st_l = st.split()
                 st_k = st_l[0]
                 if st_k in ct.Market_sort_idx.keys() and len(top_all) > 0:
-                    market_sort_value, market_sort_value_key = ct.get_market_sort_value_key(st, top_all=top_all)
+                    st_key_sort = st
+                    market_sort_value, market_sort_value_key = ct.get_market_sort_value_key(st_key_sort, top_all=top_all)
                 else:
                     log.error("market_sort key error:%s" % (st))
                     cct.sleeprandom(5)

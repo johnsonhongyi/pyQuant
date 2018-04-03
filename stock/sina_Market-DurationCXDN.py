@@ -134,8 +134,7 @@ if __name__ == "__main__":
     parserDuraton = cct.DurationArgmain()
     # market_sort_value, market_sort_value_key = ct.get_market_sort_value_key(ct.sort_value_key_perd)
     # market_sort_value, market_sort_value_key = ct.get_market_sort_value_key('1')
-    st_key_sort = '1'
-    market_sort_value, market_sort_value_key = ct.get_market_sort_value_key(st_key_sort)
+    st_key_sort = '2 2'
     while 1:
         try:
             '''
@@ -203,6 +202,8 @@ if __name__ == "__main__":
                     top_all = cct.combine_dataFrame(top_all, top_now, col=None)
 
                 top_dif = top_all.copy()
+                market_sort_value, market_sort_value_key = ct.get_market_sort_value_key(st_key_sort, top_all=top_all)
+                
                 if 'trade' in top_dif.columns:
                     top_dif['buy'] = (map(lambda x, y: y if int(x) == 0 else x,
                                           top_dif['buy'].values, top_dif['trade'].values))
