@@ -66,10 +66,10 @@ if __name__ == "__main__":
     log = LoggerFactory.getLogger('SinaMarket')
     # log.setLevel(LoggerFactory.DEBUG)
     if cct.isMac():
-        width, height = 166, 20
+        width, height = 170, 20
         cct.set_console(width, height)
     else:
-        width, height = 166, 20
+        width, height = 170, 20
         cct.set_console(width, height)
 
     # cct.set_console(width, height)
@@ -280,33 +280,57 @@ if __name__ == "__main__":
 
             else:
                 print "no data"
+
             int_time = cct.get_now_time_int()
             if cct.get_work_time():
-                if int_time < 930:
-                    while 1:
-                        cct.sleep(60)
-                        if cct.get_now_time_int() < 930:
-                            cct.sleep(60)
-                            print ".",
-                        else:
-                            top_all = pd.DataFrame()
-                            time_s = time.time()
-                            print "."
-                            break
+                if int_time < ct.open_time:
+                    cct.sleep(ct.sleep_time)
+                elif int_time < 930:
+                    cct.sleep((930 - int_time) * 55)
+                    # top_all = pd.DataFrame()
+                    time_s = time.time()
                 else:
-                    cct.sleep(60)
+                    cct.sleep(ct.duration_sleep_time)
             elif cct.get_work_duration():
                 while 1:
-                    cct.sleep(60)
+                    cct.sleep(ct.duration_sleep_time)
                     if cct.get_work_duration():
                         print ".",
-                        cct.sleep(60)
+                        cct.sleep(ct.duration_sleep_time)
                     else:
-                        print "."
+                        # top_all = pd.DataFrame()
                         cct.sleeprandom(60)
-                        top_all = pd.DataFrame()
                         time_s = time.time()
+                        print "."
                         break
+            # old while
+            # int_time = cct.get_now_time_int()
+            # if cct.get_work_time():
+            #     if int_time < 930:
+            #         while 1:
+            #             cct.sleep(60)
+            #             if cct.get_now_time_int() < 930:
+            #                 cct.sleep(60)
+            #                 print ".",
+            #             else:
+            #                 top_all = pd.DataFrame()
+            #                 time_s = time.time()
+            #                 print "."
+            #                 break
+            #     else:
+            #         cct.sleep(60)
+            # elif cct.get_work_duration():
+            #     while 1:
+            #         cct.sleep(60)
+            #         if cct.get_work_duration():
+            #             print ".",
+            #             cct.sleep(60)
+            #         else:
+            #             print "."
+            #             cct.sleeprandom(60)
+            #             top_all = pd.DataFrame()
+            #             time_s = time.time()
+            #             break
             else:
                 raise KeyboardInterrupt("StopTime")
 

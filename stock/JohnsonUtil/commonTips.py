@@ -1444,7 +1444,7 @@ def get_index_fibl():
     df = pct.powerCompute_df(['999999','399006','399001'], days=0, dtype='d', end=None, dl=10, talib=True, filter='y',index=True)
     if len(df) >0 and 'fibl' in df.columns:
         fibl = int(df.fibl.max())
-        return fibl if fibl < 5 else 2
+        return fibl if 1 < fibl < 6 else 2
     else:
         return 1
 
@@ -2120,18 +2120,23 @@ def func_compute_percd(close, lastp, op, lasth, lastl, nowh, nowl):
     #         initc -= 1
     return initc
 
-def func_compute_percd2(close, lastp, op, lasth, lastl, nowh, nowl):
+def func_compute_percd2(close, lastp, op, lasth, lastl, nowh, nowl,hmax=None,nvol=None,lvol=None):
     # down_zero, down_dn, percent_l = 0, 0, 2
      # (1 if ( ((c >= op) and ((c - lc)/lc*100 >= 0)) or (c >= op and c >=m5a) ) else down_dn)
     initc = 0
     
-    if nowl == op:
+    if nowl == op or (op > lastp and nowl >lastp):
         initc +=1
-        if  nowh > lasth or nowl > lastl:
+        if  nowh > lasth:
             initc +=1
-            if nowh == close:
-                initc +=1
-    if  op > lastp and nowl > lastp:
+            if hmax is not None:
+                if nowh >= hmax:
+                    initc +=1
+            else:
+                if nowh == close:
+                    initc +=1
+
+    if  op > lastp or nowl > lastp:
             initc +=1
 
     if ((close - lastp)/lastp*100 >= 0):
@@ -2306,7 +2311,7 @@ def combine_dataFrame(maindf, subdf, col=None, compare=None, append=False, clean
     return maindf
 
 if __name__ == '__main__':
-    print (get_index_fib())
+    print (get_index_fibl())
     GlobalValues()
     GlobalValues().setkey('key', 'GlobalValuesvalue')
     print GlobalValues().getkey('key', defValue=None)

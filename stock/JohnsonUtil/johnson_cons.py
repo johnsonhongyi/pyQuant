@@ -46,10 +46,10 @@ changeRatioUp = 1.025
 # duration_date = 10
 wencai_delay_time = 60
 resample_dtype = 'd'
-logtime = 4200
+logtime = 2700
 
-bollFilter = -2
-keep_lastnum = 9
+bollFilter = -5
+keep_lastnum = 15
 writeblockbakNum = 15
 checkfilter = True
 lastPower = False
@@ -113,7 +113,8 @@ Duration_sort_per_ratio_key = [0, 1, 0, 1, 1, 0, 0, 1, 1]
 # Duration_sort_per1d_key = [0, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1]
 
 # Duration_sort_perd = ['per%sd', 'dff', 'perc%sd', 'percent', 'b1_v', 'ratio', 'op',
-Duration_sort_perd = ['per%sd', 'dff', 'perc%sd', 'percent', 'b1_v', 'ratio', 'op',
+# Duration_sort_perd = ['per%sd', 'dff', 'perc%sd', 'percent', 'b1_v', 'ratio', 'op',
+Duration_sort_perd = ['per%sd', 'percent', 'b1_v', 'perc%sd', 'dff', 'ratio', 'op',
                       'fib', 'fibl', 'ra', 'volume', 'couts']
 Duration_sort_perd_key = [0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 1, 1]
 

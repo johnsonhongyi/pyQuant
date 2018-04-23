@@ -27,7 +27,7 @@ def func_compute_df2(c, lc, h, l):
     return du_p
 
 
-def getBollFilter(df=None, boll=6, duration=ct.PowerCountdl, filter=True, ma5d=True, dl=14, percent=False, resample='d', ene=False,down=False,indexdff=True):
+def getBollFilter(df=None, boll=ct.bollFilter, duration=ct.PowerCountdl, filter=True, ma5d=True, dl=14, percent=False, resample='d', ene=False,down=False,indexdff=True):
 
     # drop_cxg = cct.GlobalValues().getkey('dropcxg')
     # if len(drop_cxg) >0:
@@ -69,13 +69,13 @@ def getBollFilter(df=None, boll=6, duration=ct.PowerCountdl, filter=True, ma5d=T
             if cct.get_work_time() or df.ix[idx_rnd].lastp0d <> df.ix[idx_rnd].close:
                 nowd, per1d = 0, 1
                 if 'nlow' in df.columns:
-                    df['perc_n'] = map(cct.func_compute_percd2, df['close'],df['llastp'],df['open'], df['lasth%sd' % (nowd)], df['lastl%sd' % (nowd)], df['nhigh'], df['nlow'])
+                    df['perc_n'] = map(cct.func_compute_percd2, df['close'],df['llastp'],df['open'], df['lasth%sd' % (nowd)], df['lastl%sd' % (nowd)], df['nhigh'], df['nlow'],df['hmax'])
                 else:
-                    df['perc_n'] = map(cct.func_compute_percd2, df['close'],df['llastp'],df['open'], df['lasth%sd' % (nowd)], df['lastl%sd' % (nowd)], df['high'], df['low'])
+                    df['perc_n'] = map(cct.func_compute_percd2, df['close'],df['llastp'],df['open'], df['lasth%sd' % (nowd)], df['lastl%sd' % (nowd)], df['high'], df['low'],df['hmax'])
             else:
                 nowd, per1d = 1, 2
                 # print  df['per%sd' % da+1], df['lastp%sd' % (da)], df['lasth%sd' % (da)], df['lastl%sd' % (da)], df['high'], df['low']
-                df['perc_n'] = map(cct.func_compute_percd2, df['close'],df['llastp'],df['open'], df['lasth%sd' % (nowd)], df['lastl%sd' % (nowd)], df['high'], df['low'])
+                df['perc_n'] = map(cct.func_compute_percd2, df['close'],df['llastp'],df['open'], df['lasth%sd' % (nowd)], df['lastl%sd' % (nowd)], df['high'], df['low'],df['hmax'])
 
             for co in perc_col:
                 df[co] = (df[co] + df['perc_n']).map(lambda x: int(x))

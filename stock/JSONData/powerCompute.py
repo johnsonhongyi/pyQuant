@@ -1007,9 +1007,13 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y', tal
             print("intP:%s"%(len(code_l))),
         else:
             if index and len(h5) == len(code_l):
-                if len(h5[(h5.fibl <> 0 ) | (h5.fib <> 0 )]) >0:
-                    return h5
+                h5 = h5[ (h5.fibl <> h5.fib) & ((h5.fibl <> 0 ) | (h5.fib <> 0 ))]
+                temp_l = list(set(code_l) - set(h5.index))
 
+                if len(temp_l) == 0:
+                    return h5
+                else:
+                    code_l = temp_l
     else:
         #        log.info("init power hdf5")
         if len(code_l) > 50:
@@ -1039,7 +1043,10 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y', tal
     if len(code_l) > 0:
         dm = tdd.get_sina_data_df(code_l)
         if statuslist:
-            df = dm
+            if h5 is not None and len(h5) >0:
+                df = h5
+            else:
+                df = dm
 
     #    cname = ",".join(x for x in dm.name)
         dmname = dm.name
@@ -1244,6 +1251,7 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y', tal
                      df['kdj'].values, df['rsi'].values))
            df['df2'] = df['df2'].apply(lambda x:round(x,1))
            return df
+
         if len(df) <> len(code_l):
             dd = df.loc[code_l]
             dd = compute_df2(dd)
