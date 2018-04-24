@@ -241,7 +241,7 @@ if __name__ == "__main__":
                 # print cct.format_for_print(top_all)
                 # print top_all[:10]
 
-                top_temp = top_all[:ct.PowerCount].copy()
+                top_temp = stf.filterPowerCount(top_all,ct.PowerCount)
                 top_temp = pct.powerCompute_df(top_temp, dl=ct.PowerCountdl)
                 goldstock = len(top_all[(top_all.buy >= top_all.lhigh * 0.99) & (top_all.buy >= top_all.llastp * 0.99)])
                 # print "G:%s Rt:%0.1f dT:%s N:%s" % (len(top_all),float(time.time() -

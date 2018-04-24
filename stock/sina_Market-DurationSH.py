@@ -304,7 +304,7 @@ if __name__ == "__main__":
                     if percent_status == 'y' and (
                             cct.get_now_time_int() > 915 and cct.get_now_time_int() < 1505) and ptype == 'low':
                         top_dif = top_dif[top_dif.percent >= 0]
-                        top_temp = top_dif[:ct.PowerCount].copy()
+                        top_temp = stf.filterPowerCount(top_dif,ct.PowerCount)
                         top_end = top_dif[-5:].copy()
                         top_temp = pct.powerCompute_df(top_temp, dl=ct.PowerCountdl, talib=True)
                         top_end = pct.powerCompute_df(top_end, dl=ct.PowerCountdl, talib=True)
@@ -312,7 +312,7 @@ if __name__ == "__main__":
                     # elif percent_status == 'y' and cct.get_now_time_int() > 935 and ptype == 'high' :
                     elif ptype == 'low':
                         # top_dif = top_dif[top_dif.percent >= 0]
-                        top_temp = top_dif[:ct.PowerCount].copy()
+                        top_temp = stf.filterPowerCount(top_dif,ct.PowerCount)
                         top_end = top_dif[-5:].copy()
                         top_temp = pct.powerCompute_df(top_temp, dl=ct.PowerCountdl, talib=True)
                         top_end = pct.powerCompute_df(top_end, dl=ct.PowerCountdl, talib=True)

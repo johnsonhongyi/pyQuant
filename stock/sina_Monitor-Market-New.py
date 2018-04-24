@@ -238,7 +238,7 @@ if __name__ == "__main__":
 
                     # top_all=top_all.sort_values(by=['percent','dff','couts','ratio'],ascending=[0,0,1,1])
                     # print cct.format_for_print(top_dif[:10])
-                    top_temp = top_dif[:ct.PowerCount].copy()
+                    top_temp = stf.filterPowerCount(top_dif,ct.PowerCount)
                     top_temp = pct.powerCompute_df(top_temp, dl=ct.PowerCountdl)
                     goldstock = len(top_dif[(top_dif.buy >= top_dif.lhigh * 0.99)
                                             & (top_dif.buy >= top_dif.llastp * 0.99)])

@@ -241,7 +241,7 @@ if __name__ == "__main__":
 
                     # top_all=top_all.sort_values(by=['percent','dff','couts','ratio'],ascending=[0,0,1,1])
 
-                    top_temp = top_dif[:ct.PowerCount].copy()
+                    top_temp = stf.filterPowerCount(top_dif,ct.PowerCount)
                     top_end = top_all[-int((ct.PowerCount)/10):].copy()
 
                     top_temp = pct.powerCompute_df(top_temp, dl=ct.PowerCountdl, talib=True)

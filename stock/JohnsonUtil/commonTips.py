@@ -1444,7 +1444,7 @@ def get_index_fibl():
     df = pct.powerCompute_df(['999999','399006','399001'], days=0, dtype='d', end=None, dl=10, talib=True, filter='y',index=True)
     if len(df) >0 and 'fibl' in df.columns:
         fibl = int(df.fibl.max())
-        return fibl if 1 < fibl < 6 else 2
+        return fibl if 1 <= fibl < 6 else 2
     else:
         return 1
 
