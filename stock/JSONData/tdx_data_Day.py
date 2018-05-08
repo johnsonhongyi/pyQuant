@@ -2880,6 +2880,8 @@ def get_append_lastp_to_df(top_all, lastpTDX_DF=None, dl=ct.PowerCountdl, end=No
     top_all = cct.combine_dataFrame(
         top_all, tdxdata, col=None, compare=None, append=False)
 
+    top_all.rename(columns={'cumin': 'df2'}, inplace=True)
+    
     # log.info('Top-merge_now:%s' % (top_all[:1]))
     top_all = top_all[top_all['llow'] > 0]
 

@@ -69,9 +69,8 @@ def getBollFilter(df=None, boll=ct.bollFilter, duration=ct.PowerCountdl, filter=
     df['upper'] = map(lambda x: round((1 + 11.0 / 100) * x, 1), df.ma10d)
     df['lower'] = map(lambda x: round((1 - 9.0 / 100) * x, 1), df.ma10d)
     df['ene'] = map(lambda x, y: round((x + y) / 2, 1), df.upper, df.lower)
-    df = df[df.cumin > 0]
-    # df.rename(columns={'df2': 'df2b'}, inplace=True)
-    df.rename(columns={'cumin': 'df2'}, inplace=True)
+    df = df[df.df2 > 0]
+    # df.rename(columns={'cumin': 'df2'}, inplace=True)
     if df is None:
         print "dataframe is None"
         return None
