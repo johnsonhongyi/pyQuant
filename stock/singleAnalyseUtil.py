@@ -252,11 +252,36 @@ def get_today_tick_ave(code, ave=None):
         # print "IOError"
 
 
-def f_print(lens, datastr):
+def f_print(lens, datastr,color=None):
     # if lens < len(str(datastr)):
         # log.warn("str:%s f_print:%s %s"%(datastr,lens,len(str(datastr))))
     lenf = '{0:>%s}' % (lens)
     data = lenf.format(datastr)
+    # print("\033[1;31;40m您输入的帐号或密码错误！\033[0m")  
+    # \033[5;31;42m
+    # https://www.cnblogs.com/hellojesson/p/5961570.html
+    """数值表示的参数含义：
+    # 显示方式: 0（默认值）、1（高亮）、22（非粗体）、4（下划线）、24（非下划线）、 5（闪烁）、25（非闪烁）、7（反显）、27（非反显）
+    # 前景色: 30（黑色）、31（红色）、32（绿色）、 33（黄色）、34（蓝色）、35（洋 红）、36（青色）、37（白色）
+    # 背景色: 40（黑色）、41（红色）、42（绿色）、 43（黄色）、44（蓝色）、45（洋 红）、46（青色）、47（白色）
+
+    # 常见开头格式：
+    # \033[0m            默认字体正常显示，不高亮
+    # \033[32;0m       红色字体正常显示
+    # \033[1;32;40m  显示方式: 高亮    字体前景色：绿色  背景色：黑色
+    # \033[0;31;46m  显示方式: 正常    字体前景色：红色  背景色：青色
+    """
+    # data = "\033[1;31;40m%s\033[0m"%(data)
+    # color_dic = {31:'47',32:'40'}
+    color_dic = {31:'47',32:'47',35:'47'}
+    if color is not None:
+        if color <> 31:
+            # if color == 32:
+                # color = 35
+            flash = 5
+        else:
+            flash = 1
+        data = "\033[%s;%s;%sm%s\033[0m"%(flash,color,color_dic[color],data)
     return data
 
 
@@ -350,9 +375,9 @@ def get_hot_countNew(changepercent, rzrq, fibl=None, fibc=10):
             crashTen = '0'
             crash = '0'
         # top=df[ df['changepercent'] <6]
-
+        # print("\033[1;31;40m您输入的帐号或密码错误！\033[0m")  
         print(
-            "%s topT: %s top>%s: %s " % (
+            "%s topT: %s top>%s: %s" % (
                 f_print(4, market), f_print(3, len(topTen)), changepercent, f_print(4, len(top)))),
         # url = ct.DFCFW_FUND_FLOW_URL % ct.SINA_Market_KEY_TO_DFCFW[market]
         # log.debug("ffurl:%s" % url)
@@ -370,9 +395,9 @@ def get_hot_countNew(changepercent, rzrq, fibl=None, fibc=10):
             # modfprint=lambda x:f_print(4,x) if x>0 else "-%s"%(f_print(4,str(x).replace('-','')))
             # print modfprint(zlr)
             # print (u"流入: %s亿 比: %s%%" % (modfprint(zlr), modfprint(zzb))),
-            print(u"流入: %s亿 比: %s%%" % (f_print(4, zlr), f_print(4, zzb))),
+            print(u"流入: %s亿 比: %s%%" % (f_print(4, zlr,32), f_print(4, zzb,32))),
             print(u"%s %s%s" % (f_print(4, ff['close']), f_print(1, '!' if ff['open'] > ff[
-                'lastp'] else '?'), f_print(2, '!!' if ff['close'] > ff['lastp'] else '??')))
+                'lastp'] else '?'), f_print(2, '!!' if ff['close'] > ff['lastp'] else '??',32)))
         allTop = allTop.append(df, ignore_index=True)
         allTop = allTop.drop_duplicates()
     df = allTop
@@ -385,11 +410,11 @@ def get_hot_countNew(changepercent, rzrq, fibl=None, fibc=10):
     crash = df[df['percent'] < -changepercent]
     print(
         u" \tA:%s topT:%s top>%s:%s" % (
-            f_print(4, count), f_print(3, (topTen)), changepercent, f_print(4, len(top)))),
+            f_print(4, count), f_print(3, (topTen),31), changepercent, f_print(4, len(top),31))),
     print(u"crashT:%s crash<-%s:%s" %
-          (f_print(3, len(crashTen)), changepercent, f_print(4, len(crash)))),
+          (f_print(3, len(crashTen),31), changepercent, f_print(4, len(crash),31))),
     print(u"-5:%s" %
-          (f_print(4, len(crash[crash.percent < -5])))),
+          (f_print(4, len(crash[crash.percent < -5]),32))),
     # ff = ffu.get_dfcfw_fund_flow(ct.DFCFW_FUND_FLOW_ALL)
     ffall['time'] = ff['time']
     ff = ffall
@@ -399,7 +424,7 @@ def get_hot_countNew(changepercent, rzrq, fibl=None, fibc=10):
         zzb = round(float(ff['zzb']) / 3, 1)
         zt = str(ff['time'])
         print(u"流入: %s亿 占比: %s%% %s" %
-              (f_print(4, zlr), f_print(4, zzb), f_print(4, zt)))
+              (f_print(4, zlr,31), f_print(4, zzb,31), f_print(4, zt)))
 
     ff = ffu.get_dfcfw_fund_SHSZ()
     hgt = ffu.get_dfcfw_fund_HGT()
@@ -413,7 +438,7 @@ def get_hot_countNew(changepercent, rzrq, fibl=None, fibc=10):
     #         f_print(5, ff['zvol']))),
     if len(ff) > 0:
         print(u"\t\tSh: %s Vr:%s Sz: %s Vr:%s " % (
-            f_print(4, ff['scent']), f_print(5, ff['svol']), f_print(4, ff['zcent']), f_print(5, ff['zvol'])))
+            f_print(4, ff['scent']), f_print(5, ff['svol'],32), f_print(4, ff['zcent']), f_print(5, ff['zvol'],32)))
     else:
         print(u"\t\tSh: \t%s Vr:  \t%s Sz: \t%s Vr: \t%s ") % (0, 0, 0, 0)
     if len(hgt) > 0:
@@ -429,7 +454,7 @@ def get_hot_countNew(changepercent, rzrq, fibl=None, fibc=10):
         print(u"\tSh: %s rz:%s :%s%% sz: %s rz:%s :%s%% All: %s diff: %s亿" % (
             f_print(5, rzrq['sh']), f_print(4, rzrq['shrz']), shpcent, f_print(
                 5, rzrq['sz']), f_print(4, rzrq['szrz']),
-            szpcent, f_print(4, rzrq['all']), f_print(5, rzrq['dff'])))
+            szpcent, f_print(4, rzrq['all'],31), f_print(5, rzrq['dff'],31)))
     bigcount = rd.getconfigBigCount(count=None, write=True)
     # print "bigcount:",bigcount
 

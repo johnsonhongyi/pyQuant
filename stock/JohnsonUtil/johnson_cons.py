@@ -134,7 +134,7 @@ Duration_sort_percd_key = [0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1]
 
 # Duration_percent_dff = ['percent', 'b1_v', 'dff', 'df2', 'op',
 # Duration_percent_dff = ['percent','per2d','b1_v', 'dff', 'df2', 'op',
-Duration_percent_dff = ['percent','per2d','b1_v', 'dff', 'df2', 'op',
+Duration_percent_dff = ['percent','df2','per2d','b1_v', 'dff',  'op',
                         'fib', 'fibl', 'ra', 'ratio', 'volume', 'couts']
 Duration_percent_dff_key = [0, 0,0, 0, 0, 0, 1, 1, 0, 1, 1, 1]
 
@@ -179,8 +179,8 @@ Duration_ra_dff = ['ra', 'dff', 'couts', 'percent',
 
 Duration_ra_dff_key = [0, 0, 0, 0, 0, 1, 1, 1, 1]
 
-Duration_sort_per_df2 = ['percent', 'b1_v', 'ma', 'dff', 'ratio', 'volume']
-Duration_sort_per_df2_key = [0, 0, 0, 0, 0, 0]
+Duration_sort_per_df2 = ['percent', 'b1_v','df2','ma', 'dff', 'ratio', 'volume']
+Duration_sort_per_df2_key = [0, 0, 0, 0, 0, 0 , 0]
 
 # Duration_ra_goldop=['ra','percent','dff','boll','op','fib','fibl','ratio','volume','couts']
 # Duration_ra_goldop_key=[0,0,0,0,0,1,1,1,1,1]

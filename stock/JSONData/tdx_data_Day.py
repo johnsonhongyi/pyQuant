@@ -513,7 +513,7 @@ def get_tdx_Exp_day_to_df(code, start=None, end=None, dl=None, newdays=None, typ
                 if tdx_err_code is None:
                     tdx_err_code = [code]
                     cct.GlobalValues().setkey('tdx_err_code', tdx_err_code)
-                    log.error("%s start:%s df:%s dl:%s outdata!" %
+                    log.info("%s start:%s df:%s dl:%s outdata!" %
                               (code, start, len(df), dl))
                     initTdxdata += 1
                     if write_k_data_status:
@@ -3346,7 +3346,7 @@ if __name__ == '__main__':
     # log_level = LoggerFactory.DEBUG if args['-d']  else LoggerFactory.ERROR
     log.setLevel(log_level)
     # code='002169'
-    code = '300107'
+    code = '399005'
     df = get_tdx_Exp_day_to_df(code, dl=60,end=20180508, newdays=0, resample='d')
     df3 = df.sort_index(ascending=True)
     print df[:2].cumin, df[:2].cmean
