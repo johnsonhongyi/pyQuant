@@ -93,7 +93,7 @@ if __name__ == "__main__":
     lastpTDX_DF = pd.DataFrame()
     # market_sort_value, market_sort_value_key = ct.get_market_sort_value_key('8')
     resample = 'd'
-    st_key_sort = '4'
+    st_key_sort = '6'
     while 1:
         try:
             # df = rl.get_sina_all_json_dd(vol, type)

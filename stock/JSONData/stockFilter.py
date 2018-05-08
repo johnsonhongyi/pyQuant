@@ -69,7 +69,15 @@ def getBollFilter(df=None, boll=ct.bollFilter, duration=ct.PowerCountdl, filter=
     df['upper'] = map(lambda x: round((1 + 11.0 / 100) * x, 1), df.ma10d)
     df['lower'] = map(lambda x: round((1 - 9.0 / 100) * x, 1), df.ma10d)
     df['ene'] = map(lambda x, y: round((x + y) / 2, 1), df.upper, df.lower)
-    df = df[df.df2 > 0]
+    if cct.get_work_time():
+        if 915 < cct.get_now_time_int() < 930:
+            df['cumnow'] =  map(lambda x, y: 1 if x - y > 0 else 0, df.close, df.lasth1d)
+        else:
+            df['cumnow'] =  map(lambda x, y: 1 if x - y > 0 else 0, df.high, df.lasth1d)
+        df['df2'] = (df['df2'] + df['cumnow']).map(lambda x: int(x))
+        df = df[df.df2 > 1]
+    else:
+        df = df[df.df2 > 0]
     # df.rename(columns={'cumin': 'df2'}, inplace=True)
     if df is None:
         print "dataframe is None"

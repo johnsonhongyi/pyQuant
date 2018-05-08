@@ -438,7 +438,7 @@ def get_hot_countNew(changepercent, rzrq, fibl=None, fibc=10):
     #         f_print(5, ff['zvol']))),
     if len(ff) > 0:
         print(u"\t\tSh: %s Vr:%s Sz: %s Vr:%s " % (
-            f_print(4, ff['scent']), f_print(5, ff['svol'],32), f_print(4, ff['zcent']), f_print(5, ff['zvol'],32)))
+            f_print(4, ff['scent']), f_print(5, ff['svol'],31), f_print(4, ff['zcent']), f_print(5, ff['zvol'],31)))
     else:
         print(u"\t\tSh: \t%s Vr:  \t%s Sz: \t%s Vr: \t%s ") % (0, 0, 0, 0)
     if len(hgt) > 0:
