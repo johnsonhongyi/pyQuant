@@ -106,10 +106,10 @@ if __name__ == "__main__":
     # log=LoggerFactory.JohnsonLoger('SinaMarket').setLevel(LoggerFactory.DEBUG)
     # log.setLevel(LoggerFactory.DEBUG)
     if cct.isMac():
-        width, height = 174, 19
+        width, height = 174, 20
         cct.set_console(width, height)
     else:
-        width, height = 174, 19
+        width, height = 174, 20
         cct.set_console(width, height)
     status = False
     vol = ct.json_countVol

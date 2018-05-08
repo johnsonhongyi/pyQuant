@@ -39,12 +39,13 @@ duration_date_sort = duration_date_l
 PowerCountdl = duration_date_l * 2 if duration_date_l < 20 else duration_date_l
 Power_Ma_Days = 6
 Power_last_da = 1
+wencai_end_time = 2400
 # power_update_time = 900
 writeCount = 5
 changeRatio = 0.975
 changeRatioUp = 1.025
 # duration_date = 10
-wencai_delay_time = 60
+wencai_delay_time = 10
 resample_dtype = 'd'
 logtime = 2700
 

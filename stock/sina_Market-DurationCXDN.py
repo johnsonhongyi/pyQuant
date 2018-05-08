@@ -85,7 +85,7 @@ if __name__ == "__main__":
     # log.level = log.debug
     # error_handler = SyslogHandler('Sina-M-Log', level='ERROR')
 
-    width, height = 174, 21
+    width, height = 174, 22
 
     def set_duration_console(duration_date):
         if cct.isMac():
@@ -134,7 +134,8 @@ if __name__ == "__main__":
     parserDuraton = cct.DurationArgmain()
     # market_sort_value, market_sort_value_key = ct.get_market_sort_value_key(ct.sort_value_key_perd)
     # market_sort_value, market_sort_value_key = ct.get_market_sort_value_key('1')
-    st_key_sort = '2 1'
+    # st_key_sort = '2 1'
+    st_key_sort = '7'
     while 1:
         try:
             '''
@@ -149,8 +150,8 @@ if __name__ == "__main__":
             # top_now = tdd.getSinaAlldf(market='央企',filename='yqg', vol=ct.json_countVol, vtype=ct.json_countType)
             # top_now = tdd.getSinaAlldf(market=u'一带一路',filename='ydyl', vol=ct.json_countVol, vtype=ct.json_countType)
             # top_now = tdd.getSinaAlldf(market='all', vol=ct.json_countVol, vtype=ct.json_countType,trend=False)
-            top_now = tdd.getSinaAlldf(market='all', vol=ct.json_countVol, vtype=ct.json_countType,trend=False)
-            # top_now = tdd.getSinaAlldf(market='次新股',filename='cxg', vol=ct.json_countVol, vtype=ct.json_countType)
+            # top_now = tdd.getSinaAlldf(market='all', vol=ct.json_countVol, vtype=ct.json_countType,trend=False)
+            top_now = tdd.getSinaAlldf(market='次新股,zxb',filename='cxg', vol=ct.json_countVol, vtype=ct.json_countType)
             time_Rt = time.time()
             # top_now = tdd.getSinaAlldf(market='有色+煤炭', filename='mfsw', vol=ct.json_countVol, vtype=ct.json_countType)
             # top_now = tdd.getSinaAlldf(market='雄安新区', filename='xaxq', vol=ct.json_countVol, vtype=ct.json_countType)

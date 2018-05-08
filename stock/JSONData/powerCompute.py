@@ -962,9 +962,9 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y', tal
     h5_fname = 'powerCompute'
     h5_table = dtype + '_' + str(dl) + '_' + filter + '_' + 'all'
     power_columns = ['ra', 'op', 'category', 'ma', 'rsi', 'kdj',
-                     'boll', 'rah', 'df2','fib', 'fibl', 'macd', 'vstd', 'oph', 'lvolume']
-    # [['ma' ,'rsi' ,'kdj' ,'boll', 'ra','rah', 'df2' ,'fibl','fib' ,'macd' ,'oph']]
-    # [['ma' ,'rsi' ,'kdj' ,'boll', 'ra',rah', 'df2' ,'fibl','fib' ,'macd' ,'vstd', 'oph']]
+                     'boll', 'rah', 'df2b','fib', 'fibl', 'macd', 'vstd', 'oph', 'lvolume']
+    # [['ma' ,'rsi' ,'kdj' ,'boll', 'ra','rah', 'df2b' ,'fibl','fib' ,'macd' ,'oph']]
+    # [['ma' ,'rsi' ,'kdj' ,'boll', 'ra',rah', 'df2b' ,'fibl','fib' ,'macd' ,'vstd', 'oph']]
 
     h5 = h5a.load_hdf_db(h5_fname, h5_table, code_l=code_l, limit_time=ct.h5_power_limit_time)
 
@@ -977,8 +977,8 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y', tal
             #            status = len(set(power_columns) & set(df_co)) - len(power_columns) == 0
             #            if status:
 
-#            h5 = h5[(h5.op <> 0) & (h5.ra <> 0) & (h5.df2 <> 0 )]
-            h5 = h5[(h5.df2 <> 0 ) & (h5.ra <> 0 ) & (h5.boll <> 0 )]
+#            h5 = h5[(h5.op <> 0) & (h5.ra <> 0) & (h5.df2b <> 0 )]
+            h5 = h5[(h5.df2b <> 0 ) & (h5.ra <> 0 ) & (h5.boll <> 0 )]
             h5 = h5.drop(
                 [inx for inx in h5.columns if inx not in power_columns], axis=1)
 
@@ -1049,8 +1049,12 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y', tal
                 df = dm
 
     #    cname = ",".join(x for x in dm.name)
-        dmname = dm.name
-        wcdf = wcd.get_wencai_data(dmname, 'wencai')
+        n_code = [n for n in dm.index if n.startswith(('30', '60', '00'))]
+        if len(n_code) > 1:
+            dmname = dm.loc[n_code].name
+            wcdf = wcd.get_wencai_data(dmname, 'wencai',days='N')
+        else:
+            wcdf = None
         wcdf_code = None if wcdf is None else wcdf.index.tolist()
         # col_co = df.columns.tolist()
         # col_co.extend([ 'ra', 'op', 'fib', 'ma5d', 'ma10d', 'ldate', 'hmax', 'lmin', 'cmean'])
@@ -1103,7 +1107,8 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y', tal
                 #     # log.info("tdx_df:%s"%(len(tdx_df)))
                 tdx_days = len(tdx_df)
                 # if 8 < tdx_days < ct.cxg_limit_days:
-                if "per3d" in df.columns and df.loc[code].per3d > 20 and 8 < tdx_days:
+
+                if code in df.index and "per3d" in df.columns and df.loc[code].per3d > 20 and 8 < tdx_days:
                     # print code,df.loc[code].per2d
                     if tdx_days > 6:
                         top_count = 0
@@ -1239,17 +1244,17 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y', tal
             # df = df.drop_duplicates()
         df = df.fillna(0)
 
-        # df['df2'] = (map(lambda ra, fibl,rah,fib,ma,kdj,rsi:round(eval(ct.powerdiff%(ct.PowerCountdl)),1),\
+        # df['df2b'] = (map(lambda ra, fibl,rah,fib,ma,kdj,rsi:round(eval(ct.powerdiff%(ct.PowerCountdl)),1),\
         #                  df['ra'].values, df['fibl'].values,df['rah'].values,df['fib'].values,df['ma'].values,\
         #                  df['kdj'].values,df['rsi'].values))
 #        if "fib" not in df.columns:
 #            df['fib'] = 0
         def compute_df2(df):
-           df['df2'] = (map(lambda ra, fibl, rah, fib, ma, kdj, rsi: (eval(ct.powerdiff % (dl))),
+           df['df2b'] = (map(lambda ra, fibl, rah, fib, ma, kdj, rsi: (eval(ct.powerdiff % (dl))),
                      df['ra'].values, df['fibl'].values, df[
                          'rah'].values, df['fib'].values, df['ma'].values,
                      df['kdj'].values, df['rsi'].values))
-           df['df2'] = df['df2'].apply(lambda x:round(x,1))
+           df['df2b'] = df['df2b'].apply(lambda x:round(x,1))
            return df
 
         if len(df) <> len(code_l):
@@ -1342,10 +1347,10 @@ if __name__ == "__main__":
     # df = powerCompute_df(['603689', '300506', '002171'], days=ct.Power_last_da, dtype='d', end=None, dl=ct.PowerCountdl, talib=True, filter='y')
 #    df = powerCompute_df(['603689', '300506', '002171'], days=3, dtype='d', end=None, dl=ct.PowerCountdl, talib=True, filter='y')
     # df = powerCompute_df(['999999','399006'], days=0, dtype='d', end=None, dl=ct.PowerCountdl, talib=True, filter='y')
-    df = powerCompute_df(['999999','399006','399001'], days=0, dtype='d', end=None, dl=10, talib=True, filter='y',index=True)
+    df = powerCompute_df(['999999','399006','399001'], days=0, dtype='d', end=None, dl=ct.PowerCountdl, talib=True, filter='y',index=True)
 
     print "\n",cct.format_for_print(df.loc[:,['ra', 'op', 'ma', 'rsi', 'kdj',
-                     'boll', 'rah', 'df2', 'fibl', 'macd', 'vstd', 'oph', 'lvolume']])
+                     'boll', 'rah', 'df2b', 'fibl', 'macd', 'vstd', 'oph', 'lvolume']])
     # print "\n",df.fibl,df.fib
     print "\n",cct.format_for_print(df.loc[:,['op','boll','ma','kdj','macd','ldate','fibl','fib','timel']])
     # import ipdb;ipdb.set_trace()

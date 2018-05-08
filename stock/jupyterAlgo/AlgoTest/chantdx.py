@@ -487,6 +487,7 @@ def show_chan_mpl(code,start_date,end_date,stock_days,resample,show_mpl=True,lea
     def dataframe_mode_round(df):
         roundlist = [1,0]
         df_mode = []
+        # df.high.cummin().value_counts()
         for i in roundlist:
             df_mode = df.apply(lambda x:round(x,i)).mode()
             if len(df_mode) > 0:

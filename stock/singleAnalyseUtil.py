@@ -358,6 +358,8 @@ def get_hot_countNew(changepercent, rzrq, fibl=None, fibc=10):
         # log.debug("ffurl:%s" % url)
         print(u"crashT:%s crash<-%s:%s" %
               (f_print(4, len(crashTen)), changepercent, f_print(4, len(crash)))),
+        # print(u"-5:%s" %
+        #       (f_print(4, len(crash[crash < -5])))),
         ff = ffindex[market]
         if len(ff) > 0:
             zlr = float(ff['zlr'])
@@ -386,7 +388,8 @@ def get_hot_countNew(changepercent, rzrq, fibl=None, fibc=10):
             f_print(4, count), f_print(3, (topTen)), changepercent, f_print(4, len(top)))),
     print(u"crashT:%s crash<-%s:%s" %
           (f_print(3, len(crashTen)), changepercent, f_print(4, len(crash)))),
-
+    print(u"-5:%s" %
+          (f_print(4, len(crash[crash.percent < -5])))),
     # ff = ffu.get_dfcfw_fund_flow(ct.DFCFW_FUND_FLOW_ALL)
     ffall['time'] = ff['time']
     ff = ffall

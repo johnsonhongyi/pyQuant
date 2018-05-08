@@ -66,10 +66,10 @@ if __name__ == "__main__":
     log = LoggerFactory.getLogger('SinaMarket')
     # log.setLevel(LoggerFactory.DEBUG)
     if cct.isMac():
-        width, height = 170, 20
+        width, height = 170, 22
         cct.set_console(width, height)
     else:
-        width, height = 170, 20
+        width, height = 170, 22
         cct.set_console(width, height)
 
     # cct.set_console(width, height)

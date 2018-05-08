@@ -22,7 +22,7 @@ def parseArgmain():
         parser.add_argument('-v', action="store", dest="vtype", type=str, choices=['f', 'b'], default='f',help='Price Forward or back')
         parser.add_argument('-p', action="store", dest="ptype", type=str, choices=['high', 'low', 'close'], default='low',help='price type')
         parser.add_argument('-f', action="store", dest="filter", type=str, choices=['y', 'n'], default='y',help='find duration low')
-        parser.add_argument('-l', action="store", dest="dl", type=int, default=ct.PowerCountdl,help='dl default=30')
+        parser.add_argument('-l', action="store", dest="dl", type=int, default=ct.PowerCountdl,help='dl default=%s'%(ct.PowerCountdl))
         parser.add_argument('-da', action="store", dest="days", type=int, default=ct.Power_last_da,help='days')
         parser.add_argument('-m', action="store", dest="mpl", type=str, default='y',help='mpl show')
         parser.add_argument('-i', action="store", dest="line", type=str, choices=['y', 'n'], default='y', help='LineHis show')
@@ -74,11 +74,13 @@ if __name__ == "__main__":
             code = raw_input("code:")
             args = parser.parse_args(code.split())
             # print args
-            # print str(args.days)
+
             if not str(args.code) == 'None' and (args.wencai == 'y' or re.match('[ \u4e00 -\u9fa5]+',code) == None):
                 df  = wcd.get_wencai_Market_url(code,200,pct=False)
                 print df.shape,df[:8]
                 if len(df) == 1:
+                    if re.match('[ \u4e00 -\u9fa5]+',code) == None:
+                        args.code = df.code.values[0]
                     start = cct.day8_to_day10(args.start)
                     end = cct.day8_to_day10(args.end)
                     args.filter = 'y'

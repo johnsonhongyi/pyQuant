@@ -26,24 +26,35 @@ def func_compute_df2(c, lc, h, l):
         du_p = -du_p
     return du_p
 
-def filterPowerCount(df,count=500):
+def filterPowerCount(df,count=500,down=False):
     nowint=cct.get_now_time_int()
-    if 925 < nowint < 935:
-        top_high = df[ df.buy > df.llastp]
-    elif 935 < nowint < 1500:
+    top_temp = df[:count].copy()
+
+    if 915 < nowint <= 930:
+        if nowint <= 926:
+            top_temp = df[df.buy > df.llastp]
+        else:
+            top_temp = df[ (df.open > df.llastp) &(df.low >= df.llastp)]
+        if len(top_temp) > 0:
+            return top_temp
+        else:
+            log.error("915 open>llastp is None")
+            return df[:count].copy()
+    if 930 < nowint <= 950:
+        top_high = df[ (df.open > df.llastp) & (df.low >= df.llastp) ]
+    elif 950 < nowint:
         if 'nlow' in df.columns:
             top_high = df[ df.nlow > df.llastp]
         else:
-            top_high = df[ df.open > df.llastp]
+            top_high = df[ (df.open > df.llastp) & (df.low > df.llastp)]
     else:
         top_high = None
-    top_temp = df[:count].copy()
     if top_high is not None:
         top_temp = cct.combine_dataFrame(top_temp, top_high, col=None, compare=None, append=True, clean=True)
 
     return top_temp
 
-def getBollFilter(df=None, boll=ct.bollFilter, duration=ct.PowerCountdl, filter=True, ma5d=True, dl=14, percent=False, resample='d', ene=False, down=False, indexdff=True):
+def getBollFilter(df=None, boll=ct.bollFilter, duration=ct.PowerCountdl, filter=True, ma5d=True, dl=14, percent=True, resample='d', ene=False, down=False, indexdff=True):
 
     # drop_cxg = cct.GlobalValues().getkey('dropcxg')
     # if len(drop_cxg) >0:
@@ -54,10 +65,13 @@ def getBollFilter(df=None, boll=ct.bollFilter, duration=ct.PowerCountdl, filter=
             # df = df.drop(drop_t,axis=0)top
             # log.error("stf drop_cxg:%s"%(len(drop_t)))
     time_s = time.time()
+
     df['upper'] = map(lambda x: round((1 + 11.0 / 100) * x, 1), df.ma10d)
     df['lower'] = map(lambda x: round((1 - 9.0 / 100) * x, 1), df.ma10d)
     df['ene'] = map(lambda x, y: round((x + y) / 2, 1), df.upper, df.lower)
-
+    df = df[df.cumin > 0]
+    # df.rename(columns={'df2': 'df2b'}, inplace=True)
+    df.rename(columns={'cumin': 'df2'}, inplace=True)
     if df is None:
         print "dataframe is None"
         return None
@@ -79,21 +93,21 @@ def getBollFilter(df=None, boll=ct.bollFilter, duration=ct.PowerCountdl, filter=
             # df['perc_n'] = map((lambda c, lc: (1 if (c - lc) > 0 else down_zero) + (1 if (c - lc) / lc * 100 > 3 else down_zero) +
             # (down_dn if (c - lc) / lc * 100 < -3 else down_zero)), df['close'], df['lastp%sd' % da])
 
-            idx_rnd = random.randint(0, len(df) - 10)
+            idx_rnd = random.randint(0, len(df) - 10) if len(df) > 10 else 0
 
             # print "idx_rnd",idx_rnd,df.ix[idx_rnd].lastp0d ,df.ix[idx_rnd].close,df.ix[idx_rnd].lastp0d != df.ix[idx_rnd].close
             if cct.get_work_time() or df.ix[idx_rnd].lastp0d <> df.ix[idx_rnd].close:
                 nowd, per1d = 0, 1
                 if 'nlow' in df.columns:
-                    df['perc_n'] = map(cct.func_compute_percd2, df['close'], df['llastp'], df['open'], df['lasth%sd' %
+                    df['perc_n'] = map(cct.func_compute_percd2, df['close'], df['llastp'], df['open'],df['lasto%sd' % nowd], df['lasth%sd' %
                                                                                                           (nowd)], df['lastl%sd' % (nowd)], df['nhigh'], df['nlow'], df['hmax'])
                 else:
-                    df['perc_n'] = map(cct.func_compute_percd2, df['close'], df['llastp'], df['open'], df['lasth%sd' %
+                    df['perc_n'] = map(cct.func_compute_percd2, df['close'], df['llastp'], df['open'],df['lasto%sd' % nowd], df['lasth%sd' %
                                                                                                           (nowd)], df['lastl%sd' % (nowd)], df['high'], df['low'], df['hmax'])
             else:
                 nowd, per1d = 1, 2
                 # print  df['per%sd' % da+1], df['lastp%sd' % (da)], df['lasth%sd' % (da)], df['lastl%sd' % (da)], df['high'], df['low']
-                df['perc_n'] = map(cct.func_compute_percd2, df['close'], df['llastp'], df['open'], df['lasth%sd' %
+                df['perc_n'] = map(cct.func_compute_percd2, df['close'], df['llastp'], df['open'],df['lasto%sd' % nowd], df['lasth%sd' %
                                                                                                       (nowd)], df['lastl%sd' % (nowd)], df['high'], df['low'], df['hmax'])
 
             for co in perc_col:
@@ -108,7 +122,7 @@ def getBollFilter(df=None, boll=ct.bollFilter, duration=ct.PowerCountdl, filter=
         df['fib'] = 0
     # else:
 
-    co2int = ['boll', 'op', 'ratio', 'fib', 'fibl']
+    co2int = ['boll', 'op', 'ratio', 'fib', 'fibl','df2']
     co2int.extend([co for co in df.columns.tolist() if co.startswith('perc') and co.endswith('d')])
     for co in co2int:
         df[co] = df[co].astype(int)
@@ -116,11 +130,13 @@ def getBollFilter(df=None, boll=ct.bollFilter, duration=ct.PowerCountdl, filter=
     if down:
         if 'nlow' in df.columns:
             if 'max5' in df.columns:
-                df = df[(df.hmax >= df.ene) & (df.nlow >= df.low) & (df.low <> df.high) & (((df.low < df.hmax) & (df.high > df.cmean)) | (df.high > df.max5))]
+                # df = df[(df.hmax >= df.ene) & (df.nlow >= df.low) & (df.low <> df.high) & (((df.low < df.hmax) & (df.high > df.cmean)) | (df.high > df.max5))]
+                df = df[ (df.max5 >= df.ene) | (df.high > df.max5)]
             else:
                 df = df[(df.hmax >= df.ene) & (df.nlow >= df.low) & (df.low <> df.high) & (((df.low < df.hmax) & (df.high > df.cmean)))]
         else:
-            df = df[(df.hmax >= df.ene) & (df.low <> df.high) & (((df.low < df.hmax) & (df.close > df.cmean)) | (df.high > df.cmean))]
+            # df = df[ (df.max5 >= df.ene) & (df.low <> df.high) & (((df.low < df.hmax) & (df.close > df.cmean)) | (df.high > df.cmean))]
+            df = df[ (df.max5 >= df.ene)  | (df.high > df.cmean)]
         return df
 
     if 'b1_v' in df.columns and 'nvol' in df.columns:
@@ -150,11 +166,11 @@ def getBollFilter(df=None, boll=ct.bollFilter, duration=ct.PowerCountdl, filter=
             log.info("stf market_key:%s" % (market_key))
             idx_k = cct.get_col_in_columns(df, 'perc%sd', market_value)
             df = df[df["perc%sd" % (idx_k)] >= idx_k]
-        if int(market_value) < 3:
+        if int(market_value) < 3 and 930 < cct.get_now_time_int():
             if 'nlow' in df.columns:
-                df = df[((df.per1d < 3) & (df.nlow >= df.llastp) & (df.volume > 1.5)) | ((df.per1d > 5) & (df.volume > 1.5))]
+                df = df[((df.per1d < 3) & (df.nlow >= df.llastp)) | ((df.per1d > 5) & (df.buy > df.llastp))]
             else:
-                df = df[((df.per1d < 3) & (df.open > df.llastp) & (df.volume > 1.5)) | ((df.per1d > 5) & (df.volume > 1.5))]
+                df = df[((df.per1d < 3) & (df.open > df.llastp)) | ((df.per1d > 5) & (df.buy > df.llastp))]
 
     # else:
     #     if 'fib' in df.columns:
@@ -309,11 +325,15 @@ def getBollFilter(df=None, boll=ct.bollFilter, duration=ct.PowerCountdl, filter=
                     df = df[((df.volume > 2 * cct.get_work_time_ratio()) & (df.percent > -3)) | ((df.stdv < 1) &
                                                                                                  (df.percent > 2)) | ((df.lvolume > df.lvol * 0.9) & (df.lvolume > df.lowvol * 1.1))]
                     df_index = tdd.getSinaIndexdf()
+
                     df_index['volume'] = (map(lambda x, y: round(x / y / radio_t, 1), df_index.nvol.values, df_index.lvolume.values))
                     index_vol = df_index.loc['999999'].volume
                     index_percent = df_index.loc['999999'].percent
+                    index_boll = df_index.loc['999999'].boll
+                    index_op = df_index.loc['999999'].op
                     # df = df[((df.percent > -3) | (df.volume > index_vol)) & (df.percent > index_percent)]
-                    df = df[((df.percent > -3) | (df.volume > index_vol)) & (df.percent > index_percent)]
+                    # df = df[((df.percent > -1) | (df.volume > index_vol * 1.5)) & (df.percent > index_percent)  & (df.boll >= index_boll)]
+                    df = df[((df.percent > -1) | (df.volume > index_vol * 1.5)) & (df.percent > index_percent)]
 
                 else:
                     df = df[((df.volume > 1.2 * cct.get_work_time_ratio()) & (df.percent > -3))
@@ -370,6 +390,7 @@ def getBollFilter(df=None, boll=ct.bollFilter, duration=ct.PowerCountdl, filter=
         else:
             df = df[(df.buy > df.cmean)]
     print("bo:%0.1f" % (time.time() - time_s)),
+    
     return df
 
     # df = df[df.buy > df.cmean * ct.changeRatio]

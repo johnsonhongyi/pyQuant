@@ -2120,21 +2120,32 @@ def func_compute_percd(close, lastp, op, lasth, lastl, nowh, nowl):
     #         initc -= 1
     return initc
 
-def func_compute_percd2(close, lastp, op, lasth, lastl, nowh, nowl,hmax=None,nvol=None,lvol=None):
+def func_compute_percd2(close, lastp, op, lastopen,lasth, lastl, nowh, nowl,hmax=None,nvol=None,lvol=None):
     # down_zero, down_dn, percent_l = 0, 0, 2
      # (1 if ( ((c >= op) and ((c - lc)/lc*100 >= 0)) or (c >= op and c >=m5a) ) else down_dn)
     initc = 0
-    
-    if nowl == op or (op > lastp and nowl >lastp):
+    close = round(close, 1)
+    lastp = round(lastp, 1)
+    op = round(op, 1)
+    lastopen = round(lastopen, 1)
+    lasth = round(lasth, 1)
+    lastl = round(lastl, 1)
+    if hmax is not None:
+        if lastopen >= lastl:
+            initc +=1
+            if op >= nowl:
+                initc +=1
+        if nowh >= hmax:
+            initc +=1
+
+    if nowl == op or (op > lastp and nowl > lastp):
         initc +=1
+        if lastopen >= lastl:
+            initc +=1
         if  nowh > lasth:
             initc +=1
-            if hmax is not None:
-                if nowh >= hmax:
-                    initc +=1
-            else:
-                if nowh == close:
-                    initc +=1
+            if nowh == close:
+                initc +=1
 
     if  op > lastp or nowl > lastp:
             initc +=1
@@ -2259,6 +2270,7 @@ def combine_dataFrame(maindf, subdf, col=None, compare=None, append=False, clean
         #            maindf,subdf =subdf,maindf
         maindf = maindf.drop([col for col in maindf.index if col in subdf.index], axis=0)
         co_mod = maindf.dtypes[(maindf.dtypes == int) & (maindf.dtypes.keys() <> 'ldate') & (maindf.dtypes.keys() <> 'kind')]
+
         for co_t in co_mod.keys():
             if co_t in subdf.columns:
                 if maindf.dtypes[co_t] <> subdf.dtypes[co_t]:
@@ -2268,9 +2280,13 @@ def combine_dataFrame(maindf, subdf, col=None, compare=None, append=False, clean
                     # print co_t,maindf.dtypes[co_t]
                     subdf[co_t] = subdf[co_t].astype(maindf.dtypes[co_t])
                     # log.error("col to types:%s" % (maindf.dtypes[co_t]))
+            else:
+                if append:
+                    subdf[co_t] = 0
+                    subdf[co_t] = subdf[co_t].astype(maindf.dtypes[co_t])
 
         maindf = pd.concat([maindf, subdf], axis=0)
-
+        maindf = maindf.fillna(-1)
         if not 'code' in maindf.columns:
             if not maindf.index.name == 'code':
                 maindf.index.name = 'code'
@@ -2305,9 +2321,8 @@ def combine_dataFrame(maindf, subdf, col=None, compare=None, append=False, clean
     log.info("combine df :%0.2f" % (time.time() - times))
     if append:
         dif_co = list(set(maindf_co) - set(subdf_co))
-        # print "diff_co",set(dif_co) - set(['nhigh','nlow','nclose'])
         if set(dif_co) - set(['nhigh', 'nlow', 'nclose']) > 0 and len(dif_co) > 1:
-            log.error("col:%s %s" % (dif_co[:3], eval(("maindf.%s") % (dif_co[0]))[1]))
+            log.info("col:%s %s" % (dif_co[:3], eval(("maindf.%s") % (dif_co[0]))[1]))
     return maindf
 
 if __name__ == '__main__':
