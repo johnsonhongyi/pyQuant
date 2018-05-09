@@ -213,16 +213,16 @@ MonitorMarket_sort_op_key = [0, 0, 1, 0, 0, 0, 1, 1, 1]
 # Monitor_format_trade=['name', 'trade', 'ma5d','boll','dff','df2', 'percent', 'ra','op', 'fib','ratio','ma','volume','category']
 # MonitorMarket_format_buy=['name', 'buy', 'ma5d', 'boll','dff','df2','couts','percent', 'ra','op', 'ratio','ma','volume','date','category']
 
-Duration_format_buy = ['name', 'buy', 'boll', 'dff', 'df2', 'percent', 'per1d', 'per3d',
+Duration_format_buy = ['name', 'buy', 'boll', 'dff', 'df2', 'percent', 'per1d', 'perc3d',
                        'ra', 'op', 'ratio', 'couts',  'volume', 'fib','fibl', 'category']
 Duration_format_trade = ['name', 'trade', 'boll', 'dff', 'df2',
-                         'percent', 'per1d',  'per3d',  'ra', 'op', 'ratio', 'couts', 'volume', 'fib','fibl', 'category']
+                         'percent', 'per1d',  'perc3d',  'ra', 'op', 'ratio', 'couts', 'volume', 'fib','fibl', 'category']
 
 
 Monitor_format_trade = ['name', 'trade', 'boll', 'dff', 'df2', 'couts',
-                        'percent', 'per1d', 'per3d', 'ra', 'op', 'ratio',  'volume', 'fib','fibl', 'category']
+                        'percent', 'per1d', 'perc3d', 'ra', 'op', 'ratio',  'volume', 'fib','fibl', 'category']
 MonitorMarket_format_buy = ['name', 'buy', 'boll', 'dff', 'df2',
-                            'couts', 'percent', 'per1d', 'per3d', 'ra', 'op', 'ratio',  'volume', 'fib','fibl', 'category']
+                            'couts', 'percent', 'per1d', 'perc3d', 'ra', 'op', 'ratio',  'volume', 'fib','fibl', 'category']
 
 # Sina_Monitor_format =['name', 'trade', 'ma5d','boll','dff','df2','couts','percent', 'ra','op', 'fib','ratio','ma','volume','category']
 # MonitorMarket_format_buy=['name', 'buy', 'ma5d', 'boll','dff','percent', 'ra','op', 'fib','fibl','ma','macd','rsi','kdj','volume','date']
@@ -594,16 +594,16 @@ def negate_boolean_list(negate_list, idx=1, position=False):
     return sort_negate_l
 
 
-def get_Duration_format_Values(duration_format, column=None, replace='per3d',dest='b1_v'):
+def get_Duration_format_Values(duration_format, column=None, replace='perc3d',dest='b1_v'):
     if column is not None or dest <>'b1_v':
         t_list = []
 #        perd_l = ['per%sd','perc%sd']
         if column is None:
           column = [dest]
         else:
-            if isinstance(column, list):
-                column = column[:2]
-            else:
+            if not isinstance(column, list):
+#                column = column[:2]
+#            else:
                 column = [column]
         if 'percent' in column:
             column.remove('percent')
@@ -619,7 +619,7 @@ def get_Duration_format_Values(duration_format, column=None, replace='per3d',des
                 if (co <> 0 or column[co] <> replace) and (replace in column or column[co] not in duration_format):
                     if len(column) > 1 and column[co].find('per') > -1:
                         if column[co].find('perc') > -1:
-                            replace = 'per3d'
+                            replace = 'perc3d'
                         else:
                             replace = 'per1d'
                     count = duration_format.count(replace)
@@ -754,7 +754,7 @@ def get_Dynamic_Duration_perd(market_sort_value, idx_perd, columns=None):
         idx_value = eval(market_sort_value)[idx_key[i]]
         idx_perd = int(idx)
         if idx_perd > 1 or i == 0:
-            if idx_perd > 3 and columns is not None and len(columns) > 0:
+            if idx_perd > 1 and columns is not None and len(columns) > 0:
                 idx_k = idx_perd
                 if not idx_value % idx_k in columns:
                     for inx in range(8, 1, -1):

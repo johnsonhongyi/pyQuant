@@ -145,8 +145,8 @@ def getBollFilter(df=None, boll=ct.bollFilter, duration=ct.PowerCountdl, filter=
             # df = df[ (df.max5 >= df.ene) & (df.low <> df.high) & (((df.low < df.hmax) & (df.close > df.cmean)) | (df.high > df.cmean))]
             df = df[ (df.max5 >= df.ene)  | (df.high > df.cmean)]
         return df
-
-    if 'b1_v' in df.columns and 'nvol' in df.columns:
+    
+    if cct.get_work_time() and 'b1_v' in df.columns and 'nvol' in df.columns:
         df = df[(df.b1_v > 0) | (df.nvol > 0)]
 
     radio_t = cct.get_work_time_ratio()

@@ -243,7 +243,7 @@ terminal_positionKey = {'sina_Market-DurationDn.py': '216, 490',
                         'sina_Monitor-Market-LH.py': '184, 239',
                         'sina_Monitor-Market.py': '19, 179',
                         'sina_Monitor.py': '28, 23',
-                        'singleAnalyseUtil.py': '651, 23',
+                        'singleAnalyseUtil.py': '594, 23',
                         'LinePower.py': '38, 365', }
 
 script_set_position = '''tell application "Terminal"
@@ -1442,9 +1442,12 @@ def get_index_fibl():
     sys.path.append("..")
     from JSONData import powerCompute as pct
     df = pct.powerCompute_df(['999999','399006','399001'], days=0, dtype='d', end=None, dl=10, talib=True, filter='y',index=True)
+
     if len(df) >0 and 'fibl' in df.columns:
-        fibl = int(df.fibl.max())
-        return fibl if 1 <= fibl < 6 else 2
+        # fibl = int(df.fibl.max())
+        fibl = int(df.cumin.max())
+        fibl = fibl if fibl > 0 else 1 
+        return abs(fibl)
     else:
         return 1
 

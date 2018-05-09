@@ -3346,7 +3346,7 @@ if __name__ == '__main__':
     # log_level = LoggerFactory.DEBUG if args['-d']  else LoggerFactory.ERROR
     log.setLevel(log_level)
     # code='002169'
-    code = '399005'
+    code = '399001'
     df = get_tdx_Exp_day_to_df(code, dl=60,end=20180508, newdays=0, resample='d')
     df3 = df.sort_index(ascending=True)
     print df[:2].cumin, df[:2].cmean

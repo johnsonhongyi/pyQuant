@@ -310,12 +310,17 @@ def fibonacciCount(code, dl=60, start=None, days=0):
             if not daysData[1].ma5d[0]:
                 daysData[1].ma5d[0] = 0
             fibl.append(
-                [code, op, ra, [daysData[0], int(daysData[1].ma5d[0])], fib, st])
+                [code, op, ra, [daysData[0], int(daysData[1].ma5d[0])], fib, st ,dd.cumin[-1]])
     return fibl
 
-
+global cumin_index 
+cumin_index = {}
 def get_hot_countNew(changepercent, rzrq, fibl=None, fibc=10):
-    global fibcount
+    global fibcount,cumin_index
+    INDEX_LIST_TDX = {'999999':'sh', '399001':'sz', '399006':'cyb'}
+    # {v: k for k, v in m.items()}
+    # >>> zip(m.values(), m.keys())
+    # mi = dict(zip(m.values(), m.keys()))
     if fibcount == 0 or fibcount >= fibc:
         if fibcount >= fibc:
             fibcount = 1
@@ -324,8 +329,9 @@ def get_hot_countNew(changepercent, rzrq, fibl=None, fibc=10):
         if fibl is not None:
             int = 0
             for f in fibl:
-                code, op, ra, daysData, fib, st = f[
-                    0], f[1], f[2], f[3], f[4], f[5]
+                code, op, ra, daysData, fib, st ,cumin= f[
+                    0], f[1], f[2], f[3], f[4], f[5] ,f[6]
+                cumin_index[INDEX_LIST_TDX[code]]=cumin
                 int += 1
                 if int % 2 != 0:
                     print "%s op:%s ra:%s d:%s fib:%s m5:%s  %s" % (code, f_print(3, op), f_print(5, ra), f_print(2, daysData[0]), f_print(3, fib), f_print(4, daysData[1]), st),
@@ -395,8 +401,9 @@ def get_hot_countNew(changepercent, rzrq, fibl=None, fibc=10):
             # modfprint=lambda x:f_print(4,x) if x>0 else "-%s"%(f_print(4,str(x).replace('-','')))
             # print modfprint(zlr)
             # print (u"流入: %s亿 比: %s%%" % (modfprint(zlr), modfprint(zzb))),
-            print(u"流入: %s亿 比: %s%%" % (f_print(4, zlr,32), f_print(4, zzb,32))),
-            print(u"%s %s%s" % (f_print(4, ff['close']), f_print(1, '!' if ff['open'] > ff[
+            print(u"流入: %s亿 比: %s%%" % (f_print(6, zlr,32), f_print(4, zzb,32))),
+            print (u" %s"%(f_print(2,cumin_index[market],31))),
+            print(u"%s %s%s" % (f_print(7, ff['close']), f_print(1, '!' if ff['open'] > ff[
                 'lastp'] else '?'), f_print(2, '!!' if ff['close'] > ff['lastp'] else '??',32)))
         allTop = allTop.append(df, ignore_index=True)
         allTop = allTop.drop_duplicates()
@@ -412,7 +419,7 @@ def get_hot_countNew(changepercent, rzrq, fibl=None, fibc=10):
         u" \tA:%s topT:%s top>%s:%s" % (
             f_print(4, count), f_print(3, (topTen),31), changepercent, f_print(4, len(top),31))),
     print(u"crashT:%s crash<-%s:%s" %
-          (f_print(3, len(crashTen),31), changepercent, f_print(4, len(crash),31))),
+          (f_print(3, len(crashTen),32), changepercent, f_print(4, len(crash),31))),
     print(u"-5:%s" %
           (f_print(4, len(crash[crash.percent < -5]),32))),
     # ff = ffu.get_dfcfw_fund_flow(ct.DFCFW_FUND_FLOW_ALL)

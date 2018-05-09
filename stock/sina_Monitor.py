@@ -196,7 +196,7 @@ if __name__ == "__main__":
                     if cct.get_now_time_int() > 1030 and cct.get_now_time_int() < 1400:
                         top_all = top_all[(top_all.volume > ct.VolumeMinR) & (
                             top_all.volume < ct.VolumeMaxR)]
-
+                
                 if st_key_sort.split()[0] == '4' and cct.get_now_time_int() > 926 and 'lastbuy' in top_all.columns:
                     top_all['dff'] = (map(lambda x, y: round((x - y) / y * 100, 1),
                                           top_all['buy'].values, top_all['lastbuy'].values))

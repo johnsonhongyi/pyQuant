@@ -967,7 +967,7 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y', tal
     # [['ma' ,'rsi' ,'kdj' ,'boll', 'ra',rah', 'df2b' ,'fibl','fib' ,'macd' ,'vstd', 'oph']]
 
     h5 = h5a.load_hdf_db(h5_fname, h5_table, code_l=code_l, limit_time=ct.h5_power_limit_time)
-
+    
     if h5 is not None:
         log.info("power hdf5 data:%s" % (len(h5)))
         if h5_combine_status:
@@ -1007,6 +1007,7 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y', tal
             print("intP:%s"%(len(code_l))),
         else:
             if index and len(h5) == len(code_l):
+
                 h5 = h5[ (h5.fibl <> h5.fib) & ((h5.fibl <> 0 ) | (h5.fib <> 0 ))]
                 temp_l = list(set(code_l) - set(h5.index))
 
@@ -1094,6 +1095,10 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y', tal
                 #     dz=dz.to_frame().T
             else:
                 dz = tdd.get_sina_data_df(code)
+
+            if index and 'cumin' not in df.columns:
+                df['cumin'] = 0
+
             if len(dz) > 0 and (index or dz.buy.values > 0 or dz.sell.values > 0):
                 tdx_df = tdd.get_tdx_append_now_df_api(
                     code, start=start, end=end, type='f', df=None, dm=dz, dl=dl, newdays=5)
@@ -1217,6 +1222,7 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y', tal
             # df.fibl.astype(float)
             df.loc[code, 'ldate'] = stl
             df.loc[code, 'boll'] = operation
+            df.loc[code,'cumin'] = tdx_df.cumin[-1]
 
             tdx_df, opkdj = getab.Get_KDJ(tdx_df, dtype='d',lastday=days)
             tdx_df, opmacd = getab.Get_MACD_OP(tdx_df, dtype='d',lastday=days)
