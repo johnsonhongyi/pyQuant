@@ -326,10 +326,10 @@ def get_linear_model_histogramDouble(code, ptype='low', dtype='d', start=None, e
         ticks = ax3.get_xticks()
         ax3.plot(asset1, '-r', linewidth=2)
 
-
-        assvol = df.loc[asset.index]['vol']
-        assvol = assvol.apply(lambda x: round(x / assvol[:1], 2))
-        ax3.plot(assvol, '-g', linewidth=0.5)
+        # show volume bar !!!
+        # assvol = df.loc[asset.index]['vol']
+        # assvol = assvol.apply(lambda x: round(x / assvol[:1], 2))
+        # ax3.plot(assvol, '-g', linewidth=0.5)
 
 
         ax3.set_xticklabels([dates[int(i)] for i in (np.append(ticks[:-1], len(asset) - 1))], rotation=15)

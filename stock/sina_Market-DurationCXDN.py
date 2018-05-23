@@ -85,7 +85,7 @@ if __name__ == "__main__":
     # log.level = log.debug
     # error_handler = SyslogHandler('Sina-M-Log', level='ERROR')
 
-    width, height = 174, 22
+    width, height = 168, 22
 
     def set_duration_console(duration_date):
         if cct.isMac():
@@ -151,8 +151,8 @@ if __name__ == "__main__":
             # top_now = tdd.getSinaAlldf(market=u'一带一路',filename='ydyl', vol=ct.json_countVol, vtype=ct.json_countType)
             # top_now = tdd.getSinaAlldf(market='all', vol=ct.json_countVol, vtype=ct.json_countType,trend=False)
             # top_now = tdd.getSinaAlldf(market='all', vol=ct.json_countVol, vtype=ct.json_countType,trend=False)
-            # top_now = tdd.getSinaAlldf(market='次新股',filename='cxg', vol=ct.json_countVol, vtype=ct.json_countType)
-            top_now = tdd.getSinaAlldf(market='次新股,zxb',filename='cxg', vol=ct.json_countVol, vtype=ct.json_countType)
+            top_now = tdd.getSinaAlldf(market='次新股',filename='cxg', vol=ct.json_countVol, vtype=ct.json_countType)
+            # top_now = tdd.getSinaAlldf(market='次新股,zxb',filename='cxg', vol=ct.json_countVol, vtype=ct.json_countType)
             time_Rt = time.time()
             # top_now = tdd.getSinaAlldf(market='有色+煤炭', filename='mfsw', vol=ct.json_countVol, vtype=ct.json_countType)
             # top_now = tdd.getSinaAlldf(market='雄安新区', filename='xaxq', vol=ct.json_countVol, vtype=ct.json_countType)
@@ -377,11 +377,12 @@ if __name__ == "__main__":
 
                     # ct_Duration_format_Values = ct.get_Duration_format_Values(ct_Duration_format_Values,replace='couts',dest='stdv')
                     # ct_Duration_format_Values = ct.get_Duration_format_Values(ct_Duration_format_Values,replace='boll',dest='upper')
-                    ct_Duration_format_Values = ct.get_Duration_format_Values(ct_Duration_format_Values,replace='couts',dest='volume')
-                    ct_Duration_format_Values = ct.get_Duration_format_Values(ct_Duration_format_Values,replace='b1_v',dest='upper')
+                    ct_Duration_format_Values = ct.get_Duration_format_Values(ct_Duration_format_Values,replace='b1_v',dest='perc3d')
+                    ct_Duration_format_Values = ct.get_Duration_format_Values(ct_Duration_format_Values,replace='couts',dest='b1_v')
                     top_dd = top_dd.loc[:, ct_Duration_format_Values]
                     # ct_Duration_format_Values = ct.get_Duration_format_Values(ct_Duration_format_Values,replace='op',dest='upper')
-                    table,widths = cct.format_for_print(top_dd[:9],widths=True)
+                    # top_dd[col for col in top_dd.index if col in top_temp[:10].index]
+                    table,widths = cct.format_for_print(top_dd.loc[[col for col in top_dd[:9].index if col in top_temp[:10].index]],widths=True)
                     print table
                     print cct.format_for_print(top_dd[-4:],header=False,widths=widths)
                     # print cct.format_for_print(top_dd)

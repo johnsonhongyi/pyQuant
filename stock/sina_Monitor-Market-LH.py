@@ -298,7 +298,9 @@ if __name__ == "__main__":
                     # top_dd = pd.concat([top_temp.loc[:, ct_MonitorMarket_Values][:9], top_temp.loc[:, ct_MonitorMarket_Values][-4:]], axis=0)
 
                     # print cct.format_for_print(topdd)
-                    table,widths = cct.format_for_print(top_dd[:9],widths=True)
+                    # table,widths = cct.format_for_print(top_dd[:9],widths=True)
+                    table,widths = cct.format_for_print(top_dd.loc[[col for col in top_dd[:9].index if col in top_temp[:10].index]],widths=True)
+                    
                     print table
                     print cct.format_for_print(top_dd[-4:],header=False,widths=widths)
                     # print cct.format_for_print(top_dd)

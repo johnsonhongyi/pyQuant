@@ -537,22 +537,59 @@ def get_tdx_Exp_day_to_df(code, start=None, end=None, dl=None, newdays=None, typ
             df = df.sort_index(ascending=False)
     # add cumin[:10]
 
-    if not isinstance(df, Series):
-        cumdf = df.high.cummin()[:10].sort_index(ascending=True)
-        cum_counts = cumdf.value_counts()
-        cum_min, pos = LISCum(cumdf.tolist())
+    if not isinstance(df, Series) and len(df) > 0:
 
-        if len(cum_counts) > 0 and len(pos) > 0 and round(cum_counts.index[0], 2) == cum_min[0]:
+        cumdf = df.high.cummin()[:ct.cumdays].sort_index(ascending=True)
+        cumdf_max = df.high.cummax()[:ct.cumdays].sort_index(ascending=True)
+        cumdfc_max = df.close.cummax()[:ct.cumdays].sort_index(ascending=True)
+        cum_counts = cumdf.value_counts()
+        cum_counts_max = cumdf_max.value_counts()
+        cumdf_Lis = cumdf[cumdf.index >= cumdf[cumdf == cum_counts.index[0]].index[-1]]
+        log.debug("cumdf:%s %s"%(cumdf,cum_counts))
+        log.debug("cumdfmax:%s %s"%(cumdf_max,cum_counts_max))
+        # log.debug("cumdfc:%s %s"%(cumdfc_max,cumdfc_max.value_counts()))
+
+        cum_min, pos = LISCum(cumdf_Lis.tolist())
+        log.debug("cum_min:%s pos:%s"%(cum_min,pos))
+
+        max_lastd = cumdf_max[cumdf_max == cum_counts_max.index[0]].index[-1]
+        # cumdf_max_f = cumdf_max.sort_index(ascending=False)
+        cumdf_max_f = cumdf_max[cumdf_max.index >= max_lastd]
+        cumdf_max_f = cumdf_max_f.sort_index(ascending=False)
+        # print cumdf_max[-1],cum_counts_max.index[0]
+        cum_maxf, posf = LISCum(cumdf_max_f.tolist())
+        # import ipdb;ipdb.set_trace()
+
+        if len(cum_counts) > 0 and len(pos) > 0 :
             df['cumins'] = round(cum_counts.index[0], 2)
             df['cumine'] = round(cumdf[-1], 2)
-            if len(pos) > 1 or len(cum_counts) == len(pos) :
-                df['cumin'] = len(pos)
+            df['cumaxe'] = round(max(cumdf_max), 2)
+            df['cumaxc'] = round(max(cumdfc_max), 2)
+            # df['cumaxs'] = round(max(cumdf_max), 2)
+            # if  (round(cum_counts.index[0], 2) == cum_min[0]) and len(pos) > 1 or len(cum_counts) == len(pos) :
+            # import ipdb;ipdb.set_trace()
+
+            if  (round(cum_counts.index[0], 2) <= cum_min[0]) and len(pos) > 1 or len(cum_counts) == len(pos) :
+                if len(pos) == 1 and cum_min[0] == cumdf_max[-1]:
+                    if len(cumdf_max_f) == len(posf) and len(posf) > len(pos):
+                        df['cumin'] = -len(posf)
+                    else:
+                        df['cumin'] = len(pos)
+                else:
+                    df['cumin'] = len(pos)
+                log.debug("cumincounts:%s cum_min:%s pos:%s"%(len(pos),cum_min,pos))
+            else:
+                if len(cumdf_max_f) == len(posf) and len(posf) > len(pos):
+                    df['cumin'] = -len(posf)
+                else:
+                    df['cumin'] = -1
+        else:
+            if len(cumdf_max_f) == len(posf) and len(posf) > len(pos):
+                df['cumin'] = -len(posf)
             else:
                 df['cumin'] = -1
-        else:
-            df['cumin'] = -2
     else:
-        df['cumin'] = -2
+        df['cumin'] = -1
 
     return df
 
@@ -2845,6 +2882,8 @@ def get_append_lastp_to_df(top_all, lastpTDX_DF=None, dl=ct.PowerCountdl, end=No
             tdxdata.rename(columns={'low': 'llow'}, inplace=True)
             tdxdata.rename(columns={'vol': 'lvol'}, inplace=True)
             tdxdata.rename(columns={'amount': 'lamount'}, inplace=True)
+            tdxdata.rename(columns={'cumin': 'df2'}, inplace=True)
+            
             h5 = h5a.write_hdf_db(
                 h5_fname, tdxdata, table=h5_table, append=True)
 
@@ -2873,6 +2912,8 @@ def get_append_lastp_to_df(top_all, lastpTDX_DF=None, dl=ct.PowerCountdl, end=No
                 tdx_diff.rename(columns={'low': 'llow'}, inplace=True)
                 tdx_diff.rename(columns={'vol': 'lvol'}, inplace=True)
                 tdx_diff.rename(columns={'amount': 'lamount'}, inplace=True)
+                tdx_diff.rename(columns={'cumin': 'df2'}, inplace=True)
+
                 if newdays is None or newdays > 0:
                     h5 = h5a.write_hdf_db(h5_fname, tdx_diff, table=h5_table, append=True)
                 tdxdata = pd.concat([tdxdata, tdx_diff], axis=0)
@@ -2880,7 +2921,6 @@ def get_append_lastp_to_df(top_all, lastpTDX_DF=None, dl=ct.PowerCountdl, end=No
     top_all = cct.combine_dataFrame(
         top_all, tdxdata, col=None, compare=None, append=False)
 
-    top_all.rename(columns={'cumin': 'df2'}, inplace=True)
     
     # log.info('Top-merge_now:%s' % (top_all[:1]))
     top_all = top_all[top_all['llow'] > 0]
@@ -3344,16 +3384,18 @@ if __name__ == '__main__':
     else:
         log_level = LoggerFactory.ERROR
     # log_level = LoggerFactory.DEBUG if args['-d']  else LoggerFactory.ERROR
+    log_level = LoggerFactory.DEBUG
     log.setLevel(log_level)
     # code='002169'
-    code = '399001'
-    df = get_tdx_Exp_day_to_df(code, dl=60,end=20180508, newdays=0, resample='d')
-    df3 = df.sort_index(ascending=True)
-    print df[:2].cumin, df[:2].cmean
+    code = '399006'
+    # df2 = get_tdx_Exp_day_to_df(code,dl=60, end=20180508, newdays=0, resample='d')
+    # df = get_tdx_Exp_day_to_df(code, dl=60,end=None, newdays=0, resample='d')
+    # df3 = df.sort_index(ascending=True)
+    # print "cumin:",df[:2].cumin.values,df[:2].cumaxe.values,df[:2].cumins.values,df[:2].cumine.values,df[:2].cumaxc.values, df[:2].cmean.values
 
-    df2 = get_tdx_Exp_day_to_df(code,dl=60, end=20180505, newdays=0, resample='d')
-    df4 = df2.sort_index(ascending=True)
-    print df2[:2].cumin, df2[:2].cmean
+    df2 = get_tdx_Exp_day_to_df(code,dl=60, end=None, newdays=0, resample='d')
+    # df4 = df2.sort_index(ascending=True)
+    print "cumin:",df2[:2].cumin.values,df2[:2].cumaxe.values,df2[:2].cumins.values,df2[:2].cumine.values,df2[:2].cumaxc.values, df2[:2].cmean.values
     import ipdb;ipdb.set_trace()
 
     # print get_tdx_day_to_df_last('999999', type=1)
@@ -3373,18 +3415,24 @@ if __name__ == '__main__':
     # else:
     #     print "load cct.GlobalValues().setkey('tdx_multi_data') is ok"
     # print df.info()
-    print "t0:%0.2f" % (time.time() - time_s)
-    start = '20170126'
-    start = None
-    time_s = time.time()
-    df = search_Tdx_multi_data_duration('tdx_all_df_300', 'all_300', df=None, code_l=code_list, start=start, end=None, freq=None, col=None, index='date')
-    if df is not None:
-        print "t1:%0.2f %s" % (time.time() - time_s, df.loc['399005'][:2])
-    time_s = time.time()
-    df = search_Tdx_multi_data_duration('tdx_all_df_300', 'all_300', code_l=code_list, start=start, end=None, freq=None, col=None, index='date')
-    print "t1:%0.2f" % (time.time() - time_s)
-    if df is not None:
-        print "1:", df[-1:]
+    
+
+    # print "t0:%0.2f" % (time.time() - time_s)
+    # start = '20170126'
+    # start = None
+    # time_s = time.time()
+    # df = search_Tdx_multi_data_duration('tdx_all_df_300', 'all_300', df=None, code_l=code_list, start=start, end=None, freq=None, col=None, index='date')
+    # if df is not None:
+    #     print "t1:%0.2f %s" % (time.time() - time_s, df.loc['399005'][:2])
+    # time_s = time.time()
+    # df = search_Tdx_multi_data_duration('tdx_all_df_300', 'all_300', code_l=code_list, start=start, end=None, freq=None, col=None, index='date')
+    # print "t1:%0.2f" % (time.time() - time_s)
+    # if df is not None:
+    #     print "1:", df[-1:]
+
+
+
+
         # print df[df.index.get_level_values('code')]
     # testnumba(1000)
     # n = 100
@@ -3403,7 +3451,7 @@ if __name__ == '__main__':
     # code = '600581'
     # code = '300609'
     # code = '000916'
-    code = '600903'
+    code = '600579'
     resample = 'd'
     # code = '000001'
     # code = '000916'

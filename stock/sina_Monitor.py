@@ -66,10 +66,10 @@ if __name__ == "__main__":
     log = LoggerFactory.getLogger('SinaMarket')
     # log.setLevel(LoggerFactory.DEBUG)
     if cct.isMac():
-        width, height = 170, 22
+        width, height = 166, 22
         cct.set_console(width, height)
     else:
-        width, height = 170, 22
+        width, height = 166, 22
         cct.set_console(width, height)
 
     # cct.set_console(width, height)
@@ -93,7 +93,7 @@ if __name__ == "__main__":
     lastpTDX_DF = pd.DataFrame()
     # market_sort_value, market_sort_value_key = ct.get_market_sort_value_key('8')
     resample = 'd'
-    st_key_sort = '6'
+    st_key_sort = '4'
     while 1:
         try:
             # df = rl.get_sina_all_json_dd(vol, type)
@@ -121,7 +121,6 @@ if __name__ == "__main__":
 
                 if len(top_all) == 0 and len(lastpTDX_DF) == 0:
                     cct.get_terminal_Position(position=sys.argv[0])
-
                     time_Rt = time.time()
                     top_all, lastpTDX_DF = tdd.get_append_lastp_to_df(top_now,resample=resample)
                 elif len(top_all) == 0 and len(lastpTDX_DF) > 0:
@@ -198,6 +197,7 @@ if __name__ == "__main__":
                             top_all.volume < ct.VolumeMaxR)]
                 
                 if st_key_sort.split()[0] == '4' and cct.get_now_time_int() > 926 and 'lastbuy' in top_all.columns:
+
                     top_all['dff'] = (map(lambda x, y: round((x - y) / y * 100, 1),
                                           top_all['buy'].values, top_all['lastbuy'].values))
                 else:
@@ -214,7 +214,7 @@ if __name__ == "__main__":
                     top_all = top_all[top_all.trade >= top_all.llastp * ct.changeRatio]
 
                 cct.set_console(width, height, title=[
-                                'G:%s' % len(top_all), 'zx %s' % (blkname)])
+                                'G:%s' % len(top_all), '%s ZXG' % (blkname)])
 
 
 
@@ -258,7 +258,9 @@ if __name__ == "__main__":
                 top_dd =  cct.combine_dataFrame(top_temp.loc[:, ct_MonitorMarket_Values][:10], top_temp2.loc[:, ct_MonitorMarket_Values2][:5],append=True, clean=True)
                 # print cct.format_for_print(top_dd)
 
-                table,widths = cct.format_for_print(top_dd[:10],widths=True)
+                # table,widths = cct.format_for_print(top_dd[:10],widths=True)
+                table,widths = cct.format_for_print(top_dd.loc[[col for col in top_dd[:9].index if col in top_temp[:10].index]],widths=True)
+
                 print table
                 print cct.format_for_print(top_dd[-4:],header=False,widths=widths)
 
@@ -284,10 +286,10 @@ if __name__ == "__main__":
             int_time = cct.get_now_time_int()
             if cct.get_work_time():
                 if int_time < ct.open_time:
+                    top_all = pd.DataFrame()
                     cct.sleep(ct.sleep_time)
                 elif int_time < 930:
                     cct.sleep((930 - int_time) * 55)
-                    # top_all = pd.DataFrame()
                     time_s = time.time()
                 else:
                     cct.sleep(ct.duration_sleep_time)

@@ -41,10 +41,10 @@ def filterPowerCount(df,count=500,down=False):
             log.error("915 open>llastp is None")
             return df[:count].copy()
     if 930 < nowint <= 950:
-        top_high = df[ (df.open > df.llastp) & (df.low >= df.llastp) ]
+        top_high = df[ ((df.open > df.llastp) & (df.low >= df.llastp)) | ((df.low >= df.lastl0d)) ]
     elif 950 < nowint:
         if 'nlow' in df.columns:
-            top_high = df[ df.nlow > df.llastp]
+            top_high = df[ (df.nlow >= df.llastp) | (df.close >= df.nlow)]
         else:
             top_high = df[ (df.open > df.llastp) & (df.low > df.llastp)]
     else:
@@ -69,15 +69,35 @@ def getBollFilter(df=None, boll=ct.bollFilter, duration=ct.PowerCountdl, filter=
     df['upper'] = map(lambda x: round((1 + 11.0 / 100) * x, 1), df.ma10d)
     df['lower'] = map(lambda x: round((1 - 9.0 / 100) * x, 1), df.ma10d)
     df['ene'] = map(lambda x, y: round((x + y) / 2, 1), df.upper, df.lower)
-    if cct.get_work_time():
+
+
+    if cct.get_work_time() and 'df2' in df.columns:
         if 915 < cct.get_now_time_int() < 930:
             df['cumnow'] =  map(lambda x, y: 1 if x - y > 0 else 0, df.close, df.lasth1d)
         else:
             df['cumnow'] =  map(lambda x, y: 1 if x - y > 0 else 0, df.high, df.lasth1d)
         df['df2'] = (df['df2'] + df['cumnow']).map(lambda x: int(x))
-        df = df[df.df2 > 1]
+        # df = df[df.df2 > 1]
+    # else:
+        # df = df[df.df2 > 0]
+    cuminfibl = cct.GlobalValues().getkey('cuminfibl')
+
+    if cuminfibl is None:
+        cuminfibl = cct.get_index_fibl()
+    if cuminfibl > 1:
+        df = df[df.df2 >= cuminfibl]
+
+#    print df.loc['300107'][['close','cumine','llastp','cumaxe','cumaxc']]
+    df = df[ (df.cumine == df.cumaxc) | (df.close >= df.cumine) | (df.llastp >=df.cumaxc) | (df.close >= df.cumaxe) ]
+    if cct.get_now_time_int() > 931:
+        df = df[ (df.low <> df.high) & (( df.llastp > df.upper)| (df.llastp >= df.max5) | (df.high >= df.max5)) ]
     else:
-        df = df[df.df2 > 0]
+        df = df[ (( df.llastp > df.upper)| (df.llastp >= df.max5) | (df.high >= df.max5)) ]
+        # df = df[ (( df.llastp > df.upper)| (df.llastp >= df.max5) | (df.high >= df.max5)) | (df.per5d < 2 & df.per5d > -2 & (df.percent > 3)) ]
+    
+    # df['cumins'] = round(cum_counts.index[0], 2)
+    # df['cumine'] = round(cumdf[-1], 2)
+    # df['cumax']
     # df.rename(columns={'cumin': 'df2'}, inplace=True)
     if df is None:
         print "dataframe is None"
@@ -145,7 +165,7 @@ def getBollFilter(df=None, boll=ct.bollFilter, duration=ct.PowerCountdl, filter=
             # df = df[ (df.max5 >= df.ene) & (df.low <> df.high) & (((df.low < df.hmax) & (df.close > df.cmean)) | (df.high > df.cmean))]
             df = df[ (df.max5 >= df.ene)  | (df.high > df.cmean)]
         return df
-    
+
     if cct.get_work_time() and 'b1_v' in df.columns and 'nvol' in df.columns:
         df = df[(df.b1_v > 0) | (df.nvol > 0)]
 
@@ -167,6 +187,7 @@ def getBollFilter(df=None, boll=ct.bollFilter, duration=ct.PowerCountdl, filter=
     # print market_key, market_value
 
     if market_key is not None and market_value is not None:
+        # if market_key == '3':
 
         if market_key == '3':
             market_value = int(market_value)
@@ -332,16 +353,23 @@ def getBollFilter(df=None, boll=ct.bollFilter, duration=ct.PowerCountdl, filter=
                     df = df[((df.volume > 2 * cct.get_work_time_ratio()) & (df.percent > -3)) | ((df.stdv < 1) &
                                                                                                  (df.percent > 2)) | ((df.lvolume > df.lvol * 0.9) & (df.lvolume > df.lowvol * 1.1))]
                     df_index = tdd.getSinaIndexdf()
+                    if isinstance(df_index, pd.DataFrame):
+                        df_index['volume'] = (map(lambda x, y: round(x / y / radio_t, 1), df_index.nvol.values, df_index.lvolume.values))
+                        index_vol = df_index.loc['999999'].volume
+                        if 'percent' in df.columns:
+                            index_percent = df_index.loc['999999'].percent
+                        else:
+                            import ipdb;ipdb.set_trace()
+                            log.error("index_percent" is None)
+                            index_percent = 0
 
-                    df_index['volume'] = (map(lambda x, y: round(x / y / radio_t, 1), df_index.nvol.values, df_index.lvolume.values))
-                    index_vol = df_index.loc['999999'].volume
-                    index_percent = df_index.loc['999999'].percent
-                    index_boll = df_index.loc['999999'].boll
-                    index_op = df_index.loc['999999'].op
-                    # df = df[((df.percent > -3) | (df.volume > index_vol)) & (df.percent > index_percent)]
-                    # df = df[((df.percent > -1) | (df.volume > index_vol * 1.5)) & (df.percent > index_percent)  & (df.boll >= index_boll)]
-                    df = df[((df.percent > -1) | (df.volume > index_vol * 1.5)) & (df.percent > index_percent)]
-
+                        index_boll = df_index.loc['999999'].boll
+                        index_op = df_index.loc['999999'].op
+                        # df = df[((df.percent > -3) | (df.volume > index_vol)) & (df.percent > index_percent)]
+                        # df = df[((df.percent > -1) | (df.volume > index_vol * 1.5)) & (df.percent > index_percent)  & (df.boll >= index_boll)]
+                        df = df[((df.percent > -1) | (df.volume > index_vol * 1.5)) & (df.percent > index_percent)]
+                    else:
+                        print ("df_index is Series",df_index.T)
                 else:
                     df = df[((df.volume > 1.2 * cct.get_work_time_ratio()) & (df.percent > -3))
                             | ((df.lvolume > df.lvol * 0.8) & (df.lvolume > df.lowvol * 1.1))]
@@ -397,7 +425,7 @@ def getBollFilter(df=None, boll=ct.bollFilter, duration=ct.PowerCountdl, filter=
         else:
             df = df[(df.buy > df.cmean)]
     print("bo:%0.1f" % (time.time() - time_s)),
-    
+
     return df
 
     # df = df[df.buy > df.cmean * ct.changeRatio]

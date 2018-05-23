@@ -48,7 +48,7 @@ changeRatioUp = 1.025
 wencai_delay_time = 10
 resample_dtype = 'd'
 logtime = 2700
-
+cumdays = 10
 bollFilter = -5
 keep_lastnum = 15
 writeblockbakNum = 15

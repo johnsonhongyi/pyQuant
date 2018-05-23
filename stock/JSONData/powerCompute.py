@@ -71,6 +71,18 @@ else:
 # code = '300191'
 # code = '000738'
 
+def estimateGaussian(X):
+    m = len(X)
+    # m,n = X.shape
+    # 均值
+    mu = round(np.mean(X,axis = 0),2)
+    # 方差
+    sigma2 = round(1.0*sum((X - mu)**2,axis=0)/m,2)
+
+    return mu,sigma2
+
+
+
 def LIS(X):
     N = len(X)
     P = [0] * N

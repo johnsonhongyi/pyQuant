@@ -128,6 +128,7 @@ if __name__ == "__main__":
     # market_sort_value, market_sort_value_key = ct.get_market_sort_value_key(ct.sort_value_key_perd)
     st_key_sort = '3 %s'%(cct.get_index_fibl())
 
+
     while 1:
         try:
             '''
@@ -402,7 +403,9 @@ if __name__ == "__main__":
                     
                     top_dd = top_dd.loc[:, ct_Duration_format_Values]
 
-                    table,widths = cct.format_for_print(top_dd[:10],widths=True)
+                    # table,widths = cct.format_for_print(top_dd[:10],widths=True)
+                    table,widths = cct.format_for_print(top_dd.loc[[col for col in top_dd[:10].index if col in top_temp[:10].index]],widths=True)
+                    
                     print table
                     print cct.format_for_print(top_dd[-4:],header=False,widths=widths)
 

@@ -123,14 +123,15 @@ if __name__ == "__main__":
     # all_diffpath = tdd.get_tdx_dir_blocknew() + '062.blk'
     parser = cct.MoniterArgmain()
     parserDuraton = cct.DurationArgmain()
-    st_key_sort = '2 %s'%(cct.get_index_fibl())
+    # st_key_sort = '2 %s'%(cct.get_index_fibl())
+    st_key_sort = '6'
     
     while 1:
         try:
             # df = sina_data.Sina().all
             time_Rt = time.time()
-            # top_now = tdd.getSinaAlldf(market='060', vol=ct.json_countVol, vtype=ct.json_countType)
-            top_now = tdd.getSinaAlldf(market='rzrq', vol=ct.json_countVol, vtype=ct.json_countType,trend=True)
+            top_now = tdd.getSinaAlldf(market='060', vol=ct.json_countVol, vtype=ct.json_countType)
+            # top_now = tdd.getSinaAlldf(market='rzrq', vol=ct.json_countVol, vtype=ct.json_countType,trend=True)
             # top_now = tdd.getSinaAlldf(market='all', vol=ct.json_countVol, vtype=ct.json_countType)
 
             # top_dif = top_now
@@ -364,7 +365,9 @@ if __name__ == "__main__":
                     # ct_Duration_format_Values = ct.get_Duration_format_Values(ct_Duration_format_Values,replace='op',dest='boll')
                     top_dd = top_dd.loc[:, ct_Duration_format_Values]
                     # print cct.format_for_print(top_dd)
-                    table,widths = cct.format_for_print(top_dd[:9],widths=True)
+                    # table,widths = cct.format_for_print(top_dd[:9],widths=True)
+                    table,widths = cct.format_for_print(top_dd.loc[[col for col in top_dd[:9].index if col in top_temp[:10].index]],widths=True)
+                    
                     print table
                     print cct.format_for_print(top_dd[-4:],header=False,widths=widths)
                 # if cct.get_now_time_int() < 930 or cct.get_now_time_int() > 1505 or (cct.get_now_time_int() > 1125 and cct.get_now_time_int() < 1505):

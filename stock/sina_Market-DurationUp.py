@@ -361,7 +361,9 @@ if __name__ == "__main__":
                         ct_Duration_format_Values = ct.get_Duration_format_Values(ct.Duration_format_trade, market_sort_value[:])
                         top_dd = top_dd.loc[:, ct_Duration_format_Values]
                     # print cct.format_for_print(top_dd)
-                    table,widths = cct.format_for_print(top_dd[:9],widths=True)
+                    # table,widths = cct.format_for_print(top_dd[:9],widths=True)
+                    table,widths = cct.format_for_print(top_dd.loc[[col for col in top_dd[:9].index if col in top_temp[:10].index]],widths=True)
+                    
                     print table
                     print cct.format_for_print(top_dd[-4:],header=False,widths=widths)
                 # if cct.get_now_time_int() < 930 or cct.get_now_time_int() > 1505 or (cct.get_now_time_int() > 1125 and cct.get_now_time_int() < 1505):

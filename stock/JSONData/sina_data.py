@@ -760,10 +760,11 @@ if __name__ == "__main__":
     # log.setLevel(LoggerFactory.DEBUG)
     sina = Sina()
     # print len(df)
-    # code='601198'
+    # code='300107'
     df =sina.all
     # print df.lastbuy[-5:].to_frame().T
 
+    print sina.get_stock_code_data('300107').T
     print df[-5:][['open','close']].T
     print df.columns
     # print df[-5:][['lastbuy','close']].T
@@ -785,7 +786,6 @@ if __name__ == "__main__":
     # print df.columns
     # df = sina.all
     # print df.nlow[:5]
-#    print sina.get_stock_code_data('002873')
     # print sina.get_stock_code_data('600199,300334',index=False)
     # print len(sina.market('sh'))
 

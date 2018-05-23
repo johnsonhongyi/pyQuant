@@ -1446,10 +1446,16 @@ def get_index_fibl():
     if len(df) >0 and 'fibl' in df.columns:
         # fibl = int(df.fibl.max())
         fibl = int(df.cumin.max())
-        fibl = fibl if fibl > 0 else 1 
-        return abs(fibl)
+        fibl = fibl if fibl > 2 else 2 
+        # return abs(fibl)
     else:
-        return 1
+        fibl = 1
+        
+    # cct.GlobalValues()
+    GlobalValues().setkey('cuminfibl', fibl)
+
+    return abs(fibl)
+
 
 def write_to_blocknew(p_name, data, append=True, doubleFile=True, keep_last=None):
     if keep_last is None:
@@ -1460,7 +1466,7 @@ def write_to_blocknew(p_name, data, append=True, doubleFile=True, keep_last=None
     index_list = ['1999999', '0399001', '0159915']
     # index_list = ['1999999', '27#HSI',  '0159915']
 
-    def writeBlocknew(p_name, data, append=True):
+    def writeBlocknew(p_name, data, append=True,keep_last=keep_last):
         if append:
             fout = open(p_name, 'rb+')
             # fout = open(p_name)
@@ -1581,7 +1587,7 @@ def write_to_blocknew(p_name, data, append=True, doubleFile=True, keep_last=None
     elif p_name.find('064.blk') > 0:
         writeBlocknew(p_name, data, append)
         if doubleFile:
-            writeBlocknew(blockNew, data, append)
+            writeBlocknew(blockNew, data, append,keep_last=12)
             writeBlocknew(blockNewStart, data, append)
         # print "write to append:%s :%s :%s"%(append,p_name,len(data))
     elif p_name.find('068.blk') > 0 or p_name.find('069.blk') > 0:
@@ -2135,11 +2141,17 @@ def func_compute_percd2(close, lastp, op, lastopen,lasth, lastl, nowh, nowl,hmax
     lastl = round(lastl, 1)
     if hmax is not None:
         if lastopen >= lastl:
-            initc +=1
-            if op >= nowl:
+            # initc +=1
+            # if op >= nowl:
+            #     initc +=1
+            if nowh >= hmax:
                 initc +=1
-        if nowh >= hmax:
-            initc +=1
+        # if lastopen >= lastl:
+        #     initc +=1
+        #     if op >= nowl:
+        #         initc +=1
+        # if nowh >= hmax:
+        #     initc +=1
 
     if nowl == op or (op > lastp and nowl > lastp):
         initc +=1
@@ -2147,8 +2159,8 @@ def func_compute_percd2(close, lastp, op, lastopen,lasth, lastl, nowh, nowl,hmax
             initc +=1
         if  nowh > lasth:
             initc +=1
-            if nowh == close:
-                initc +=1
+            # if nowh == close:
+            #     initc +=1
 
     if  op > lastp or nowl > lastp:
             initc +=1
@@ -2156,8 +2168,8 @@ def func_compute_percd2(close, lastp, op, lastopen,lasth, lastl, nowh, nowl,hmax
     if ((close - lastp)/lastp*100 >= 0):
         if op > lastp:
             initc +=1
-            if nowh == nowl:
-                initc +=1
+            # if nowh == nowl:
+            #     initc +=1
             if nowl > lastp:
                 initc +=1
                 if nowl > lasth:
@@ -2165,8 +2177,8 @@ def func_compute_percd2(close, lastp, op, lastopen,lasth, lastl, nowh, nowl,hmax
 
             if close > nowh * ct.changeRatio:
                 initc +=1
-                if lastp == lasth:
-                    initc +=1
+                # if lastp == lasth:
+                #     initc +=1
 
             if (close >= op):
                 initc +=1
@@ -2250,17 +2262,17 @@ def combine_dataFrame(maindf, subdf, col=None, compare=None, append=False, clean
 
         no_index = maindf.drop([inx for inx in maindf.index if inx not in subdf.index], axis=0)
 #        no_index = maindf.loc[subdf.index]
-        if col is not None and compare is not None:
-            # if col in subdf.columns:
-            # sub_col = list(set(subdf.columns) - set([col]))
+        # if col is not None and compare is not None:
+        #     # if col in subdf.columns:
+        #     # sub_col = list(set(subdf.columns) - set([col]))
 
-            # sub_dif_inx = list(set(subdf.index) - set(maindf.index))
-            # trandf = subdf.drop(sub_dif_inx,axis=0)
-            # no_index[compare]=map((lambda x,y:y-x),no_index.couts,trandf.couts)
-            pass
-            # no_index[compare]=map((lambda x,y:y-x),eval("subdf.%s"%(col)),eval("no_index.%s"%(col)))
-        else:
-            sub_col = list(set(subdf.columns) - set())
+        #     # sub_dif_inx = list(set(subdf.index) - set(maindf.index))
+        #     # trandf = subdf.drop(sub_dif_inx,axis=0)
+        #     # no_index[compare]=map((lambda x,y:y-x),no_index.couts,trandf.couts)
+        #     pass
+        #     # no_index[compare]=map((lambda x,y:y-x),eval("subdf.%s"%(col)),eval("no_index.%s"%(col)))
+        # else:
+        #     sub_col = list(set(subdf.columns) - set())
 
         drop_sub_col = [col for col in no_index.columns if col in subdf.columns]
         no_index = no_index.drop(drop_sub_col, axis=1)

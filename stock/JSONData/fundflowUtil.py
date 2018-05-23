@@ -450,6 +450,8 @@ if __name__ == "__main__":
     ffindex = get_dfcfw_fund_flow('all')
     print ffindex
     print get_dfcfw_fund_SHSZ()
+    print "hgt:",get_dfcfw_fund_HGT()
+    print "szt:",get_dfcfw_fund_HGT(url=ct.DFCFW_FUND_FLOW_SZT)
     sys.exit(0)
     # for x in pp.keys():
     # print pp[x]
