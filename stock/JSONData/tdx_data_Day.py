@@ -139,8 +139,40 @@ def get_kdate_data(code, start='', end='', ktype='D', index=False):
             # print df.index
     return df
 
+def LIS(X):
+    N = len(X)
+    P = [0] * N
+    M = [0] * (N + 1)
+    L = 0
+    for i in range(N):
+        lo = 1
+        hi = L
+        while lo <= hi:
+            mid = (lo + hi) // 2
+            if (X[M[mid]] < X[i]):
+                lo = mid + 1
+            else:
+                hi = mid - 1
+
+        newL = lo
+        P[i] = M[newL - 1]
+        M[newL] = i
+
+        if (newL > L):
+            L = newL
+
+    S = []
+    pos = []
+    k = M[L]
+    for i in range(L - 1, -1, -1):
+        S.append(round(X[k],2))
+        pos.append(k)
+        k = P[k]
+    return S[::-1], pos[::-1]
 
 def LISCum(X):
+    #Lis 逐级升高,重复break
+    #
     N = len(X)
     P = [0] * N
     M = [0] * (N + 1)
@@ -1871,9 +1903,15 @@ def getSinaAlldf(market='cyb', vol=ct.json_countVol, vtype=ct.json_countType, fi
 
     elif market.find('blk') > 0 or market.isdigit():
             # blkname = '061.blk'
+        
         code_l = cct.read_to_blocknew(market)
-
         df = sina_data.Sina().get_stock_list_data(code_l)
+
+        # if len(code_l) > 0:
+        #     df = sina_data.Sina().get_stock_list_data(code_l)
+        # else:
+        #     df = wcd.get_wcbk_df(filter=market, market=filename,
+        #                      perpage=1000, days=ct.wcd_limit_day)
         # df = pd.read_csv(block_path,dtype={'code':str},encoding = 'gbk')
     elif market in ['sh', 'sz', 'cyb']:
         df = rl.get_sina_Market_json(market)
@@ -1882,8 +1920,13 @@ def getSinaAlldf(market='cyb', vol=ct.json_countVol, vtype=ct.json_countType, fi
         df = sina_data.Sina().all
         market_all = True
     else:
-        df = wcd.get_wcbk_df(filter=market, market=filename,
-                             perpage=1000, days=ct.wcd_limit_day)
+        
+        if filename == 'cxg':
+            df = wcd.get_wcbk_df(filter=market, market=filename,
+                                 perpage=1000, days=10,monitor=True)
+        else:
+            df = wcd.get_wcbk_df(filter=market, market=filename,
+                                 perpage=1000, days=ct.wcd_limit_day,monitor=True)
         if 'code' in df.columns:
             df = df.set_index('code')
         df = sina_data.Sina().get_stock_list_data(df.index.tolist())
@@ -1892,7 +1935,7 @@ def getSinaAlldf(market='cyb', vol=ct.json_countVol, vtype=ct.json_countType, fi
 
     if len(m_mark) > 1:
         dfw = wcd.get_wcbk_df(filter=m_0, market=filename,
-                             perpage=1000, days=ct.wcd_limit_day)
+                             perpage=1000, days=ct.wcd_limit_day,monitor=True)
         if 'code' in dfw.columns:
             dfw = dfw.set_index('code')
         dfw = sina_data.Sina().get_stock_list_data(dfw.index.tolist())
@@ -3387,7 +3430,7 @@ if __name__ == '__main__':
     log_level = LoggerFactory.DEBUG
     log.setLevel(log_level)
     # code='002169'
-    code = '399006'
+    code = '399001'
     # df2 = get_tdx_Exp_day_to_df(code,dl=60, end=20180508, newdays=0, resample='d')
     # df = get_tdx_Exp_day_to_df(code, dl=60,end=None, newdays=0, resample='d')
     # df3 = df.sort_index(ascending=True)

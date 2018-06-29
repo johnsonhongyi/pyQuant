@@ -1446,7 +1446,7 @@ def get_index_fibl():
     if len(df) >0 and 'fibl' in df.columns:
         # fibl = int(df.fibl.max())
         fibl = int(df.cumin.max())
-        fibl = fibl if fibl > 2 else 2 
+        fibl = fibl if fibl > 1 else 1 
         # return abs(fibl)
     else:
         fibl = 1
@@ -1636,10 +1636,15 @@ def read_to_blocknew(p_name):
             log.error("path error:%s" % (blockNew))
     else:
         blockNew = get_tdx_dir_blocknew() + p_name
+
+    if os.path.exists(blockNew):
+        codelist = read_block(blockNew)
+    else:
+        codelist = []
     # blockNewStart = get_tdx_dir_blocknew() + '066.blk'
     # writeBlocknew(blockNew, data)
     # p_data = ['zxg', '069', '068', '067', '061']
-    return read_block(blockNew)
+    return codelist
 
 
 def getFibonacci(num, days=None):

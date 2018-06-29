@@ -161,7 +161,7 @@ wencai_count = cct.get_config_value_wencai(config_ini,fname)
 
 # cct.get_config_value_wencai(config_ini,fname)
 
-def get_wencai_Market_url(filter='国企改革',perpage=1,url=None,pct=False,single=False):
+def get_wencai_Market_url(filter='国企改革',perpage=1,url=None,pct=False,monitor=False,):
     urllist = []
     global null,wencai_count,pct_status
     if pct is not None:
@@ -169,7 +169,8 @@ def get_wencai_Market_url(filter='国企改革',perpage=1,url=None,pct=False,sin
     df = pd.DataFrame()
 
     # if ((pct_status) or  ( pct_status and not(925 < cct.get_now_time_int() < ct.wencai_end_time)) ) and url == None and cct.get_config_value_wencai(config_ini,fname) < 1:
-    if ((pct_status) or  (not pct_status and (925 < cct.get_now_time_int() < ct.wencai_end_time)) ) and url == None and cct.get_config_value_wencai(config_ini,fname) < 1:
+
+    if monitor or ((pct_status) or  (not pct_status and (925 < cct.get_now_time_int() < ct.wencai_end_time)) ) and url == None and cct.get_config_value_wencai(config_ini,fname) < 1:
         time_s = time.time()
         duratime = cct.get_config_value_wencai(config_ini,fname,currvalue=time_s,xtype='time',update=False)
         if duratime < ct.wencai_delay_time:
@@ -357,6 +358,8 @@ def get_wencai_Market_url(filter='国企改革',perpage=1,url=None,pct=False,sin
                             sin_category = blist[-1].replace(u'\u66f4\u591a','')
                             for code in singlelist:
                                 if code['code'] == blist[0].split('\n')[-1]:
+                                    sin_category = ";".join(x for x in sin_category.split(';')[:3])
+                                    sin_category = sin_category[:15] if len(sin_category) > 15 else sin_category
                                     code['category'] = sin_category
                                     singlelist_category.append(code)
                                     break
@@ -482,9 +485,12 @@ def get_write_wencai_market_to_csv(df=None,market='wcbk',renew=False,days=60):
     def wencaiwrite_to_csv(df,filename,renew=False):
         if df is None or len(df) == 0 :
             log.warn("df is write None")
-#        else:
-            # log.warn('market not found')
-            # return pd.DataFrame()
+        else:
+            # category = ";".join(x for x in code_t[4].split(';')[:3])
+            # category = category[:15] if len(category) > 15 else category
+            if 'category' in df.columns:
+                df = df.fillna('--')
+                # df['category'] = (map(lambda x: ';'.join(str(x).split(';')[:3]),df['category']))
         if df is not None and len(df)>0 and 'code' in df.columns:
             df.drop_duplicates('code',inplace=True)
             df = df.set_index('code')
@@ -539,14 +545,17 @@ def get_write_wencai_market_to_csv(df=None,market='wcbk',renew=False,days=60):
         log.error('wencaiErr:%s'%(market))
     if df is not None and 'code' in df.columns:
         df=df.set_index('code')
+        if 'category' in df.columns:
+            df = df.fillna('--')
+            df['category'] = (map(lambda x: ';'.join(str(x).split(';')[:3]),df['category']))
     return df
 
-def get_wcbk_df(filter='混改',market='nybk',perpage=1000,days=120):
+def get_wcbk_df(filter='混改',market='nybk',perpage=1000,days=120,monitor=False):
     fpath = get_wencai_filepath(market)
     if os.path.exists(fpath) and os.path.getsize(fpath) > 200 and 0 <= cct.creation_date_duration(fpath) <= days :
         df = get_write_wencai_market_to_csv(None,market,renew=True,days=days)
     else:
-        df = get_wencai_Market_url(filter,perpage)
+        df = get_wencai_Market_url(filter,perpage,monitor=monitor)
         df = get_write_wencai_market_to_csv(df,market,renew=True,days=days)
     if 'code' in df.columns:
         df = df.set_index('code')
