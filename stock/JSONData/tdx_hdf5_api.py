@@ -341,6 +341,7 @@ def write_hdf_db(fname, df, table='all', index=False, complib='blosc', baseCount
 #        return False
     df=df.fillna(0)
     df=df[~df.index.duplicated(keep='first')]
+
     code_subdf=df.index.tolist()
     global RAMDISK_KEY
     if not RAMDISK_KEY < 1:
@@ -348,107 +349,109 @@ def write_hdf_db(fname, df, table='all', index=False, complib='blosc', baseCount
 
     if not MultiIndex:
         df['timel']=time.time()
-    if df is not None and not df.empty and table is not None:
-        # h5 = get_hdf5_file(fname,wr_mode='r')
-        tmpdf=[]
-        with SafeHDFStore(fname) as store:
-            if store is not None:
-                if '/' + table in store.keys():
-                    tmpdf=store[table]
-                    tmpdf = tmpdf[~tmpdf.index.duplicated(keep='first')]
+
+    if not rewrite:
+        if df is not None and not df.empty and table is not None:
+            # h5 = get_hdf5_file(fname,wr_mode='r')
+            tmpdf=[]
+            with SafeHDFStore(fname) as store:
+                if store is not None:
+                    if '/' + table in store.keys():
+                        tmpdf=store[table]
+                        tmpdf = tmpdf[~tmpdf.index.duplicated(keep='first')]
 
 
-        if not MultiIndex:
-            if index:
-                # log.error("debug index:%s %s %s"%(df,index,len(df)))
-                df.index=map((lambda x: str(1000000 - int(x))
-                                if x.startswith('0') else x), df.index)
-            if tmpdf is not None and len(tmpdf) > 0:
-                if 'code' in tmpdf.columns:
-                    tmpdf=tmpdf.set_index('code')
-                if 'code' in df.columns:
-                    df=df.set_index('code')
-                diff_columns=set(df.columns) - set(tmpdf.columns)
-                if len(diff_columns) <> 0:
-                    log.error("columns diff:%s" % (diff_columns))
+            if not MultiIndex:
+                if index:
+                    # log.error("debug index:%s %s %s"%(df,index,len(df)))
+                    df.index=map((lambda x: str(1000000 - int(x))
+                                    if x.startswith('0') else x), df.index)
+                if tmpdf is not None and len(tmpdf) > 0:
+                    if 'code' in tmpdf.columns:
+                        tmpdf=tmpdf.set_index('code')
+                    if 'code' in df.columns:
+                        df=df.set_index('code')
+                    diff_columns=set(df.columns) - set(tmpdf.columns)
+                    if len(diff_columns) <> 0:
+                        log.error("columns diff:%s" % (diff_columns))
 
-                limit_t=time.time()
-                df['timel']=limit_t
-                # df_code = df.index.tolist()
+                    limit_t=time.time()
+                    df['timel']=limit_t
+                    # df_code = df.index.tolist()
 
-                df=cct.combine_dataFrame(tmpdf, df, col=None, append=append)
+                    df=cct.combine_dataFrame(tmpdf, df, col=None, append=append)
 
-                if not append:
-                    df['timel']=time.time()
-                elif fname == 'powerCompute':
-                    o_time=df[df.timel < limit_t].timel.tolist()
-                    o_time=sorted(set(o_time), reverse=False)
-                    if len(o_time) > ct.h5_time_l_count:
-                        o_time=[time.time() - t_x for t_x in o_time]
-                        o_timel=len(o_time)
-                        o_time=np.mean(o_time)
-                        if o_time > ct.h5_power_limit_time:
-                            df['timel']=time.time()
-                            log.error("%s %s o_time:%.1f timel:%s" % (fname, table, o_time, o_timel))
+                    if not append:
+                        df['timel']=time.time()
+                    elif fname == 'powerCompute':
+                        o_time=df[df.timel < limit_t].timel.tolist()
+                        o_time=sorted(set(o_time), reverse=False)
+                        if len(o_time) > ct.h5_time_l_count:
+                            o_time=[time.time() - t_x for t_x in o_time]
+                            o_timel=len(o_time)
+                            o_time=np.mean(o_time)
+                            if o_time > ct.h5_power_limit_time:
+                                df['timel']=time.time()
+                                log.error("%s %s o_time:%.1f timel:%s" % (fname, table, o_time, o_timel))
 
-    #            df=cct.combine_dataFrame(tmpdf, df, col=None,append=False)
-                log.info("read hdf time:%0.2f" % (time.time() - time_t))
-            else:
-                # if index:
-                    # df.index = map((lambda x:str(1000000-int(x)) if x.startswith('0') else x),df.index)
-                log.info("h5 None hdf reindex time:%0.2f" %
-                         (time.time() - time_t))
-        else:
-            # df.loc[df.index.isin(['000002','000001'], level='code')]
-            # df.loc[(df.index.get_level_values('code')== 600004)]
-            # df.loc[(df.index.get_level_values('code')== '600199')]
-            # da.swaplevel(0, 1, axis=0).loc['2017-05-25']
-            # df.loc[(600004,20170414),:]
-            # df.xs(20170425,level='date')
-            # df.index.get_level_values('code').unique()
-            # df.index.get_loc(600006)
-            # slice(58, 87, None)
-            # df.index.get_loc_level(600006)
-            # da.swaplevel(0, 1, axis=0).loc['2017-05-25']
-            # da.reorder_levels([1,0], axis=0)
-            # da.sort_index(level=0, axis=0,ascending=False
-            # setting: dfm.index.is_lexsorted() dfm = dfm.sort_index()  da.loc[('000001','2017-05-12'):('000005','2017-05-25')]
-            # da.groupby(level=1).mean()
-            # da.index.get_loc('000005')     da.iloc[slice(22,33,None)]
-            # mask = totals['dirty']+totals['swap'] > 1e7     result =
-            # mask.loc[mask]
-            # store.remove('key_name', where='<where clause>')
-            
-            
-            # tmpdf = tmpdf[~tmpdf.index.duplicated(keep='first')]
-            # df = df[~df.index.duplicated(keep='first')]
-            if not rewrite and tmpdf is not None and len(tmpdf) > 0:
-                # multi_code = tmpdf.index.get_level_values('code').unique().tolist()
-                multi_code=tmpdf.index.get_level_values('code').unique().tolist()
-                df_multi_code = df.index.get_level_values('code').unique().tolist()
-                dratio = cct.get_diff_dratio(multi_code, df_multi_code)
-                if dratio < ct.dratio_limit:
-                    comm_code = list(set(df_multi_code) & set(multi_code))
-                    # print df_multi_code,multi_code,comm_code,len(comm_code)
-                    inx_key=comm_code[random.randint(0, len(comm_code)-1)]
-                    if  inx_key in df.index.get_level_values('code'):
-                        now_time=df.loc[inx_key].index[-1]
-                        tmp_time=tmpdf.loc[inx_key].index[-1]
-                        if now_time == tmp_time:
-                            log.error("%s %s Multi out %s hdf5:%s No Wri!!!" % (fname, table,inx_key
-                                , now_time))
-                            return False
-                elif dratio == 1:
-                    print ("newData ratio:%s all:%s"%(dratio,len(df)))
+        #            df=cct.combine_dataFrame(tmpdf, df, col=None,append=False)
+                    log.info("read hdf time:%0.2f" % (time.time() - time_t))
                 else:
-                    log.error("dratio:%s main:%s new:%s %s %s Multi All Wri" % (dratio,len(multi_code),len(df_multi_code),fname, table))
-                # da.drop(('000001','2017-05-11'))
+                    # if index:
+                        # df.index = map((lambda x:str(1000000-int(x)) if x.startswith('0') else x),df.index)
+                    log.info("h5 None hdf reindex time:%0.2f" %
+                             (time.time() - time_t))
             else:
-                log.error("%s %s Multi rewrite:%s Wri!!!" % (fname, table, rewrite))
+                # df.loc[df.index.isin(['000002','000001'], level='code')]
+                # df.loc[(df.index.get_level_values('code')== 600004)]
+                # df.loc[(df.index.get_level_values('code')== '600199')]
+                # da.swaplevel(0, 1, axis=0).loc['2017-05-25']
+                # df.loc[(600004,20170414),:]
+                # df.xs(20170425,level='date')
+                # df.index.get_level_values('code').unique()
+                # df.index.get_loc(600006)
+                # slice(58, 87, None)
+                # df.index.get_loc_level(600006)
+                # da.swaplevel(0, 1, axis=0).loc['2017-05-25']
+                # da.reorder_levels([1,0], axis=0)
+                # da.sort_index(level=0, axis=0,ascending=False
+                # setting: dfm.index.is_lexsorted() dfm = dfm.sort_index()  da.loc[('000001','2017-05-12'):('000005','2017-05-25')]
+                # da.groupby(level=1).mean()
+                # da.index.get_loc('000005')     da.iloc[slice(22,33,None)]
+                # mask = totals['dirty']+totals['swap'] > 1e7     result =
+                # mask.loc[mask]
+                # store.remove('key_name', where='<where clause>')
+                
+                
+                # tmpdf = tmpdf[~tmpdf.index.duplicated(keep='first')]
+                # df = df[~df.index.duplicated(keep='first')]
+                if not rewrite and tmpdf is not None and len(tmpdf) > 0:
+                    # multi_code = tmpdf.index.get_level_values('code').unique().tolist()
+                    multi_code=tmpdf.index.get_level_values('code').unique().tolist()
+                    df_multi_code = df.index.get_level_values('code').unique().tolist()
+                    dratio = cct.get_diff_dratio(multi_code, df_multi_code)
+                    if dratio < ct.dratio_limit:
+                        comm_code = list(set(df_multi_code) & set(multi_code))
+                        # print df_multi_code,multi_code,comm_code,len(comm_code)
+                        inx_key=comm_code[random.randint(0, len(comm_code)-1)]
+                        if  inx_key in df.index.get_level_values('code'):
+                            now_time=df.loc[inx_key].index[-1]
+                            tmp_time=tmpdf.loc[inx_key].index[-1]
+                            if now_time == tmp_time:
+                                log.error("%s %s Multi out %s hdf5:%s No Wri!!!" % (fname, table,inx_key
+                                    , now_time))
+                                return False
+                    elif dratio == 1:
+                        print ("newData ratio:%s all:%s"%(dratio,len(df)))
+                    else:
+                        log.error("dratio:%s main:%s new:%s %s %s Multi All Wri" % (dratio,len(multi_code),len(df_multi_code),fname, table))
+                    # da.drop(('000001','2017-05-11'))
+                else:
+                    log.error("%s %s Multi rewrite:%s Wri!!!" % (fname, table, rewrite))
+
 
     time_t=time.time()
     if df is not None and not df.empty and table is not None:
-        #        df['timel'] =  time.time()
         if df is not None and not df.empty and len(df) > 0:
             dd=df.dtypes.to_frame()
 
@@ -472,7 +475,7 @@ def write_hdf_db(fname, df, table='all', index=False, complib='blosc', baseCount
             df=df.fillna(0)
             if h5 is not None:
                 if '/' + table in h5.keys():
-                    if not MultiIndex:
+                    if not MultiIndex or rewrite:
                         h5.remove(table)
                         h5[table]=df
                         # h5.put(table, df, format='table',index=False, data_columns=True, append=False)
@@ -730,9 +733,20 @@ def load_hdf_db(fname, table='all', code_l=None, timelimit=True, index=False, li
 
     log.info("load_hdf_time:%0.2f" % (time.time() - time_t))
     # if df is not None and len(df) > 1:
-    # df = df.drop_duplicates()
     if df is not None:
-        df=df[~df.index.duplicated(keep='first')]
+        df=df[~df.index.duplicated(keep='last')]
+        
+    if 'volume' in df.columns:
+        count_drop = len(df)
+        df = df.drop_duplicates('volume',keep='last')
+        dratio=round((float(len(df))) / float(count_drop),2)
+        log.debug("all:%s  drop:%s  dratio:%.2f"%(int(count_drop/100),int(len(df)/100),dratio))
+        if dratio < 0.6:
+            if isinstance(df.index, pd.core.index.MultiIndex):
+                write_hdf_db(fname, df, table=table, index=index, MultiIndex=True,rewrite=True)
+
+    # df = df.drop_duplicates()
+
     return df
 
 # def load_hdf_db_old_outdate(fname,table='all',code_l=None,timelimit=True,index=False,limit_time=ct.h5_limit_time):

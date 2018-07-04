@@ -624,7 +624,7 @@ class Sina:
         fname = 'sina_logtime'
         logtime = cct.get_config_value_ramfile(fname)
 
-        if cct.get_now_time_int() > 930 and not index and len(df) > 3000 and cct.get_work_time():
+        if cct.get_now_time_int() > 925 and not index and len(df) > 3000 and cct.get_work_time():
             time_s = time.time()
             df.index = df.index.astype(str)
             df.ticktime = df.ticktime.astype(str)
@@ -668,18 +668,18 @@ class Sina:
             log.info("hdf5 class all :%s  time:%0.2f" % (len(df), time.time() - time_s))
 
 
-        if 'nlow' not in df.columns or 'nhigh' not in df.columns or (cct.get_work_time() and 927 < cct.get_now_time_int() <= 1500):
+        if 'nlow' not in df.columns or 'nhigh' not in df.columns or (cct.get_work_time() and 924 < cct.get_now_time_int() <= 1501):
             # if 'nlow' not in df.columns or 'nhigh' not in df.columns or cct.get_work_time():
             h5 = h5a.load_hdf_db(h5_fname, h5_table, timelimit=False)
            
             time_s = time.time()
             if cct.get_work_time() and cct.get_now_time_int() <= 945:
                 run_col = ['low', 'high', 'close']
-                startime = '09:25:00'
+                startime = '09:24:00'
                 # endtime = '10:00:00'
                 endtime = '09:45:00'
                 dd = self.get_col_agg_df(h5, dd, run_col, all_func, startime, endtime)
-                startime = '09:25:00'
+                startime = '09:24:00'
                 # endtime = '10:00:00'
                 endtime = '09:45:00'
                 run_col = {'close': 'std'}
@@ -691,11 +691,11 @@ class Sina:
 
             else:
                 run_col = ['low', 'high']
-                startime = '09:25:00'
+                startime = '09:24:00'
                 # endtime = '10:00:00'
                 endtime = '09:45:00'
                 dd = self.get_col_agg_df(h5, dd, run_col, all_func, startime, endtime)
-                startime = '09:25:00'
+                startime = '09:24:00'
                 endtime = '15:01:00'
                 run_col = ['close']
                 # h5 = cct.get_limit_multiIndex_Group(h5, freq='15T', col=run_col,start=startime, end=endtime)

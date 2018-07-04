@@ -1750,6 +1750,9 @@ def using_Grouper(df, freq='5T', col='low', closed='right', label='right'):
 
 
 def select_multiIndex_index(df, index='ticktime', start=None, end=None, datev=None, code=None):
+    # df = df[df.index.duplicated()]
+
+    # df = df.drop_duplicates('volume')
     if index <> 'date' and code is None:
         if start is not None and len(start) < 10:
             if datev is None:
@@ -1784,9 +1787,9 @@ def select_multiIndex_index(df, index='ticktime', start=None, end=None, datev=No
 
     if code is not None:
         if start is None:
-            start = get_today(sep='-') + ' ' + '09:27:00'
+            start = get_today(sep='-') + ' ' + '09:24:30'
         else:
-            start = day8_to_day10(start) + ' ' + '09:27:00'
+            start = day8_to_day10(start) + ' ' + '09:24:30'
         # df = df[(df.index.get_level_values('code') == code) & (df.index.get_level_values(index) > start)]
         df = df[(df.index.get_level_values('code') == code)]
 
@@ -1869,6 +1872,8 @@ def get_limit_multiIndex_freq(df, freq='5T', col='low', index='ticktime', start=
     # print df.loc['600007',['close','ticktime']]
     if freq is not None and col is not None:
         # import pdb;pdb.set_trace()
+        if col == 'all':
+            df.volume = df.volume - df.volume.shift(1)
         df = using_Grouper(df, freq=freq, col=col)
         # print df.loc['600007',['close','low','high','ticktime']]
     else:
