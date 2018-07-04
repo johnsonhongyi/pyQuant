@@ -326,7 +326,6 @@ def get_linear_model_status(code, df=None, dtype='d', type='m', start=None, end=
     if len(df) > 0 and df is not None:
         df = df.sort_index(ascending=True)
         df = df[df.index >= start]
-
     if len(df) == 0 or df is None:
         if start is not None and len(start) > 8 and int(start[:4]) > 2500:
             log.warn("code:%s ERROR:%s" % (code, start))

@@ -1876,6 +1876,7 @@ def getSinaIndexdf():
 
 def getSinaAlldf(market='cyb', vol=ct.json_countVol, vtype=ct.json_countType, filename='mnbk', table='top_now', trend=False):
     print "initdx",
+    
     market_all = False
     m_mark = market.split(',')
 
@@ -1962,6 +1963,8 @@ def getSinaAlldf(market='cyb', vol=ct.json_countVol, vtype=ct.json_countType, fi
         if 'code' in df.columns:
             df = df.set_index('code')
     else:
+        if not market  in ['sz','sh']:
+            market = 'all'
         df = rl.get_sina_Market_json(market)
 #        codelist = df.code.tolist()
 #        df = df.set_index('code')
@@ -3427,7 +3430,7 @@ if __name__ == '__main__':
     else:
         log_level = LoggerFactory.ERROR
     # log_level = LoggerFactory.DEBUG if args['-d']  else LoggerFactory.ERROR
-    log_level = LoggerFactory.DEBUG
+    # log_level = LoggerFactory.DEBUG
     log.setLevel(log_level)
     # code='002169'
     code = '399001'
@@ -3436,10 +3439,10 @@ if __name__ == '__main__':
     # df3 = df.sort_index(ascending=True)
     # print "cumin:",df[:2].cumin.values,df[:2].cumaxe.values,df[:2].cumins.values,df[:2].cumine.values,df[:2].cumaxc.values, df[:2].cmean.values
 
-    df2 = get_tdx_Exp_day_to_df(code,dl=60, end=None, newdays=0, resample='d')
-    # df4 = df2.sort_index(ascending=True)
-    print "cumin:",df2[:2].cumin.values,df2[:2].cumaxe.values,df2[:2].cumins.values,df2[:2].cumine.values,df2[:2].cumaxc.values, df2[:2].cmean.values
-    import ipdb;ipdb.set_trace()
+    # df2 = get_tdx_Exp_day_to_df(code,dl=60, end=None, newdays=0, resample='d')
+    # # df4 = df2.sort_index(ascending=True)
+    # print "cumin:",df2[:2].cumin.values,df2[:2].cumaxe.values,df2[:2].cumins.values,df2[:2].cumine.values,df2[:2].cumaxc.values, df2[:2].cmean.values
+    # import ipdb;ipdb.set_trace()
 
     # print get_tdx_day_to_df_last('999999', type=1)
     # sys.exit(0)
@@ -3512,7 +3515,7 @@ if __name__ == '__main__':
     # print get_tdx_exp_low_or_high_power(code, dl=20,end='2017-06-28',ptype='high')
     # print get_tdx_exp_low_or_high_power(code, dl=20, end='2017-06-28', ptype='low')
 
-    print get_tdx_exp_low_or_high_power(code, dl=60, end=None, ptype='high', power=False, resample=resample)[:1]
+    # print get_tdx_exp_low_or_high_power(code, dl=60, end=None, ptype='high', power=False, resample=resample)[:1]
     # df = get_tdx_exp_low_or_high_power(code, dl=60, end=None, ptype='low', power=False, resample=resample)
     # print get_tdx_Exp_day_to_df(code, dl=60, newdays=0, resample='m')[:2]
     # print get_tdx_Exp_day_to_df(code, dl=30, newdays=0, resample='d')[:2]

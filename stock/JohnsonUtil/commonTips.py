@@ -536,6 +536,10 @@ def tran2GBK(strInput):
     elif strCodingFmt == "utf8":
         return strInput.decode("utf8").encode("gbk")
 
+def get_file_size(path_to_file):
+    # filesize = os.path.getsize(path_to_file) / 1000 / 1000
+    filesize = os.path.getsize(path_to_file)
+    return filesize
 
 def creation_date_duration(path_to_file):
     """

@@ -565,6 +565,7 @@ def get_linear_model_status(code, df=None, dtype='d', type='m', start=None, end=
         return operation, ratio
 
     df = df.fillna(0)
+    
     if len(df) > 1 + days:
         if days != 0:
             asset = df[:-days]

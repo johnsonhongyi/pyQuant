@@ -104,8 +104,9 @@ if __name__ == "__main__":
             # print len(top_now)
 
             time_Rt = time.time()
-            top_now = tdd.getSinaAlldf(
-                market='all', vol=ct.json_countVol, vtype=ct.json_countType)
+            # top_now = tdd.getSinaAlldf(market='all', vol=ct.json_countVol, vtype=ct.json_countType)
+            top_now = tdd.getSinaAlldf(market='次新股,060',filename='cxg', vol=ct.json_countVol, vtype=ct.json_countType)
+
             time_d = time.time()
             if time_d - time_s > delay_time:
                 status_change = True

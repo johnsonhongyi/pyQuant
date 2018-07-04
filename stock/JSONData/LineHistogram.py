@@ -149,7 +149,8 @@ def get_linear_model_histogramDouble(code, ptype='low', dtype='d', start=None, e
         df = tdd.get_tdx_append_now_df_api(code, start, end).sort_index(ascending=True)
     if not dtype == 'd':
         df = tdd.get_tdx_stock_period_to_type(df, dtype).sort_index(ascending=True)
-    asset = df[ptype]
+
+    asset = df[ptype].round(2)
     log.info("df:%s" % asset[:1])
     asset = asset.dropna()
     dates = asset.index
