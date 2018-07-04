@@ -748,8 +748,8 @@ def day8_to_day10(start, sep='-'):
     if start:
         start = str(start)
         if len(start) == 8:
-            start = start[:4] + sep + start[4:6] + sep + start[6:]
-            return start
+            if start.find(':') < 0:
+                start = start[:4] + sep + start[4:6] + sep + start[6:]
     return start
 
 
@@ -1851,7 +1851,10 @@ def get_limit_multiIndex_Row(df, col=None, index='ticktime', start=None, end='10
     return df
 
 
+
 def get_limit_multiIndex_freq(df, freq='5T', col='low', index='ticktime', start=None, end='10:00:00', code=None):
+    # quotes = cct.get_limit_multiIndex_freq(h5, freq=resample.upper(), col='all', start=start, end=end, code=code)
+    # isinstance(spp.all_10.index[:1], pd.core.index.MultiIndex)
     if df is not None:
         dd = select_multiIndex_index(df, index=index, start=start, end=end, code=code)
         if code is not None:
