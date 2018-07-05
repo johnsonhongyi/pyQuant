@@ -125,7 +125,9 @@ if __name__ == "__main__":
     parserDuraton = cct.DurationArgmain()
     
     market_sort_value, market_sort_value_key = ct.get_market_sort_value_key(ct.sort_value_key_perd)
-    
+    st_key_sort = '3'
+    st = None
+
     while 1:
         try:
             '''
@@ -136,9 +138,12 @@ if __name__ == "__main__":
             # top_dif = top_now
             # top_now.to_hdf("testhdf5", 'marketDD', format='table', complevel=9)
             '''
+            if st is None:
+                st_key_sort = '%s %s'%(st_key_sort.split()[0],cct.get_index_fibl())
+
             time_Rt = time.time()
-            top_now = tdd.getSinaAlldf(market='all', vol=ct.json_countVol, vtype=ct.json_countType)
-#            top_now = tdd.getSinaAlldf(market=u'次新股',filename='cxg', vol=ct.json_countVol, vtype=ct.json_countType)
+            # top_now = tdd.getSinaAlldf(market='all', vol=ct.json_countVol, vtype=ct.json_countType)
+            top_now = tdd.getSinaAlldf(market=u'次新股',filename='cxg', vol=ct.json_countVol, vtype=ct.json_countType)
             now_count = len(top_now)
             radio_t = cct.get_work_time_ratio()
             # top_now = top_now[top_now.buy > 0]
@@ -495,7 +500,7 @@ if __name__ == "__main__":
                 sys.exit(0)
             else:
                 print "input error:%s" % (st)
-        except (IOError, EOFError, Exception) as e:status
+        except (IOError, EOFError, Exception) as e:
             #            print "Error", e
             import traceback
             traceback.print_exc()

@@ -237,9 +237,9 @@ def write_hdf(f, key, df, complib):
 
 def get_hdf5_file(fpath, wr_mode='r', complevel=9, complib='blosc', mutiindx=False):
     """[summary]
-    
+
     [old api out date]
-    
+
     Parameters
     ----------
     fpath : {[type]}
@@ -252,7 +252,7 @@ def get_hdf5_file(fpath, wr_mode='r', complevel=9, complib='blosc', mutiindx=Fal
         [description] (the default is 'blosc', which [default_description])
     mutiindx : {bool}, optional
         [description] (the default is False, which [default_description])
-    
+
     Returns
     -------
     [type]
@@ -305,9 +305,9 @@ def get_hdf5_file(fpath, wr_mode='r', complevel=9, complib='blosc', mutiindx=Fal
 
 def write_hdf_db(fname, df, table='all', index=False, complib='blosc', baseCount=500, append=True, MultiIndex=False,rewrite=False):
     """[summary]
-    
+
     [description]
-    
+
     Parameters
     ----------
     fname : {[type]}
@@ -326,7 +326,7 @@ def write_hdf_db(fname, df, table='all', index=False, complib='blosc', baseCount
         [description] (the default is True, which [default_description])
     MultiIndex : {bool}, optional
         [description] (the default is False, which [default_description])
-    
+
     Returns
     -------
     [type]
@@ -421,8 +421,8 @@ def write_hdf_db(fname, df, table='all', index=False, complib='blosc', baseCount
                 # mask = totals['dirty']+totals['swap'] > 1e7     result =
                 # mask.loc[mask]
                 # store.remove('key_name', where='<where clause>')
-                
-                
+
+
                 # tmpdf = tmpdf[~tmpdf.index.duplicated(keep='first')]
                 # df = df[~df.index.duplicated(keep='first')]
                 if not rewrite and tmpdf is not None and len(tmpdf) > 0:
@@ -475,11 +475,24 @@ def write_hdf_db(fname, df, table='all', index=False, complib='blosc', baseCount
             df=df.fillna(0)
             if h5 is not None:
                 if '/' + table in h5.keys():
-                    if not MultiIndex or rewrite:
+                    if not MultiIndex:
+
+                        # if MultiIndex and rewrite:
+                        #     src_code = h5[table].index.get_level_values('code').unique().tolist()
+                        #     new_code = df.index.get_level_values('code').unique().tolist()
+                        #     diff_code = list(set(new_code) - set(src_code))
+                        #     dratio = cct.get_diff_dratio(new_code, src_code)
+                        #     print dratio,len(diff_code)
+                        #     import ipdb;ipdb.set_trace()
+                        #     df = pd.concat([df, h5[table]], axis=0)
+                        #     df = df.index.drop_duplicates()
+                                # df[df.index.get_level_values('code') not in diff_code ]
                         h5.remove(table)
                         h5[table]=df
                         # h5.put(table, df, format='table',index=False, data_columns=True, append=False)
                     else:
+                        if rewrite:
+                            h5.remove(table)
                         h5.put(table, df, format='table', index=False, complib=complib, data_columns=True, append=True)
                         # h5.append(table, df, format='table', append=True,data_columns=True, dropna=None)
                 else:
@@ -537,9 +550,9 @@ def write_hdf_db(fname, df, table='all', index=False, complib='blosc', baseCount
 
 def load_hdf_db(fname, table='all', code_l=None, timelimit=True, index=False, limit_time=ct.h5_limit_time, dratio_limit=ct.dratio_limit,MultiIndex=False):
     """[summary]
-    
+
     [load hdf ]
-    
+
     Parameters
     ----------
     fname : {[type]}
@@ -558,7 +571,7 @@ def load_hdf_db(fname, table='all', code_l=None, timelimit=True, index=False, li
         [description] (the default is ct.dratio_limit, which [default_description])
     MultiIndex : {bool}, optional
         [description] (the default is False, which [default_description])
-    
+
     Returns
     -------
     [dataframe]
@@ -572,6 +585,7 @@ def load_hdf_db(fname, table='all', code_l=None, timelimit=True, index=False, li
     dd=None
     if code_l is not None:
         if table is not None:
+
             with SafeHDFStore(fname) as store:
                 if store is not None:
                     try:
@@ -632,7 +646,7 @@ def load_hdf_db(fname, table='all', code_l=None, timelimit=True, index=False, li
 
                     else:
                        df=dd.loc[dif_co]
-                       
+
                     if dratio > dratio_limit:
                        if len(code_l) > ct.h5_time_l_count * 10 and INIT_LOG_Error < 5:
                            # INIT_LOG_Error += 1
@@ -697,9 +711,9 @@ def load_hdf_db(fname, table='all', code_l=None, timelimit=True, index=False, li
                         if len(o_time) > 0:
                             l_time=np.mean(o_time)
                             # l_time = time.time() - l_time
-# return_hdf_status = not cct.get_work_day_status()  or not
-# cct.get_work_time() or (cct.get_work_day_status() and
-# (cct.get_work_time() and l_time < limit_time))
+                # return_hdf_status = not cct.get_work_day_status()  or not
+                # cct.get_work_time() or (cct.get_work_day_status() and
+                # (cct.get_work_time() and l_time < limit_time))
                             return_hdf_status=not cct.get_work_time() or (
                                 cct.get_work_time() and l_time < limit_time)
                             log.info("return_hdf_status:%s time:%0.2f" %
@@ -732,18 +746,19 @@ def load_hdf_db(fname, table='all', code_l=None, timelimit=True, index=False, li
                          ([time.time() - t_x for t_x in time_list]))
 
     log.info("load_hdf_time:%0.2f" % (time.time() - time_t))
-    # if df is not None and len(df) > 1:
+
     if df is not None:
         df=df[~df.index.duplicated(keep='last')]
-        
-    if 'volume' in df.columns:
-        count_drop = len(df)
-        df = df.drop_duplicates('volume',keep='last')
-        dratio=round((float(len(df))) / float(count_drop),2)
-        log.debug("all:%s  drop:%s  dratio:%.2f"%(int(count_drop/100),int(len(df)/100),dratio))
-        if dratio < 0.6:
-            if isinstance(df.index, pd.core.index.MultiIndex):
-                write_hdf_db(fname, df, table=table, index=index, MultiIndex=True,rewrite=True)
+        if fname.find('MultiIndex') > 0 and 'volume' in df.columns:
+            count_drop = len(df)
+            df = df.drop_duplicates()
+            # df = df.drop_duplicates('volume',keep='last')
+            dratio=round((float(len(df))) / float(count_drop),2)
+            log.debug("all:%s  drop:%s  dratio:%.2f"%(int(count_drop/100),int(len(df)/100),dratio))
+            if dratio < 0.8:
+                log.error("MultiIndex drop_duplicates:%s %s dr:%s"%(count_drop,len(df),dratio))
+                if isinstance(df.index, pd.core.index.MultiIndex):
+                    write_hdf_db(fname, df, table=table, index=index, MultiIndex=True,rewrite=True)
 
     # df = df.drop_duplicates()
 

@@ -126,8 +126,8 @@ if __name__ == "__main__":
     parser = cct.MoniterArgmain()
     parserDuraton = cct.DurationArgmain()
     # market_sort_value, market_sort_value_key = ct.get_market_sort_value_key(ct.sort_value_key_perd)
-    st_key_sort = '2 %s'%(cct.get_index_fibl())
-    # st_key_sort = '3 %s'%(cct.get_index_fibl())
+    st_key_sort = '2'
+    st = None
 
 
     while 1:
@@ -141,6 +141,9 @@ if __name__ == "__main__":
             # top_now.to_hdf("testhdf5", 'marketDD', format='table', complevel=9)
             '''
             # top_now = tdd.getSinaAlldf(market='cyb', vol=ct.json_countVol, vtype=ct.json_countType)
+            if st is None:
+                st_key_sort = '%s %s'%(st_key_sort.split()[0],cct.get_index_fibl())
+
             time_Rt = time.time()
             top_now = tdd.getSinaAlldf(market='all', vol=ct.json_countVol, vtype=ct.json_countType)
             # top_now = tdd.getSinaAlldf(market='rzrq', vol=ct.json_countVol, vtype=ct.json_countType)

@@ -198,9 +198,9 @@ class Sina:
 #                return_hdf_status = not cct.get_work_day_status() or (cct.get_work_day_status() and (cct.get_work_time() and l_time < sina_limit_time))
                 return_hdf_status = not cct.get_work_time() or (cct.get_work_time() and l_time < sina_limit_time)
                 log.info("915:%s sina_time:%0.2f limit:%s" % (sina_time_status, l_time, sina_limit_time))
-                
+
                 h5 = self.combine_lastbuy(h5)
-                        
+
                 if sina_time_status and l_time < 6:
                     log.info("open 915 hdf ok:%s" % (len(h5)))
                     return h5
@@ -276,6 +276,7 @@ class Sina:
                     map(lambda stock_code: ('sz%s') % stock_code,
                         self.stock_codes))
             self.stock_codes = list(set(self.stock_codes))
+
             h5 = h5a.load_hdf_db(self.hdf_name, self.table, code_l=self.stock_codes, limit_time=self.sina_limit_time)
             if h5 is not None:
                 h5 = self.combine_lastbuy(h5)
@@ -365,21 +366,22 @@ class Sina:
     #     # cct.to_mp_run(self.get_stocks_by_range, threads)
     #
     #     return self.format_response_data()
-    
+
     def combine_lastbuy(self,h5):
-        if  cct.get_now_time_int() > 930 and cct.get_work_time():
+        if  cct.get_now_time_int() > 925:
             h5_fname = 'sina_MultiIndex_data'
             h5_table = 'all' + '_' + str(ct.sina_limit_time)
             fname = 'sina_logtime'
             logtime = cct.get_config_value_ramfile(fname)
             # if logtime <> 0 and not cct.get_work_time():
+
             if logtime <> 0:
-                if 'lastbuy' not in h5.columns:
+                if 'lastbuy' not in h5.columns or len(h5[h5.lastbuy < 0]) > 0:
                     h5_a = h5a.load_hdf_db(h5_fname, h5_table, timelimit=False)
                     if h5_a is not None and 'lastbuy' in h5_a.columns:
-                        lastbuycol = h5_a.lastbuy.groupby(level=[0]).tail(1).reset_index().set_index('code').lastbuy           
+                        lastbuycol = h5_a.lastbuy.groupby(level=[0]).tail(1).reset_index().set_index('code').lastbuy
                         h5 = cct.combine_dataFrame(h5,lastbuycol)
-                        # h5['lastbuy'] = (map(lambda x, y: y if int(x) == 0 else x,h5['lastbuy'].values, h5['llastp'].values))                    
+                        # h5['lastbuy'] = (map(lambda x, y: y if int(x) == 0 else x,h5['lastbuy'].values, h5['llastp'].values))
                 else:
                     h5['lastbuy'] = (map(lambda x, y: y if int(x) == 0 else x,
                                               h5['lastbuy'].values, h5['close'].values))
@@ -635,17 +637,19 @@ class Sina:
 
             # df = df.loc[:, ['open', 'high', 'low', 'close', 'llastp', 'volume', 'ticktime']]
             # config_ini = cct.get_ramdisk_dir() + os.path.sep+ 'h5config.txt'
-            
+
             if logtime == 0:
                 duratime = cct.get_config_value_ramfile(fname,currvalue=time.time(),xtype='time',update=True)
                 df['lastbuy'] = (map(lambda x, y: y if int(x) == 0 else x,
                                           df['close'].values, df['llastp'].values))
+
             else:
                 if time.time() - float(logtime) > float(ct.logtime):
                 # if cct.get_now_time_int() - cct.GlobalValues().getkey('logtime') > ct.logtime:
                     duratime = cct.get_config_value_ramfile(fname,currvalue=time.time(),xtype='time',update=True)
                     df['lastbuy'] = (map(lambda x, y: y if int(x) == 0 else x,
                                               df['close'].values, df['llastp'].values))
+
                 else:
                     df = self.combine_lastbuy(df)
             #top_temp.loc['600903'][['lastbuy','now']]
@@ -671,7 +675,7 @@ class Sina:
         if 'nlow' not in df.columns or 'nhigh' not in df.columns or (cct.get_work_time() and 924 < cct.get_now_time_int() <= 1501):
             # if 'nlow' not in df.columns or 'nhigh' not in df.columns or cct.get_work_time():
             h5 = h5a.load_hdf_db(h5_fname, h5_table, timelimit=False)
-           
+
             time_s = time.time()
             if cct.get_work_time() and cct.get_now_time_int() <= 945:
                 run_col = ['low', 'high', 'close']
@@ -708,11 +712,11 @@ class Sina:
                 if dd is not None and len(dd) > 0 and  'nclose' in dd.columns and 'nstd' in dd.columns:
                     for co in ['nclose','nstd']:
                         dd[co] = dd[co].apply(lambda x: round(x, 2))
-            if 'nstd' in dd.columns:            
+            if 'nstd' in dd.columns:
                 dd['stdv'] = map(lambda x, y: round(x / y * 100, 1), dd.nstd, dd.open)
 
             # if h5 is not None and 'lastbuy' in h5.columns:
-            #     lastbuycol = h5.lastbuy.groupby(level=[0]).tail(1).reset_index().set_index('code').lastbuy           
+            #     lastbuycol = h5.lastbuy.groupby(level=[0]).tail(1).reset_index().set_index('code').lastbuy
             #     dd = cct.combine_dataFrame(dd,lastbuycol)
 
             log.info("agg_df_all_time:%0.2f" % (time.time() - time_s))
@@ -763,12 +767,15 @@ if __name__ == "__main__":
     # code='300107'
     df =sina.all
     # print df.lastbuy[-5:].to_frame().T
+    df = Sina().market('cyb')
+    print df.shape
+    import ipdb;ipdb.set_trace()
 
     print sina.get_stock_code_data('300107').T
     print df[-5:][['open','close']].T
     print df.columns
     # print df[-5:][['lastbuy','close']].T
-    
+
     # print sina.get_stock_list_data(['999999','399001','399006'],index=True)
     df = sina.get_stock_code_data('999999,399001,399006',index=True)
     print df.volume
@@ -779,7 +786,7 @@ if __name__ == "__main__":
     dd = sina.get_stock_code_data([code_agg,'600050','002350', '601899',\
       '603363','000868','603917','600392','300713','000933','002505','603676'])
     print dd.T
-    
+
     print dd.loc[:, ['name','open','low','high','close', 'nclose', 'nlow', 'nhigh', 'nstd', 'ticktime']], dd.shape
     # print dd.loc[code_agg].T
 

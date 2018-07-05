@@ -123,13 +123,17 @@ if __name__ == "__main__":
     # all_diffpath = tdd.get_tdx_dir_blocknew() + '062.blk'
     parser = cct.MoniterArgmain()
     parserDuraton = cct.DurationArgmain()
-    st_key_sort = '2 %s'%(cct.get_index_fibl())
+    st_key_sort = '2'
+    st = None
     # st_key_sort = '6'
     
     while 1:
         try:
             # df = sina_data.Sina().all
             time_Rt = time.time()
+            if st is None:
+                st_key_sort = '%s %s'%(st_key_sort.split()[0],cct.get_index_fibl())
+                
             top_now = tdd.getSinaAlldf(market='060', vol=ct.json_countVol, vtype=ct.json_countType)
             # top_now = tdd.getSinaAlldf(market='次新股',filename='cxg', vol=ct.json_countVol, vtype=ct.json_countType)
             

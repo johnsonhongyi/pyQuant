@@ -134,7 +134,8 @@ if __name__ == "__main__":
     parserDuraton = cct.DurationArgmain()
     # market_sort_value, market_sort_value_key = ct.get_market_sort_value_key(ct.sort_value_key_perd)
     # market_sort_value, market_sort_value_key = ct.get_market_sort_value_key('1')
-    st_key_sort = '2 1'
+    st_key_sort = '2'
+    st = None
     # st_key_sort = '7'
     while 1:
         try:
@@ -146,6 +147,9 @@ if __name__ == "__main__":
             # top_dif = top_now
             # top_now.to_hdf("testhdf5", 'marketDD', format='table', complevel=9)
             '''
+            if st is None:
+                st_key_sort = '%s %s'%(st_key_sort.split()[0],cct.get_index_fibl())
+            
             # top_now = tdd.getSinaAlldf(market='cx', vol=ct.json_countVol, vtype=ct.json_countType)
             # top_now = tdd.getSinaAlldf(market='央企',filename='yqg', vol=ct.json_countVol, vtype=ct.json_countType)
             # top_now = tdd.getSinaAlldf(market=u'一带一路',filename='ydyl', vol=ct.json_countVol, vtype=ct.json_countType)
@@ -321,7 +325,7 @@ if __name__ == "__main__":
                     top_all = tdd.get_powerdf_to_all(top_all, top_end)
                     # top_temp = stf.getBollFilter(df=top_temp, boll=ct.bollFilter,duration=ct.PowerCountdl, filter=True, percent=True, resample=resample)
                     # top_temp = stf.getBollFilter(df=top_temp, boll=ct.bollFilter,duration=ct.PowerCountdl, filter=True, percent=True, resample=resample)
-                    top_temp = stf.getBollFilter(df=top_temp, boll=ct.bollFilter, duration=ct.PowerCountdl, filter=True, ma5d=True, dl=14, percent=False, resample=resample, ene=False,cuminTrend=False)
+                    top_temp = stf.getBollFilter(df=top_temp, boll=ct.bollFilter, duration=ct.PowerCountdl, filter=True, ma5d=False, dl=14, percent=False, resample=resample, ene=False,cuminTrend=False)
                     # top_end = stf.getBollFilter(df=top_temp, boll=ct.bollFilter, duration=ct.PowerCountdl, filter=False, ma5d=False, dl=14, percent=False, resample=resample, ene=False)
 
                     print("N:%s K:%s %s G:%s" % (

@@ -150,6 +150,8 @@ def get_linear_model_histogramDouble(code, ptype='low', dtype='d', start=None, e
     if not dtype == 'd':
         df = tdd.get_tdx_stock_period_to_type(df, dtype).sort_index(ascending=True)
 
+    if len(df) == 0:
+        raise Exception("Code:%s error, df is None" % (code))
     asset = df[ptype].round(2)
     log.info("df:%s" % asset[:1])
     asset = asset.dropna()
@@ -342,7 +344,14 @@ def get_linear_model_histogramDouble(code, ptype='low', dtype='d', start=None, e
     if 'name' in df.columns:
         plt.legend([df.name.values[-1:][0], df1.name.values[-1:][0]], loc=0)
     else:
-        plt.legend([code, code2], loc=0)
+        dm = tdd.get_sina_data_df(code)
+        if 'name' in dm.columns:
+            cname = dm.name[0]
+        else:
+            cname = '-'
+        # plt.legend([code, code2], loc=0)
+        plt.legend([cname, code2], loc=0)
+
 
     ax2 = fig.add_subplot(323)
     # ax2.plot(asset)
@@ -664,7 +673,13 @@ def get_linear_model_histogram(code, ptype='low', dtype='d', start=None, end=Non
     if 'name' in df.columns:
         plt.legend([df.name[-1], df1.name[-1]], loc=0)
     else:
-        plt.legend([code, code2], loc=0)
+        dm = tdd.get_sina_data_df(code)
+        if 'name' in dm.columns:
+            cname = dm.name[0]
+        else:
+            cname = '-'
+        # plt.legend([code, code2], loc=0)
+        plt.legend([cname, code2], loc=0)
     plt.show(block=False)
     # print plt.get_backend()
     # plt.show()

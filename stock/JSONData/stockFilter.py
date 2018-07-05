@@ -221,7 +221,8 @@ def getBollFilter(df=None, boll=ct.bollFilter, duration=ct.PowerCountdl, filter=
 
     filter_up = 'ma5d'
     filter_dn = 'ma10d'
-    if filter_up in df.columns:
+
+    if ma5d and filter_up in df.columns:
         if filter_dn in df.columns:
             if market_key is not None and market_key == '3':
                 df = df[(df.buy >= df[filter_up]) & (df.buy * 1.02 >= df[filter_dn] * ct.changeRatio)]
@@ -234,7 +235,7 @@ def getBollFilter(df=None, boll=ct.bollFilter, duration=ct.PowerCountdl, filter=
 
     # if 'nlow' in df.columns and 932 < cct.get_now_time_int() < 1030:
 
-    if not ene:
+    if  ene:
         #        df = df[ ((df.buy > df.ene) & (df['lvolr%s' % (resample)] > 1.2)) | ((df.buy > df.upper) & (df.nclose > df.cmean))]
 
         if 'nclose' in df.columns:
@@ -362,7 +363,7 @@ def getBollFilter(df=None, boll=ct.bollFilter, duration=ct.PowerCountdl, filter=
                     if isinstance(df_index, pd.DataFrame):
                         df_index['volume'] = (map(lambda x, y: round(x / y / radio_t, 1), df_index.nvol.values, df_index.lvolume.values))
                         index_vol = df_index.loc['999999'].volume
-                        if 'percent' in df.columns:
+                        if 'percent' in df.columns and '999999' in df_index.index:
                             index_percent = df_index.loc['999999'].percent
                         else:
                             # import ipdb;ipdb.set_trace()

@@ -94,6 +94,7 @@ if __name__ == "__main__":
     # market_sort_value, market_sort_value_key = ct.get_market_sort_value_key('8')
     resample = 'd'
     st_key_sort = '4'
+    st = None
     while 1:
         try:
             # df = rl.get_sina_all_json_dd(vol, type)
@@ -102,7 +103,8 @@ if __name__ == "__main__":
             #     print len(df),
             # top_now = rl.get_sina_dd_count_price_realTime(df)
             # print len(top_now)
-
+            if st is None and st_key_sort in ['2','3']:
+                st_key_sort = '%s %s'%(st_key_sort.split()[0],cct.get_index_fibl())
             time_Rt = time.time()
             # top_now = tdd.getSinaAlldf(market='all', vol=ct.json_countVol, vtype=ct.json_countType)
             top_now = tdd.getSinaAlldf(market='次新股,060',filename='cxg', vol=ct.json_countVol, vtype=ct.json_countType)
@@ -156,7 +158,7 @@ if __name__ == "__main__":
 
                 top_bak = top_all
                 market_sort_value, market_sort_value_key = ct.get_market_sort_value_key(st_key_sort, top_all=top_all)
-                
+
                 codelist = top_all.index.tolist()
                 if len(codelist) > 0:
                     # log.info('toTDXlist:%s' % len(codelist))
@@ -196,11 +198,15 @@ if __name__ == "__main__":
                     if cct.get_now_time_int() > 1030 and cct.get_now_time_int() < 1400:
                         top_all = top_all[(top_all.volume > ct.VolumeMinR) & (
                             top_all.volume < ct.VolumeMaxR)]
-                
+
                 if st_key_sort.split()[0] == '4' and cct.get_now_time_int() > 926 and 'lastbuy' in top_all.columns:
 
+                        
                     top_all['dff'] = (map(lambda x, y: round((x - y) / y * 100, 1),
                                           top_all['buy'].values, top_all['lastbuy'].values))
+                    # if len(top_all[top_all.lastbuy < 0]) > 0 or len(top_all[top_all.dff < -10]) >0 :
+                    #     print top_all.loc['600313'].lastbuy,top_all.loc['600313'].buy,top_all.loc['600313'].lastp
+                    #     import ipdb;ipdb.set_trace()
                 else:
                     top_all['dff'] = (map(lambda x, y: round((x - y) / y * 100, 1),
                                           top_all['buy'].values, top_all['lastp'].values))

@@ -1460,7 +1460,6 @@ def get_index_fibl():
 
     return abs(fibl)
 
-
 def write_to_blocknew(p_name, data, append=True, doubleFile=True, keep_last=None):
     if keep_last is None:
         keep_last = ct.keep_lastnum
@@ -2318,7 +2317,7 @@ def combine_dataFrame(maindf, subdf, col=None, compare=None, append=False, clean
                     subdf[co_t] = subdf[co_t].astype(maindf.dtypes[co_t])
 
         maindf = pd.concat([maindf, subdf], axis=0)
-        maindf = maindf.fillna(-1)
+        maindf = maindf.fillna(-2)
         if not 'code' in maindf.columns:
             if not maindf.index.name == 'code':
                 maindf.index.name = 'code'

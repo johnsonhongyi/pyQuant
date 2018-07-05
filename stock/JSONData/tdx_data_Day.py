@@ -569,59 +569,58 @@ def get_tdx_Exp_day_to_df(code, start=None, end=None, dl=None, newdays=None, typ
             df = df.sort_index(ascending=False)
     # add cumin[:10]
 
-    if not isinstance(df, Series) and len(df) > 0:
+    if not MultiIndex : 
+        if  not isinstance(df, Series) and len(df) > 0:
 
-        cumdf = df.high.cummin()[:ct.cumdays].sort_index(ascending=True)
-        cumdf_max = df.high.cummax()[:ct.cumdays].sort_index(ascending=True)
-        cumdfc_max = df.close.cummax()[:ct.cumdays].sort_index(ascending=True)
-        cum_counts = cumdf.value_counts()
-        cum_counts_max = cumdf_max.value_counts()
-        cumdf_Lis = cumdf[cumdf.index >= cumdf[cumdf == cum_counts.index[0]].index[-1]]
-        log.debug("cumdf:%s %s"%(cumdf,cum_counts))
-        log.debug("cumdfmax:%s %s"%(cumdf_max,cum_counts_max))
-        # log.debug("cumdfc:%s %s"%(cumdfc_max,cumdfc_max.value_counts()))
+            cumdf = df.high.cummin()[:ct.cumdays].sort_index(ascending=True)
+            cumdf_max = df.high.cummax()[:ct.cumdays].sort_index(ascending=True)
+            cumdfc_max = df.close.cummax()[:ct.cumdays].sort_index(ascending=True)
+            cum_counts = cumdf.value_counts()
+            cum_counts_max = cumdf_max.value_counts()
+            cumdf_Lis = cumdf[cumdf.index >= cumdf[cumdf == cum_counts.index[0]].index[-1]]
+            log.debug("cumdf:%s %s"%(cumdf,cum_counts))
+            log.debug("cumdfmax:%s %s"%(cumdf_max,cum_counts_max))
+            # log.debug("cumdfc:%s %s"%(cumdfc_max,cumdfc_max.value_counts()))
 
-        cum_min, pos = LISCum(cumdf_Lis.tolist())
-        log.debug("cum_min:%s pos:%s"%(cum_min,pos))
+            cum_min, pos = LISCum(cumdf_Lis.tolist())
+            log.debug("cum_min:%s pos:%s"%(cum_min,pos))
 
-        max_lastd = cumdf_max[cumdf_max == cum_counts_max.index[0]].index[-1]
-        # cumdf_max_f = cumdf_max.sort_index(ascending=False)
-        cumdf_max_f = cumdf_max[cumdf_max.index >= max_lastd]
-        cumdf_max_f = cumdf_max_f.sort_index(ascending=False)
-        # print cumdf_max[-1],cum_counts_max.index[0]
-        cum_maxf, posf = LISCum(cumdf_max_f.tolist())
-        # import ipdb;ipdb.set_trace()
+            max_lastd = cumdf_max[cumdf_max == cum_counts_max.index[0]].index[-1]
+            # cumdf_max_f = cumdf_max.sort_index(ascending=False)
+            cumdf_max_f = cumdf_max[cumdf_max.index >= max_lastd]
+            cumdf_max_f = cumdf_max_f.sort_index(ascending=False)
+            # print cumdf_max[-1],cum_counts_max.index[0]
+            cum_maxf, posf = LISCum(cumdf_max_f.tolist())
 
-        if len(cum_counts) > 0 and len(pos) > 0 :
-            df['cumins'] = round(cum_counts.index[0], 2)
-            df['cumine'] = round(cumdf[-1], 2)
-            df['cumaxe'] = round(max(cumdf_max), 2)
-            df['cumaxc'] = round(max(cumdfc_max), 2)
-            # df['cumaxs'] = round(max(cumdf_max), 2)
-            # if  (round(cum_counts.index[0], 2) == cum_min[0]) and len(pos) > 1 or len(cum_counts) == len(pos) :
-            # import ipdb;ipdb.set_trace()
+            if len(cum_counts) > 0 and len(pos) > 0 :
+                df['cumins'] = round(cum_counts.index[0], 2)
+                df['cumine'] = round(cumdf[-1], 2)
+                df['cumaxe'] = round(max(cumdf_max), 2)
+                df['cumaxc'] = round(max(cumdfc_max), 2)
+                # df['cumaxs'] = round(max(cumdf_max), 2)
+                # if  (round(cum_counts.index[0], 2) == cum_min[0]) and len(pos) > 1 or len(cum_counts) == len(pos) :
 
-            if  (round(cum_counts.index[0], 2) <= cum_min[0]) and len(pos) > 1 or len(cum_counts) == len(pos) :
-                if len(pos) == 1 and cum_min[0] == cumdf_max[-1]:
+                if  (round(cum_counts.index[0], 2) <= cum_min[0]) and len(pos) > 1 or len(cum_counts) == len(pos) :
+                    if len(pos) == 1 and cum_min[0] == cumdf_max[-1]:
+                        if len(cumdf_max_f) == len(posf) and len(posf) > len(pos):
+                            df['cumin'] = -len(posf)
+                        else:
+                            df['cumin'] = len(pos)
+                    else:
+                        df['cumin'] = len(pos)
+                    log.debug("cumincounts:%s cum_min:%s pos:%s"%(len(pos),cum_min,pos))
+                else:
                     if len(cumdf_max_f) == len(posf) and len(posf) > len(pos):
                         df['cumin'] = -len(posf)
                     else:
-                        df['cumin'] = len(pos)
-                else:
-                    df['cumin'] = len(pos)
-                log.debug("cumincounts:%s cum_min:%s pos:%s"%(len(pos),cum_min,pos))
+                        df['cumin'] = -1
             else:
                 if len(cumdf_max_f) == len(posf) and len(posf) > len(pos):
                     df['cumin'] = -len(posf)
                 else:
                     df['cumin'] = -1
         else:
-            if len(cumdf_max_f) == len(posf) and len(posf) > len(pos):
-                df['cumin'] = -len(posf)
-            else:
-                df['cumin'] = -1
-    else:
-        df['cumin'] = -1
+            df['cumin'] = -1
 
     return df
 
@@ -1447,16 +1446,19 @@ def Write_tdx_all_to_hdf(market, h5_fname='tdx_all_df', h5_table='all', dl=300, 
     Returns:
         [boll] -- [write status]
     """
+
     time_a = time.time()
     if not h5_fname.endswith(str(dl)):
         h5_fname = h5_fname + '_' + str(dl)
         h5_table = h5_table + '_' + str(dl)
     else:
         log.error("start write index tdx data:%s" % (tdx_index_code_list))
+
     if market == 'all':
         index_key = tdx_index_code_list
-        Write_tdx_all_to_hdf(index_key, h5_fname=h5_fname, h5_table=h5_table, dl=dl, index=True, rewrite=rewrite)
+        Write_tdx_all_to_hdf(index_key, h5_fname=h5_fname, h5_table=h5_table, dl=dl, index=True,rewrite = rewrite)
         index = False
+        rewrite = False 
         market = ['cyb', 'sh', 'sz']
     if not isinstance(market, list):
         mlist = [market]
@@ -1466,6 +1468,7 @@ def Write_tdx_all_to_hdf(market, h5_fname='tdx_all_df', h5_table='all', dl=300, 
     if index:
         mlist = ['inx']
     status = False
+    
     for ma in mlist:
         dd = pd.DataFrame()
         if not index:
@@ -1547,8 +1550,9 @@ def Write_tdx_all_to_hdf(market, h5_fname='tdx_all_df', h5_table='all', dl=300, 
                 Closing remaining open files:/Volumes/RamDisk/tdx_all_df_30.h5...done
                 '''
         concat_t = time.time() - time_s
+        # dd = dd.loc[:,[u'open', u'high', u'low', u'close', u'vol', u'amount']]
         print("rewrite:%s dd.concat all :%s  time:%0.2f" % (rewrite, len(dfcode), concat_t))
-        status = h5a.write_hdf_db(h5_fname, dd, table=h5_table, index=False, baseCount=500, append=False, MultiIndex=True, rewrite=rewrite)
+        status = h5a.write_hdf_db(h5_fname, dd, table=h5_table, index=False, baseCount=500, append=False, MultiIndex=True,rewrite=rewrite)
         if status:
             print("hdf5 write all ok:%s  atime:%0.2f wtime:%0.2f" % (len(dfcode), time.time() - time_a, time.time() - time_s - concat_t))
         else:
@@ -1661,6 +1665,7 @@ def search_Tdx_multi_data_duration(fname='tdx_all_df_300', table='all_300', df=N
     tdx_hd5_name = cct.tdx_hd5_name
     if df is None and fname == tdx_hd5_name:
         df = cct.GlobalValues().getkey(tdx_hd5_name)
+
     if df is None:
         if start is not None and len(str(start)) < 8:
             df_tmp = get_tdx_Exp_day_to_df('999999', end=end).sort_index(ascending=False)
@@ -1668,6 +1673,7 @@ def search_Tdx_multi_data_duration(fname='tdx_all_df_300', table='all_300', df=N
         h5 = h5a.load_hdf_db(fname, table=table, code_l=code_l, timelimit=False, MultiIndex=True)
     else:
         h5 = df.loc[df.index.isin(code_l, level='code')]
+    
     if h5 is not None and len(h5) > 0:
         h51 = cct.get_limit_multiIndex_Row(h5, col=col, index=index, start=start, end=end)
     else:
@@ -1876,7 +1882,7 @@ def getSinaIndexdf():
 
 def getSinaAlldf(market='cyb', vol=ct.json_countVol, vtype=ct.json_countType, filename='mnbk', table='top_now', trend=False):
     print "initdx",
-    
+
     market_all = False
     m_mark = market.split(',')
 
@@ -1924,7 +1930,7 @@ def getSinaAlldf(market='cyb', vol=ct.json_countVol, vtype=ct.json_countType, fi
         
         if filename == 'cxg':
             df = wcd.get_wcbk_df(filter=market, market=filename,
-                                 perpage=1000, days=10,monitor=True)
+                                 perpage=1000, days=8,monitor=True)
         else:
             df = wcd.get_wcbk_df(filter=market, market=filename,
                                  perpage=1000, days=ct.wcd_limit_day,monitor=True)
@@ -2008,7 +2014,7 @@ def getSinaAlldf(market='cyb', vol=ct.json_countVol, vtype=ct.json_countType, fi
             dm = dm[(dm.b1 > 0) | (dm.a1 > 0)]
             dm['b1_v'] = ((dm['b1_v'] + dm['b2_v']) / 100 / 10000).map(lambda x: round(x, 1) + 0.01)
 
-        elif cct.get_now_time_int() > 926:
+        elif 926 < cct.get_now_time_int() < 1502 :
             # dm = dm[dm.open > 0]
             dm = dm[(dm.b1 > 0) | (dm.a1 > 0)]
             dm['b1_v'] = ((dm['b1_v']) / dm['volume'] * 100).map(lambda x: round(x, 1))
@@ -3442,7 +3448,6 @@ if __name__ == '__main__':
     # df2 = get_tdx_Exp_day_to_df(code,dl=60, end=None, newdays=0, resample='d')
     # # df4 = df2.sort_index(ascending=True)
     # print "cumin:",df2[:2].cumin.values,df2[:2].cumaxe.values,df2[:2].cumins.values,df2[:2].cumine.values,df2[:2].cumaxc.values, df2[:2].cmean.values
-    # import ipdb;ipdb.set_trace()
 
     # print get_tdx_day_to_df_last('999999', type=1)
     # sys.exit(0)

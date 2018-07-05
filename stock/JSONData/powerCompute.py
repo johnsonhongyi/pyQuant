@@ -817,14 +817,24 @@ def get_linear_model_candles(code, ptype='low', dtype='d', start=None, end=None,
     # plt.legend(["MA:10"+str(roll_mean[-1]], fontsize=12,loc=2)
 
     plt.ylabel('Price', fontsize=12)
+
     if 'name' in df.columns:
         plt.title(
             df.name.values[-1:][0] + " " + code + " | " +
             str(dates[-1])[:11] + " | " + "MA:%0.2f" % (roll_mean[-1]),
             fontsize=12)
     else:
-        plt.title(code + " | " + str(dates[-1])[:11] +
-                  " | " + "MA:%0.2f" % (roll_mean[-1]), fontsize=12)
+        # import ipdb;ipdb.set_trace()
+        dm = tdd.get_sina_data_df(code)
+        if 'name' in dm.columns:
+            cname = dm.name[0]
+        else:
+            cname = '-'
+        # plt.title(code + " | " + str(dates[-1])[:11] + " | " + "MA:%0.2f" % (roll_mean[-1]), fontsize=12)
+        plt.title(cname + " " + code + " | " +
+            str(dates[-1])[:11] + " | " + "MA:%0.2f" % (roll_mean[-1]),
+            fontsize=12)
+
     # plt.title(code + " | " + str(dates[-1])[:11], fontsize=14)
     fib = cct.getFibonacci(len(asset) * 5, len(asset))
     plt.legend(["Now:%s" % df.close[-1], "Hi:%s" % df.high[-1], "Lo:%0.2f" % (asset.iat[-1]), "day:%s" %
@@ -932,10 +942,10 @@ def get_linear_model_candles(code, ptype='low', dtype='d', start=None, end=None,
     plt.xticks(rotation=15, horizontalalignment='center')
 
 
-    assvol = df['vol']
-    # assvol = assvol.apply(lambda x: round(x / assvol[:1]*asset[:1], 2))
-    assvol = assvol.apply(lambda x: round(x / assvol[:1]+asset[:1], 2))
-    ax.plot(assvol, '-g', linewidth=0.5)
+    #show green vol line
+    # assvol = df['vol']
+    # assvol = assvol.apply(lambda x: round(x / assvol[:1]+asset[:1], 2))
+    # ax.plot(assvol, '-g', linewidth=0.5)
     # print assvol
 
     zp = zoompan.ZoomPan()
@@ -981,7 +991,7 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y', tal
 
     h5 = h5a.load_hdf_db(h5_fname, h5_table, code_l=code_l, limit_time=ct.h5_power_limit_time)
     
-    if h5 is not None:
+    if not index and h5 is not None :
         log.info("power hdf5 data:%s" % (len(h5)))
         if h5_combine_status:
             # if (not (915 < cct.get_now_time_int() < 935) or not cct.get_work_day_status())  and h5_combine_status:
@@ -1235,7 +1245,10 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y', tal
             # df.fibl.astype(float)
             df.loc[code, 'ldate'] = stl
             df.loc[code, 'boll'] = operation
-            df.loc[code,'cumin'] = tdx_df.cumin[-1]
+            if tdx_df.cumin[-1] == 0:
+                df.loc[code,'cumin'] = tdx_df.cumin[-2]
+            else:
+                df.loc[code,'cumin'] = tdx_df.cumin[-1]
 
             tdx_df, opkdj = getab.Get_KDJ(tdx_df, dtype='d',lastday=days)
             tdx_df, opmacd = getab.Get_MACD_OP(tdx_df, dtype='d',lastday=days)
@@ -1304,7 +1317,6 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y', tal
         cct.GlobalValues().setkey('wencai_drop', wencai_drop)
 
     # print "global:%s"%(cct.GlobalValues().getkey('dropcxg'))
-
     h5 = h5a.write_hdf_db(h5_fname, df.loc[code_l], table=h5_table, append=True)
 
     print "Power:%0.2f" % (time.time() - ts),

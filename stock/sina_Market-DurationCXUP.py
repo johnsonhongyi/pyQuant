@@ -124,11 +124,15 @@ if __name__ == "__main__":
     parser = cct.MoniterArgmain()
     parserDuraton = cct.DurationArgmain()
     st_key_sort = ct.sort_value_key_perd
+    st = None
     while 1:
         try:
             # df = sina_data.Sina().all
             # top_now = tdd.getSinaAlldf(market='cx', vol=ct.json_countVol, vtype=ct.json_countType)
             # top_now = tdd.getSinaAlldf(market='次新股',filename='cxg', vol=ct.json_countVol, vtype=ct.json_countType)
+            if st is None:
+                st_key_sort = '%s %s'%(st_key_sort.split()[0],cct.get_index_fibl())
+                
             time_Rt = time.time()
             top_now = tdd.getSinaAlldf(market='雄安特区', filename='xatq', vol=ct.json_countVol, vtype=ct.json_countType)
             # top_now = tdd.getSinaAlldf(market=u'新股与次新股',filename='cxg', vol=ct.json_countVol, vtype=ct.json_countType)
