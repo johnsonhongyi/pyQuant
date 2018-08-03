@@ -156,7 +156,6 @@ def get_sina_Market_json(market='all', showtime=True, num='100', retry_count=3, 
     h5_fname = 'get_sina_all_ratio'
     # h5_table = 'all'
     h5_table = 'all'+'_'+str(num)
-
     # if market == 'all':
     limit_time = ct.sina_dd_limit_time
     h5 = h5a.load_hdf_db(h5_fname, table=h5_table,limit_time=limit_time)
@@ -249,6 +248,19 @@ def get_sina_Market_json(market='all', showtime=True, num='100', retry_count=3, 
         else:
             h5 = h5a.write_hdf_db(h5_fname, df, table=h5_table,append=True)
         if showtime: print ("Market-df:%s %s" % (format((time.time() - start_t), '.1f'), len(df))),
+
+        if market == 'all':
+            co_inx = [inx for inx in df.index if str(inx).startswith(('6','30','00'))]
+            df = df.loc[co_inx]            
+        elif market == 'sh':
+            co_inx = [inx for inx in df.index if str(inx).startswith(('6'))]
+            df = df.loc[co_inx]            
+        elif market == 'sz':
+            co_inx = [inx for inx in df.index if str(inx).startswith(('00'))]
+            df = df.loc[co_inx]            
+        elif market == 'cyb':
+            co_inx = [inx for inx in df.index if str(inx).startswith(('30'))]
+            df = df.loc[co_inx]            
 
         return df
     else:

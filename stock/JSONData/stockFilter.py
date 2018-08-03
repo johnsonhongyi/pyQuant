@@ -27,6 +27,7 @@ def func_compute_df2(c, lc, h, l):
     return du_p
 
 def filterPowerCount(df,count=500,down=False):
+    
     nowint=cct.get_now_time_int()
     top_temp = df[:count].copy()
 

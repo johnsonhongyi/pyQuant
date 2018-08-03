@@ -386,11 +386,11 @@ def write_hdf_db(fname, df, table='all', index=False, complib='blosc', baseCount
                     elif fname == 'powerCompute':
                         o_time=df[df.timel < limit_t].timel.tolist()
                         o_time=sorted(set(o_time), reverse=False)
-                        if len(o_time) > ct.h5_time_l_count:
+                        if len(o_time) >= ct.h5_time_l_count:
                             o_time=[time.time() - t_x for t_x in o_time]
                             o_timel=len(o_time)
                             o_time=np.mean(o_time)
-                            if o_time > ct.h5_power_limit_time:
+                            if (o_time) > ct.h5_power_limit_time:
                                 df['timel']=time.time()
                                 log.error("%s %s o_time:%.1f timel:%s" % (fname, table, o_time, o_timel))
 

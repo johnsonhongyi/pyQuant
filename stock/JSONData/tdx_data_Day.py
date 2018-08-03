@@ -1002,10 +1002,8 @@ def get_tdx_append_now_df_api(code, start=None, end=None, type='f', df=None, dm=
 
 
 def get_tdx_append_now_df_api_tofile(code, dm=None, newdays=0, start=None, end=None, type='f', df=None, dl=5, power=True):
-
     start = cct.day8_to_day10(start)
     end = cct.day8_to_day10(end)
-
     if df is None:
         df = get_tdx_Exp_day_to_df(
             code, start=start, end=end, dl=dl, newdays=newdays).sort_index(ascending=True)
@@ -1028,7 +1026,10 @@ def get_tdx_append_now_df_api_tofile(code, dm=None, newdays=0, start=None, end=N
     if not power:
         return df
 
-    today = cct.get_today()
+    if dm is not None:
+        today = dm.dt.loc[code]
+    else:
+        today = cct.get_today()
     if len(df) > 0:
         tdx_last_day = df.index[-1]
         if tdx_last_day == today:
@@ -1057,9 +1058,7 @@ def get_tdx_append_now_df_api_tofile(code, dm=None, newdays=0, start=None, end=N
             duration = 0
         else:
             today = end
-#    print cct.last_tddate(duration)
-# if duration >= 1 and (tdx_last_day != cct.last_tddate(1) or
-# cct.get_now_time_int() > 1530):
+
     if duration > 1 and (tdx_last_day != cct.last_tddate(1)):
         try:
             ds = get_kdate_data(code_ts, start=tdx_last_day,
@@ -1179,7 +1178,8 @@ def get_tdx_append_now_df_api_tofile(code, dm=None, newdays=0, start=None, end=N
         dm_code = dm_code.set_index('date')
         # log.debug("df.open:%s dm.open%s" % (df.open[-1], round(dm.open[-1], 2)))
         # print df.close[-1],round(dm.close[-1],2)
-        if end is None and ((df is not None and not dm.empty) and (round(df.open[-1], 2) != round(dm.open[-1], 2)) and (round(df.close[-1], 2) != round(dm.close[-1], 2))):
+
+        if end is None and ((df is not None and not dm.empty) and (round(df.open[-1], 2) != round(dm.open[-1], 2)) or (round(df.close[-1], 2) != round(dm.close[-1], 2))):
             if dm.open[0] > 0 and len(df) > 0:
                 if dm_code.index[-1] == df.index[-1]:
                     log.debug("app_api_dm.Index:%s df:%s" %
@@ -1201,6 +1201,7 @@ def get_tdx_append_now_df_api_tofile(code, dm=None, newdays=0, start=None, end=N
         df['ma60d'] = pd.rolling_mean(df.close, 60)
         df = df.fillna(0)
         df = df.sort_index(ascending=False)
+    
     if writedm and len(df) > 0:
         if cct.get_now_time_int() < 900 or cct.get_now_time_int() > 1505:
             sta = write_tdx_sina_data_to_file(code, df=df)
@@ -1734,11 +1735,15 @@ def Write_market_all_day_mp(market='all', rewrite=False):
         df = sina_data.Sina().market(mk)
         # df = rl.get_sina_Market_json(mk)
         # print df.loc['600581']
-        df = df[(df.b1 > 0) | (df.a1 > 0)]
+
         print("market:%s A:%s" % (mk, len(df))),
         if df is None or len(df) < 10:
             print "df is none"
             break
+        else:
+            # dt = df.dt.value_counts().index[0]
+            # df = df[((df.b1 > 0) | (df.a1 > 0)) & ( df.dt >= dt)]
+            df = df[((df.b1 > 0) | (df.a1 > 0))]
         code_list = df.index.tolist()
         dm = get_sina_data_df(code_list)
         log.info('code_list:%s df:%s' % (len(code_list), len(df)))
@@ -1747,7 +1752,8 @@ def Write_market_all_day_mp(market='all', rewrite=False):
         # get_tdx_append_now_df_api_tofile('603113', dm=None, newdays=1,
         # start=None, end=None, type='f', df=None, dl=2, power=True)
         results = cct.to_mp_run_async(
-            get_tdx_append_now_df_api_tofile, code_list, dm=dm, newdays=0)
+            # get_tdx_append_now_df_api_tofile, code_list, dm=dm, newdays=0)
+            get_tdx_append_now_df_api_tofile, code_list, dm, 0)
         # for code in code_list:
         # print "code:%s "%(code),
         # res=get_tdx_append_now_df_api_tofile(code,dm,5)
@@ -1764,7 +1770,7 @@ def Write_market_all_day_mp(market='all', rewrite=False):
             get_tdx_append_now_df_api_tofile(inx)
         print "Index Wri ok",
         Write_sina_to_tdx(tdx_index_code_list, index=True)
-    Write_sina_to_tdx(market='all')
+        Write_sina_to_tdx(market='all')
     print "All is ok"
     return results
 
@@ -3465,9 +3471,12 @@ if __name__ == '__main__':
     # print Write_tdx_all_to_hdf(tdx_index_code_list, h5_fname='tdx_all_df', h5_table='all', dl=300,index=True)
     # print Write_sina_to_tdx(tdx_index_code_list,index=True)
     # print cct.get_ramdisk_path('tdx')
-    code_list = sina_data.Sina().market('cyb').index.tolist()
-    code_list.extend(tdx_index_code_list)
+    
+    # code_list = sina_data.Sina().market('cyb').index.tolist()
+    # code_list.extend(tdx_index_code_list)
     time_s = time.time()
+    
+
     # df = h5a.load_hdf_db('tdx_all_df_300', table='all_300', timelimit=False,MultiIndex=True)
     # if cct.GlobalValues().getkey(cct.tdx_hd5_name) is None:
     #     # cct.GlobalValues()
@@ -3502,9 +3511,9 @@ if __name__ == '__main__':
     # print python_resample(qs, xs, rands)
     # print get_kdate_data('300534', start='2017-05-01', end='', ktype='D')
 #    code='300174'
-    # dm = get_sina_data_df(sina_data.Sina().market('all').index.tolist())
-    dm = None
-    # get_tdx_append_now_df_api_tofile('002196', dm=dm,newdays=0, start=None, end=None, type='f', df=None, dl=10, power=True)
+    dm = get_sina_data_df(sina_data.Sina().market('all').index.tolist())
+    # dm = None
+    get_tdx_append_now_df_api_tofile('000838', dm=dm,newdays=0, start=None, end=None, type='f', df=None, dl=10, power=True)
     # get_tdx_append_now_df_api_tofile('002196', dm=dm,newdays=1,dl=5)
 #
     # code = '300661'
@@ -3558,14 +3567,18 @@ if __name__ == '__main__':
 
         # st.close()
 
-    market = cct.cct_raw_input("write all data append [all,sh,sz,cyb,alla] :")
-    if market in ['all', 'sh', 'sz', 'cyb', 'alla']:
-        if market != 'all':
-            Write_market_all_day_mp(market, rewrite=True)
+    while 1:
+        market = cct.cct_raw_input("write all data append [all,sh,sz,cyb,alla,q] :")
+        if market != 'q' :
+            if market in ['all', 'sh', 'sz', 'cyb', 'alla']:
+                if market != 'all':
+                    Write_market_all_day_mp(market, rewrite=True)
+                else:
+                    Write_market_all_day_mp(market)
+            else:
+                print "market is None "
         else:
-            Write_market_all_day_mp(market)
-    else:
-        print "market is None "
+            break
 
     # print get_tdx_Exp_day_to_df('300546',dl=20)
     # print get_tdx_Exp_day_to_df('999999',end=None).sort_index(ascending=False).shape

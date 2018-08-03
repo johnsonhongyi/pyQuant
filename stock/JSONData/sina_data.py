@@ -582,7 +582,8 @@ class Sina:
         # if self.index_status:
         # if cct.get_work_time() or (cct.get_now_time_int() > 915) :
         # df = df.drop('close', axis=1)
-
+        dt = df.dt.value_counts().index[0]
+        df = df[(df.dt >= dt)]
         df.rename(columns={'close': 'llastp'}, inplace=True)
         df['b1_vv'] = df['b1_v']
         if (cct.get_now_time_int() > 915 and cct.get_now_time_int() < 926):
