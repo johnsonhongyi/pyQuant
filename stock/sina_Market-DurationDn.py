@@ -145,7 +145,7 @@ if __name__ == "__main__":
                 st_key_sort = '%s %s'%(st_key_sort.split()[0],cct.get_index_fibl())
 
             time_Rt = time.time()
-            top_now = tdd.getSinaAlldf(market='all', vol=ct.json_countVol, vtype=ct.json_countType)
+            top_now = tdd.getSinaAlldf(market='all', vol=ct.json_countVol, vtype=ct.json_countType,trend=False)
             # top_now = tdd.getSinaAlldf(market='rzrq', vol=ct.json_countVol, vtype=ct.json_countType)
             # top_now = tdd.getSinaAlldf(market='060', vol=ct.json_countVol, vtype=ct.json_countType)
 
@@ -348,7 +348,7 @@ if __name__ == "__main__":
                     top_all = tdd.get_powerdf_to_all(top_all, top_temp)
                     top_all = tdd.get_powerdf_to_all(top_all, top_end)
                     top_temp = stf.getBollFilter(
-                        df=top_temp, boll=ct.bollFilter, duration=ct.PowerCountdl, resample=resample)
+                        df=top_temp, boll=ct.bollFilter, duration=ct.PowerCountdl, upper=False,resample=resample)
                     print("N:%s K:%s %s G:%s" % (
                         now_count, len(top_all[top_all['buy'] > 0]),
                         len(top_now[top_now['volume'] <= 0]), goldstock)),

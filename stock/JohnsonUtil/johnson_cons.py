@@ -28,6 +28,8 @@ INDEX_LIST_TDX = {'sh': 'sh999999', 'sz': 'sz399001', 'hs300': 'sz399300',
 DD_VOL_List = {'0': '40000', '1': '100000',
                '2': '100000', '3': '200000', '4': '1000000'}
 # LvolumeSize = 125000
+tqdm_mininterval=2
+ncols = 60
 LvolumeSize = 12500
 VolumeMaxR = 5000
 VolumeMinR = 0.1
@@ -138,9 +140,9 @@ Duration_percent_dff = ['percent','df2','per2d','b1_v', 'dff',  'op',
                         'fib', 'fibl', 'ra', 'ratio', 'volume', 'couts']
 Duration_percent_dff_key = [0, 0,0, 0, 0, 0, 1, 1, 0, 1, 1, 1]
 
-Duration_percent_vol = ['percent', 'volume', 'dff',
+Duration_percent_vol = ['perc_n','percent', 'volume', 'dff',
                         'df2', 'op', 'fib', 'fibl', 'ra', 'ratio', 'couts']
-Duration_percent_vol_key = [0, 0, 0, 0, 0, 1, 1, 0, 1, 1]
+Duration_percent_vol_key = [0,0, 0, 0, 0, 0, 1, 1, 0, 1, 1]
 
 # Duration_percent_per_ra=['percent','ra','dff','op','fib','fibl','ratio','volume','couts']
 # Duration_percent_per_ra_key=[0,0,0,0,1,1,1,1,1]
@@ -553,7 +555,7 @@ def RawMenuArgmain():
     raw = 'status:[go(g),clear(c),[d 20150101 [l|h]|[y|n|pn|py],quit(q),W(a),sh]:'
     raw_input_menu = raw + "\n\tNow : %s" + \
         "\n\t1:Sort By Percent\t2:Sort by per1d\t3:Sort By percd\t\t4:Sort By DFF\n\t5:Sort By Ra_dff\t6:Sort By df2\t7:Sort Per b1V\t\t8:Sort by Count" + \
-        "\n\t9:By perc_vol\t\tx: by_opboll\tx1:by boll_perc\nplease input:"
+        "\n\t9:By perc_n\t\tx: by_opboll\tx1:by boll_perc\nplease input:"
     return raw_input_menu
 
 # "Sort By Percent\t3:Sort By DFF\n\t2:Sort By OP\t\t4:Sort By Ra\nplease input:"
@@ -734,6 +736,7 @@ def get_market_sort_value_key(st, top_all=None, perd_d=3):
                 else:
                     market_sort_value_key = negate_boolean_list(market_sort_value_key)
             market_sort_value = eval(market_sort_name)
+    cct.GlobalValues().setkey('market_sort_value',market_sort_value[:1][0])
     return market_sort_value, market_sort_value_key
 
 

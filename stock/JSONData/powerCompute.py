@@ -23,6 +23,7 @@ from JohnsonUtil import LoggerFactory as LoggerFactory
 import time
 # log = LoggerFactory.getLogger("PowerCompute")
 log = LoggerFactory.log
+from tqdm import tqdm
 # log.setLevel(LoggerFactory.INFO)
 
 if not cct.isMac():
@@ -1072,7 +1073,6 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y', tal
             else:
                 df = dm
 
-    #    cname = ",".join(x for x in dm.name)
         n_code = [n for n in dm.index if n.startswith(('30', '60', '00'))]
         if len(n_code) > 1:
             dmname = dm.loc[n_code].name
@@ -1090,7 +1090,8 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y', tal
                 df[co] = 0
 
         for code in code_l:
-
+        # for ind in tqdm(range(len(code_l)),unit='%',mininterval=ct.tqdm_mininterval,unit_scale=True,total=len(code_l),ncols=ct.ncols):
+            # code = code_l[ind]
             # if 'boll' in df.loc[code].index:
             #     if 'time' in df.columns and len(df[df.time <> 0]) > 0 and df[:1].boll.values <> 0 and time.time() - df[df.time <> 0].time[0] < ct.power_update_time:
             #         continue
@@ -1245,11 +1246,15 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y', tal
             # df.fibl.astype(float)
             df.loc[code, 'ldate'] = stl
             df.loc[code, 'boll'] = operation
-            if tdx_df.cumin[-1] == 0:
-                df.loc[code,'cumin'] = tdx_df.cumin[-2]
-            else:
-                df.loc[code,'cumin'] = tdx_df.cumin[-1]
 
+            if 'cumin' in tdx_df.columns:
+                if tdx_df.cumin[-1] == 0:
+                    df.loc[code,'cumin'] = tdx_df.cumin[-2]
+                else:
+                    df.loc[code,'cumin'] = tdx_df.cumin[-1]
+            else:
+                df.loc[code,'cumin'] = -1
+                
             tdx_df, opkdj = getab.Get_KDJ(tdx_df, dtype='d',lastday=days)
             tdx_df, opmacd = getab.Get_MACD_OP(tdx_df, dtype='d',lastday=days)
             tdx_df, oprsi = getab.Get_RSI(tdx_df, dtype='d',lastday=days)
@@ -1274,6 +1279,8 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y', tal
             # df = getab.Get_BBANDS(df, dtype='d')
             #'volume', 'ratio', 'couts','ldate' -> 'ma','macd','rsi','kdj'
             # df = df.drop_duplicates()
+        
+
         df = df.fillna(0)
 
         # df['df2b'] = (map(lambda ra, fibl,rah,fib,ma,kdj,rsi:round(eval(ct.powerdiff%(ct.PowerCountdl)),1),\

@@ -786,7 +786,8 @@ if __name__ == '__main__':
     time_st=time.time()
 
     dm = tdd.get_sina_data_df(codel)
-    results = cct.to_mp_run_async(Get_BBANDS,codel,'d',5,ct.PowerCountdl,dm)
+
+    results = cct.to_mp_run_async(Get_BBANDS,codel,dtype='d',days=5,dl=ct.PowerCountdl,dm=dm)
     # results=[]
     # for code in codel:
         # results.append(Get_BBANDS(code,'d',5,ct.PowerCountdl,dm))  

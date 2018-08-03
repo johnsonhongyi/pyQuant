@@ -93,6 +93,7 @@ if __name__ == "__main__":
     lastpTDX_DF = pd.DataFrame()
     # market_sort_value, market_sort_value_key = ct.get_market_sort_value_key('8')
     resample = 'd'
+    # st_key_sort = '9'
     st_key_sort = '4'
     st = None
     while 1:
@@ -106,8 +107,8 @@ if __name__ == "__main__":
             if st is None and st_key_sort in ['2','3']:
                 st_key_sort = '%s %s'%(st_key_sort.split()[0],cct.get_index_fibl())
             time_Rt = time.time()
-            # top_now = tdd.getSinaAlldf(market='all', vol=ct.json_countVol, vtype=ct.json_countType)
-            top_now = tdd.getSinaAlldf(market='次新股,060',filename='cxg', vol=ct.json_countVol, vtype=ct.json_countType)
+            top_now = tdd.getSinaAlldf(market='all', vol=ct.json_countVol, vtype=ct.json_countType)
+            # top_now = tdd.getSinaAlldf(market='次新股,060',filename='cxg', vol=ct.json_countVol, vtype=ct.json_countType)
 
             time_d = time.time()
             if time_d - time_s > delay_time:
@@ -241,7 +242,7 @@ if __name__ == "__main__":
                 # top_temp = stf.getBollFilter(df=top_temp, boll=ct.bollFilter, duration=ct.PowerCountdl, filter=False, ma5d=False, dl=14, percent=False, resample='d')
                 # top_temp = stf.getBollFilter(df=top_temp, boll=ct.bollFilter, duration=ct.PowerCountdl, filter=True, ma5d=True, dl=14, percent=False, resample=resample)
                 top_temp = stf.getBollFilter(df=top_temp,resample=resample, down=True)
-                # top_end = stf.getBollFilter(df=top_end,resample=resample, down=True)
+                top_end = stf.getBollFilter(df=top_end,resample=resample, down=True)
 
                 print "G:%s Rt:%0.1f dT:%s N:%s T:%s" % (goldstock, float(time.time() - time_Rt), cct.get_time_to_date(time_s), cct.get_now_time(), len(top_temp))
 
@@ -260,6 +261,7 @@ if __name__ == "__main__":
 
                 market_sort_value2, market_sort_value_key2 = ct.get_market_sort_value_key(f_sort, top_all=top_all)
                 ct_MonitorMarket_Values2 = ct.get_Duration_format_Values(ct.Monitor_format_trade, market_sort_value2[:2])
+                
                 top_temp2 = top_end.sort_values(by=(market_sort_value2), ascending=market_sort_value_key2)
 
                 top_dd =  cct.combine_dataFrame(top_temp.loc[:, ct_MonitorMarket_Values][:10], top_temp2.loc[:, ct_MonitorMarket_Values2][:5],append=True, clean=True)

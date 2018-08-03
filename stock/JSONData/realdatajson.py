@@ -446,12 +446,12 @@ def get_sina_all_json_dd(vol='0', type='0', num='10000', retry_count=3, pause=0.
     h5_table = 'all'+'_'+ct.DD_VOL_List[str(vol)]+'_'+str(num)
     limit_time = ct.sina_dd_limit_time
     h5 = h5a.load_hdf_db(h5_fname, table=h5_table,limit_time=limit_time)
-    if h5 is not None and not h5.empty and 'timel' in h5.columns:
+    if h5 is not None and not h5.empty and len(h5) > 500 and 'timel' in h5.columns:
        o_time = h5[h5.timel <> 0].timel
        if len(o_time) > 0:
            o_time = o_time[0]
            l_time = time.time() - o_time
-
+           
            return_hdf_status = not cct.get_work_time() or (cct.get_work_time() and l_time < limit_time)
            if return_hdf_status:
                log.info("load hdf data:%s %s %s"%(h5_fname,h5_table,len(h5)))

@@ -337,7 +337,7 @@ if __name__ == "__main__":
                     top_all = tdd.get_powerdf_to_all(top_all, top_temp)
                     top_all = tdd.get_powerdf_to_all(top_all, top_end)
 
-                    top_temp = stf.getBollFilter(df=top_temp, boll=ct.bollFilter, duration=ct.PowerCountdl,resample=resample,ene=True,cuminTrend=False)
+                    top_temp = stf.getBollFilter(df=top_temp, boll=ct.bollFilter, duration=ct.PowerCountdl,resample=resample,ene=True,upper=True,cuminTrend=False)
                     print("N:%s K:%s %s G:%s" % (
                         now_count, len(top_all[top_all['buy'] > 0]),
                         len(top_now[top_now['volume'] <= 0]), goldstock)),

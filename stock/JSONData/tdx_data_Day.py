@@ -1747,7 +1747,7 @@ def Write_market_all_day_mp(market='all', rewrite=False):
         # get_tdx_append_now_df_api_tofile('603113', dm=None, newdays=1,
         # start=None, end=None, type='f', df=None, dl=2, power=True)
         results = cct.to_mp_run_async(
-            get_tdx_append_now_df_api_tofile, code_list, dm, 0)
+            get_tdx_append_now_df_api_tofile, code_list, dm=dm, newdays=0)
         # for code in code_list:
         # print "code:%s "%(code),
         # res=get_tdx_append_now_df_api_tofile(code,dm,5)
@@ -1965,6 +1965,7 @@ def getSinaAlldf(market='cyb', vol=ct.json_countVol, vtype=ct.json_countType, fi
     # cct._write_to_csv(df,'codeall')
     # top_now = get_mmarket='all'arket_price_sina_dd_realTime(df, vol, type)
 #    df =  df.dropna()
+    
     if len(df) > 0:
         if 'code' in df.columns:
             df = df.set_index('code')
@@ -2242,8 +2243,8 @@ def get_duration_date(code, ptype='low', dt=None, df=None, dl=None):
     else:
         dz = df
     if ptype == 'high':
-        lowp = dz.close.max()
-        lowdate = dz[dz.close == lowp].index.values[-1]
+        lowp = dz.high.max()
+        lowdate = dz[dz.high == lowp].index.values[-1]
         log.debug("high:%s" % lowdate)
     elif ptype == 'close':
         lowp = dz.close.min()
@@ -2346,16 +2347,16 @@ def get_duration_price_date(code=None, ptype='low', dt=None, df=None, dl=None, e
         dz = df
     if len(dz) > 0:
         if ptype == 'high':
-            lowp = dz.close.max()
-            lowdate = dz[dz.close == lowp].index.values[-1]
+            lowp = dz.high.max()
+            lowdate = dz[dz.high == lowp].index.values[-1]
             log.debug("high:%s" % lowdate)
         elif ptype == 'close':
             lowp = dz.close.min()
             lowdate = dz[dz.close == lowp].index.values[-1]
             log.debug("high:%s" % lowdate)
         else:
-            lowp = dz.close.min()
-            lowdate = dz[dz.close == lowp].index.values[-1]
+            lowp = dz.low.min()
+            lowdate = dz[dz.low == lowp].index.values[-1]
             log.debug("low:%s" % lowdate)
         log.debug("date:%s %s:%s" % (lowdate, ptype, lowp))
     else:
@@ -2398,14 +2399,18 @@ def compute_lastdays_percent(df=None, lastdays=3, resample='d'):
             df['lasto%sd' % da] = df['open'].shift(da)
             df['lasth%sd' % da] = df['high'].shift(da)
             df['lastl%sd' % da] = df['low'].shift(da)
+            df['lastv%sd' % da] = df['vol'].shift(da)
+
             # df['lastv%sd' % da] = (df['vol'].shift(da)/min_vol)
             # lasp_percent = df['per%sd' % (da - 1)][da-1] if (da - 1) > 0 else 0
-            df['per%sd' % da] = ((df['close'] - df['lastp%sd' % da]) / df['lastp%sd' % da]).map(lambda x: round(x * 100, 1))
+            df['per%sd' % da] = ((df['close'] - df['lastp%sd' % da]) / df['lastp%sd' % da] * 100).map(lambda x: round(x, 1) if x < 9.85 or x > 10 else 10.0)
+
             if da == 1:
                 df['lastp%sd' % 0] = df['close'][-1]
                 df['lasth%sd' % 0] = df['high'][-1]
                 df['lastl%sd' % 0] = df['low'][-1]
                 df['lasto%sd' % 0] = df['open'][-1]
+                df['lastv%sd' % 0] = df['vol'][-1]
                 # df['lastv%sd' % 0] = (df['vol'][-1]/min_vol)
                 # df['perlastp'] = df['per%sd' % da]
                 # df['perlastp'] = (df['per%sd' % da]).map(lambda x: 1 if x >= -0.1 else 0)
@@ -2414,8 +2419,10 @@ def compute_lastdays_percent(df=None, lastdays=3, resample='d'):
                 # down_zero, down_dn, percent_l = 0, 0, 2
                 # df['perlastp'] = map((lambda c, lc,op,m5a,lh,ll,nh,nl: (1 if ( ((c >= op) and ((c - lc)/lc*100 >= 0)) or (c >= op and c >=m5a) ) else down_dn)), df['close'], df['lastp%sd' % da],df['open'],df['ma5d'])
 
+                # top_temp[:5][['lowvol','lvol','lvolume','volume','lv','hv']]
+                df = df.fillna(1)
                 df['perlastp'] = map(cct.func_compute_percd2, df['close'], df['lastp%sd' % da], df['open'], df[
-                                     'lasto%sd' % da], df['lasth%sd' % da], df['lastl%sd' % da], df['high'], df['low'])
+                                     'lasto%sd' % da], df['lasth%sd' % da], df['lastl%sd' % da], df['high'], df['low'],df['vol'],df['lastv%sd' % da])
                 # close, lastp, op, lasth, lastl, nowh, nowl
                 # nowd,per1d = 1 ,2
                 # df['per%sd' % per1d] = ((df['lastp%sd' % da] - df['close'].shift(per1d)) / df['close'].shift(per1d)).map(lambda x: round(x * 100, 2))
@@ -2433,6 +2440,7 @@ def compute_lastdays_percent(df=None, lastdays=3, resample='d'):
             df['lasth%sd' % da] = df['lasth%sd' % da][-1]
             df['lastl%sd' % da] = df['lastl%sd' % da][-1]
             df['lasto%sd' % da] = df['lasto%sd' % da][-1]
+            df['lastv%sd' % da] = df['lastv%sd' % da][-1]
             df['mean%sd' % da] = df['mean%sd' % da][-1]
             # df['lastv%sd' % da] = df['lastv%sd' % da][-1]
             # break
@@ -2486,16 +2494,16 @@ def get_tdx_exp_low_or_high_price(code, dt=None, ptype='close', dl=None, end=Non
                     dz = df
             if dz is not None and not dz.empty:
                 if ptype == 'high':
-                    lowp = dz.close.max()
-                    lowdate = dz[dz.close == lowp].index.values[-1]
+                    lowp = dz.high.max()
+                    lowdate = dz[dz.high == lowp].index.values[-1]
                     log.debug("high:%s" % lowdate)
                 elif ptype == 'close':
                     lowp = dz.close.min()
                     lowdate = dz[dz.close == lowp].index.values[-1]
                     log.debug("close:%s" % lowdate)
                 else:
-                    lowp = dz.close.min()
-                    lowdate = dz[dz.close == lowp].index.values[-1]
+                    lowp = dz.low.min()
+                    lowdate = dz[dz.low == lowp].index.values[-1]
                     log.debug("low:%s" % lowdate)
 
                 log.debug("date:%s %s:%s" % (lowdate, ptype, lowp))
@@ -2605,19 +2613,20 @@ def get_tdx_exp_low_or_high_power(code, dt=None, ptype='close', dl=None, end=Non
                     dz = df
             if dz is not None and not dz.empty:
                 if ptype == 'high':
-                    lowp = dz.close.max()
-                    lowdate = dz[dz.close == lowp].index.values[-1]
+                    lowp = dz.high.max()
+                    lowdate = dz[dz.high == lowp].index.values[-1]
                     log.debug("high:%s" % lowdate)
                 elif ptype == 'close':
                     lowp = dz.close.min()
                     lowdate = dz[dz.close == lowp].index.values[-1]
                     log.debug("close:%s" % lowdate)
                 else:
-                    lowp = dz.close.min()
-                    lowdate = dz[dz.close == lowp].index.values[-1]
+                    lowp = dz.low.min()
+                    lowdate = dz[dz.low == lowp].index.values[-1]
                     log.debug("low:%s" % lowdate)
 
-                lastvol = dz.vol[:lvoldays].mean()
+                # lastvol = dz.vol[:lvoldays].mean()
+                lastvol = dz.vol[:lvoldays].median()
 
                 log.debug("date:%s %s:%s" % (lowdate, ptype, lowp))
                 # log.debug("date:%s %s:%s" % (dt, ptype, lowp))
@@ -2852,7 +2861,7 @@ def get_tdx_all_day_LastDF(codeList, dt=None, ptype='close'):
     else:
         dl = None
     results = cct.to_mp_run_async(
-        get_tdx_Exp_day_to_df, codeList, None, None, 1, 0)
+        get_tdx_Exp_day_to_df, codeList, start=None, end=None, dl=1, newdays=0)
     # get_tdx_day_to_df_last, codeList, 1, type, dt, ptype, dl)
     # results=[]
     # for code in codeList:
@@ -3050,8 +3059,6 @@ def get_tdx_exp_all_LastDF(codeList, dt=None, end=None, ptype='low', filter='n')
             dl = len(df[df.index >= dt]) + changedays
             dt = df[df.index <= dt].index.values[changedays]
             log.info("LastDF:%s,%s" % (dt, dl))
-            # results = cct.to_mp_run_async(get_tdx_exp_low_or_high_price, codeList, dt, ptype, dl,end)
-            # results = get_tdx_exp_low_or_high_price(codeList[0], dt,ptype,dl)
         results = []
         for code in codeList:
             results.append(get_tdx_exp_low_or_high_price(code, dt, ptype, dl))
@@ -3071,16 +3078,15 @@ def get_tdx_exp_all_LastDF(codeList, dt=None, end=None, ptype='low', filter='n')
             # dl = len(get_kdate_data('sh', start=dt))
             log.info("LastDF:%s,%s" % (dt, dl))
         results = cct.to_mp_run_async(
-            get_tdx_exp_low_or_high_price, codeList, dt, ptype, dl, end)
+            get_tdx_exp_low_or_high_price, codeList, dt=dt, ptype=ptype, dl=dl, end=end)
         # print dt,ptype,dl,end
         # for code in codelist:
         #     print code
         #     print get_tdx_exp_low_or_high_price('600654', dt, ptype, dl,end)
 
     else:
-        # results = cct.to_mp_run_async(get_tdx_exp_low_or_high_price,codeList)
         results = cct.to_mp_run_async(
-            get_tdx_Exp_day_to_df, codeList, 'f', None, None, None, 1)
+            get_tdx_Exp_day_to_df, codeList, type='f', start=None, end=None, dl=None, newdays=1)
 
     # print results
 #    df = pd.DataFrame(results, columns=ct.TDX_Day_columns)
@@ -3127,7 +3133,8 @@ def get_tdx_exp_all_LastDF_DL(codeList, dt=None, end=None, ptype='low', filter='
                 dt = None
             log.info("LastDF:%s,%s" % (dt, dl))
         results = cct.to_mp_run_async(
-            get_tdx_exp_low_or_high_power, codeList, dt, ptype, dl, end, power, lastp, newdays, resample)
+            get_tdx_exp_low_or_high_power, codeList, dt=dt, ptype=ptype, dl=dl, end=end, power=power, lastp=lastp, newdays=newdays, resample=resample)
+            
         # results = get_tdx_exp_low_or_high_price(codeList[0], dt,ptype,dl)
 #        results=[]
 #        for code in codeList:
@@ -3169,7 +3176,8 @@ def get_tdx_exp_all_LastDF_DL(codeList, dt=None, end=None, ptype='low', filter='
 
         if len(codeList) > 150:
             results = cct.to_mp_run_async(
-                get_tdx_exp_low_or_high_power, codeList, dt, ptype, dl, end, power, lastp, newdays, resample)
+                # get_tdx_exp_low_or_high_power, codeList, dt, ptype, dl, end, power, lastp, newdays, resample)
+                get_tdx_exp_low_or_high_power, codeList, dt=dt, ptype=ptype, dl=dl, end=end, power=power, lastp=lastp, newdays=newdays, resample=resample)
         else:
             results = []
             ts = time.time()
@@ -3185,10 +3193,9 @@ def get_tdx_exp_all_LastDF_DL(codeList, dt=None, end=None, ptype='low', filter='
         #     print get_tdx_exp_low_or_high_price('600654', dt, ptype, dl,end)
 
     else:
-        # results = cct.to_mp_run_async(get_tdx_exp_low_or_high_price,codeList)
         dl = None
         results = cct.to_mp_run_async(
-            get_tdx_Exp_day_to_df, codeList, 'f', None, None, None, 1)
+            get_tdx_Exp_day_to_df, codeList, type='f', start=None, end=None, dl=None, newdays=1)
 
     # print results
 #    df = pd.DataFrame(results, columns=ct.TDX_Day_columns)
@@ -3439,8 +3446,10 @@ if __name__ == '__main__':
     # log_level = LoggerFactory.DEBUG
     log.setLevel(log_level)
     # code='002169'
-    code = '399001'
-    # df2 = get_tdx_Exp_day_to_df(code,dl=60, end=20180508, newdays=0, resample='d')
+    # code = '002906'
+    # df2 = get_tdx_Exp_day_to_df(code,dl=160, end=None, newdays=0, resample='w')
+    # print df2.shape,df2.cumin
+
     # df = get_tdx_Exp_day_to_df(code, dl=60,end=None, newdays=0, resample='d')
     # df3 = df.sort_index(ascending=True)
     # print "cumin:",df[:2].cumin.values,df[:2].cumaxe.values,df[:2].cumins.values,df[:2].cumine.values,df[:2].cumaxc.values, df[:2].cmean.values
@@ -3502,7 +3511,9 @@ if __name__ == '__main__':
     # code = '600581'
     # code = '300609'
     # code = '000916'
-    code = '600579'
+    # code = '000593'
+    code = '000557'
+    # code = '300707'
     resample = 'd'
     # code = '000001'
     # code = '000916'
@@ -3510,8 +3521,9 @@ if __name__ == '__main__':
 
     # print get_tdx_exp_all_LastDF_DL([code],  dt=60, ptype='low', filter='y', power=ct.lastPower, resample=resample)
 
-    df = get_tdx_Exp_day_to_df(code, dl=30, newdays=0, resample='d')
-    print "day_to_df:", df[:1]
+    df = get_tdx_Exp_day_to_df(code, dl=6, newdays=0, resample='d')
+
+    print "day_to_df:", df[:1][['per1d','per2d','per3d']]
     # col_co = df.columns.tolist()
     # col_ra_op = col_co.extend([ 'ra', 'op', 'fib', 'ma5d', 'ma10d', 'ldate', 'hmax', 'lmin', 'cmean'])
     # print col_ra_op,col_co

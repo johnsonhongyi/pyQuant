@@ -374,7 +374,7 @@ class Sina:
             fname = 'sina_logtime'
             logtime = cct.get_config_value_ramfile(fname)
             # if logtime <> 0 and not cct.get_work_time():
-
+            h5 = h5.fillna(0)
             if logtime <> 0:
                 if 'lastbuy' not in h5.columns or len(h5[h5.lastbuy < 0]) > 0:
                     h5_a = h5a.load_hdf_db(h5_fname, h5_table, timelimit=False)

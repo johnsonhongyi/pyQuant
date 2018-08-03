@@ -22,7 +22,7 @@ import johnson_cons as ct
 import socket
 from configobj import ConfigObj
 log = LoggerFactory.log
-
+from tqdm import tqdm
 
 # log.setLevel(Log.DEBUG)
 # import numba as nb
@@ -1128,13 +1128,17 @@ def to_mp_run(cmd, urllist):
     print "mp:%s" % len(urllist),
 
     pool = ThreadPool(cpu_count())
+    # pool = ThreadPool(2)
     # pool = ThreadPool(4)
     # print cpu_count()
     # pool = multiprocessing.Pool(processes=8)
     # for code in codes:
     #     results=pool.apply_async(sl.get_multiday_ave_compare_silent_noreal,(code,60))
     # result=[]
-    results = pool.map(cmd, urllist)
+    # results = pool.map(cmd, urllist)
+    results = []
+    for y in tqdm(pool.imap_unordered(cmd, urllist),unit='%',mininterval=ct.tqpm_mininterval,unit_scale=True,total=len(urllist),ncols=ct.ncols):
+        results.append(y)
     # for code in urllist:
     # result.append(pool.apply_async(cmd,(code,)))
 
@@ -1144,44 +1148,67 @@ def to_mp_run(cmd, urllist):
     # print "time:MP", (time.time() - n_t)
     return results
 
-
-def to_mp_run_async(cmd, urllist, *args):
+from functools import partial
+def to_mp_run_async(cmd, urllist, *args,**kwargs):
     # n_t=time.time()
     # print "mp_async:%s" % len(urllist),
     # print "a!!!!:",status
-    pool = ThreadPool(cpu_count())
-#    print cpu_count()
-    # print arg
-    # print cpu_count()
-    # pool = multiprocessing.Pool(processes=8)
-    # for code in codes:
-    #     results=pool.apply_async(sl.get_multiday_ave_compare_silent_noreal,(code,60))
-    # result=[]
-    # results = pool.map(cmd, urllist)
-    # for code in urllist:
-    # result.append(pool.apply_async(cmd,(code,)))
-    time_s = time.time()
+
+    # n_t = time.time()
     results = []
-    idx = 1
-    count = int(len(urllist) / 10)
-    for code in urllist:
-        # result = pool.apply_async(cmd, (code, arg))
-        # arg=(code)+','+(args)
-        # result = code
-        try:
-            result = pool.apply_async(cmd, (code,) + args).get()
-            if (count <> 0 and idx % count == 0) and time.time() - time_s > 1:
-                log.info("idx:%s code:%s" % (idx, code)),
-                idx += 1
-                time_s = time.time()
-            results.append(result)
-        except Exception as e:
-            print e, code
+    if len(urllist) > 50:
+        if len(kwargs) > 0 :
+            pool = ThreadPool(1)
+            func = partial(cmd, **kwargs)
+            # for y in tqdm(pool.imap_unordered(func, urllist),unit='%',mininterval=ct.tqdm_mininterval,unit_scale=True,total=len(urllist),ncols=5):
+            # results = pool.map(func, urllist)
+            for y in tqdm(pool.imap_unordered(func, urllist),unit='%',mininterval=ct.tqdm_mininterval,unit_scale=True,total=len(urllist),ncols=ct.ncols):
+                results.append(y)
+        else:
+            pool = ThreadPool(cpu_count())
+            # log.error("to_mp_run args is not None")
+            for inx in tqdm(range(len(urllist)),unit='%',mininterval=ct.tqdm_mininterval,unit_scale=True,total=len(urllist),ncols=ct.ncols):
+                code = urllist[inx]
+            # for code in urllist:
+                try:
+                    # result = pool.apply_async(cmd, (code,) + args).get()
+                    results.append(pool.apply_async(cmd, (code,) + args).get())
+                except Exception as e:
+                    print e, code
+    else:
+        if len(kwargs) > 0 :
+            pool = ThreadPool(1)
+            func = partial(cmd, **kwargs)
+            # for y in tqdm(pool.imap_unordered(func, urllist),unit='%',mininterval=ct.tqdm_mininterval,unit_scale=True,total=len(urllist),ncols=5):
+            # results = pool.map(func, urllist)
+            results = pool.map(func, urllist)
+        else:
+            pool = ThreadPool(cpu_count())
+            for code in urllist:
+                try:
+                    # result = pool.apply_async(cmd, (code,) + args).get()
+                    results.append(pool.apply_async(cmd, (code,) + args).get())
+                except Exception as e:
+                    print e, code
+
+
+
+    # results = []
+    # try:
+    #     # [x.get() for x in [pool.apply_async(cmd, (x,)+ args) for x in urllist]]
+    #     # for y in tqdm(pool.apply_async(cmd, (urllist,) + args).get(),unit='%',unit_scale=False,total=len(urllist),ncols=3):
+    #     # for y in tqdm(pool.apply_async(cmd, (urllist,) + args).get(),unit='%',unit_scale=False,total=len(urllist),ncols=3):
+    #     for y in tqdm([x.get() for x in [pool.apply_async(cmd, (x,)+ args) for x in urllist]],unit='%',unit_scale=True,total=len(urllist),ncols=5):
+    #         results.append(y)
+    # except Exception as e:
+    #     print e, code
+
+
     pool.close()
     pool.join()
     # results = flatten(map(lambda x: x.get(), results))
     # results = flatten( results)
-    # print "time:MP", (time.time() - n_t)
+    # print "time:MP", (time.time() - n_t),
     return results
 
 
@@ -1454,9 +1481,9 @@ def get_index_fibl():
         # return abs(fibl)
     else:
         fibl = 1
-        
     # cct.GlobalValues()
     GlobalValues().setkey('cuminfibl', fibl)
+    GlobalValues().setkey('indexfibl', int(df.fibl.min()))
 
     return abs(fibl)
 
@@ -1727,6 +1754,7 @@ def using_Grouper_eval(df, freq='5T', col='low', closed='right', label='right'):
     return eval("(df.groupby([level_values(i) for i in [0]]+[pd.Grouper(freq=freq, level=-1,closed='%s',label='%s')]).agg(%s))" % (closed, label, func))
 
 
+# def using_Grouper(df, freq='5T', col='low', closed='right', label='right'):
 def using_Grouper(df, freq='5T', col='low', closed='right', label='right'):
     func = {}
     if col == 'all':
@@ -1872,7 +1900,9 @@ def get_limit_multiIndex_freq(df, freq='5T', col='low', index='ticktime', start=
     if freq is not None and col is not None:
         # import pdb;pdb.set_trace()
         if col == 'all':
+            vol0 = df.volume[0]
             df.volume = df.volume - df.volume.shift(1)
+            df.volume[0] = vol0
         df = using_Grouper(df, freq=freq, col=col)
         # print df.loc['600007',['close','low','high','ticktime']]
     else:
@@ -2145,107 +2175,153 @@ def func_compute_percd(close, lastp, op, lasth, lastl, nowh, nowl):
     #         initc -= 1
     return initc
 
-def func_compute_percd2(close, lastp, op, lastopen,lasth, lastl, nowh, nowl,hmax=None,nvol=None,lvol=None):
+def func_compute_percd2(close, lastp, op, lastopen,lasth, lastl, nowh, nowl,nowvol=None,lastvol=1,hmax=None,cumin=None):
     # down_zero, down_dn, percent_l = 0, 0, 2
      # (1 if ( ((c >= op) and ((c - lc)/lc*100 >= 0)) or (c >= op and c >=m5a) ) else down_dn)
     initc = 0
-    close = round(close, 1)
-    lastp = round(lastp, 1)
-    op = round(op, 1)
-    lastopen = round(lastopen, 1)
-    lasth = round(lasth, 1)
-    lastl = round(lastl, 1)
-    if hmax is not None:
-        if lastopen >= lastl:
-            # initc +=1
-            # if op >= nowl:
-            #     initc +=1
-            if nowh >= hmax:
-                initc +=1
-        # if lastopen >= lastl:
-        #     initc +=1
-        #     if op >= nowl:
-        #         initc +=1
-        # if nowh >= hmax:
-        #     initc +=1
-
-    if nowl == op or (op > lastp and nowl > lastp):
-        initc +=1
-        if lastopen >= lastl:
-            initc +=1
-        if  nowh > lasth:
-            initc +=1
-            # if nowh == close:
-            #     initc +=1
-
-    if  op > lastp or nowl > lastp:
-            initc +=1
-
-    if ((close - lastp)/lastp*100 >= 0):
-        if op > lastp:
-            initc +=1
-            # if nowh == nowl:
-            #     initc +=1
-            if nowl > lastp:
-                initc +=1
-                if nowl > lasth:
+    if lasth <> 1.0 and lastl <> 1.0 and lasth <> 0 and lastl <> 0:
+        close = round(close, 1)
+        lastp = round(lastp, 1)
+        op = round(op, 1)
+        lastopen = round(lastopen, 1)
+        lasth = round(lasth, 1)
+        lastl = round(lastl, 1)
+        percent = round((close - lastp)/lastp*100,1)
+        now_du = round((nowh - nowl)/nowl*100,1)
+        last_du = round((lasth - lastl)/lastl*100,1)
+        volratio = round((nowvol / lastvol),1)
+        if volratio > 1.1:
+            if last_du > 3 or now_du >3:
+                if percent > 2: 
                     initc +=1
-
-            if close > nowh * ct.changeRatio:
-                initc +=1
-                # if lastp == lasth:
+                # if percent > 5 or (nowvol / lastvol) > 1.5:
                 #     initc +=1
+                # if percent > 8 and (nowvol / lastvol) > 1.2:
+                #     initc +=1
+                if percent < -2 and volratio > 1.2:
+                    initc -=1
+                if close >= lasth*0.98:
+                    initc +=3
+                    if close >= nowh*0.98:
+                        initc +=3
+            else:
+                if lastp > lastopen and close > op:
+                    initc +=3
 
-            if (close >= op):
-                initc +=1
-                if (nowh > lasth):
+        else:
+            if last_du > 3 or now_du > 3:
+                if percent > 2:
                     initc +=1
-                    if (nowl >= lastl):
+                elif -2 < percent < 1:
+                    initc -=1
+                elif percent < -2:
+                    initc -=2
+                if close >= lasth:
+                    initc +=1
+                    if close >= nowh*0.98:
                         initc +=1
             else:
-                initc -=1
-                if (nowh < lasth):
-                    initc -=1
-                    if  nowl < lastl:
-                        initc -=1
-        else:
+                if lastp > lastopen and close > op:
+                    initc +=3
+
+
+
+        if nowl == op or (op > lastp and nowl > lastp):
             initc +=1
-            if op >= nowl*0.995:
+            if lastopen >= lastl:
                 initc +=1
-                if (nowh > lasth):
+            if  nowh > lasth:
+                initc +=1
+                # if nowh == close:
+                #     initc +=1
+
+        if  op > lastp or nowl > lastp:
+                initc +=1
+
+        if ((close - lastp)/lastp*100 >= 0):
+            if op > lastp:
+                initc +=1
+                # if nowh == nowl:
+                #     initc +=1
+                if nowl > lastp:
                     initc +=1
-                    if close > nowh * ct.changeRatio:
+                    if nowl > lasth:
+                        initc +=1
+
+                if close > nowh * ct.changeRatio:
+                    initc +=1
+                    # if lastp == lasth:
+                    #     initc +=1
+
+                if (close >= op):
+                    initc +=1
+                    if (nowh > lasth):
                         initc +=1
                         if (nowl >= lastl):
                             initc +=1
-
-    else:
-        if op < lastp:
-            if (close >= op):
-                if  nowl > lastl:
+                else:
+                    initc -=1
+                    if (nowh < lasth):
+                        initc -=1
+                        if  nowl < lastl:
+                            initc -=1
+            else:
+                initc +=1
+                if op >= nowl*0.995:
                     initc +=1
-            else:
-                initc -=1
-                if (nowh < lasth):
-                    initc -=1
-                    if  nowl < lastl:
-                        initc -=1
-        else:
-            if (close < op):
-                if (nowh < lasth):
-                    initc -=1
-                if  nowl < lastl:
-                    initc -=1
-            else:
-                if (nowh < lasth):
-                    initc -=1
-                    if  nowl < lastl:
-                        initc -=1
-        if nowh < lastp:
-            initc -=1
-            if nowh < lastl:
-                initc -=1
+                    if (nowh > lasth):
+                        initc +=1
+                        if close > nowh * ct.changeRatio:
+                            initc +=1
+                            if (nowl >= lastl):
+                                initc +=1
 
+        else:
+            if op < lastp:
+                if (close >= op):
+                    if  nowl > lastl:
+                        initc +=1
+                else:
+                    initc -=1
+                    if (nowh < lasth):
+                        initc -=1
+                        if  nowl < lastl:
+                            initc -=1
+            else:
+                if (close < op):
+                    if (nowh < lasth):
+                        initc -=1
+                    if  nowl < lastl:
+                        initc -=1
+                else:
+                    if (nowh < lasth):
+                        initc -=1
+                        if  nowl < lastl:
+                            initc -=1
+            if nowh < lastp:
+                initc -=1
+                if nowh < lastl:
+                    initc -=1
+
+        if hmax is not None:
+            if cumin is not None:
+                if volratio > 4:
+                    if cumin < 2:
+                        initc += 8
+                    elif cumin > 5:
+                        initc -= 11
+                elif lastopen >= lastl:
+                    # initc +=1
+                    # if op >= nowl:
+                    #     initc +=1
+                    if nowh >= hmax:
+                        initc +=11
+            # if lastopen >= lastl:
+            #     initc +=1
+            #     if op >= nowl:
+            #         initc +=1
+            # if nowh >= hmax:
+            #     initc +=1
 
     return initc
                     
