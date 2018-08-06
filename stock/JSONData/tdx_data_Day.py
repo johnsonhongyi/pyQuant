@@ -1736,7 +1736,6 @@ def Write_market_all_day_mp(market='all', rewrite=False):
         # df = rl.get_sina_Market_json(mk)
         # print df.loc['600581']
 
-        print("market:%s A:%s" % (mk, len(df))),
         if df is None or len(df) < 10:
             print "df is none"
             break
@@ -1744,6 +1743,8 @@ def Write_market_all_day_mp(market='all', rewrite=False):
             # dt = df.dt.value_counts().index[0]
             # df = df[((df.b1 > 0) | (df.a1 > 0)) & ( df.dt >= dt)]
             df = df[((df.b1 > 0) | (df.a1 > 0))]
+            
+        print("market:%s A:%s" % (mk, len(df))),
         code_list = df.index.tolist()
         dm = get_sina_data_df(code_list)
         log.info('code_list:%s df:%s' % (len(code_list), len(df)))
