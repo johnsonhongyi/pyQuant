@@ -448,8 +448,10 @@ class Sina:
         #        self.index_status = index
         if index:
             ulist = self.set_stock_codes_index_init(ulist, index)
+            h5 = None
+        else:
+            h5 = h5a.load_hdf_db(self.hdf_name, self.table, code_l=ulist, index=index)
 
-        h5 = h5a.load_hdf_db(self.hdf_name, self.table, code_l=ulist, index=index)
         if h5 is not None:
             log.info("hdf5 data:%s" % (len(h5)))
             h5 = self.combine_lastbuy(h5)

@@ -1210,7 +1210,6 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y', tal
             log.info("add power hdf5 code_l:%s" % (len(code_l)))
             print("intP:%s"%(len(code_l))),
         else:
-            import ipdb;ipdb.set_trace()
             
             if index or len(h5) == len(code_l):
                 h5 = h5[ (h5.fibl <> h5.fib) & ((h5.fibl <> 0 ) | (h5.fib <> 0 ))]
@@ -1229,7 +1228,7 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y', tal
             print("intP:%s"%(len(code_l))),
 
     if len(code_l) > 0:
-        dm = tdd.get_sina_data_df(code_l)
+        dm = tdd.get_sina_data_df(code_l,index=index)
         if statuslist:
             if h5 is not None and len(h5) >0:
                 df = h5
@@ -1452,6 +1451,7 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y', tal
         # for code in code_l:
         #     result = powerCompute_mp(code, df=df,dm=dm, statuslist=True, index=index, end=end,dl=dl,wcdf=wcdf)
         #     results.append(result)
+        
         results = [x for x in results if x is not None]
         dd = pd.DataFrame(results)
         code_l = dd.index
