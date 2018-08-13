@@ -443,11 +443,16 @@ def get_hot_countNew(changepercent, rzrq, fibl=None, fibc=10):
     #         f_print(4, ff['scent']), f_print(4, ff['sup']), f_print(5, ff['svol']), f_print(4, ff['zcent']),
     #         f_print(4, ff['zup']),
     #         f_print(5, ff['zvol']))),
+    bigcount = rd.getconfigBigCount(count=None, write=True)
+
     if len(ff) > 0:
         print(u"\t\tSh: %s Vr:%s Sz: %s Vr:%s " % (
-            f_print(4, ff['scent']), f_print(5, ff['svol'],31), f_print(4, ff['zcent']), f_print(5, ff['zvol'],31)))
+            f_print(4, ff['scent']), f_print(5, ff['svol'],31), f_print(4, ff['zcent']), f_print(5, ff['zvol'],31))),
+        print(u'B:%s-%s V:%s' % (bigcount[0], bigcount[2], f_print(4,bigcount[1])))
     else:
-        print(u"\t\tSh: \t%s Vr:  \t%s Sz: \t%s Vr: \t%s ") % (0, 0, 0, 0)
+        print(u"\t\tSh: \t%s Vr:  \t%s Sz: \t%s Vr: \t%s ") % (0, 0, 0, 0),
+        print(u'B:%s-%s V:%s' % (bigcount[0], bigcount[2], f_print(4,bigcount[1])))
+
     if len(hgt) > 0:
         print("\t\tHgt: %s Ggt: %s Sgt: %s Gst: %s" %
               (hgt['hgt'], hgt['ggt'], szt['hgt'], szt['ggt']))
@@ -462,7 +467,6 @@ def get_hot_countNew(changepercent, rzrq, fibl=None, fibc=10):
             f_print(5, rzrq['sh']), f_print(4, rzrq['shrz']), shpcent, f_print(
                 5, rzrq['sz']), f_print(4, rzrq['szrz']),
             szpcent, f_print(4, rzrq['all'],31), f_print(5, rzrq['dff'],31)))
-    bigcount = rd.getconfigBigCount(count=None, write=True)
     # print "bigcount:",bigcount
 
     cct.set_console(width, height,

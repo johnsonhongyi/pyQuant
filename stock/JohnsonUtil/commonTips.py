@@ -1480,7 +1480,7 @@ def get_index_fibl():
     if len(df) >0 and 'fibl' in df.columns:
         # fibl = int(df.fibl.max())
         fibl = int(df.cumin.max())
-        fibl = fibl if fibl > 1 else 1 
+        fibl = fibl if 3 >= fibl >= 1 else 1 
         # return abs(fibl)
     else:
         fibl = 1

@@ -230,7 +230,7 @@ if __name__ == "__main__":
                 #     top_all['dff'] = (map(lambda x, y: round((x - y) / y * 100, 1),
                 #                           top_all['buy'].values, top_all['lastp'].values))
 
-                top_temp = stf.filterPowerCount(top_all,ct.PowerCount)
+                top_temp = stf.filterPowerCount(top_all,ct.PowerCount,down=True)
                 top_end = top_all[-int((ct.PowerCount)/10):].copy()
                 top_temp = pct.powerCompute_df(top_temp, dl=ct.PowerCountdl)
                 top_end = pct.powerCompute_df(top_end, dl=ct.PowerCountdl)
