@@ -405,21 +405,37 @@ def get_hot_countNew(changepercent, rzrq, fibl=None, fibc=10):
             print (u" %s"%(f_print(2,cumin_index[market],31))),
             print(u"%s %s%s" % (f_print(7, ff['close']), f_print(1, '!' if ff['open'] > ff[
                 'lastp'] else '?'), f_print(2, '!!' if ff['close'] > ff['lastp'] else '??',32)))
-        allTop = allTop.append(df, ignore_index=True)
+        allTop = allTop.append(df.reset_index(), ignore_index=True)
         allTop = allTop.drop_duplicates()
     df = allTop
+    df  = tdd.get_single_df_lastp_to_df(
+                        df.set_index('code'),resample='d')    
     count = len(df.index)
     top = df[df['percent'] > changepercent]
     topTen = df[df['percent'] > 9.9]
-    topTen = str(len(topTen)) +'('+str(len(top_Ten_Dropcxg))+')'
+    if 'max5' in df.columns: 
+        top_Max = (df[(df.close >= df.hmax) & (df.close >= df.max5)])
+
+        top_Max = len(top_Max)
+        # top_low = len(df[df.low < df.min5])
+        top_min = len(df[(df.close <= df.lmin) & (df.close <= df.min5)])
+
+    else:
+        top_Max = 0
+        top_low = 0
+        top_min = 0
+
+    topTen = str(len(topTen)) +'('+str(len(top_Ten_Dropcxg))+')' +'(H:'+str(top_Max)+')'
     # print "top_Ten_Dropcxg:%s",top_Ten_Dropcxg
     crashTen = df[df['percent'] < -9.8]
+    crashTen = str(len(crashTen)) +'(L:'+str(top_min)+')'
+
     crash = df[df['percent'] < -changepercent]
     print(
-        u" \tA:%s topT:%s top>%s:%s" % (
+        u"A:%s topT:%s top>%s:%s" % (
             f_print(4, count), f_print(3, (topTen),31), changepercent, f_print(4, len(top),31))),
     print(u"crashT:%s crash<-%s:%s" %
-          (f_print(3, len(crashTen),32), changepercent, f_print(4, len(crash),31))),
+          (f_print(3, (crashTen),32), changepercent, f_print(4, len(crash),31))),
     print(u"-5:%s" %
           (f_print(4, len(crash[crash.percent < -5]),32))),
     # ff = ffu.get_dfcfw_fund_flow(ct.DFCFW_FUND_FLOW_ALL)
@@ -446,18 +462,18 @@ def get_hot_countNew(changepercent, rzrq, fibl=None, fibc=10):
     bigcount = rd.getconfigBigCount(count=None, write=True)
 
     if len(ff) > 0:
-        print(u"\t\tSh: %s Vr:%s Sz: %s Vr:%s " % (
+        print(u"\tSh: %s Vr:%s Sz: %s Vr:%s " % (
             f_print(4, ff['scent']), f_print(5, ff['svol'],31), f_print(4, ff['zcent']), f_print(5, ff['zvol'],31))),
         print(u'B:%s-%s V:%s' % (bigcount[0], bigcount[2], f_print(4,bigcount[1])))
     else:
-        print(u"\t\tSh: \t%s Vr:  \t%s Sz: \t%s Vr: \t%s ") % (0, 0, 0, 0),
+        print(u"\tSh: \t%s Vr:  \t%s Sz: \t%s Vr: \t%s ") % (0, 0, 0, 0),
         print(u'B:%s-%s V:%s' % (bigcount[0], bigcount[2], f_print(4,bigcount[1])))
 
     if len(hgt) > 0:
-        print("\t\tHgt: %s Ggt: %s Sgt: %s Gst: %s" %
+        print("\tHgt: %s Ggt: %s Sgt: %s Gst: %s" %
               (hgt['hgt'], hgt['ggt'], szt['hgt'], szt['ggt']))
     else:
-        print("\t\tHgt: \t%s Ggt: \t%s Sgt: %s Gst: %s" % (0, 0, 0, 0))
+        print("\tHgt: \t%s Ggt: \t%s Sgt: %s Gst: %s" % (0, 0, 0, 0))
     if len(rzrq) > 0:
         shpcent = round((rzrq['shrz'] / rzrq['sh'] * 100),
                         1) if rzrq['sh'] > 0 else '?'

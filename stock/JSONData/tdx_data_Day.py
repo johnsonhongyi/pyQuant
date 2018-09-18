@@ -368,7 +368,7 @@ def get_tdx_Exp_day_to_df(code, start=None, end=None, dl=None, newdays=None, typ
                 df['ma20d'] = pd.rolling_mean(df.close, 20)
                 df['ma60d'] = pd.rolling_mean(df.close, 60)
                 # df['msg'] = df.high[-tdx_max_int:].max()
-                df['hmax'] = df.close[-tdx_max_int:max_int_end].max()
+                df['hmax'] = df.high[-tdx_max_int:max_int_end].max()
                 df['max5'] = df.close[-5:max_int_end].max()
                 df['lmin'] = df.low[-tdx_max_int:max_int_end].min()
                 df['min5'] = df.low[-5:max_int_end].min()
@@ -531,7 +531,7 @@ def get_tdx_Exp_day_to_df(code, start=None, end=None, dl=None, newdays=None, typ
                 df['ma10d'] = pd.rolling_mean(df.close, 10)
                 df['ma20d'] = pd.rolling_mean(df.close, 20)
                 df['ma60d'] = pd.rolling_mean(df.close, 60)
-                df['hmax'] = df.close[-tdx_max_int:max_int_end].max()
+                df['hmax'] = df.high[-tdx_max_int:max_int_end].max()
                 df['max5'] = df.close[-5:max_int_end].max()
                 df['lmin'] = df.low[-tdx_max_int:max_int_end].min()
                 df['min5'] = df.low[-5:max_int_end].min()
@@ -582,7 +582,7 @@ def get_tdx_Exp_day_to_df(code, start=None, end=None, dl=None, newdays=None, typ
             log.debug("cumdfmax:%s %s"%(cumdf_max,cum_counts_max))
             # log.debug("cumdfc:%s %s"%(cumdfc_max,cumdfc_max.value_counts()))
 
-            cum_min, pos = LISCum(cumdf_Lis.tolist())
+            cum_min, pos = LIS(cumdf_Lis.tolist())
             log.debug("cum_min:%s pos:%s"%(cum_min,pos))
 
             max_lastd = cumdf_max[cumdf_max == cum_counts_max.index[0]].index[-1]
@@ -590,7 +590,7 @@ def get_tdx_Exp_day_to_df(code, start=None, end=None, dl=None, newdays=None, typ
             cumdf_max_f = cumdf_max[cumdf_max.index >= max_lastd]
             cumdf_max_f = cumdf_max_f.sort_index(ascending=False)
             # print cumdf_max[-1],cum_counts_max.index[0]
-            cum_maxf, posf = LISCum(cumdf_max_f.tolist())
+            cum_maxf, posf = LIS(cumdf_max_f.tolist())
 
             if len(cum_counts) > 0 and len(pos) > 0 :
                 df['cumins'] = round(cum_counts.index[0], 2)
@@ -2884,6 +2884,57 @@ def get_tdx_all_day_LastDF(codeList, dt=None, ptype='close'):
     if dt != None:
         print("TDX:%0.2f" % (time.time() - time_t)),
     return df
+
+def get_single_df_lastp_to_df(top_all, lastpTDX_DF=None, dl=ct.PowerCountdl, end=None, ptype='low', filter='y', power=True, lastp=False, newdays=None, checknew=True, resample='d'):
+
+    time_s = time.time()
+    codelist = top_all.index.tolist()
+#    codelist = ['603169']
+    log.info('toTDXlist:%s dl=%s end=%s ptype=%s' % (len(codelist), dl, end, ptype))
+    # print codelist[5]
+    h5_fname = 'tdx_last_df'
+    # market=ptype+'_'+str(dl)+'_'+filter+'_'+str(len(codelist))
+    if end is not None:
+        h5_table = ptype + '_' + resample + '_' + str(dl) + '_' + filter + \
+            '_' + end.replace('-', '') + '_' + 'all'
+    else:
+        h5_table = ptype + '_' + resample + '_' + str(dl) + '_' + filter + '_' + 'all'
+
+    # if newdays is not None:
+    #     h5_table = h5_table + '_'+ str(newdays)
+
+    log.info('h5_table:%s' % (h5_table))
+
+    # codelist = dm.index.tolist()
+    # codelist.extend(tdx_index_code_list)
+    # search_Tdx_multi_data_duration(cct.tdx_hd5_name, 'all_300',code_l=codelist, start=60, end=None, index='date')
+
+    if lastpTDX_DF is None or len(lastpTDX_DF) == 0:
+        # h5 = top_hdf_api(fname=h5_fname,table=market,df=None)
+        h5 = h5a.load_hdf_db(h5_fname, table=h5_table,
+                             code_l=codelist, timelimit=False)
+
+        if h5 is not None and not h5.empty:
+            #            o_time = h5[h5.time <> 0].time
+            #            if len(o_time) > 0:
+            #                o_time = o_time[0]
+            #            print time.time() - o_time
+            #                if time.time() - o_time > h5_limit_time:
+            log.info("load hdf data:%s %s %s" % (h5_fname, h5_table, len(h5)))
+            tdxdata = h5
+        else:
+            log.error("TDX None:%s")
+            return top_all
+    else:
+        tdxdata = lastpTDX_DF
+
+    top_all = cct.combine_dataFrame(
+        top_all, tdxdata, col=None, compare=None, append=False)
+    
+    # log.info('Top-merge_now:%s' % (top_all[:1]))
+    top_all = top_all[top_all['llow'] > 0]
+    log.debug('T:%0.2f'%(time.time()-time_s))
+    return top_all
 
 
 def get_append_lastp_to_df(top_all, lastpTDX_DF=None, dl=ct.PowerCountdl, end=None, ptype='low', filter='y', power=True, lastp=False, newdays=None, checknew=True, resample='d'):

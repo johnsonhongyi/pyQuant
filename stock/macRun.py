@@ -126,21 +126,21 @@ sleep 0.1;osascript -e 'tell application "Python Launcher" to quit';sleep 5;
 
 cmdRun = '''cd /Users/Johnson/Documents/Quant/pyQuant/stock;
 open sina_Market-DurationDn.py;
-sleep 0.1;osascript -e 'tell application "Python Launcher" to quit';sleep 25;
+sleep 0.2;osascript -e 'tell application "Python Launcher" to quit';sleep 25;
 open singleAnalyseUtil.py;
-sleep 0.1;osascript -e 'tell application "Python Launcher" to quit';sleep 25;
+sleep 0.2;osascript -e 'tell application "Python Launcher" to quit';sleep 25;
 open sina_Monitor.py;
-sleep 0.1;osascript -e 'tell application "Python Launcher" to quit';sleep 25;
+sleep 0.2;osascript -e 'tell application "Python Launcher" to quit';sleep 25;
 open sina_Monitor-Market-LH.py;
-sleep 0.1;osascript -e 'tell application "Python Launcher" to quit';sleep 15;
+sleep 0.2;osascript -e 'tell application "Python Launcher" to quit';sleep 15;
 open sina_Market-DurationUP.py;
-sleep 0.1;osascript -e 'tell application "Python Launcher" to quit';sleep 25;
+sleep 0.2;osascript -e 'tell application "Python Launcher" to quit';sleep 25;
 open sina_Market-DurationCXDN.py;
-sleep 0.1;osascript -e 'tell application "Python Launcher" to quit';sleep 25;
+sleep 0.2;osascript -e 'tell application "Python Launcher" to quit';sleep 25;
 open sina_Market-DurationSH.py;
-sleep 0.1;osascript -e 'tell application "Python Launcher" to quit';sleep 25;
+sleep 0.2;osascript -e 'tell application "Python Launcher" to quit';sleep 25;
 open LinePower.py;
-sleep 0.1;osascript -e 'tell application "Python Launcher" to quit';sleep 5;
+sleep 0.2;osascript -e 'tell application "Python Launcher" to quit';sleep 5;
 '''
 
 # cmdRun = '''cd /Users/Johnson/Documents/Quant/pyQuant/stock;
@@ -196,7 +196,7 @@ def getPosition(cmd=None, position=None,close=False):
                 if close:
                     # print ("close:%s %s"%(n,title))
                     os.system(closeterminalw%(n))
-                return position
+                return cmd,position
 
 def setPosition(cmd=None, position=None):
     count = doScript(scriptcount)
@@ -248,8 +248,8 @@ if int(count) > 3:
     print getPosition('sina_Monitor-GOLD.py')
     print getPosition('sina_Monitor.py')
     print getPosition('LinePower.py')
-    getPosition('Johnson@',close=True)
-    getPosition('/Users/Johnson/Documents',close=True)
+    print getPosition('Johnson',close=True)
+    print getPosition('/Users/Johnson/Documents',close=True)
 else:   
     setPosition(cmd=None, position=None)
     cct.get_terminal_Position(cct.clean_terminal[2],close=True)

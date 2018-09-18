@@ -239,12 +239,12 @@ end tell
 terminal_positionKey = {'sina_Market-DurationDn.py': '216, 490',
                         'sina_Market-DurationCXDN.py': '-16, 54',
                         'sina_Market-DurationSH.py': '-28, 563',
-                        'sina_Market-DurationUP.py': '-22, 89',
+                        'sina_Market-DurationUp.py': '-22, 89',
                         'sina_Monitor-Market-LH.py': '184, 239',
                         'sina_Monitor-Market.py': '19, 179',
                         'sina_Monitor.py': '28, 23',
                         'singleAnalyseUtil.py': '594, 23',
-                        'LinePower.py': '38, 365', }
+                        'LinePower.py': '110, 227', }
 
 script_set_position = '''tell application "Terminal"
     --activate
@@ -296,6 +296,7 @@ def get_terminal_Position(cmd=None, position=None, close=False, retry=False):
                     # log.info("count n:%s title:%s" % (n, title))
 
                     if title.lower().find(cmd.lower()) >= 0:
+
                         log.info("WinFind:%s get_title:%s " % (n, title))
                         win_count += 1
                         # print "get:%s"%(n)
@@ -602,6 +603,7 @@ def set_console(width=80, height=15, color=3, title=None, closeTerminal=True):
             # print filename
     else:
         filename = (os.path.basename(sys.argv[0])) + ' ' + title
+    
     if isMac():
         # os.system('printf "\033]0;%s\007"'%(filename))
         if title is None:
@@ -616,8 +618,10 @@ def set_console(width=80, height=15, color=3, title=None, closeTerminal=True):
     # printf "\033]0;My Window title\007”
     # os.system('color %s'%color)
     # set_ctrl_handler()
+    
     if closeTerminal:
-        get_terminal_Position(cmd=scriptquit, position=None, close=False)
+        # get_terminal_Position(cmd=scriptquit, position=None, close=False)
+        get_terminal_Position(position=filename)
         # get_terminal_Position(clean_terminal[1], close=True)
 
 
