@@ -26,8 +26,8 @@ def func_compute_df2(c, lc, h, l):
         du_p = -du_p
     return du_p
 
-def filterPowerCount(df,count=500,down=False):
-    
+def filterPowerCount(df,count=200,down=False):
+
     nowint=cct.get_now_time_int()
     top_temp = df[:count].copy()
 
@@ -62,7 +62,7 @@ def filterPowerCount(df,count=500,down=False):
             radio_t = 1
 
         top_high = top_high[ (((top_high.buy > top_high.ene) & (top_high.volume / radio_t > top_high.lvol * 1.5)) ) |  (((top_high.lastv0d > top_high.lvol * 1.5) & (top_high.lastv1d > top_high.lvol * 1.5)) & (top_high.lastp0d > top_high.ene) ) | (((top_high.lastp0d > top_high.ene) | (top_high.lastp1d > top_high.ene)) & (top_high.lastp2d > top_high.ene)) | ((top_high.buy > top_high.max5)|(top_high.buy > top_high.ene))]
-        top_temp = cct.combine_dataFrame(top_temp, top_high, col=None, compare=None, append=True, clean=True)
+        top_temp = cct.combine_dataFrame(top_temp, top_high[:count], col=None, compare=None, append=True, clean=True)
 
     return top_temp
 

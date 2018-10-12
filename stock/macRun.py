@@ -126,10 +126,8 @@ sleep 0.1;osascript -e 'tell application "Python Launcher" to quit';sleep 5;
 
 cmdRun = '''cd /Users/Johnson/Documents/Quant/pyQuant/stock;
 open sina_Market-DurationDn.py;
-sleep 0.2;osascript -e 'tell application "Python Launcher" to quit';sleep 25;
+sleep 0.2;osascript -e 'tell application "Python Launcher" to quit';sleep 35;
 open singleAnalyseUtil.py;
-sleep 0.2;osascript -e 'tell application "Python Launcher" to quit';sleep 25;
-open sina_Monitor.py;
 sleep 0.2;osascript -e 'tell application "Python Launcher" to quit';sleep 25;
 open sina_Monitor-Market-LH.py;
 sleep 0.2;osascript -e 'tell application "Python Launcher" to quit';sleep 15;
@@ -140,6 +138,8 @@ sleep 0.2;osascript -e 'tell application "Python Launcher" to quit';sleep 25;
 open sina_Market-DurationSH.py;
 sleep 0.2;osascript -e 'tell application "Python Launcher" to quit';sleep 25;
 open LinePower.py;
+sleep 0.2;osascript -e 'tell application "Python Launcher" to quit';sleep 45;
+open sina_Monitor.py;
 sleep 0.2;osascript -e 'tell application "Python Launcher" to quit';sleep 5;
 '''
 
@@ -237,16 +237,21 @@ if int(count) > 3:
     # print getPosition('cd \'/Users/Johnson/Documents/Quant/pyQuant/stock/\'')
     # print getPosition('cd \'/Users/Johnson/Documents')
     # print getPosition('cd \'/Users/Johnson/Documents',close=True)
-    print getPosition('singleAnalyseUtil.py')
-    print getPosition('sina_Market-DurationDn.py')
-    print getPosition('sina_Monitor-Market-LH.py')
-    print "'sina_Market-DurationUP.py'",getPosition('sina_Market-DurationUP.py')
-    print getPosition('sina_Market-DurationSH.py')
-    print getPosition('sina_Market-DurationCXDN.py')
-    print getPosition('sina_Market-DurationCXUP.py')
-    print getPosition('sina_Market-DurationDnUP.py')
-    print getPosition('sina_Monitor-GOLD.py')
-    print getPosition('sina_Monitor.py')
+    for key in positionKey.keys():
+        print (getPosition(key))
+
+    # print 'singleAnalyseUtil.py:',getPosition('singleAnalyseUtil.py')
+    # print 'sina_Market-DurationDn.py:',getPosition('sina_Market-DurationDn.py')
+    # print 'sina_Monitor-Market-LH.py:',getPosition('sina_Monitor-Market-LH.py')
+    # print "sina_Market-DurationUP.py:",getPosition('sina_Market-DurationUP.py')
+    # print 'sina_Market-DurationSH.py:',getPosition('sina_Market-DurationSH.py')
+    # print 'sina_Market-DurationCXDN.py:',getPosition('sina_Market-DurationCXDN.py')
+    # print 'sina_Market-DurationCXUP.py:',getPosition('sina_Market-DurationCXUP.py')
+    # print 'sina_Market-DurationDnUP.py:',getPosition('sina_Market-DurationDnUP.py')
+    # print 'sina_Monitor-GOLD.py:',getPosition('sina_Monitor-GOLD.py')
+    # print 'sina_Monitor.py:',getPosition('sina_Monitor.py')
+
+
     print getPosition('LinePower.py')
     print getPosition('Johnson',close=True)
     print getPosition('/Users/Johnson/Documents',close=True)

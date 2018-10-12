@@ -236,7 +236,17 @@ scriptname = '''tell application "Terminal"
 end tell
 '''
 
-terminal_positionKey = {'sina_Market-DurationDn.py': '216, 490',
+terminal_positionKey = {'sina_Market-DurationDn.py': '654, 680',
+                        'sina_Market-DurationCXDN.py': '-16, 54',
+                        'sina_Market-DurationSH.py': '-28, 563',
+                        'sina_Market-DurationUp.py': '-22, 89',
+                        'sina_Monitor-Market-LH.py': '666, 338',
+                        'sina_Monitor-Market.py': '19, 179',
+                        'sina_Monitor.py': '28, 23',
+                        'singleAnalyseUtil.py': '1095, 23',
+                        'LinePower.py': '110, 227', }
+
+terminal_positionKeyMac = {'sina_Market-DurationDn.py': '216, 490',
                         'sina_Market-DurationCXDN.py': '-16, 54',
                         'sina_Market-DurationSH.py': '-28, 563',
                         'sina_Market-DurationUp.py': '-22, 89',
@@ -1163,6 +1173,7 @@ def to_mp_run_async(cmd, urllist, *args,**kwargs):
     if len(urllist) > 50:
         if len(kwargs) > 0 :
             pool = ThreadPool(1)
+            # pool = ThreadPool(2)
             func = partial(cmd, **kwargs)
             # for y in tqdm(pool.imap_unordered(func, urllist),unit='%',mininterval=ct.tqdm_mininterval,unit_scale=True,total=len(urllist),ncols=5):
             # results = pool.map(func, urllist)

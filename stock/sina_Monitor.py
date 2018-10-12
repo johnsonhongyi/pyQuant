@@ -108,6 +108,7 @@ if __name__ == "__main__":
                 st_key_sort = '%s %s'%(st_key_sort.split()[0],cct.get_index_fibl())
             time_Rt = time.time()
             top_now = tdd.getSinaAlldf(market='all', vol=ct.json_countVol, vtype=ct.json_countType)
+            # top_now = tdd.getSinaAlldf(market='rzrq', vol=ct.json_countVol, vtype=ct.json_countType)
             # top_now = tdd.getSinaAlldf(market='次新股,060',filename='cxg', vol=ct.json_countVol, vtype=ct.json_countType)
 
             time_d = time.time()
