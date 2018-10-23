@@ -253,16 +253,27 @@ def get_dfcfw_fund_SHSZ(url=ct.DFCFW_ZS_SHSZ):
     return dd
 
 
+global rzrqCount
+rzrqCount = 1
+
 def get_dfcfw_rzrq_SHSZ(url=ct.DFCFW_RZRQ_SHSZ):
     data = {}
     log.info("http://data.eastmoney.com/rzrq/total.html")
 
     def get_tzrq(url, today):
+        global rzrqCount
         url = url % today
-        data = cct.get_url_data(url)
-        # data = cct.get_url_data_R(url)
-        # vollist=re.findall('{data:(\d+)',code)
-        vol_l = re.findall('\"([\d\D]+?)\"', data)
+        if rzrqCount < 3:
+            data = cct.get_url_data(url)
+            # data = cct.get_url_data_R(url)
+            if len(data) < 1:
+                rzrqCount +=1
+                vol_l =[]
+            # vollist=re.findall('{data:(\d+)',code)
+            else:
+                vol_l = re.findall('\"([\d\D]+?)\"', data)
+        else:
+            vol_l = []
         # print vol_l
         dd = {}
         # print vol_l

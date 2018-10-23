@@ -475,6 +475,9 @@ def get_hot_countNew(changepercent, rzrq, fibl=None, fibc=10):
     else:
         print("\tHgt: \t%s Ggt: \t%s Sgt: %s Gst: %s" % (0, 0, 0, 0))
     if len(rzrq) > 0:
+        if 'shrz' not in rzrq.keys() and 'szrz' not in rzrq.keys():
+            rzrq['shrz'] = 0
+            rzrq['szrz'] = 0
         shpcent = round((rzrq['shrz'] / rzrq['sh'] * 100),
                         1) if rzrq['sh'] > 0 else '?'
         szpcent = round((rzrq['szrz'] / rzrq['sz'] * 100),

@@ -1016,8 +1016,9 @@ def get_work_time_ratio():
 
     return ratio_t
 
-
-def get_url_data_R(url, timeout=10):
+global ReqErrorCount
+ReqErrorCount = 1
+def get_url_data_R(url, timeout=5):
     # headers = {'User-Agent':'Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.6) Gecko/20091201 Firefox/3.5.6'}
     headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.2; rv:16.0) Gecko/20100101 Firefox/16.0',
                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
@@ -1032,23 +1033,26 @@ def get_url_data_R(url, timeout=10):
     except (socket.timeout, socket.error) as e:
         # print data.encoding
         data = ''
+
         log.error('socket timed out error:%s - URL %s ' % (e, url))
         sleeprandom(60)
     except Exception as e:
         data = ''
         log.error('url Exception Error:%s - URL %s ' % (e, url))
+
         sleeprandom(60)
     else:
         log.info('Access successful.')
     return data
 
 
-def get_url_data(url, retry_count=5, pause=0.05, timeout=10, headers=None):
+def get_url_data(url, retry_count=3, pause=0.05, timeout=5, headers=None):
     #    headers = {'User-Agent':'Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.6) Gecko/20091201 Firefox/3.5.6'}
     if headers is None:
         headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.2; rv:16.0) Gecko/20100101 Firefox/16.0',
                    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
                    'Connection': 'keep-alive'}
+    global ReqErrorCount
 
     for _ in range(retry_count):
         time.sleep(pause)
@@ -1057,10 +1061,18 @@ def get_url_data(url, retry_count=5, pause=0.05, timeout=10, headers=None):
         except (socket.timeout, socket.error) as e:
             data = ''
             log.error('socket timed out error:%s - URL %s ' % (e, url))
-            sleeprandom(60)
+            if ReqErrorCount < 3:
+                ReqErrorCount +=1
+                sleeprandom(60)
+            else:
+                break
         except Exception as e:
             log.error('url Exception Error:%s - URL %s ' % (e, url))
-            sleeprandom(60)
+            if ReqErrorCount < 3:
+                ReqErrorCount +=1
+                sleeprandom(60)
+            else:
+                break
         else:
             log.info('Access successful.')
         # print data.text
@@ -1071,7 +1083,6 @@ def get_url_data(url, retry_count=5, pause=0.05, timeout=10, headers=None):
             return data.text
     #     else:
     #         return df
-        sleeprandom(10)
     print "url:%s" % (url)
     return ''
     # raise IOError(ct.NETWORK_URL_ERROR_MSG)
