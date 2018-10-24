@@ -398,6 +398,18 @@ DFCFW_FUND_FLOW_ALL = "http://s1.dfcfw.com/js/index.js?rt=0.3585179701661414"
 DFCFW_FUND_FLOW_URL_New = "http://nufm.dfcfw.com/EM_Finance2014NumericApplication/JS.aspx?type=CT&cmd=%s&sty=CTBFTA&st=z&sr=&p=&ps=&cb=&js=var%%20tab_data=({data:[(x)]})&token=70f12f2f4f091e459a279469fe49eca5"
 # DFCFW_FUND_FLOW_URL_New="http://nufm.dfcfw.com/EM_Finance2014NumericApplication/JS.aspx?type=CT&cmd=%s"
 
+# http://data.eastmoney.com/rzrq/
+'''
+var rzrqDomain = 'http://dcfm.eastmoney.com/';
+        var rzrqDateArr = [{"Market":"SZ","NewDate":"2018-10-23T00:00:00"},{"Market":"LS","NewDate":"2018-10-23T00:00:00"},{"Market":"HZ","NewDate":"2018-10-23T00:00:00"}];
+        var rzrqDate = {};
+        for (var i = 0; i < rzrqDateArr.length; i++) {
+            rzrqDate[rzrqDateArr[i]['Market']] = rzrqDateArr[i]['NewDate']
+        }
+'''
+
+DFCFW_RZYE = "http://dcfm.eastmoney.com/em_mutisvcexpandinterface/api/js/get?type=RZRQ_SUMMARY_NJ&token=70f12f2f4f091e459a279469fe49eca5&st="
+dfcfw_rzye_columns = ['tdate','rzye_h','rzye_s','rzye_hs','ltsz_h','ltsz_s','ltsz_hs','rzyezb_h','rzyezb_s','rzyezb_hs','rzmre_h','rzmre_s','rzmre_hs','rqye_h','rqye_s','rqye_hs','rzrqye_h','rzrqye_s','rzrqye_hs','rzrqyecz_h','rzrqyecz_s','rzrqyecz_hs']
 # TDX_Day_columns=['code','date','open','high','low','close','vol','amount']
 TDX_Day_columns_all = ['code', 'date', 'open', 'high', 'low', 'close', 'vol','amount', 'ra', 'op', 'fib', 'ma5d', 'ma10d', 'ldate', 'hmax', 'lmin', 'cmean']
 TDX_Day_columns = ['code', 'date', 'open', 'high', 'low', 'close', 'vol','amount']

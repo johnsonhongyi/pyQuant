@@ -253,13 +253,71 @@ def get_dfcfw_fund_SHSZ(url=ct.DFCFW_ZS_SHSZ):
     return dd
 
 
-global rzrqCount
-rzrqCount = 1
+# global rzrqCount
+# rzrqCount = 1
 
-def get_dfcfw_rzrq_SHSZ(url=ct.DFCFW_RZRQ_SHSZ):
+def get_dfcfw_rzrq_SHSZ(url=ct.DFCFW_RZYE):
+    data = {}
+    log.info("%s"%(ct.DFCFW_RZYE))
+    rzdata = cct.get_url_data(url)
+    rz_dic = re.findall('{"tdate"[\D\d]+?}', rzdata.encode('utf8'))
+    rzdict=[eval(x) for x in rz_dic]
+    df=pd.DataFrame(rzdict,columns=ct.dfcfw_rzye_columns)
+    df.tdate = df.tdate.apply(lambda x:x[:10])
+    df = df.set_index('tdate')
+    df.rename(columns={'rzye_hs': 'all'}, inplace=True)
+    df.rename(columns={'rzye_h': 'sh'}, inplace=True)
+    df.rename(columns={'rzye_s': 'sz'}, inplace=True)
+    df['all'] = df['all'].apply(lambda x:round((x/1000/1000/100),2))
+    df['sh'] = df['sh'].apply(lambda x:round((x/1000/1000/100),2))
+    df['sz'] = df['sz'].apply(lambda x:round((x/1000/1000/100),2))
+    # data=get_tzrq(url,today)
+    # yestoday = cct.last_tddate(1)
+    # log.debug(today)
+    # beforeyesterday =  cct.last_tddate(days=2)
+    def get_days_data(days=1,df=None):
+            rzrq_status = 1
+            # data=''
+            da = 0
+            i = 0
+            while rzrq_status:
+                for x in range(days, 20):
+                    yestoday = cct.last_tddate(x)
+                    if yestoday in df.index:
+                        data2 = df.loc[yestoday]
+                        log.info("yestoday:%s data:%s" % (yestoday, data2))
+                        break
+                        # print da
+                    else:
+                        log.info("%s:%s" % (yestoday, data2))
+                rzrq_status = 0
+            return data2
+
+    data1 = get_days_data(1,df)
+    data2 = get_days_data(2,df)
+    
+    # data = df.loc[yestoday]
+    # data2 = df.loc[beforeyesterday]
+    log.info("data1:%s,data2:%s", data1, data2)
+    if len(data2) > 0:
+        # print data2
+        data['all'] = round(data1.loc['all'], 2)
+        data['sh'] = round(data1.loc['sh'], 2)
+        data['sz'] = round(data1.loc['sz'], 2)
+        data['dff'] = round(data1.loc['all'] - data2.loc['all'], 2)
+        data['shrz'] = round(data1.loc['sh'] - data2.loc['sh'], 2)
+        data['szrz'] = round(data1.loc['sz'] - data2.loc['sz'], 2)
+    else:
+        data['dff'] = 'error'
+    if len(data) == 0:
+        log.info("Fund_f NO Url:%s" % url)
+    return data
+
+
+def get_dfcfw_rzrq_SHSZ_Outdate(url=ct.DFCFW_RZRQ_SHSZ):
     data = {}
     log.info("http://data.eastmoney.com/rzrq/total.html")
-
+    ct.DFCFW_RZYE
     def get_tzrq(url, today):
         global rzrqCount
         url = url % today
