@@ -2,16 +2,11 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="f090dad1-4324-4dd7-b658-6ef3a59fd6f8" name="Default" comment="clean easyquant">
-      <change type="DELETED" beforePath="$PROJECT_DIR$/xuefu/pyalg_test.py" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/stock/JohhnsonUtil/captops.csv" afterPath="$PROJECT_DIR$/stock/JohhnsonUtil/captops.csv" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/vcs.xml" afterPath="$PROJECT_DIR$/.idea/vcs.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/stock/JSONData/count.ini" afterPath="$PROJECT_DIR$/stock/JSONData/count.ini" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/stock/JSONData/tdx_data_Day.py" afterPath="$PROJECT_DIR$/stock/JSONData/tdx_data_Day.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/stock/JohhnsonUtil/johnson_cons.py" afterPath="$PROJECT_DIR$/stock/JohhnsonUtil/johnson_cons.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/stock/sina_Market-DurationUp.py" afterPath="$PROJECT_DIR$/stock/sina_Market-DurationUp.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/xuefu/constant.py" afterPath="$PROJECT_DIR$/xuefu/constant.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/xuefu/data.py" afterPath="$PROJECT_DIR$/xuefu/data.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/xuefu/pyalg_2.py" afterPath="$PROJECT_DIR$/xuefu/pyalg_2.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/xuefu/utils/dataFramefeed.py" afterPath="$PROJECT_DIR$/xuefu/utils/dataFramefeed.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/stock/JSONData/sina_data.py" afterPath="$PROJECT_DIR$/stock/JSONData/sina_data.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/stock/JohnsonUtil/wencai/cxg.csv" afterPath="$PROJECT_DIR$/stock/JohnsonUtil/wencai/cxg.csv" />
     </list>
     <list id="2cfb04de-6b7a-4d7a-bd6f-729c2b84ef9c" name="Ext Workxml changelist" comment="Ext Workxml changelist" />
     <ignored path="pyQuant.iws" />
@@ -36,19 +31,9 @@
       <file leaf-file-name="tusharetest.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/stock/dataBarFeed/tusharetest.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="0">
+            <state relative-caret-position="792">
               <caret line="118" column="81" lean-forward="false" selection-start-line="118" selection-start-column="81" selection-end-line="118" selection-end-column="81" />
-              <folding>
-                <element signature="e#923#2346#0" expanded="true" />
-                <element signature="e#2449#2636#0" expanded="true" />
-                <element signature="e#2672#2706#0" expanded="true" />
-                <element signature="e#3412#4152#0" expanded="true" />
-                <element signature="e#6554#7302#0" expanded="true" />
-                <element signature="e#7335#8346#0" expanded="true" />
-                <element signature="e#8751#8824#0" expanded="true" />
-                <element signature="e#8854#12715#0" expanded="true" />
-                <element signature="e#26768#28814#0" expanded="true" />
-              </folding>
+              <folding />
             </state>
           </provider>
         </entry>
@@ -56,115 +41,31 @@
       <file leaf-file-name="powerTech.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/stock/dataBarFeed/powerTech.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1584">
-              <caret line="712" column="72" lean-forward="false" selection-start-line="712" selection-start-column="68" selection-end-line="712" selection-end-column="72" />
+            <state relative-caret-position="1784">
+              <caret line="712" column="51" lean-forward="false" selection-start-line="712" selection-start-column="51" selection-end-line="712" selection-end-column="51" />
               <folding>
                 <element signature="e#26#36#0" expanded="true" />
-                <element signature="e#1095#1544#0" expanded="false" />
-                <element signature="e#1408#1456#0" expanded="false" />
-                <element signature="e#1491#1544#0" expanded="false" />
-                <element signature="e#1609#1626#0" expanded="false" />
-                <element signature="e#2017#2055#0" expanded="false" />
-                <element signature="e#2449#2661#0" expanded="false" />
-                <element signature="e#2707#3126#0" expanded="false" />
-                <element signature="e#3049#3126#0" expanded="false" />
-                <element signature="e#3158#3538#0" expanded="false" />
-                <element signature="e#3180#3303#0" expanded="false" />
-                <element signature="e#3330#3450#0" expanded="false" />
-                <element signature="e#3588#3657#0" expanded="false" />
-                <element signature="e#3702#4185#0" expanded="false" />
-                <element signature="e#3781#3858#0" expanded="false" />
-                <element signature="e#4108#4185#0" expanded="false" />
-                <element signature="e#4220#4308#0" expanded="false" />
-                <element signature="e#4919#5840#0" expanded="false" />
-                <element signature="e#5098#5166#0" expanded="false" />
-                <element signature="e#5213#5393#0" expanded="false" />
-                <element signature="e#5441#5620#0" expanded="false" />
-                <element signature="e#5859#6696#0" expanded="false" />
-                <element signature="e#6110#6239#0" expanded="false" />
-                <element signature="e#6286#6417#0" expanded="false" />
-                <element signature="e#6577#6610#0" expanded="false" />
-                <element signature="e#6896#7076#0" expanded="false" />
-                <element signature="e#7237#7330#0" expanded="false" />
-                <element signature="e#7465#9725#0" expanded="false" />
-                <element signature="e#8485#8596#0" expanded="false" />
-                <element signature="e#8623#8749#0" expanded="false" />
-                <element signature="e#8796#9114#0" expanded="false" />
-                <element signature="e#9141#9719#0" expanded="false" />
-                <element signature="e#9339#9719#0" expanded="false" />
-                <element signature="e#9370#9482#0" expanded="false" />
-                <element signature="e#10082#10294#0" expanded="false" />
-                <element signature="e#10347#10766#0" expanded="false" />
-                <element signature="e#10689#10766#0" expanded="false" />
-                <element signature="e#10798#11179#0" expanded="false" />
-                <element signature="e#10820#10944#0" expanded="false" />
-                <element signature="e#10971#11091#0" expanded="false" />
-                <element signature="e#11229#11298#0" expanded="false" />
-                <element signature="e#11343#11833#0" expanded="false" />
-                <element signature="e#11422#11499#0" expanded="false" />
-                <element signature="e#11756#11833#0" expanded="false" />
-                <element signature="e#11868#11956#0" expanded="false" />
-                <element signature="e#12016#12097#0" expanded="false" />
-                <element signature="e#12158#12972#0" expanded="false" />
-                <element signature="e#12233#12582#0" expanded="false" />
-                <element signature="e#12476#12503#0" expanded="false" />
-                <element signature="e#12609#12888#0" expanded="false" />
-                <element signature="e#13008#14371#0" expanded="false" />
-                <element signature="e#13092#14293#0" expanded="false" />
-                <element signature="e#13292#13665#0" expanded="false" />
-                <element signature="e#13350#13573#0" expanded="false" />
-                <element signature="e#13700#14293#0" expanded="false" />
-                <element signature="e#13737#14201#0" expanded="false" />
-                <element signature="e#14390#14546#0" expanded="false" />
-                <element signature="e#14852#14893#0" expanded="false" />
-                <element signature="e#15079#16077#0" expanded="false" />
-                <element signature="e#15214#15256#0" expanded="false" />
-                <element signature="e#15662#15802#0" expanded="false" />
-                <element signature="e#15829#16077#0" expanded="false" />
-                <element signature="e#16097#17180#0" expanded="false" />
-                <element signature="e#16317#16626#0" expanded="false" />
-                <element signature="e#16503#16626#0" expanded="false" />
-                <element signature="e#16793#16899#0" expanded="false" />
-                <element signature="e#16927#17175#0" expanded="false" />
-                <element signature="e#17566#18313#0" expanded="true" />
-                <element signature="e#18216#18294#0" expanded="false" />
-                <element signature="e#18248#18294#0" expanded="false" />
-                <element signature="e#18421#18721#0" expanded="false" />
-                <element signature="e#18479#18610#0" expanded="false" />
-                <element signature="e#18803#18856#0" expanded="false" />
-                <element signature="e#19087#19106#0" expanded="false" />
-                <element signature="e#19490#19676#0" expanded="false" />
-                <element signature="e#19633#19676#0" expanded="false" />
-                <element signature="e#19922#22651#1" expanded="false" />
-                <element signature="e#22799#22823#0" expanded="false" />
-                <element signature="e#22965#23030#0" expanded="false" />
-                <element signature="e#23199#23453#0" expanded="false" />
-                <element signature="e#23576#23722#0" expanded="false" />
-                <element signature="e#24103#24227#0" expanded="false" />
-                <element signature="e#24324#24861#0" expanded="false" />
-                <element signature="e#24479#24757#0" expanded="false" />
-                <element signature="e#24511#24748#0" expanded="false" />
-                <element signature="e#24884#25443#0" expanded="false" />
-                <element signature="e#25031#25064#0" expanded="false" />
-                <element signature="e#25500#25561#0" expanded="false" />
-                <element signature="e#26112#26152#0" expanded="false" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="tdx_data_Day.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="sina_Market-DurationCXDN.py" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/stock/sina_Market-DurationCXDN.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="704">
+              <caret line="86" column="27" lean-forward="true" selection-start-line="86" selection-start-column="27" selection-end-line="86" selection-end-column="27" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="tdx_data_Day.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/stock/JSONData/tdx_data_Day.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="361">
-              <caret line="1836" column="64" lean-forward="true" selection-start-line="1836" selection-start-column="64" selection-end-line="1836" selection-end-column="64" />
-              <folding>
-                <element signature="e#46313#48560#0" expanded="true" />
-                <element signature="e#48653#49940#0" expanded="true" />
-                <element signature="e#50016#52256#0" expanded="true" />
-                <element signature="e#52414#55602#0" expanded="true" />
-                <element signature="e#55691#58345#0" expanded="true" />
-              </folding>
+            <state relative-caret-position="295">
+              <caret line="1833" column="35" lean-forward="false" selection-start-line="1833" selection-start-column="35" selection-end-line="1833" selection-end-column="35" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -172,22 +73,8 @@
       <file leaf-file-name="fundflowUtil.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/stock/JSONData/fundflowUtil.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="103">
-              <caret line="87" column="41" lean-forward="true" selection-start-line="87" selection-start-column="41" selection-end-line="87" selection-end-column="41" />
-              <folding>
-                <element signature="e#436#2135#0" expanded="true" />
-                <element signature="e#4843#5826#0" expanded="true" />
-                <element signature="e#5880#7934#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="johnson_cons.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/stock/JohhnsonUtil/johnson_cons.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="5104">
-              <caret line="239" column="19" lean-forward="false" selection-start-line="239" selection-start-column="0" selection-end-line="239" selection-end-column="19" />
+            <state relative-caret-position="770">
+              <caret line="87" column="41" lean-forward="false" selection-start-line="87" selection-start-column="41" selection-end-line="87" selection-end-column="41" />
               <folding />
             </state>
           </provider>
@@ -208,8 +95,8 @@
       <file leaf-file-name="sina_Monitor-Market-LH.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/stock/sina_Monitor-Market-LH.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="699">
-              <caret line="162" column="63" lean-forward="false" selection-start-line="162" selection-start-column="63" selection-end-line="162" selection-end-column="63" />
+            <state relative-caret-position="2156">
+              <caret line="162" column="17" lean-forward="false" selection-start-line="162" selection-start-column="17" selection-end-line="162" selection-end-column="17" />
               <folding />
             </state>
           </provider>
@@ -218,11 +105,9 @@
       <file leaf-file-name="LineHistogram.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/stock/JSONData/LineHistogram.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="7722">
+            <state relative-caret-position="7062">
               <caret line="367" column="10" lean-forward="false" selection-start-line="367" selection-start-column="10" selection-end-line="367" selection-end-column="10" />
-              <folding>
-                <element signature="e#1042#1597#0" expanded="true" />
-              </folding>
+              <folding />
             </state>
           </provider>
         </entry>
@@ -335,9 +220,10 @@
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="y" value="22" />
-    <option name="width" value="1436" />
-    <option name="height" value="878" />
+    <option name="x" value="141" />
+    <option name="y" value="37" />
+    <option name="width" value="1492" />
+    <option name="height" value="970" />
   </component>
   <component name="ProjectInspectionProfilesVisibleTreeState">
     <entry key="Project Default">
@@ -430,7 +316,7 @@
   </component>
   <component name="PropertiesComponent">
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
-    <property name="settings.editor.selected.configurable" value="preferences.externalTools" />
+    <property name="settings.editor.selected.configurable" value="project.propVCSSupport.Mappings" />
     <property name="FileHistory.git4idea.history.GitHistoryProvider_flatWidth0" value="97" />
     <property name="FileHistory.git4idea.history.GitHistoryProvider_flatOrder0" value="0" />
     <property name="FileHistory.git4idea.history.GitHistoryProvider_flatWidth1" value="114" />
@@ -471,24 +357,7 @@
       <recent name="$PROJECT_DIR$/stock/JohhnsonUtil" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.powerTech">
-    <configuration default="false" name="tusharetest" type="PythonConfigurationType" factoryName="Python" temporary="true">
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/stock/dataBarFeed" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <module name="pyQuant" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/stock/dataBarFeed/tusharetest.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <method />
-    </configuration>
+  <component name="RunManager" selected="Python.sina_Market-DurationCXDN">
     <configuration default="false" name="powerTech" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -553,6 +422,23 @@
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <module name="pyQuant" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/stock/singleAnalyseUtil.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <method />
+    </configuration>
+    <configuration default="false" name="sina_Market-DurationCXDN" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/stock" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="pyQuant" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/stock/sina_Market-DurationCXDN.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <method />
@@ -729,19 +615,19 @@
       <method />
     </configuration>
     <list size="5">
-      <item index="0" class="java.lang.String" itemvalue="Python.tusharetest" />
-      <item index="1" class="java.lang.String" itemvalue="Python.powerTech" />
-      <item index="2" class="java.lang.String" itemvalue="Python.qtMain" />
-      <item index="3" class="java.lang.String" itemvalue="Python.fundflowUtil" />
-      <item index="4" class="java.lang.String" itemvalue="Python.singleAnalyseUtil" />
+      <item index="0" class="java.lang.String" itemvalue="Python.powerTech" />
+      <item index="1" class="java.lang.String" itemvalue="Python.qtMain" />
+      <item index="2" class="java.lang.String" itemvalue="Python.fundflowUtil" />
+      <item index="3" class="java.lang.String" itemvalue="Python.singleAnalyseUtil" />
+      <item index="4" class="java.lang.String" itemvalue="Python.sina_Market-DurationCXDN" />
     </list>
     <recent_temporary>
       <list size="5">
-        <item index="0" class="java.lang.String" itemvalue="Python.powerTech" />
-        <item index="1" class="java.lang.String" itemvalue="Python.fundflowUtil" />
-        <item index="2" class="java.lang.String" itemvalue="Python.singleAnalyseUtil" />
-        <item index="3" class="java.lang.String" itemvalue="Python.qtMain" />
-        <item index="4" class="java.lang.String" itemvalue="Python.tusharetest" />
+        <item index="0" class="java.lang.String" itemvalue="Python.sina_Market-DurationCXDN" />
+        <item index="1" class="java.lang.String" itemvalue="Python.powerTech" />
+        <item index="2" class="java.lang.String" itemvalue="Python.fundflowUtil" />
+        <item index="3" class="java.lang.String" itemvalue="Python.singleAnalyseUtil" />
+        <item index="4" class="java.lang.String" itemvalue="Python.qtMain" />
       </list>
     </recent_temporary>
   </component>
@@ -1117,27 +1003,27 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="22" width="1436" height="878" extended-state="6" />
-    <editor active="true" />
+    <frame x="141" y="37" width="1492" height="970" extended-state="0" />
+    <editor active="false" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.17060933" sideWeight="0.47207206" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.18163265" sideWeight="0.47207206" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32951653" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.317662" sideWeight="0.5143488" order="11" side_tool="true" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.22323462" sideWeight="0.5120532" order="11" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.29262087" sideWeight="0.5062546" order="10" side_tool="false" content_ui="tabs" />
-      <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.326972" sideWeight="0.53421634" order="4" side_tool="false" content_ui="tabs" />
-      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.17892504" sideWeight="0.47776365" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.30661577" sideWeight="0.48565122" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32687926" sideWeight="0.5309365" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.333713" sideWeight="0.49080268" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.17892504" sideWeight="0.47776365" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.30637813" sideWeight="0.48295927" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.18387553" sideWeight="0.52792794" order="2" side_tool="true" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.46564886" sideWeight="0.48565122" order="5" side_tool="false" content_ui="tabs" x="41" y="354" width="1395" height="213" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32951653" sideWeight="0.48473284" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.22900763" sideWeight="0.49742457" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.31043258" sideWeight="0.49448124" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.46564886" sideWeight="0.48565122" order="5" side_tool="false" content_ui="tabs" x="41" y="354" width="1395" height="213" />
     </layout>
     <layout-to-restore>
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32951653" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
@@ -1345,21 +1231,7 @@
     </watches-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/stock/JohhnsonUtil/commonTips.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="152" column="0" lean-forward="false" selection-start-line="152" selection-start-column="0" selection-end-line="152" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/stock/JohhnsonUtil/johnson_cons.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="15" column="13" lean-forward="false" selection-start-line="15" selection-start-column="13" selection-end-line="15" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/stock/JohhnsonUtil/johnson_cons.py" />
     <entry file="file://$PROJECT_DIR$/stock/LinePower.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
@@ -1371,19 +1243,11 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding>
-            <element signature="e#1042#1597#0" expanded="true" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/studyTips/subprocess_async.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="264" column="22" lean-forward="false" selection-start-line="264" selection-start-column="22" selection-end-line="264" selection-end-column="55" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/studyTips/subprocess_async.py" />
     <entry file="file://$PROJECT_DIR$/stock/sina_Monitor-Market-New.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
@@ -1406,13 +1270,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/studyTips/automd5/pywinauto_notepad.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="8" column="14" lean-forward="false" selection-start-line="8" selection-start-column="14" selection-end-line="8" selection-end-column="14" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/studyTips/automd5/pywinauto_notepad.py" />
     <entry file="file://$PROJECT_DIR$/stock/testpy/matplotlibcode/sample_shsh.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
@@ -1497,34 +1355,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/stock/stock-Line-2016-03-13.csv">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="5" column="9" lean-forward="false" selection-start-line="5" selection-start-column="9" selection-end-line="5" selection-end-column="9" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/stock/stock-Line-down-2016-01-18.csv">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="9" column="15" lean-forward="false" selection-start-line="9" selection-start-column="15" selection-end-line="9" selection-end-column="15" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/stock/stock-Line-down-2016-03-13.csv">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/stock/JohhnsonUtil/LoggerFactory.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/stock/stock-Line-2016-03-13.csv" />
+    <entry file="file://$PROJECT_DIR$/stock/stock-Line-down-2016-01-18.csv" />
+    <entry file="file://$PROJECT_DIR$/stock/stock-Line-down-2016-03-13.csv" />
+    <entry file="file://$PROJECT_DIR$/stock/JohhnsonUtil/LoggerFactory.py" />
     <entry file="file://$APPLICATION_HOME_DIR$/helpers/pydev/pydevd_frame.py" />
     <entry file="file://$PROJECT_DIR$/stock/sina_Monitor.py">
       <provider selected="true" editor-type-id="text-editor">
@@ -1542,14 +1376,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/stock/JohhnsonUtil/commonTips.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="15">
-          <caret line="159" column="0" lean-forward="false" selection-start-line="159" selection-start-column="0" selection-end-line="159" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/stock/JohhnsonUtil/commonTips.py" />
     <entry file="file://$PROJECT_DIR$/stock/sina_Market-DurationDn.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="15">
@@ -1615,19 +1442,9 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/stock/dataBarFeed/tusharetest.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
+        <state relative-caret-position="792">
           <caret line="118" column="81" lean-forward="false" selection-start-line="118" selection-start-column="81" selection-end-line="118" selection-end-column="81" />
-          <folding>
-            <element signature="e#923#2346#0" expanded="true" />
-            <element signature="e#2449#2636#0" expanded="true" />
-            <element signature="e#2672#2706#0" expanded="true" />
-            <element signature="e#3412#4152#0" expanded="true" />
-            <element signature="e#6554#7302#0" expanded="true" />
-            <element signature="e#7335#8346#0" expanded="true" />
-            <element signature="e#8751#8824#0" expanded="true" />
-            <element signature="e#8854#12715#0" expanded="true" />
-            <element signature="e#26768#28814#0" expanded="true" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -1648,24 +1465,13 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/stock/JSONData/fundflowUtil.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="103">
-          <caret line="87" column="41" lean-forward="true" selection-start-line="87" selection-start-column="41" selection-end-line="87" selection-end-column="41" />
-          <folding>
-            <element signature="e#436#2135#0" expanded="true" />
-            <element signature="e#4843#5826#0" expanded="true" />
-            <element signature="e#5880#7934#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/stock/JohhnsonUtil/johnson_cons.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="5104">
-          <caret line="239" column="19" lean-forward="false" selection-start-line="239" selection-start-column="0" selection-end-line="239" selection-end-column="19" />
+        <state relative-caret-position="770">
+          <caret line="87" column="41" lean-forward="false" selection-start-line="87" selection-start-column="41" selection-end-line="87" selection-end-column="41" />
           <folding />
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/stock/JohhnsonUtil/johnson_cons.py" />
     <entry file="file://$PROJECT_DIR$/stock/QT/qtMain.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="88">
@@ -1678,109 +1484,9 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/stock/JSONData/LineHistogram.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="7722">
+        <state relative-caret-position="7062">
           <caret line="367" column="10" lean-forward="false" selection-start-line="367" selection-start-column="10" selection-end-line="367" selection-end-column="10" />
-          <folding>
-            <element signature="e#1042#1597#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/stock/dataBarFeed/powerTech.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1584">
-          <caret line="712" column="72" lean-forward="false" selection-start-line="712" selection-start-column="68" selection-end-line="712" selection-end-column="72" />
-          <folding>
-            <element signature="e#26#36#0" expanded="true" />
-            <element signature="e#1095#1544#0" expanded="false" />
-            <element signature="e#1408#1456#0" expanded="false" />
-            <element signature="e#1491#1544#0" expanded="false" />
-            <element signature="e#1609#1626#0" expanded="false" />
-            <element signature="e#2017#2055#0" expanded="false" />
-            <element signature="e#2449#2661#0" expanded="false" />
-            <element signature="e#2707#3126#0" expanded="false" />
-            <element signature="e#3049#3126#0" expanded="false" />
-            <element signature="e#3158#3538#0" expanded="false" />
-            <element signature="e#3180#3303#0" expanded="false" />
-            <element signature="e#3330#3450#0" expanded="false" />
-            <element signature="e#3588#3657#0" expanded="false" />
-            <element signature="e#3702#4185#0" expanded="false" />
-            <element signature="e#3781#3858#0" expanded="false" />
-            <element signature="e#4108#4185#0" expanded="false" />
-            <element signature="e#4220#4308#0" expanded="false" />
-            <element signature="e#4919#5840#0" expanded="false" />
-            <element signature="e#5098#5166#0" expanded="false" />
-            <element signature="e#5213#5393#0" expanded="false" />
-            <element signature="e#5441#5620#0" expanded="false" />
-            <element signature="e#5859#6696#0" expanded="false" />
-            <element signature="e#6110#6239#0" expanded="false" />
-            <element signature="e#6286#6417#0" expanded="false" />
-            <element signature="e#6577#6610#0" expanded="false" />
-            <element signature="e#6896#7076#0" expanded="false" />
-            <element signature="e#7237#7330#0" expanded="false" />
-            <element signature="e#7465#9725#0" expanded="false" />
-            <element signature="e#8485#8596#0" expanded="false" />
-            <element signature="e#8623#8749#0" expanded="false" />
-            <element signature="e#8796#9114#0" expanded="false" />
-            <element signature="e#9141#9719#0" expanded="false" />
-            <element signature="e#9339#9719#0" expanded="false" />
-            <element signature="e#9370#9482#0" expanded="false" />
-            <element signature="e#10082#10294#0" expanded="false" />
-            <element signature="e#10347#10766#0" expanded="false" />
-            <element signature="e#10689#10766#0" expanded="false" />
-            <element signature="e#10798#11179#0" expanded="false" />
-            <element signature="e#10820#10944#0" expanded="false" />
-            <element signature="e#10971#11091#0" expanded="false" />
-            <element signature="e#11229#11298#0" expanded="false" />
-            <element signature="e#11343#11833#0" expanded="false" />
-            <element signature="e#11422#11499#0" expanded="false" />
-            <element signature="e#11756#11833#0" expanded="false" />
-            <element signature="e#11868#11956#0" expanded="false" />
-            <element signature="e#12016#12097#0" expanded="false" />
-            <element signature="e#12158#12972#0" expanded="false" />
-            <element signature="e#12233#12582#0" expanded="false" />
-            <element signature="e#12476#12503#0" expanded="false" />
-            <element signature="e#12609#12888#0" expanded="false" />
-            <element signature="e#13008#14371#0" expanded="false" />
-            <element signature="e#13092#14293#0" expanded="false" />
-            <element signature="e#13292#13665#0" expanded="false" />
-            <element signature="e#13350#13573#0" expanded="false" />
-            <element signature="e#13700#14293#0" expanded="false" />
-            <element signature="e#13737#14201#0" expanded="false" />
-            <element signature="e#14390#14546#0" expanded="false" />
-            <element signature="e#14852#14893#0" expanded="false" />
-            <element signature="e#15079#16077#0" expanded="false" />
-            <element signature="e#15214#15256#0" expanded="false" />
-            <element signature="e#15662#15802#0" expanded="false" />
-            <element signature="e#15829#16077#0" expanded="false" />
-            <element signature="e#16097#17180#0" expanded="false" />
-            <element signature="e#16317#16626#0" expanded="false" />
-            <element signature="e#16503#16626#0" expanded="false" />
-            <element signature="e#16793#16899#0" expanded="false" />
-            <element signature="e#16927#17175#0" expanded="false" />
-            <element signature="e#17566#18313#0" expanded="true" />
-            <element signature="e#18216#18294#0" expanded="false" />
-            <element signature="e#18248#18294#0" expanded="false" />
-            <element signature="e#18421#18721#0" expanded="false" />
-            <element signature="e#18479#18610#0" expanded="false" />
-            <element signature="e#18803#18856#0" expanded="false" />
-            <element signature="e#19087#19106#0" expanded="false" />
-            <element signature="e#19490#19676#0" expanded="false" />
-            <element signature="e#19633#19676#0" expanded="false" />
-            <element signature="e#19922#22651#1" expanded="false" />
-            <element signature="e#22799#22823#0" expanded="false" />
-            <element signature="e#22965#23030#0" expanded="false" />
-            <element signature="e#23199#23453#0" expanded="false" />
-            <element signature="e#23576#23722#0" expanded="false" />
-            <element signature="e#24103#24227#0" expanded="false" />
-            <element signature="e#24324#24861#0" expanded="false" />
-            <element signature="e#24479#24757#0" expanded="false" />
-            <element signature="e#24511#24748#0" expanded="false" />
-            <element signature="e#24884#25443#0" expanded="false" />
-            <element signature="e#25031#25064#0" expanded="false" />
-            <element signature="e#25500#25561#0" expanded="false" />
-            <element signature="e#26112#26152#0" expanded="false" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -1788,10 +1494,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="229">
           <caret line="779" column="22" lean-forward="false" selection-start-line="779" selection-start-column="21" selection-end-line="779" selection-end-column="22" />
-          <folding>
-            <element signature="e#9370#19881#0" expanded="true" />
-            <element signature="e#12982#15203#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1805,23 +1507,35 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/stock/sina_Monitor-Market-LH.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="699">
-          <caret line="162" column="63" lean-forward="false" selection-start-line="162" selection-start-column="63" selection-end-line="162" selection-end-column="63" />
+        <state relative-caret-position="2156">
+          <caret line="162" column="17" lean-forward="false" selection-start-line="162" selection-start-column="17" selection-end-line="162" selection-end-column="17" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/stock/JSONData/tdx_data_Day.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="361">
-          <caret line="1836" column="64" lean-forward="true" selection-start-line="1836" selection-start-column="64" selection-end-line="1836" selection-end-column="64" />
+        <state relative-caret-position="295">
+          <caret line="1833" column="35" lean-forward="false" selection-start-line="1833" selection-start-column="35" selection-end-line="1833" selection-end-column="35" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/stock/dataBarFeed/powerTech.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1784">
+          <caret line="712" column="51" lean-forward="false" selection-start-line="712" selection-start-column="51" selection-end-line="712" selection-end-column="51" />
           <folding>
-            <element signature="e#46313#48560#0" expanded="true" />
-            <element signature="e#48653#49940#0" expanded="true" />
-            <element signature="e#50016#52256#0" expanded="true" />
-            <element signature="e#52414#55602#0" expanded="true" />
-            <element signature="e#55691#58345#0" expanded="true" />
+            <element signature="e#26#36#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/stock/sina_Market-DurationCXDN.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="704">
+          <caret line="86" column="27" lean-forward="true" selection-start-line="86" selection-start-column="27" selection-end-line="86" selection-end-column="27" />
+          <folding />
         </state>
       </provider>
     </entry>

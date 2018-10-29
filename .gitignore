@@ -106,8 +106,20 @@ $RECYCLE.BIN/
 *.msp
 
 # Windows shortcuts
+#20181029-vscode-add
 *.lnk
-
+*.pyc
+*~
+# .ropeproject
+.hg
+.svn
+_svn
+.git
 .idea/workspace.xml
-
 xuefu/
+all300.h5
+all300.h5
+all300.h5
+sina_MultiIndex_data.h5
+tdx_all_df_300.h5
+jupyterAlgo/
