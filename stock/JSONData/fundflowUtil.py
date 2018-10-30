@@ -260,8 +260,10 @@ def get_dfcfw_rzrq_SHSZ(url=ct.DFCFW_RZYE):
     data = {}
     log.info("%s"%(ct.DFCFW_RZYE))
     rzdata = cct.get_url_data(url)
+    # import pdb;pdb.set_trace()
+    rzdata = rzdata.replace(':"-"',':"0.0"')
     rz_dic = re.findall('{"tdate"[\D\d]+?}', rzdata.encode('utf8'))
-    rzdict=[eval(x) for x in rz_dic]
+    rzdict=[eval(x) for x in rz_dic ]
     df=pd.DataFrame(rzdict,columns=ct.dfcfw_rzye_columns)
     df.tdate = df.tdate.apply(lambda x:x[:10])
     df = df.set_index('tdate')
