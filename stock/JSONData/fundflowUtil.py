@@ -261,7 +261,7 @@ def get_dfcfw_rzrq_SHSZ(url=ct.DFCFW_RZYE):
     log.info("%s"%(ct.DFCFW_RZYE))
     rzdata = cct.get_url_data(url)
     # import pdb;pdb.set_trace()
-    rzdata = rzdata.replace(':"-"',':"0.0"')
+    rzdata = rzdata.replace(':"-"',':0.1')
     rz_dic = re.findall('{"tdate"[\D\d]+?}', rzdata.encode('utf8'))
     rzdict=[eval(x) for x in rz_dic ]
     df=pd.DataFrame(rzdict,columns=ct.dfcfw_rzye_columns)
