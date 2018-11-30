@@ -195,13 +195,13 @@ def get_sina_Market_json(market='all', showtime=True, num='100', retry_count=3, 
         url_list=[]
         # for m in ct.SINA_Market_KEY.values():
         for m in ['sh_a','sz_a']:
-            list=_get_sina_Market_url(m, num=num)
-            for l in list:url_list.append(l)
+            mlist=_get_sina_Market_url(m, num=num)
+            for l in mlist:url_list.append(l)
         # print url_list
     else:
         url_list=_get_sina_Market_url(ct.SINA_Market_KEY[market], num=num)
         # print url_list
-    log.debug("Market_jsonURL: %s" % url_list[0])
+    # log.debug("Market_jsonURL: %s" % url_list[0])
     # print url_list
     # print "url:",url_list
     df = pd.DataFrame()
@@ -209,7 +209,10 @@ def get_sina_Market_json(market='all', showtime=True, num='100', retry_count=3, 
     # df = df.append(data, ignore_index=True)
 
     # results = cct.to_mp_run(_parsing_Market_price_json, url_list)
-    results = cct.to_asyncio_run(url_list, _parsing_Market_price_json)
+    if len(url_list) > 0:
+        results = cct.to_asyncio_run(url_list, _parsing_Market_price_json)
+    else:
+        results = []
     if len(results)>0:
         df = df.append(results, ignore_index=True)
         # df['volume']= df['volume'].apply(lambda x:x/100)

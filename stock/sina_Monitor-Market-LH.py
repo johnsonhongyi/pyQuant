@@ -144,9 +144,9 @@ if __name__ == "__main__":
                 st_key_sort = '%s %s'%(st_key_sort.split()[0],cct.get_index_fibl())
                 
             # top_now = tdd.getSinaAlldf(market='次新股',filename='cxg', vol=ct.json_countVol, vtype=ct.json_countType)
-            # top_now = tdd.getSinaAlldf(market='cyb', filename=None, vol=ct.json_countVol, vtype=ct.json_countType,trend=True)
+            top_now = tdd.getSinaAlldf(market='cyb', filename=None, vol=ct.json_countVol, vtype=ct.json_countType,trend=True)
             # top_now = tdd.getSinaAlldf(market='次新股,cyb', filename='cxg', vol=ct.json_countVol, vtype=ct.json_countType,trend=False)
-            top_now = tdd.getSinaAlldf(market='次新股,060', filename='cxg', vol=ct.json_countVol, vtype=ct.json_countType,trend=False)
+            # top_now = tdd.getSinaAlldf(market='次新股,060', filename='cxg', vol=ct.json_countVol, vtype=ct.json_countType,trend=False)
             # top_now = tdd.getSinaAlldf(market='次新股,zxb',filename='cxg', vol=ct.json_countVol, vtype=ct.json_countType)
             
             # print top_now.loc['300208','name']
