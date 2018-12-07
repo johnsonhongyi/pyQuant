@@ -102,7 +102,8 @@ if __name__ == "__main__":
             # df = rl.get_sina_Market_json('all')
             # top_now = rl.get_market_price_sina_dd_realTime(df, vol, type)
             time_Rt = time.time()
-            top_now = tdd.getSinaAlldf(market='cyb', vol=ct.json_countVol, vtype=ct.json_countType)
+            market_blk = 'cyb'
+            top_now = tdd.getSinaAlldf(market=market_blk, vol=ct.json_countVol, vtype=ct.json_countType)
             # print top_now.loc['601900',:]
             df_count = len(top_now)
             now_count = len(top_now)
@@ -232,7 +233,7 @@ if __name__ == "__main__":
                 goldstock = len(top_dif[(top_dif.buy >= top_dif.lhigh * 0.99) & (top_dif.buy >= top_dif.llastp * 0.99)])
 
                 cct.set_console(width, height,
-                                title=['dT:%s' % cct.get_time_to_date(time_s), 'G:%s' % len(top_dif), 'zxg: %s' % (blkname)])
+                                title=['dT:%s' % cct.get_time_to_date(time_s), 'G:%s' % len(top_dif), 'zxg: %s' % (blkname+'-'+market_blk)])
 
                 top_all = tdd.get_powerdf_to_all(top_all, top_temp)
                 top_temp = stf.getBollFilter(df=top_temp, boll=ct.bollFilter, duration=ct.PowerCountdl)

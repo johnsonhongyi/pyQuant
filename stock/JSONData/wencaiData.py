@@ -591,6 +591,7 @@ def get_write_wencai_market_to_csv(df=None, market='wcbk', renew=False, days=60)
 
 def get_wcbk_df(filter='混改', market='nybk', perpage=1000, days=120, monitor=False):
     fpath = get_wencai_filepath(market)
+    # import pdb; pdb.set_trace()
     if os.path.exists(fpath) and os.path.getsize(fpath) > 200 and 0 <= cct.creation_date_duration(fpath) <= days:
         df = get_write_wencai_market_to_csv(
             None, market, renew=True, days=days)
@@ -630,9 +631,9 @@ if __name__ == '__main__':
 
     # df = get_wencai_Market_url('赢时胜,博腾股份,炬华科技',500,single=True)
 
-    df = get_wcbk_df(filter='城建+一带一路', market='ydyl')
+    # df = get_wcbk_df(filter='城建+一带一路', market='ydyl')
     # df =  get_wcbk_df(filter='新股与次新股',market='cxg')
-    # df =  get_wcbk_df(filter='雄安特区',market='xatq')
+    df =  get_wcbk_df(filter='雄安特区',market='xatq')
     # df =  get_wcbk_df(filter='新能源',market='xny')
     # df =  get_wcbk_df(filter='全部股票概念',market='wencai',perpage=4000)
 

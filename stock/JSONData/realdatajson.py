@@ -109,7 +109,7 @@ def _get_sina_Market_url(market='sh_a', count=None, num='1000'):
     if count == None:
         url = ct.JSON_Market_Center_CountURL % (market)
         # print url
-        data = cct.get_url_data(url)
+        data = cct.get_url_data(url,timeout=10)
         # print data
         count = re.findall('(\d+)', data, re.S)
         urllist = []

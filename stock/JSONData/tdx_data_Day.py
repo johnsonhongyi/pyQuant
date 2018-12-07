@@ -1934,7 +1934,6 @@ def getSinaAlldf(market='cyb', vol=ct.json_countVol, vtype=ct.json_countType, fi
         df = sina_data.Sina().all
         market_all = True
     else:
-        
         if filename == 'cxg':
             df = wcd.get_wcbk_df(filter=market, market=filename,
                                  perpage=1000, days=8,monitor=True)

@@ -129,15 +129,16 @@ if __name__ == "__main__":
         try:
             # df = sina_data.Sina().all
             # top_now = tdd.getSinaAlldf(market='cx', vol=ct.json_countVol, vtype=ct.json_countType)
-            # top_now = tdd.getSinaAlldf(market='´ÎÐÂ¹É',filename='cxg', vol=ct.json_countVol, vtype=ct.json_countType)
+            # top_now = tdd.getSinaAlldf(market='æ¬¡æ–°è‚¡',filename='cxg', vol=ct.json_countVol, vtype=ct.json_countType)
             if st is None:
                 st_key_sort = '%s %s'%(st_key_sort.split()[0],cct.get_index_fibl())
                 
             time_Rt = time.time()
-            top_now = tdd.getSinaAlldf(market='ÐÛ°²ÌØÇø', filename='xatq', vol=ct.json_countVol, vtype=ct.json_countType)
-            # top_now = tdd.getSinaAlldf(market=u'ÐÂ¹ÉÓë´ÎÐÂ¹É',filename='cxg', vol=ct.json_countVol, vtype=ct.json_countType)
+            market_blk = 'é›„å®‰ç‰¹åŒº'
+            top_now = tdd.getSinaAlldf(market=market_blk, filename='xatq', vol=ct.json_countVol, vtype=ct.json_countType)
+            # top_now = tdd.getSinaAlldf(market=u'æ¬¡æ–°è‚¡',filename='cxg', vol=ct.json_countVol, vtype=ct.json_countType)
 
-            # top_now = tdd.getSinaAlldf(market='»ì¸Ä', filename='mnbk',vol=ct.json_countVol, vtype=ct.json_countType)
+            # top_now = tdd.getSinaAlldf(market='ï¿½ï¿½ï¿½', filename='mnbk',vol=ct.json_countVol, vtype=ct.json_countType)
 
             # top_dif = top_now
             # top_now.to_hdf("testhdf5", 'marketDD', format='table', complevel=9)
@@ -215,7 +216,7 @@ if __name__ == "__main__":
                     top_dif['buy'] = (
                         map(lambda x, y: y if int(x) == 0 else x, top_dif['buy'].values, top_dif['trade'].values))
 
-                # ÅÐ¶ÏÖ÷Éý
+                # ï¿½Ð¶ï¿½ï¿½ï¿½ï¿½ï¿½
                 # log.debug('top_dif:%s'%(len(top_dif)))
                 if ct.checkfilter and cct.get_now_time_int() > 915 and cct.get_now_time_int() < ct.checkfilter_end_timeDu:
                     top_dif = top_dif[top_dif.low > top_dif.llow * ct.changeRatio]
@@ -321,7 +322,7 @@ if __name__ == "__main__":
 
                     cct.set_console(width, height,
                                     title=[du_date, 'dT:%s' % cct.get_time_to_date(time_s), 'G:%s' % goldstock,
-                                           'zxg: %s' % (blkname)])
+                                           'zxg: %s' % (blkname+'-'+market_blk)])
 
                     top_all = tdd.get_powerdf_to_all(top_all, top_temp)
                     top_all = tdd.get_powerdf_to_all(top_all, top_end)
@@ -486,8 +487,8 @@ if __name__ == "__main__":
             cct.sleeprandom(ct.duration_sleep_time / 2)
 
 '''
-{symbol:"sz000001",code:"000001",name:"Æ½°²ÒøÐÐ",trade:"0.00",pricechange:"0.000",changepercent:"0.000",buy:"12.36",sell:"12.36",settlement:"12.34",open:"0.00",high:"0.00",low:"0",volume:0,amount:0,ticktime:"09:17:55",per:7.133,pb:1.124,mktcap:17656906.355526,nmc:14566203.350486,turnoverratio:0},
-{symbol:"sz000002",code:"000002",name:"Íò  ¿Æ£Á",trade:"0.00",pricechange:"0.000",changepercent:"0.000",buy:"0.00",sell:"0.00",settlement:"24.43",open:"0.00",high:"0.00",low:"0",volume:0,amount:0,ticktime:"09:17:55",per:17.084,pb:3.035,mktcap:26996432.575,nmc:23746405.928119,turnoverratio:0},
+{symbol:"sz000001",code:"000001",name:"Æ½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½",trade:"0.00",pricechange:"0.000",changepercent:"0.000",buy:"12.36",sell:"12.36",settlement:"12.34",open:"0.00",high:"0.00",low:"0",volume:0,amount:0,ticktime:"09:17:55",per:7.133,pb:1.124,mktcap:17656906.355526,nmc:14566203.350486,turnoverratio:0},
+{symbol:"sz000002",code:"000002",name:"ï¿½ï¿½  ï¿½Æ£ï¿½",trade:"0.00",pricechange:"0.000",changepercent:"0.000",buy:"0.00",sell:"0.00",settlement:"24.43",open:"0.00",high:"0.00",low:"0",volume:0,amount:0,ticktime:"09:17:55",per:17.084,pb:3.035,mktcap:26996432.575,nmc:23746405.928119,turnoverratio:0},
 
 python -m cProfile -s cumulative timing_functions.py
 http://www.jb51.net/article/63244.htm

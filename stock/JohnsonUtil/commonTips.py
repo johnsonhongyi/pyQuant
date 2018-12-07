@@ -1018,7 +1018,7 @@ def get_work_time_ratio():
 
 global ReqErrorCount
 ReqErrorCount = 1
-def get_url_data_R(url, timeout=5):
+def get_url_data_R(url, timeout=6):
     # headers = {'User-Agent':'Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.6) Gecko/20091201 Firefox/3.5.6'}
     headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.2; rv:16.0) Gecko/20100101 Firefox/16.0',
                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
@@ -1046,7 +1046,7 @@ def get_url_data_R(url, timeout=5):
     return data
 
 
-def get_url_data(url, retry_count=3, pause=0.05, timeout=5, headers=None):
+def get_url_data(url, retry_count=3, pause=0.05, timeout=6, headers=None):
     #    headers = {'User-Agent':'Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.6) Gecko/20091201 Firefox/3.5.6'}
     if headers is None:
         headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.2; rv:16.0) Gecko/20100101 Firefox/16.0',

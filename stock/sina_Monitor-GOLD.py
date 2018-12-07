@@ -154,7 +154,8 @@ if __name__ == "__main__":
     while 1:
         try:
             time_Rt = time.time()
-            top_now = tdd.getSinaAlldf(market='captops', vol=ct.json_countVol, vtype=ct.json_countType)
+            market_blk = 'captops'
+            top_now = tdd.getSinaAlldf(market=market_blk, vol=ct.json_countVol, vtype=ct.json_countType)
             # print top_now
             # print top_now.columns
             time_d = time.time()
@@ -247,7 +248,7 @@ if __name__ == "__main__":
                 # print "G:%s Rt:%0.1f dT:%s N:%s" % (len(top_all),float(time.time() -
                 # time_Rt),cct.get_time_to_date(time_s),cct.get_now_time())
                 cct.set_console(width, height,
-                                title=['dT:%s' % cct.get_time_to_date(time_s), 'G:%s' % len(top_all), 'zxg: %s' % (blkname)])
+                                title=['dT:%s' % cct.get_time_to_date(time_s), 'G:%s' % len(top_all), 'zxg: %s' % (blkname+'-'+market_blk)])
 
                 top_all = tdd.get_powerdf_to_all(top_all, top_temp)
                 top_temp = stf.getBollFilter(df=top_temp, boll=1)
