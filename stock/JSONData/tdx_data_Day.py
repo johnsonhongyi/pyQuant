@@ -1733,6 +1733,7 @@ def Write_market_all_day_mp(market='all', rewrite=False):
     for mk in mlist:
         time_t = time.time()
         df = sina_data.Sina().market(mk)
+        # df = getSinaAlldf(market=mk,trend=False)
         # df = rl.get_sina_Market_json(mk)
         # print df.loc['600581']
 
@@ -1898,7 +1899,13 @@ def getSinaAlldf(market='cyb', vol=ct.json_countVol, vtype=ct.json_countType, fi
         market = m_mark[1]
 
     if market == 'rzrq':
+
         df = cct.get_rzrq_code()
+        code_l = cct.read_to_blocknew('068')
+        code_l.extend(df.code.tolist())
+        code_l = list(set(code_l))
+        df = sina_data.Sina().get_stock_list_data(code_l)
+
     elif market == 'cx':
         df = cct.get_rzrq_code(market)
     elif market == 'zxb':

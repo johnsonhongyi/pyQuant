@@ -1496,7 +1496,7 @@ def get_config_value_wencai(fname, classtype, currvalue=0, xtype='limit', update
         config.write()
     return int(currvalue)
 
-def get_index_fibl():
+def get_index_fibl(default=2):
     import sys
     sys.path.append("..")
     from JSONData import powerCompute as pct
@@ -1505,7 +1505,7 @@ def get_index_fibl():
     if len(df) >0 and 'fibl' in df.columns:
         # fibl = int(df.fibl.max())
         fibl = int(df.cumin.max())
-        fibl = fibl if 5 > fibl > 1 else 2 
+        fibl = fibl if 5 > fibl > 1 else default 
         # fibl = fibl if 3 >= fibl >= 1 else 1 
         # return abs(fibl)
     else:
@@ -1621,7 +1621,10 @@ def write_to_blocknew(p_name, data, append=True, doubleFile=True, keep_last=None
         fout.close()
         # if p_name.find('066.blk') >= 0:
         if counts == 0:
-            log.error("data is None:%s"%(p_name))
+            if len(data) == 0:
+                log.error("counts and data is None:%s"%(p_name))
+            else:
+                print ("counts:0 data:%s :%s"%(len(data),p_name))
         else:
             print "all write to %s:%s" % (p_name, counts)
 

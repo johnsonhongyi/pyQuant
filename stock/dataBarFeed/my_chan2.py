@@ -136,7 +136,7 @@ def parse2ChanKTMP(k_data, k_values, in_chan=False,chan_kdf=True):
         if in_chan:
             dfbao.set_value(dt, ['enddate'], 0)
     dfbao = dfbao[dfbao['enddate'] != 0]
-    print "t:%s"%(time.time()-time_s)
+    log.info("t:%s"%(time.time()-time_s))
     return dfbao
 # 处理k线成缠论k线
 

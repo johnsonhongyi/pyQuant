@@ -132,12 +132,12 @@ if __name__ == "__main__":
             # df = sina_data.Sina().all
             time_Rt = time.time()
             if st is None:
-                st_key_sort = '%s %s'%(st_key_sort.split()[0],cct.get_index_fibl())
+                st_key_sort = '%s %s'%(st_key_sort.split()[0],cct.get_index_fibl(default=1))
                 
             # top_now = tdd.getSinaAlldf(market='060', vol=ct.json_countVol, vtype=ct.json_countType)
             # top_now = tdd.getSinaAlldf(market='次新股',filename='cxg', vol=ct.json_countVol, vtype=ct.json_countType)
             # market_blk = 'rzrq'
-            market_blk = '060'
+            market_blk = '068'
             # top_now = tdd.getSinaAlldf(market= market_blk , vol=ct.json_countVol, vtype=ct.json_countType,trend=True)
             # top_now = tdd.getSinaAlldf(market='次新股,060', filename='cxg' , vol=ct.json_countVol, vtype=ct.json_countType,trend=True)
             top_now = tdd.getSinaAlldf(market=market_blk, vol=ct.json_countVol, vtype=ct.json_countType,trend=True)

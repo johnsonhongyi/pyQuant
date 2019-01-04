@@ -117,7 +117,7 @@ Duration_sort_per_ratio_key = [0, 1, 0, 1, 1, 0, 0, 1, 1]
 
 # Duration_sort_perd = ['per%sd', 'dff', 'perc%sd', 'percent', 'b1_v', 'ratio', 'op',
 # Duration_sort_perd = ['per%sd', 'dff', 'perc%sd', 'percent', 'b1_v', 'ratio', 'op',
-Duration_sort_perd = ['per%sd', 'percent', 'b1_v', 'perc%sd', 'dff', 'ratio', 'op',
+Duration_sort_perd = ['per%sd','df2',  'percent', 'perc%sd', 'dff', 'ratio', 'op',
                       'fib', 'fibl', 'ra', 'volume', 'couts']
 Duration_sort_perd_key = [0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 1, 1]
 

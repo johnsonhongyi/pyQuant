@@ -576,6 +576,9 @@ if __name__ == '__main__':
     fibl = fibonacciCount(['999999', '399001', '399006'], dl=dl)
     percentDuration = 2
     cct.get_terminal_Position(position=sys.argv[0])
+    from JSONData import stockFilter as stf
+    blkname = '068.blk'
+    block_path = tdd.get_tdx_dir_blocknew() + blkname
     while 1:
         try:
             if not status:
@@ -657,17 +660,14 @@ if __name__ == '__main__':
                             print "write dm to file"
                             if cct.get_work_day_status():
                                 tdd.Write_market_all_day_mp('all')
-                            break
-                # else:
-                #     dd = tdd.get_tdx_Exp_day_to_df('999999', type='f', dl=1)
-                #     if dd.date.values
-	                from JSONData import stockFilter as stf
-	                blkname = '060.blk'
-	                block_path = tdd.get_tdx_dir_blocknew() + blkname
-	                top_temp = cct.GlobalValues().getkey('top_max')
 
-	                codew = stf.WriteCountFilter(top_temp, writecount='all')
-	                cct.write_to_blocknew(block_path,codew,doubleFile=False)
+                                top_temp = cct.GlobalValues().getkey('top_max')
+                                codew = stf.WriteCountFilter(top_temp, writecount='all')
+                                cct.write_to_blocknew(block_path,codew,doubleFile=False)
+                            break
+
+
+
 	                
                 raise KeyboardInterrupt("Stop Time")
                 # st = cct.cct_raw_input("status:[go(g),clear(c),quit(q,e)]:")
@@ -700,9 +700,6 @@ if __name__ == '__main__':
 
             elif st.startswith('w') or st.startswith('a'):
                 args = cct.writeArgmain().parse_args(st.split())
-                from JSONData import stockFilter as stf
-                blkname = '060.blk'
-                block_path = tdd.get_tdx_dir_blocknew() + blkname
                 top_temp = cct.GlobalValues().getkey('top_max')
                 codew = stf.WriteCountFilter(
                     top_temp, writecount=args.dl)
