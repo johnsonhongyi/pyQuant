@@ -513,7 +513,7 @@ def WriteCountFilter(df, op='op', writecount=ct.writeCount, end=None, duration=1
     codel = []
     if str(writecount) <> 'all':
         if end is None and int(writecount) > 0:
-            if int(writecount) < 100 and len(df) > 0 and 'percent' in df.columns:
+            if int(writecount) < 101 and len(df) > 0 and 'percent' in df.columns:
                 codel = df.index[:int(writecount)].tolist()
                 # dd=df[df.percent == 10]
                 # df_list=dd.index.tolist()

@@ -237,7 +237,7 @@ end tell
 
 terminal_positionKey = {'sina_Market-DurationDn.py': '654, 680',
                         'sina_Market-DurationCXDN.py': '-16, 54',
-                        'sina_Market-DurationSH.py': '-28, 563',
+                        'sina_Market-DurationSH.py': '-29, 623',
                         'sina_Market-DurationUp.py': '-22, 89',
                         'sina_Monitor-Market-LH.py': '666, 338',
                         'sina_Monitor-Market.py': '19, 179',
@@ -247,7 +247,7 @@ terminal_positionKey = {'sina_Market-DurationDn.py': '654, 680',
 
 terminal_positionKeyMac = {'sina_Market-DurationDn.py': '216, 490',
                         'sina_Market-DurationCXDN.py': '-16, 54',
-                        'sina_Market-DurationSH.py': '-28, 563',
+                        'sina_Market-DurationSH.py': '-29, 623',
                         'sina_Market-DurationUp.py': '-22, 89',
                         'sina_Monitor-Market-LH.py': '184, 239',
                         'sina_Monitor-Market.py': '19, 179',

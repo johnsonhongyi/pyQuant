@@ -136,8 +136,11 @@ if __name__ == "__main__":
                 
             # top_now = tdd.getSinaAlldf(market='060', vol=ct.json_countVol, vtype=ct.json_countType)
             # top_now = tdd.getSinaAlldf(market='次新股',filename='cxg', vol=ct.json_countVol, vtype=ct.json_countType)
-            market_blk = 'rzrq'
-            top_now = tdd.getSinaAlldf(market= market_blk , vol=ct.json_countVol, vtype=ct.json_countType,trend=True)
+            # market_blk = 'rzrq'
+            market_blk = '060'
+            # top_now = tdd.getSinaAlldf(market= market_blk , vol=ct.json_countVol, vtype=ct.json_countType,trend=True)
+            # top_now = tdd.getSinaAlldf(market='次新股,060', filename='cxg' , vol=ct.json_countVol, vtype=ct.json_countType,trend=True)
+            top_now = tdd.getSinaAlldf(market=market_blk, vol=ct.json_countVol, vtype=ct.json_countType,trend=True)
             # top_now = tdd.getSinaAlldf(market='all', vol=ct.json_countVol, vtype=ct.json_countType)
 
             # top_dif = top_now

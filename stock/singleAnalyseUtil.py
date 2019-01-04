@@ -416,19 +416,20 @@ def get_hot_countNew(changepercent, rzrq, fibl=None, fibc=10):
     if 'max5' in df.columns: 
         top_Max = (df[(df.close >= df.hmax) & (df.close >= df.max5)])
 
-        top_Max = len(top_Max)
         # top_low = len(df[df.low < df.min5])
-        top_min = len(df[(df.close <= df.lmin) & (df.close <= df.min5)])
+        top_min = (df[(df.close <= df.lmin) & (df.close <= df.min5)])
+        cct.GlobalValues().setkey('top_max',top_Max)
+        cct.GlobalValues().setkey('top_min',top_min)
 
     else:
-        top_Max = 0
+        top_Max = []
         top_low = 0
-        top_min = 0
+        top_min = []
 
-    topTen = str(len(topTen)) +'('+str(len(top_Ten_Dropcxg))+')' +'(H:'+str(top_Max)+')'
+    topTen = str(len(topTen)) +'('+str(len(top_Ten_Dropcxg))+')' +'(H:'+str(len(top_Max))+')'
     # print "top_Ten_Dropcxg:%s",top_Ten_Dropcxg
     crashTen = df[df['percent'] < -9.8]
-    crashTen = str(len(crashTen)) +'(L:'+str(top_min)+')'
+    crashTen = str(len(crashTen)) +'(L:'+str(len(top_min))+')'
 
     crash = df[df['percent'] < -changepercent]
     print(
@@ -660,6 +661,14 @@ if __name__ == '__main__':
                 # else:
                 #     dd = tdd.get_tdx_Exp_day_to_df('999999', type='f', dl=1)
                 #     if dd.date.values
+	                from JSONData import stockFilter as stf
+	                blkname = '060.blk'
+	                block_path = tdd.get_tdx_dir_blocknew() + blkname
+	                top_temp = cct.GlobalValues().getkey('top_max')
+
+	                codew = stf.WriteCountFilter(top_temp, writecount='all')
+	                cct.write_to_blocknew(block_path,codew,doubleFile=False)
+	                
                 raise KeyboardInterrupt("Stop Time")
                 # st = cct.cct_raw_input("status:[go(g),clear(c),quit(q,e)]:")
                 # if len(st) == 0:
@@ -688,6 +697,24 @@ if __name__ == '__main__':
                 num_input = ''
                 ave = None
                 code = ''
+
+            elif st.startswith('w') or st.startswith('a'):
+                args = cct.writeArgmain().parse_args(st.split())
+                from JSONData import stockFilter as stf
+                blkname = '060.blk'
+                block_path = tdd.get_tdx_dir_blocknew() + blkname
+                top_temp = cct.GlobalValues().getkey('top_max')
+                codew = stf.WriteCountFilter(
+                    top_temp, writecount=args.dl)
+                if args.code == 'a':
+                    cct.write_to_blocknew(block_path,codew,doubleFile=False)
+                    # sl.write_to_blocknew(all_diffpath, codew)
+                else:
+                    cct.write_to_blocknew(block_path,codew, False,doubleFile=False)
+                    # sl.write_to_blocknew(all_diffpath, codew, False)
+                print ("wri ok:%s" % block_path)
+
+
             elif len(st) == 6:
                 status = True
                 num_input = st
