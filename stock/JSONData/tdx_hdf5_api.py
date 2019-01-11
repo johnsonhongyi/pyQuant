@@ -699,9 +699,30 @@ def load_hdf_db(fname, table='all', code_l=None, timelimit=True, index=False, li
         # h5 = get_hdf5_file(fname,wr_mode='r')
         if table is not None:
             with SafeHDFStore(fname) as store:
+                # if store is not None:
+                #     if '/' + table in store.keys():
+                #         try:
+                #             dd=store[table]
+                #         except Exception as e:
+                #             print ("%s fname:%s"%(e,fname))
+                #             cct.sleep(ct.sleep_time)     
                 if store is not None:
-                    if '/' + table in store.keys():
-                        dd=store[table]
+                    try:
+                        if '/' + table in store.keys():
+                            dd=store[table]
+                    except AttributeError, e:
+                        store.close()
+                        os.remove(store.filename)
+                        log.error("AttributeError:%s %s"%(fname,e))
+                        log.error("Remove File:%s"%(fname))
+                    except Exception, e:
+                        log.error("Exception:%s %s"%(fname,e))
+                        print "Exception:%s name:%s"%(fname,e)
+                    else:
+                        pass
+                    finally:
+                        pass   
+                                        
             if dd is not None and len(dd) > 0:
                 if timelimit:
                     if dd is not None and len(dd) > 0:

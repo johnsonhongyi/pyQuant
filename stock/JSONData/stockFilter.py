@@ -77,13 +77,14 @@ def getBollFilter(df=None, boll=ct.bollFilter, duration=ct.PowerCountdl, filter=
             # df = df.drop(drop_t,axis=0)top
             # log.error("stf drop_cxg:%s"%(len(drop_t)))
     time_s = time.time()
-    if filter:
-        if 'boll' in df.columns:
-            df = df[(df.boll >= boll)]
 
     df['upper'] = map(lambda x: round((1 + 11.0 / 100) * x, 1), df.ma10d)
     df['lower'] = map(lambda x: round((1 - 9.0 / 100) * x, 1), df.ma10d)
     df['ene'] = map(lambda x, y: round((x + y) / 2, 1), df.upper, df.lower)
+    
+    if filter:
+        if 'boll' in df.columns:
+            df = df[(df.boll >= boll) | (df.buy > df.upper)]
 
     if cct.get_work_time() and 'df2' in df.columns:
         if 915 < cct.get_now_time_int() < 930:
