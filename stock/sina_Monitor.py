@@ -268,6 +268,9 @@ if __name__ == "__main__":
                 ct_MonitorMarket_Values = ct.get_Duration_format_Values(ct_MonitorMarket_Values,replace='b1_v',dest='volume')
                 ct_MonitorMarket_Values2 = ct.get_Duration_format_Values(ct_MonitorMarket_Values2,replace='b1_v',dest='volume')
 
+                if st_key_sort == '1' or st_key_sort == '7':
+                    top_temp = top_temp[top_temp.per1d < 8]
+
                 top_dd =  cct.combine_dataFrame(top_temp.loc[:, ct_MonitorMarket_Values][:10], top_temp2.loc[:, ct_MonitorMarket_Values2][:5],append=True, clean=True)
                 # print cct.format_for_print(top_dd)
 

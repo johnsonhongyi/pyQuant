@@ -351,7 +351,8 @@ if __name__ == "__main__":
                     # top_all = tdd.get_powerdf_to_all(top_all, top_temp)
                     top_all = tdd.get_powerdf_to_all(top_all, top_end)
                     top_temp = stf.getBollFilter(
-                        df=top_temp, boll=11, duration=ct.PowerCountdl, upper=False, resample=resample)
+                        df=top_temp, boll=ct.bollFilter, duration=ct.PowerCountdl, upper=False, resample=resample)
+                        # df=top_temp, boll=11, duration=ct.PowerCountdl, upper=False, resample=resample)
                         # df=top_temp, boll=ct.bollFilter, duration=ct.PowerCountdl, upper=False, resample=resample)
                     print("N:%s K:%s %s G:%s" % (
                         now_count, len(top_all[top_all['buy'] > 0]),

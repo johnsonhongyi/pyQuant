@@ -265,7 +265,7 @@ if __name__ == "__main__":
                     # top_temp = stf.getBollFilter(df=top_temp, boll=ct.bollFilter,duration=ct.PowerCountdl)
                     # top_temp = stf.getBollFilter(df=top_temp, boll=-10, duration=ct.PowerCountdl,resample=resample)
                     top_temp = stf.getBollFilter(  df=top_temp, boll=ct.bollFilter, duration=ct.PowerCountdl, filter=False, ma5d=False, dl=14, percent=False, resample='d', ene=True)
-                    # top_end = stf.getBollFilter(  df=top_end, down=True)
+                    top_end = stf.getBollFilter(  df=top_end, down=True)
                     print("A:%s N:%s K:%s %s G:%s" % (
                         df_count, now_count, len(top_all[top_all['buy'] > 0]),
                         len(top_now[top_now['volume'] <= 0]), goldstock)),

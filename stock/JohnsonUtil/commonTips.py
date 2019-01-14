@@ -16,7 +16,7 @@ import trollius as asyncio
 from trollius.coroutines import From
 
 import LoggerFactory
-from prettytable import *
+from prettytable import PrettyTable
 
 import johnson_cons as ct
 import socket
@@ -1496,7 +1496,7 @@ def get_config_value_wencai(fname, classtype, currvalue=0, xtype='limit', update
         config.write()
     return int(currvalue)
 
-def get_index_fibl(default=2):
+def get_index_fibl(default=1):
     import sys
     sys.path.append("..")
     from JSONData import powerCompute as pct
@@ -1505,7 +1505,7 @@ def get_index_fibl(default=2):
     if len(df) >0 and 'fibl' in df.columns:
         # fibl = int(df.fibl.max())
         fibl = int(df.cumin.max())
-        fibl = fibl if 5 > fibl > 1 else default 
+        fibl = fibl if 4 > fibl > 1 else default 
         # fibl = fibl if 3 >= fibl >= 1 else 1 
         # return abs(fibl)
     else:

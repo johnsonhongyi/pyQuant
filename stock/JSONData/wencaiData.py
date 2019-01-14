@@ -192,7 +192,8 @@ def get_wencai_Market_url(filter='国企改革', perpage=1, url=None, pct=False,
         log.info("duratime:%s", duratime)
         duratime = cct.get_config_value_wencai(
             config_ini, fname, currvalue=time.time(), xtype='time', update=True)
-        wencairoot = 'http://www.iwencai.com/stockpick/search?typed=0&preParams=&ts=1&f=1&qs=result_original&selfsectsn=&querytype=&searchfilter=&tid=stockpick&w=%s'
+        # wencairoot = 'http://www.iwencai.com/stockpick/search?typed=0&preParams=&ts=1&f=1&qs=result_original&selfsectsn=&querytype=&searchfilter=&tid=stockpick&w=%s'
+        wencairoot = 'http://www.iwencai.com/stockpick/search?typed=1&preParams=&ts=1&f=1&qs=result_rewrite&selfsectsn=&querytype=stock&searchfilter=&tid=stockpick&w=%s'
         url = wencairoot % (filter)
         log.debug("url:%s" % (url))
         # url = ct.get_url_data_R % (market)
@@ -405,6 +406,7 @@ def get_wencai_Market_url(filter='国企改革', perpage=1, url=None, pct=False,
             # print type(count[0])
             # print type(list(count[0]))
             # print count[0].decode('unicode-escape')
+
             if len(df) == 0:
                 log.error('df is None:%s' % (url))
         else:
@@ -445,6 +447,7 @@ def get_wencai_data(dm, market='wencai', days=120, pct=True):
     global wencai_count
     global pct_status
     pct_status = pct
+
     if len(dm) > 1:
         # code_l = []
         # wcd_o = get_write_wencai_market_to_csv(market=market)
@@ -463,13 +466,15 @@ def get_wencai_data(dm, market='wencai', days=120, pct=True):
             #            if  len(dm) - len(set(dm.index) & set(df.index.values)) < 10 :
             # drop_cxg = cct.GlobalValues().getkey('dropcxg')
             wencai_drop = cct.GlobalValues().getkey('wencai_drop')
-            if wencai_drop is not None and len(wencai_drop) > 1:
+
+            if wencai_drop is not None and len(wencai_drop) > 3:
                 return_status = True
             else:
                 return_status = False
 
             dratio = cct.get_diff_dratio(df.index, dm.index)
-            if return_status or dratio < 0.1:
+            # if return_status or dratio < 0.01:
+            if return_status:
                 if 'code' in df.columns:
                     df = df.set_index('code')
                     df = df.drop_duplicates()
@@ -525,6 +530,7 @@ def get_write_wencai_market_to_csv(df=None, market='wcbk', renew=False, days=60)
             # category = category[:15] if len(category) > 15 else category
             if 'category' in df.columns:
                 df = df.fillna('--')
+                df = df[~(df.category == '--')]
                 # df['category'] = (map(lambda x: ';'.join(str(x).split(';')[:3]),df['category']))
         if df is not None and len(df) > 0 and 'code' in df.columns:
             df.drop_duplicates('code', inplace=True)
@@ -546,10 +552,20 @@ def get_write_wencai_market_to_csv(df=None, market='wcbk', renew=False, days=60)
 
     filepath = get_wencai_filepath(market)
     if os.path.exists(filepath):
+
         if isinstance(df, pd.DataFrame) and renew and cct.creation_date_duration(filepath) > days:
             df = wencaiwrite_to_csv(df, filepath, renew)
         else:
             dfz = pd.read_csv(filepath, dtype={'code': str}, encoding='utf8')
+            # re.match('[ \u4e00 -\u9fa5]+',code)
+
+            # if 'category' in dfz.columns:
+            #     # dfz = dfz.fillna('--')
+            #     dfz['category'] = dfz['category'].apply(lambda x: x if len(str(x)) > 8 else '---')
+            #     # dfz = dfz[~(dfz.category == '--')]
+            #     dfzcount = len(dfz[~(dfz.category == '---')])
+            # else:
+            #     dfzcount = len(dfz)
             dfzcount = len(dfz)
             dfdrop = dfz.drop_duplicates()
             if dfzcount <> len(dfdrop):
@@ -592,6 +608,7 @@ def get_write_wencai_market_to_csv(df=None, market='wcbk', renew=False, days=60)
 def get_wcbk_df(filter='混改', market='nybk', perpage=1000, days=120, monitor=False):
     fpath = get_wencai_filepath(market)
     # import pdb; pdb.set_trace()
+
     if os.path.exists(fpath) and os.path.getsize(fpath) > 200 and 0 <= cct.creation_date_duration(fpath) <= days:
         df = get_write_wencai_market_to_csv(
             None, market, renew=True, days=days)
@@ -633,19 +650,23 @@ if __name__ == '__main__':
 
     # df = get_wcbk_df(filter='城建+一带一路', market='ydyl')
     # df =  get_wcbk_df(filter='新股与次新股',market='cxg')
-    df =  get_wcbk_df(filter='雄安特区',market='xatq')
+    # df =  get_wcbk_df(filter='雄安特区',market='xatq')
     # df =  get_wcbk_df(filter='新能源',market='xny')
     # df =  get_wcbk_df(filter='全部股票概念',market='wencai',perpage=4000)
 
     # get_wencai_data('沧州明珠', 'wencai',days='N')
-    print df.shape, df[:5]
+    # print df.shape, df[:5]
+    import ipdb;ipdb.set_trace()
+
     # df = get_wencai_Market_url('农业',10000)
 #    df = get_write_wencai_market_to_csv(df,'wcbk')
 
     # df = get_wcbk_df('混改')
 
 #    print write_wencai_market_to_csv(df)[:2]
-    # df = get_codelist_df(['天龙集团','太阳电缆','杭州解百'])
+    df = get_codelist_df(['贝通信','太阳电缆','杭州解百'])
+    import ipdb;ipdb.set_trace()
+
     # df = get_codelist_df([u'\u7ef4\u5b8f\u80a1\u4efd', u'\u6d77\u987a\u65b0\u6750', u'\u6da6\u6b23\u79d1\u6280', u'\u84dd\u6d77\u534e\u817e', u'\u5149\u529b\u79d1\u6280'])
     # df = df.sort_values(by='percent',ascending=[0]) if len(df) > 0 else df
     # if 'percent' in df.columns:

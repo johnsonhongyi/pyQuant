@@ -3335,7 +3335,6 @@ def get_tdx_search_day_DF(market='cyb'):
     print "t:", time.time() - time_t
     return results
 
-
 def get_tdx_stock_period_to_type(stock_data, period_day='w', periods=5, ncol=None):
     period_type = period_day
     # Ä¬ÈÏµÄindexÀàÐÍ:
