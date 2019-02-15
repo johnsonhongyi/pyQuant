@@ -985,8 +985,8 @@ def powerCompute_mp(code,df=None,dm=None,dtype='d',statuslist=True,index=False,e
     else:
         dz = tdd.get_sina_data_df(code)
 
-    if index and 'cumin' not in df.columns:
-        df['cumin'] = 0
+    # if index and 'cumin' not in df.columns:
+    #     df['cumin'] = 0
 
     global Power_CXG_Error, drop_cxg, wencai_drop
     if len(dz) > 0 and (index or dz.buy.values > 0 or dz.sell.values > 0):
@@ -1076,14 +1076,14 @@ def powerCompute_mp(code,df=None,dm=None,dtype='d',statuslist=True,index=False,e
         # rac += ra
 
         if ptype == 'low':
-            ral = ra
+            ral = round(ra,1)
             opl = op
             stl = st
             # fibl = str(daysData[0])
             fibl = int(daysData[0])
         else:
             oph = op
-            rah = ra
+            rah = round(ra,1)
             # fib = str(daysData[0])
             fib = int(daysData[0])
     # fibl = sep.join(fib)
@@ -1103,21 +1103,21 @@ def powerCompute_mp(code,df=None,dm=None,dtype='d',statuslist=True,index=False,e
             df.loc[code, 'ma10d'] = round(
                 float(tdx_df[:1].ma10d[0]), 2)
     dd['op'] = opl
-    dd['ra'] = ral
+    dd['ra'] = round(ral,1)
     dd['oph'] = oph
-    dd['rah'] = rah
+    dd['rah'] = round(rah,1)
     dd['fib'] = fib
     dd['fibl'] = fibl
     dd['ldate'] = stl
     dd['boll'] = operation
 
-    if 'cumin' in tdx_df.columns:
-        if tdx_df.cumin[-1] == 0:
-            dd['cumin'] = tdx_df.cumin[-2]
-        else:
-            dd['cumin'] = tdx_df.cumin[-1]
-    else:
-        dd['cumin'] = -1
+    # if 'cumin' in tdx_df.columns:
+    #     if tdx_df.cumin[-1] == 0:
+    #         dd['cumin'] = tdx_df.cumin[-2]
+    #     else:
+    #         dd['cumin'] = tdx_df.cumin[-1]
+    # else:
+    #     dd['cumin'] = -1
         
     tdx_df, opkdj = getab.Get_KDJ(tdx_df, dtype='d',lastday=days)
     tdx_df, opmacd = getab.Get_MACD_OP(tdx_df, dtype='d',lastday=days)
@@ -1164,7 +1164,7 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y', tal
     h5_fname = 'powerCompute'
     h5_table = dtype + '_' + str(dl) + '_' + filter + '_' + 'all'
     power_columns = ['ra', 'op', 'category', 'ma', 'rsi', 'kdj',
-                     'boll', 'rah', 'df2b','fib', 'fibl', 'macd', 'vstd', 'oph', 'lvolume']
+                     'boll', 'rah', 'df2','fib', 'fibl', 'macd', 'vstd', 'oph', 'lvolume']
     # [['ma' ,'rsi' ,'kdj' ,'boll', 'ra','rah', 'df2b' ,'fibl','fib' ,'macd' ,'oph']]
     # [['ma' ,'rsi' ,'kdj' ,'boll', 'ra',rah', 'df2b' ,'fibl','fib' ,'macd' ,'vstd', 'oph']]
 
@@ -1182,7 +1182,7 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y', tal
 #            h5 = h5[(h5.op <> 0) & (h5.ra <> 0) & (h5.df2b <> 0 )]
 
             # h5 = h5[(h5.df2b <> 0 ) & (h5.ra <> 0 ) & (h5.boll <> 0 )]
-            h5 = h5[(h5.df2b <> 0 ) & (h5.boll <> 0 )]
+            h5 = h5[(h5.df2 <> 0 ) & (h5.boll <> 0 )]
             h5 = h5.drop(
                 [inx for inx in h5.columns if inx not in power_columns], axis=1)
 
@@ -1466,11 +1466,11 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y', tal
 #        if "fib" not in df.columns:
 #            df['fib'] = 0
         def compute_df2(df):
-           df['df2b'] = (map(lambda ra, fibl, rah, fib, ma, kdj, rsi: (eval(ct.powerdiff % (dl))),
+           df['df2'] = (map(lambda ra, fibl, rah, fib, ma, kdj, rsi: (eval(ct.powerdiff % (dl))),
                      df['ra'].values, df['fibl'].values, df[
                          'rah'].values, df['fib'].values, df['ma'].values,
                      df['kdj'].values, df['rsi'].values))
-           df['df2b'] = df['df2b'].apply(lambda x:round(x,1))
+           df['df2'] = df['df2'].apply(lambda x:round(x,1))
            return df
 
         if len(df) <> len(code_l):
@@ -1569,7 +1569,7 @@ if __name__ == "__main__":
     df = powerCompute_df(['300038', '300031', '300675'], days=0, dtype='d', end=None, dl=ct.PowerCountdl, talib=True, filter='y',index=False)
 
     print "\n",cct.format_for_print(df.loc[:,['ra', 'op', 'ma', 'rsi', 'kdj',
-                     'boll', 'rah', 'df2b', 'fibl', 'macd', 'vstd', 'oph', 'lvolume']][:5])
+                     'boll', 'rah', 'df2', 'fibl', 'macd', 'vstd', 'oph', 'lvolume']][:5])
     # print "\n",df.fibl,df.fib
     print "\n",cct.format_for_print(df.loc[:,['op','boll','ma','kdj','macd','ldate','fibl','fib','timel']][:5])
     # import ipdb;ipdb.set_trace()

@@ -425,8 +425,8 @@ if __name__ == "__main__":
                                                          widths=True)  # pylint: disable=C0103,C0103,C0103,C0103,C0103,C0103,C0103,C0103,C0103,C0103,C0103,C0103,C0103,C0103,C0103,C0103,C0103,C0103
 
                     print table
+                    cct.counterCategory(top_temp)
                     print cct.format_for_print(top_dd[-4:], header=False, widths=widths)  # pylint: disable=C0326,C0326,C0326,C0326,C0326,C0326,C0326,C0326,C0326,C0326,C0326,C0326,C0326,C0326,C0326,C0326,C0326
-
                     # print (cct.format_for_print(top_dd))
                 # if cct.get_now_time_int() < 930 or cct.get_now_time_int() > 1505 or (cct.get_now_time_int() > 1125 and cct.get_now_time_int() < 1505):
                 # print cct.format_for_print(top_dif[-10:])
@@ -470,8 +470,16 @@ if __name__ == "__main__":
             else:
                 raise KeyboardInterrupt("StopTime")
         except (KeyboardInterrupt) as e:
+            # from collections import Counter,OrderedDict
+            # categoryl = top_temp.category[:100].tolist()
+            # dicSort = []
+            # for i in categoryl:
+            #     dicSort.extend(i.split(';'))
+            # topSort = Counter(dicSort)
+            # top5 = OrderedDict(topSort.most_common(5))
+            # for i in top5.keys():
+            #     print i,
             st = cct.cct_raw_input(ct.RawMenuArgmain() % (market_sort_value))
-
             if len(st) == 0:
                 status = False
             elif (len(st.split()[0]) == 1 and st.split()[0].isdigit()) or st.split()[0].startswith('x'):

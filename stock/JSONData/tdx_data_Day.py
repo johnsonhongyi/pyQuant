@@ -139,7 +139,7 @@ def get_kdate_data(code, start='', end='', ktype='D', index=False):
             # print df.index
     return df
 
-def LIS(X):
+def LIS_TDX(X):
     N = len(X)
     P = [0] * N
     M = [0] * (N + 1)
@@ -170,7 +170,7 @@ def LIS(X):
         k = P[k]
     return S[::-1], pos[::-1]
 
-def LISCum(X):
+def LIS_TDX_Cum(X):
     #Lis 逐级升高,重复break
     #
     N = len(X)
@@ -365,7 +365,7 @@ def get_tdx_Exp_day_to_df(code, start=None, end=None, dl=None, newdays=None, typ
                     df = get_tdx_stock_period_to_type(df, period_day=resample)
                 df['ma5d'] = pd.rolling_mean(df.close, 5)
                 df['ma10d'] = pd.rolling_mean(df.close, 10)
-                df['ma20d'] = pd.rolling_mean(df.close, 20)
+                df['ma20d'] = pd.rolling_mean(df.close, 26)
                 df['ma60d'] = pd.rolling_mean(df.close, 60)
                 # df['msg'] = df.high[-tdx_max_int:].max()
                 df['hmax'] = df.high[-tdx_max_int:max_int_end].max()
@@ -529,7 +529,7 @@ def get_tdx_Exp_day_to_df(code, start=None, end=None, dl=None, newdays=None, typ
                         df = df.set_index('date')
                 df['ma5d'] = pd.rolling_mean(df.close, 5)
                 df['ma10d'] = pd.rolling_mean(df.close, 10)
-                df['ma20d'] = pd.rolling_mean(df.close, 20)
+                df['ma20d'] = pd.rolling_mean(df.close, 26)
                 df['ma60d'] = pd.rolling_mean(df.close, 60)
                 df['hmax'] = df.high[-tdx_max_int:max_int_end].max()
                 df['max5'] = df.close[-5:max_int_end].max()
@@ -568,59 +568,110 @@ def get_tdx_Exp_day_to_df(code, start=None, end=None, dl=None, newdays=None, typ
             df = df.fillna(0)
             df = df.sort_index(ascending=False)
     # add cumin[:10]
+    
+    # if not MultiIndex : 
+    #     if  not isinstance(df, Series) and len(df) > 0:
 
-    if not MultiIndex : 
-        if  not isinstance(df, Series) and len(df) > 0:
+    #         cumdf = df.low.cummin()[:ct.cumdays].sort_index(ascending=True)
+    #         cumdf_max = df.high.cummax()[:ct.cumdays].sort_index(ascending=True)
+    #         cumdfc_max = df.close.cummax()[:ct.cumdays].sort_index(ascending=True)
+            
+    #         # cumdf = df.low.cummin().sort_index(ascending=True)
+    #         # cumdf_max = df.high.cummax().sort_index(ascending=True)
+    #         # cumdfc_max = df.close.cummax().sort_index(ascending=True)
 
-            cumdf = df.high.cummin()[:ct.cumdays].sort_index(ascending=True)
-            cumdf_max = df.high.cummax()[:ct.cumdays].sort_index(ascending=True)
-            cumdfc_max = df.close.cummax()[:ct.cumdays].sort_index(ascending=True)
-            cum_counts = cumdf.value_counts()
-            cum_counts_max = cumdf_max.value_counts()
-            cumdf_Lis = cumdf[cumdf.index >= cumdf[cumdf == cum_counts.index[0]].index[-1]]
-            log.debug("cumdf:%s %s"%(cumdf,cum_counts))
-            log.debug("cumdfmax:%s %s"%(cumdf_max,cum_counts_max))
-            # log.debug("cumdfc:%s %s"%(cumdfc_max,cumdfc_max.value_counts()))
+    #         # cum_days = 30 if len(df) > 30 else (len(df))
+    #         # cumdf = df.low.cummin()[:cum_days].sort_index(ascending=True)
+    #         # cumdf_max = df.high.cummax()[:cum_days].sort_index(ascending=True)
+    #         # cumdfc_max = df.close.cummax()[:cum_days].sort_index(ascending=True)
+            
+    #         cum_counts = cumdf.value_counts()
+    #         cum_counts_max = cumdf_max.value_counts()
+    #         cum_values = cumdf.values.tolist()
 
-            cum_min, pos = LIS(cumdf_Lis.tolist())
-            log.debug("cum_min:%s pos:%s"%(cum_min,pos))
+    #         if len(cum_counts) > 1 :
+    #             # if cum_counts.values[0] > cum_counts.values[1] * 2 and (cum_counts.values[1] < 3 or cum_counts.index[0] * 1.25 < cum_counts.index[1]) :
+    #             # if cum_counts.values[0] > cum_counts.values[1] * 2 and ( (cum_values[::-1].index(cum_counts.index[1]) <> 0) or (cum_values[::-1].index(cum_counts.index[0]) < cum_values[::-1].index(cum_counts.index[1]))):
 
-            max_lastd = cumdf_max[cumdf_max == cum_counts_max.index[0]].index[-1]
-            # cumdf_max_f = cumdf_max.sort_index(ascending=False)
-            cumdf_max_f = cumdf_max[cumdf_max.index >= max_lastd]
-            cumdf_max_f = cumdf_max_f.sort_index(ascending=False)
-            # print cumdf_max[-1],cum_counts_max.index[0]
-            cum_maxf, posf = LIS(cumdf_max_f.tolist())
+    #             if cum_counts.values[0] > cum_counts.values[1] * 2 and (cum_counts.values[1] < 3 or cum_values.index(cum_counts.index[0]) > cum_values.index(cum_counts.index[1])):
+    #                 pos_price = cum_counts.index[0]
+    #             else:
+    #                 pos_price = cum_counts.index[1]
 
-            if len(cum_counts) > 0 and len(pos) > 0 :
-                df['cumins'] = round(cum_counts.index[0], 2)
-                df['cumine'] = round(cumdf[-1], 2)
-                df['cumaxe'] = round(max(cumdf_max), 2)
-                df['cumaxc'] = round(max(cumdfc_max), 2)
-                # df['cumaxs'] = round(max(cumdf_max), 2)
-                # if  (round(cum_counts.index[0], 2) == cum_min[0]) and len(pos) > 1 or len(cum_counts) == len(pos) :
+    #         else:
+    #             # for i in (range(1,len(cum_counts)-1)):
+    #             #     if cum_counts.index[i] in cumdf.values:
+    #             pos_price = cum_counts.index[0]
 
-                if  (round(cum_counts.index[0], 2) <= cum_min[0]) and len(pos) > 1 or len(cum_counts) == len(pos) :
-                    if len(pos) == 1 and cum_min[0] == cumdf_max[-1]:
-                        if len(cumdf_max_f) == len(posf) and len(posf) > len(pos):
-                            df['cumin'] = -len(posf)
-                        else:
-                            df['cumin'] = len(pos)
-                    else:
-                        df['cumin'] = len(pos)
-                    log.debug("cumincounts:%s cum_min:%s pos:%s"%(len(pos),cum_min,pos))
-                else:
-                    if len(cumdf_max_f) == len(posf) and len(posf) > len(pos):
-                        df['cumin'] = -len(posf)
-                    else:
-                        df['cumin'] = -1
-            else:
-                if len(cumdf_max_f) == len(posf) and len(posf) > len(pos):
-                    df['cumin'] = -len(posf)
-                else:
-                    df['cumin'] = -1
-        else:
-            df['cumin'] = -1
+    #         if (cum_values[::-1].index(pos_price) <> 0):
+    #             cumdf_Lis = cumdf[cumdf.index >= cumdf[cumdf == pos_price ].index[-1]]
+    #         else:
+    #             cumdf_Lis = cumdf[cumdf.index >= cumdf[cumdf == pos_price ].index[0]]
+
+    #         # cumdf_Lis,pos_l = LIS_TDX(cumdf.tolist())
+    #         cumdf_Max_Lis = cumdf_max[cumdf_max.index >= cumdf_max[cumdf_max == cum_counts_max.index[0]].index[-1]]
+    #         # cumdf_Max_Lis,pos_m = LIS_TDX(cumdf_max.tolist())
+
+    #         # log.debug("cumdf:%s %s"%(cumdf,cum_counts))
+    #         # log.debug("cumdfmax:%s %s"%(cumdf_max,cum_counts_max))
+    #         # log.debug("cumdfc:%s %s"%(cumdfc_max,cumdfc_max.value_counts()))
+
+    #         # cum_min, pos = LIS_TDX_Cum(cumdf_Lis.tolist())
+    #         # log.debug("cum_min:%s pos:%s"%(cum_min,pos))
+
+    #         # max_lastd = cumdf_max[cumdf_max == cum_counts_max.index[0]].index[-1]
+    #         # cumdf_max_f = cumdf_max[cumdf_max.index >= max_lastd]
+    #         # cumdf_max_f = cumdf_max_f.sort_index(ascending=False)
+    #         # #print cumdf_max[-1],cum_counts_max.index[0]
+    #         # cum_maxf, posf = LIS_TDX_Cum(cumdf_max_f.tolist())
+
+    #         if len(cumdf_Lis) > 1:
+    #             df['cumins'] = round(cum_counts.index[0], 2) 
+    #             #low price and start pos
+    #             df['cumine'] = round(cumdf[-1], 2)
+    #             #e end price and pos
+    #             df['cumaxe'] = round(max(cumdf_max), 2)
+    #             #cumax  high price max
+    #             df['cumaxc'] = round(max(cumdfc_max), 2)
+    #             #cumax close price max
+    #             # df['cumaxs'] = round(max(cumdf_max), 2)
+    #             df['cumin'] = len(cumdf_Lis)
+    #         else:
+    #             df['cumin'] = -len(cumdf_Max_Lis) if len(cum_counts_max) > 1 else (len(cumdf))
+    #         # if len(cum_counts) > 0 and len(pos) > 0 :
+    #         #     df['cumins'] = round(cum_counts.index[0], 2) 
+    #         #     #low price and start pos
+    #         #     df['cumine'] = round(cumdf[-1], 2)
+    #         #     #cumine end price and pos
+    #         #     df['cumaxe'] = round(max(cumdf_max), 2)
+    #         #     #cumax  high price max
+    #         #     df['cumaxc'] = round(max(cumdfc_max), 2)
+    #         #     #cumax close price max
+    #         #     # df['cumaxs'] = round(max(cumdf_max), 2)
+    #         #     # if  (round(cum_counts.index[0], 2) == cum_min[0]) and len(pos) > 1 or len(cum_counts) == len(pos) :
+    #         #     import ipdb;ipdb.set_trace()
+
+    #         #     if  (round(cum_counts.index[0], 2) <= cum_min[0]) and len(pos) > 1 or len(cum_counts) == len(pos) :
+    #         #         if len(pos) == 1 and cum_min[0] == cumdf_max[-1]:
+    #         #             if len(cumdf_max_f) == len(posf) and len(posf) > len(pos):
+    #         #                 df['cumin'] = -len(posf)
+    #         #             else:
+    #         #                 df['cumin'] = len(pos)
+    #         #         else:
+    #         #             df['cumin'] = len(pos)
+    #         #         log.debug("cumincounts:%s cum_min:%s pos:%s"%(len(pos),cum_min,pos))
+    #         #     else:
+    #         #         if len(cumdf_max_f) == len(posf) and len(posf) > len(pos):
+    #         #             df['cumin'] = -len(posf)
+    #         #         else:
+    #         #             df['cumin'] = -1
+    #         # else:
+    #         #     if len(cumdf_max_f) == len(posf) and len(posf) > len(pos):
+    #         #         df['cumin'] = -len(posf)
+    #         #     else:
+    #         #         df['cumin'] = -1
+    #     else:
+    #         df['cumin'] = 0
 
     return df
 
@@ -874,7 +925,7 @@ def get_tdx_append_now_df_api(code, start=None, end=None, type='f', df=None, dm=
             df = df.sort_index(ascending=True)
             df['ma5d'] = pd.rolling_mean(df.close, 5)
             df['ma10d'] = pd.rolling_mean(df.close, 10)
-            df['ma20d'] = pd.rolling_mean(df.close, 20)
+            df['ma20d'] = pd.rolling_mean(df.close, 26)
             df['ma60d'] = pd.rolling_mean(df.close, 60)
             df = df.fillna(0)
             df = df.sort_index(ascending=False)
@@ -912,7 +963,7 @@ def get_tdx_append_now_df_api(code, start=None, end=None, type='f', df=None, dm=
                 df = df.sort_index(ascending=True)
                 df['ma5d'] = pd.rolling_mean(df.close, 5)
                 df['ma10d'] = pd.rolling_mean(df.close, 10)
-                df['ma20d'] = pd.rolling_mean(df.close, 20)
+                df['ma20d'] = pd.rolling_mean(df.close, 26)
                 df['ma60d'] = pd.rolling_mean(df.close, 60)
                 df = df.fillna(0)
                 df = df.sort_index(ascending=False)
@@ -988,7 +1039,7 @@ def get_tdx_append_now_df_api(code, start=None, end=None, type='f', df=None, dm=
         df = df.sort_index(ascending=True)
         df['ma5d'] = pd.rolling_mean(df.close, 5)
         df['ma10d'] = pd.rolling_mean(df.close, 10)
-        df['ma20d'] = pd.rolling_mean(df.close, 20)
+        df['ma20d'] = pd.rolling_mean(df.close, 26)
         df['ma60d'] = pd.rolling_mean(df.close, 60)
         df = df.fillna(0)
         df = df.sort_index(ascending=False)
@@ -1107,7 +1158,7 @@ def get_tdx_append_now_df_api_tofile(code, dm=None, newdays=0, start=None, end=N
         df = df.sort_index(ascending=True)
         df['ma5d'] = pd.rolling_mean(df.close, 5)
         df['ma10d'] = pd.rolling_mean(df.close, 10)
-        df['ma20d'] = pd.rolling_mean(df.close, 20)
+        df['ma20d'] = pd.rolling_mean(df.close, 26)
         df['ma60d'] = pd.rolling_mean(df.close, 60)
         df = df.fillna(0)
         df = df.sort_index(ascending=False)
@@ -1137,7 +1188,7 @@ def get_tdx_append_now_df_api_tofile(code, dm=None, newdays=0, start=None, end=N
                 df = df.sort_index(ascending=True)
                 df['ma5d'] = pd.rolling_mean(df.close, 5)
                 df['ma10d'] = pd.rolling_mean(df.close, 10)
-                df['ma20d'] = pd.rolling_mean(df.close, 20)
+                df['ma20d'] = pd.rolling_mean(df.close, 26)
                 df['ma60d'] = pd.rolling_mean(df.close, 60)
                 df = df.fillna(0)
                 df = df.sort_index(ascending=False)
@@ -1197,7 +1248,7 @@ def get_tdx_append_now_df_api_tofile(code, dm=None, newdays=0, start=None, end=N
         df = df.sort_index(ascending=True)
         df['ma5d'] = pd.rolling_mean(df.close, 5)
         df['ma10d'] = pd.rolling_mean(df.close, 10)
-        df['ma20d'] = pd.rolling_mean(df.close, 20)
+        df['ma20d'] = pd.rolling_mean(df.close, 26)
         df['ma60d'] = pd.rolling_mean(df.close, 60)
         df = df.fillna(0)
         df = df.sort_index(ascending=False)
@@ -1840,7 +1891,7 @@ def get_tdx_power_now_df(code, start=None, end=None, type='f', df=None, dm=None,
         df = df.sort_index(ascending=True)
         df['ma5d'] = pd.rolling_mean(df.close, 5)
         df['ma10d'] = pd.rolling_mean(df.close, 10)
-        df['ma20d'] = pd.rolling_mean(df.close, 20)
+        df['ma20d'] = pd.rolling_mean(df.close, 26)
         df['ma60d'] = pd.rolling_mean(df.close, 60)
         # df['ma5d'].fillna(0)
         # df['ma10d'].fillna(0)
@@ -2391,7 +2442,7 @@ def get_duration_price_date(code=None, ptype='low', dt=None, df=None, dl=None, e
 
 
 def compute_lastdays_percent(df=None, lastdays=3, resample='d'):
-
+    
     if df is not None and len(df) > lastdays:
         if resample <> 'd':
             df = df[:-1]
@@ -2416,8 +2467,10 @@ def compute_lastdays_percent(df=None, lastdays=3, resample='d'):
 
             # df['lastv%sd' % da] = (df['vol'].shift(da)/min_vol)
             # lasp_percent = df['per%sd' % (da - 1)][da-1] if (da - 1) > 0 else 0
-            df['per%sd' % da] = ((df['close'] - df['lastp%sd' % da]) / df['lastp%sd' % da] * 100).map(lambda x: round(x, 1) if x < 9.85 or x > 10 else 10.0)
-
+            df['per%sd' % da] = ((df['close'] - df['lastp%sd' % da]) / df['lastp%sd' % da] * 100).map(lambda x: round(x, 0) if x < 9.85 or x > 10 else 10.0)
+            # https://ntguardian.wordpress.com/2016/09/19/introduction-stock-market-data-python-1/
+            # stock_return = stocks.apply(lambda x: x / x[0])
+            # stock_change = stocks.apply(lambda x: np.log(x) - np.log(x.shift(1))) # shift moves dates back by 1.
             if da == 1:
                 df['lastp%sd' % 0] = df['close'][-1]
                 df['lasth%sd' % 0] = df['high'][-1]
@@ -3007,7 +3060,7 @@ def get_append_lastp_to_df(top_all, lastpTDX_DF=None, dl=ct.PowerCountdl, end=No
             tdxdata.rename(columns={'low': 'llow'}, inplace=True)
             tdxdata.rename(columns={'vol': 'lvol'}, inplace=True)
             tdxdata.rename(columns={'amount': 'lamount'}, inplace=True)
-            tdxdata.rename(columns={'cumin': 'df2'}, inplace=True)
+            # tdxdata.rename(columns={'cumin': 'df2'}, inplace=True)
             
             h5 = h5a.write_hdf_db(
                 h5_fname, tdxdata, table=h5_table, append=True)
@@ -3037,7 +3090,7 @@ def get_append_lastp_to_df(top_all, lastpTDX_DF=None, dl=ct.PowerCountdl, end=No
                 tdx_diff.rename(columns={'low': 'llow'}, inplace=True)
                 tdx_diff.rename(columns={'vol': 'lvol'}, inplace=True)
                 tdx_diff.rename(columns={'amount': 'lamount'}, inplace=True)
-                tdx_diff.rename(columns={'cumin': 'df2'}, inplace=True)
+                # tdx_diff.rename(columns={'cumin': 'df2'}, inplace=True)
 
                 if newdays is None or newdays > 0:
                     h5 = h5a.write_hdf_db(h5_fname, tdx_diff, table=h5_table, append=True)
@@ -3508,12 +3561,21 @@ if __name__ == '__main__':
     # log_level = LoggerFactory.DEBUG if args['-d']  else LoggerFactory.ERROR
     # log_level = LoggerFactory.DEBUG
     log.setLevel(log_level)
-    # code='002169'
+    # code='399001'
+    code='000862'
+    # code='002387'
+    # code='002942'
     # code = '002906'
+    # code = '603486'
+    # code = '999999'
     # df2 = get_tdx_Exp_day_to_df(code,dl=160, end=None, newdays=0, resample='w')
+    
     # print df2.shape,df2.cumin
 
-    # df = get_tdx_Exp_day_to_df(code, dl=60,end=None, newdays=0, resample='d')
+    df = get_tdx_Exp_day_to_df(code, dl=21,end=None, newdays=0, resample='d')
+    # print df.cumin[:1]
+    import ipdb;ipdb.set_trace()
+    
     # df3 = df.sort_index(ascending=True)
     # print "cumin:",df[:2].cumin.values,df[:2].cumaxe.values,df[:2].cumins.values,df[:2].cumine.values,df[:2].cumaxc.values, df[:2].cmean.values
 

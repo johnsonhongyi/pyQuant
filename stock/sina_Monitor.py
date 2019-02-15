@@ -94,7 +94,8 @@ if __name__ == "__main__":
     # market_sort_value, market_sort_value_key = ct.get_market_sort_value_key('8')
     resample = 'd'
     # st_key_sort = '9'
-    st_key_sort = '4'
+    st_key_sort = '7'
+    # st_key_sort = '4'
     st = None
     while 1:
         try:
@@ -108,6 +109,8 @@ if __name__ == "__main__":
                 st_key_sort = '%s %s'%(st_key_sort.split()[0],cct.get_index_fibl())
             time_Rt = time.time()
             top_now = tdd.getSinaAlldf(market='all', vol=ct.json_countVol, vtype=ct.json_countType)
+            # top_now = tdd.getSinaAlldf(market='央企',filename='yqbk', vol=ct.json_countVol, vtype=ct.json_countType,trend=False)
+            
             # top_now = tdd.getSinaAlldf(market='rzrq', vol=ct.json_countVol, vtype=ct.json_countType)
             # top_now = tdd.getSinaAlldf(market='次新股,060',filename='cxg', vol=ct.json_countVol, vtype=ct.json_countType)
 
@@ -268,7 +271,8 @@ if __name__ == "__main__":
                 ct_MonitorMarket_Values = ct.get_Duration_format_Values(ct_MonitorMarket_Values,replace='b1_v',dest='volume')
                 ct_MonitorMarket_Values2 = ct.get_Duration_format_Values(ct_MonitorMarket_Values2,replace='b1_v',dest='volume')
 
-                if st_key_sort == '1' or st_key_sort == '7':
+                # if st_key_sort == '1' or st_key_sort == '7':
+                if st_key_sort == '1':
                     top_temp = top_temp[top_temp.per1d < 8]
 
                 top_dd =  cct.combine_dataFrame(top_temp.loc[:, ct_MonitorMarket_Values][:10], top_temp2.loc[:, ct_MonitorMarket_Values2][:5],append=True, clean=True)
@@ -278,6 +282,7 @@ if __name__ == "__main__":
                 table,widths = cct.format_for_print(top_dd.loc[[col for col in top_dd[:9].index if col in top_temp[:10].index]],widths=True)
 
                 print table
+                cct.counterCategory(top_temp)
                 print cct.format_for_print(top_dd[-4:],header=False,widths=widths)
 
                 # print cct.format_for_print(top_temp.loc[:, ct_MonitorMarket_Values][:10])

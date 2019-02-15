@@ -174,6 +174,7 @@ wencai_count = cct.get_config_value_wencai(config_ini, fname)
 
 def get_wencai_Market_url(filter='国企改革', perpage=1, url=None, pct=False, monitor=False,):
     urllist = []
+    filter = '题材是%s'%(filter)
     global null, wencai_count, pct_status
     if pct is not None:
         pct_status = pct
@@ -646,9 +647,10 @@ if __name__ == '__main__':
 #    type='TMT'
 #    type='国企改革'
 
+    df = get_wencai_Market_url('OLED',200)
     # df = get_wencai_Market_url('赢时胜,博腾股份,炬华科技',500,single=True)
 
-    # df = get_wcbk_df(filter='城建+一带一路', market='ydyl')
+    # df = get_wcbk_df(filter='OLED', market='oled')
     # df =  get_wcbk_df(filter='新股与次新股',market='cxg')
     # df =  get_wcbk_df(filter='雄安特区',market='xatq')
     # df =  get_wcbk_df(filter='新能源',market='xny')

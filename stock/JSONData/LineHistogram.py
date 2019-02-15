@@ -870,7 +870,7 @@ def parseArgmain():
 if __name__ == "__main__":
     # matplotlib.use('WXAgg')
     #     plt.interactive(True)
-    # status=get_linear_model_status('601198')
+    # status=get_linear_model_histogramDouble('601198')
     # print status
     # get_tdx_and_now_data('002399')
     # sys.exit(0)

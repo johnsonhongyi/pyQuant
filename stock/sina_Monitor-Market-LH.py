@@ -133,7 +133,8 @@ if __name__ == "__main__":
     # all_diffpath = tdd.get_tdx_dir_blocknew() + '062.blk'
     
     # market_sort_value, market_sort_value_key = ct.get_market_sort_value_key(ct.sort_value_key_perd)
-    st_key_sort = '2'
+    # st_key_sort = '2'
+    st_key_sort = '7'
     st = None
     # st_key_sort = ct.sort_value_key_perd
     while 1:
@@ -145,7 +146,9 @@ if __name__ == "__main__":
                 
             # top_now = tdd.getSinaAlldf(market='次新股',filename='cxg', vol=ct.json_countVol, vtype=ct.json_countType)
             market_blk = 'cyb'
-            top_now = tdd.getSinaAlldf(market=market_blk, filename=None, vol=ct.json_countVol, vtype=ct.json_countType,trend=True)
+            # top_now = tdd.getSinaAlldf(market=market_blk, filename=None, vol=ct.json_countVol, vtype=ct.json_countType,trend=True)
+            top_now = tdd.getSinaAlldf(market='央企',filename='yqbk', vol=ct.json_countVol, vtype=ct.json_countType,trend=False)
+            
             # top_now = tdd.getSinaAlldf(market='次新股,cyb', filename='cxg', vol=ct.json_countVol, vtype=ct.json_countType,trend=False)
             # top_now = tdd.getSinaAlldf(market='次新股,060', filename='cxg', vol=ct.json_countVol, vtype=ct.json_countType,trend=False)
             # top_now = tdd.getSinaAlldf(market='次新股,zxb',filename='cxg', vol=ct.json_countVol, vtype=ct.json_countType)
@@ -305,6 +308,11 @@ if __name__ == "__main__":
                     ct_MonitorMarket_Values = ct.get_Duration_format_Values(ct_MonitorMarket_Values,replace='b1_v',dest='volume')
                     ct_MonitorMarket_Values2 = ct.get_Duration_format_Values(ct_MonitorMarket_Values2,replace='b1_v',dest='volume')
                     
+
+                    # if st_key_sort == '1' or st_key_sort == '7':
+                    if st_key_sort == '1':
+                        top_temp = top_temp[top_temp.per1d < 8]
+
                     top_dd = cct.combine_dataFrame(top_temp.loc[:, ct_MonitorMarket_Values][:9], top_temp2.loc[:, ct_MonitorMarket_Values2][:4],append=True, clean=True)
 
                     # top_dd = pd.concat([top_temp.loc[:, ct_MonitorMarket_Values][:9], top_temp.loc[:, ct_MonitorMarket_Values][-4:]], axis=0)
@@ -314,6 +322,7 @@ if __name__ == "__main__":
                     table,widths = cct.format_for_print(top_dd.loc[[col for col in top_dd[:9].index if col in top_temp[:10].index]],widths=True)
                     
                     print table
+                    cct.counterCategory(top_temp)
                     print cct.format_for_print(top_dd[-4:],header=False,widths=widths)
                     # print cct.format_for_print(top_dd)
 

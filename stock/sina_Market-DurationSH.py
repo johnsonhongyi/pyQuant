@@ -141,6 +141,8 @@ if __name__ == "__main__":
             # top_now = tdd.getSinaAlldf(market= market_blk , vol=ct.json_countVol, vtype=ct.json_countType,trend=True)
             # top_now = tdd.getSinaAlldf(market='次新股,060', filename='cxg' , vol=ct.json_countVol, vtype=ct.json_countType,trend=True)
             top_now = tdd.getSinaAlldf(market=market_blk, vol=ct.json_countVol, vtype=ct.json_countType,trend=True)
+            # top_now = tdd.getSinaAlldf(market='央企',filename='yqbk', vol=ct.json_countVol, vtype=ct.json_countType,trend=False)
+            
             # top_now = tdd.getSinaAlldf(market='all', vol=ct.json_countVol, vtype=ct.json_countType)
 
             # top_dif = top_now
@@ -378,6 +380,7 @@ if __name__ == "__main__":
                     table,widths = cct.format_for_print(top_dd.loc[[col for col in top_dd[:9].index if col in top_temp[:10].index]],widths=True)
                     
                     print table
+                    cct.counterCategory(top_temp)
                     print cct.format_for_print(top_dd[-4:],header=False,widths=widths)
                 # if cct.get_now_time_int() < 930 or cct.get_now_time_int() > 1505 or (cct.get_now_time_int() > 1125 and cct.get_now_time_int() < 1505):
                 # print cct.format_for_print(top_dif[-10:])

@@ -310,13 +310,13 @@ def fibonacciCount(code, dl=60, start=None, days=0):
             if not daysData[1].ma5d[0]:
                 daysData[1].ma5d[0] = 0
             fibl.append(
-                [code, op, ra, [daysData[0], int(daysData[1].ma5d[0])], fib, st ,dd.cumin[-1]])
+                [code, op, ra, [daysData[0], int(daysData[1].ma5d[0])], fib, st ])
     return fibl
 
-global cumin_index 
-cumin_index = {}
+# global cumin_index 
+# cumin_index = {}
 def get_hot_countNew(changepercent, rzrq, fibl=None, fibc=10):
-    global fibcount,cumin_index
+    global fibcount
     INDEX_LIST_TDX = {'999999':'sh', '399001':'sz', '399006':'cyb'}
     # {v: k for k, v in m.items()}
     # >>> zip(m.values(), m.keys())
@@ -329,9 +329,9 @@ def get_hot_countNew(changepercent, rzrq, fibl=None, fibc=10):
         if fibl is not None:
             int = 0
             for f in fibl:
-                code, op, ra, daysData, fib, st ,cumin= f[
-                    0], f[1], f[2], f[3], f[4], f[5] ,f[6]
-                cumin_index[INDEX_LIST_TDX[code]]=cumin
+                code, op, ra, daysData, fib, st = f[
+                    0], f[1], f[2], f[3], f[4], f[5] 
+                # cumin_index[INDEX_LIST_TDX[code]]=cumin
                 int += 1
                 if int % 2 != 0:
                     print "%s op:%s ra:%s d:%s fib:%s m5:%s  %s" % (code, f_print(3, op), f_print(5, ra), f_print(2, daysData[0]), f_print(3, fib), f_print(4, daysData[1]), st),
@@ -402,7 +402,7 @@ def get_hot_countNew(changepercent, rzrq, fibl=None, fibc=10):
             # print modfprint(zlr)
             # print (u"流入: %s亿 比: %s%%" % (modfprint(zlr), modfprint(zzb))),
             print(u"流入: %s亿 比: %s%%" % (f_print(6, zlr,32), f_print(4, zzb,32))),
-            print (u" %s"%(f_print(2,cumin_index[market],31))),
+            # print (u" %s"%(f_print(2,cumin_index[market],31))),
             print(u"%s %s%s" % (f_print(7, ff['close']), f_print(1, '!' if ff['open'] > ff[
                 'lastp'] else '?'), f_print(2, '!!' if ff['close'] > ff['lastp'] else '??',32)))
         allTop = allTop.append(df.reset_index(), ignore_index=True)

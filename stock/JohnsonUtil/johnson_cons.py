@@ -50,7 +50,7 @@ changeRatioUp = 1.025
 wencai_delay_time = 10
 resample_dtype = 'd'
 logtime = 1800
-cumdays = 10
+cumdays = 14
 bollFilter = -5
 keep_lastnum = 15
 writeblockbakNum = 15
@@ -117,7 +117,8 @@ Duration_sort_per_ratio_key = [0, 1, 0, 1, 1, 0, 0, 1, 1]
 
 # Duration_sort_perd = ['per%sd', 'dff', 'perc%sd', 'percent', 'b1_v', 'ratio', 'op',
 # Duration_sort_perd = ['per%sd', 'dff', 'perc%sd', 'percent', 'b1_v', 'ratio', 'op',
-Duration_sort_perd = ['per%sd', 'percent','df2',  'perc%sd', 'dff', 'ratio', 'op',
+# Duration_sort_perd = ['per%sd', 'perc%sd','percent','df2',   'dff', 'ratio', 'op',
+Duration_sort_perd = ['per%sd','percent', 'perc%sd','df2',   'dff', 'ratio', 'op',
                       'fib', 'fibl', 'ra', 'volume', 'couts']
 Duration_sort_perd_key = [0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 1, 1]
 

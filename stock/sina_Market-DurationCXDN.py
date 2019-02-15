@@ -109,6 +109,7 @@ if __name__ == "__main__":
     # op, ra, duration_date, days = pct.get_linear_model_status('999999', filter='y', dl=dl, ptype=ptype, days=1)
     # duration_date = ct.duration_date
     duration_date = int(ct.duration_date_up / 2)
+    # duration_date = int(cduration_date_l)
     # duration_date = 30
     du_date = duration_date
     # resample = ct.resample_dtype
@@ -393,6 +394,7 @@ if __name__ == "__main__":
                     # top_dd[col for col in top_dd.index if col in top_temp[:10].index]
                     table,widths = cct.format_for_print(top_dd.loc[[col for col in top_dd[:9].index if col in top_temp[:10].index]],widths=True)
                     print table
+                    # cct.counterCategory(top_temp)
                     print cct.format_for_print(top_dd[-4:],header=False,widths=widths)
                     # print cct.format_for_print(top_dd)
                 # if cct.get_now_time_int() < 930 or cct.get_now_time_int() > 1505 or (cct.get_now_time_int() > 1125 and cct.get_now_time_int() < 1505):

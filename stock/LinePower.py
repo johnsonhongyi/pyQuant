@@ -74,8 +74,7 @@ if __name__ == "__main__":
             code = raw_input("code:")
             args = parser.parse_args(code.split())
             # print args
-
-            if not str(args.code) == 'None' and (args.wencai == 'y' or re.match('[ \u4e00 -\u9fa5]+',code) == None):
+            if not str(args.code) == 'None' and (args.wencai == 'y' or re.match('[a-zA-Z]+',code) is not None  or re.match('[ \u4e00 -\u9fa5]+',code) == None ):
                 df  = wcd.get_wencai_Market_url(code,200,pct=False)
                 print df.shape,df[:8]
                 if len(df) == 1:

@@ -243,7 +243,7 @@ terminal_positionKey = {'sina_Market-DurationDn.py': '654, 680',
                         'sina_Monitor-Market.py': '19, 179',
                         'sina_Monitor.py': '28, 23',
                         'singleAnalyseUtil.py': '1095, 23',
-                        'LinePower.py': '110, 227', }
+                        'LinePower.py': '6, 216', }
 
 terminal_positionKeyMac = {'sina_Market-DurationDn.py': '216, 490',
                         'sina_Market-DurationCXDN.py': '-16, 54',
@@ -253,7 +253,7 @@ terminal_positionKeyMac = {'sina_Market-DurationDn.py': '216, 490',
                         'sina_Monitor-Market.py': '19, 179',
                         'sina_Monitor.py': '28, 23',
                         'singleAnalyseUtil.py': '594, 23',
-                        'LinePower.py': '110, 227', }
+                        'LinePower.py': '6, 216', }
 
 script_set_position = '''tell application "Terminal"
     --activate
@@ -1496,7 +1496,7 @@ def get_config_value_wencai(fname, classtype, currvalue=0, xtype='limit', update
         config.write()
     return int(currvalue)
 
-def get_index_fibl(default=1):
+def get_index_fibl(default=2):
     import sys
     sys.path.append("..")
     from JSONData import powerCompute as pct
@@ -1504,7 +1504,8 @@ def get_index_fibl(default=1):
 
     if len(df) >0 and 'fibl' in df.columns:
         # fibl = int(df.fibl.max())
-        fibl = int(df.cumin.max())
+        # fibl = int(df.cumin.max())
+        fibl = int(df.fibl.max())
         fibl = fibl if 4 > fibl > 1 else default 
         # fibl = fibl if 3 >= fibl >= 1 else 1 
         # return abs(fibl)
@@ -1516,13 +1517,26 @@ def get_index_fibl(default=1):
 
     return abs(fibl)
 
+from collections import Counter,OrderedDict
+def counterCategory(df):
+    if len(df) > 0:
+        categoryl = df.category[:20].tolist()
+        dicSort = []
+        for i in categoryl:
+            dicSort.extend(i.split(';'))
+        topSort = Counter(dicSort)
+        top5 = OrderedDict(topSort.most_common(3))
+        for i in top5.keys():
+            print i,top5[i],
+        print ''   
+
 def write_to_blocknew(p_name, data, append=True, doubleFile=True, keep_last=None):
     if keep_last is None:
         keep_last = ct.keep_lastnum
     # index_list = ['1999999','47#IFL0',  '0399006', '27#HSI']
     # index_list = ['1999999','47#IFL0', '27#HSI',  '0399006']
     # index_list = ['1999999','0399001','47#IFL0', '27#HSI',  '0159915']
-    index_list = ['1999999', '0399001', '0159915']
+    index_list = ['0399001', '1999999', '0159915']
     # index_list = ['1999999', '27#HSI',  '0159915']
 
     def writeBlocknew(p_name, data, append=True,keep_last=keep_last):
@@ -2233,12 +2247,12 @@ def func_compute_percd2(close, lastp, op, lastopen,lasth, lastl, nowh, nowl,nowv
                 if percent < -2 and volratio > 1.2:
                     initc -=1
                 if close >= lasth*0.98:
-                    initc +=3
+                    initc +=1
                     if close >= nowh*0.98:
-                        initc +=3
+                        initc +=1
             else:
                 if lastp > lastopen and close > op:
-                    initc +=3
+                    initc +=1
 
         else:
             if last_du > 3 or now_du > 3:
@@ -2254,7 +2268,7 @@ def func_compute_percd2(close, lastp, op, lastopen,lasth, lastl, nowh, nowl,nowv
                         initc +=1
             else:
                 if lastp > lastopen and close > op:
-                    initc +=3
+                    initc +=1
 
 
 
@@ -2341,7 +2355,157 @@ def func_compute_percd2(close, lastp, op, lastopen,lasth, lastl, nowh, nowl,nowv
                     if cumin < 2:
                         initc += 8
                     elif cumin > 5:
-                        initc -= 11
+                        initc -= 2
+                elif lastopen >= lastl:
+                    # initc +=1
+                    # if op >= nowl:
+                    #     initc +=1
+                    if nowh >= hmax:
+                        initc +=2
+            # if lastopen >= lastl:
+            #     initc +=1
+            #     if op >= nowl:
+            #         initc +=1
+            # if nowh >= hmax:
+            #     initc +=1
+
+    return initc
+
+def func_compute_percdS(close, lastp, op, lastopen,lasth, lastl, nowh, nowl,nowvol=None,lastvol=1,hmax=None,cumin=None):
+    # down_zero, down_dn, percent_l = 0, 0, 2
+     # (1 if ( ((c >= op) and ((c - lc)/lc*100 >= 0)) or (c >= op and c >=m5a) ) else down_dn)
+    initc = 0
+    if lasth <> 1.0 and lastl <> 1.0 and lasth <> 0 and lastl <> 0:
+        close = round(close, 1)
+        lastp = round(lastp, 1)
+        op = round(op, 1)
+        lastopen = round(lastopen, 1)
+        lasth = round(lasth, 1)
+        lastl = round(lastl, 1)
+        percent = round((close - lastp)/lastp*100,1)
+        now_du = round((nowh - nowl)/nowl*100,1)
+        last_du = round((lasth - lastl)/lastl*100,1)
+        volratio = round((nowvol / lastvol),1)
+        if volratio > 1.1:
+            if last_du > 3 or now_du >3:
+                if percent > 2: 
+                    initc +=1
+                # if percent > 5 or (nowvol / lastvol) > 1.5:
+                #     initc +=1
+                # if percent > 8 and (nowvol / lastvol) > 1.2:
+                #     initc +=1
+                if percent < -2 and volratio > 1.2:
+                    initc -=1
+                if close >= lasth*0.98:
+                    initc +=1
+                    if close >= nowh*0.98:
+                        initc +=1
+            else:
+                if lastp > lastopen and close > op:
+                    initc +=1
+
+        else:
+            if last_du > 3 or now_du > 3:
+                if percent > 2:
+                    initc +=1
+                elif -2 < percent < 1:
+                    initc -=1
+                elif percent < -2:
+                    initc -=2
+                if close >= lasth:
+                    initc +=1
+                    if close >= nowh*0.98:
+                        initc +=1
+            else:
+                if lastp > lastopen and close > op:
+                    initc +=1
+
+
+
+        if nowl == op or (op > lastp and nowl > lastp):
+            initc +=1
+            if lastopen >= lastl:
+                initc +=1
+            if  nowh > lasth:
+                initc +=1
+                # if nowh == close:
+                #     initc +=1
+
+        if  op > lastp or nowl > lastp:
+                initc +=1
+
+        if ((close - lastp)/lastp*100 >= 0):
+            if op > lastp:
+                initc +=1
+                # if nowh == nowl:
+                #     initc +=1
+                if nowl > lastp:
+                    initc +=1
+                    if nowl > lasth:
+                        initc +=1
+
+                if close > nowh * ct.changeRatio:
+                    initc +=1
+                    # if lastp == lasth:
+                    #     initc +=1
+
+                if (close >= op):
+                    initc +=1
+                    if (nowh > lasth):
+                        initc +=1
+                        if (nowl >= lastl):
+                            initc +=1
+                else:
+                    initc -=1
+                    if (nowh < lasth):
+                        initc -=1
+                        if  nowl < lastl:
+                            initc -=1
+            else:
+                initc +=1
+                if op >= nowl*0.995:
+                    initc +=1
+                    if (nowh > lasth):
+                        initc +=1
+                        if close > nowh * ct.changeRatio:
+                            initc +=1
+                            if (nowl >= lastl):
+                                initc +=1
+
+        else:
+            if op < lastp:
+                if (close >= op):
+                    if  nowl > lastl:
+                        initc +=1
+                else:
+                    initc -=1
+                    if (nowh < lasth):
+                        initc -=1
+                        if  nowl < lastl:
+                            initc -=1
+            else:
+                if (close < op):
+                    if (nowh < lasth):
+                        initc -=1
+                    if  nowl < lastl:
+                        initc -=1
+                else:
+                    if (nowh < lasth):
+                        initc -=1
+                        if  nowl < lastl:
+                            initc -=1
+            if nowh < lastp:
+                initc -=1
+                if nowh < lastl:
+                    initc -=1
+
+        if hmax is not None:
+            if cumin is not None:
+                if volratio > 4:
+                    if cumin < 2:
+                        initc += 8
+                    elif cumin > 5:
+                        initc -= 2
                 elif lastopen >= lastl:
                     # initc +=1
                     # if op >= nowl:
@@ -2355,8 +2519,7 @@ def func_compute_percd2(close, lastp, op, lastopen,lasth, lastl, nowh, nowl,nowv
             # if nowh >= hmax:
             #     initc +=1
 
-    return initc
-                    
+    return initc                    
 
 def combine_dataFrame(maindf, subdf, col=None, compare=None, append=False, clean=True):
     times = time.time()
