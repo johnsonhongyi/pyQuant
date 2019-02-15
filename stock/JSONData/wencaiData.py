@@ -174,7 +174,8 @@ wencai_count = cct.get_config_value_wencai(config_ini, fname)
 
 def get_wencai_Market_url(filter='国企改革', perpage=1, url=None, pct=False, monitor=False,):
     urllist = []
-    filter = '题材是%s'%(filter)
+    if isinstance(filter, str):
+    	filter = '题材是%s'%(filter)
     global null, wencai_count, pct_status
     if pct is not None:
         pct_status = pct
