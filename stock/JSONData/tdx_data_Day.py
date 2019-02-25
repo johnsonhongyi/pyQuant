@@ -2469,9 +2469,10 @@ def compute_lastdays_percent(df=None, lastdays=3, resample='d',vc_radio=100):
 
         df['perd'] = ((df['close'] - df['close'].shift(1)) / df['close'].shift(1) * 100).map(lambda x: round(x, 1) if ( x < 9.85)  else 10.0)
 
-        df = df.fillna(0)
 
         df['vchange'] = ((df['vol'] - df['vol'].shift(1)) / df['vol'].shift(1) * 100).map(lambda x: round(x, 1))
+        
+        df = df.fillna(0)
         
         df['vcra'] = len(df[df.vchange > vc_radio])
         
