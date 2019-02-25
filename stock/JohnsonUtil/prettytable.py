@@ -44,7 +44,7 @@ import sys
 import textwrap
 import unicodedata
 
-import commonTips as cct
+# import commonTips as cct
 
 # reload(sys)
 # sys.setdefaultencoding('utf-8')
@@ -90,12 +90,33 @@ PLAIN_COLUMNS = 12
 RANDOM = 20
 
 _re = re.compile("\033\[[0-9;]*m")
+import platform
 
 def _get_size(text):
     lines = text.split("\n")
     height = len(lines)
     width = max([_str_block_width(line) for line in lines])
     return (width, height)
+
+def get_sys_system():
+    return platform.system()
+
+def get_sys_platform():
+    return platform.platform()
+
+def get_os_system():
+    os_sys = get_sys_system()
+    os_platform = get_sys_platform()
+    if os_sys.find('Darwin') == 0:
+        # log.info("Mac:%s" % os_platform)
+        return 'mac'
+
+    elif os_sys.find('Win') == 0:
+        # log.info("Windows:%s" % os_sys)
+        if os_platform.find('XP'):
+            return 'win'
+    else:
+        return 'other'
 
 class PrettyTable(object):
 
@@ -127,8 +148,8 @@ class PrettyTable(object):
         sort_key - sorting key function, applied to data points before sorting
         valign - default valign for each row (None, "t", "m" or "b")
         reversesort - True or False to sort in descending or ascending order"""
-
-        if cct.get_sys_system().find('Win') == 0:
+        
+        if get_sys_system().find('Win') == 0:
             self.encoding = kwargs.get("encoding", "gbk")
         else:
             self.encoding = kwargs.get("encoding", "UTF-8")
@@ -140,7 +161,7 @@ class PrettyTable(object):
         self._max_width = {}
         self._rows = []
         self._widths = []
-        self.system = cct.get_os_system()
+        self.system = get_os_system()
         if field_names:
             self.field_names = field_names
         else:

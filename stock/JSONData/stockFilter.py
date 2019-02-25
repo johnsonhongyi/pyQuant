@@ -44,7 +44,7 @@ def filterPowerCount(df,count=200,down=False,duration=2):
             return df[:count].copy()
 
     if 945 < nowint <= 1000:
-        top_high = df[ ((df.open > df.llastp) & (df.low >= df.llastp)) | ((df.low >= df.lastl2d) | (df.percent > df['per%sd'%(duration)])) ]
+        top_high = df[ ((df.open > df.llastp) & (df.low >= df.llastp))  ]
     elif 1000 < nowint:
         if 'nlow' in df.columns:
             # top_high = df[ (df.nlow >= df.llastp) | (df.close >= df.nlow)]
@@ -63,12 +63,12 @@ def filterPowerCount(df,count=200,down=False,duration=2):
         else:
             radio_t = 1
 
-        top_high = top_high[ (((top_high.buy > top_high.ene) & (top_high.volume / radio_t >  2)) ) |  (((top_high.lastv0d > top_high.lvol * 1.5) & (top_high.lastv1d > top_high.lvol * 1.5)) & (top_high.lastp0d > top_high.ene) ) | (((top_high.lastp0d > top_high.ene) | (top_high.lastp1d > top_high.ene)) & (top_high.lastp2d > top_high.ene)) | ((top_high.buy > top_high.max5)|(top_high.buy > top_high.ene))]
+        top_high = top_high[ (((top_high.buy > top_high.ene) & (top_high.volume / radio_t >  2)) ) |  (((top_high.lastv1d > top_high.lvol * 1.5) ) & (top_high.lastp1d > top_high.ene) ) ]
         if len(top_high) > count:
             top_high = top_high[ (top_high.low > top_high.ene) | ((top_high.percent > 1) & (top_high.volume > 2))]
         top_temp = cct.combine_dataFrame(top_temp, top_high, col=None, compare=None, append=True, clean=True)
 
-    return top_temp[:100]
+    return top_temp
 
 def getBollFilter(df=None, boll=ct.bollFilter, duration=ct.PowerCountdl, filter=True, ma5d=True, dl=14, percent=True, resample='d', ene=False,upper=False, down=False, indexdff=True,cuminTrend=False):
 
@@ -80,8 +80,7 @@ def getBollFilter(df=None, boll=ct.bollFilter, duration=ct.PowerCountdl, filter=
         # if len(drop_t) > 0:
             # df = df.drop(drop_t,axis=0)top
             # log.error("stf drop_cxg:%s"%(len(drop_t)))
-    time_s = time.time()
-
+    time_s = time.time()    
     df['upper'] = map(lambda x: round((1 + 11.0 / 100) * x, 1), df.ma10d)
     df['lower'] = map(lambda x: round((1 - 9.0 / 100) * x, 1), df.ma10d)
     df['ene'] = map(lambda x, y: round((x + y) / 2, 1), df.upper, df.lower)
@@ -103,7 +102,7 @@ def getBollFilter(df=None, boll=ct.bollFilter, duration=ct.PowerCountdl, filter=
     radio_t = cct.get_work_time_ratio()
     df['lvolr%s' % (resample)] = df['volume']
     # df['volume'] = (map(lambda x, y: round(x / y / radio_t, 1), df.nvol.values, df.lvolume.values))
-    df['volume'] = (map(lambda x, y: round(x / y / radio_t, 1), df.nvol.values, df.lastv0d.values))
+    df['volume'] = (map(lambda x, y: round(x / y / radio_t, 1), df.nvol.values, df.lastv1d.values))
     
     indexfibl = cct.GlobalValues().getkey('indexfibl')
     sort_value = cct.GlobalValues().getkey('market_sort_value')
@@ -128,22 +127,21 @@ def getBollFilter(df=None, boll=ct.bollFilter, duration=ct.PowerCountdl, filter=
     #     df = df[ (df.cumine == df.cumaxc) | (df.close >= df.cumine) | (df.llastp >=df.cumaxc) | (df.close >= df.cumaxe) ]
     # else:
     #     upper = True
-
+    
     if not down:
         if upper:
-            upper_count = len( df[ ( (df.df2 > 2)  |( df.buy > df.upper)| ( df.lastp0d > df.upper) | ( df.lastp1d > df.upper) | ( df.lastp2d > df.upper) | ( df.lastp3d > df.upper))])
-            # ene_count = len(df[df.buy > df.upper])
-            if upper_count > 30:
-                df = df[ ( (df.df2 > 1) | ( df.buy > df.upper)| ( df.lastp0d > df.upper) | ( df.lastp1d > df.upper) | ( df.lastp2d > df.upper) | ( df.lastp3d > df.upper))]
-            else:        
-                df = df[ ( (( df.buy > df.ene ) & (df.df2 > indexfibl)) | ( df.buy > df.upper)| ( df.lasth0d > df.upper) | ( df.lasth1d > df.upper) | ( df.lasth2d > df.upper) | ( df.lasth3d > df.upper))]
+            # upper_count = len( df[ ( ( df.buy > df.upper)| ( df.lastp0d > df.upper) | ( df.lastp1d > df.upper) | ( df.lastp2d > df.upper) | ( df.lastp3d > df.upper))])
+            # # ene_count = len(df[df.buy > df.upper])
+            # if upper_count > 30:
+            #     df = df[ (  ( df.buy > df.upper)| ( df.lastp0d > df.upper) | ( df.lastp1d > df.upper) | ( df.lastp2d > df.upper) | ( df.lastp3d > df.upper))]
+            # else:        
+            #     df = df[ ( (( df.buy > df.ene ) ) | ( df.buy > df.upper)| ( df.lasth0d > df.upper) | ( df.lasth1d > df.upper) | ( df.lasth2d > df.upper) | ( df.lasth3d > df.upper))]
+            df = df[ (df.low >= df.upper) | (df.close >= df.upper) | (df.per1d >= 9.5) | (df.lastp1d == df.hmax) | ((df.lastp1d <> df.hmax) & (df.high > df.hmax))]
         else:
             if 935 < cct.get_now_time_int() < 1400:
-                df = df[ ((df.df2 > 1) | ( df.buy > df.ene) | ( df.llastp > df.ene)| (df.llastp >= df.max5) | (df.high >= df.max5) | (df.max5 >= df.upper)) ]
-                # df = df[ (df.low <> df.high) & (( df.llastp > df.upper)| (df.llastp >= df.max5) | (df.high >= df.max5) | (df.max5 >= df.upper)) ]
+                df = df[ ( ( df.buy > df.ene) | ( df.llastp > df.ene)| (df.llastp >= df.max5) | (df.high >= df.max5) | (df.max5 >= df.upper)) ]
             else:
-                df = df[ ((df.df2 > 1)  | ( df.buy > df.ene) | ( df.llastp > df.ene)| (df.llastp >= df.max5) | (df.high >= df.max5) | (df.max5 >= df.upper)) ]
-            # df = df[ (( df.llastp > df.upper)| (df.llastp >= df.max5) | (df.high >= df.max5)) | (df.per5d < 2 & df.per5d > -2 & (df.percent > 3)) ]
+                df = df[ ( ( df.buy > df.ene) | ( df.llastp > df.ene)| (df.llastp >= df.max5) | (df.high >= df.max5) | (df.max5 >= df.upper)) ]
 
     # df['cumins'] = round(cum_counts.index[0], 2)
     # df['cumine'] = round(cumdf[-1], 2)
@@ -204,20 +202,20 @@ def getBollFilter(df=None, boll=ct.bollFilter, duration=ct.PowerCountdl, filter=
 
     co2int = ['boll', 'op', 'ratio', 'fib', 'fibl','df2']
     co2int.extend([co for co in df.columns.tolist() if co.startswith('perc') and co.endswith('d')])
+    co2int.extend(['top10','topR'])
     for co in co2int:
         df[co] = df[co].astype(int)
 
     if down:
         if 'nlow' in df.columns:
-            (((df.buy > df.ene) & (df.volume / radio_t > 1.5)) ) |  (((df.lastv0d > df.lvol * 1.5) & (df.lastv1d > df.lvol * 1.5)) & (df.lastp0d > df.ene) ) | (((df.lastp0d > df.ene) | (df.lastp1d > df.ene)) & (df.lastp2d > df.ene)) | ((df.buy > df.max5)|(df.buy > df.ene))
             if 'max5' in df.columns:
                 # df = df[(df.hmax >= df.ene) & (df.nlow >= df.low) & (df.low <> df.high) & (((df.low < df.hmax) & (df.high > df.cmean)) | (df.high > df.max5))]
-                df = df[ (((df.buy > df.ene) & (df.volume / radio_t > 1.5)) ) |  (((df.lastv0d > df.lvol * 1.5) & (df.lastv1d > df.lvol * 1.5)) & (df.lastp0d > df.ene) ) | (((df.lastp0d > df.ene) | (df.lastp1d > df.ene)) & (df.lastp2d > df.ene)) | ((df.buy > df.max5)|(df.buy > df.ene)) | (df.max5 >= df.ene) | (df.high > df.max5)]
+                df = df[ (((df.buy > df.ene) & (df.volume / radio_t > 1.5)) ) |  (((df.lastv1d > df.lvol * 1.5) & (df.lastv1d > df.lvol * 1.5)) & (df.lastp1d > df.ene) )]
             else:
-                df = df[ (((df.buy > df.ene) & (df.volume / radio_t > 1.5)) ) |  (((df.lastv0d > df.lvol * 1.5) & (df.lastv1d > df.lvol * 1.5)) & (df.lastp0d > df.ene) ) | (((df.lastp0d > df.ene) | (df.lastp1d > df.ene)) & (df.lastp2d > df.ene)) | ((df.buy > df.max5)|(df.buy > df.ene)) | (df.hmax >= df.ene) & (df.nlow >= df.low) & (df.low <> df.high) & (((df.low < df.hmax) & (df.high > df.cmean)))]
+                df = df[ (((df.buy > df.ene) & (df.volume / radio_t > 1.5)) ) |  (((df.lastv1d > df.lvol * 1.5) )  )]
         else:
             # df = df[ (df.max5 >= df.ene) & (df.low <> df.high) & (((df.low < df.hmax) & (df.close > df.cmean)) | (df.high > df.cmean))]
-            df = df[ (((df.buy > df.ene) & (df.volume / radio_t > 1.5)) ) |  (((df.lastv0d > df.lvol * 1.5) & (df.lastv1d > df.lvol * 1.5)) & (df.lastp0d > df.ene) ) | (((df.lastp0d > df.ene) | (df.lastp1d > df.ene)) & (df.lastp2d > df.ene)) | ((df.buy > df.max5)|(df.buy > df.ene)) | (df.max5 >= df.ene)  | (df.high > df.cmean)]
+            df = df[ (((df.buy > df.ene) & (df.volume / radio_t > 1.5)) )  | (((df.lastp1d > df.ene) ) | ((df.buy > df.max5)|(df.buy > df.ene)) | (df.max5 >= df.ene)  | (df.high > df.cmean) )]
         return df
 
     if cct.get_work_time() and 'b1_v' in df.columns and 'nvol' in df.columns:
@@ -289,10 +287,10 @@ def getBollFilter(df=None, boll=ct.bollFilter, duration=ct.PowerCountdl, filter=
 
         if 'nclose' in df.columns:
             # df = df[ ((df.buy > df.ene) ) | ((df.buy > df.upper) & ( df.nclose > df.cmean))]
-            df = df[ ((df.df2 > 1) & (df.buy > df.llastp)) | ((df['nclose'] > df['ene'] * ct.changeRatio) & (df['percent'] > -3) & (df.volume > 1.5)) |
+            df = df[ ((df.buy > df.llastp)) | ((df['nclose'] > df['ene'] * ct.changeRatio) & (df['percent'] > -3) & (df.volume > 1.5)) |
                     ((df['nclose'] > df['upper'] * ct.changeRatio) & (df['buy'] > df['upper'] * ct.changeRatioUp)) | ((df['llastp'] > df['upper']) & (df['nclose'] > df['upper']))]
         else:
-            df = df[ ((df.df2 > 1) & (df.buy > df.llastp)) |  ((df.buy > df.ene)) | ((df.buy > df.upper) & (df.close > df.cmean))]
+            df = df[ ( (df.buy > df.llastp)) |  ((df.buy > df.ene)) | ((df.buy > df.upper) & (df.close > df.cmean))]
 
         if 'nlow' in df.columns and 930 < cct.get_now_time_int():
             # for col in ['nhigh', 'nclose', 'nlow','nstd']:
@@ -347,20 +345,20 @@ def getBollFilter(df=None, boll=ct.bollFilter, duration=ct.PowerCountdl, filter=
         if filter:
             
             if cct.get_now_time_int() > 915 and cct.get_now_time_int() <= 1000:
-                df = df[ ((df.df2 > 1) & (df.buy > df.llastp)) |  (df.buy > df.hmax * ct.changeRatio) | (df.buy < df.lmin * ct.changeRatioUp) | (df.per3d > 2)]
+                df = df[ ( (df.buy > df.llastp)) |  (df.buy > df.hmax * ct.changeRatio) | (df.buy < df.lmin * ct.changeRatioUp) ]
                 # df = df[(df.buy > df.hmax * ct.changeRatio) & (df.low > df.llastp)]
                 # df = df[(df.buy > df.cmean * ct.changeRatioUp) | (df.open > df.llastp)]
                 # df = df[df.buy > df.cmean]
 
             elif cct.get_now_time_int() > 1000 and cct.get_now_time_int() <= 1430:
-                df = df[ ((df.df2 > 1) & (df.buy > df.llastp)) |  (df.buy > df.hmax * ct.changeRatio) | (df.buy < df.lmin * ct.changeRatioUp) | (df.per3d > 2)]
+                df = df[ ((df.buy > df.llastp)) |  (df.buy > df.hmax * ct.changeRatio) | (df.buy < df.lmin * ct.changeRatioUp) ]
                 # df = df[(df.buy > df.hmax * ct.changeRatio) | (df.low > df.llastp)]
                 # df = df[(df.buy > df.hmax * ct.changeRatio) & (df.low > df.llastp)]
 
                 # df = df[(df.buy > df.cmean * ct.changeRatioUp) | (df.open > df.llastp)]
                 # df = df[df.buy > df.cmean]
             else:
-                df = df[ ((df.df2 > 1) & (df.buy > df.llastp)) |  (df.buy > df.hmax * ct.changeRatio) | (df.buy < df.lmin * ct.changeRatioUp) | (df.per3d > 5)]
+                df = df[ ( (df.buy > df.llastp)) |  (df.buy > df.hmax * ct.changeRatio) | (df.buy < df.lmin * ct.changeRatioUp) ]
 
                 # df = df[(df.buy > df.hmax * ct.changeRatio) | (df.low > df.llastp)]
                 # df = df[(df.buy > df.hmax * ct.changeRatio) & (df.low > df.llastp)]
@@ -368,15 +366,6 @@ def getBollFilter(df=None, boll=ct.bollFilter, duration=ct.PowerCountdl, filter=
                 # df = df[(df.buy > df.cmean * ct.changeRatioUp) | (df.open > df.llastp)]
                 # df = df[df.buy > df.cmean]
 
-            # if ma5d:
-            #     # op, ra, st, days = pct.get_linear_model_status('999999', filter='y', dl=dl, ptype='low')
-            #     oph, rah, sth, daysh = pct.get_linear_model_status('999999', filter='y', dl=dl, ptype='high')
-            #     # fibl = str(days[0])
-            #     fibh = str(daysh[0])
-            #     # if 1 < fibl < dl / 2 and fibh > dl / 3:
-            #     if fibh > dl / 3:
-            #         df = df[ ((df.ma5d * ct.changeRatio < df.low) & (df.low < df.ma5d * (2 - ct.changeRatio))) | ((df.percent > 1) & (df.volume > 3))]
-            # print df.loc['000801']
 
             if 'vstd' in df.columns:
                 # df = df[(df.lvol * df.volume > (df.vstd + df.lvol)) | ((df.percent > -10) & (df.hv / df.lv > 1.5))]
@@ -565,5 +554,6 @@ def WriteCountFilter(df, op='op', writecount=ct.writeCount, end=None, duration=1
                         end -= 1
                     codel = df.index.tolist()[writecount:end]
     else:
-        codel = df.index.tolist()
+        if df is not None and len(df) > 0:
+            codel = df.index.tolist()
     return codel

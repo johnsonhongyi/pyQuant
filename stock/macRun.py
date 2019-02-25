@@ -136,12 +136,14 @@ sleep 0.2;osascript -e 'tell application "Python Launcher" to quit';sleep 25;
 open sina_Market-DurationCXDN.py;
 sleep 0.2;osascript -e 'tell application "Python Launcher" to quit';sleep 25;
 open sina_Market-DurationSH.py;
-sleep 0.2;osascript -e 'tell application "Python Launcher" to quit';sleep 25;
-open LinePower.py;
 sleep 0.2;osascript -e 'tell application "Python Launcher" to quit';sleep 45;
 open sina_Monitor.py;
 sleep 0.2;osascript -e 'tell application "Python Launcher" to quit';sleep 5;
 '''
+
+# sleep 0.2;osascript -e 'tell application "Python Launcher" to quit';sleep 25;
+# open LinePower.py;
+
 
 # cmdRun = '''cd /Users/Johnson/Documents/Quant/pyQuant/stock;
 # open singleAnalyseUtil.py;

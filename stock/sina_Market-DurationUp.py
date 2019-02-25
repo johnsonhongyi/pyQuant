@@ -107,7 +107,8 @@ if __name__ == "__main__":
     # duration_date = 300
     du_date = duration_date
     # resample = ct.resample_dtype
-    resample = 'w'
+    # resample = 'w'
+    resample = 'd'
     end_date = None
     ptype = 'low'
     filter = 'y'
@@ -124,7 +125,8 @@ if __name__ == "__main__":
     parser = cct.MoniterArgmain()
     parserDuraton = cct.DurationArgmain()
     # market_sort_value, market_sort_value_key = ct.get_market_sort_value_key(ct.sort_value_key_perd23)
-    market_sort_value, market_sort_value_key = ct.get_market_sort_value_key('x1 d f')
+    # market_sort_value, market_sort_value_key = ct.get_market_sort_value_key('x1 d f')
+    market_sort_value, market_sort_value_key = ct.get_market_sort_value_key('1')
     st_key_sort = '2'
     st = None
     
@@ -136,7 +138,8 @@ if __name__ == "__main__":
             if st is None:
                 st_key_sort = '%s %s'%(st_key_sort.split()[0],cct.get_index_fibl())
             # top_now = tdd.getSinaAlldf(market='060.blk', vol=ct.json_countVol, vtype=ct.json_countType)
-            market_blk = '次新股'
+            # market_blk = '次新股'
+            market_blk = '060'
             top_now = tdd.getSinaAlldf(market=market_blk,filename='cxg', vol=ct.json_countVol, vtype=ct.json_countType)
             
             # top_now = tdd.getSinaAlldf(market='all', vol=ct.json_countVol, vtype=ct.json_countType,trend=True)
@@ -319,7 +322,10 @@ if __name__ == "__main__":
                     # elif percent_status == 'y' and cct.get_now_time_int() > 935 and ptype == 'high' :
                     elif ptype == 'low':
                         # top_dif = top_dif[top_dif.percent >= 0]
-                        top_temp = stf.filterPowerCount(top_dif,ct.PowerCount)
+                        # top_temp = stf.filterPowerCount(top_dif,ct.PowerCount)
+                        # top_temp = top_dif[ ((top_dif.lastp0d >=9.8)  & (top_dif.lastp1d < 9) & (top_dif.lastp2d < 9) & (top_dif.lastp3d < 9) )  | ((top_dif.lastp0d <9)  & (top_dif.lastp1d < 9) & (top_dif.lastp2d < 9) & (top_dif.lastp3d < 9)) ][:100]
+                        # top_temp = top_dif[ ((top_dif.per1d >=9.8)  & (top_dif.per2d < 9) & (top_dif.per3d < 9) & (top_dif.per4d < 9) )  | ((top_dif.per1d <9)  & (top_dif.per2d < 9) & (top_dif.per3d < 9) & (top_dif.per4d < 9)) ][:100]
+                        top_temp = top_dif[ ((top_dif.per1d >=9.8)  & (top_dif.per2d < 8) & (top_dif.per3d < 8)  ) ][:100]
                         top_end = top_dif[-5:].copy()
                         top_temp = pct.powerCompute_df(top_temp, dl=ct.PowerCountdl, talib=True)
                         top_end = pct.powerCompute_df(top_end, dl=ct.PowerCountdl, talib=True)
@@ -370,6 +376,7 @@ if __name__ == "__main__":
                         ct_Duration_format_Values = ct.get_Duration_format_Values(ct.Duration_format_trade, market_sort_value[:])
                     
                     ct_Duration_format_Values = ct.get_Duration_format_Values(ct_Duration_format_Values,replace='b1_v',dest='volume')                    
+                    ct_Duration_format_Values = ct.get_Duration_format_Values(ct_Duration_format_Values,replace='fibl',dest='top10')                    
                     top_dd = top_dd.loc[:, ct_Duration_format_Values]
                     # print cct.format_for_print(top_dd)
                     # table,widths = cct.format_for_print(top_dd[:9],widths=True)

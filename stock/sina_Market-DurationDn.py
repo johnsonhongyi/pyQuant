@@ -351,7 +351,7 @@ if __name__ == "__main__":
                     # top_all = tdd.get_powerdf_to_all(top_all, top_temp)
                     top_all = tdd.get_powerdf_to_all(top_all, top_end)
                     top_temp = stf.getBollFilter(
-                        df=top_temp, boll=ct.bollFilter, duration=ct.PowerCountdl, upper=False, resample=resample)
+                        df=top_temp, boll=ct.bollFilter, duration=ct.PowerCountdl, upper=True, resample=resample)
                         # df=top_temp, boll=11, duration=ct.PowerCountdl, upper=False, resample=resample)
                         # df=top_temp, boll=ct.bollFilter, duration=ct.PowerCountdl, upper=False, resample=resample)
                     print("N:%s K:%s %s G:%s" % (
@@ -416,10 +416,13 @@ if __name__ == "__main__":
                     ct_Duration_format_Values = ct.get_Duration_format_Values(
                         ct_Duration_format_Values, replace='op', dest='boll')
                     ct_Duration_format_Values = ct.get_Duration_format_Values(
-                        ct_Duration_format_Values, replace='b1_v', dest='upper')
+                        ct_Duration_format_Values, replace='b1_v', dest='upper')  
+                    ct_Duration_format_Values = ct.get_Duration_format_Values(
+                        ct_Duration_format_Values, replace='fibl',dest='top10')
 
                     top_dd = top_dd.loc[:, ct_Duration_format_Values]
 
+                    # df[df.columns[(df.columns >= 'per1d') & (df.columns <= 'per9d')]][:100]
                     # table,widths = cct.format_for_print(top_dd[:10],widths=True)
                     table, widths = cct.format_for_print(top_dd.loc[[col for col in top_dd[:10].index if col in top_temp[:10].index]],
                                                          widths=True)  # pylint: disable=C0103,C0103,C0103,C0103,C0103,C0103,C0103,C0103,C0103,C0103,C0103,C0103,C0103,C0103,C0103,C0103,C0103,C0103

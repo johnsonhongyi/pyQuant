@@ -133,7 +133,7 @@ if __name__ == "__main__":
     parser = cct.MoniterArgmain()
     parserDuraton = cct.DurationArgmain()
     # market_sort_value, market_sort_value_key = ct.get_market_sort_value_key(ct.sort_value_key_perd)
-    # market_sort_value, market_sort_value_key = ct.get_market_sort_value_key('1')
+    market_sort_value, market_sort_value_key = ct.get_market_sort_value_key('1')
     st_key_sort = '7'
     # st_key_sort = '2'
     st = None
@@ -389,6 +389,7 @@ if __name__ == "__main__":
                     # ct_Duration_format_Values = ct.get_Duration_format_Values(ct_Duration_format_Values,replace='boll',dest='upper')
                     ct_Duration_format_Values = ct.get_Duration_format_Values(ct_Duration_format_Values,replace='b1_v',dest='perc3d')
                     ct_Duration_format_Values = ct.get_Duration_format_Values(ct_Duration_format_Values,replace='couts',dest='b1_v')
+                    ct_Duration_format_Values = ct.get_Duration_format_Values(ct_Duration_format_Values,replace='fibl',dest='top10')
                     top_dd = top_dd.loc[:, ct_Duration_format_Values]
                     # ct_Duration_format_Values = ct.get_Duration_format_Values(ct_Duration_format_Values,replace='op',dest='upper')
                     # top_dd[col for col in top_dd.index if col in top_temp[:10].index]

@@ -1209,7 +1209,10 @@ def to_mp_run_async(cmd, urllist, *args,**kwargs):
             func = partial(cmd, **kwargs)
             # for y in tqdm(pool.imap_unordered(func, urllist),unit='%',mininterval=ct.tqdm_mininterval,unit_scale=True,total=len(urllist),ncols=5):
             # results = pool.map(func, urllist)
-            results = pool.map(func, urllist)
+            try:
+                results = pool.map(func, urllist)
+            except Exception as e:
+                print e, code
         else:
             pool = ThreadPool(cpu_count())
             for code in urllist:
@@ -1523,7 +1526,8 @@ def counterCategory(df):
         categoryl = df.category[:20].tolist()
         dicSort = []
         for i in categoryl:
-            dicSort.extend(i.split(';'))
+            if isinstance(i, str):
+                dicSort.extend(i.split(';'))
         topSort = Counter(dicSort)
         top5 = OrderedDict(topSort.most_common(3))
         for i in top5.keys():
@@ -2221,11 +2225,14 @@ def func_compute_percd(close, lastp, op, lasth, lastl, nowh, nowl):
     #         initc -= 1
     return initc
 
+# import numba as nb
+# @nb.autojit
 def func_compute_percd2(close, lastp, op, lastopen,lasth, lastl, nowh, nowl,nowvol=None,lastvol=1,hmax=None,cumin=None):
     # down_zero, down_dn, percent_l = 0, 0, 2
      # (1 if ( ((c >= op) and ((c - lc)/lc*100 >= 0)) or (c >= op and c >=m5a) ) else down_dn)
+     
     initc = 0
-    if lasth <> 1.0 and lastl <> 1.0 and lasth <> 0 and lastl <> 0:
+    if 0 < lastp < 1000 and lasth <> 1.0 and lastl <> 1.0 and lasth <> 0 and lastl <> 0:
         close = round(close, 1)
         lastp = round(lastp, 1)
         op = round(op, 1)

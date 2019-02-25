@@ -995,6 +995,8 @@ def powerCompute_mp(code,df=None,dm=None,dtype='d',statuslist=True,index=False,e
 
         tdx_df = tdx_df.fillna(0)
         tdx_df = tdx_df.sort_index(ascending=True)
+        if 'topR' not in df.columns or ('topR' in df.columns and not (0 < df.loc[code,'topR'] < 10)):
+            df.loc[code,'topR']=tdd.compute_top10_count(tdx_df[:1]).topR.values[0]
 
         # if len(df) > days + 1 and days != 0:
         #     # log.info("tdx_df:%s"%(len(tdx_df)))
@@ -1103,9 +1105,9 @@ def powerCompute_mp(code,df=None,dm=None,dtype='d',statuslist=True,index=False,e
             df.loc[code, 'ma10d'] = round(
                 float(tdx_df[:1].ma10d[0]), 2)
     dd['op'] = opl
-    dd['ra'] = round(ral,1)
+    dd['ra'] = ral
     dd['oph'] = oph
-    dd['rah'] = round(rah,1)
+    dd['rah'] = rah
     dd['fib'] = fib
     dd['fibl'] = fibl
     dd['ldate'] = stl
@@ -1153,13 +1155,7 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y', tal
         h5_combine_status = True
         statuslist = False
 
-    # if '999999' not in code_l:
-    #     code_l.append('999999')
-    #     code_l.append('399001')
-
-    # code_src = code_l
     global Power_CXG_Error, drop_cxg, wencai_drop
-#    drop_cxg
 
     h5_fname = 'powerCompute'
     h5_table = dtype + '_' + str(dl) + '_' + filter + '_' + 'all'
@@ -1182,7 +1178,7 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y', tal
 #            h5 = h5[(h5.op <> 0) & (h5.ra <> 0) & (h5.df2b <> 0 )]
 
             # h5 = h5[(h5.df2b <> 0 ) & (h5.ra <> 0 ) & (h5.boll <> 0 )]
-            h5 = h5[(h5.df2 <> 0 ) & (h5.boll <> 0 )]
+            h5 = h5[(h5.op <> 0 ) & (h5.boll <> 0 )]
             h5 = h5.drop(
                 [inx for inx in h5.columns if inx not in power_columns], axis=1)
 
@@ -1251,206 +1247,18 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y', tal
             for co in list(co_dif):
                 df[co] = 0
 
-    #     for code in code_l:
-    #     # for ind in tqdm(range(len(code_l)),unit='%',mininterval=ct.tqdm_mininterval,unit_scale=True,total=len(code_l),ncols=ct.ncols):
-    #         # code = code_l[ind]
-    #         # if 'boll' in df.loc[code].index:
-    #         #     if 'time' in df.columns and len(df[df.time <> 0]) > 0 and df[:1].boll.values <> 0 and time.time() - df[df.time <> 0].time[0] < ct.power_update_time:
-    #         #         continue
-    #             # elif df.loc[code].boll <> 0:
-    #             #     continue
-
-    #         if statuslist:
-    #             start = None
-    #         else:
-    #             if dl is None:
-    #                 start = df.loc[code, 'date']
-    #                 start = cct.day8_to_day10(start)
-    #                 # filter = 'y'
-    #                 # print start
-    #             else:
-    #                 start = None
-    #         start = cct.day8_to_day10(start)
-    #         end = cct.day8_to_day10(end)
-    #         if code in dm.index:
-    #             # log.info("dz:%s"%(dm.loc[code]))
-    #             dz = dm.loc[code].to_frame().T
-    #             # if len(dz) > 1:
-    #             #     dz=dz.to_frame()[0].T
-    #             # else:
-    #             #     dz=dz.to_frame().T
-    #         else:
-    #             dz = tdd.get_sina_data_df(code)
-
-    #         if index and 'cumin' not in df.columns:
-    #             df['cumin'] = 0
-
-    #         if len(dz) > 0 and (index or dz.buy.values > 0 or dz.sell.values > 0):
-    #             tdx_df = tdd.get_tdx_append_now_df_api(
-    #                 code, start=start, end=end, type='f', df=None, dm=dz, dl=dl, newdays=5)
-
-    #             tdx_df = tdx_df.fillna(0)
-    #             tdx_df = tdx_df.sort_index(ascending=True)
-
-    #             # if len(df) > days + 1 and days != 0:
-    #             #     # log.info("tdx_df:%s"%(len(tdx_df)))
-    #             #     tdx_df = tdx_df[:-days]
-    #             #     # log.info("tdx_df:%s"%(len(tdx_df)))
-    #             tdx_days = len(tdx_df)
-    #             # if 8 < tdx_days < ct.cxg_limit_days:
-
-    #             if code in df.index and "per3d" in df.columns and df.loc[code].per3d > 20 and 8 < tdx_days:
-    #                 # print code,df.loc[code].per2d
-    #                 if tdx_days > 6:
-    #                     top_count = 0
-    #                     for day in range(len(tdx_df), 0, -1):
-    #                         #                        for day in range(len(tdx_df)):
-    #                         # tmpdf=pd.DataFrame(df.loc[:,column][-days-2:-1-day], columns=[column])
-    #                         # c_open = df.open.values[-days]
-    #                         c_high = tdx_df.high.values[-day]
-    #                         c_low = tdx_df.low.values[-day]
-    #     #                    print c_high,c_low
-    #                         if int(c_high) <> 0 and c_high == c_low:
-    #                             top_count += 1
-    #                         else:
-    #                             if day == 1 and (915 < cct.get_now_time_int() < 932 and cct.get_work_day_status()):
-    #                                 # if day == 1 and
-    #                                 # cct.get_work_day_status():
-    #                                 c_buy = dz.buy.values[-1]
-    #                                 c_close_l = tdx_df.close.values[-2]
-    #                                 c_percent = round(
-    #                                     (c_buy - c_close_l) / c_close_l * 100, 2)
-    #                                 # if 0 < c_percent < 9.9:
-    #                                 if 0 < c_percent:
-    #                                     break
-    #                             else:
-    #                                 if tdx_days - day < 3:
-    #                                     top_count += 1
-    #                                     continue
-    #                                 else:
-    #                                     break
-    #     #                            log.info('code:%s c_high <> c_low:top :%s'%(code,tdx_days - day))
-    #                 else:
-    #                     top_count = len(tdx_df)
-
-    #                 if top_count == len(tdx_df):
-    #                     drop_cxg.append(code)
-    #                     if Power_CXG_Error < 2:
-    #                         log.error('CXG Good:%s' % (code))
-    #                     continue
-    #             elif tdx_days <= 8:
-    #                 drop_cxg.append(code)
-    #                 continue
-
-    #         else:
-    #             df.loc[code, 'op'] = 1
-    #             df.loc[code, 'ra'] = 1
-    #             df.loc[code, 'fib'] = 1
-    #             df.loc[code, 'fibl'] = 1
-    #             df.loc[code, 'ldate'] = 1
-    #             df.loc[code, 'boll'] = 1
-    #             df.loc[code, 'kdj'] = 1
-    #             df.loc[code, 'macd'] = 1
-    #             df.loc[code, 'rsi'] = 1
-    #             df.loc[code, 'ma'] = 1
-    #             df.loc[code, 'oph'] = 1
-    #             df.loc[code, 'rah'] = 1
-    #             continue
-    # #        tdx_df = tdd.get_tdx_power_now_df(code, start=start, end=end, type='f', df=None, dm=dz, dl=dl*2)
-    #         opc = 0
-    #         stl = ''
-    #         rac = 0
-    #         # fib = []
-    #         fibl = 0
-    #         fib = 0
-    #         if len(tdx_df) < 2:
-    #             continue
-    #         # sep = '|'
-    #         for ptype in ['low', 'high']:
-    #             op, ra, st, daysData = get_linear_model_status(
-    #                 code, df=tdx_df, dtype=dtype, start=start, end=end,days=days, dl=dl, filter=filter, ptype=ptype)
-    #             # opc += op
-    #             # rac += ra
-
-    #             if ptype == 'low':
-    #                 ral = ra
-    #                 opl = op
-    #                 stl = st
-    #                 # fibl = str(daysData[0])
-    #                 fibl = int(daysData[0])
-    #             else:
-    #                 oph = op
-    #                 rah = ra
-    #                 # fib = str(daysData[0])
-    #                 fib = int(daysData[0])
-    #         # fibl = sep.join(fib)
-
-    #         tdx_df, operation = getab.Get_BBANDS(tdx_df, dtype='d',lastday=days)
-    #         # opc +=operation
-    #         # if opc > 21:
-    #         #     opc = 21
-    #         # log.debug( "opc:%s op:%s"%(opc,operation))
-
-    #         # df.loc[code,'ma5'] = daysData[1].ma5d[0]
-    #         # print tdx_df[:1].ma5d[0],daysData[1].ma5d[0]
-    #         if len(tdx_df) > 0 and 'ma5d' in tdx_df.columns:
-    #             if tdx_df[:1].ma5d[0] is not None and tdx_df[:1].ma5d[0] != 0:
-    #                 df.loc[code, 'ma5d'] = round(float(tdx_df[:1].ma5d[0]), 2)
-    #             if tdx_df[:1].ma10d[0] is not None and tdx_df[:1].ma10d[0] != 0:
-    #                 df.loc[code, 'ma10d'] = round(
-    #                     float(tdx_df[:1].ma10d[0]), 2)
-    #         df.loc[code, 'op'] = opl
-    #         df.loc[code, 'ra'] = ral
-    #         df.loc[code, 'oph'] = oph
-    #         df.loc[code, 'rah'] = rah
-    #         df.loc[code, 'fib'] = fib
-    #         df.loc[code, 'fibl'] = fibl
-    #         # df.fibl.astype(float)
-    #         df.loc[code, 'ldate'] = stl
-    #         df.loc[code, 'boll'] = operation
-
-    #         if 'cumin' in tdx_df.columns:
-    #             if tdx_df.cumin[-1] == 0:
-    #                 df.loc[code,'cumin'] = tdx_df.cumin[-2]
-    #             else:
-    #                 df.loc[code,'cumin'] = tdx_df.cumin[-1]
-    #         else:
-    #             df.loc[code,'cumin'] = -1
-                
-    #         tdx_df, opkdj = getab.Get_KDJ(tdx_df, dtype='d',lastday=days)
-    #         tdx_df, opmacd = getab.Get_MACD_OP(tdx_df, dtype='d',lastday=days)
-    #         tdx_df, oprsi = getab.Get_RSI(tdx_df, dtype='d',lastday=days)
-    #         # opma = getab.algoMultiDay_trends(tdx_df
-    #         opma = getab.algoMultiDay(tdx_df)
-    #         volstd = getab.powerStd(code=code, df=tdx_df, ptype='vol',lastday=days)
-    #         df.loc[code, 'kdj'] = opkdj
-    #         df.loc[code, 'macd'] = opmacd
-    #         df.loc[code, 'rsi'] = oprsi
-    #         df.loc[code, 'ma'] = opma
-    #         df.loc[code, 'vstd'] = volstd
-    #         df.loc[code, 'lvolume'] = tdx_df.vol[1]
-
-    #         if wcdf_code is not None and code in wcdf_code:
-    #             df.loc[code, 'category'] = wcdf.loc[code, 'category']
-    #         else:
-    #             wencai_drop.append(code)
-    #             log.warn("code not in wcdf:%s" % (code))
-    #         # else:
-    #             # df.loc[code,'category'] = 0
-
-    #         # df = getab.Get_BBANDS(df, dtype='d')
-    #         #'volume', 'ratio', 'couts','ldate' -> 'ma','macd','rsi','kdj'
-    #         # df = df.drop_duplicates()
-        
-        # dd = powerCompute_mp(code_l[0], df=df,dm=dm, statuslist=True, index=index, end=end,dl=dl,wcdf=wcdf)        
-        
-
+        # if len(code_l) < 5:
+        #     results=[]
+        #     for code in code_l:
+        #         result= powerCompute_mp(code, df=df,dm=dm, statuslist=True, index=index, end=end,dl=dl,wcdf=wcdf)
+        #         results.append(result)
+        # # import ipdb;ipdb.set_trace()
+        # else:
+        #     results = cct.to_mp_run_async(
+        #             powerCompute_mp,code_l, df=df,dm=dm, statuslist=True, index=index, end=end,dl=dl,wcdf=wcdf)
         results = cct.to_mp_run_async(
-                powerCompute_mp,code_l, df=df,dm=dm, statuslist=True, index=index, end=end,dl=dl,wcdf=wcdf)
-        # results=[]
-        # for code in code_l:
-        #     result = powerCompute_mp(code, df=df,dm=dm, statuslist=True, index=index, end=end,dl=dl,wcdf=wcdf)
-        #     results.append(result)
+                        powerCompute_mp,code_l, df=df,dm=dm, statuslist=True, index=index, end=end,dl=dl,wcdf=wcdf)
+
         
         results = [x for x in results if x is not None]
         dd = pd.DataFrame(results)
@@ -1466,12 +1274,16 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y', tal
 #        if "fib" not in df.columns:
 #            df['fib'] = 0
         def compute_df2(df):
-           df['df2'] = (map(lambda ra, fibl, rah, fib, ma, kdj, rsi: (eval(ct.powerdiff % (dl))),
-                     df['ra'].values, df['fibl'].values, df[
-                         'rah'].values, df['fib'].values, df['ma'].values,
-                     df['kdj'].values, df['rsi'].values))
-           df['df2'] = df['df2'].apply(lambda x:round(x,1))
-           return df
+            # df['df2'] = (map(lambda ra, fibl, rah, fib, ma, kdj, rsi: (eval(ct.powerdiff % (dl))),
+            #          df['ra'].values, df['fibl'].values, df[
+            #              'rah'].values, df['fib'].values, df['ma'].values,
+            #          df['kdj'].values, df['rsi'].values))
+            if 'topR' in df.columns:
+                df['df2'] = df['topR']
+            else:
+                df['df2'] = 0
+            df['df2'] = df['df2'].apply(lambda x:round(x,1))
+            return df
 
         if len(df) <> len(code_l):
             dd = df.loc[code_l]

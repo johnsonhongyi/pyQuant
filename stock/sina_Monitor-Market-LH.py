@@ -145,10 +145,11 @@ if __name__ == "__main__":
                 st_key_sort = '%s %s'%(st_key_sort.split()[0],cct.get_index_fibl())
                 
             # top_now = tdd.getSinaAlldf(market='次新股',filename='cxg', vol=ct.json_countVol, vtype=ct.json_countType)
-            market_blk = 'cyb'
+            # market_blk = 'cyb'
+            market_blk = '央企'
             # top_now = tdd.getSinaAlldf(market=market_blk, filename=None, vol=ct.json_countVol, vtype=ct.json_countType,trend=True)
             top_now = tdd.getSinaAlldf(market='央企',filename='yqbk', vol=ct.json_countVol, vtype=ct.json_countType,trend=False)
-            
+                
             # top_now = tdd.getSinaAlldf(market='次新股,cyb', filename='cxg', vol=ct.json_countVol, vtype=ct.json_countType,trend=False)
             # top_now = tdd.getSinaAlldf(market='次新股,060', filename='cxg', vol=ct.json_countVol, vtype=ct.json_countType,trend=False)
             # top_now = tdd.getSinaAlldf(market='次新股,zxb',filename='cxg', vol=ct.json_countVol, vtype=ct.json_countType)
@@ -167,9 +168,8 @@ if __name__ == "__main__":
             else:
                 status_change = False
             # print ("Buy>0:%s"%len(top_now[top_now['buy'] > 0])),
-            log.info("top_now['buy']:%s" % (top_now[:2]['buy']))
-            log.info("top_now.buy[:30]>0:%s" %
-                     len(top_now[:30][top_now[:30]['buy'] > 0]))
+            # log.info("top_now['buy']:%s" % (top_now[:2]['buy']))
+            # log.info("top_now.buy[:30]>0:%s" %len(top_now[:30][top_now[:30]['buy'] > 0]))
             if len(top_now) > 10 or cct.get_work_time():
                 # if len(top_now) > 10 or len(top_now[:10][top_now[:10]['buy'] > 0]) > 3:
                 # if len(top_now) > 10 and not top_now[:1].buy.values == 0:
@@ -253,6 +253,7 @@ if __name__ == "__main__":
                     # top_all=top_all.sort_values(by=['percent','dff','couts','ratio'],ascending=[0,0,1,1])
 
                     top_temp = stf.filterPowerCount(top_dif,ct.PowerCount)
+                    
                     top_end = top_all[-int((ct.PowerCount)/10):].copy()
 
                     top_temp = pct.powerCompute_df(top_temp, dl=ct.PowerCountdl, talib=True)
@@ -306,7 +307,9 @@ if __name__ == "__main__":
                     
 
                     ct_MonitorMarket_Values = ct.get_Duration_format_Values(ct_MonitorMarket_Values,replace='b1_v',dest='volume')
+                    ct_MonitorMarket_Values = ct.get_Duration_format_Values(ct_MonitorMarket_Values,replace='fibl',dest='top10')
                     ct_MonitorMarket_Values2 = ct.get_Duration_format_Values(ct_MonitorMarket_Values2,replace='b1_v',dest='volume')
+                    ct_MonitorMarket_Values2 = ct.get_Duration_format_Values(ct_MonitorMarket_Values2,replace='fibl',dest='top10')
                     
 
                     # if st_key_sort == '1' or st_key_sort == '7':

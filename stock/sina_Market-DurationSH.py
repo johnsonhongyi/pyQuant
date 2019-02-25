@@ -136,8 +136,8 @@ if __name__ == "__main__":
                 
             # top_now = tdd.getSinaAlldf(market='060', vol=ct.json_countVol, vtype=ct.json_countType)
             # top_now = tdd.getSinaAlldf(market='次新股',filename='cxg', vol=ct.json_countVol, vtype=ct.json_countType)
-            # market_blk = 'rzrq'
-            market_blk = '068'
+            market_blk = 'rzrq'
+            # market_blk = '068'
             # top_now = tdd.getSinaAlldf(market= market_blk , vol=ct.json_countVol, vtype=ct.json_countType,trend=True)
             # top_now = tdd.getSinaAlldf(market='次新股,060', filename='cxg' , vol=ct.json_countVol, vtype=ct.json_countType,trend=True)
             top_now = tdd.getSinaAlldf(market=market_blk, vol=ct.json_countVol, vtype=ct.json_countType,trend=True)
@@ -373,7 +373,8 @@ if __name__ == "__main__":
                     # ct_Duration_format_Values = ct.get_Duration_format_Values(ct_Duration_format_Values,replace='couts',dest='stdv')
                     ct_Duration_format_Values = ct.get_Duration_format_Values(ct_Duration_format_Values,replace='couts',dest='volume')
                     ct_Duration_format_Values = ct.get_Duration_format_Values(ct_Duration_format_Values,replace='b1_v',dest='upper')
-                    # ct_Duration_format_Values = ct.get_Duration_format_Values(ct_Duration_format_Values,replace='op',dest='boll')
+                    ct_Duration_format_Values = ct.get_Duration_format_Values(ct_Duration_format_Values,replace='fibl',dest='top10')
+
                     top_dd = top_dd.loc[:, ct_Duration_format_Values]
                     # print cct.format_for_print(top_dd)
                     # table,widths = cct.format_for_print(top_dd[:9],widths=True)

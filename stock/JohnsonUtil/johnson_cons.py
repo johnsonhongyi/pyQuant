@@ -30,12 +30,13 @@ DD_VOL_List = {'0': '40000', '1': '100000',
 # LvolumeSize = 125000
 tqdm_mininterval=2
 ncols = 60
+topR = 1
 LvolumeSize = 12500
 VolumeMaxR = 5000
 VolumeMinR = 0.1
 PowerCount = 200
 duration_diff = 6
-duration_date_l = 21
+duration_date_l = 30
 duration_date_up = 120
 duration_date_sort = duration_date_l
 PowerCountdl = duration_date_l * 2 if duration_date_l < 20 else duration_date_l
@@ -47,7 +48,7 @@ writeCount = 5
 changeRatio = 0.975
 changeRatioUp = 1.025
 # duration_date = 10
-wencai_delay_time = 10
+wencai_delay_time = 300
 resample_dtype = 'd'
 logtime = 1800
 cumdays = 14
@@ -148,7 +149,7 @@ Duration_percent_vol_key = [0,0, 0, 0, 0, 0, 1, 1, 0, 1, 1]
 # Duration_percent_per_ra=['percent','ra','dff','op','fib','fibl','ratio','volume','couts']
 # Duration_percent_per_ra_key=[0,0,0,0,1,1,1,1,1]
 
-Duration_percent_df2dff = ['df2', 'dff', 'percent',
+Duration_percent_df2dff = ['top10', 'dff', 'percent',
                            'op', 'fib', 'fibl', 'ra', 'ratio', 'volume', 'couts']
 Duration_percent_df2dff_key = [0, 0, 0, 0, 1, 1, 0, 1, 1, 1]
 
@@ -161,7 +162,7 @@ Duration_percent_df2dff_key = [0, 0, 0, 0, 1, 1, 0, 1, 1, 1]
 
 # Duration_percent_boll_key = [0, 0, 0, 0, 0, 1, 1, 1, 1, 1]
 
-Duration_percent_opboll = ['op', 'perc3d', 'percent',
+Duration_percent_opboll = ['topR', 'perc3d', 'percent',
                          'dff', 'fib', 'fibl', 'ratio', 'volume', 'couts']
 Duration_percent_opboll_key = [0, 0, 0, 0, 1, 1, 1, 1, 1]
 
@@ -567,8 +568,8 @@ INDEX_SYMBOL = {"399990": "sz399990", "000006": "sh000006", "399998": "sz399998"
 def RawMenuArgmain():
     raw = 'status:[go(g),clear(c),[d 20150101 [l|h]|[y|n|pn|py],quit(q),W(a),sh]:'
     raw_input_menu = raw + "\n\tNow : %s" + \
-        "\n\t1:Sort By Percent\t2:Sort by per1d\t3:Sort By percd\t\t4:Sort By DFF\n\t5:Sort By Ra_dff\t6:Sort By df2\t7:Sort Per b1V\t\t8:Sort by Count" + \
-        "\n\t9:By perc_n\t\tx: by_opboll\tx1:by boll_perc\nplease input:"
+        "\n\t1:Sort By Percent\t2:Sort by per1d\t3:Sort By percd\t\t4:Sort By DFF\n\t5:Sort By Ra_dff\t6:Sort By top10\t7:Sort Per b1V\t\t8:Sort by Count" + \
+        "\n\t9:By perc_n\t\tx: by_topR\tx1:by boll_perc\nplease input:"
     return raw_input_menu
 
 # "Sort By Percent\t3:Sort By DFF\n\t2:Sort By OP\t\t4:Sort By Ra\nplease input:"

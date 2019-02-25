@@ -30,8 +30,41 @@ from JohnsonUtil import johnson_cons as ct
 log = LoggerFactory.log
 # curl 'http://www.iwencai.com/stockpick/search?typed=1&preParams=&ts=1&f=1&qs=index_rewrite&selfsectsn=&querytype=&searchfilter=&tid=stockpick&w=%E9%9B%84%E5%AE%89' -H 'Cookie: v=AZaxA_wZ09rYlOd-tO91dApK4U2ZN9pxLHsO1QD_gnkUwzj_aMcqgfwLXuTQ'
 
+import requests
+from lxml import etree
+def post_login(login_url='http://upass.10jqka.com.cn/login',header=None,url=None):
+	res_keep=requests.Session()#保持Cookie不变，然后再次访问这个页面
+	ex_html=res_keep.get(login_url,headers=header).text
+	html=etree.HTML(ex_html)
+	value=html.xpath('//div[@class="box"]/form/input/@value')
+	postData = {
+		'act': "login_submit",
+		'isiframe': "1",
+		'view': "iwc_quick",
+		'rsa_version': "default_2",
+		'redir': "http://www.iwencai.com/user/pop-logined",
+		'uname': "OuY03m5D1ojuPmpTAbgkpcm0dod5fMbU8jVOwd17WCPEW0pz52RyEcXU+2ZLiBmP+5jckGeUR5ba/fDjkUaPVaisn9Je4l7+JPv3iX/VS4erW25ueJEoVszK9kM3oF2mT3lraObawMclBteFcfwWHyWhsW7YmN19cgOdsQWWWno=",
+		'passwd': "IVORnBZ0Pdi+ix+ehVqiCdYTWCkGBy/kYEeTyTmi+5QBiL8SvYZZg3LLVzzfeMbOWaR/rK4Aoc80kSpqCIETfN3EmhA1CKK9ukI0TImlm8ASlqqz/lUq0lm5LwuMRdBjcD3hoP4RnvDc+W2+ng4XA31YsG6pBo+YF5IHcIxaScU=",
+		'captchaCode': "",
+		'longLogin': "on",
+		}
+	getData = {
+		'v': 'AZaxA_wZ09rYlOd-tO91dApK4U2ZN9pxLHsO1QD_gnkUwzj_aMcqgfwLXuTQ'
+		}
 
-def post_login(root='http://upass.10jqka.com.cn/login', url=None):
+	headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.2; rv:16.0) Gecko/20100101 Firefox/16.0',
+				'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+				'Connection': 'keep-alive', 'v': 'AZaxA_wZ09rYlOd-tO91dApK4U2ZN9pxLHsO1QD_gnkUwzj_aMcqgfwLXuTQ'}
+	wencairoot = 'http://www.iwencai.com/stockpick/search?typed=1&preParams=&ts=1&f=1&qs=result_rewrite&selfsectsn=&querytype=stock&searchfilter=&tid=stockpick&w=%s'
+	url = wencairoot % ('中国联通')			
+	res_post=res_keep.post(login_url,data=postData,headers=header)#使用构建好的postdata重新登录发送post请求,用之前的res_keep进行post请求
+
+	respond=res_keep.get(url,headers=header).text#获取到成绩页面源代码,用之前的res_keep进行get请求
+	import ipdb;ipdb.set_trace()
+	return respond
+
+
+def post_login2(root='http://upass.10jqka.com.cn/login', url=None):
     import urllib2
     import urllib
     postData = {
@@ -53,29 +86,47 @@ def post_login(root='http://upass.10jqka.com.cn/login', url=None):
                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
                'Connection': 'keep-alive', 'v': 'AZaxA_wZ09rYlOd-tO91dApK4U2ZN9pxLHsO1QD_gnkUwzj_aMcqgfwLXuTQ'}
     from cookielib import CookieJar
-    cj = CookieJar()
-    opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
-    data_encoded = urllib.urlencode(postData)
+    # cookie = CookieJar()
+    # opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
+    cookie = CookieJar()
+    #利用urllib2库的HTTPCookieProcessor对象来创建cookie处理器
+    handler=urllib2.HTTPCookieProcessor(cookie)
+    #通过handler来构建opener
+    opener = urllib2.build_opener(handler)
+    #此处的open方法同urllib2的urlopen方法，也可以传入request
+    # response = opener.open(root)
+    # for item in cookie:
+	   #  print 'Name = '+item.name
+	   #  print 'Value = '+item.value
+    # import ipdb;ipdb.set_trace()
+
+    data_encoded = urllib.urlencode(postData).encode()
+    # data_encoded = urllib.parse.urlencode(postData).encode()
     # url = 'http://www.iwencai.com/stockpick/search?typed=0&preParams=&ts=1&f=1&qs=result_original&selfsectsn=&querytype=&searchfilter=&tid=stockpick&w=%s'
-    url = 'http://www.iwencai.com/stockpick/search?typed=1&preParams=&ts=1&f=1&qs=index_rewrite&selfsectsn=&querytype=&searchfilter=&tid=stockpick&w=%s'
-    url = url % ('国企改革')
-    for ck in cj:
-        print ck
-    print ":"
+    # url = 'http://www.iwencai.com/stockpick/search?typed=1&preParams=&ts=1&f=1&qs=index_rewrite&selfsectsn=&querytype=&searchfilter=&tid=stockpick&w=%s'
+    wencairoot = 'http://www.iwencai.com/stockpick/search?typed=1&preParams=&ts=1&f=1&qs=result_rewrite&selfsectsn=&querytype=stock&searchfilter=&tid=stockpick&w=%s'
+    url = wencairoot % ('中国联通')
+    # for ck in cookie:
+        # print ck
+    # print ":"
     try:
         response = opener.open(root, data_encoded)
         content = response.read()
         # count = re.findall('\[[A-Za-z].*\]', data, re.S)
         status = response.getcode()
-        for ck in cj:
+        for ck in cookie:
             print ck
         print "\t:"
-        # cj["session"]["u_name_wc"] = "mx_149958484"
+        # cookie["session"]["u_name_wc"] = "mx_149958484"
+
+        import ipdb;ipdb.set_trace()
+
         if status == 200:
-            response = opener.open(url, data=headers)
+            # response = opener.open(url, data=headers)
+            response = opener.open(url)
             page = response.read()
             print page
-#            for ck in cj:
+#            for ck in cookie:
 #                print ck
     except urllib2.HTTPError, e:
         print e.code
@@ -174,7 +225,8 @@ wencai_count = cct.get_config_value_wencai(config_ini, fname)
 
 def get_wencai_Market_url(filter='国企改革', perpage=1, url=None, pct=False, monitor=False,):
     urllist = []
-    if isinstance(filter, str):
+    if len(filter.split(',')) < 2:
+    # if isinstance(filter.split(','), str):
     	filter = '题材是%s'%(filter)
     global null, wencai_count, pct_status
     if pct is not None:
@@ -182,7 +234,7 @@ def get_wencai_Market_url(filter='国企改革', perpage=1, url=None, pct=False,
     df = pd.DataFrame()
 
     # if ((pct_status) or  ( pct_status and not(925 < cct.get_now_time_int() < ct.wencai_end_time)) ) and url == None and cct.get_config_value_wencai(config_ini,fname) < 1:
-
+    
     if monitor or ((pct_status) or (not pct_status and (925 < cct.get_now_time_int() < ct.wencai_end_time))) and url == None and cct.get_config_value_wencai(config_ini, fname) < 1:
         time_s = time.time()
         duratime = cct.get_config_value_wencai(
@@ -410,7 +462,7 @@ def get_wencai_Market_url(filter='国企改革', perpage=1, url=None, pct=False,
             # print count[0].decode('unicode-escape')
 
             if len(df) == 0:
-                log.error('df is None:%s' % (url))
+                log.error('df 0 filter:%s df is None:%s' % (filter,url))
         else:
             log.error('count is 0')
 
@@ -555,7 +607,7 @@ def get_write_wencai_market_to_csv(df=None, market='wcbk', renew=False, days=60)
     filepath = get_wencai_filepath(market)
     if os.path.exists(filepath):
 
-        if isinstance(df, pd.DataFrame) and renew and cct.creation_date_duration(filepath) > days:
+        if df is not None and len(df) > 10 and isinstance(df, pd.DataFrame) and renew and cct.creation_date_duration(filepath) > days:
             df = wencaiwrite_to_csv(df, filepath, renew)
         else:
             dfz = pd.read_csv(filepath, dtype={'code': str}, encoding='utf8')
@@ -627,9 +679,8 @@ def wencaisinglejson():
     import json
     # obj = json.dumps(jsonda)
     obj = json.loads(jsonda)
-    import ipdb
-    ipdb.set_trace()
     print "obj:", obj['data']
+    import ipdb;ipdb.set_trace()
 
 
 if __name__ == '__main__':
@@ -639,8 +690,8 @@ if __name__ == '__main__':
     # print sina_json_Big_Count()
     # print getconfigBigCount(write=True)
     # sys.exit(0)
-    # post_login()
     log.setLevel(LoggerFactory.DEBUG)
+    post_login()
     # wencaisinglejson()
     # print get_wencai_Market_url(filter='国企改革',perpage=1000,pct=True)
     # print get_wencai_Market_url(filter='国企改革',perpage=1000,pct=False)

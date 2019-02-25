@@ -269,7 +269,9 @@ if __name__ == "__main__":
                 top_temp2 = top_end.sort_values(by=(market_sort_value2), ascending=market_sort_value_key2)
                 
                 ct_MonitorMarket_Values = ct.get_Duration_format_Values(ct_MonitorMarket_Values,replace='b1_v',dest='volume')
+                ct_MonitorMarket_Values = ct.get_Duration_format_Values(ct_MonitorMarket_Values,replace='fibl',dest='top10')
                 ct_MonitorMarket_Values2 = ct.get_Duration_format_Values(ct_MonitorMarket_Values2,replace='b1_v',dest='volume')
+                ct_MonitorMarket_Values2 = ct.get_Duration_format_Values(ct_MonitorMarket_Values2,replace='fibl',dest='top10')
 
                 # if st_key_sort == '1' or st_key_sort == '7':
                 if st_key_sort == '1':

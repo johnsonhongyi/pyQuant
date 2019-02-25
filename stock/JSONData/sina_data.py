@@ -451,8 +451,8 @@ class Sina:
             h5 = None
         else:
             h5 = h5a.load_hdf_db(self.hdf_name, self.table, code_l=ulist, index=index)
-
-        if h5 is not None:
+            
+        if h5 is not None and len(h5) >= len(ulist):
             log.info("hdf5 data:%s" % (len(h5)))
             h5 = self.combine_lastbuy(h5)
             return h5

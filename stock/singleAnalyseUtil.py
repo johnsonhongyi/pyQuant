@@ -358,7 +358,7 @@ def get_hot_countNew(changepercent, rzrq, fibl=None, fibc=10):
         if 'percent' not in df.columns:
             df['percent'] = map(lambda x, y: round(
                 (x - y) / y * 100, 1), df.close.values, df.llastp.values)
-
+        
         if 'percent' in df.columns.values:
             # and len(df[:20][df[:20]['percent']>0])>3:
             # if 'code' in df.columns:
