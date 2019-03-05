@@ -132,12 +132,12 @@ if __name__ == "__main__":
             # df = sina_data.Sina().all
             time_Rt = time.time()
             if st is None:
-                st_key_sort = '%s %s'%(st_key_sort.split()[0],cct.get_index_fibl(default=1))
+                st_key_sort = '%s %s'%(st_key_sort.split()[0],cct.get_index_fibl(default=2))
                 
             # top_now = tdd.getSinaAlldf(market='060', vol=ct.json_countVol, vtype=ct.json_countType)
             # top_now = tdd.getSinaAlldf(market='次新股',filename='cxg', vol=ct.json_countVol, vtype=ct.json_countType)
-            market_blk = 'rzrq'
-            # market_blk = '068'
+            # market_blk = 'rzrq'
+            market_blk = '060'
             # top_now = tdd.getSinaAlldf(market= market_blk , vol=ct.json_countVol, vtype=ct.json_countType,trend=True)
             # top_now = tdd.getSinaAlldf(market='次新股,060', filename='cxg' , vol=ct.json_countVol, vtype=ct.json_countType,trend=True)
             top_now = tdd.getSinaAlldf(market=market_blk, vol=ct.json_countVol, vtype=ct.json_countType,trend=True)
@@ -225,6 +225,8 @@ if __name__ == "__main__":
 
                 top_dif = top_all.copy()
                 market_sort_value, market_sort_value_key = ct.get_market_sort_value_key(st_key_sort, top_all=top_all)
+
+                top_dif = top_dif[(top_dif.low >= top_dif.upper) & (top_dif.low >= top_dif.ma5d)]
 
                 log.debug('top_dif:%s' % (len(top_dif)))
                 if 'trade' in top_dif.columns:

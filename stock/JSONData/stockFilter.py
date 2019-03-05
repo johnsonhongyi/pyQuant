@@ -43,12 +43,12 @@ def filterPowerCount(df,count=200,down=False,duration=2):
             log.error("915 open>llastp is None")
             return df[:count].copy()
 
-    if 945 < nowint <= 1000:
+    if 930 < nowint <= 945:
         top_high = df[ ((df.open > df.llastp) & (df.low >= df.llastp))  ]
-    elif 1000 < nowint:
+    elif 945 < nowint:
         if 'nlow' in df.columns:
             # top_high = df[ (df.nlow >= df.llastp) | (df.close >= df.nlow)]
-            top_high = df[ ((df.nlow >= df.llastp) & (df.nlow >= df.low)) | (df.percent > df['per%sd'%(duration)])]
+            top_high = df[ ((df.nlow >= df.llastp) & (df.nlow >= df.low)) | ((df.nlow <= df.low) & (df.open == df.nlow))]
         else:
             top_high = df[ ((df.open > df.llastp) & (df.low > df.llastp)) | (df.percent > df['per%sd'%(duration)])]
     else:
@@ -70,6 +70,13 @@ def filterPowerCount(df,count=200,down=False,duration=2):
 
     return top_temp
 
+def compute_perd_value(df,market_value=2,col='per'):
+
+    temp=df[df.columns[(df.columns >= '%s1d'%(col)) & (df.columns <= '%s%sd'%(col,market_value))]]
+    df['%s%sd'%(col,market_value)]=temp.T.sum()
+    return df
+
+
 def getBollFilter(df=None, boll=ct.bollFilter, duration=ct.PowerCountdl, filter=True, ma5d=True, dl=14, percent=True, resample='d', ene=False,upper=False, down=False, indexdff=True,cuminTrend=False):
 
     # drop_cxg = cct.GlobalValues().getkey('dropcxg')
@@ -80,16 +87,20 @@ def getBollFilter(df=None, boll=ct.bollFilter, duration=ct.PowerCountdl, filter=
         # if len(drop_t) > 0:
             # df = df.drop(drop_t,axis=0)top
             # log.error("stf drop_cxg:%s"%(len(drop_t)))
+
+    # hvdu max量天数  lvdu  min天数  hv max量  lv 量
+    # fib < 2 (max) fibl > 2   lvdu > 3  (hvdu > ? or volume < 5)? ene
     time_s = time.time()    
-    df['upper'] = map(lambda x: round((1 + 11.0 / 100) * x, 1), df.ma10d)
-    df['lower'] = map(lambda x: round((1 - 9.0 / 100) * x, 1), df.ma10d)
-    df['ene'] = map(lambda x, y: round((x + y) / 2, 1), df.upper, df.lower)
+    # df['upper'] = map(lambda x: round((1 + 11.0 / 100) * x, 1), df.ma10d)
+    # df['lower'] = map(lambda x: round((1 - 9.0 / 100) * x, 1), df.ma10d)
+    # df['ene'] = map(lambda x, y: round((x + y) / 2, 1), df.upper, df.lower)
     
     df = df[ (df.close > df.ma20d) | (df.close > df.ene ) ]
     if filter:
         if 'boll' in df.columns:
             df = df[(df.boll >= boll) | (df.buy > df.upper)]
-
+    # if 'nlow' in df.columns:
+        # df = df[ ((df.nlow >= df.llastp) & (df.nlow >= df.low)) | ((df.nlow <= df.low) & (df.open == df.nlow))]
     # if cct.get_work_time() and 'df2' in df.columns:
     #     if 915 < cct.get_now_time_int() < 930:
     #         df['cumnow'] =  map(lambda x, y: 1 if x - y > 0 else 0, df.close, df.cumaxe)
@@ -102,7 +113,9 @@ def getBollFilter(df=None, boll=ct.bollFilter, duration=ct.PowerCountdl, filter=
     radio_t = cct.get_work_time_ratio()
     df['lvolr%s' % (resample)] = df['volume']
     # df['volume'] = (map(lambda x, y: round(x / y / radio_t, 1), df.nvol.values, df.lvolume.values))
-    df['volume'] = (map(lambda x, y: round(x / y / radio_t, 1), df.nvol.values, df.lastv1d.values))
+    # import ipdb;ipdb.set_trace()
+    df['volume'] = (map(lambda x, y,z: round((x / y / 0.415) if z < 9.9 else (x / y) , 1), df.nvol.values, df.lastv1d.values,df.percent.values))
+    # df['volume'] = (map(lambda x, y: round(x / y / radio_t, 1), df.nvol.values, df.lastv1d.values))
     
     indexfibl = cct.GlobalValues().getkey('indexfibl')
     sort_value = cct.GlobalValues().getkey('market_sort_value')
@@ -203,6 +216,8 @@ def getBollFilter(df=None, boll=ct.bollFilter, duration=ct.PowerCountdl, filter=
     co2int = ['boll', 'op', 'ratio', 'fib', 'fibl','df2']
     co2int.extend([co for co in df.columns.tolist() if co.startswith('perc') and co.endswith('d')])
     co2int.extend(['top10','topR'])
+    co2int = [inx for inx in co2int if inx in df.columns]
+    
     for co in co2int:
         df[co] = df[co].astype(int)
 
@@ -242,6 +257,17 @@ def getBollFilter(df=None, boll=ct.bollFilter, duration=ct.PowerCountdl, filter=
             log.info("stf market_key:%s" % (market_key))
             idx_k = cct.get_col_in_columns(df, 'perc%sd', market_value)
             df = df[df["perc%sd" % (idx_k)] >= idx_k]
+            if int(market_value) > 1 and 930 < cct.get_now_time_int():
+	            df = compute_perd_value(df,market_value,'perc')
+	            df = compute_perd_value(df,market_value,'per')
+
+        elif market_key == '2':
+            if int(market_value) > 1 and 930 < cct.get_now_time_int():
+                # df['per%d'%(market_value)] = compute_perd_value(df,market_value)
+                df = compute_perd_value(df,market_value)
+            	df = compute_perd_value(df,market_value,'perc')
+
+
         # if int(market_value) < 3 and 930 < cct.get_now_time_int():
         #     if 'nlow' in df.columns:
         #         # df = df[((df.per1d < 3) & (df.nlow >= df.llastp)) | ((df.per1d > 5) & (df.buy > df.llastp))]
@@ -518,15 +544,16 @@ def WriteCountFilter(df, op='op', writecount=ct.writeCount, end=None, duration=1
         if end is None and int(writecount) > 0:
             if int(writecount) < 101 and len(df) > 0 and 'percent' in df.columns:
                 codel = df.index[:int(writecount)].tolist()
-                market_value = cct.GlobalValues().getkey('market_value')
-                market_key = cct.GlobalValues().getkey('market_key')
-                if market_key == '2':
-                    market_value_perd = int(market_value) * 9.8
-                    dd=df[ df['per%sd'%(market_value)] > market_value_perd ]
-                    df_list=dd.index.tolist()
-                    for co in df_list:
-                        if co not in codel:
-                            codel.append(co)
+                # market_value = cct.GlobalValues().getkey('market_value')
+                # market_key = cct.GlobalValues().getkey('market_key')
+                # if market_key == '2':
+                #     # market_value_perd = int(market_value) * 9.8
+                #     market_value_perd = 9.8
+                #     dd=df[ df['per%sd'%(market_value)] > market_value_perd ]
+                #     df_list=dd.index.tolist()
+                #     for co in df_list:
+                #         if co not in codel:
+                #             codel.append(co)
             else:
                 if len(str(writecount)) >= 4:
                     codel.append(str(writecount).zfill(6))

@@ -6,7 +6,6 @@ from pyalgotrade.technical import cross,highlow
 #from pyalgotrade.technical import vwap
 from pyalgotrade.stratanalyzer import sharpe
 from pandas import DataFrame
-
 from compiler.ast import flatten
 import numpy as np
 from pyalgotrade.broker.fillstrategy import DefaultStrategy
@@ -68,6 +67,7 @@ class BBands(strategy.BacktestingStrategy):
         if dt is None:
             dt = self.getlastDate()
         dd = self.feed[self.feed.index <= str(dt)][-self.dl:]
+        # dd = self.feed[:self.dl]
         return dd
 
     def getlastDate(self):
@@ -136,7 +136,7 @@ class BBands(strategy.BacktestingStrategy):
         # df['ene'] = map(lambda x, y: round((x + y) / 2, 1), df.upper, df.lower)
         # get_ene_status(self.__instrument,self.getFeed(),dl=self.dl,ptype='low')
 
-        ene_stats = ptc.get_ene_status(self.__instrument,self.getFeed(),end=self.getlastDate(),dl=int(self.dl))
+        ene_stats = ptc.get_ene_status(self.__instrument,self.getFeed(),dl=int(self.dl))
         # if  len(ene_stats) > 0:
         return ene_stats
         
@@ -614,8 +614,8 @@ import json
 # import tushare as ts
 
 
-def turtle_test(code,start=None,plot=True,dl=20):
-    feed = ptc.get_tdx_barfeed(code,start)
+def turtle_test(code,start=None,plot=True,dl=60):
+    feed = ptc.get_tdx_barfeed(code,start,dl=dl)
     #myStrategy = pyalg_test.SMACrossOver(feed, "orcl", 20)
     pars=[2, 20, 60, 10]
 #    myStrategy = thrSMA_dayinfo(feed, "orcl",*pars)
@@ -689,4 +689,5 @@ def turtle_test(code,start=None,plot=True,dl=20):
 if __name__ == '__main__':
     #vwap(True)
     code='600776'
-    turtle_test(code,'2018-08-01',dl=30)
+    # code='000002'
+    turtle_test(code,'2016-08-01',dl=60)

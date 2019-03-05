@@ -245,7 +245,6 @@ if __name__ == "__main__":
                 # log.debug("top_dif.low > 0:%s" % (len(top_dif)))
                 # top_dif.loc['600610','volume':'lvol']
                 top_dif['volume'] = (map(lambda x, y: round(x / y / radio_t, 1), top_dif.volume.values, top_dif.lvol.values))
-
                 # if 'op' in top_dif.columns:
                 #     top_dif=top_dif[top_dif.op >12]
                 #     print "op:",len(top_dif),

@@ -225,7 +225,10 @@ wencai_count = cct.get_config_value_wencai(config_ini, fname)
 
 def get_wencai_Market_url(filter='国企改革', perpage=1, url=None, pct=False, monitor=False,):
     urllist = []
-    if len(filter.split(',')) < 2:
+    if len(filter) == 0 :
+         log.error('filter is %s'%(filter))
+         return pd.DataFrame()
+    if len(filter) > 2 and len(filter.split(',')) < 2:
     # if isinstance(filter.split(','), str):
     	filter = '题材是%s'%(filter)
     global null, wencai_count, pct_status
@@ -235,7 +238,7 @@ def get_wencai_Market_url(filter='国企改革', perpage=1, url=None, pct=False,
 
     # if ((pct_status) or  ( pct_status and not(925 < cct.get_now_time_int() < ct.wencai_end_time)) ) and url == None and cct.get_config_value_wencai(config_ini,fname) < 1:
     
-    if monitor or ((pct_status) or (not pct_status and (925 < cct.get_now_time_int() < ct.wencai_end_time))) and url == None and cct.get_config_value_wencai(config_ini, fname) < 1:
+    if wencai_count < 1 and (monitor or ((pct_status) or (not pct_status and (925 < cct.get_now_time_int() < ct.wencai_end_time))) and url == None and cct.get_config_value_wencai(config_ini, fname) < 1):
         time_s = time.time()
         duratime = cct.get_config_value_wencai(
             config_ini, fname, currvalue=time_s, xtype='time', update=False)

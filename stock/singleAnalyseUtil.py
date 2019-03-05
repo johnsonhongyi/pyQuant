@@ -471,10 +471,11 @@ def get_hot_countNew(changepercent, rzrq, fibl=None, fibc=10):
         print(u'B:%s-%s V:%s' % (bigcount[0], bigcount[2], f_print(4,bigcount[1])))
 
     if len(hgt) > 0:
-        print("\tHgt: %s Ggt: %s Sgt: %s Gst: %s" %
-              (hgt['hgt'], hgt['ggt'], szt['hgt'], szt['ggt']))
+        print("\tHgt: %s Ggt: %s Sgt: %s Gst: %s SSVol:%s" %
+              (hgt['hgt'], hgt['ggt'], szt['hgt'], szt['ggt'],f_print(5, ff['allvol'],31)))
     else:
         print("\tHgt: \t%s Ggt: \t%s Sgt: %s Gst: %s" % (0, 0, 0, 0))
+        
     if len(rzrq) > 0:
         if 'shrz' not in rzrq.keys() and 'szrz' not in rzrq.keys():
             rzrq['shrz'] = 0
@@ -663,7 +664,7 @@ if __name__ == '__main__':
 
                                 top_temp = cct.GlobalValues().getkey('top_max')
                                 codew = stf.WriteCountFilter(top_temp, writecount='all')
-                                cct.write_to_blocknew(block_path,codew,doubleFile=False)
+                                cct.write_to_blocknew(block_path,codew,append=False,doubleFile=False)
                             break
 
 

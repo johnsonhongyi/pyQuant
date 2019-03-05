@@ -18,6 +18,87 @@ from statsmodels import regression
 log = LoggerFactory.log
 # log.setLevel(LoggerFactory.INFO)
 log.setLevel(LoggerFactory.WARN)
+import pandas as pd
+
+
+def compute_perd_df(dd,lastdays=3):
+    df = dd[-(lastdays+1):].copy()
+    df['perlastp'] = map(cct.func_compute_percd2, df['close'], df['close'].shift(1), df['open'], df['open'].shift(1), df['high'].shift(1), df['low'].shift(1), df['high'], df['low'],df['volume'],df['volume'].shift(1),df['upper'])
+    df['perd'] = ((df['close'] - df['close'].shift(1)) / df['close'].shift(1) * 100).map(lambda x: round(x, 1))
+    # df['perddu'] = ((df['high'] - df['low']) / df['low'] * 100).map(lambda x: round(x, 1))
+    dd['upperT'] = df.close[df.high > df.upper].count()
+    dd['lowerT'] = df.low[(df.low > df.lower *0.98) & (df.low < df.lower *1.02) ].count()
+
+    df = df.dropna()
+    df['perd'] = df['perd'].apply(lambda x: round(x, 1) if ( x < 9.85)  else 10.0)
+    dd['perd'] = df['perd']
+    dd['perlastp'] = df['perlastp']
+
+    return dd
+
+def compute_lastdays_percent(df=None, lastdays=3, resample='d',vc_radio=100):
+
+    if df is not None and len(df) > lastdays:
+        if resample <> 'd':
+            df = df[:-1]
+            # print "df:",df[-1:]
+        # if len(df) > lastdays + 1:
+        #     lastdays = len(df) - 1
+        #     lastdays = lastdays if lastdays < ct.compute_lastdays else ct.compute_lastdays
+        if 'date' in df.columns:
+            df = df.set_index('date')
+        df = df.sort_index(ascending=True)
+        # if cct.get_work_day_status() and 915 < cct.get_now_time_int() < 1500:
+        #     df = df[df.index < cct.get_today()]
+        # df['ma5d'] = pd.rolling_mean(df.close, 5)
+
+#        df['perd'] = ((df['close'] - df['close'].shift(1)) / df['close'].shift(1) * 100).map(lambda x: round(x, 1) if ( x < 9.85)  else 10.0)
+        df['ma5d'] = pd.rolling_mean(df.close, 5)
+        df['ma10d'] = pd.rolling_mean(df.close, 10)
+        df['ma20d'] = pd.rolling_mean(df.close, 26)
+
+        df['upper'] = map(lambda x: round((1 + 11.0 / 100) * x, 1), df.ma10d)
+        df['lower'] = map(lambda x: round((1 - 9.0 / 100) * x, 1), df.ma10d)
+        df['ene'] = map(lambda x, y: round((x + y) / 2, 1), df.upper, df.lower)
+        df = df.fillna(0)
+
+        df = compute_perd_df(df,lastdays=lastdays)
+        df['vchange'] = ((df['volume'] - df['volume'].shift(1)) / df['volume'].shift(1) * 100).map(lambda x: round(x, 1))
+        df = df.fillna(0)
+        df['vcra'] = len(df[df.vchange > vc_radio])
+        df['vcall'] = df['vchange'].sum()
+        df['vchange'] = df['vchange'][-1]
+
+        # df['meann'] = ((df['high'] + df['low']) / 2).map(lambda x: round(x, 1))
+
+        for da in range(1, lastdays + 1, 1):
+
+
+            # df['lastp%sd' % da] = df['close'].shift(da-1)
+            # df['lasto%sd' % da] = df['open'].shift(da-1)
+            # df['lasth%sd' % da] = df['high'].shift(da-1)
+            # df['lastl%sd' % da] = df['low'].shift(da-1)
+            # df['lastv%sd' % da] = df['vol'].shift(da-1)
+            if da == 1:
+                df['lastp%sd' % da] = df['close'][-da]
+                df['lasto%sd' % da] = df['open'][-da]
+                df['lasth%sd' % da] = df['high'][-da]
+                df['lastl%sd' % da] = df['low'][-da]
+                df['lastv%sd' % da] = df['volume'][-da]
+
+            # df['per%sd' % da] = df['close'].pct_change(da).apply(lambda x:round(x*100,1))
+            # df['per%sd' % da] = df['perd'][-da:].sum()
+            df['per%sd' % da] = df['perd'][-da]
+            # df['per%sd' % da] = df['perd'].shift(da-1)
+            df['perc%sd' % da] = df['perlastp'][-da]
+            # df['perc%sd' % da] = (df['perlastp'][-da:].sum())
+        # df['lastv9m'] = df['vol'][-lastdays:].mean()
+            # df['mean%sd' % da] = df['meann'][-da]
+        df = df.reset_index()
+    else:
+        log.info("compute df is none")
+
+    return df
 
 
 def get_tdx_barfeed(code, start=None, dl=30):
@@ -411,29 +492,38 @@ def get_ene_status(code, df=None, start=None, end=None, dl=None, dtype='d', ptyp
     if not dtype == 'd':
         df = tdd.get_tdx_stock_period_to_type(df, dtype).sort_index(ascending=True)
 
-    chan_status = chant.show_chan_mpl_power(code, resample=dtype, show_mpl=False, least_init=2, chanK_flag=False, windows=20, power=True, fb_show=0, df=df)
-    
-    df['upper'] = map(lambda x: round((1 + 11.0 / 100) * x, 1), df.ma10d)
-    df['lower'] = map(lambda x: round((1 - 9.0 / 100) * x, 1), df.ma10d)
-    df['ene'] = map(lambda x, y: round((x + y) / 2, 1), df.upper, df.lower)
+    # chan_status = chant.show_chan_mpl_power(code, resample=dtype, show_mpl=False, least_init=1, chanK_flag=False, windows=20, power=True, fb_show=0, df=df)
+    dd = df.copy()
+    dd = compute_lastdays_percent(dd,lastdays=9)
+    # dd['upper'] = map(lambda x: round((1 + 11.0 / 100) * x, 1), dd.ma10d)
+    # dd['lower'] = map(lambda x: round((1 - 9.0 / 100) * x, 1), dd.ma10d)
+    # dd['ene'] = map(lambda x, y: round((x + y) / 2, 1), dd.upper, dd.lower)
 
-    stsc = df[-1:][df.close > df.ene]
-    
-    # stsh = df[-1:][df.high > df.ene]
-    # stsl = df[-1:][df.low > df.ene]
-    # if len(stsc) > 0 and len(stsh) > 0 and len(stsl) > 0:
-    if len(stsc) > 0:
-        print "stsc1:", len(stsc)
-        return 1
+    # stsc = dd['upperT'].values[0]
+    stsc = dd['lowerT'].values[0]
+    today = dd[-1:]
+    if  stsc > 0:
+        print "stsc1upperT:", stsc,dd.date[-1:],
+        # if len(today[(today.low >= today.upper) |  (today.low > today.ma5d) ]) >0:
+        if len(today[(today.low >= today.lower) &  (today.close > today.ma5d) ]) >0:
+            print "buy"
+            return 1
+        else:
+            return 2
     else:
-        stsc2 = df[-2:][df.close > df.upper]
-        stsc = df[-1:][df.close > df.upper]
-        print "dn stsc1:", len(stsc),len(stsc2)
-        # stsh = df[-1:][df.high > df.upper]
-        # stsl = df[-1:][df.low > df.upper] 
-        if len(stsc2) > 0 and len(stsc) == 0:
+        # print "stsc1upperT:", stsc,dd.date[-1:]
+        # stsc2 = df[-2:][df.close > df.upper]
+        # stsc = df[-1:][df.close > df.upper]
+        # print "dn stsc1:", len(stsc),len(stsc2)
+        # # stsh = df[-1:][df.high > df.upper]
+        # # stsl = df[-1:][df.low > df.upper] 
+        # if len(stsc2) > 0 and len(stsc) == 0:
+        # if len(today[(today.close <= today.upper) |  (today.close < today.ma5d) ]) >0:
+        if len(today[((today.close <= today.upper*1.02) & (today.close > today.upper*0.98) )|  ((today.high > today.upper)) ]) >0:
             return 0
-
+        else:
+            return 2
+    # return stsc
 
 def get_diff_index(code, df=None, start=None, end=None, dl=None, dtype='d', ptype='close'):
     df = get_duration_filter(code, df=df, dl=dl, ptype=ptype)

@@ -94,8 +94,8 @@ if __name__ == "__main__":
     # market_sort_value, market_sort_value_key = ct.get_market_sort_value_key('8')
     resample = 'd'
     # st_key_sort = '9'
-    st_key_sort = '7'
-    # st_key_sort = '4'
+    # st_key_sort = '7'
+    st_key_sort = '4'
     st = None
     while 1:
         try:
@@ -161,6 +161,10 @@ if __name__ == "__main__":
                 # top_all=top_all.sort_values(by=['dff','ratio','percent','couts'],ascending=[0,1,0,1])
                 # top_all=top_all.sort_values(by=['dff','percent','couts','ratio'],ascending=[0,0,1,1])
 
+                # top_all[(top_all.upperT > 3) & (top_all.top10 >2) &(top_all.close > top_all.upper*0.98) & (top_all.close < top_all.upper *1.05)]
+                # top_all[(top_all.upperT > 3) & (top_all.top10 >2) &(top_all.close > top_all.upper*0.98) & (top_all.close < top_all.upper *1.05) &(top_all.lastp1d > top_all.upper)].name
+                # cct.write_to_blocknew(block_path, dd.index.tolist())
+                # writecode = "cct.write_to_blocknew(block_path, dd.index.tolist())"
                 top_bak = top_all
                 market_sort_value, market_sort_value_key = ct.get_market_sort_value_key(st_key_sort, top_all=top_all)
 

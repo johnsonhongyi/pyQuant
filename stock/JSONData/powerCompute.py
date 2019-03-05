@@ -566,7 +566,7 @@ def get_linear_model_status(code, df=None, dtype='d', type='m', start=None, end=
         return operation, ratio
 
     df = df.fillna(0)
-    
+
     if len(df) > 1 + days:
         if days != 0:
             asset = df[:-days]
@@ -579,6 +579,7 @@ def get_linear_model_status(code, df=None, dtype='d', type='m', start=None, end=
         ratio_l = []
 #        idx = days if days <> 0 else 1
         if countall:
+            # for co in ['low', 'high', 'close']:
             for co in ['low', 'high', 'close']:
                 assetratio = asset[co]
                 nowpratio = df[co][-days] if len(df) > 1 + days else None
@@ -598,38 +599,35 @@ def get_linear_model_status(code, df=None, dtype='d', type='m', start=None, end=
         return operationcount, min(ratio_l), df[:1].index.values[0], [len(df), df[:1]]
 
     elif len(asset) == 1:
-        ## log.error("powerCompute code:%s"%(code))
         if ptype == 'high':
-            if df.close[-1] >= df.high[-1] * 0.99 and df.close[-1] >= df.open[-1]:
-                return 12, 10, df.index.values[0], [len(df), df[:1]]
+            # if df.close[-1] >= df.high[-1] * 0.99 and df.close[-1] >= df.open[-1]:
+            return 10, 10, df.index.values[0], [len(df), df[:1]]
 
-            elif df.close[-1] > df.open[-1]:
-                if df.close[-1] > df.high[-1] * 0.97:
-                    if len(df) > 2 and df.close[-1] > df.close[-2]:
-                        return 10, 10, df.index.values[0], [len(df), df[:1]]
-                    else:
-                        return 11, 10, df.index.values[0], [len(df), df[:1]]
-                else:
-                    return 9, 10, df.index.values[0], [len(df), df[:1]]
-            else:
-                if len(df) >= 2:
-                    if df.close[-1] > df.close[-2] * 1.01:
-                        return 9, 10, df.index.values[0], [len(df), df[:1]]
-                    elif df.close[-1] > df.close[-2]:
-                        return 8, 10, df.index.values[0], [len(df), df[:1]]
-                    elif df.low[-1] > df.low[-2]:
-                        return 6, 9, df.index.values[0], [len(df), df[:1]]
-                    else:
-                        return 3, 8, df.index.values[0], [len(df), df[:1]]
-                else:
-                    return 1, 7, df.index.values[0], [len(df), df[:1]]
+        #     elif df.close[-1] > df.open[-1]:
+        #         if df.close[-1] > df.high[-1] * 0.97:
+        #             if len(df) > 2 and df.close[-1] > df.close[-2]:
+        #                 return 10, 10, df.index.values[0], [len(df), df[:1]]
+        #             else:
+        #                 return 11, 10, df.index.values[0], [len(df), df[:1]]
+        #         else:
+        #             return 9, 10, df.index.values[0], [len(df), df[:1]]
+        #     else:
+        #         if len(df) >= 2:
+        #             if df.close[-1] > df.close[-2] * 1.01:
+        #                 return 9, 10, df.index.values[0], [len(df), df[:1]]
+        #             elif df.close[-1] > df.close[-2]:
+        #                 return 8, 10, df.index.values[0], [len(df), df[:1]]
+        #             elif df.low[-1] > df.low[-2]:
+        #                 return 6, 9, df.index.values[0], [len(df), df[:1]]
+        #             else:
+        #                 return 3, 8, df.index.values[0], [len(df), df[:1]]
+        #         else:
+        #             return 1, 7, df.index.values[0], [len(df), df[:1]]
         else:
             return -10, -10, df.index.values[0], [len(df), df[:1]]
     else:
-        ## log.error("code:%s %s :%s" % (code, ptype,len(df)))
         if ptype == 'high':
-            ## log.warn("df is None,start:%s index:%s" % (start, index_d))
-            return 13, 11, cct.get_today(), [len(df), df[:1]]
+        	return 10, 10, cct.get_today(), [len(df), df[:1]]
         else:
             return -10, -10, cct.get_today(), [len(df), df[:1]]
 
@@ -962,9 +960,9 @@ Power_CXG_Error = 0
 drop_cxg = []
 wencai_drop = []
 
-def powerCompute_mp(code,df=None,dm=None,dtype='d',statuslist=True,index=False,end=None,dl=10,days=0,wcdf=None):
+def powerCompute_mp2(code,df=None,dm=None,dtype='d',statuslist=True,index=False,end=None,dl=10,days=0,wcdf=None):
     wcdf_code = None if wcdf is None else wcdf.index.tolist()
-    
+
     if code in df.index:
         dd = df.loc[code]
     else:
@@ -983,7 +981,7 @@ def powerCompute_mp(code,df=None,dm=None,dtype='d',statuslist=True,index=False,e
     if code in dm.index:
         dz = dm.loc[code].to_frame().T
     else:
-        dz = tdd.get_sina_data_df(code)
+        dz = tdd.get_sina_data_df(code,index=index)
 
     # if index and 'cumin' not in df.columns:
     #     df['cumin'] = 0
@@ -995,7 +993,7 @@ def powerCompute_mp(code,df=None,dm=None,dtype='d',statuslist=True,index=False,e
 
         tdx_df = tdx_df.fillna(0)
         tdx_df = tdx_df.sort_index(ascending=True)
-        if 'topR' not in df.columns or ('topR' in df.columns and not (0 < df.loc[code,'topR'] < 10)):
+        if not index and ('topR' not in df.columns or ('topR' in df.columns and not (0 < df.loc[code,'topR'] < 10))):
             df.loc[code,'topR']=tdd.compute_top10_count(tdx_df[:1]).topR.values[0]
 
         # if len(df) > days + 1 and days != 0:
@@ -1005,7 +1003,8 @@ def powerCompute_mp(code,df=None,dm=None,dtype='d',statuslist=True,index=False,e
         tdx_days = len(tdx_df)
         # if 8 < tdx_days < ct.cxg_limit_days:
 
-        if code in df.index and "per3d" in df.columns and df.loc[code].per3d > 20 and 8 < tdx_days:
+        # if code in df.index and "per3d" in df.columns and df.loc[code].per3d > 20 and 8 < tdx_days:
+        if code in df.index and "per3d" in df.columns  and 8 < tdx_days:
             # print code,df.loc[code].per2d
             if tdx_days > 6:
                 top_count = 0
@@ -1120,11 +1119,10 @@ def powerCompute_mp(code,df=None,dm=None,dtype='d',statuslist=True,index=False,e
     #         dd['cumin'] = tdx_df.cumin[-1]
     # else:
     #     dd['cumin'] = -1
-        
+
     tdx_df, opkdj = getab.Get_KDJ(tdx_df, dtype='d',lastday=days)
     tdx_df, opmacd = getab.Get_MACD_OP(tdx_df, dtype='d',lastday=days)
     tdx_df, oprsi = getab.Get_RSI(tdx_df, dtype='d',lastday=days)
-    # opma = getab.algoMultiDay_trends(tdx_df
     opma = getab.algoMultiDay(tdx_df)
     volstd = getab.powerStd(code=code, df=tdx_df, ptype='vol',lastday=days)
     dd['kdj'] = opkdj
@@ -1132,8 +1130,174 @@ def powerCompute_mp(code,df=None,dm=None,dtype='d',statuslist=True,index=False,e
     dd['rsi'] = oprsi
     dd['ma'] = opma
     dd['vstd'] = volstd
-    dd['lvolume'] = tdx_df.vol[1]
+    dd['lvolume'] = tdx_df.vol[1] # lastv2d
 
+    if wcdf_code is not None and code in wcdf_code:
+        dd['category'] = wcdf.loc[code, 'category']
+    else:
+        wencai_drop.append(code)
+        log.warn("code not in wcdf:%s" % (code))
+
+    return dd
+
+
+def powerCompute_mp(code,df=None,dm=None,dtype='d',statuslist=True,index=False,end=None,dl=10,days=0,wcdf=None):
+    wcdf_code = None if wcdf is None else wcdf.index.tolist()
+
+    if code in df.index:
+        dd = df.loc[code]
+    else:
+        log.error("dd is None")
+        dd = pd.DataFrame()
+    if statuslist:
+        start = None
+    else:
+        if dl is None:
+            start = df.loc[code, 'date']
+            start = cct.day8_to_day10(start)
+        else:
+            start = None
+    start = cct.day8_to_day10(start)
+    end = cct.day8_to_day10(end)
+    if code in dm.index:
+        dz = dm.loc[code].to_frame().T
+    else:
+        dz = tdd.get_sina_data_df(code)
+
+    global Power_CXG_Error, drop_cxg, wencai_drop
+    if len(dz) > 0 and (index or dz.buy.values > 0 or dz.sell.values > 0):
+        tdx_df = tdd.get_tdx_append_now_df_api(
+            code, start=start, end=end, type='f', df=None, dm=dz, dl=dl, power=False,newdays=5)
+        # tdx_df = tdd.get_tdx_Exp_day_to_df(code,start=start, end=end, type='f', dl=dl,newdays=5)
+        tdx_df = tdx_df.fillna(0)
+        tdx_df = tdx_df.sort_index(ascending=True)
+        # if not index and ('topR' not in df.columns or ('topR' in df.columns and not (0 < df.loc[code,'topR'] < 10))):
+        #     df.loc[code,'topR']=tdd.compute_top10_count(tdx_df[:1]).topR.values[0]
+
+        # tdx_days = len(tdx_df)
+
+        # if code in df.index and "per3d" in df.columns  and 8 < tdx_days:
+        #     if tdx_days > 6:
+        #         top_count = 0
+        #         for day in range(len(tdx_df), 0, -1):
+        #             c_high = tdx_df.high.values[-day]
+        #             c_low = tdx_df.low.values[-day]
+        #             if int(c_high) <> 0 and c_high == c_low:
+        #                 top_count += 1
+        #             else:
+        #                 if day == 1 and (915 < cct.get_now_time_int() < 932 and cct.get_work_day_status()):
+        #                     # if day == 1 and
+        #                     # cct.get_work_day_status():
+        #                     c_buy = dz.buy.values[-1]
+        #                     c_close_l = tdx_df.close.values[-2]
+        #                     c_percent = round(
+        #                         (c_buy - c_close_l) / c_close_l * 100, 2)
+        #                     # if 0 < c_percent < 9.9:
+        #                     if 0 < c_percent:
+        #                         break
+        #                 else:
+        #                     if tdx_days - day < 3:
+        #                         top_count += 1
+        #                         continue
+        #                     else:
+        #                         break
+        #     else:
+        #         top_count = len(tdx_df)
+
+        #     if top_count == len(tdx_df):
+        #         drop_cxg.append(code)
+        #         if Power_CXG_Error < 2:
+        #             log.error('CXG Good:%s' % (code))
+        #             return None
+        # elif tdx_days <= 8:
+        #     drop_cxg.append(code)
+        #     return None
+
+    else:
+        dd['op'] = -1
+        dd['ra'] = -1
+        dd['fib'] = -1
+        dd['fibl'] = -1
+        dd['ldate'] = -1
+        dd['boll'] = -1
+        dd['kdj'] = -1
+        dd['macd'] = -1
+        dd['rsi'] = -1
+        dd['ma'] = -1
+        dd['oph'] = -1
+        dd['rah'] = -1
+        return dd
+    opc = 0
+    stl = ''
+    rac = 0
+    fibl = 0
+    fib = 0
+
+    dd['op'] = 1
+    dd['ra'] = 1
+    dd['fib'] = 1
+    dd['fibl'] = 1
+    dd['ldate'] = 1
+    dd['boll'] = 1
+    dd['kdj'] = 1
+    dd['macd'] = 1
+    dd['rsi'] = 1
+    dd['ma'] = 1
+    dd['oph'] = 1
+    dd['rah'] = 1
+
+    '''
+    if len(tdx_df) < 2:
+        return None
+    for ptype in ['low', 'high']:
+        op, ra, st, daysData = get_linear_model_status(
+            code, df=tdx_df, dtype=dtype, start=start, end=end,days=days, dl=dl, filter=filter, ptype=ptype)
+        if ptype == 'low':
+            ral = round(ra,1)
+            opl = op
+            stl = st
+            fibl = int(daysData[0])
+        else:
+            oph = op
+            rah = round(ra,1)
+            fib = int(daysData[0])
+
+    tdx_df, operation = getab.Get_BBANDS(tdx_df, dtype='d',lastday=days)
+    if len(tdx_df) > 0 and 'ma5d' in tdx_df.columns:
+        if tdx_df[:1].ma5d[0] is not None and tdx_df[:1].ma5d[0] != 0:
+            df.loc[code, 'ma5d'] = round(float(tdx_df[:1].ma5d[0]), 2)
+        if tdx_df[:1].ma10d[0] is not None and tdx_df[:1].ma10d[0] != 0:
+            df.loc[code, 'ma10d'] = round(
+                float(tdx_df[:1].ma10d[0]), 2)
+    dd['op'] = opl
+    dd['ra'] = ral
+    dd['oph'] = oph
+    dd['rah'] = rah
+    dd['fib'] = fib
+    dd['fibl'] = fibl
+    dd['ldate'] = stl
+    dd['boll'] = operation
+
+        # if 'cumin' in tdx_df.columns:
+        #     if tdx_df.cumin[-1] == 0:
+        #         dd['cumin'] = tdx_df.cumin[-2]
+        #     else:
+        #         dd['cumin'] = tdx_df.cumin[-1]
+        # else:
+        #     dd['cumin'] = -1
+
+    tdx_df, opkdj = getab.Get_KDJ(tdx_df, dtype='d',lastday=days)
+    tdx_df, opmacd = getab.Get_MACD_OP(tdx_df, dtype='d',lastday=days)
+    tdx_df, oprsi = getab.Get_RSI(tdx_df, dtype='d',lastday=days)
+    opma = getab.algoMultiDay(tdx_df)
+    volstd = getab.powerStd(code=code, df=tdx_df, ptype='vol',lastday=days)
+    dd['kdj'] = opkdj
+    dd['macd'] = opmacd
+    dd['rsi'] = oprsi
+    dd['ma'] = opma
+    dd['vstd'] = volstd
+    dd['lvolume'] = tdx_df.vol[1] # lastv2d
+    '''
     if wcdf_code is not None and code in wcdf_code:
         dd['category'] = wcdf.loc[code, 'category']
     else:
@@ -1168,7 +1332,7 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y', tal
 
     if not index and h5 is not None :
         log.info("power hdf5 data:%s" % (len(h5)))
-        if h5_combine_status:
+        if h5_combine_status and 'boll' in h5.columns and 'op' in h5.columns:
             # if (not (915 < cct.get_now_time_int() < 935) or not cct.get_work_day_status())  and h5_combine_status:
             #            df_co = df.columns
             #            h5_co = h5.columns
@@ -1206,7 +1370,7 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y', tal
             log.info("add power hdf5 code_l:%s" % (len(code_l)))
             print("intP:%s"%(len(code_l))),
         else:
-            
+
             if index or len(h5) == len(code_l):
                 h5 = h5[ (h5.fibl <> h5.fib) & ((h5.fibl <> 0 ) | (h5.fib <> 0 ))]
                 temp_l = list(set(code_l) - set(h5.index))
@@ -1232,11 +1396,14 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y', tal
                 df = dm
 
         n_code = [n for n in dm.index if n.startswith(('30', '60', '00'))]
-        if len(n_code) > 1:
-            dmname = dm.loc[n_code].name
-            wcdf = wcd.get_wencai_data(dmname, 'wencai',days='N')
-        else:
-            wcdf = None
+        # if len(n_code) > 1:
+        #     dmname = dm.loc[n_code].name
+        #     wcdf = wcd.get_wencai_data(dmname, 'wencai',days='N')
+        # else:
+        #     wcdf = None
+        wcdf = None
+
+        
         # wcdf_code = None if wcdf is None else wcdf.index.tolist()
         # col_co = df.columns.tolist()
         # col_co.extend([ 'ra', 'op', 'fib', 'ma5d', 'ma10d', 'ldate', 'hmax', 'lmin', 'cmean'])
@@ -1256,10 +1423,11 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y', tal
         # else:
         #     results = cct.to_mp_run_async(
         #             powerCompute_mp,code_l, df=df,dm=dm, statuslist=True, index=index, end=end,dl=dl,wcdf=wcdf)
-        results = cct.to_mp_run_async(
-                        powerCompute_mp,code_l, df=df,dm=dm, statuslist=True, index=index, end=end,dl=dl,wcdf=wcdf)
-
         
+        results = cct.to_mp_run_async(
+                        powerCompute_mp2,code_l, df=df,dm=dm, statuslist=True, index=index, end=end,dl=dl,wcdf=wcdf)
+
+
         results = [x for x in results if x is not None]
         dd = pd.DataFrame(results)
         code_l = dd.index
@@ -1279,7 +1447,8 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y', tal
             #              'rah'].values, df['fib'].values, df['ma'].values,
             #          df['kdj'].values, df['rsi'].values))
             if 'topR' in df.columns:
-                df['df2'] = df['topR']
+                # df['df2'] = df['topR']
+                df['df2'] = df['upperT']
             else:
                 df['df2'] = 0
             df['df2'] = df['df2'].apply(lambda x:round(x,1))
@@ -1378,7 +1547,8 @@ if __name__ == "__main__":
     # df = powerCompute_df(['999999','399006','399001'], days=0, dtype='d', end=None, dl=ct.PowerCountdl, talib=True, filter='y',index=True)
     # df = powerCompute_df(['300550','300560','399001'], days=0, dtype='d', end=None, dl=ct.PowerCountdl, talib=True, filter='y',index=True)
     # df = powerCompute_df(codelist, days=0, dtype='d', end=None, dl=ct.PowerCountdl, talib=True, filter='y',index=False)
-    df = powerCompute_df(['300038', '300031', '300675'], days=0, dtype='d', end=None, dl=ct.PowerCountdl, talib=True, filter='y',index=False)
+    # df = powerCompute_df(['300038', '300031', '300675'], days=0, dtype='d', end=None, dl=ct.PowerCountdl, talib=True, filter='y',index=False)
+    df = powerCompute_mp2('300038', days=0, dtype='d', end=None, dl=ct.PowerCountdl)
 
     print "\n",cct.format_for_print(df.loc[:,['ra', 'op', 'ma', 'rsi', 'kdj',
                      'boll', 'rah', 'df2', 'fibl', 'macd', 'vstd', 'oph', 'lvolume']][:5])

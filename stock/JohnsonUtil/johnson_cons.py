@@ -30,7 +30,7 @@ DD_VOL_List = {'0': '40000', '1': '100000',
 # LvolumeSize = 125000
 tqdm_mininterval=2
 ncols = 60
-topR = 1
+topR = 0.8
 LvolumeSize = 12500
 VolumeMaxR = 5000
 VolumeMinR = 0.1
@@ -39,6 +39,7 @@ duration_diff = 6
 duration_date_l = 30
 duration_date_up = 120
 duration_date_sort = duration_date_l
+# PowerCountdl = duration_date_l * 2 if duration_date_l < 20 else duration_date_l
 PowerCountdl = duration_date_l * 2 if duration_date_l < 20 else duration_date_l
 Power_Ma_Days = 6
 Power_last_da = 1
@@ -48,7 +49,7 @@ writeCount = 5
 changeRatio = 0.975
 changeRatioUp = 1.025
 # duration_date = 10
-wencai_delay_time = 300
+wencai_delay_time = 45
 resample_dtype = 'd'
 logtime = 1800
 cumdays = 14
@@ -73,7 +74,7 @@ sina_limit_time = 10
 h5_time_l_count = 6
 sina_dd_limit_time = 900
 diffcode = 0.2
-dratio_limit = 0.12
+dratio_limit = 0.05
 duration_sleep_time = 60
 compute_lastdays = 9
 sort_value_key_perd23 = '2 3 d f'
@@ -142,8 +143,8 @@ Duration_percent_dff = ['percent','df2','per2d','b1_v', 'dff',  'op',
                         'fib', 'fibl', 'ra', 'ratio', 'volume', 'couts']
 Duration_percent_dff_key = [0, 0,0, 0, 0, 0, 1, 1, 0, 1, 1, 1]
 
-Duration_percent_vol = ['perc_n','percent', 'volume', 'dff',
-                        'df2', 'op', 'fib', 'fibl', 'ra', 'ratio', 'couts']
+Duration_percent_vol = ['df2','fib','percent', 'dff',
+                        'df2', 'op', 'fib', 'volume', 'ra', 'ratio', 'couts']
 Duration_percent_vol_key = [0,0, 0, 0, 0, 0, 1, 1, 0, 1, 1]
 
 # Duration_percent_per_ra=['percent','ra','dff','op','fib','fibl','ratio','volume','couts']
@@ -569,7 +570,7 @@ def RawMenuArgmain():
     raw = 'status:[go(g),clear(c),[d 20150101 [l|h]|[y|n|pn|py],quit(q),W(a),sh]:'
     raw_input_menu = raw + "\n\tNow : %s" + \
         "\n\t1:Sort By Percent\t2:Sort by per1d\t3:Sort By percd\t\t4:Sort By DFF\n\t5:Sort By Ra_dff\t6:Sort By top10\t7:Sort Per b1V\t\t8:Sort by Count" + \
-        "\n\t9:By perc_n\t\tx: by_topR\tx1:by boll_perc\nplease input:"
+        "\n\t9:By df2\t\tx: by_topR\tx1:by boll_perc\nplease input:"
     return raw_input_menu
 
 # "Sort By Percent\t3:Sort By DFF\n\t2:Sort By OP\t\t4:Sort By Ra\nplease input:"

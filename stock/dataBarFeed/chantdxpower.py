@@ -659,7 +659,51 @@ def show_chan_mpl_tdx(code, start_date=None, end_date=None, stock_days=60, resam
     # log.debug("线段   :%s" % (x_xd_seq[:-2]))
     # log.debug("笔值  :%s" % ([str(x) for x in (y_xd_seq)][:-2]))
     # # Y_hat = X * b + a
+def get_quotes_tdx(code, start=None, end=None, dl=120, resample='d', show_name=True,df=None):
 
+    if df is None:
+        if resample in ['d', 'w', 'm']:
+            quotes = tdd.get_tdx_append_now_df_api(code=code, start=start, end=end, dl=dl).sort_index(ascending=True)
+        else:
+            h5_fname = 'sina_MultiIndex_data'
+            h5_table = 'all_10'
+            time_s = time.time()
+            h5 = h5a.load_hdf_db(h5_fname, table=h5_table, code_l=None, timelimit=False, dratio_limit=0.12)
+            quotes = cct.get_limit_multiIndex_freq(h5, freq=resample.upper(), col='all', start=start, end=end, code=code)
+            quotes = quotes.reset_index().set_index('ticktime')
+            # period_stock_data['close'] = stock_data['close'].resample(period_type, how='last')
+            if 'volume' in quotes.columns:
+                quotes.rename(columns={'volume': 'vol'}, inplace=True)
+                quotes['amount'] = (map(lambda x, y: round((x * y), 1), quotes.close.values, quotes.vol.values))            
+    else:
+        quotes = df
+        if 'volume' in quotes.columns:
+            quotes.rename(columns={'volume': 'vol'}, inplace=True)
+            # quotes['amount'] = (map(lambda x, y: round((x * y), 1), quotes.close.values, quotes.vol.values))            
+            
+    if not resample == 'd' and resample in tdd.resample_dtype:
+        quotes = tdd.get_tdx_stock_period_to_type(quotes, period_day=resample)
+    if str(quotes.index.dtype) <> 'datetime64[ns]':
+        quotes.index = quotes.index.astype('datetime64')        
+
+    if show_name:
+        if 'name' in quotes.columns:
+            cname = quotes.name[0]
+            # cname_g =cname
+        else:
+            dm = tdd.get_sina_data_df(code)
+            if 'name' in dm.columns:
+                cname = dm.name[0]
+            else:
+                cname = '-'
+    else:
+        cname = '-'
+    if quotes is not None and len(quotes) > 0:
+        quotes = quotes.loc[:, ['open', 'close', 'high', 'low', 'vol', 'amount']]
+    else:
+        # log.error("quotes is None check:%s"%(code))
+        raise Exception("Code:%s error, df is None%s" % (code))
+    return quotes, cname
 
 def show_chan_mpl_power(code, start_date=None, end_date=None, stock_days=60, resample='d', show_mpl=True, least_init=2, chanK_flag=False, windows=20, power=True, fb_show=0,df=None):
 
@@ -756,52 +800,6 @@ def show_chan_mpl_power(code, start_date=None, end_date=None, stock_days=60, res
             # print "次级:",len(biIdx),biIdx,[str(k_data_c.index[x])[:10] for x in biIdx]
         return biIdx
 
-    def get_quotes_tdx(code, start=None, end=None, dl=120, resample='d', show_name=True,df=None):
-
-        if df is None:
-
-            if resample in ['d', 'w', 'm']:
-                quotes = tdd.get_tdx_append_now_df_api(code=code, start=start, end=end, dl=dl).sort_index(ascending=True)
-            else:
-                h5_fname = 'sina_MultiIndex_data'
-                h5_table = 'all_10'
-                time_s = time.time()
-                h5 = h5a.load_hdf_db(h5_fname, table=h5_table, code_l=None, timelimit=False, dratio_limit=0.12)
-                quotes = cct.get_limit_multiIndex_freq(h5, freq=resample.upper(), col='all', start=start, end=end, code=code)
-                quotes = quotes.reset_index().set_index('ticktime')
-                # period_stock_data['close'] = stock_data['close'].resample(period_type, how='last')
-                if 'volume' in quotes.columns:
-                    quotes.rename(columns={'volume': 'vol'}, inplace=True)
-                    quotes['amount'] = (map(lambda x, y: round((x * y), 1), quotes.close.values, quotes.vol.values))            
-        else:
-            quotes = df
-            if 'volume' in quotes.columns:
-                quotes.rename(columns={'volume': 'vol'}, inplace=True)
-                # quotes['amount'] = (map(lambda x, y: round((x * y), 1), quotes.close.values, quotes.vol.values))            
-                
-        if not resample == 'd' and resample in tdd.resample_dtype:
-            quotes = tdd.get_tdx_stock_period_to_type(quotes, period_day=resample)
-        if str(quotes.index.dtype) <> 'datetime64[ns]':
-            quotes.index = quotes.index.astype('datetime64')        
-
-        if show_name:
-            if 'name' in quotes.columns:
-                cname = quotes.name[0]
-                # cname_g =cname
-            else:
-                dm = tdd.get_sina_data_df(code)
-                if 'name' in dm.columns:
-                    cname = dm.name[0]
-                else:
-                    cname = '-'
-        else:
-            cname = '-'
-        if quotes is not None and len(quotes) > 0:
-            quotes = quotes.loc[:, ['open', 'close', 'high', 'low', 'vol', 'amount']]
-        else:
-            # log.error("quotes is None check:%s"%(code))
-            raise Exception("Code:%s error, df is None%s" % (code))
-        return quotes, cname
 
     time_s = time.time()
     quotes, cname = get_quotes_tdx(stock_code, start_date, end_date, dl=stock_days, resample=resample, show_name=show_mpl,df=df)
@@ -1915,45 +1913,45 @@ def show_chan_mpl_fb(code, start_date, end_date, stock_days, resample, show_mpl=
             # print "次级:",len(biIdx),biIdx,[str(k_data_c.index[x])[:10] for x in biIdx]
         return biIdx
 
-    def get_quotes_tdx(code, start=None, end=None, dl=120, resample='d', show_name=True):
+    # def get_quotes_tdx(code, start=None, end=None, dl=120, resample='d', show_name=True):
 
-        if resample in ['d', 'w', 'm']:
-            quotes = tdd.get_tdx_append_now_df_api(code=code, start=start, end=end, dl=dl).sort_index(ascending=True)
-        else:
-            h5_fname = 'sina_MultiIndex_data'
-            h5_table = 'all_10'
-            time_s = time.time()
-            h5 = h5a.load_hdf_db(h5_fname, table=h5_table, code_l=None, timelimit=False, dratio_limit=0.12)
-            quotes = cct.get_limit_multiIndex_freq(h5, freq=resample.upper(), col='all', start=start, end=end, code=code)
-            quotes = quotes.reset_index().set_index('ticktime')
-            # period_stock_data['close'] = stock_data['close'].resample(period_type, how='last')
-            if 'volume' in quotes.columns:
-                quotes.rename(columns={'volume': 'vol'}, inplace=True)
-                quotes['amount'] = (map(lambda x, y: round((x * y), 1), quotes.close.values, quotes.vol.values))            
+    #     if resample in ['d', 'w', 'm']:
+    #         quotes = tdd.get_tdx_append_now_df_api(code=code, start=start, end=end, dl=dl).sort_index(ascending=True)
+    #     else:
+    #         h5_fname = 'sina_MultiIndex_data'
+    #         h5_table = 'all_10'
+    #         time_s = time.time()
+    #         h5 = h5a.load_hdf_db(h5_fname, table=h5_table, code_l=None, timelimit=False, dratio_limit=0.12)
+    #         quotes = cct.get_limit_multiIndex_freq(h5, freq=resample.upper(), col='all', start=start, end=end, code=code)
+    #         quotes = quotes.reset_index().set_index('ticktime')
+    #         # period_stock_data['close'] = stock_data['close'].resample(period_type, how='last')
+    #         if 'volume' in quotes.columns:
+    #             quotes.rename(columns={'volume': 'vol'}, inplace=True)
+    #             quotes['amount'] = (map(lambda x, y: round((x * y), 1), quotes.close.values, quotes.vol.values))            
         
-        if not resample == 'd' and resample in tdd.resample_dtype:
-            quotes = tdd.get_tdx_stock_period_to_type(quotes, period_day=resample)
-        if str(quotes.index.dtype) <> 'datetime64[ns]':
-            quotes.index = quotes.index.astype('datetime64')
+    #     if not resample == 'd' and resample in tdd.resample_dtype:
+    #         quotes = tdd.get_tdx_stock_period_to_type(quotes, period_day=resample)
+    #     if str(quotes.index.dtype) <> 'datetime64[ns]':
+    #         quotes.index = quotes.index.astype('datetime64')
 
-        if show_name:
-            if 'name' in quotes.columns:
-                cname = quotes.name[0]
-                # cname_g =cname
-            else:
-                dm = tdd.get_sina_data_df(code)
-                if 'name' in dm.columns:
-                    cname = dm.name[0]
-                else:
-                    cname = '-'
-        else:
-            cname = '-'
-        if quotes is not None and len(quotes) > 0:
-            quotes= quotes.loc[:, ['open', 'close', 'high', 'low', 'vol', 'amount']]
-        else:
-            # log.error("quotes is None check:%s"%(code))
-            raise Exception("Code:%s error, df is None" % (code))
-        return quotes, cname
+    #     if show_name:
+    #         if 'name' in quotes.columns:
+    #             cname = quotes.name[0]
+    #             # cname_g =cname
+    #         else:
+    #             dm = tdd.get_sina_data_df(code)
+    #             if 'name' in dm.columns:
+    #                 cname = dm.name[0]
+    #             else:
+    #                 cname = '-'
+    #     else:
+    #         cname = '-'
+    #     if quotes is not None and len(quotes) > 0:
+    #         quotes= quotes.loc[:, ['open', 'close', 'high', 'low', 'vol', 'amount']]
+    #     else:
+    #         # log.error("quotes is None check:%s"%(code))
+    #         raise Exception("Code:%s error, df is None" % (code))
+    #     return quotes, cname
 
 
     quotes, cname= get_quotes_tdx(stock_code, start_date, end_date, dl=stock_days, resample=resample, show_name=show_mpl)
@@ -2476,7 +2474,7 @@ def parseArgmain():
         parser.add_argument('-i', action="store", dest="line", type=str, choices=['y', 'n'], default='y', help='LineHis show')
         parser.add_argument('-w', action="store", dest="wencai", type=str, choices=['y', 'n'], default='n', help='WenCai Search')
         parser.add_argument('-k', action="store", dest="chanK_flag", type=int, choices=[1, 0], default=0, help='WenCai Search')
-        parser.add_argument('-le', action="store", dest="least", type=int, default=2, help='least_init 2')
+        parser.add_argument('-le', action="store", dest="least", type=int, default=1, help='least_init 2')
         parser.add_argument('-fb', action="store", dest="fb", type=int, choices=[1, 0], default=0, help='fb show')
         return parser
     except Exception, e:
@@ -2516,11 +2514,14 @@ if __name__ == "__main__":
         cct.set_console(80, 19)
     else:
         cct.set_console(80, 19)
+    # code='600604'
+    # show_chan_mpl_tdx(code, start_date=None, end_date=None, stock_days=60, resample='d', show_mpl=True, least_init=2, chanK_flag=False, windows=20, power=True, fb_show=0, df=None)
+    # code = raw_input("code:")
+    # import ipdb;ipdb.set_trace()
+    
     parser=parseArgmain()
     parser.print_help()
     # show_chan_mpl('999999', None, None, 60, 'd', show_mpl=True)
-    # show_chan_mpl_tdx('600677', start_date=None, end_date=None, stock_days=60, resample='d', show_mpl=True, least_init=2, chanK_flag=False, windows=20, power=True, fb_show=0, df=None)
-    # code = raw_input("code:")
 
     while 1:
         try:
