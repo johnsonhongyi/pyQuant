@@ -229,13 +229,17 @@ if __name__ == "__main__":
                 if cct.get_now_time_int() > 915:
                     top_dif = top_dif[top_dif.buy > 0]
 
-                if st_key_sort.split()[0] == '4' and cct.get_now_time_int() > 926 and 'lastbuy' in top_dif.columns:
+                if st_key_sort.split()[0] == '4' and 926 < cct.get_now_time_int() < 1455 and 'lastbuy' in top_dif.columns:
                     top_dif['dff'] = (map(lambda x, y: round((x - y) / y * 100, 1),
                                           top_dif['buy'].values, top_dif['lastbuy'].values))
+                    top_dif['dff2'] = (map(lambda x, y: round((x - y) / y * 100, 1),
+                                          top_dif['buy'].values, top_dif['lastp'].values))
                 else:
                     top_dif['dff'] = (map(lambda x, y: round((x - y) / y * 100, 1),
                                           top_dif['buy'].values, top_dif['lastp'].values))
-
+                    if 'lastbuy' in top_dif.columns:
+                        top_dif['dff2'] = (map(lambda x, y: round((x - y) / y * 100, 1),
+                                              top_dif['buy'].values, top_dif['lastbuy'].values))
 
                 # print top_dif.loc['600610',:]
                 # top_dif = top_dif[top_dif.trade > 0]

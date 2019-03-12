@@ -564,7 +564,6 @@ def get_linear_model_status(code, df=None, dtype='d', type='m', start=None, end=
             # else:
                 # operation += 1
         return operation, ratio
-
     df = df.fillna(0)
 
     if len(df) > 1 + days:
@@ -1130,7 +1129,7 @@ def powerCompute_mp2(code,df=None,dm=None,dtype='d',statuslist=True,index=False,
     dd['rsi'] = oprsi
     dd['ma'] = opma
     dd['vstd'] = volstd
-    dd['lvolume'] = tdx_df.vol[1] # lastv2d
+    # dd['lvolume'] = tdx_df.vol[1] # lastv2d
 
     if wcdf_code is not None and code in wcdf_code:
         dd['category'] = wcdf.loc[code, 'category']
@@ -1171,6 +1170,46 @@ def powerCompute_mp(code,df=None,dm=None,dtype='d',statuslist=True,index=False,e
         # tdx_df = tdd.get_tdx_Exp_day_to_df(code,start=start, end=end, type='f', dl=dl,newdays=5)
         tdx_df = tdx_df.fillna(0)
         tdx_df = tdx_df.sort_index(ascending=True)
+        # idx = tdx_df.perd[tdx_df.perd <0].argmax()
+        # if code == '603220':
+        #     import ipdb;ipdb.set_trace()
+        idxdf = tdx_df.red[tdx_df.red <0]
+        if len(idxdf) >1:
+            idx = tdx_df.red[tdx_df.red <0].argmax()
+        else:
+            if len(tdx_df.red[tdx_df.red >0]) == 0: 
+                drop_cxg.append(code)
+                return None
+            else:
+                idx = tdx_df.red[tdx_df.red >0].index[0]
+        trend = tdx_df[tdx_df.index >= idx]
+        fibl = len(trend)
+        idxh = tdx_df.high.argmax()
+        fibh = len(tdx_df[tdx_df.index >= idxh])
+        vratio = -1
+        if fibl > 1:
+            vratio = round(((trend.close[-1] - trend.close[0])/trend.close[0]*100)/fibl,1)
+
+        # opc = 0
+        # stl = ''
+        # rac = 0
+        # fibl = 0
+        # fib = 0
+
+        dd['op'] = int(len(LIS(tdx_df.close)[1])/float(len(tdx_df.close))*10)
+        dd['ra'] = (vratio)
+        dd['fib'] = fibl
+        dd['fibl'] = fibh
+        dd['ldate'] = idx
+        dd['boll'] = tdx_df.upperL[0]
+        dd['df2'] = tdx_df.upperT[0]
+        dd['kdj'] = 1
+        dd['macd'] = 1
+        dd['rsi'] = 1
+        dd['ma'] = 1
+        dd['oph'] = 1
+        dd['rah'] = 1
+
         # if not index and ('topR' not in df.columns or ('topR' in df.columns and not (0 < df.loc[code,'topR'] < 10))):
         #     df.loc[code,'topR']=tdd.compute_top10_count(tdx_df[:1]).topR.values[0]
 
@@ -1223,28 +1262,12 @@ def powerCompute_mp(code,df=None,dm=None,dtype='d',statuslist=True,index=False,e
         dd['kdj'] = -1
         dd['macd'] = -1
         dd['rsi'] = -1
+        dd['df2'] = -1
         dd['ma'] = -1
         dd['oph'] = -1
         dd['rah'] = -1
         return dd
-    opc = 0
-    stl = ''
-    rac = 0
-    fibl = 0
-    fib = 0
-
-    dd['op'] = 1
-    dd['ra'] = 1
-    dd['fib'] = 1
-    dd['fibl'] = 1
-    dd['ldate'] = 1
-    dd['boll'] = 1
-    dd['kdj'] = 1
-    dd['macd'] = 1
-    dd['rsi'] = 1
-    dd['ma'] = 1
-    dd['oph'] = 1
-    dd['rah'] = 1
+    
 
     '''
     if len(tdx_df) < 2:
@@ -1298,18 +1321,19 @@ def powerCompute_mp(code,df=None,dm=None,dtype='d',statuslist=True,index=False,e
     dd['vstd'] = volstd
     dd['lvolume'] = tdx_df.vol[1] # lastv2d
     '''
-    if wcdf_code is not None and code in wcdf_code:
-        dd['category'] = wcdf.loc[code, 'category']
-    else:
-        wencai_drop.append(code)
-        log.warn("code not in wcdf:%s" % (code))
+    # if wcdf_code is not None and code in wcdf_code:
+    #     dd['category'] = wcdf.loc[code, 'category']
+    # else:
+    #     wencai_drop.append(code)
+    #     log.warn("code not in wcdf:%s" % (code))
 
     return dd
 
 
 def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y', talib=False, newdays=None, days=0,index=False):
+    if not index :
+        return df
     ts = time.time()
-
     if isinstance(df, list):
         h5_combine_status = False
         code_l = df
@@ -1324,7 +1348,8 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y', tal
     h5_fname = 'powerCompute'
     h5_table = dtype + '_' + str(dl) + '_' + filter + '_' + 'all'
     power_columns = ['ra', 'op', 'category', 'ma', 'rsi', 'kdj',
-                     'boll', 'rah', 'df2','fib', 'fibl', 'macd', 'vstd', 'oph', 'lvolume']
+                     'boll', 'rah', 'df2','fib', 'fibl', 'macd', 'vstd', 'oph']
+                     # 'boll', 'rah', 'df2','fib', 'fibl', 'macd', 'vstd', 'oph', 'lvolume']
     # [['ma' ,'rsi' ,'kdj' ,'boll', 'ra','rah', 'df2b' ,'fibl','fib' ,'macd' ,'oph']]
     # [['ma' ,'rsi' ,'kdj' ,'boll', 'ra',rah', 'df2b' ,'fibl','fib' ,'macd' ,'vstd', 'oph']]
 
@@ -1342,7 +1367,8 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y', tal
 #            h5 = h5[(h5.op <> 0) & (h5.ra <> 0) & (h5.df2b <> 0 )]
 
             # h5 = h5[(h5.df2b <> 0 ) & (h5.ra <> 0 ) & (h5.boll <> 0 )]
-            h5 = h5[(h5.op <> 0 ) & (h5.boll <> 0 )]
+
+            h5 = h5[(h5.op <> -1 ) & (h5.boll <> -1 )]
             h5 = h5.drop(
                 [inx for inx in h5.columns if inx not in power_columns], axis=1)
 
@@ -1414,10 +1440,11 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y', tal
             for co in list(co_dif):
                 df[co] = 0
 
-        # if len(code_l) < 5:
+        # if len(code_l) < 5000:
         #     results=[]
         #     for code in code_l:
         #         result= powerCompute_mp(code, df=df,dm=dm, statuslist=True, index=index, end=end,dl=dl,wcdf=wcdf)
+        #         print result
         #         results.append(result)
         # # import ipdb;ipdb.set_trace()
         # else:
@@ -1425,10 +1452,11 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y', tal
         #             powerCompute_mp,code_l, df=df,dm=dm, statuslist=True, index=index, end=end,dl=dl,wcdf=wcdf)
         
         results = cct.to_mp_run_async(
-                        powerCompute_mp2,code_l, df=df,dm=dm, statuslist=True, index=index, end=end,dl=dl,wcdf=wcdf)
+                        powerCompute_mp,code_l, df=df,dm=dm, statuslist=True, index=index, end=end,dl=dl,wcdf=wcdf)
 
-
+        
         results = [x for x in results if x is not None]
+
         dd = pd.DataFrame(results)
         code_l = dd.index
         df.drop([inx for inx in dd.index  if inx in df.index], axis=0, inplace=True)
@@ -1439,27 +1467,27 @@ def powerCompute_df(df, dtype='d', end=None, dl=ct.PowerCountdl, filter='y', tal
         # df['df2b'] = (map(lambda ra, fibl,rah,fib,ma,kdj,rsi:round(eval(ct.powerdiff%(ct.PowerCountdl)),1),\
         #                  df['ra'].values, df['fibl'].values,df['rah'].values,df['fib'].values,df['ma'].values,\
         #                  df['kdj'].values,df['rsi'].values))
-#        if "fib" not in df.columns:
-#            df['fib'] = 0
-        def compute_df2(df):
-            # df['df2'] = (map(lambda ra, fibl, rah, fib, ma, kdj, rsi: (eval(ct.powerdiff % (dl))),
-            #          df['ra'].values, df['fibl'].values, df[
-            #              'rah'].values, df['fib'].values, df['ma'].values,
-            #          df['kdj'].values, df['rsi'].values))
-            if 'topR' in df.columns:
-                # df['df2'] = df['topR']
-                df['df2'] = df['upperT']
-            else:
-                df['df2'] = 0
-            df['df2'] = df['df2'].apply(lambda x:round(x,1))
-            return df
 
-        if len(df) <> len(code_l):
-            dd = df.loc[code_l]
-            dd = compute_df2(dd)
-            df = cct.combine_dataFrame(df, dd, col=None)
-        else:
-            df = compute_df2(df)
+        # def compute_df2(df):
+        #     # df['df2'] = (map(lambda ra, fibl, rah, fib, ma, kdj, rsi: (eval(ct.powerdiff % (dl))),
+        #     #          df['ra'].values, df['fibl'].values, df[
+        #     #              'rah'].values, df['fib'].values, df['ma'].values,
+        #     #          df['kdj'].values, df['rsi'].values))
+        #     if 'topR' in df.columns:
+        #         # df['df2'] = df['topR']
+        #         df['df2'] = df['upperT']
+        #     else:
+        #         df['df2'] = 0
+        #     df['df2'] = df['df2'].apply(lambda x:round(x,1))
+        #     return df
+
+        # if len(df) <> len(code_l):
+        #     dd = df.loc[code_l]
+        #     dd = compute_df2(dd)
+        #     df = cct.combine_dataFrame(df, dd, col=None)
+        # else:
+        #     df = compute_df2(df)
+
         # df = df.replace(np.inf,0)
         # df = df.replace(-np.inf,0)
         # df = df.fillna(0)
@@ -1535,7 +1563,8 @@ if __name__ == "__main__":
     # print get_linear_model_status('600671', filter='y', start='20160329', ptype='low')
     # print get_linear_model_status('600671', filter='y', start='20160329', ptype='high')
     # print get_linear_model_status('999999', filter='y', dl=30, ptype='high')
-    # print get_linear_model_status('999999', filter='y', dl=30, ptype='low')
+    # print get_linear_model_status('601519', filter='y', dl=30, ptype='low')
+    print get_linear_model_status('601319', filter='y', dl=30, ptype='low')
     # powerCompute_df(top_temp,dl=ct.PowerCountdl,talib=True)
 
     # import sina_data
@@ -1548,10 +1577,10 @@ if __name__ == "__main__":
     # df = powerCompute_df(['300550','300560','399001'], days=0, dtype='d', end=None, dl=ct.PowerCountdl, talib=True, filter='y',index=True)
     # df = powerCompute_df(codelist, days=0, dtype='d', end=None, dl=ct.PowerCountdl, talib=True, filter='y',index=False)
     # df = powerCompute_df(['300038', '300031', '300675'], days=0, dtype='d', end=None, dl=ct.PowerCountdl, talib=True, filter='y',index=False)
-    df = powerCompute_mp2('300038', days=0, dtype='d', end=None, dl=ct.PowerCountdl)
+    # df = powerCompute_mp2('300038', days=0, dtype='d', end=None, dl=ct.PowerCountdl)
 
     print "\n",cct.format_for_print(df.loc[:,['ra', 'op', 'ma', 'rsi', 'kdj',
-                     'boll', 'rah', 'df2', 'fibl', 'macd', 'vstd', 'oph', 'lvolume']][:5])
+                     'boll', 'rah', 'df2', 'fibl', 'macd', 'vstd', 'oph']][:5])
     # print "\n",df.fibl,df.fib
     print "\n",cct.format_for_print(df.loc[:,['op','boll','ma','kdj','macd','ldate','fibl','fib','timel']][:5])
     # import ipdb;ipdb.set_trace()

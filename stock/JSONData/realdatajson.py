@@ -219,7 +219,7 @@ def get_sina_Market_json(market='all', showtime=True, num='100', retry_count=3, 
         # print df.columns
         if 'ratio' in df.columns:
             df['ratio']=df['ratio'].apply(lambda x:round(x,1))
-        df['percent']=df['percent'].apply(lambda x:round(x,1))
+        df['percent']=df['percent'].apply(lambda x:round(x,2))
 #        if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 926:
 #            df = df[(df.buy > 0)]
 #        else:

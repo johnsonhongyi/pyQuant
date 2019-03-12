@@ -194,7 +194,8 @@ if __name__ == "__main__":
                         map(lambda x, y: round(x / y / radio_t, 1), top_all['volume'].values, top_all['lvol'].values))
 
                     if cct.get_now_time_int() > 915:
-                        top_all = top_all[top_all.low > top_all.llow * ct.changeRatio]
+                        top_all = top_all[top_all.open > top_all.lasth1d]
+                        # top_all = top_all[top_all.low > top_all.llow * ct.changeRatio]
                         # top_all = top_all[top_all.trade > top_all.lhigh * ct.changeRatio]
 
                     # if cct.get_now_time_int() > 915 and cct.get_now_time_int() <= 926:
@@ -208,21 +209,25 @@ if __name__ == "__main__":
                         top_all = top_all[(top_all.volume > ct.VolumeMinR) & (
                             top_all.volume < ct.VolumeMaxR)]
 
-                if st_key_sort.split()[0] == '4' and cct.get_now_time_int() > 926 and 'lastbuy' in top_all.columns:
+                if st_key_sort.split()[0] == '4' and 926 < cct.get_now_time_int() < 1455 and 'lastbuy' in top_all.columns:
 
                         
                     top_all['dff'] = (map(lambda x, y: round((x - y) / y * 100, 1),
                                           top_all['buy'].values, top_all['lastbuy'].values))
+                    top_all['dff2'] = (map(lambda x, y: round((x - y) / y * 100, 1),
+                                          top_all['buy'].values, top_all['lastp'].values))
                     # if len(top_all[top_all.lastbuy < 0]) > 0 or len(top_all[top_all.dff < -10]) >0 :
                     #     print top_all.loc['600313'].lastbuy,top_all.loc['600313'].buy,top_all.loc['600313'].lastp
                     #     import ipdb;ipdb.set_trace()
                 else:
                     top_all['dff'] = (map(lambda x, y: round((x - y) / y * 100, 1),
                                           top_all['buy'].values, top_all['lastp'].values))
-
-
+                    if 'lastbuy' in top_all.columns:
+                        top_all['dff2'] = (map(lambda x, y: round((x - y) / y * 100, 1),
+                                          top_all['buy'].values, top_all['lastbuy'].values))
                 top_all = top_all.sort_values(
                         by=['dff', 'percent', 'volume', 'couts', 'ratio'],ascending=[0, 0, 0, 1, 1])
+
 #                    by=ct.Monitor_sort_count, ascending=[0, 0, 0, 0, 1])
                 # top_all = top_all.sort_values(by=['dff', 'couts', 'volume', 'ratio'], ascending=[0, 0, 0, 1])
                 # top_all=top_all.sort_values(by=['percent','dff','couts','ratio'],ascending=[0,0,1,1])

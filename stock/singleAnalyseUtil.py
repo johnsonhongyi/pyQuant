@@ -315,6 +315,7 @@ def fibonacciCount(code, dl=60, start=None, days=0):
 
 # global cumin_index 
 # cumin_index = {}
+top_Ten_Dropcxg=[]
 def get_hot_countNew(changepercent, rzrq, fibl=None, fibc=10):
     global fibcount
     INDEX_LIST_TDX = {'999999':'sh', '399001':'sz', '399006':'cyb'}
@@ -343,10 +344,11 @@ def get_hot_countNew(changepercent, rzrq, fibl=None, fibc=10):
     allTop = pd.DataFrame()
     indexKeys = ['sh', 'sz', 'cyb']
     ffindex = ffu.get_dfcfw_fund_flow('all')
+
     ffall = {}
     ffall['zlr'] = 0
     ffall['zzb'] = 0
-    top_Ten_Dropcxg=[]
+
     for market in indexKeys:
         # market = ct.SINA_Market_KEY()
         #        df = rd.get_sina_Market_json(market, False)
@@ -369,9 +371,11 @@ def get_hot_countNew(changepercent, rzrq, fibl=None, fibc=10):
             # else:
             top = df[df['percent'] > changepercent]
             topTen = df[df['percent'] > 9.9]
-            topT_l = tdd.get_tdx_exp_all_LastDF_DL(topTen.index.tolist(), dt=20,newdays=10,showRunTime=False)
-            if isinstance(topT_l, pd.DataFrame):
-                top_Ten_Dropcxg.extend(topT_l.index.tolist())  
+            dropcode = [ x for x in topTen.index.tolist() if x not in top_Ten_Dropcxg]
+            if len(dropcode) >0:
+                topT_l = tdd.get_tdx_exp_all_LastDF_DL(dropcode, dt=ct.duration_date_l,newdays=10,showRunTime=False)
+                if isinstance(topT_l, pd.DataFrame):
+                    top_Ten_Dropcxg.extend(topT_l.index.tolist())  
             crashTen = df[df['percent'] < -9.8]
             crash = df[df['percent'] < -changepercent]
         else:
@@ -412,7 +416,7 @@ def get_hot_countNew(changepercent, rzrq, fibl=None, fibc=10):
                         df.set_index('code'),resample='d')    
     count = len(df.index)
     top = df[df['percent'] > changepercent]
-    topTen = df[df['percent'] > 9.9]
+    topTen = df[df['percent'] >= 9.9]
     if 'max5' in df.columns: 
         top_Max = (df[(df.close >= df.hmax) & (df.close >= df.max5)])
 

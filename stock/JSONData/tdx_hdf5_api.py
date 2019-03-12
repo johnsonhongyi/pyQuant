@@ -108,7 +108,7 @@ class SafeHDFStore(HDFStore):
                 # time.sleep(probe_interval)
                 if self.countlock > 1:
                     log.error("IOError Error:%s" % (e))
-                if self.countlock <= 15:
+                if self.countlock <= 8:
                     time.sleep(round(random.randint(3, 10) / 1.2, 2))
                     # time.sleep(random.randint(0,5))
                     self.countlock += 1
@@ -157,10 +157,11 @@ class SafeHDFStore(HDFStore):
                     log.error("ptrepack hdf Error:%s Er:%s" % (self.fname,p.stderr))
                     # return -1
                 else:
-                    os.remove(self.temp_file)
+                    if os.path.exists(self.temp_file):
+                        os.remove(self.temp_file)
                     # log.error("fname:%s h5_size:%sM Limit:%s t:%.1f" % (self.fname, h5_size, new_limit , time_pt - time.time()))
-
-            os.remove(self._lock)
+            if os.path.exists(self._lock):
+                os.remove(self._lock)
             gc.collect()
 '''
 https://stackoverflow.com/questions/21126295/how-do-you-create-a-compressed-dataset-in-pytables-that-can-store-a-unicode-stri/21128497#21128497
@@ -652,7 +653,7 @@ def load_hdf_db(fname, table='all', code_l=None, timelimit=True, index=False, li
                            # INIT_LOG_Error += 1
                            log.error("fn:%s cl:%s h5:%s don't find:%s dra:%0.2f log_err:%s" % (
                                fname, len(code_l), len(dd), len(code_l) - len(dif_co), dratio, INIT_LOG_Error))
-
+                           return None
 
 
     #                 if dratio < dratio_limit:

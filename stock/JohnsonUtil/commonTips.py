@@ -43,7 +43,10 @@ initGlobalValue = 0
 # clean_terminal = ["Python Launcher", 'Johnson — -bash', 'Johnson — python']
 clean_terminal = ["Python Launcher", 'Johnson — -bash', 'Johnson — python']
 writecode = "cct.write_to_blocknew(block_path, dd.index.tolist())"
-
+perdall = "df[df.columns[(df.columns >= 'per1d') & (df.columns <= 'per%sd'%(ct.compute_lastdays))]][:1]"
+perdallc = "df[df.columns[(df.columns >= 'perc1d') & (df.columns <= 'perc%sd'%(ct.compute_lastdays))]][:1]"
+perdalla = "df[df.columns[ ((df.columns >= 'per1d') & (df.columns <= 'per%sd'%(ct.compute_lastdays))) | ((df.columns >= 'du1d') & (df.columns <= 'du%sd'%(ct.compute_lastdays)))]][:1]"
+perdallu = "df[df.columns[ ((df.columns >= 'du1d') & (df.columns <= 'du%sd'%(ct.compute_lastdays)))]][:1]"
 
 class GlobalValues:
     # -*- coding: utf-8 -*-
@@ -1181,6 +1184,7 @@ def to_mp_run_async(cmd, urllist, *args,**kwargs):
 
     # n_t = time.time()
     results = []
+    
     if len(urllist) > 50:
         if len(kwargs) > 0 :
             pool = ThreadPool(1)
@@ -1501,25 +1505,27 @@ def get_config_value_wencai(fname, classtype, currvalue=0, xtype='limit', update
     return int(currvalue)
 
 def get_index_fibl(default=2):
-    import sys
-    sys.path.append("..")
-    from JSONData import powerCompute as pct
-    df = pct.powerCompute_df(['999999','399006','399001'], days=0, dtype='d', end=None, dl=10, talib=True, filter='y',index=True)
+    # import sys
+    # sys.path.append("..")
+    # from JSONData import powerCompute as pct
+    # df = pct.powerCompute_df(['999999','399006','399001'], days=0, dtype='d', end=None, dl=10, talib=True, filter='y',index=True)
+    # df = tdd.get_tdx_exp_all_LastDF_DL(
+    #             ['999999','399006','399001'], dt=10)
 
-    if len(df) >0 and 'fibl' in df.columns:
-        # fibl = int(df.fibl.max())
-        # fibl = int(df.cumin.max())
-        fibl = int(df.fibl.max())
-        fibl = fibl if 4 > fibl > 1 else default
-        # fibl = fibl if 3 >= fibl >= 1 else 1
-        # return abs(fibl)
-    else:
-        fibl = 1
-    # cct.GlobalValues()
-    GlobalValues().setkey('cuminfibl', fibl)
-    GlobalValues().setkey('indexfibl', int(df.fibl.min()))
-
-    return abs(fibl)
+    # if len(df) >0 and 'fibl' in df.columns:
+    #     # fibl = int(df.fibl.max())
+    #     # fibl = int(df.cumin.max())
+    #     fibl = int(df.fibl.max())
+    #     fibl = fibl if 4 > fibl > 1 else default
+    #     # fibl = fibl if 3 >= fibl >= 1 else 1
+    #     # return abs(fibl)
+    # else:
+    #     fibl = 1
+    # # cct.GlobalValues()
+    # GlobalValues().setkey('cuminfibl', fibl)
+    # GlobalValues().setkey('indexfibl', int(df.fibl.min()))
+    # return abs(fibl)
+    return 1
 
 from collections import Counter,OrderedDict
 def counterCategory(df):

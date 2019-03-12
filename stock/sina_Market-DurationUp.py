@@ -140,7 +140,8 @@ if __name__ == "__main__":
                 st_key_sort = '%s %s'%(st_key_sort.split()[0],cct.get_index_fibl())
             # top_now = tdd.getSinaAlldf(market='060.blk', vol=ct.json_countVol, vtype=ct.json_countType)
             # market_blk = '次新股'
-            market_blk = '060'
+            market_blk = 'all'
+            # market_blk = '060'
             top_now = tdd.getSinaAlldf(market=market_blk,filename='cxg', vol=ct.json_countVol, vtype=ct.json_countType)
             
             # top_now = tdd.getSinaAlldf(market='all', vol=ct.json_countVol, vtype=ct.json_countType,trend=True)
@@ -223,8 +224,12 @@ if __name__ == "__main__":
                     top_all = cct.combine_dataFrame(top_all, top_now)
 
                 # top_all = top_all[top_all.buy > 0]
+                # top_list = tdd.compute_jump_du_count(top_all)
+                # top_dif = top_all.loc[top_list]
+                top_dif = top_all[(top_all.boll == 0) & (top_all.fibl ==1) &(top_all.fib > 3) &(top_all.per1d < 8)]
 
-                top_dif = top_all.copy()
+                # top_dif = top_all.copy()
+
                 log.debug('top_dif:%s' % (len(top_dif)))
                 if 'trade' in top_dif.columns:
                     top_dif['buy'] = (map(lambda x, y: y if int(x) == 0 else x,
@@ -241,12 +246,17 @@ if __name__ == "__main__":
                     top_dif = top_dif[top_dif.buy > 0]
 
                 # log.debug('top_dif:%s' % (len(top_dif)))
-                if st_key_sort.split()[0] == '4' and cct.get_now_time_int() > 926 and 'lastbuy' in top_dif.columns:
+                if st_key_sort.split()[0] == '4' and 926 < cct.get_now_time_int() < 1455 > 926 and 'lastbuy' in top_dif.columns:
                     top_dif['dff'] = (map(lambda x, y: round((x - y) / y * 100, 1),
                                           top_dif['buy'].values, top_dif['lastbuy'].values))
+                    top_dif['dff2'] = (map(lambda x, y: round((x - y) / y * 100, 1),
+                                          top_dif['buy'].values, top_dif['lastp'].values))
                 else:
                     top_dif['dff'] = (map(lambda x, y: round((x - y) / y * 100, 1),
                                           top_dif['buy'].values, top_dif['lastp'].values))
+                    if 'lastbuy' in top_dif.columns:
+                        top_dif['dff2'] = (map(lambda x, y: round((x - y) / y * 100, 1),
+                                          top_dif['buy'].values, top_dif['lastbuy'].values))
                 # top_dif['dff'] = (
                 #     map(lambda x, y: round((x - y) / y * 100, 1), top_dif['buy'].values, top_dif['lastp'].values))
                 # print top_dif.loc['600610',:]
@@ -329,6 +339,8 @@ if __name__ == "__main__":
 
                     # elif percent_status == 'y' and cct.get_now_time_int() > 935 and ptype == 'high' :
                     elif ptype == 'low':
+                        
+                        top_temp = top_dif[top_dif.topR >= 1]
                         # top_dif = top_dif[top_dif.percent >= 0]
                         # top_temp = stf.filterPowerCount(top_dif,ct.PowerCount)
                         # top_temp = top_dif[ ((top_dif.lastp0d >=9.8)  & (top_dif.lastp1d < 9) & (top_dif.lastp2d < 9) & (top_dif.lastp3d < 9) )  | ((top_dif.lastp0d <9)  & (top_dif.lastp1d < 9) & (top_dif.lastp2d < 9) & (top_dif.lastp3d < 9)) ][:100]
@@ -336,14 +348,16 @@ if __name__ == "__main__":
                         # top_temp = top_dif[ ((top_dif.per1d >=9.8)  & (top_dif.per2d < 8) & (top_dif.per3d < 8)  ) ][:100]
                         # top_temp = top_dif[ ((top_dif.per1d >=9.8)  & (top_dif.per2d < 8) & (top_dif.per3d < 8)) | ((top_dif.vcra > 8) & (top_dif.vchange > 100)) ]
                         # top_temp = top_dif[ ((top_dif.per1d < 8 )  & (top_dif.per2d < 5) & (top_dif.per3d < 4)) & ((top_dif.vcra >= top_dif.vcra.mean()) & (top_dif.vchange < 220) & (top_dif.vchange > 100)) ]
+                        
                         #近5天没有涨停记录,次日放量1倍
-                        # top_temp = top_dif[ ( (top_dif.top10 < 3) & (top_dif.close >= top_dif.max5 ) & (top_dif.per5d < 9 ) & (top_dif.per4d < 9 )  & (top_dif.per2d < 9) & (top_dif.per3d < 9)) & ((top_dif.vcra >= top_dif.vcra.std()) & (top_dif.vchange < 220) & (top_dif.vchange > 30)) ]
-                        if cct.get_now_time_int() > 935 and 'nlow' in top_dif.columns:
-                            # top_temp = top_dif[ (top_dif.close  <= top_dif.upper * 1.1) & (top_dif.open  >= top_dif.nlow) & (top_dif.close  >= top_dif.max5) & (top_dif.top10 < 4) & (top_dif.top10 >= 0) ]
-                            top_temp = top_dif[ (top_dif.open  >= top_dif.nlow) & (top_dif.low  >= top_dif.max5) & (top_dif.top10 < 4) & (top_dif.top10 > 0) ]
-                        else:
-                            # top_temp = top_dif[ (top_dif.close  <= top_dif.upper * 1.1) & (top_dif.open  >= top_dif.low) & (top_dif.close  >= top_dif.max5) & (top_dif.top10 < 4) & (top_dif.top10 >= 0) ]
-                            top_temp = top_dif[ (top_dif.open  >= top_dif.low) & (top_dif.low  >= top_dif.max5) & (top_dif.top10 < 4) & (top_dif.top10 > 0) ]
+                        # top_temp = top_dif[ ( (top_dif.top10 < 3) & (top_dif.close >= top_dif.max5 ) & (top_dif.per5d < 9 ) & (top_dif.per4d < 9 )  & (top_dif.per2d < 9) & (top_dif.per3d < 9)) & ((top_dif.vcra >= top_dif.vcra.std()) & (top_dif.vchange < 220) & (top_dif.vchange > 50)) ]
+                       
+                        # if cct.get_now_time_int() > 935 and 'nlow' in top_dif.columns:
+                        #     # top_temp = top_dif[ (top_dif.close  <= top_dif.upper * 1.1) & (top_dif.open  >= top_dif.nlow) & (top_dif.close  >= top_dif.max5) & (top_dif.top10 < 4) & (top_dif.top10 >= 0) ]
+                        #     top_temp = top_dif[ (top_dif.open  >= top_dif.nlow) & (top_dif.low  >= top_dif.max5) & (top_dif.top10 < 3) & (top_dif.top10 > 0) ]
+                        # else:
+                        #     # top_temp = top_dif[ (top_dif.close  <= top_dif.upper * 1.1) & (top_dif.open  >= top_dif.low) & (top_dif.close  >= top_dif.max5) & (top_dif.top10 < 4) & (top_dif.top10 >= 0) ]
+                        #     top_temp = top_dif[ (top_dif.open  >= top_dif.low) & (top_dif.low  >= top_dif.max5) & (top_dif.top10 < 3) & (top_dif.top10 > 0) ]
 
                         # top_temp = top_dif[ (top_dif.close >= top_dif.hvhigh) &  (top_dif.lastp1d >= top_dif.upper) & (top_dif.low >= top_dif.upper)]
 

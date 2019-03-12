@@ -58,7 +58,7 @@ if __name__ == "__main__":
     # print powerCompute_df(['300134','002171'], dtype='d',end=None, dl=10, filter='y')
     # # print powerCompute_df(['601198', '002791', '000503'], dtype='d', end=None, dl=30, filter='y')
     # print get_linear_model_status('999999', filter='y', dl=34, ptype='low', days=1)
-    # print get_linear_model_status('399006', filter='y', dl=34, ptype='low', days=1)
+    # print pct.get_linear_model_status('601519', filter='y', dl=34, ptype='low', days=1)
     # sys.exit()
     import re
     if cct.isMac():

@@ -2453,17 +2453,65 @@ def get_duration_price_date(code=None, ptype='low', dt=None, df=None, dl=None, e
     else:
         return lowdate, index_d, df
 
+
+def compute_power_tdx_df(tdx_df,dd):
+    if len(tdx_df) == 9:
+        idxdf = tdx_df.red[tdx_df.red <0]
+        if len(idxdf) >1:
+            idx = tdx_df.red[tdx_df.red <0].argmax()
+        else:
+            if len(tdx_df.red[tdx_df.red >0]) == 0: 
+                return dd
+            else:
+                idx = tdx_df.red[tdx_df.red >0].index[0]
+        trend = tdx_df[tdx_df.index >= idx]
+        fibl = len(trend)
+        idxh = tdx_df.high.argmax()
+        fibh = len(tdx_df[tdx_df.index >= idxh])
+        vratio = -1
+        if fibl > 1:
+            vratio = round(((trend.close[-1] - trend.close[0])/trend.close[0]*100)/fibl,1)
+
+
+        dd['op'] = int(len(LIS_TDX(tdx_df.close)[1])/float(len(tdx_df.close))*10)
+        dd['ra'] = (vratio)
+        dd['fib'] = fibl
+        dd['fibl'] = fibh
+        dd['ldate'] = idx
+        dd['boll'] = dd.upperL[0]
+        dd['df2'] = dd.upperT[0]
+        dd['kdj'] = 1
+        dd['macd'] = 1
+        dd['rsi'] = 1
+        dd['ma'] = 1
+        dd['oph'] = 1
+        dd['rah'] = 1
+    else:
+        log.error("tdx_df is no 9 ")
+    return dd
+
 def compute_perd_df(dd,lastdays=3):
     df = dd[-(lastdays+1):].copy()
+    
     df['perlastp'] = map(cct.func_compute_percd2, df['close'], df['close'].shift(1), df['open'], df['open'].shift(1), df['high'].shift(1), df['low'].shift(1), df['high'], df['low'],df['vol'],df['vol'].shift(1),df['upper'])
     df['perd'] = ((df['close'] - df['close'].shift(1)) / df['close'].shift(1) * 100).map(lambda x: round(x, 1))
+    df['red'] = ((df['close'] - df['open']) / df['close'] * 100).map(lambda x: round(x, 1))
+    df['lastdu'] = ((df['high'] - df['low']) / df['close'] * 100).map(lambda x: round(x, 1))
     # df['perddu'] = ((df['high'] - df['low']) / df['low'] * 100).map(lambda x: round(x, 1))
     dd['upperT'] = df.close[df.high > df.upper].count()
+    dd['upperL'] = df.close[df.low > df.upper].count()
+    dd['red'] = df.red[df.red > 0].count()
+    temp_du = df['perd'] - df['lastdu']
+    dd['topR']=temp_du.T[temp_du.T >= 0].count()    #跳空缺口
+    dd['top0']=temp_du.T[temp_du.T == 0].count()    #一字涨停
 
     df = df.dropna()
     df['perd'] = df['perd'].apply(lambda x: round(x, 1) if ( x < 9.85)  else 10.0)
     dd['perd'] = df['perd']
+    dd['lastdu'] = df['lastdu']
     dd['perlastp'] = df['perlastp']
+    dd = compute_top10_count(dd)
+    dd = compute_power_tdx_df(df, dd)
 
     return dd
 
@@ -2498,7 +2546,7 @@ def compute_lastdays_percent(df=None, lastdays=3, resample='d',vc_radio=100):
         df = df.fillna(0)
         df['vcra'] = len(df[df.vchange > vc_radio])
         df['vcall'] = df['vchange'].sum()
-        df['vchange'] = df['vchange'][-1]
+        # df['vchange'] = df['vchange'][-1]
 
         # df['meann'] = ((df['high'] + df['low']) / 2).map(lambda x: round(x, 1))
 
@@ -2520,6 +2568,7 @@ def compute_lastdays_percent(df=None, lastdays=3, resample='d',vc_radio=100):
             # df['per%sd' % da] = df['close'].pct_change(da).apply(lambda x:round(x*100,1))
             # df['per%sd' % da] = df['perd'][-da:].sum()
             df['per%sd' % da] = df['perd'][-da]
+            # df['du%sd' % da] = df['perd'][-da] - df['lastdu'][-da] 
             # df['per%sd' % da] = df['perd'].shift(da-1)
             df['perc%sd' % da] = df['perlastp'][-da]
             # df['perc%sd' % da] = (df['perlastp'][-da:].sum())
@@ -3006,12 +3055,26 @@ def get_single_df_lastp_to_df(top_all, lastpTDX_DF=None, dl=ct.PowerCountdl, end
     log.debug('T:%0.2f'%(time.time()-time_s))
     return top_all
 
-
-def compute_top10_count(df,lastdays=ct.compute_lastdays,top_limit=ct.topR):
+def compute_jump_du_count(df,lastdays=ct.compute_lastdays):
     temp=df[df.columns[(df.columns >= 'per1d') & (df.columns <= 'per%sd'%(lastdays))]]
+    tpp =temp[temp >9.9].count()
+    idxkey= tpp[ tpp ==tpp.min()].index.values[0]
+    perlist = temp.columns[temp.columns <= idxkey][-2:].values.tolist()
+    if len(perlist) >=2:
+        # codelist= temp[ ((temp[perlist[0]] >9) &(temp[perlist[1]] > 9)) | (temp[perlist[1]] > 9) ].index.tolist()
+        codelist= temp[ ((temp[perlist[0]] >9)) | (temp[perlist[1]] > 9) ].index.tolist()
+    else:
+        codelist= temp[ (temp[perlist[0]] >9.9)].index.tolist()
+    return codelist
+
+def compute_top10_count(df,lastdays=ct.compute_lastdays,top_limit=ct.per_redline):
+    temp=df[df.columns[(df.columns >= 'per1d') & (df.columns <= 'per%sd'%(lastdays))]]
+    # temp_du=df[df.columns[(df.columns >= 'du1d') & (df.columns <= 'du%sd'%(lastdays))]]
     # temp.T[temp.T >=10].count()
-    df['top10']=temp.T[temp.T >=9.9].count()
-    df['topR']=temp.T[temp.T >= top_limit].count()
+    df['top10']=temp.T[temp.T >=9.9].count()        #涨停个数
+    df['topU']=temp.T[temp.T >= top_limit].count()  #0.8 上涨个数
+    # df['topR']=temp_du.T[temp_du.T >= 0].count()    #跳空缺口
+    # df['top0']=temp_du.T[temp_du.T == 0].count()    #一字涨停
     df['upper'] = map(lambda x: round((1 + 11.0 / 100) * x, 1), df.ma10d)
     df['lower'] = map(lambda x: round((1 - 9.0 / 100) * x, 1), df.ma10d)
     df['ene'] = map(lambda x, y: round((x + y) / 2, 1), df.upper, df.lower)
@@ -3088,7 +3151,7 @@ def get_append_lastp_to_df(top_all, lastpTDX_DF=None, dl=ct.PowerCountdl, end=No
             # # aa=df[df.columns[(df.columns >= 'per1d') & (df.columns <= 'per9d')]]
             # aa.T[aa.T >=10].count()
             # df['top1']=aa.T[aa.T >=10].count()
-            tdxdata = compute_top10_count(tdxdata)
+            # tdxdata = compute_top10_count(tdxdata)
 
             wcdf = wcd.get_wencai_data(top_all.name, 'wencai',days='N')
             tdxdata = cct.combine_dataFrame(tdxdata, wcdf.loc[:, ['category']])
@@ -3123,7 +3186,7 @@ def get_append_lastp_to_df(top_all, lastpTDX_DF=None, dl=ct.PowerCountdl, end=No
                 tdx_diff.rename(columns={'vol': 'lvol'}, inplace=True)
                 tdx_diff.rename(columns={'amount': 'lamount'}, inplace=True)
                 # tdx_diff.rename(columns={'cumin': 'df2'}, inplace=True)
-                tdx_diff = compute_top10_count(tdx_diff)
+                # tdx_diff = compute_top10_count(tdx_diff)
 
                 # wcdf = wcd.get_wencai_data(top_all.loc[tdx_diff.index,'name'], 'wencai',days='N')
                 wcdf = wcd.get_wencai_data(top_all.name, 'wencai',days='N')
@@ -3616,7 +3679,12 @@ if __name__ == '__main__':
     code='601699'
     code='600604'
     code='002175'
-    # code='300017'
+    code='603000'
+    code='600331'
+    code='603063'
+    # code='600613'
+    # code='601519'
+    # code='300216'
     # code = '002906'
     # code = '603486'
     # code = '999999'

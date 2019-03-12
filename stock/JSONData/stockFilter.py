@@ -164,11 +164,17 @@ def getBollFilter(df=None, boll=ct.bollFilter, duration=ct.PowerCountdl, filter=
         print "dataframe is None"
         return None
     else:
-        df.loc[df.percent >= 9.94, 'percent'] = 10
+        # top10 = df[ (df.percent >= 9.99) & (df.b1_v > df.a1_v)]
+
+        # df.loc[(df.percent >= 9.99) & (df.b1_v > df.a1_v), 'percent'] = -10
+        if cct.get_now_time_int() < 950 or cct.get_now_time_int() > 1502 :
+            df.loc[(df.b1_v > df.a1_v), 'percent'] = 10
+        else:
+            df.loc[(df.b1_v > df.a1_v), 'percent'] = -11
         # if resample in ['d', 'w']:
         if resample in ['d']:
-            df.loc[df.per1d >= 9.94, 'per1d'] = 10
-            df['percent'] = df['percent'].apply(lambda x: round(x, 1))
+            df.loc[df.per1d >= 9.99, 'per1d'] = 10
+            df['percent'] = df['percent'].apply(lambda x: round(x, 2))
             # time_ss = time.time()
             perc_col = [co for co in df.columns if co.find('perc') == 0]
             per_col = [co for co in df.columns if co.find('per') == 0]
@@ -419,11 +425,11 @@ def getBollFilter(df=None, boll=ct.bollFilter, duration=ct.PowerCountdl, filter=
                 #     df = df[(df.volume > 1.5 * cct.get_work_time_ratio()) & (df.percent > -5)]
                 # df = df[(df.lvolume > df.lvol * 0.9) & (df.lvolume > df.lowvol * 1.1)]
                 if 'stdv' in df.columns and 926 < cct.get_now_time_int():
-                    df = df[((df.volume > 2 * cct.get_work_time_ratio()) & (df.percent > -3)) | ((df.stdv < 1) &
-                                                                                                 (df.percent > 2)) | ((df.lvolume > df.lvol * 0.9) & (df.lvolume > df.lowvol * 1.1))]
+                    # df = df[((df.volume > 2 * cct.get_work_time_ratio()) & (df.percent > -3)) | ((df.stdv < 1) &
+                    #                (df.percent > 2)) | ((df.lvolume > df.lvol * 0.9) & (df.lvolume > df.lowvol * 1.1))]
                     df_index = tdd.getSinaIndexdf()
                     if isinstance(df_index, type(pd.DataFrame())):
-                        df_index['volume'] = (map(lambda x, y: round(x / y / radio_t, 1), df_index.nvol.values, df_index.lvolume.values))
+                        df_index['volume'] = (map(lambda x, y: round(x / y / radio_t, 1), df_index.nvol.values, df_index.lastv1d.values))
                         index_vol = df_index.loc['999999'].volume
                         if 'percent' in df_index.columns and '999999' in df_index.index:
                             index_percent = df_index.loc['999999'].percent
@@ -440,8 +446,7 @@ def getBollFilter(df=None, boll=ct.bollFilter, duration=ct.PowerCountdl, filter=
                     else:
                         print ("df_index is Series",df_index.T)
                 else:
-                    df = df[((df.volume > 1.2 * cct.get_work_time_ratio()) & (df.percent > -3))
-                            | ((df.lvolume > df.lvol * 0.8) & (df.lvolume > df.lowvol * 1.1))]
+                    df = df[((df.volume > 1.2 * cct.get_work_time_ratio()) & (df.percent > -3))]
 
                 # df = df[((df['buy'] >= df['ene'])) | ((df['buy'] < df['ene']) & (df['low'] > df['lower'])) | ((df['buy'] > df['upper']) & (df['low'] > df['upper']))]
                 # df = df[(( df['ene'] * ct.changeRatio < df['open']) & (df['buy'] > df['ene'] * ct.changeRatioUp)) | ((df['low'] > df['upper']) & (df['close'] > df['ene']))]
