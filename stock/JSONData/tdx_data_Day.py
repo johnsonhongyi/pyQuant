@@ -2460,7 +2460,7 @@ def compute_power_tdx_df(tdx_df,dd):
         if len(idxdf) >1:
             idx = tdx_df.red[tdx_df.red <0].argmax()
         else:
-            if len(tdx_df.red[tdx_df.red >0]) == 0: 
+            if len(tdx_df.red[tdx_df.red >0]) == 0:
                 return dd
             else:
                 idx = tdx_df.red[tdx_df.red >0].index[0]
@@ -2495,8 +2495,10 @@ def compute_perd_df(dd,lastdays=3):
     
     df['perlastp'] = map(cct.func_compute_percd2, df['close'], df['close'].shift(1), df['open'], df['open'].shift(1), df['high'].shift(1), df['low'].shift(1), df['high'], df['low'],df['vol'],df['vol'].shift(1),df['upper'])
     df['perd'] = ((df['close'] - df['close'].shift(1)) / df['close'].shift(1) * 100).map(lambda x: round(x, 1))
+    df = df.dropna()
     df['red'] = ((df['close'] - df['open']) / df['close'] * 100).map(lambda x: round(x, 1))
     df['lastdu'] = ((df['high'] - df['low']) / df['close'] * 100).map(lambda x: round(x, 1))
+
     # df['perddu'] = ((df['high'] - df['low']) / df['low'] * 100).map(lambda x: round(x, 1))
     dd['upperT'] = df.close[df.high > df.upper].count()
     dd['upperL'] = df.close[df.low > df.upper].count()
@@ -2505,12 +2507,10 @@ def compute_perd_df(dd,lastdays=3):
     dd['topR']=temp_du.T[temp_du.T >= 0].count()    #跳空缺口
     dd['top0']=temp_du.T[temp_du.T == 0].count()    #一字涨停
 
-    df = df.dropna()
     df['perd'] = df['perd'].apply(lambda x: round(x, 1) if ( x < 9.85)  else 10.0)
     dd['perd'] = df['perd']
     dd['lastdu'] = df['lastdu']
     dd['perlastp'] = df['perlastp']
-    dd = compute_top10_count(dd)
     dd = compute_power_tdx_df(df, dd)
 
     return dd
@@ -2546,7 +2546,7 @@ def compute_lastdays_percent(df=None, lastdays=3, resample='d',vc_radio=100):
         df = df.fillna(0)
         df['vcra'] = len(df[df.vchange > vc_radio])
         df['vcall'] = df['vchange'].sum()
-        # df['vchange'] = df['vchange'][-1]
+        df['vchange'] = df['vchange'][-1]
 
         # df['meann'] = ((df['high'] + df['low']) / 2).map(lambda x: round(x, 1))
 
@@ -2568,12 +2568,14 @@ def compute_lastdays_percent(df=None, lastdays=3, resample='d',vc_radio=100):
             # df['per%sd' % da] = df['close'].pct_change(da).apply(lambda x:round(x*100,1))
             # df['per%sd' % da] = df['perd'][-da:].sum()
             df['per%sd' % da] = df['perd'][-da]
-            # df['du%sd' % da] = df['perd'][-da] - df['lastdu'][-da] 
+            # df['du%sd' % da] = df['perd'][-da] - df['lastdu'][-da]
             # df['per%sd' % da] = df['perd'].shift(da-1)
             df['perc%sd' % da] = df['perlastp'][-da]
             # df['perc%sd' % da] = (df['perlastp'][-da:].sum())
         # df['lastv9m'] = df['vol'][-lastdays:].mean()
             # df['mean%sd' % da] = df['meann'][-da]
+        df = compute_top10_count(df)
+
         df = df.reset_index()
     else:
         log.info("compute df is none")
@@ -2769,7 +2771,7 @@ def get_tdx_exp_low_or_high_power(code, dt=None, ptype='close', dl=None, end=Non
                 dd['close'] = dtemp.close.values[0]
                 dd['open'] = dtemp.open.values[0]
                 dd['vol'] = dtemp.vol.values[0]
-                
+
                 dd['lowvol'] = dd.vol
                 dd['last6vol'] = lastvol
 
@@ -3075,9 +3077,9 @@ def compute_top10_count(df,lastdays=ct.compute_lastdays,top_limit=ct.per_redline
     df['topU']=temp.T[temp.T >= top_limit].count()  #0.8 上涨个数
     # df['topR']=temp_du.T[temp_du.T >= 0].count()    #跳空缺口
     # df['top0']=temp_du.T[temp_du.T == 0].count()    #一字涨停
-    df['upper'] = map(lambda x: round((1 + 11.0 / 100) * x, 1), df.ma10d)
-    df['lower'] = map(lambda x: round((1 - 9.0 / 100) * x, 1), df.ma10d)
-    df['ene'] = map(lambda x, y: round((x + y) / 2, 1), df.upper, df.lower)
+    # df['upper'] = map(lambda x: round((1 + 11.0 / 100) * x, 1), df.ma10d)
+    # df['lower'] = map(lambda x: round((1 - 9.0 / 100) * x, 1), df.ma10d)
+    # df['ene'] = map(lambda x, y: round((x + y) / 2, 1), df.upper, df.lower)
     df = df.fillna(0)
     return df
 

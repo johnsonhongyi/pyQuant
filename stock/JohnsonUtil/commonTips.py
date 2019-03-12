@@ -1184,7 +1184,7 @@ def to_mp_run_async(cmd, urllist, *args,**kwargs):
 
     # n_t = time.time()
     results = []
-    
+
     if len(urllist) > 50:
         if len(kwargs) > 0 :
             pool = ThreadPool(1)
@@ -1229,22 +1229,8 @@ def to_mp_run_async(cmd, urllist, *args,**kwargs):
 
 
 
-    # results = []
-    # try:
-    #     # [x.get() for x in [pool.apply_async(cmd, (x,)+ args) for x in urllist]]
-    #     # for y in tqdm(pool.apply_async(cmd, (urllist,) + args).get(),unit='%',unit_scale=False,total=len(urllist),ncols=3):
-    #     # for y in tqdm(pool.apply_async(cmd, (urllist,) + args).get(),unit='%',unit_scale=False,total=len(urllist),ncols=3):
-    #     for y in tqdm([x.get() for x in [pool.apply_async(cmd, (x,)+ args) for x in urllist]],unit='%',unit_scale=True,total=len(urllist),ncols=5):
-    #         results.append(y)
-    # except Exception as e:
-    #     print e, code
-
-
     pool.close()
     pool.join()
-    # results = flatten(map(lambda x: x.get(), results))
-    # results = flatten( results)
-    # print "time:MP", (time.time() - n_t),
     return results
 
 

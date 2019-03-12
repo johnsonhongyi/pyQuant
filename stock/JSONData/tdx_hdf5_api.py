@@ -706,7 +706,7 @@ def load_hdf_db(fname, table='all', code_l=None, timelimit=True, index=False, li
                 #             dd=store[table]
                 #         except Exception as e:
                 #             print ("%s fname:%s"%(e,fname))
-                #             cct.sleep(ct.sleep_time)     
+                #             cct.sleep(ct.sleep_time)
                 if store is not None:
                     try:
                         if '/' + table in store.keys():
@@ -722,8 +722,8 @@ def load_hdf_db(fname, table='all', code_l=None, timelimit=True, index=False, li
                     else:
                         pass
                     finally:
-                        pass   
-                                        
+                        pass
+
             if dd is not None and len(dd) > 0:
                 if timelimit:
                     if dd is not None and len(dd) > 0:
