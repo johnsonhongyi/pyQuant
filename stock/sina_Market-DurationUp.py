@@ -144,10 +144,6 @@ if __name__ == "__main__":
             # market_blk = '060'
             top_now = tdd.getSinaAlldf(market=market_blk,filename='cxg', vol=ct.json_countVol, vtype=ct.json_countType)
             
-            # top_now = tdd.getSinaAlldf(market='all', vol=ct.json_countVol, vtype=ct.json_countType,trend=True)
-
-            #top_dif = top_now
-            # top_now.to_hdf("testhdf5", 'marketDD', format='table', complevel=9)
             now_count = len(top_now)
             radio_t = cct.get_work_time_ratio()
             # top_now = top_now[top_now.buy > 0]
@@ -158,50 +154,22 @@ if __name__ == "__main__":
                 top_all = pd.DataFrame()
             else:
                 status_change = False
-            # print ("Buy>0:%s" % len(top_now[top_now['buy'] > 0])),
             if len(top_now) > 10 or cct.get_work_time():
                 # time_Rt = time.time()
                 if len(top_all) == 0 and len(lastpTDX_DF) == 0:
                     cct.get_terminal_Position(position=sys.argv[0])
 
-                    # print duration_date, end_date, ptype, filter, ct.lastPower,resample
-                    # time_Rt = time.time()
                     top_all, lastpTDX_DF = tdd.get_append_lastp_to_df(
                         top_now, lastpTDX_DF=None, dl=duration_date, end=end_date, ptype=ptype, filter=filter, power=ct.lastPower, lastp=False, resample=resample)
                     log.debug("len:%s" % (len(top_all)))
-                    # codelist = top_all.index.tolist()
-                    # log.info('toTDXlist:%s' % len(codelist))
-                    # # tdxdata = tdd.get_tdx_all_day_LastDF(codelist,dt=duration_date,ptype=ptype)
-                    # # print "duration_date:%s ptype=%s filter:%s"%(duration_date, ptype,filter)
-                    # # tdxdata = tdd.get_tdx_exp_all_LastDF(codelist, dt=duration_date, end=end_date,ptype=ptype,filter=filter)
-                    # power=ct.lastPower
-                    # tdxdata = tdd.get_tdx_exp_all_LastDF_DL(codelist, dt=duration_date, end=end_date,ptype=ptype,filter=filter,power=ct.lastPower)
-                    # log.debug("TdxLastP: %s %s" % (len(tdxdata), tdxdata.columns.values))
-                    # tdxdata.rename(columns={'low': 'llow'}, inplace=True)
-                    # tdxdata.rename(columns={'high': 'lhigh'}, inplace=True)
-                    # tdxdata.rename(columns={'close': 'lastp'}, inplace=True)
-                    # tdxdata.rename(columns={'vol': 'lvol'}, inplace=True)
-                    # if power:
-                    #     tdxdata = tdxdata.loc[:, ['llow', 'lhigh', 'lastp', 'lvol', 'date','ra','op','fib','ldate']]
-                    #     # print tdxdata[(tdxdata.op >15) | (tdxdata.op <3)]
-                    #     # print len(tdxdata[(tdxdata.op >12)]),
-                    # else:
-                    #     tdxdata = tdxdata.loc[:, ['llow', 'lhigh', 'lastp', 'lvol', 'date']]
-                    # log.debug("TDX Col:%s" % tdxdata.columns.values)
-                    # top_all = top_all.merge(tdxdata, left_index=True, right_index=True, how='left')
-                    # lastpTDX_DF = tdxdata
-                    # log.info('Top-merge_now:%s' % (top_all[:1]))
-                    # top_all = top_all[top_all['llow'] > 0]
 
                 elif len(top_all) == 0 and len(lastpTDX_DF) > 0:
                     top_all = top_now
                     top_all = top_all.merge(lastpTDX_DF, left_index=True, right_index=True, how='left')
-                    # lastpTDX_DF=tdxdata
                     log.info('Top-merge_now:%s' % (top_all[:1]))
                     top_all = top_all[top_all['llow'] > 0]
 
                 else:
-                    # time_f = time.time()
                     log.info("start symbol code :%0.2f" % (cct.get_now_time_int()))
                     log.info("diff co:%s" % (set(top_all.columns) - set(top_now.columns)))
                     if 'couts' in top_now.columns.values:
@@ -224,9 +192,10 @@ if __name__ == "__main__":
                     top_all = cct.combine_dataFrame(top_all, top_now)
 
                 # top_all = top_all[top_all.buy > 0]
-                # top_list = tdd.compute_jump_du_count(top_all)
-                # top_dif = top_all.loc[top_list]
-                top_dif = top_all[(top_all.boll == 0) & (top_all.fibl ==1) &(top_all.fib > 3) &(top_all.per1d < 8)]
+                top_list = tdd.compute_jump_du_count(top_all)
+                top_dif = top_all.loc[top_list]
+                # top_dif = top_all[(top_all.lastdu < 15) & ((top_all.fib > 1) | (top_all.fibl >5)) &( (top_all.vcall < 80) ) &(top_all.top10 < 2)]
+                # top_dif = top_all[(top_all.top10 < 1)]
 
                 # top_dif = top_all.copy()
 
@@ -383,7 +352,7 @@ if __name__ == "__main__":
                     top_all = tdd.get_powerdf_to_all(top_all, top_temp)
                     top_all = tdd.get_powerdf_to_all(top_all, top_end)
                     # top_temp = stf.getBollFilter(df=top_temp, boll=ct.bollFilter, duration=ct.PowerCountdl,resample=resample)
-                    top_temp = stf.getBollFilter(df=top_temp, boll=ct.bollFilter, duration=ct.PowerCountdl, filter=False, ma5d=False, dl=14, percent=False, resample=resample, ene=False)
+                    top_temp = stf.getBollFilter(df=top_temp, boll=ct.bollFilter, duration=ct.PowerCountdl, filter=False, ma5d=False, dl=14, percent=False, resample=resample, ene=False,top10=False)
 
                     print("N:%s K:%s %s G:%s" % (
                         now_count, len(top_all[top_all['buy'] > 0]),

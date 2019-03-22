@@ -480,7 +480,7 @@ def Get_MACD(df, dtype='d', days=ct.Power_Ma_Days,lastday=ct.Power_last_da):
         return (df, 1)
 #    df=df.fillna(0)
     macd, macdsignal, macdhist = ta.MACD(
-        np.array(df['close']), fastperiod=12, slowperiod=26, signalperiod=9)
+        np.array(df['close']), fastperiod=5, slowperiod=34, signalperiod=5)
     SignalMA5 = ta.MA(macdsignal, timeperiod=5, matype=0)
     SignalMA10 = ta.MA(macdsignal, timeperiod=10, matype=0)
     SignalMA20 = ta.MA(macdsignal, timeperiod=20, matype=0)
@@ -491,6 +491,10 @@ def Get_MACD(df, dtype='d', days=ct.Power_Ma_Days,lastday=ct.Power_last_da):
     dflen = df.shape[0]
     MAlen = len(SignalMA5)
     operate = 0
+    dd = df.dropna()
+    print dd[['diffd','dead','ddead']],dd.ddead.argmin()
+    import ipdb;ipdb.set_trace()
+
     # 2个数组 1.DIFF、DEA均为正，DIFF向上突破DEA，买入信号。 2.DIFF、DEA均为负，DIFF向下跌破DEA，卖出信号。
     # 待修改
     diff = df.loc[df.index[-1], 'diff%s' % dtype]
@@ -771,8 +775,8 @@ if __name__ == '__main__':
     #    code='300201'
     import sys
     # print powerStd('600208',ptype='vol')
-    code = '002160'
-    codel=['601766','300638','002695','601555','002486','600321','002437','399006','999999']
+    code = '000993'
+    codel=['600917','300638','002695','601555','002486','600321','002437','399006','999999']
     # codel = ['300661', '600212', '300153', '603580']
     # codel=['600212']
     # dl = 21
@@ -804,7 +808,7 @@ if __name__ == '__main__':
     # sys.exit(0)
     for code in codel:
         df = tdd.get_tdx_append_now_df_api(
-            code, dl=int(dl * 1.5)).sort_index(ascending=True)
+            code, dl=int(dl * 1)).sort_index(ascending=True)
     #    df = tdd.get_tdx_power_now_df(code,dl=30)
         # print df[:2]
         # print "len:",len(df)

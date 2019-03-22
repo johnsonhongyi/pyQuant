@@ -167,7 +167,6 @@ if __name__ == "__main__":
                 # writecode = "cct.write_to_blocknew(block_path, dd.index.tolist())"
                 top_bak = top_all
                 market_sort_value, market_sort_value_key = ct.get_market_sort_value_key(st_key_sort, top_all=top_all)
-
                 codelist = top_all.index.tolist()
                 if len(codelist) > 0:
                     # log.info('toTDXlist:%s' % len(codelist))
@@ -191,10 +190,10 @@ if __name__ == "__main__":
                     # top_dif['volume'] = top_dif['volume'].apply(lambda x: round(x / radio_t, 1))
                     log.debug("top_diff:vol")
                     top_all['volume'] = (
-                        map(lambda x, y: round(x / y / radio_t, 1), top_all['volume'].values, top_all['lvol'].values))
+                        map(lambda x, y: round(x / y / radio_t, 1), top_all['volume'].values, top_all.lvol.values))
 
-                    if cct.get_now_time_int() > 915:
-                        top_all = top_all[top_all.open > top_all.lasth1d]
+                    # if cct.get_now_time_int() > 915:
+                        # top_all = top_all[top_all.open > top_all.lasth1d]
                         # top_all = top_all[top_all.low > top_all.llow * ct.changeRatio]
                         # top_all = top_all[top_all.trade > top_all.lhigh * ct.changeRatio]
 
@@ -205,9 +204,9 @@ if __name__ == "__main__":
                     # top_all = top_all[top_all.prev_p >= top_all.lhigh]
                     # top_all = top_all.loc[:,
                         # ['name', 'percent', 'ma5d','dff', 'couts', 'volume', 'trade', 'prev_p', 'ratio']]
-                    if cct.get_now_time_int() > 1030 and cct.get_now_time_int() < 1400:
-                        top_all = top_all[(top_all.volume > ct.VolumeMinR) & (
-                            top_all.volume < ct.VolumeMaxR)]
+                    # if cct.get_now_time_int() > 1030 and cct.get_now_time_int() < 1400:
+                    #     top_all = top_all[(top_all.volume > ct.VolumeMinR) & (
+                    #         top_all.volume < ct.VolumeMaxR)]
 
                 if st_key_sort.split()[0] == '4' and 926 < cct.get_now_time_int() < 1455 and 'lastbuy' in top_all.columns:
 
@@ -231,8 +230,8 @@ if __name__ == "__main__":
 #                    by=ct.Monitor_sort_count, ascending=[0, 0, 0, 0, 1])
                 # top_all = top_all.sort_values(by=['dff', 'couts', 'volume', 'ratio'], ascending=[0, 0, 0, 1])
                 # top_all=top_all.sort_values(by=['percent','dff','couts','ratio'],ascending=[0,0,1,1])
-                if cct.get_now_time_int() > 930 and 'llastp' in top_all.columns:
-                    top_all = top_all[top_all.trade >= top_all.llastp * ct.changeRatio]
+                # if cct.get_now_time_int() > 930 and 'llastp' in top_all.columns:
+                #     top_all = top_all[top_all.trade >= top_all.llastp * ct.changeRatio]
 
                 cct.set_console(width, height, title=[
                                 'G:%s' % len(top_all), '%s ZXG' % (blkname)])
@@ -241,9 +240,41 @@ if __name__ == "__main__":
 
                 # if len(top_all[top_all.dff > 0]) == 0:
                 #     top_all['dff'] = (map(lambda x, y: round((x - y) / y * 100, 1),
-                #                           top_all['buy'].values, top_all['lastp'].values))
 
-                top_temp = stf.filterPowerCount(top_all,ct.PowerCount,down=True)
+                # top_temp = top_all[ ((top_all.lastdu > 5) & (top_all.lastdu < 15)) & (top_all.fib > 1) & ( (top_all.volume > 1.2) & (top_all.volume < 3)) & (top_all.vchange < 120) &( (top_all.op > 0) & (top_all.op < 80))]
+                # top_temp = top_all[(top_all.top10 >0) & (top_all.topR >0) &(top_all.boll >1) &(top_all.df2 >1)]
+
+                # top_temp = top_all[(top_all.fib >= 1) & ((top_all.lastdu > 5) | ((top_all.vchange > 30) & (top_all.vchange < 100)))]
+                # top_temp = top_all.copy()
+                # top_temp =  top_all[(top_all.boll < 1) &(top_all.df2 >0) &(top_all.close > top_all.max5)]
+
+                if cct.get_now_time_int() > 830 and cct.get_now_time_int() <= 926:
+                    top_temp =  top_all[((top_all.topR < 2) & (top_all.close > top_all.lastp1d))]
+                    # top_temp =  top_all[((top_all.boll >0) & (top_all.close > top_all.lastp1d))]
+
+                    # top_all[(top_all.low >= top_all.nlow)& (top_all.high > top_all.nhigh)]
+                else:
+
+                    top_temp =  top_all[(top_all.topR < 2)  & ((top_all.low > top_all.lastp1d) | (top_all.low == top_all.open))]
+                    # top_temp =  top_all[(top_all.boll >0)  & ((top_all.low > top_all.upper) | (top_all.low == top_all.open))]
+                    # top_temp =  top_all[(top_all.boll >0)  & ((top_all.low > top_all.lastp1d) | (top_all.low == top_all.open))]
+                    # top_temp =  top_all[(top_all.topR < 2) & (top_all.close >= top_all.nhigh) & ((top_all.low > top_all.lastp1d) | (top_all.low == top_all.open))]
+                    # if 'nlow' in top_all.columns:  
+                        # top_temp = top_all[(top_all.low >= top_all.nlow)& (top_all.close >= top_all.nhigh) &( (top_all.open == top_all.nlow) | (top_all.open > top_all.lastp1d))]
+                # dd =top_all[(top_all.boll >0) &(top_all.df2 >0) &(top_all.low >= top_all.ma20d) &(top_all.low <= top_all.ma20d *1.05)]
+                
+                if cct.get_now_time_int() > 925 and cct.get_now_time_int() <= 1450:
+                    if 'nlow' in top_temp.columns:                #                           top_all['buy'].values, top_all['lastp'].values))
+                        # top_temp = top_temp[(top_temp.open > top_temp.lastp1d) & ((top_temp.low >= top_temp.nlow) | (top_temp.low > top_temp.lastl1d))]
+                        top_temp = top_temp[(top_temp.low > top_temp.lastl1d) & ((top_temp.low >= top_temp.nlow) | (top_temp.low > top_temp.lastp1d))]
+                    else:
+                        if cct.get_now_time_int() > 915 and cct.get_now_time_int() <= 925:
+                            # top_temp = top_temp[(top_temp.close > top_temp.lastp1d) & (top_temp.low > top_temp.lastl1d)]
+                            top_temp = top_temp[(top_temp.close > top_temp.lastp1d) & (top_temp.close > top_temp.lastl1d)]
+                        else:
+                            top_temp = top_temp[(top_temp.close > top_temp.lastp1d) & (top_temp.low > top_temp.lastl1d)]
+
+                top_temp = stf.filterPowerCount(top_temp,ct.PowerCount,down=True)
                 top_end = top_all[-int((ct.PowerCount)/10):].copy()
                 top_temp = pct.powerCompute_df(top_temp, dl=ct.PowerCountdl)
                 top_end = pct.powerCompute_df(top_end, dl=ct.PowerCountdl)

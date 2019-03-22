@@ -136,8 +136,8 @@ if __name__ == "__main__":
                 
             # top_now = tdd.getSinaAlldf(market='060', vol=ct.json_countVol, vtype=ct.json_countType)
             # top_now = tdd.getSinaAlldf(market='次新股',filename='cxg', vol=ct.json_countVol, vtype=ct.json_countType)
-            # market_blk = 'rzrq'
-            market_blk = '060'
+            market_blk = 'rzrq'
+            # market_blk = '060'
             # top_now = tdd.getSinaAlldf(market= market_blk , vol=ct.json_countVol, vtype=ct.json_countType,trend=True)
             # top_now = tdd.getSinaAlldf(market='次新股,060', filename='cxg' , vol=ct.json_countVol, vtype=ct.json_countType,trend=True)
             top_now = tdd.getSinaAlldf(market=market_blk, vol=ct.json_countVol, vtype=ct.json_countType,trend=True)
@@ -223,10 +223,15 @@ if __name__ == "__main__":
                     #             top_all.loc[symbol, ct.columns_now] = top_now.loc[symbol, ct.columns_now]
                     top_all = cct.combine_dataFrame(top_all, top_now, col=None)
 
-                top_dif = top_all.copy()
+                # top_dif = top_all.copy()
+                if cct.get_now_time_int() > 830 and cct.get_now_time_int() <= 926:
+                    top_dif =  top_all[(top_all.topR >0) &(top_all.close > top_all.lastp1d)]
+                else:
+                    top_dif =  top_all[(top_all.topR >0) &(top_all.low > top_all.lastp1d)]
+                    top_dif = top_dif[(top_dif.low >= top_dif.ene) & (top_dif.low >= top_dif.ma5d)]
+                    
                 market_sort_value, market_sort_value_key = ct.get_market_sort_value_key(st_key_sort, top_all=top_all)
 
-                top_dif = top_dif[(top_dif.low >= top_dif.upper) & (top_dif.low >= top_dif.ma5d)]
 
                 log.debug('top_dif:%s' % (len(top_dif)))
                 if 'trade' in top_dif.columns:

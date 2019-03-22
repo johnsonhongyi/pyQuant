@@ -141,6 +141,6 @@ def get_roll_mean_all(single=True,tdx=False,app=True,duration=100):
     return df
 
 if __name__ == '__main__':
-    get_roll_mean_all(single=False,tdx=True,app=True)
+    get_roll_mean_all(single=False,tdx=True,app=True,duration=250)
     # get_roll_mean_all(single=True,tdx=True,app=True)
     # get_roll_mean_all(single=True,tdx=True,app=False)

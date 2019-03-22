@@ -60,7 +60,6 @@ def post_login(login_url='http://upass.10jqka.com.cn/login',header=None,url=None
 	res_post=res_keep.post(login_url,data=postData,headers=header)#使用构建好的postdata重新登录发送post请求,用之前的res_keep进行post请求
 
 	respond=res_keep.get(url,headers=header).text#获取到成绩页面源代码,用之前的res_keep进行get请求
-	import ipdb;ipdb.set_trace()
 	return respond
 
 
@@ -308,7 +307,6 @@ def get_wencai_Market_url(filter='国企改革', perpage=1, url=None, pct=False,
 
             # href = re.findall('(http:\/\/[\D\d]+)";', html, re.S)
             # if len(href) >0:
-            #     import ipdb;ipdb.set_trace()
             #     html = cct.get_url_data(href[0])
 
             count = re.findall(
@@ -322,7 +320,6 @@ def get_wencai_Market_url(filter='国企改革', perpage=1, url=None, pct=False,
 
             # count = grep_stock_codes.findall(data,re.S)
             if len(count) == 0:
-                # import ipdb;ipdb.set_trace()
                 log.info("count: len:%s url:%s" % (len(count), url))
 
             log.info(time.time() - time_s)
@@ -565,6 +562,8 @@ def get_wencai_data(dm, market='wencai', days=120, pct=True):
         df = df.set_index('code')
     if df is not None and len(df) > 1:
         df = df.drop_duplicates()
+        df['category'] = df['category'].apply(lambda x:str(x).replace('\n',''))
+
     return df
 
 
@@ -659,6 +658,7 @@ def get_write_wencai_market_to_csv(df=None, market='wcbk', renew=False, days=60)
             df = df.fillna('--')
             df['category'] = (map(lambda x: ';'.join(
                 str(x).split(';')[:3]), df['category']))
+            df['category'] = df['category'].apply(lambda x:str(x).replace('\n',''))
     return df
 
 

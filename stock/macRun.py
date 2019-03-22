@@ -105,7 +105,7 @@ positionKey = cct.terminal_positionKey
 
 cmdRun_dnup = '''cd /Users/Johnson/Documents/Quant/pyQuant/stock;
 open sina_Market-DurationDn.py;
-sleep 0.1;osascript -e 'tell application "Python Launcher" to quit';sleep 45;
+sleep 0.1;osascript -e 'tell application "Python Launcher" to quit';sleep 210;
 open singleAnalyseUtil.py;
 sleep 0.1;osascript -e 'tell application "Python Launcher" to quit';sleep 25;
 open sina_Monitor.py;
@@ -126,7 +126,25 @@ sleep 0.1;osascript -e 'tell application "Python Launcher" to quit';sleep 5;
 
 cmdRun = '''cd /Users/Johnson/Documents/Quant/pyQuant/stock;
 open sina_Market-DurationDn.py;
-sleep 0.2;osascript -e 'tell application "Python Launcher" to quit';sleep 35;
+sleep 0.2;osascript -e 'tell application "Python Launcher" to quit';sleep 15;
+open singleAnalyseUtil.py;
+sleep 0.2;osascript -e 'tell application "Python Launcher" to quit';sleep 15;
+open sina_Monitor-Market-LH.py;
+sleep 0.2;osascript -e 'tell application "Python Launcher" to quit';sleep 15;
+open sina_Market-DurationUP.py;
+sleep 0.2;osascript -e 'tell application "Python Launcher" to quit';sleep 15;
+open sina_Market-DurationCXDN.py;
+sleep 0.2;osascript -e 'tell application "Python Launcher" to quit';sleep 15;
+open sina_Market-DurationSH.py;
+sleep 0.2;osascript -e 'tell application "Python Launcher" to quit';sleep 15;
+open sina_Monitor.py;
+sleep 0.2;osascript -e 'tell application "Python Launcher" to quit';sleep 5;
+'''
+
+
+cmdRun200 = '''cd /Users/Johnson/Documents/Quant/pyQuant/stock;
+open sina_Market-DurationDn.py;
+sleep 0.2;osascript -e 'tell application "Python Launcher" to quit';sleep 200;
 open singleAnalyseUtil.py;
 sleep 0.2;osascript -e 'tell application "Python Launcher" to quit';sleep 25;
 open sina_Monitor-Market-LH.py;
@@ -140,7 +158,6 @@ sleep 0.2;osascript -e 'tell application "Python Launcher" to quit';sleep 45;
 open sina_Monitor.py;
 sleep 0.2;osascript -e 'tell application "Python Launcher" to quit';sleep 5;
 '''
-
 # sleep 0.2;osascript -e 'tell application "Python Launcher" to quit';sleep 25;
 # open LinePower.py;
 
@@ -218,8 +235,16 @@ def setPosition(cmd=None, position=None):
             # position = doScript(scriptposition % ('get', str(n)))
             # print positio
     else:
-        print "run Cmd"
-        os.system(cmdRun)
+        if os.path.exists(cct.get_ramdisk_path('tdx_last_df')): 
+            f_size = os.path.getsize(cct.get_ramdisk_path('tdx_last_df')) / 1000 / 1000
+        else:
+            f_size = 0 
+        if f_size > 2:
+            print "run Cmd"
+            os.system(cmdRun)
+        else:
+            print "run Cmd200"
+            os.system(cmdRun200)
         setPosition(cmd=None, position=None)
         os.system(closeLaunch) 
         # getPosition('Johnson@',close=True)
@@ -257,7 +282,7 @@ if int(count) > 3:
     print getPosition('LinePower.py')
     print getPosition('Johnson',close=True)
     print getPosition('/Users/Johnson/Documents',close=True)
-else:   
+else:
     setPosition(cmd=None, position=None)
     cct.get_terminal_Position(cct.clean_terminal[2],close=True)
 cct.get_terminal_Position(cct.clean_terminal[1],close=True)

@@ -214,6 +214,17 @@ if __name__ == "__main__":
                     top_all = cct.combine_dataFrame(top_all, top_now, col=None)
 
                 top_dif = top_all.copy()
+                # if cct.get_now_time_int() > 915 and cct.get_now_time_int() <= 926:
+                #     top_dif =  top_all[(top_all.topR < 2) & (top_all.open > top_all.lastp1d)]
+                #     # top_all[(top_all.low >= top_all.nlow)& (top_all.high > top_all.nhigh)]
+                # else:
+                #     # top_dif =  top_all[(top_all.topR < 2) & ((top_all.low > top_all.lastp1d) | (top_all.low == top_all.open))]
+                #     if 'nlow' in top_all.columns and 'nhigh' in top_all.columns:
+                #         top_dif = top_all[(top_all.low >= top_all.nlow)& (top_all.close >= top_all.nhigh)]
+                #         # top_dif = top_all[(top_all.low >= top_all.nlow)& (top_all.close >= top_all.nhigh) &(top_all.open == top_all.low)]
+                #     else:
+                #         top_dif = top_all[(top_all.topR >0) & (top_all.low >= top_all.lastp1d)]
+                        
                 market_sort_value, market_sort_value_key = ct.get_market_sort_value_key(st_key_sort, top_all=top_all)
                 
                 if 'trade' in top_dif.columns:

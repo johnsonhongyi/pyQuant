@@ -77,7 +77,7 @@ def compute_perd_value(df,market_value=2,col='per'):
     return df
 
 
-def getBollFilter(df=None, boll=ct.bollFilter, duration=ct.PowerCountdl, filter=True, ma5d=True, dl=14, percent=True, resample='d', ene=False,upper=False, down=False, indexdff=True,cuminTrend=False):
+def getBollFilter(df=None, boll=ct.bollFilter, duration=ct.PowerCountdl, filter=True, ma5d=True, dl=14, percent=True, resample='d', ene=False,upper=False, down=False, indexdff=True,cuminTrend=False,top10=True):
 
     # drop_cxg = cct.GlobalValues().getkey('dropcxg')
     # if len(drop_cxg) >0:
@@ -113,8 +113,11 @@ def getBollFilter(df=None, boll=ct.bollFilter, duration=ct.PowerCountdl, filter=
     radio_t = cct.get_work_time_ratio()
     df['lvolr%s' % (resample)] = df['volume']
     # df['volume'] = (map(lambda x, y: round(x / y / radio_t, 1), df.nvol.values, df.lvolume.values))
-    # import ipdb;ipdb.set_trace()
-    df['volume'] = (map(lambda x, y,z: round((x / y / 0.415) if z < 9.9 else (x / y) , 1), df.nvol.values, df.lastv1d.values,df.percent.values))
+    if cct.get_now_time_int() > 1530:
+        df['volume'] = (map(lambda x, y,z: round((x / y / radio_t) if z < 9.9 else (x / y) , 1), df.nvol.values, df.ma5vol.values,df.percent.values))
+    else:
+        df['volume'] = (map(lambda x, y,z: round((x / y / radio_t) if z < 9.9 else (x / y) , 1), df.nvol.values, df.lvol.values,df.percent.values))
+    # df['volume'] = (map(lambda x, y,z: round((x / y / radio_t) if z < 9.9 else (x / y) , 1), df.nvol.values, df.ma5vol.values,df.percent.values))
     # df['volume'] = (map(lambda x, y: round(x / y / radio_t, 1), df.nvol.values, df.lastv1d.values))
     
     indexfibl = cct.GlobalValues().getkey('indexfibl')
@@ -167,10 +170,11 @@ def getBollFilter(df=None, boll=ct.bollFilter, duration=ct.PowerCountdl, filter=
         # top10 = df[ (df.percent >= 9.99) & (df.b1_v > df.a1_v)]
 
         # df.loc[(df.percent >= 9.99) & (df.b1_v > df.a1_v), 'percent'] = -10
-        if cct.get_now_time_int() < 950 or cct.get_now_time_int() > 1502 :
-            df.loc[(df.b1_v > df.a1_v), 'percent'] = 10
+        if not top10 or (cct.get_now_time_int() < 950 or cct.get_now_time_int() > 1502) :
+            df.loc[(df.b1_v > df.a1_v), 'percent'] = 10.1
         else:
-            df.loc[(df.b1_v > df.a1_v), 'percent'] = -11
+            df.loc[(df.b1_v > df.a1_v), 'percent'] = 10.1
+            # df.loc[(df.b1_v > df.a1_v), 'percent'] = -11
         # if resample in ['d', 'w']:
         if resample in ['d']:
             df.loc[df.per1d >= 9.99, 'per1d'] = 10
@@ -228,15 +232,15 @@ def getBollFilter(df=None, boll=ct.bollFilter, duration=ct.PowerCountdl, filter=
         df[co] = df[co].astype(int)
 
     if down:
-        if 'nlow' in df.columns:
-            if 'max5' in df.columns:
-                # df = df[(df.hmax >= df.ene) & (df.nlow >= df.low) & (df.low <> df.high) & (((df.low < df.hmax) & (df.high > df.cmean)) | (df.high > df.max5))]
-                df = df[ (((df.buy > df.ene) & (df.volume / radio_t > 1.5)) ) |  (((df.lastv1d > df.lvol * 1.5) & (df.lastv1d > df.lvol * 1.5)) & (df.lastp1d > df.ene) )]
-            else:
-                df = df[ (((df.buy > df.ene) & (df.volume / radio_t > 1.5)) ) |  (((df.lastv1d > df.lvol * 1.5) )  )]
-        else:
-            # df = df[ (df.max5 >= df.ene) & (df.low <> df.high) & (((df.low < df.hmax) & (df.close > df.cmean)) | (df.high > df.cmean))]
-            df = df[ (((df.buy > df.ene) & (df.volume / radio_t > 1.5)) )  | (((df.lastp1d > df.ene) ) | ((df.buy > df.max5)|(df.buy > df.ene)) | (df.max5 >= df.ene)  | (df.high > df.cmean) )]
+        # if 'nlow' in df.columns:
+        #     if 'max5' in df.columns:
+        #         # df = df[(df.hmax >= df.ene) & (df.nlow >= df.low) & (df.low <> df.high) & (((df.low < df.hmax) & (df.high > df.cmean)) | (df.high > df.max5))]
+        #         df = df[ (((df.buy > df.ene) & (df.volume / radio_t > 1.5)) ) |  (((df.lastv1d > df.lvol * 1.5) & (df.lastv1d > df.lvol * 1.5)) & (df.lastp1d > df.ene) )]
+        #     else:
+        #         df = df[ (((df.buy > df.ene) & (df.volume / radio_t > 1.5)) ) |  (((df.lastv1d > df.lvol * 1.5) )  )]
+        # else:
+        #     # df = df[ (df.max5 >= df.ene) & (df.low <> df.high) & (((df.low < df.hmax) & (df.close > df.cmean)) | (df.high > df.cmean))]
+        #     df = df[ (((df.buy > df.ene) & (df.volume / radio_t > 1.5)) )  | (((df.lastp1d > df.ene) ) | ((df.buy > df.max5)|(df.buy > df.ene)) | (df.max5 >= df.ene)  | (df.high > df.cmean) )]
         return df
 
     if cct.get_work_time() and 'b1_v' in df.columns and 'nvol' in df.columns:

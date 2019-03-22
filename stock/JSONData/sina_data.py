@@ -697,26 +697,31 @@ class Sina:
                         dd[co] = dd[co].apply(lambda x: round(x, 2))
 
             else:
-                run_col = ['low', 'high']
+                run_col = ['low','high']
                 startime = '09:24:00'
                 # endtime = '10:00:00'
                 endtime = '09:45:00'
                 dd = self.get_col_agg_df(h5, dd, run_col, all_func, startime, endtime)
+
+                # run_col = ['high']
+                # startime = '09:24:00'
+                # endtime = '10:30:00'
+                # dd = self.get_col_agg_df(h5, dd, run_col, all_func, startime, endtime)
+
                 startime = '09:24:00'
                 endtime = '15:01:00'
                 run_col = ['close']
                 # h5 = cct.get_limit_multiIndex_Group(h5, freq='15T', col=run_col,start=startime, end=endtime)
                 # time_s=time.time()
                 dd = self.get_col_agg_df(h5, dd, run_col, all_func, startime, endtime)
-                # print "time:%s"%(time.time()-time_s)
-                run_col = {'close': 'std'}
-                dd = self.get_col_agg_df(h5, dd, run_col, run_col, startime, endtime)
-                dd.rename(columns={'std': 'nstd'}, inplace=True)
-                if dd is not None and len(dd) > 0 and  'nclose' in dd.columns and 'nstd' in dd.columns:
-                    for co in ['nclose','nstd']:
-                        dd[co] = dd[co].apply(lambda x: round(x, 2))
-            if 'nstd' in dd.columns:
-                dd['stdv'] = map(lambda x, y: round(x / y * 100, 1), dd.nstd, dd.open)
+                # run_col = {'close': 'std'}
+                # dd = self.get_col_agg_df(h5, dd, run_col, run_col, startime, endtime)
+                # dd.rename(columns={'std': 'nstd'}, inplace=True)
+                # if dd is not None and len(dd) > 0 and  'nclose' in dd.columns and 'nstd' in dd.columns:
+                #     for co in ['nclose','nstd']:
+                #         dd[co] = dd[co].apply(lambda x: round(x, 2))
+            # if 'nstd' in dd.columns:
+            #     dd['stdv'] = map(lambda x, y: round(x / y * 100, 1), dd.nstd, dd.open)
 
             # if h5 is not None and 'lastbuy' in h5.columns:
             #     lastbuycol = h5.lastbuy.groupby(level=[0]).tail(1).reset_index().set_index('code').lastbuy

@@ -2456,28 +2456,28 @@ def get_duration_price_date(code=None, ptype='low', dt=None, df=None, dl=None, e
 
 def compute_power_tdx_df(tdx_df,dd):
     if len(tdx_df) == 9:
-        idxdf = tdx_df.red[tdx_df.red <0]
-        if len(idxdf) >1:
-            idx = tdx_df.red[tdx_df.red <0].argmax()
-        else:
-            if len(tdx_df.red[tdx_df.red >0]) == 0:
-                return dd
-            else:
-                idx = tdx_df.red[tdx_df.red >0].index[0]
-        trend = tdx_df[tdx_df.index >= idx]
-        fibl = len(trend)
+        # idxdf = tdx_df.red[tdx_df.red <0]
+        # if len(idxdf) >1:
+        #     idx = tdx_df.red[tdx_df.red <0].argmax()
+        # else:
+        #     if len(tdx_df.red[tdx_df.red >0]) == 0:
+        #         return dd
+        #     else:
+        #         idx = tdx_df.red[tdx_df.red >0].index[0]
+        # trend = tdx_df[tdx_df.index >= idx]
+        # fibl = len(trend)
         idxh = tdx_df.high.argmax()
         fibh = len(tdx_df[tdx_df.index >= idxh])
-        vratio = -1
-        if fibl > 1:
-            vratio = round(((trend.close[-1] - trend.close[0])/trend.close[0]*100)/fibl,1)
+        # vratio = -1
+        # if fibl > 1:
+        #     vratio = round(((trend.close[-1] - trend.close[0])/trend.close[0]*100)/fibl,1)
 
 
-        dd['op'] = int(len(LIS_TDX(tdx_df.close)[1])/float(len(tdx_df.close))*10)
-        dd['ra'] = (vratio)
-        dd['fib'] = fibl
+        # dd['op'] = int(len(LIS_TDX(tdx_df.close)[1])/float(len(tdx_df.close))*10)
+        # dd['ra'] = (vratio)
+        # dd['fib'] = fibl
         dd['fibl'] = fibh
-        dd['ldate'] = idx
+        # dd['ldate'] = idx
         dd['boll'] = dd.upperL[0]
         dd['df2'] = dd.upperT[0]
         dd['kdj'] = 1
@@ -2487,8 +2487,31 @@ def compute_power_tdx_df(tdx_df,dd):
         dd['oph'] = 1
         dd['rah'] = 1
     else:
-        log.error("tdx_df is no 9 ")
+        dd['op'] = -1
+        dd['ra'] = -1
+        dd['fib'] = -1
+        dd['fibl'] = -1
+        dd['ldate'] = -1
+        dd['boll'] = -1
+        dd['kdj'] = -1
+        dd['macd'] = -1
+        dd['rsi'] = -1
+        dd['df2'] = -1
+        dd['ma'] = -1
+        dd['oph'] = -1
+        dd['rah'] = -1
+        # log.error("tdx_df is no 9:%s"%(dd.code[0]))
     return dd
+
+
+def dataframe_mode_round(df):
+    roundlist = [1, 0]
+    df_mode = []
+    for i in roundlist:
+        df_mode = df.apply(lambda x: round(x, i)).mode()
+        if len(df_mode) > 0:
+            break
+    return df_mode
 
 def compute_perd_df(dd,lastdays=3):
     df = dd[-(lastdays+1):].copy()
@@ -2498,21 +2521,93 @@ def compute_perd_df(dd,lastdays=3):
     df = df.dropna()
     df['red'] = ((df['close'] - df['open']) / df['close'] * 100).map(lambda x: round(x, 1))
     df['lastdu'] = ((df['high'] - df['low']) / df['close'] * 100).map(lambda x: round(x, 1))
-
     # df['perddu'] = ((df['high'] - df['low']) / df['low'] * 100).map(lambda x: round(x, 1))
     dd['upperT'] = df.close[df.high > df.upper].count()
-    dd['upperL'] = df.close[df.low > df.upper].count()
-    dd['red'] = df.red[df.red > 0].count()
+    upperL = df.close[df.low > df.upper]
+    top_10 = df[df.perd >9.9]
+    if len(top_10) >0:
+        if len(top_10) == len(df[df.index >= top_10.index[0]]):
+            top_ten = len(top_10)
+        else:
+            top_ten = 0
+    else:
+        top_ten = 0
+    if len(upperL) > 0:
+        cum_maxf, posf = LIS_TDX(upperL)
+        if len(upperL) == len(df[df.index >= upperL.index[0]]):
+            if len(cum_maxf) == len(upperL):
+                dd['upperL'] = len(upperL) + top_ten
+            else:
+                dd['upperL'] = top_ten
+        else:
+            dd['upperL'] = len(cum_maxf) 
+
+    else:
+        dd['upperL'] = top_ten
+    # dd['upperL'] = df.close[df.low > df.upper].count()
+    # dd['red'] = df.red[df.red > 0].count()
+    dd['red'] = df.red.max()
     temp_du = df['perd'] - df['lastdu']
+    # print df[df.close > df.ma5d]
+
     dd['topR']=temp_du.T[temp_du.T >= 0].count()    #跳空缺口
     dd['top0']=temp_du.T[temp_du.T == 0].count()    #一字涨停
 
     df['perd'] = df['perd'].apply(lambda x: round(x, 1) if ( x < 9.85)  else 10.0)
     dd['perd'] = df['perd']
-    dd['lastdu'] = df['lastdu']
+    # print dataframe_mode_round(df.high)
+    # print dataframe_mode_round(df.low)
+
+    dd['lastdu'] = df['lastdu'].max()
     dd['perlastp'] = df['perlastp']
     dd = compute_power_tdx_df(df, dd)
 
+    return dd
+
+
+def compute_ma_cross(dd,ma1='ma5d',ma2='ma10d',ratio=0.02):
+    df = dd[(dd[ma2] <> 0)]
+    # temp = df[ (df[ma1] > df[ma2] * (1-ratio))  & (df[ma1] < df[ma2] * (1+ratio)) ]
+    temp = df[ (df.close > df.ene) & (df[ma1] > df[ma2] * (1-ratio))  & (df[ma1] < df[ma2] * (1+ratio))]
+    if len(temp) > 0:
+        temp_close = temp.close - temp.ene
+        if len(temp_close[temp_close >0]) >0:
+            idx_min = temp_close.argmin()
+        else:
+            idx_min = -1
+
+        if idx_min <> -1:
+            fibl = len(dd[dd.index >= idx_min])
+            idx = round((dd.close[-1]/temp.close[temp.index == idx_min])*100-100,1)
+        else:
+            fibl = -1
+            idx = round((dd.close[-1]/temp.close[-1])*100-100,1)
+        # if len(temp) == len(df):
+        #     fibl = len(dd[dd.index >= temp.index[0]])
+        #     idx = round((dd.close[-1]/temp.close[0])*100-100,1)
+        # else:
+        #     fibl = len(dd[dd.index >= temp.index[-1]])
+        #     idx = round((dd.close[-1]/temp.close[-1])*100-100,1)
+        dd['op'] = idx
+        dd['fib'] = fibl
+        dd['ra'] = round(idx/fibl,1)
+        dd['ldate'] = temp.index[0]
+    else:
+
+        temp = df[ df[ma1] > df[ma2]]
+        if len(temp) == len(df) and len(df) > 0:
+            fibl = len(dd[dd.index >= temp.index[0]])
+            idx = round((dd.close[-1]/temp.close[0])*100-100,1)
+            dd['op'] = idx
+            dd['fib'] = fibl
+            dd['ra'] = round(idx/fibl,1)
+            dd['ldate'] = temp.index[0]
+        else:
+            idx = 0
+            dd['op'] = idx
+            dd['fib'] = -1
+            dd['ra'] = -1
+            dd['ldate'] = -1
     return dd
 
 def compute_lastdays_percent(df=None, lastdays=3, resample='d',vc_radio=100):
@@ -2532,21 +2627,24 @@ def compute_lastdays_percent(df=None, lastdays=3, resample='d',vc_radio=100):
         # df['ma5d'] = pd.rolling_mean(df.close, 5)
 
 #        df['perd'] = ((df['close'] - df['close'].shift(1)) / df['close'].shift(1) * 100).map(lambda x: round(x, 1) if ( x < 9.85)  else 10.0)
-        df['ma5d'] = pd.rolling_mean(df.close, 5)
-        df['ma10d'] = pd.rolling_mean(df.close, 10)
-        df['ma20d'] = pd.rolling_mean(df.close, 26)
+        df['ma5d'] = pd.rolling_mean(df.close, 5).apply(lambda x: round(x,1))
+        df['ma10d'] = pd.rolling_mean(df.close, 10).apply(lambda x: round(x,1))
+        df['ma20d'] = pd.rolling_mean(df.close, 26).apply(lambda x: round(x,1))
 
         df['upper'] = map(lambda x: round((1 + 11.0 / 100) * x, 1), df.ma10d)
         df['lower'] = map(lambda x: round((1 - 9.0 / 100) * x, 1), df.ma10d)
         df['ene'] = map(lambda x, y: round((x + y) / 2, 1), df.upper, df.lower)
         df = df.fillna(0)
+        dd = compute_ma_cross(df)
 
         df = compute_perd_df(df,lastdays=lastdays)
         df['vchange'] = ((df['vol'] - df['vol'].shift(1)) / df['vol'].shift(1) * 100).map(lambda x: round(x, 1))
         df = df.fillna(0)
         df['vcra'] = len(df[df.vchange > vc_radio])
-        df['vcall'] = df['vchange'].sum()
-        df['vchange'] = df['vchange'][-1]
+        df['ma5vol'] = df.vol[-df.fib[0]]
+        # df['ma5vol'] = df.vol[-df.fib[0]]
+        df['vcall'] = df['vchange'].max()
+        # df['vchange'] = df['vchange'][-1]
 
         # df['meann'] = ((df['high'] + df['low']) / 2).map(lambda x: round(x, 1))
 
@@ -2770,9 +2868,9 @@ def get_tdx_exp_low_or_high_power(code, dt=None, ptype='close', dl=None, end=Non
                 dd['low'] = dtemp.low.values[0]
                 dd['close'] = dtemp.close.values[0]
                 dd['open'] = dtemp.open.values[0]
-                dd['vol'] = dtemp.vol.values[0]
-
-                dd['lowvol'] = dd.vol
+                # dd['vol'] = 
+                
+                dd['lowvol'] = dtemp.vol.values[0]
                 dd['last6vol'] = lastvol
 
                 # if 'ma5d' in df.columns and 'ma10d' in df.columns:
@@ -3058,13 +3156,14 @@ def get_single_df_lastp_to_df(top_all, lastpTDX_DF=None, dl=ct.PowerCountdl, end
     return top_all
 
 def compute_jump_du_count(df,lastdays=ct.compute_lastdays):
+    df = df[(df.op > -1) & (df.boll > -1)]
     temp=df[df.columns[(df.columns >= 'per1d') & (df.columns <= 'per%sd'%(lastdays))]]
     tpp =temp[temp >9.9].count()
     idxkey= tpp[ tpp ==tpp.min()].index.values[0]
     perlist = temp.columns[temp.columns <= idxkey][-2:].values.tolist()
     if len(perlist) >=2:
         # codelist= temp[ ((temp[perlist[0]] >9) &(temp[perlist[1]] > 9)) | (temp[perlist[1]] > 9) ].index.tolist()
-        codelist= temp[ ((temp[perlist[0]] >9)) | (temp[perlist[1]] > 9) ].index.tolist()
+        codelist= temp[ ((temp[perlist[0]] >9)) & (temp[perlist[1]] > 9) ].index.tolist()
     else:
         codelist= temp[ (temp[perlist[0]] >9.9)].index.tolist()
     return codelist
@@ -3682,8 +3781,13 @@ if __name__ == '__main__':
     code='600604'
     code='002175'
     code='603000'
-    code='600331'
-    code='603063'
+    code='000990'
+    # code='600299'
+    # code='002606'
+    # code='000504'
+    # code='600331'
+    # code='002124'
+    # code='300081'
     # code='600613'
     # code='601519'
     # code='300216'
