@@ -117,7 +117,7 @@ class Sina:
         self.table = 'all'
         self.sina_limit_time = ct.sina_limit_time
         pd.options.mode.chained_assignment = None
-
+        self.cname = False
         # self.all
         # h5 = self.load_hdf_db(table='all', code_l=None, init=True)
         # if h5 is None:
@@ -245,6 +245,25 @@ class Sina:
         #           (len(self.stock_list), len(self.stock_list)))
         return self.get_stock_data()
 
+    def get_cname_code(self,cname):
+        self.cname  = True
+        dm = self.all
+        df = dm[dm.name == cname]
+        if len(df) == 1:
+            code = df.index[0]
+        else:
+            code = 0
+        return code
+    def get_code_cname(self,code):
+        self.cname  = True
+        dm = self.all
+        df = dm[dm.index == code]
+        if len(df) == 1:
+            code = df.name[0]
+        else:
+            code = 0
+        return code
+        
     def market(self, market):
         if market in ['all']:
             return self.all
@@ -368,7 +387,7 @@ class Sina:
     #     return self.format_response_data()
 
     def combine_lastbuy(self,h5):
-        if  cct.get_now_time_int() > 925:
+        if not self.cname and cct.get_now_time_int() > 925:
             h5_fname = 'sina_MultiIndex_data'
             h5_table = 'all' + '_' + str(ct.sina_limit_time)
             fname = 'sina_logtime'
@@ -384,7 +403,8 @@ class Sina:
                         # h5['lastbuy'] = (map(lambda x, y: y if int(x) == 0 else x,h5['lastbuy'].values, h5['llastp'].values))
                 else:
                     h5['lastbuy'] = (map(lambda x, y: y if int(x) == 0 else x,
-                                              h5['lastbuy'].values, h5['close'].values))
+                                             h5['lastbuy'].values, h5['close'].values))
+
         return h5
 
     def set_stock_codes_index_init(self, code, index=False):

@@ -154,6 +154,7 @@ if __name__ == "__main__":
                 top_all = pd.DataFrame()
             else:
                 status_change = False
+            top_list = []
             if len(top_now) > 10 or cct.get_work_time():
                 # time_Rt = time.time()
                 if len(top_all) == 0 and len(lastpTDX_DF) == 0:
@@ -162,6 +163,7 @@ if __name__ == "__main__":
                     top_all, lastpTDX_DF = tdd.get_append_lastp_to_df(
                         top_now, lastpTDX_DF=None, dl=duration_date, end=end_date, ptype=ptype, filter=filter, power=ct.lastPower, lastp=False, resample=resample)
                     log.debug("len:%s" % (len(top_all)))
+                    top_list = tdd.compute_jump_du_count(top_all)
 
                 elif len(top_all) == 0 and len(lastpTDX_DF) > 0:
                     top_all = top_now
@@ -192,8 +194,11 @@ if __name__ == "__main__":
                     top_all = cct.combine_dataFrame(top_all, top_now)
 
                 # top_all = top_all[top_all.buy > 0]
-                top_list = tdd.compute_jump_du_count(top_all)
-                top_dif = top_all.loc[top_list]
+                # top_list = tdd.compute_jump_du_count(top_all)
+                if len(top_list) > 0:
+                    top_dif = top_all.loc[top_list]
+                else:
+                    top_dif = top_all[(top_all.top10 < 3)]
                 # top_dif = top_all[(top_all.lastdu < 15) & ((top_all.fib > 1) | (top_all.fibl >5)) &( (top_all.vcall < 80) ) &(top_all.top10 < 2)]
                 # top_dif = top_all[(top_all.top10 < 1)]
 

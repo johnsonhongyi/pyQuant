@@ -1923,7 +1923,17 @@ def get_sina_data_df(code,index=False):
         dm = sina_data.Sina().get_stock_code_data(code,index=index)
     return dm
 
+def get_sina_data_cname(cname,index=False):
+    # index_status=False
+    code = sina_data.Sina().get_cname_code(cname)
+    return code
 
+def get_sina_data_code(code,index=False):
+    # index_status=False
+    code = sina_data.Sina().get_code_cname(code)
+    return code
+
+# print get_sina_data_cname('通合科技')
 def getSinaJsondf(market='cyb', vol=ct.json_countVol, vtype=ct.json_countType):
     df = rl.get_sina_Market_json(market)
     top_now = rl.get_market_price_sina_dd_realTime(df, vol, vtype)
@@ -3158,6 +3168,7 @@ def get_single_df_lastp_to_df(top_all, lastpTDX_DF=None, dl=ct.PowerCountdl, end
 def compute_jump_du_count(df,lastdays=ct.compute_lastdays):
     df = df[(df.op > -1) & (df.boll > -1)]
     temp=df[df.columns[(df.columns >= 'per1d') & (df.columns <= 'per%sd'%(lastdays))]]
+    
     tpp =temp[temp >9.9].count()
     idxkey= tpp[ tpp ==tpp.min()].index.values[0]
     perlist = temp.columns[temp.columns <= idxkey][-2:].values.tolist()

@@ -299,11 +299,12 @@ def show_chan_mpl_tdx(code, start_date=None, end_date=None, stock_days=60, resam
                 cname = quotes.name[0]
                 # cname_g =cname
             else:
-                dm = tdd.get_sina_data_df(code)
-                if 'name' in dm.columns:
-                    cname = dm.name[0]
-                else:
-                    cname = '-'
+                # dm = tdd.get_sina_data_df(code)
+                cname = tdd.get_sina_data_code(code)
+                # if 'name' in dm.columns:
+                #     cname = dm.name[0]
+                # else:
+                #     cname = '-'
         else:
             cname = '-'
         if quotes is not None and len(quotes) > 0:
@@ -691,11 +692,11 @@ def get_quotes_tdx(code, start=None, end=None, dl=120, resample='d', show_name=T
             cname = quotes.name[0]
             # cname_g =cname
         else:
-            dm = tdd.get_sina_data_df(code)
-            if 'name' in dm.columns:
-                cname = dm.name[0]
-            else:
-                cname = '-'
+            cname = tdd.get_sina_data_code(code)
+            # if 'name' in dm.columns:
+            #     cname = dm.name[0]
+            # else:
+            #     cname = '-'
     else:
         cname = '-'
     if quotes is not None and len(quotes) > 0:
@@ -2522,7 +2523,7 @@ if __name__ == "__main__":
     parser=parseArgmain()
     parser.print_help()
     # show_chan_mpl('999999', None, None, 60, 'd', show_mpl=True)
-
+    import re
     while 1:
         try:
             # log.setLevel(LoggerFactory.INFO)
@@ -2534,6 +2535,10 @@ if __name__ == "__main__":
             # print args
             # print str(args.days)
 
+            if not str(args.code) == 'None' and (re.match('[a-zA-Z]+',code) is not None  or re.match('[ \u4e00 -\u9fa5]+',code) == None ):
+                args.code = tdd.get_sina_data_cname(args.code)
+
+                # print "code:%s %s"%(code,args.code)
             if len(str(args.code)) == 6:
                 if args.start is not None and len(args.start) <= 4:
                     args.dl=int(args.start)
