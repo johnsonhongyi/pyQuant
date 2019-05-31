@@ -1727,10 +1727,11 @@ def search_Tdx_multi_data_duration(fname='tdx_all_df_300', table='all_300', df=N
     time_s = time.time()
     # h5_fname = h5_fname +'_'+str(dl)
     # h5_table = h5_table + '_' + str(dl)
+
     tdx_hd5_name = cct.tdx_hd5_name
     if df is None and fname == tdx_hd5_name:
         df = cct.GlobalValues().getkey(tdx_hd5_name)
-
+        
     if df is None:
         if start is not None and len(str(start)) < 8:
             df_tmp = get_tdx_Exp_day_to_df('999999', end=end).sort_index(ascending=False)
@@ -2525,15 +2526,16 @@ def dataframe_mode_round(df):
 
 def compute_perd_df(dd,lastdays=3):
     df = dd[-(lastdays+1):].copy()
-    
     df['perlastp'] = map(cct.func_compute_percd2, df['close'], df['close'].shift(1), df['open'], df['open'].shift(1), df['high'].shift(1), df['low'].shift(1), df['high'], df['low'],df['vol'],df['vol'].shift(1),df['upper'])
     df['perd'] = ((df['close'] - df['close'].shift(1)) / df['close'].shift(1) * 100).map(lambda x: round(x, 1))
+    # df['perd'] = ((df['low'] - df['low'].shift(1)) / df['close'].shift(1) * 100).map(lambda x: round(x, 1))
+
     df = df.dropna()
-    df['red'] = ((df['close'] - df['open']) / df['close'] * 100).map(lambda x: round(x, 1))
+    # df['red'] = ((df['close'] - df['open']) / df['close'] * 100).map(lambda x: round(x, 1))
     df['lastdu'] = ((df['high'] - df['low']) / df['close'] * 100).map(lambda x: round(x, 1))
     # df['perddu'] = ((df['high'] - df['low']) / df['low'] * 100).map(lambda x: round(x, 1))
-    dd['upperT'] = df.close[df.high > df.upper].count()
-    upperL = df.close[df.low > df.upper]
+    dd['upperT'] = dd.close[ (dd.upper > 0) & (dd.high > dd.upper)].count()
+    upperL = dd.close[ (dd.upper > 0) & (dd.close >= dd.upper)]
     top_10 = df[df.perd >9.9]
     if len(top_10) >0:
         if len(top_10) == len(df[df.index >= top_10.index[0]]):
@@ -2556,7 +2558,11 @@ def compute_perd_df(dd,lastdays=3):
         dd['upperL'] = top_ten
     # dd['upperL'] = df.close[df.low > df.upper].count()
     # dd['red'] = df.red[df.red > 0].count()
-    dd['red'] = df.red.max()
+    ra = round((df.close[-1]-dd.close.max())/df.close[-1]*100,1)
+    if ra == 0.0:
+        ra = round((df.close[-1]-df.close.min())/df.close[-1]*100,1)
+    dd['ra'] = ra
+
     temp_du = df['perd'] - df['lastdu']
     # print df[df.close > df.ma5d]
 
@@ -2569,20 +2575,34 @@ def compute_perd_df(dd,lastdays=3):
     # print dataframe_mode_round(df.low)
 
     dd['lastdu'] = df['lastdu'].max()
+
     dd['perlastp'] = df['perlastp']
     dd = compute_power_tdx_df(df, dd)
 
     return dd
 
 
+def compute_upper_cross(dd,ma1='upper',ma2='ma5d',ratio=0.02):
+    
+    df = dd[(dd[ma1] <> 0)]
+    # temp = df[ (df[ma1] > df[ma2] * (1-ratio))  & (df[ma1] < df[ma2] * (1+ratio)) ]
+    temp = df[(df.low > df.upper)]
+    if len(temp) >0 and  temp.index[-1] == df.index[-1]:
+        dd['topU'] = len(temp)
+    else:
+        dd['topU'] = 0
+    return dd
+
 def compute_ma_cross(dd,ma1='ma5d',ma2='ma10d',ratio=0.02):
+
     df = dd[(dd[ma2] <> 0)]
     # temp = df[ (df[ma1] > df[ma2] * (1-ratio))  & (df[ma1] < df[ma2] * (1+ratio)) ]
-    temp = df[ (df.close > df.ene) & (df[ma1] > df[ma2] * (1-ratio))  & (df[ma1] < df[ma2] * (1+ratio))]
+    temp = df[ ((df.close > df.ene) & (df.close < df.upper)) & (df[ma1] > df[ma2] * (1-ratio))  & (df[ma1] < df[ma2] * (1+ratio))]
+
     if len(temp) > 0:
         temp_close = temp.close - temp.ene
         if len(temp_close[temp_close >0]) >0:
-            idx_min = temp_close.argmin()
+            idx_min = temp_close.argmax()
         else:
             idx_min = -1
 
@@ -2645,7 +2665,9 @@ def compute_lastdays_percent(df=None, lastdays=3, resample='d',vc_radio=100):
         df['lower'] = map(lambda x: round((1 - 9.0 / 100) * x, 1), df.ma10d)
         df['ene'] = map(lambda x, y: round((x + y) / 2, 1), df.upper, df.lower)
         df = df.fillna(0)
+
         dd = compute_ma_cross(df)
+        dd = compute_upper_cross(df)
 
         df = compute_perd_df(df,lastdays=lastdays)
         df['vchange'] = ((df['vol'] - df['vol'].shift(1)) / df['vol'].shift(1) * 100).map(lambda x: round(x, 1))
@@ -2666,7 +2688,7 @@ def compute_lastdays_percent(df=None, lastdays=3, resample='d',vc_radio=100):
             # df['lasth%sd' % da] = df['high'].shift(da-1)
             # df['lastl%sd' % da] = df['low'].shift(da-1)
             # df['lastv%sd' % da] = df['vol'].shift(da-1)
-            if da == 1:
+            if da <=2:
                 df['lastp%sd' % da] = df['close'][-da]
                 df['lasto%sd' % da] = df['open'][-da]
                 df['lasth%sd' % da] = df['high'][-da]
@@ -3183,8 +3205,10 @@ def compute_top10_count(df,lastdays=ct.compute_lastdays,top_limit=ct.per_redline
     temp=df[df.columns[(df.columns >= 'per1d') & (df.columns <= 'per%sd'%(lastdays))]]
     # temp_du=df[df.columns[(df.columns >= 'du1d') & (df.columns <= 'du%sd'%(lastdays))]]
     # temp.T[temp.T >=10].count()
+
     df['top10']=temp.T[temp.T >=9.9].count()        #涨停个数
-    df['topU']=temp.T[temp.T >= top_limit].count()  #0.8 上涨个数
+
+    # df['topU']=temp.T[temp.T >= top_limit].count()  #0.8 上涨个数
     # df['topR']=temp_du.T[temp_du.T >= 0].count()    #跳空缺口
     # df['top0']=temp_du.T[temp_du.T == 0].count()    #一字涨停
     # df['upper'] = map(lambda x: round((1 + 11.0 / 100) * x, 1), df.ma10d)
@@ -3792,7 +3816,8 @@ if __name__ == '__main__':
     code='600604'
     code='002175'
     code='603000'
-    code='000990'
+    code='000723'
+    # code='000990'
     # code='600299'
     # code='002606'
     # code='000504'
@@ -3811,7 +3836,7 @@ if __name__ == '__main__':
     # print get_kdate_data('000859', start='2019-01-01', end='', ktype='D')
     # write_tdx_tushare_to_file(code)
     # df = get_tdx_exp_low_or_high_power(code, dl=30, newdays=0, resample='d')
-    df = get_tdx_Exp_day_to_df(code, dl=30,end=None, newdays=0, resample='d')
+    df = get_tdx_Exp_day_to_df(code, dl=60,end=None, newdays=0, resample='d')
     # print df.perc1d[-1:],df.perc2d[-1:],df.perc3d[-1:],df.perc4d[-1:],df.perc5d[-1:]
     # print df[df.columns[(df.columns >= 'perc1d') & (df.columns <= 'perc%sd'%(9))]][:1]
     import ipdb;ipdb.set_trace()
@@ -3913,9 +3938,9 @@ if __name__ == '__main__':
 
     hdf5_wri = cct.cct_raw_input("write all Tdx data to Multi hdf[rw|y|n]:")
     if hdf5_wri == 'rw':
-        Write_tdx_all_to_hdf('all', h5_fname='tdx_all_df', h5_table='all', dl=300, rewrite=True)
+        Write_tdx_all_to_hdf('all', h5_fname='tdx_all_df', h5_table='all', dl=900, rewrite=True)
     elif hdf5_wri == 'y':
-        Write_tdx_all_to_hdf('all', h5_fname='tdx_all_df', h5_table='all', dl=300)
+        Write_tdx_all_to_hdf('all', h5_fname='tdx_all_df', h5_table='all', dl=900)
 
     # hdf5_wri = cct.cct_raw_input("write all index tdx data to hdf[y|n]:")
     # if hdf5_wri == 'y':

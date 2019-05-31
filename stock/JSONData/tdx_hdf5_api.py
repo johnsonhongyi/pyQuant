@@ -34,7 +34,9 @@ class SafeHDFStore(HDFStore):
         baseDir = BaseDir
         self.fname_o = args[0]
         self.config_ini = baseDir + os.path.sep+ 'h5config.txt'
-        if args[0] == cct.tdx_hd5_name:
+
+        if args[0] == cct.tdx_hd5_name or args[0].find('tdx_all_df') >=0:
+            
             self.fname = cct.get_run_path_tdx(args[0])
             log.info("tdx_hd5:%s"%(self.fname))
         else:

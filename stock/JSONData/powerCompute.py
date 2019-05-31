@@ -1579,10 +1579,10 @@ if __name__ == "__main__":
     # df = powerCompute_df(['300038', '300031', '300675'], days=0, dtype='d', end=None, dl=ct.PowerCountdl, talib=True, filter='y',index=False)
     # df = powerCompute_mp2('300038', days=0, dtype='d', end=None, dl=ct.PowerCountdl)
 
-    print "\n",cct.format_for_print(df.loc[:,['ra', 'op', 'ma', 'rsi', 'kdj',
-                     'boll', 'rah', 'df2', 'fibl', 'macd', 'vstd', 'oph']][:5])
+    # print "\n",cct.format_for_print(df.loc[:,['ra', 'op', 'ma', 'rsi', 'kdj',
+                     # 'boll', 'rah', 'df2', 'fibl', 'macd', 'vstd', 'oph']][:5])
     # print "\n",df.fibl,df.fib
-    print "\n",cct.format_for_print(df.loc[:,['op','boll','ma','kdj','macd','ldate','fibl','fib','timel']][:5])
+    # print "\n",cct.format_for_print(df.loc[:,['op','boll','ma','kdj','macd','ldate','fibl','fib','timel']][:5])
     # import ipdb;ipdb.set_trace()
 
     # powerCompute_df(codelist, dtype='d',end=None, dl=ct.PowerCountdl, talib=True,filter='y')
@@ -1591,7 +1591,7 @@ if __name__ == "__main__":
     # print get_linear_model_status('999999', filter='y', dl=34, ptype='low', days=1)
     # print get_linear_model_status('399006', filter='y', dl=34, ptype='low',
     # days=1)
-    sys.exit()
+    # sys.exit()
     if cct.isMac():
         cct.set_console(80, 19)
     else:

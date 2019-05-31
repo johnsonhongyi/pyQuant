@@ -13,6 +13,18 @@ start = None
 time_s = time.time()
 # code_list = ['399006','000001','999999']
 
+def get_multi_date_duration(df,dt):
+    dd = df.reset_index()
+    dd = dd[dd.date >= dt]
+    # dd['couts'] = dd.groupby(['code'])['code'].transform('count')
+    dd = dd.set_index(['code', 'date'])
+    return dd
+def get_multi_code_count(df,col='code'):
+    dd = df.reset_index()
+    dd['couts'] = dd.groupby([col])[col].transform('count')
+    dd = dd.set_index(['code', 'date'])
+    return dd
+
 def get_roll_mean_all(single=True,tdx=False,app=True,duration=100):
     # df = tdd.search_Tdx_multi_data_duration('tdx_all_df_300', 'all_300', df=None,code_l=code_list, start=start, end=None, freq=None, col=None, index='date')
     block_path = tdd.get_tdx_dir_blocknew() + '060.blk'
@@ -22,18 +34,33 @@ def get_roll_mean_all(single=True,tdx=False,app=True,duration=100):
         return True
     code_list = sina_data.Sina().market('all').index.tolist()
     print "all code:",len(code_list)
-    df = tdd.search_Tdx_multi_data_duration('tdx_all_df_300', 'all_300', df=None,code_l=code_list, start='20150501', end=None, freq=None, col=None, index='date')
+    if duration < 300 :
+        h5_fname = 'tdx_all_df' + '_' + str(300)
+        h5_table = 'all' + '_' + str(300)
+    else:
+        h5_fname = 'tdx_all_df' + '_' + str(900)
+        h5_table = 'all' + '_' + str(900)
+    # df = tdd.search_Tdx_multi_data_duration('tdx_all_df_300', 'all_300', df=None,code_l=code_list, start='20150501', end=None, freq=None, col=None, index='date')
+    df = tdd.search_Tdx_multi_data_duration(h5_fname, h5_table, df=None,code_l=code_list, start=None, end=None, freq=None, col=None, index='date')
+    
     code_uniquelist=df.index.get_level_values('code').unique()
     code_select = code_uniquelist[random.randint(0,len(code_uniquelist)-1)]
-    print round(time.time()-time_s,2),df.index.get_level_values('code').unique().shape,code_select,df.loc[code_select][-1:]
+    print round(time.time()-time_s,2),df.index.get_level_values('code').unique().shape,code_select,df.loc[code_select].shape
     # df.groupby(level=[0]),df.index.get_level_values(0)
     # len(df.index.get_level_values('code').unique())
     # df = df[~df.index.duplicated(keep='first')]
     dfs = df
     groupd = dfs.groupby(level=[0])
+    
     # rollma = ['5','10','60','100','200']
     # rollma = ['5','10','250']
-    rollma = [duration]
+    if duration == 250:
+        rollma = ['10']
+    else:
+        rollma = ['10','250']
+
+    rollma.extend([str(duration)])
+
     # import ipdb;ipdb.set_trace()
     # df.loc['300130'][:2]
     for da in rollma:
@@ -43,8 +70,6 @@ def get_roll_mean_all(single=True,tdx=False,app=True,duration=100):
     # df.ix[df.index.levels[0]]
     #df.ix[df.index[len(df.index)-1][0]] #last row
     # dfs = tdd.search_Tdx_multi_data_duration(df=dfs,code_l=code_list, start='20170918', end='20170918', freq=None, col=None, index='date')
-
-
 
 
     # print dfs[:1],len(dfs)
@@ -58,12 +83,15 @@ def get_roll_mean_all(single=True,tdx=False,app=True,duration=100):
     else:
         dl = 30
         dindex = tdd.get_tdx_Exp_day_to_df(
-            '999999', dl=30).sort_index(ascending=False)
+            '999999', dl=dl).sort_index(ascending=False)
         dt = tdd.get_duration_price_date('999999', df=dindex)
         dt = dindex[dindex.index >= dt].index.values
         dt_low = dt[-1]
         dtlen = len(dt) if len(dt) >0 else 1
         dfs = groupd.tail(dtlen)
+        dfs = get_multi_date_duration(dfs,dt[-1])
+
+        # dfs.reset_index().groupby(['code'])['date'].transform('count')
         single = True
         
     dfs = dfs.fillna(0)
@@ -73,10 +101,14 @@ def get_roll_mean_all(single=True,tdx=False,app=True,duration=100):
     # mask = (dfs[('ma%s')%(rollma[0])] > dfs[('ma%s')%(rollma[1])]) & (dfs[('ma%s')%(rollma[-1])] > 0) &  (dfs[('close')] > dfs[('ma%s')%(rollma[-1])]) 
    
 
-    mask = ((dfs[('ma%s')%(rollma[-1])] > 0) & (dfs[('close')] > dfs[('ma%s')%(rollma[-1])])) 
+    # mask = ( (dfs[('ma%s')%(rollma[0])] > 0) & (dfs[('ma%s')%(rollma[-1])] > 0) & (dfs[('close')] > dfs[('ma%s')%(rollma[-1])]) & (dfs[('close')] > dfs[('ma%s')%(rollma[0])]))
+    mask = ( (dfs[('ma%s')%(rollma[0])] > 0) & (dfs[('ma%s')%(rollma[-1])] > 0) & (dfs[('close')] > dfs[('ma%s')%(rollma[-1])]) & (dfs[('close')] > dfs[('ma%s')%(rollma[0])]))
     # mask = ((dfs[('close')] > dfs[('ma%s')%(rollma[-1])])) 
     df=dfs.loc[idx[mask, :]]
+    df = get_multi_code_count(df)
 
+    # import ipdb;ipdb.set_trace()
+    # df.sort_values(by='couts',ascending=0)
     # groupd.first()[:2],groupd.last()[:2]
     # groupd = df250.groupby(level=[0])
     # '''
@@ -103,12 +135,19 @@ def get_roll_mean_all(single=True,tdx=False,app=True,duration=100):
             #     codew = df[df.date == cct.get_today()].index.tolist()
             if dt_low is not None:
                 groupd2 = df.groupby(level=[0])
-                df = groupd2.head(1)
+                df = groupd2.tail(1)
                 df = df.reset_index().set_index('code')
                 # import ipdb;ipdb.set_trace()
 
-                df = df[(df.date >= dt_low) & (df.date <= cct.get_today())]
+                # df = df[(df.date >= dt_low) & (df.date <= cct.get_today())]
+
+                df = df[(df.date >= cct.last_tddate(1))]
+                # print df.date.mode()[0]
+                df = df.sort_values(by='couts',ascending=1)
+                df = df[df.couts > df.couts.std()]
+                # df = df[(df.date >= df.date.mode()[0]) & (df.date <= cct.get_today())]
                 codew = df.index.tolist()
+
                 if app:
                     print round(time.time()-time_s,2),'groupd2',len(df)
 
@@ -141,6 +180,7 @@ def get_roll_mean_all(single=True,tdx=False,app=True,duration=100):
     return df
 
 if __name__ == '__main__':
-    get_roll_mean_all(single=False,tdx=True,app=True,duration=250)
+    # get_roll_mean_all(single=False,tdx=True,app=True,duration=250)
+    get_roll_mean_all(single=False,tdx=True,app=True,duration=600)
     # get_roll_mean_all(single=True,tdx=True,app=True)
     # get_roll_mean_all(single=True,tdx=True,app=False)

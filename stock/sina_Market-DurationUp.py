@@ -130,7 +130,7 @@ if __name__ == "__main__":
     market_sort_value, market_sort_value_key = ct.get_market_sort_value_key('1')
     st_key_sort = '2'
     st = None
-    
+    top_list = []
     while 1:
         try:
             # df = sina_data.Sina().all
@@ -154,7 +154,7 @@ if __name__ == "__main__":
                 top_all = pd.DataFrame()
             else:
                 status_change = False
-            top_list = []
+
             if len(top_now) > 10 or cct.get_work_time():
                 # time_Rt = time.time()
                 if len(top_all) == 0 and len(lastpTDX_DF) == 0:

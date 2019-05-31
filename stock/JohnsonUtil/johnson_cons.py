@@ -30,7 +30,7 @@ DD_VOL_List = {'0': '40000', '1': '100000',
 # LvolumeSize = 125000
 tqdm_mininterval=2
 ncols = 60
-per_redline = 0.8
+per_redline = 0.5
 LvolumeSize = 12500
 VolumeMaxR = 5000
 VolumeMinR = 0.1
@@ -120,13 +120,13 @@ Duration_sort_per_ratio_key = [0, 1, 0, 1, 1, 0, 0, 1, 1]
 # Duration_sort_perd = ['per%sd', 'dff', 'perc%sd', 'percent', 'b1_v', 'ratio', 'op',
 # Duration_sort_perd = ['per%sd', 'dff', 'perc%sd', 'percent', 'b1_v', 'ratio', 'op',
 # Duration_sort_perd = ['per%sd', 'perc%sd','percent','df2',   'dff', 'ratio', 'op',
-Duration_sort_perd = ['per%sd','percent', 'perc%sd','df2',   'dff', 'ratio', 'op',
+Duration_sort_perd = ['per%sd','percent',   'dff', 'perc%sd','df2', 'ratio', 'op',
                       'fib', 'fibl', 'ra', 'volume', 'couts']
 Duration_sort_perd_key = [0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 1, 1]
 
-Duration_sort_percd = ['perc%sd', 'per%sd', 'percent', 'b1_v', 'ratio', 'op',
+Duration_sort_percd = ['perc%sd',   'dff', 'per%sd', 'percent', 'b1_v', 'ratio', 'op',
                        'fib', 'fibl', 'ra', 'percent', 'volume', 'couts']
-Duration_sort_percd_key = [0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1]
+Duration_sort_percd_key = [0, 0,0, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1]
 
 # Duration_sort_percd = ['perc%sd', 'dff', 'per%sd', 'percent', 'b1_v', 'ratio', 'op',
 #                        'fib', 'fibl', 'ra', 'percent', 'volume', 'couts']
@@ -139,7 +139,7 @@ Duration_sort_percd_key = [0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1]
 
 # Duration_percent_dff = ['percent', 'b1_v', 'dff', 'df2', 'op',
 # Duration_percent_dff = ['percent','per2d','b1_v', 'dff', 'df2', 'op',
-Duration_percent_dff = ['percent','df2','per2d','b1_v', 'dff',  'op',
+Duration_percent_dff = ['percent','df2','per1d','b1_v', 'dff',  'op',
                         'fib', 'fibl', 'ra', 'ratio', 'volume', 'couts']
 Duration_percent_dff_key = [0, 0,0, 0, 0, 0, 1, 1, 0, 1, 1, 1]
 

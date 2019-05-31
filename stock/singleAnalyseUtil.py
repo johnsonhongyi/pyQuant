@@ -593,8 +593,8 @@ if __name__ == '__main__':
                     fibl = fibonacciCount(
                         ['999999', '399001', '399006'], dl=dl)
                 if len(rzrq) == 0 or rzrq['sh'] == 0 or rzrq['sz'] == 0 or rzrq['all'] == 0:
-                    if rzrq['shrz'] == 0 or rzrq['szrz'] == 0 or rzrq['dff'] == 0 or rzrq['all'] == 0:
-                        log.warn("rzrq 0")
+                    # if rzrq['shrz'] == 0 or rzrq['szrz'] == 0 or rzrq['dff'] == 0 or rzrq['all'] == 0:
+                    #     log.warn("rzrq 0")
                     rzrq = ffu.get_dfcfw_rzrq_SHSZ()
                 get_hot_countNew(percentDuration, rzrq, fibl, fibc)
                 fibcount += 1
@@ -702,7 +702,8 @@ if __name__ == '__main__':
                 num_input = ''
                 ave = None
                 code = ''
-
+            elif st.lower() == 'c' or st.lower() == 'C':
+                rzrq = {}
             elif st.startswith('w') or st.startswith('a'):
                 args = cct.writeArgmain().parse_args(st.split())
                 top_temp = cct.GlobalValues().getkey('top_max')

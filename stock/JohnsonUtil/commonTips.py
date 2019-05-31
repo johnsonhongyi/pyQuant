@@ -745,12 +745,13 @@ def sleep(timet, catch=True):
 
 def sleeprandom(timet):
     now_t = get_now_time_int()
-    if now_t > 915 and now_t < 926:
-        sleeptime = random.randint(10 / 3, 5)
-    else:
-        sleeptime = random.randint(timet / 3, timet)
-    print "Error2sleep:%s" % (sleeptime)
-    sleep(sleeptime, False)
+    if get_work_duration():
+        if now_t > 915 and now_t < 926:
+            sleeptime = random.randint(10 / 3, 5)
+        else:
+            sleeptime = random.randint(timet / 3, timet)
+        print "Error2sleep:%s" % (sleeptime)
+        sleep(sleeptime, False)
 
 
 def get_cpu_count():
@@ -1511,7 +1512,7 @@ def get_index_fibl(default=2):
     # GlobalValues().setkey('cuminfibl', fibl)
     # GlobalValues().setkey('indexfibl', int(df.fibl.min()))
     # return abs(fibl)
-    return 1
+    return default
 
 from collections import Counter,OrderedDict
 def counterCategory(df):
@@ -2220,6 +2221,7 @@ def func_compute_percd(close, lastp, op, lasth, lastl, nowh, nowl):
     return initc
 
 # import numba as nb
+# @numba.jit(nopython=True)
 # @nb.autojit
 def func_compute_percd2(close, lastp, op, lastopen,lasth, lastl, nowh, nowl,nowvol=None,lastvol=None,upper=None,hmax=None):
     # down_zero, down_dn, percent_l = 0, 0, 2
@@ -2628,8 +2630,8 @@ def combine_dataFrame(maindf, subdf, col=None, compare=None, append=False, clean
     log.info("combine df :%0.2f" % (time.time() - times))
     if append:
         dif_co = list(set(maindf_co) - set(subdf_co))
-        if set(dif_co) - set(['nhigh', 'nlow', 'nclose']) > 0 and len(dif_co) > 1:
-            log.info("col:%s %s" % (dif_co[:3], eval(("maindf.%s") % (dif_co[0]))[1]))
+        # if set(dif_co) - set(['nhigh', 'nlow', 'nclose']) > 0 and len(dif_co) > 1:
+            # log.info("col:%s %s" % (dif_co[:3], eval(("maindf.%s") % (dif_co[0]))[1]))
     return maindf
 
 if __name__ == '__main__':

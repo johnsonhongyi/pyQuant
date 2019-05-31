@@ -272,7 +272,7 @@ def getBollFilter(df=None, boll=ct.bollFilter, duration=ct.PowerCountdl, filter=
 	            df = compute_perd_value(df,market_value,'per')
 
         elif market_key == '2':
-            if int(market_value) > 1 and 930 < cct.get_now_time_int():
+            if int(market_value) > 1 and 915 < cct.get_now_time_int():
                 # df['per%d'%(market_value)] = compute_perd_value(df,market_value)
                 df = compute_perd_value(df,market_value)
             	df = compute_perd_value(df,market_value,'perc')

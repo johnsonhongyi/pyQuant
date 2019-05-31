@@ -297,7 +297,7 @@ def get_dfcfw_rzrq_SHSZ(url=ct.DFCFW_RZYE):
                         log.info("%s:None" % (yestoday))
                 rzrq_status = 0
             return data2
-
+            
     data1 = get_days_data(1,df)
     data2 = get_days_data(2,df)
     
@@ -519,7 +519,12 @@ if __name__ == "__main__":
     # print ff
     #
 #    pp=get_dfcfw_fund_HGT(ct.DFCFW_FUND_FLOW_HGT)
+    log.setLevel(LoggerFactory.DEBUG)
     # print get_dfcfw_rzrq_SHSZ(url=ct.DFCFW_RZRQ_SHSZ)
+    rzrq = get_dfcfw_rzrq_SHSZ()
+    print rzrq
+    import ipdb;ipdb.set_trace()
+
     indexKeys = [ 'sh','sz', 'cyb']
     ffindex = get_dfcfw_fund_flow('all')
     print ffindex
