@@ -108,7 +108,8 @@ if __name__ == "__main__":
             if st is None and st_key_sort in ['2','3']:
                 st_key_sort = '%s %s'%(st_key_sort.split()[0],cct.get_index_fibl())
             time_Rt = time.time()
-            top_now = tdd.getSinaAlldf(market='rzrq', vol=ct.json_countVol, vtype=ct.json_countType)
+            # top_now = tdd.getSinaAlldf(market='央企,rzrq',filename='yqbk', vol=ct.json_countVol, vtype=ct.json_countType)
+            top_now = tdd.getSinaAlldf(market='all', vol=ct.json_countVol, vtype=ct.json_countType)
             # top_now = tdd.getSinaAlldf(market='央企',filename='yqbk', vol=ct.json_countVol, vtype=ct.json_countType,trend=False)
             
             # top_now = tdd.getSinaAlldf(market='rzrq', vol=ct.json_countVol, vtype=ct.json_countType)
@@ -248,30 +249,37 @@ if __name__ == "__main__":
                 # top_temp = top_all.copy()
                 # top_temp =  top_all[(top_all.boll < 1) &(top_all.df2 >0) &(top_all.close > top_all.max5)]
 
-                # if cct.get_now_time_int() > 830 and cct.get_now_time_int() <= 935:
-                #     # top_temp =  top_all[( ((top_all.top10 >0) | (top_all.boll >0)) & (top_all.lastp1d > top_all.ma5d) & (top_all.close > top_all.lastp1d))]
-                #     # top_temp =  top_all[((top_all.lastp1d < top_all.ma5d) & (top_all.close > top_all.lastp1d))]
-                #     # top_temp =  top_all[((top_all.topR < 2) & (top_all.close > top_all.upper) & (top_all.close > top_all.lastp1d))]
-                #     top_temp =  top_all[((top_all.topR >0) & (top_all.top10 >1) &   (top_all.close > top_all.upper) & (top_all.close > top_all.ma5d))]
-                #     # top_temp =  top_all[((top_all.boll >0) & (top_all.close > top_all.lastp1d))]
+                if cct.get_now_time_int() > 830 and cct.get_now_time_int() <= 935:
+                    top_temp = top_all[ (top_all.low >= top_all.lastl1d) & (top_all.lasth1d > top_all.lasth2d) & (top_all.close > top_all.lastp1d)] 
+                    # top_temp =  top_all[( ((top_all.top10 >0) | (top_all.boll >0)) & (top_all.lastp1d > top_all.ma5d) & (top_all.close > top_all.lastp1d))]
+                    # top_temp =  top_all[((top_all.lastp1d < top_all.ma5d) & (top_all.close > top_all.lastp1d))]
+                    # top_temp =  top_all[((top_all.topR < 2) & (top_all.close > top_all.upper) & (top_all.close > top_all.lastp1d))]
+                    # top_temp =  top_all[((top_all.topR >0) & (top_all.top10 >1) &   (top_all.close > top_all.upper) & (top_all.close > top_all.ma5d))]
+                    # top_temp =  top_all[((top_all.boll >0) & (top_all.close > top_all.lastp1d))]
 
-                #     # top_all[(top_all.low >= top_all.nlow)& (top_all.high > top_all.nhigh)]
-                # else:
+                    # top_all[(top_all.low >= top_all.nlow)& (top_all.high > top_all.nhigh)]
+                else:
 
-                #     top_temp =  top_all[ ( (top_all.lastp1d > top_all.lastp2d) &(top_all.close >top_all.lastp1d )) | ((top_all.low >= top_all.nlow)) & ((top_all.lastp1d > top_all.ma5d)  & (top_all.close > top_all.ma5d) &(top_all.close > top_all.lastp1d))]
+                    # top_temp =  top_all[ ( (top_all.lastp1d > top_all.lastp2d) &(top_all.close >top_all.lastp1d )) | ((top_all.low >= top_all.nlow)) & ((top_all.lastp1d > top_all.ma5d)  & (top_all.close > top_all.ma5d) &(top_all.close > top_all.lastp1d))]
 
                     # top_temp =  top_all[ ((top_all.top10 >0) | (top_all.boll >0))  & (top_all.lastp1d > top_all.ma5d)  & ((top_all.low > top_all.lastl1d) | (top_all.low == top_all.open))]
+                    # top_temp =  top_all[ ( (top_all.lastp1d > top_all.ma5d) ) ]
                     # top_temp =  top_all[(top_all.topR < 2)  & (top_all.close > top_all.upper) & ((top_all.low > top_all.lastp1d) | (top_all.low == top_all.open))]
                     # top_temp =  top_all[((top_all.topR >0) & (top_all.top10 >1) &   (top_all.close > top_all.upper) & (top_all.low > top_all.lastl1d) & (top_all.close > top_all.ma5d) )]
                     # top_temp =  top_all[(top_all.boll >0)  & ((top_all.low > top_all.upper) | (top_all.low == top_all.open))]
                     # top_temp =  top_all[(top_all.boll >0)  & ((top_all.low > top_all.lastp1d) | (top_all.low == top_all.open))]
                     # top_temp =  top_all[(top_all.topR < 2) & (top_all.close >= top_all.nhigh) & ((top_all.low > top_all.lastp1d) | (top_all.low == top_all.open))]
-                    # if 'nlow' in top_all.columns:  
-                        # top_temp = top_all[(top_all.low >= top_all.nlow)& (top_all.close >= top_all.nhigh) &( (top_all.open == top_all.nlow) | (top_all.open > top_all.lastp1d))]
-                
+
+                    if 'nlow' in top_all.columns:  
+                        # top_temp = top_all[  (top_all.low >= top_all.lastl1d) & (top_all.lasth1d > top_all.lasth2d) & (top_all.low >= top_all.nlow) & ((top_all.open >= top_all.nlow *0.998) & (top_all.open <= top_all.nlow*1.002)) ]
+                        top_temp = top_all[ (top_all.volume >= 1.2 ) & (top_all.low >= top_all.lastl1d) & (top_all.lasth1d > top_all.lasth2d) & (top_all.low >= top_all.nlow) & ((top_all.open >= top_all.nlow *0.99) & (top_all.open <= top_all.nlow*1.01)) ]
+                    else:
+                        top_temp = top_all[ (top_all.volume >= 1.2 ) & (top_all.low >= top_all.lastl1d) & (top_all.lasth1d > top_all.lasth2d) & (top_all.close > top_all.lastp1d)] 
 
                 # dd =top_all[(top_all.boll >0) &(top_all.df2 >0) &(top_all.low >= top_all.ma20d) &(top_all.low <= top_all.ma20d *1.05)]
-                top_temp = top_all.copy()
+                
+                # top_temp = top_all.copy()
+
                 # if cct.get_now_time_int() > 925 and cct.get_now_time_int() <= 1450:
                 #     if 'nlow' in top_temp.columns:                #                           top_all['buy'].values, top_all['lastp'].values))
                 #         # top_temp = top_temp[(top_temp.open > top_temp.lastp1d) & ((top_temp.low >= top_temp.nlow) | (top_temp.low > top_temp.lastl1d))]
@@ -286,7 +294,7 @@ if __name__ == "__main__":
                 #             # top_temp = top_temp[(top_temp.close > top_temp.lastp1d) & (top_temp.low > top_temp.lastl1d)]
                 #             top_temp = top_temp[(top_temp.low > top_temp.lastl1d) & (top_temp.low >= top_temp.nlow) & (top_temp.top10 > 0)]
                 
-                top_temp = stf.filterPowerCount(top_temp,ct.PowerCount,down=True)
+                # top_temp = stf.filterPowerCount(top_temp,ct.PowerCount,down=True)
 
                 top_end = top_all[-int((ct.PowerCount)/10):].copy()
                 top_temp = pct.powerCompute_df(top_temp, dl=ct.PowerCountdl)

@@ -2048,6 +2048,7 @@ def getSinaAlldf(market='cyb', vol=ct.json_countVol, vtype=ct.json_countType, fi
             co_inx = [inx for inx in code_l if inx in df.index and str(inx).startswith(('30'))]
         else:
             co_inx = [inx for inx in code_l if inx in df.index]
+        
         df = df.loc[co_inx]
     # codelist=df.code.tolist()
     # cct._write_to_csv(df,'codeall')
@@ -3811,7 +3812,7 @@ if __name__ == '__main__':
     # code='000837'
     # code='000750'
     # code='000752'
-    code='002387'
+    code='000043'
     code='601699'
     code='600604'
     code='002175'
@@ -3836,7 +3837,7 @@ if __name__ == '__main__':
     # print get_kdate_data('000859', start='2019-01-01', end='', ktype='D')
     # write_tdx_tushare_to_file(code)
     # df = get_tdx_exp_low_or_high_power(code, dl=30, newdays=0, resample='d')
-    df = get_tdx_Exp_day_to_df(code, dl=60,end=None, newdays=0, resample='d')
+    df = get_tdx_Exp_day_to_df(code, dl=ct.PowerCountdl,end=None, newdays=0, resample='d')
     # print df.perc1d[-1:],df.perc2d[-1:],df.perc3d[-1:],df.perc4d[-1:],df.perc5d[-1:]
     # print df[df.columns[(df.columns >= 'perc1d') & (df.columns <= 'perc%sd'%(9))]][:1]
     import ipdb;ipdb.set_trace()

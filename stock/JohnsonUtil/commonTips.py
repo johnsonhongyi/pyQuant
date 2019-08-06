@@ -239,7 +239,19 @@ scriptname = '''tell application "Terminal"
 end tell
 '''
 
-terminal_positionKey = {'sina_Market-DurationDn.py': '654, 680',
+
+
+terminal_positionKey = {'sina_Market-DurationDn.py': '8, 801',
+                        'sina_Market-DurationCXDN.py': '79, 734',
+                        'sina_Market-DurationSH.py': '-29, 623',
+                        'sina_Market-DurationUp.py': '-22, 89',
+                        'sina_Monitor-Market-LH.py': '666, 338',
+                        'sina_Monitor-Market.py': '19, 179',
+                        'sina_Monitor.py': '205, 659',
+                        'singleAnalyseUtil.py': '328, 594',
+                        'LinePower.py': '6, 216', }
+
+terminal_positionKey_all = {'sina_Market-DurationDn.py': '654, 680',
                         'sina_Market-DurationCXDN.py': '-16, 54',
                         'sina_Market-DurationSH.py': '-29, 623',
                         'sina_Market-DurationUp.py': '-22, 89',
@@ -248,6 +260,8 @@ terminal_positionKey = {'sina_Market-DurationDn.py': '654, 680',
                         'sina_Monitor.py': '28, 23',
                         'singleAnalyseUtil.py': '1095, 23',
                         'LinePower.py': '6, 216', }
+
+
 
 terminal_positionKeyMac = {'sina_Market-DurationDn.py': '216, 490',
                         'sina_Market-DurationCXDN.py': '-16, 54',
@@ -1491,7 +1505,7 @@ def get_config_value_wencai(fname, classtype, currvalue=0, xtype='limit', update
         config.write()
     return int(currvalue)
 
-def get_index_fibl(default=2):
+def get_index_fibl(default=1):
     # import sys
     # sys.path.append("..")
     # from JSONData import powerCompute as pct

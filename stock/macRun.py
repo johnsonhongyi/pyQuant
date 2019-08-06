@@ -100,7 +100,7 @@ osascript -e
 #                'singleAnalyseUtil.py': '620, 22',
 #                'LinePower.py':'40, 497',}
                
-positionKey = cct.terminal_positionKey
+
 
 
 cmdRun_dnup = '''cd /Users/Johnson/Documents/Quant/pyQuant/stock;
@@ -124,7 +124,7 @@ open sina_Market-DurationDnUP.py;
 sleep 0.1;osascript -e 'tell application "Python Launcher" to quit';sleep 5;
 '''
 
-cmdRun = '''cd /Users/Johnson/Documents/Quant/pyQuant/stock;
+cmdRun_all = '''cd /Users/Johnson/Documents/Quant/pyQuant/stock;
 open sina_Market-DurationDn.py;
 sleep 0.2;osascript -e 'tell application "Python Launcher" to quit';sleep 15;
 open singleAnalyseUtil.py;
@@ -142,7 +142,29 @@ sleep 0.2;osascript -e 'tell application "Python Launcher" to quit';sleep 5;
 '''
 
 
+cmdRun = '''cd /Users/Johnson/Documents/Quant/pyQuant/stock;
+open sina_Market-DurationDn.py;
+sleep 0.2;osascript -e 'tell application "Python Launcher" to quit';sleep 15;
+open singleAnalyseUtil.py;
+sleep 0.2;osascript -e 'tell application "Python Launcher" to quit';sleep 15;
+open sina_Market-DurationCXDN.py;
+sleep 0.2;osascript -e 'tell application "Python Launcher" to quit';sleep 15;
+open sina_Monitor.py;
+sleep 0.2;osascript -e 'tell application "Python Launcher" to quit';sleep 5;
+'''
+
 cmdRun200 = '''cd /Users/Johnson/Documents/Quant/pyQuant/stock;
+open sina_Market-DurationDn.py;
+sleep 0.2;osascript -e 'tell application "Python Launcher" to quit';sleep 200;
+open singleAnalyseUtil.py;
+sleep 0.2;osascript -e 'tell application "Python Launcher" to quit';sleep 25;
+open sina_Market-DurationCXDN.py;
+sleep 0.2;osascript -e 'tell application "Python Launcher" to quit';sleep 25;
+open sina_Monitor.py;
+sleep 0.2;osascript -e 'tell application "Python Launcher" to quit';sleep 5;
+'''
+
+cmdRun200_all = '''cd /Users/Johnson/Documents/Quant/pyQuant/stock;
 open sina_Market-DurationDn.py;
 sleep 0.2;osascript -e 'tell application "Python Launcher" to quit';sleep 200;
 open singleAnalyseUtil.py;
@@ -217,6 +239,9 @@ def getPosition(cmd=None, position=None,close=False):
                     os.system(closeterminalw%(n))
                 return cmd,position
 
+positionKey = cct.terminal_positionKey
+
+
 def setPosition(cmd=None, position=None):
     count = doScript(scriptcount)
     # print count
@@ -259,7 +284,7 @@ def setPosition(cmd=None, position=None):
 count = doScript(scriptcount)
 # print count
 # count = 2
-if int(count) > 3:
+if int(count) > 2:
     # print getPosition('Johnson@bogon',close=True)
     # print getPosition('cd \'/Users/Johnson/Documents/Quant/pyQuant/stock/\'')
     # print getPosition('cd \'/Users/Johnson/Documents')
@@ -269,13 +294,13 @@ if int(count) > 3:
 
     # print 'singleAnalyseUtil.py:',getPosition('singleAnalyseUtil.py')
     # print 'sina_Market-DurationDn.py:',getPosition('sina_Market-DurationDn.py')
-    # print 'sina_Monitor-Market-LH.py:',getPosition('sina_Monitor-Market-LH.py')
-    # print "sina_Market-DurationUP.py:",getPosition('sina_Market-DurationUP.py')
-    # print 'sina_Market-DurationSH.py:',getPosition('sina_Market-DurationSH.py')
+    # # print 'sina_Monitor-Market-LH.py:',getPosition('sina_Monitor-Market-LH.py')
+    # # print "sina_Market-DurationUP.py:",getPosition('sina_Market-DurationUP.py')
+    # # print 'sina_Market-DurationSH.py:',getPosition('sina_Market-DurationSH.py')
     # print 'sina_Market-DurationCXDN.py:',getPosition('sina_Market-DurationCXDN.py')
-    # print 'sina_Market-DurationCXUP.py:',getPosition('sina_Market-DurationCXUP.py')
-    # print 'sina_Market-DurationDnUP.py:',getPosition('sina_Market-DurationDnUP.py')
-    # print 'sina_Monitor-GOLD.py:',getPosition('sina_Monitor-GOLD.py')
+    # # print 'sina_Market-DurationCXUP.py:',getPosition('sina_Market-DurationCXUP.py')
+    # # print 'sina_Market-DurationDnUP.py:',getPosition('sina_Market-DurationDnUP.py')
+    # # print 'sina_Monitor-GOLD.py:',getPosition('sina_Monitor-GOLD.py')
     # print 'sina_Monitor.py:',getPosition('sina_Monitor.py')
 
 

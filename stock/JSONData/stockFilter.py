@@ -172,8 +172,11 @@ def getBollFilter(df=None, boll=ct.bollFilter, duration=ct.PowerCountdl, filter=
         # df.loc[(df.percent >= 9.99) & (df.b1_v > df.a1_v), 'percent'] = -10
         if not top10 or (cct.get_now_time_int() < 950 or cct.get_now_time_int() > 1502) :
             df.loc[(df.b1_v > df.a1_v), 'percent'] = 10.1
+            df.loc[ ((df.percent >= 9.97) & (df.percent < 10.1)),'percent'] =10
+
         else:
             df.loc[(df.b1_v > df.a1_v), 'percent'] = 10.1
+            df.loc[ ((df.percent >= 9.97) & (df.percent < 10.1)),'percent'] =10
             # df.loc[(df.b1_v > df.a1_v), 'percent'] = -11
         # if resample in ['d', 'w']:
         if resample in ['d']:
