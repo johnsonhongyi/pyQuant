@@ -8,7 +8,7 @@
 #
 # sys.setdefaultencoding('utf-8')
 
-import random
+# import random
 import re
 import sys
 import time
@@ -84,7 +84,7 @@ def get_sina_url(vol='0', type='0', pageCount='100'):
 def evalcmd(dir_mo):
     end = True
     import readline
-    import rlcompleter
+    # import rlcompleter
     # readline.set_completer(cct.MyCompleter(dir_mo).complete)
     readline.parse_and_bind('tab:complete')
     while end:
@@ -107,6 +107,7 @@ def evalcmd(dir_mo):
                 print e
                 # evalcmd(dir_mo)
                 # break
+
 
 if __name__ == "__main__":
     from docopt import docopt
@@ -148,14 +149,16 @@ if __name__ == "__main__":
     lastpTDX_DF = pd.DataFrame()
     parser = cct.MoniterArgmain()
     parserDuraton = cct.DurationArgmain()
-    
-    market_sort_value, market_sort_value_key = ct.get_market_sort_value_key(ct.sort_value_key_perd)
-    
+
+    market_sort_value, market_sort_value_key = ct.get_market_sort_value_key(
+        ct.sort_value_key_perd)
+
     while 1:
         try:
             time_Rt = time.time()
             market_blk = 'captops'
-            top_now = tdd.getSinaAlldf(market=market_blk, vol=ct.json_countVol, vtype=ct.json_countType)
+            top_now = tdd.getSinaAlldf(
+                market=market_blk, vol=ct.json_countVol, vtype=ct.json_countType)
             # print top_now
             # print top_now.columns
             time_d = time.time()
@@ -214,7 +217,8 @@ if __name__ == "__main__":
                     top_all['dff'] = (
                         map(lambda x, y: round(((float(x) - float(y)) / float(y) * 100), 1), top_all['buy'].values, top_all['lastp'].values))
                     if cct.get_now_time_int() > 915 and cct.get_now_time_int() < ct.checkfilter_end_time:
-                        top_all = top_all[top_all.low > top_all.llow * ct.changeRatio]
+                        top_all = top_all[top_all.low >
+                                          top_all.llow * ct.changeRatio]
                         # top_all = top_all[top_all.trade > top_all.lhigh * ct.changeRatio]
 
                     if cct.get_now_time_int() > 915 and cct.get_now_time_int() <= 926:
@@ -228,7 +232,8 @@ if __name__ == "__main__":
                         # top_all = top_all[(top_all.volume > ct.VolumeMinR) & (top_all.volume < ct.VolumeMaxR)]
 
                 # top_all = top_all.sort_values(by=[ 'couts', 'dff','volume', 'ratio'], ascending=[0, 0, 0, 1])
-                top_all = top_all.sort_values(by=ct.Monitor_sort_count, ascending=[0, 0, 0, 0, 1])
+                top_all = top_all.sort_values(
+                    by=ct.Monitor_sort_count, ascending=[0, 0, 0, 0, 1])
                 # top_all = top_all.sort_values(by=[ 'couts'], ascending=[0])
                 # top_all=top_all.sort_values(by=['dff','percent','couts','ratio'],ascending=[0,0,1,1])
 
@@ -242,13 +247,14 @@ if __name__ == "__main__":
                 # print cct.format_for_print(top_all)
                 # print top_all[:10]
 
-                top_temp = stf.filterPowerCount(top_all,ct.PowerCount)
+                top_temp = stf.filterPowerCount(top_all, ct.PowerCount)
                 top_temp = pct.powerCompute_df(top_temp, dl=ct.PowerCountdl)
-                goldstock = len(top_all[(top_all.buy >= top_all.lhigh * 0.99) & (top_all.buy >= top_all.llastp * 0.99)])
+                goldstock = len(top_all[(
+                    top_all.buy >= top_all.lhigh * 0.99) & (top_all.buy >= top_all.llastp * 0.99)])
                 # print "G:%s Rt:%0.1f dT:%s N:%s" % (len(top_all),float(time.time() -
                 # time_Rt),cct.get_time_to_date(time_s),cct.get_now_time())
                 cct.set_console(width, height,
-                                title=['dT:%s' % cct.get_time_to_date(time_s), 'G:%s' % len(top_all), 'zxg: %s' % (blkname+'-'+market_blk)])
+                                title=['dT:%s' % cct.get_time_to_date(time_s), 'G:%s' % len(top_all), 'zxg: %s' % (blkname + '-' + market_blk)])
 
                 top_all = tdd.get_powerdf_to_all(top_all, top_temp)
                 top_temp = stf.getBollFilter(df=top_temp, boll=1)
@@ -269,8 +275,9 @@ if __name__ == "__main__":
                 #     top_temp = top_temp.loc[:,ct.Monitor_format_trade]
                 # else:
                 #     top_temp = top_temp.loc[:,ct.Monitor_format_trade]
-                ct_MonitorMarket_Values = ct.get_Duration_format_Values(ct.Monitor_format_trade, market_sort_value[:2])
-                print cct.format_for_print(top_temp.loc[:, ct_MonitorMarket_Values][:10])                
+                ct_MonitorMarket_Values = ct.get_Duration_format_Values(
+                    ct.Monitor_format_trade, market_sort_value[:2])
+                print cct.format_for_print(top_temp.loc[:, ct_MonitorMarket_Values][:10])
 
                 # print cct.format_for_print(top_all[:10])
                 if status:
@@ -328,7 +335,8 @@ if __name__ == "__main__":
                 st_k = st_l[0]
                 if st_k in ct.Market_sort_idx.keys() and len(top_all) > 0:
                     st_key_sort = st
-                    market_sort_value, market_sort_value_key = ct.get_market_sort_value_key(st_key_sort, top_all=top_all)
+                    market_sort_value, market_sort_value_key = ct.get_market_sort_value_key(
+                        st_key_sort, top_all=top_all)
                 else:
                     log.error("market_sort key error:%s" % (st))
                     cct.sleeprandom(5)

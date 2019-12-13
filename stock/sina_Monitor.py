@@ -91,11 +91,12 @@ if __name__ == "__main__":
     blkname = '064.blk'
     block_path = tdd.get_tdx_dir_blocknew() + blkname
     lastpTDX_DF = pd.DataFrame()
-    # market_sort_value, market_sort_value_key = ct.get_market_sort_value_key('8')
+    market_sort_value, market_sort_value_key = ct.get_market_sort_value_key(ct.sort_value_key_perd23)
     resample = 'd'
     # st_key_sort = '9'
     # st_key_sort = '7'
-    st_key_sort = '4'
+    # st_key_sort = '4'
+    st_key_sort = ct.sort_value_key_perd23
     st = None
     while 1:
         try:
@@ -167,7 +168,7 @@ if __name__ == "__main__":
                 # cct.write_to_blocknew(block_path, dd.index.tolist())
                 # writecode = "cct.write_to_blocknew(block_path, dd.index.tolist())"
                 top_bak = top_all
-                market_sort_value, market_sort_value_key = ct.get_market_sort_value_key(st_key_sort, top_all=top_all)
+                # market_sort_value, market_sort_value_key = ct.get_market_sort_value_key(st_key_sort, top_all=top_all)
                 codelist = top_all.index.tolist()
                 if len(codelist) > 0:
                     # log.info('toTDXlist:%s' % len(codelist))

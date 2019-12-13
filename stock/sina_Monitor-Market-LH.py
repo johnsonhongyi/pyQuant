@@ -1,8 +1,8 @@
 # -*- coding:utf-8 -*-
 # !/usr/bin/env python
 
-import gc
-import random
+# import gc
+# import random
 import re
 import sys
 import time
@@ -19,7 +19,7 @@ import JohnsonUtil.johnson_cons as ct
 from JSONData import tdx_data_Day as tdd
 from JSONData import powerCompute as pct
 from JSONData import stockFilter as stf
-from JSONData import wencaiData as wcd
+# from JSONData import wencaiData as wcd
 from JohnsonUtil import LoggerFactory
 from JohnsonUtil import commonTips as cct
 import singleAnalyseUtil as sl
@@ -61,7 +61,7 @@ def get_sina_url(vol='0', type='0', pageCount='100'):
 def evalcmd(dir_mo):
     end = True
     import readline
-    import rlcompleter
+    # import rlcompleter
     # readline.set_completer(cct.MyCompleter(dir_mo).complete)
     readline.parse_and_bind('tab:complete')
     while end:

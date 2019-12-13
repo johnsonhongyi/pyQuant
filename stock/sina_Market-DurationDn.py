@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 # !/usr/bin/env python
-import gc
-import random
+# import gc
+# import random
 import re
 import sys
 import time
@@ -18,16 +18,17 @@ from JohnsonUtil import LoggerFactory as LoggerFactory
 # from logbook import Logger,StreamHandler,SyslogHandler
 # from logbook import StderrHandler
 
-
 # def parseArgmain():
 # import argparse
 # parser = argparse.ArgumentParser()
 # parser.add_argument('dt', type=str, nargs='?', help='20150612')
 # return parser
+
+
 def evalcmd(dir_mo):
     end = True
     import readline
-    import rlcompleter
+    # import rlcompleter
     # readline.set_completer(cct.MyCompleter(dir_mo).complete)
     readline.parse_and_bind('tab:complete')
     while end:
@@ -108,6 +109,7 @@ if __name__ == "__main__":
     # print cct.last_tddate(2)
     # end_date = cct.last_tddate(days=ct.lastdays)
     end_date = None
+    
     # ptype = 'high'
     ptype = 'low'
     filter = 'y'
@@ -125,8 +127,10 @@ if __name__ == "__main__":
     # all_diffpath = tdd.get_tdx_dir_blocknew() + '062.blk'
     parser = cct.MoniterArgmain()
     parserDuraton = cct.DurationArgmain()
-    # market_sort_value, market_sort_value_key = ct.get_market_sort_value_key(ct.sort_value_key_perd)
-    st_key_sort = '2'
+    market_sort_value, market_sort_value_key = ct.get_market_sort_value_key(
+        ct.sort_value_key_perd23)
+    # st_key_sort = '2'
+    st_key_sort = ct.sort_value_key_perd23
     # st_key_sort = '4'
     st = None
 
@@ -144,7 +148,7 @@ if __name__ == "__main__":
             if st is None:
                 st_key_sort = '%s %s' % (
                     st_key_sort.split()[0], cct.get_index_fibl())
-
+            
             time_Rt = time.time()
             # market_blk = 'all'
             market_blk = 'rzrq'
@@ -226,8 +230,8 @@ if __name__ == "__main__":
                     top_all = cct.combine_dataFrame(top_all, top_now, col=None)
 
                 top_dif = top_all.copy()
-                market_sort_value, market_sort_value_key = ct.get_market_sort_value_key(
-                    st_key_sort, top_all=top_all)
+                # market_sort_value, market_sort_value_key = ct.get_market_sort_value_key(
+                #     st_key_sort, top_all=top_all)
 
                 if 'trade' in top_dif.columns:
                     top_dif['buy'] = (
@@ -253,7 +257,7 @@ if __name__ == "__main__":
                 # top_dif.loc['600610','volume':'lvol']
                 top_dif['volume'] = (
                     map(lambda x, y: round(x / y / radio_t, 1), top_dif.volume.values, top_dif.lvol.values))
-                
+
                 # if 'op' in top_dif.columns:
                 #     top_dif=top_dif[top_dif.op >12]
                 #     print "op:",len(top_dif),
@@ -353,8 +357,8 @@ if __name__ == "__main__":
                     top_all = tdd.get_powerdf_to_all(top_all, top_end)
                     top_temp = stf.getBollFilter(
                         df=top_temp, boll=ct.bollFilter, duration=ct.PowerCountdl, upper=True, resample=resample)
-                        # df=top_temp, boll=11, duration=ct.PowerCountdl, upper=False, resample=resample)
-                        # df=top_temp, boll=ct.bollFilter, duration=ct.PowerCountdl, upper=False, resample=resample)
+                    # df=top_temp, boll=11, duration=ct.PowerCountdl, upper=False, resample=resample)
+                    # df=top_temp, boll=ct.bollFilter, duration=ct.PowerCountdl, upper=False, resample=resample)
                     print("N:%s K:%s %s G:%s" % (
                         now_count, len(top_all[top_all['buy'] > 0]),
                         len(top_now[top_now['volume'] <= 0]), goldstock)),
@@ -417,9 +421,9 @@ if __name__ == "__main__":
                     ct_Duration_format_Values = ct.get_Duration_format_Values(
                         ct_Duration_format_Values, replace='op', dest='boll')
                     ct_Duration_format_Values = ct.get_Duration_format_Values(
-                        ct_Duration_format_Values, replace='b1_v', dest='upper')  
+                        ct_Duration_format_Values, replace='b1_v', dest='upper')
                     ct_Duration_format_Values = ct.get_Duration_format_Values(
-                        ct_Duration_format_Values, replace='fibl',dest='top10')
+                        ct_Duration_format_Values, replace='fibl', dest='top10')
 
                     top_dd = top_dd.loc[:, ct_Duration_format_Values]
 

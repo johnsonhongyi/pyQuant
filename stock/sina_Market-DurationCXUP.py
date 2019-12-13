@@ -1,14 +1,14 @@
 # -*- coding:utf-8 -*-
 # !/usr/bin/env python
 
-import gc
-import random
+# import gc
+# import random
 import re
 import sys
 import time
 
 import pandas as pd
-import dfgui
+# import dfgui
 import JohnsonUtil.johnson_cons as ct
 import singleAnalyseUtil as sl
 from JSONData import powerCompute as pct
@@ -31,7 +31,7 @@ from JohnsonUtil import commonTips as cct
 def evalcmd(dir_mo):
     end = True
     import readline
-    import rlcompleter
+    # import rlcompleter
     # readline.set_completer(cct.MyCompleter(dir_mo).complete)
     readline.parse_and_bind('tab:complete')
     while end:

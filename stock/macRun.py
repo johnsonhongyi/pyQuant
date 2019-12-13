@@ -99,8 +99,56 @@ osascript -e
 #                'sina_Monitor.py': '39, 22',
 #                'singleAnalyseUtil.py': '620, 22',
 #                'LinePower.py':'40, 497',}
-               
 
+# os.system("osascript -e '%s'"%(cmd))
+rcmd = 'tell application "Terminal" to do script "cd /Users/Johnson/Documents/Quant/pyQuant/stock;python2 %s"'
+
+rproc = ['sina_Market-DurationDn.py' ,'singleAnalyseUtil.py','sina_Market-DurationCXDN.py','sina_Monitor.py','sina_Market-DurationUP.py']               
+cmdRun_launch = '''cd /Users/Johnson/Documents/Quant/pyQuant/stock;
+open sina_Market-DurationDn.py;
+sleep 0.2;osascript -e 'tell application "Python Launcher" to quit';sleep 15;
+open singleAnalyseUtil.py;
+sleep 0.2;osascript -e 'tell application "Python Launcher" to quit';sleep 15;
+open sina_Market-DurationCXDN.py;
+sleep 0.2;osascript -e 'tell application "Python Launcher" to quit';sleep 15;
+open sina_Monitor.py;
+sleep 0.2;osascript -e 'tell application "Python Launcher" to quit';sleep 5;
+open sina_Market-DurationUP.py;
+sleep 0.2;osascript -e 'tell application "Python Launcher" to quit';sleep 5;
+
+'''
+
+cmdRun = '''osascript -e '%s';sleep 10;
+osascript -e '%s';sleep 10;
+osascript -e '%s';sleep 10;
+osascript -e '%s';sleep 10;
+osascript -e '%s';sleep 10;
+'''%(rcmd%(rproc[0]),rcmd%(rproc[1]),rcmd%(rproc[2]),rcmd%(rproc[3]),rcmd%(rproc[4]))
+
+cmdRun200 = '''osascript -e '%s';sleep 200;
+osascript -e '%s';sleep 25;
+osascript -e '%s';sleep 25;
+osascript -e '%s';sleep 15;
+osascript -e '%s';sleep 5;
+'''%(rcmd%(rproc[0]),rcmd%(rproc[1]),rcmd%(rproc[2]),rcmd%(rproc[3]),rcmd%(rproc[4]))
+
+cmdRun200_launch = '''cd /Users/Johnson/Documents/Quant/pyQuant/stock;
+open sina_Market-DurationDn.py;
+sleep 0.2;osascript -e 'tell application "Python Launcher" to quit';sleep 200;
+open singleAnalyseUtil.py;
+sleep 0.2;osascript -e 'tell application "Python Launcher" to quit';sleep 25;
+open sina_Market-DurationCXDN.py;
+sleep 0.2;osascript -e 'tell application "Python Launcher" to quit';sleep 25;
+open sina_Monitor.py;
+sleep 0.2;osascript -e 'tell application "Python Launcher" to quit';sleep 15;
+open sina_Market-DurationUP.py;
+sleep 0.2;osascript -e 'tell application "Python Launcher" to quit';sleep 5;
+'''
+
+# print cmdRun
+# print cmdRun200
+# os.system(cmdRun)
+# sys.exit(0)
 
 
 cmdRun_dnup = '''cd /Users/Johnson/Documents/Quant/pyQuant/stock;
@@ -142,29 +190,8 @@ sleep 0.2;osascript -e 'tell application "Python Launcher" to quit';sleep 5;
 '''
 
 
-cmdRun = '''cd /Users/Johnson/Documents/Quant/pyQuant/stock;
-open sina_Market-DurationDn.py;
-sleep 0.2;osascript -e 'tell application "Python Launcher" to quit';sleep 15;
-open singleAnalyseUtil.py;
-sleep 0.2;osascript -e 'tell application "Python Launcher" to quit';sleep 15;
-open sina_Market-DurationCXDN.py;
-sleep 0.2;osascript -e 'tell application "Python Launcher" to quit';sleep 15;
-open sina_Monitor.py;
-sleep 0.2;osascript -e 'tell application "Python Launcher" to quit';sleep 5;
-'''
 
-cmdRun200 = '''cd /Users/Johnson/Documents/Quant/pyQuant/stock;
-open sina_Market-DurationDn.py;
-sleep 0.2;osascript -e 'tell application "Python Launcher" to quit';sleep 200;
-open singleAnalyseUtil.py;
-sleep 0.2;osascript -e 'tell application "Python Launcher" to quit';sleep 25;
-open sina_Market-DurationCXDN.py;
-sleep 0.2;osascript -e 'tell application "Python Launcher" to quit';sleep 25;
-open sina_Monitor.py;
-sleep 0.2;osascript -e 'tell application "Python Launcher" to quit';sleep 5;
-'''
-
-cmdRun200_all = '''cd /Users/Johnson/Documents/Quant/pyQuant/stock;
+cmdRun200_all_old = '''cd /Users/Johnson/Documents/Quant/pyQuant/stock;
 open sina_Market-DurationDn.py;
 sleep 0.2;osascript -e 'tell application "Python Launcher" to quit';sleep 200;
 open singleAnalyseUtil.py;
@@ -274,8 +301,13 @@ def setPosition(cmd=None, position=None):
         os.system(closeLaunch) 
         # getPosition('Johnson@',close=True)
         # getPosition('/Users/Johnson/Documents',close=True)
-        # getPosition('Johnson — bash',close=True)
-        # getPosition('Johnson — python',close=True)
+        print getPosition('Johnson — bash',close=True)
+        # print getPosition('Johnson',close=True)
+        # print getPosition('Johnson — bash',close=True)
+        # print getPosition('Johnson — bash',close=True)
+        # print getPosition('Johnson',close=True)
+        print getPosition('Johnson — python',close=True)
+        # print getPosition('Johnson',close=True)
 # count = doScript(scriptcount        
 # os.system(cmdRun)
 # getPosition('Johnson@',close=True)
@@ -295,7 +327,7 @@ if int(count) > 2:
     # print 'singleAnalyseUtil.py:',getPosition('singleAnalyseUtil.py')
     # print 'sina_Market-DurationDn.py:',getPosition('sina_Market-DurationDn.py')
     # # print 'sina_Monitor-Market-LH.py:',getPosition('sina_Monitor-Market-LH.py')
-    # # print "sina_Market-DurationUP.py:",getPosition('sina_Market-DurationUP.py')
+    print "sina_Market-DurationUP.py:",getPosition('sina_Market-DurationUP.py')
     # # print 'sina_Market-DurationSH.py:',getPosition('sina_Market-DurationSH.py')
     # print 'sina_Market-DurationCXDN.py:',getPosition('sina_Market-DurationCXDN.py')
     # # print 'sina_Market-DurationCXUP.py:',getPosition('sina_Market-DurationCXUP.py')
@@ -311,11 +343,13 @@ else:
     setPosition(cmd=None, position=None)
     cct.get_terminal_Position(cct.clean_terminal[2],close=True)
 cct.get_terminal_Position(cct.clean_terminal[1],close=True)
+
+cct.get_terminal_Position(cmd=cct.scriptquit, position=None, close=False)
 # getPosition('Johnson —',close=True)
 # getPosition('Johnson —',close=True)
 # getPosition('Johnson — python',close=True)
 # getPosition('Johnson — osasc',close=True)
-
+print getPosition('Johnson — python',close=True)
 '''
 
 https://stackoverflow.com/questions/8798641/close-terminal-window-from-within-shell-script-unix

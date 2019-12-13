@@ -29,11 +29,10 @@ def quit(signum, frame):
     print 'You choose to stop me.'
     sys.exit()
 
-
 def evalcmd(dir_mo):
     end = True
     import readline
-    import rlcompleter
+    # import rlcompleter
     # readline.set_completer(cct.MyCompleter(dir_mo).complete)
     readline.parse_and_bind('tab:complete')
     while end:
@@ -132,9 +131,10 @@ if __name__ == "__main__":
     # all_diffpath = tdd.get_tdx_dir_blocknew() + '062.blk'
     parser = cct.MoniterArgmain()
     parserDuraton = cct.DurationArgmain()
-    # market_sort_value, market_sort_value_key = ct.get_market_sort_value_key(ct.sort_value_key_perd)
-    market_sort_value, market_sort_value_key = ct.get_market_sort_value_key('1')
-    st_key_sort = '7'
+    market_sort_value, market_sort_value_key = ct.get_market_sort_value_key(ct.sort_value_key_perd23)
+    # market_sort_value, market_sort_value_key = ct.get_market_sort_value_key('1')
+    # st_key_sort = '7'
+    st_key_sort = ct.sort_value_key_perd23
     # st_key_sort = '2'
     st = None
     while 1:
@@ -225,7 +225,7 @@ if __name__ == "__main__":
                 #     else:
                 #         top_dif = top_all[(top_all.topR >0) & (top_all.low >= top_all.lastp1d)]
                         
-                market_sort_value, market_sort_value_key = ct.get_market_sort_value_key(st_key_sort, top_all=top_all)
+                # market_sort_value, market_sort_value_key = ct.get_market_sort_value_key(st_key_sort, top_all=top_all)
                 
                 if 'trade' in top_dif.columns:
                     top_dif['buy'] = (map(lambda x, y: y if int(x) == 0 else x,

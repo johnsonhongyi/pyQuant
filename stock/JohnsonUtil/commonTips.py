@@ -244,7 +244,7 @@ end tell
 terminal_positionKey = {'sina_Market-DurationDn.py': '8, 801',
                         'sina_Market-DurationCXDN.py': '79, 734',
                         'sina_Market-DurationSH.py': '-29, 623',
-                        'sina_Market-DurationUp.py': '-22, 89',
+                        'sina_Market-DurationUp.py': '451, 703',
                         'sina_Monitor-Market-LH.py': '666, 338',
                         'sina_Monitor-Market.py': '19, 179',
                         'sina_Monitor.py': '205, 659',
@@ -960,7 +960,7 @@ def get_work_hdf_status():
 def get_work_duration():
     int_time = get_now_time_int()
     # now_t = int(now_t)
-    if get_work_day_status() and ((800 < int_time < 915) or (1132 < int_time < 1300)):
+    if get_work_day_status() and ((700 < int_time < 915) or (1132 < int_time < 1300)):
         # if (int_time > 830 and int_time < 915) or (int_time > 1130 and int_time < 1300) or (int_time > 1500 and int_time < 1510):
         # return False
         return True
@@ -1042,6 +1042,7 @@ def get_url_data_R(url, timeout=30):
                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
                'Connection': 'keep-alive'}
     req = Request(url, headers=headers)
+    req.keep_alive = False
     try:
         fp = urlopen(req, timeout=timeout)
         data = fp.read()
@@ -1071,11 +1072,13 @@ def get_url_data(url, retry_count=3, pause=0.05, timeout=30, headers=None):
                    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
                    'Connection': 'keep-alive'}
     global ReqErrorCount
-
+    # requests.adapters.DEFAULT_RETRIES = 5 # 增加重连次数
+    s = requests.session()
+    s.keep_alive = False # 关闭多余连接
     for _ in range(retry_count):
         time.sleep(pause)
         try:
-            data = requests.get(url, headers=headers, timeout=timeout,allow_redirects=False)
+            data = s.get(url, headers=headers, timeout=timeout,allow_redirects=False)
         except (socket.timeout, socket.error) as e:
             data = ''
             log.error('socket timed out error:%s - URL %s ' % (e, url))

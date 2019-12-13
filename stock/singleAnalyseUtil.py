@@ -38,7 +38,7 @@ except_count = 0
 
 
 def time_sleep(timemin):
-    time1 = time.time()
+    # time1 = time.time()
     time.sleep(timemin)
     return True
 
@@ -46,7 +46,7 @@ def time_sleep(timemin):
 def evalcmd(dir_mo):
     end = True
     import readline
-    import rlcompleter
+    # import rlcompleter
     # readline.set_completer(cct.MyCompleter(dir_mo).complete)
     readline.parse_and_bind('tab:complete')
     while end:
@@ -405,9 +405,10 @@ def get_hot_countNew(changepercent, rzrq, fibl=None, fibc=10):
             # modfprint=lambda x:f_print(4,x) if x>0 else "-%s"%(f_print(4,str(x).replace('-','')))
             # print modfprint(zlr)
             # print (u"流入: %s亿 比: %s%%" % (modfprint(zlr), modfprint(zzb))),
-            print(u"流入: %s亿 比: %s%%" % (f_print(6, zlr,32), f_print(4, zzb,32))),
+            print(u"流入: %s亿 比: %s%% " % (f_print(6, zlr,32), f_print(4, zzb,32))),
+
             # print (u" %s"%(f_print(2,cumin_index[market],31))),
-            print(u"%s %s%s" % (f_print(7, ff['close']), f_print(1, '!' if ff['open'] > ff[
+            print(u"%s %s%% %s%s" % (f_print(7, ff['close']),f_print(4,round((ff['close']-ff['lastp'])*100/ff['close'],2),31), f_print(1, '!' if ff['open'] > ff[
                 'lastp'] else '?'), f_print(2, '!!' if ff['close'] > ff['lastp'] else '??',32)))
         allTop = allTop.append(df.reset_index(), ignore_index=True)
         allTop = allTop.drop_duplicates()

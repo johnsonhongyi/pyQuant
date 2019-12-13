@@ -294,7 +294,7 @@ def get_dfcfw_rzrq_SHSZ(url=ct.DFCFW_RZYE):
                         break
                         # print da
                     else:
-                        log.info("%s:None" % (yestoday))
+                        log.error("%s:None" % (yestoday))
                 rzrq_status = 0
             return data2
             
