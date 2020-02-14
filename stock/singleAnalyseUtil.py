@@ -406,9 +406,12 @@ def get_hot_countNew(changepercent, rzrq, fibl=None, fibc=10):
             # print modfprint(zlr)
             # print (u"流入: %s亿 比: %s%%" % (modfprint(zlr), modfprint(zzb))),
             print(u"流入: %s亿 比: %s%% " % (f_print(6, zlr,32), f_print(4, zzb,32))),
-
+            if ff['close'] == 0:
+                _percent = 0
+            else:
+                _percent = round((ff['close']-ff['lastp'])*100/ff['close'],2)
             # print (u" %s"%(f_print(2,cumin_index[market],31))),
-            print(u"%s %s%% %s%s" % (f_print(7, ff['close']),f_print(4,round((ff['close']-ff['lastp'])*100/ff['close'],2),31), f_print(1, '!' if ff['open'] > ff[
+            print(u"%s %s%% %s%s" % (f_print(7, ff['close']),f_print(4,_percent,31), f_print(1, '!' if ff['open'] > ff[
                 'lastp'] else '?'), f_print(2, '!!' if ff['close'] > ff['lastp'] else '??',32)))
         allTop = allTop.append(df.reset_index(), ignore_index=True)
         allTop = allTop.drop_duplicates()
