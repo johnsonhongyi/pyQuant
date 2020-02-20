@@ -266,7 +266,8 @@ def getPosition(cmd=None, position=None,close=False):
                     os.system(closeterminalw%(n))
                 return cmd,position
 
-positionKey = cct.terminal_positionKey
+# positionKey = cct.terminal_positionKey
+positionKey = cct.terminal_positionKey_VM
 
 
 def setPosition(cmd=None, position=None):

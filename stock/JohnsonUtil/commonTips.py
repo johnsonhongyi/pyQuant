@@ -136,6 +136,7 @@ win7rootXunji = r'E:\DOC\Parallels\WinTools\zd_pazq'
 win7rootList = [win10Lixin, win7rootAsus, win7rootXunji, win10Lengend]
 # macroot = r'/Users/Johnson/Documents/Johnson/WinTools/zd_pazq'
 macroot = r'/Users/Johnson/Documents/Johnson/WinTools/new_tdx'
+macroot_vm = r'/Volumes/VMware Shared Folders/MacTools/WinTools/new_tdx'
 xproot = r'E:\DOC\Parallels\WinTools\zd_pazq'
 tdx_hd5_name = r'tdx_all_df_%s' % (300)
 tdx_hd5_path = get_run_path_tdx(tdx_hd5_name)
@@ -151,7 +152,7 @@ def get_tdx_dir():
     os_platform = get_sys_platform()
     if os_sys.find('Darwin') == 0:
         log.info("DarwinFind:%s" % os_sys)
-        basedir = macroot.replace('/', path_sep).replace('\\', path_sep)
+        basedir = macroot_vm.replace('/', path_sep).replace('\\', path_sep)
         log.info("Mac:%s" % os_platform)
 
     elif os_sys.find('Win') == 0:
@@ -272,6 +273,18 @@ terminal_positionKeyMac = {'sina_Market-DurationDn.py': '216, 490',
                         'sina_Monitor.py': '28, 23',
                         'singleAnalyseUtil.py': '594, 23',
                         'LinePower.py': '6, 216', }
+
+terminal_positionKey_VM = {'sina_Market-DurationDn.py': '342, 397',
+                        'sina_Market-DurationCXDN.py': '84, 222',
+                        'sina_Market-DurationSH.py': '-29, 623',
+                        'sina_Market-DurationUp.py': '-12, 383',
+                        'sina_Monitor-Market-LH.py': '666, 338',
+                        'sina_Monitor-Market.py': '19, 179',
+                        'sina_Monitor.py': '8, 30',
+                        'singleAnalyseUtil.py': '615, 23',
+                        'LinePower.py': '6, 216', }
+
+terminal_positionKey = terminal_positionKey_VM
 
 script_set_position = '''tell application "Terminal"
     --activate
