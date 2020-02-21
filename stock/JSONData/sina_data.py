@@ -46,6 +46,7 @@ class StockCode:
         all_stock_codes_url = 'http://www.shdjt.com/js/lib/astock.js'
         grep_stock_codes = re.compile('~(\d+)`')
         response = requests.get(all_stock_codes_url)
+        response.encoding = self.encoding
         stock_codes = grep_stock_codes.findall(response.text)
         stock_codes = list(set([elem for elem in stock_codes if elem.startswith(('6', '30', '00'))]))
         # df=rl.get_sina_Market_json('all')
@@ -118,6 +119,7 @@ class Sina:
         self.sina_limit_time = ct.sina_limit_time
         pd.options.mode.chained_assignment = None
         self.cname = False
+        self.encoding = 'gbk'
         # self.all
         # h5 = self.load_hdf_db(table='all', code_l=None, init=True)
         # if h5 is None:
@@ -350,6 +352,7 @@ class Sina:
         # response = yield From(loop.run_in_executor(None,self.get_url_data_R,
         # (self.sina_stock_api + self.stock_list[index])))
         response = yield From(loop.run_in_executor(None, requests.get, (self.sina_stock_api + self.stock_list[index])))
+        response.encoding = self.encoding
         # response = yield (requests.get(self.sina_stock_api + self.stock_list[index]))
         # log.debug("url:%s"%(self.sina_stock_api + self.stock_list[index]))
         # log.debug("res_encoding:%s" % response.encoding[:10])
@@ -457,6 +460,7 @@ class Sina:
         self.url = self.sina_stock_api + ','.join(self.stock_codes)
         log.info("stock_list:%s" % self.url[:20])
         response = requests.get(self.url)
+        response.encoding = self.encoding
         self.stock_data.append(response.text)
         self.dataframe = self.format_response_data(index)
         # self.get_tdx_dd()
@@ -513,6 +517,7 @@ class Sina:
             self.url = self.sina_stock_api + ','.join(self.stock_codes)
             log.info("stock_list:%s" % self.url[:30])
             response = requests.get(self.url)
+            response.encoding = self.encoding
             self.stock_data.append(response.text)
             self.dataframe = self.format_response_data(index)
         # self.get_tdx_dd()

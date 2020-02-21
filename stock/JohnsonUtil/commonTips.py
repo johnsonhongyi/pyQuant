@@ -74,6 +74,7 @@ class GlobalValues:
 
 
 def format_for_print(df,header=True,widths=False):
+
     if header:
         table = PrettyTable([''] + list(df.columns))
     else:
@@ -101,19 +102,6 @@ def format_for_print2(df):
     return str(table)
 
 
-def get_os_system():
-    os_sys = get_sys_system()
-    os_platform = get_sys_platform()
-    if os_sys.find('Darwin') == 0:
-        # log.info("Mac:%s" % os_platform)
-        return 'mac'
-
-    elif os_sys.find('Win') == 0:
-        # log.info("Windows:%s" % os_sys)
-        if os_platform.find('XP'):
-            return 'win'
-    else:
-        return 'other'
 
 
 def get_run_path_tdx(fp=None):
@@ -131,9 +119,10 @@ def get_run_path_tdx(fp=None):
 
 win10Lengend = r'D:\Program\gfzq'
 win10Lixin = r'C:\zd_zszq'
+win10Triton = r'D:\MacTools\WinTools\new_tdx'
 win7rootAsus = r'D:\Program Files\gfzq'
 win7rootXunji = r'E:\DOC\Parallels\WinTools\zd_pazq'
-win7rootList = [win10Lixin, win7rootAsus, win7rootXunji, win10Lengend]
+win7rootList = [win10Triton,win10Lixin, win7rootAsus, win7rootXunji, win10Lengend]
 # macroot = r'/Users/Johnson/Documents/Johnson/WinTools/zd_pazq'
 macroot = r'/Users/Johnson/Documents/Johnson/WinTools/new_tdx'
 macroot_vm = r'/Volumes/VMware Shared Folders/MacTools/WinTools/new_tdx'
@@ -178,6 +167,26 @@ def get_sys_platform():
 
 def get_sys_system():
     return platform.system()
+
+def get_os_system():
+    os_sys = get_sys_system()
+    os_platform = get_sys_platform()
+    if os_sys.find('Darwin') == 0:
+        # log.info("Mac:%s" % os_platform)
+        return 'mac'
+    elif os_sys.find('Win') == 0:
+        # log.info("Windows:%s" % os_sys)
+        if os_platform.find('10'):
+            return 'win10'
+
+    elif os_sys.find('Win') == 0:
+        # log.info("Windows:%s" % os_sys)
+        if os_platform.find('XP'):
+            return 'winXP'
+    else:
+        return 'other'
+
+
 
 
 def get_ramdisk_dir():
@@ -921,7 +930,11 @@ def get_today_duration(datastr, endday=None):
             today = datetime.datetime.strptime(day8_to_day10(endday), '%Y-%m-%d').date()
         else:
             today = datetime.date.today()
-        last_day = datetime.datetime.strptime(datastr, '%Y-%m-%d').date()
+        last_day = datetime.datetime.strptime(datastr, '%Y/%m/%d').date()
+        # if get_os_system() == 'mac':
+        #     last_day = datetime.datetime.strptime(datastr, '%Y-%m-%d').date()
+        # else:
+        #     last_day = datetime.datetime.strptime(datastr, '%Y-%m-%d').date()
         duration_day = int((today - last_day).days)
     else:
         duration_day = None
@@ -1087,6 +1100,7 @@ def get_url_data(url, retry_count=3, pause=0.05, timeout=30, headers=None):
     global ReqErrorCount
     # requests.adapters.DEFAULT_RETRIES = 5 # 增加重连次数
     s = requests.session()
+    s.encoding = 'gbk'
     s.keep_alive = False # 关闭多余连接
     for _ in range(retry_count):
         time.sleep(pause)
@@ -2733,7 +2747,7 @@ if __name__ == '__main__':
         print x
         print last_tddate(x)
         # print last_tddate(2)
-    # print get_os_system()
+    print get_os_system()
     set_console()
     set_console(title=['G', 'dT'])
     raw_input("a")

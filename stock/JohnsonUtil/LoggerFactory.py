@@ -33,10 +33,11 @@ import ipykernel.iostream
 # constants = load_module("commonTips")    
 # print constants    
 
+win10_ramdisk_triton = r'E:'
 win10_ramdisk_root = r'R:'
 mac_ramdisk_root = r'/Volumes/RamDisk' 
 path_sep = os.path.sep
-ramdisk_rootList = [win10_ramdisk_root, mac_ramdisk_root]
+ramdisk_rootList = [win10_ramdisk_triton,win10_ramdisk_root, mac_ramdisk_root]
 
 def get_log_file(log_n='stock.log'):
     basedir = None

@@ -117,6 +117,9 @@ def get_os_system():
             return 'win'
     else:
         return 'other'
+# if get_os_system().find('win') >= 0:
+#     import win_unicode_console
+#     win_unicode_console.enable()
 
 class PrettyTable(object):
 
@@ -149,7 +152,7 @@ class PrettyTable(object):
         valign - default valign for each row (None, "t", "m" or "b")
         reversesort - True or False to sort in descending or ascending order"""
         
-        if get_sys_system().find('Win') == 0:
+        if get_sys_system().find('WinXP') == 0:
             self.encoding = kwargs.get("encoding", "gbk")
         else:
             self.encoding = kwargs.get("encoding", "UTF-8")
@@ -223,7 +226,7 @@ class PrettyTable(object):
             value = str(value)
         if not isinstance(value, unicode):
             if  self.system== 'win':
-                value = value.encode('gbk')
+                value = value.encode(self.encoding)
             value = unicode(value, self.encoding, "strict")
         return value
 

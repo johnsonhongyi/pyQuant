@@ -29,6 +29,10 @@ from JohnsonUtil import johnson_cons as ct
 # log=LoggerFactory.getLogger('wencaiData')
 log = LoggerFactory.log
 # curl 'http://www.iwencai.com/stockpick/search?typed=1&preParams=&ts=1&f=1&qs=index_rewrite&selfsectsn=&querytype=&searchfilter=&tid=stockpick&w=%E9%9B%84%E5%AE%89' -H 'Cookie: v=AZaxA_wZ09rYlOd-tO91dApK4U2ZN9pxLHsO1QD_gnkUwzj_aMcqgfwLXuTQ'
+if cct.get_os_system().find('win') >= 0:
+    import win_unicode_console
+    win_unicode_console.enable()
+    # os.write(sys.stdout.fileno(), table)
 
 import requests
 from lxml import etree
