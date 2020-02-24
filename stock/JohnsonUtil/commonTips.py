@@ -930,11 +930,12 @@ def get_today_duration(datastr, endday=None):
             today = datetime.datetime.strptime(day8_to_day10(endday), '%Y-%m-%d').date()
         else:
             today = datetime.date.today()
-        last_day = datetime.datetime.strptime(datastr, '%Y/%m/%d').date()
-        # if get_os_system() == 'mac':
-        #     last_day = datetime.datetime.strptime(datastr, '%Y-%m-%d').date()
-        # else:
-        #     last_day = datetime.datetime.strptime(datastr, '%Y-%m-%d').date()
+        if get_os_system() == 'mac':
+            last_day = datetime.datetime.strptime(datastr, '%Y/%m/%d').date()
+            # last_day = datetime.datetime.strptime(datastr, '%Y-%m-%d').date()
+        else:
+            last_day = datetime.datetime.strptime(datastr, '%Y/%m/%d').date()
+            # last_day = datetime.datetime.strptime(datastr, '%Y-%m-%d').date()
         duration_day = int((today - last_day).days)
     else:
         duration_day = None
