@@ -102,10 +102,13 @@ def format_for_print2(df):
     return str(table)
 
 
+def getcwd():
+    dirname, filename = os.path.split(os.path.abspath(sys.argv[0]))
+    return dirname
 
 
 def get_run_path_tdx(fp=None):
-    path = os.getcwd()
+    path = getcwd()
     alist = path.split('stock')
     if len(alist) > 0:
         path = alist[0]
@@ -400,7 +403,9 @@ def run_numba(func):
 
 
 def get_work_path(base, dpath, fname):
-    baser = os.getcwd().split(base)[0]
+
+    # baser = os.getcwd().split(base)[0]
+    baser = getcwd().split(base)[0]
     base = baser + base + path_sep + dpath + path_sep
     filepath = base + fname
     return filepath
@@ -408,7 +413,7 @@ def get_work_path(base, dpath, fname):
 
 def get_rzrq_code(market='all'):
 
-    baser = os.getcwd().split('stock')[0]
+    baser = getcwd().split('stock')[0]
     base = baser + 'stock' + path_sep + 'JohnsonUtil' + path_sep
     szrz = base + 'szrzrq.csv'
     shrz = base + 'shrzrq.csv'
@@ -457,7 +462,7 @@ def get_tushare_market(market='zxb', renew=False, days=5):
         df.reset_index(inplace=True)
         return df
 
-    baser = os.getcwd().split('stock')[0]
+    baser = getcwd().split('stock')[0]
     base = baser + 'stock' + path_sep + 'JohnsonUtil' + path_sep
     filepath = base + market + '.csv'
     if os.path.exists(filepath):
@@ -930,12 +935,14 @@ def get_today_duration(datastr, endday=None):
             today = datetime.datetime.strptime(day8_to_day10(endday), '%Y-%m-%d').date()
         else:
             today = datetime.date.today()
-        if get_os_system() == 'mac':
-            last_day = datetime.datetime.strptime(datastr, '%Y/%m/%d').date()
-            # last_day = datetime.datetime.strptime(datastr, '%Y-%m-%d').date()
-        else:
-            last_day = datetime.datetime.strptime(datastr, '%Y/%m/%d').date()
-            # last_day = datetime.datetime.strptime(datastr, '%Y-%m-%d').date()
+        # if get_os_system() == 'mac':
+        #     # last_day = datetime.datetime.strptime(datastr, '%Y/%m/%d').date()
+        #     last_day = datetime.datetime.strptime(datastr, '%Y-%m-%d').date()
+        # else:
+        #     # last_day = datetime.datetime.strptime(datastr, '%Y/%m/%d').date()
+        #     last_day = datetime.datetime.strptime(datastr, '%Y-%m-%d').date()
+        last_day = datetime.datetime.strptime(datastr, '%Y-%m-%d').date()
+        
         duration_day = int((today - last_day).days)
     else:
         duration_day = None

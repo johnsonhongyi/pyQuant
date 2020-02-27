@@ -49,7 +49,8 @@ def get_log_file(log_n='stock.log'):
         path = basedir + os.path.sep
         # print basedir,path
     else:
-        path = os.getcwd()
+        # path = os.getcwd()
+        path = os.path.split(os.path.abspath(sys.argv[0]))[0]
         alist = path.split('stock')
         if len(alist) > 0:
             path = alist[0]

@@ -573,7 +573,8 @@ def get_wencai_data(dm, market='wencai', days=120, pct=True):
 
 def get_wencai_filepath(market):
     path_sep = os.path.sep
-    baser = os.getcwd().split('stock')[0]
+    # baser = os.getcwd().split('stock')[0]
+    baser = cct.getcwd().split('stock')[0]
     base = baser + path_sep + 'stock' + path_sep + \
         'JohnsonUtil' + path_sep + 'wencai' + path_sep
     filepath = base + market + '.csv'

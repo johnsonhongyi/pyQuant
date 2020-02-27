@@ -1,0 +1,11 @@
+Windows Registry Editor Version 5.00
+
+[HKEY_CLASSES_ROOT\Directory\shell\cmdhere]
+
+@="Open CMD Here"
+
+"Icon"="cmd.exe"
+
+[HKEY_CLASSES_ROOT\Directory\shell\cmdhere\command]
+
+@="cmd.exe \"cd %1\"  /s /k pushd \"%V\""
