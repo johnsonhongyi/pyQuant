@@ -25,7 +25,8 @@ import time
 log = LoggerFactory.log
 from tqdm import tqdm
 # log.setLevel(LoggerFactory.INFO)
-
+# plt.rcParams['font.sans-serif']=['SimHei']
+# plt.rcParams['axes.unicode_minus']=False
 if not cct.isMac():
     def set_ctrl_handler():
         import win32api
@@ -931,6 +932,8 @@ def get_linear_model_candles(code, ptype='low', dtype='d', start=None, end=None,
     if 'date' in df.columns:
         df = df.drop(['date'],axis=1)
     idx = df.reset_index().index
+    pos = np.array(pos)
+    neg = np.array(neg)
     ax2.bar(idx[pos],volume[pos],color='red',width=1,align='center')
     ax2.bar(idx[neg],volume[neg],color='green',width=1,align='center')
     yticks = ax2.get_yticks()
@@ -951,7 +954,10 @@ def get_linear_model_candles(code, ptype='low', dtype='d', start=None, end=None,
     figPan = zp.pan_factory(ax)
     # plt.xticks(rotation=30, horizontalalignment='center')
     # plt.setp( axs[1].xaxis.get_majorticklabels(), rotation=70 )
-    plt.show(block=False)
+    if cct.get_os_system() == 'mac':
+        plt.show(block=False)
+    else:
+        plt.show(block=True)
     return df
 
 global Power_CXG_Error, drop_cxg, wencai_drop

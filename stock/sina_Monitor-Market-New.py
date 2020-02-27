@@ -99,7 +99,6 @@ if __name__ == "__main__":
     status_change = False
     
     market_sort_value, market_sort_value_key = ct.get_market_sort_value_key(ct.sort_value_key_perd)
-    git
     while 1:
         try:
             # df = sina_data.Sina().all
