@@ -3936,7 +3936,14 @@ if __name__ == '__main__':
     # sys.exit(0)
 #    print write_tdx_tushare_to_file(code)
 
-    hdf5_wri = cct.cct_raw_input("write all Tdx data to Multi hdf[rw|y|n]:")
+    hdf5_wri = cct.cct_raw_input("write all Tdx data to Multi hdf_300[rw|y|n]:")
+    if hdf5_wri == 'rw':
+        Write_tdx_all_to_hdf('all', h5_fname='tdx_all_df', h5_table='all', dl=300, rewrite=True)
+    elif hdf5_wri == 'y':
+        Write_tdx_all_to_hdf('all', h5_fname='tdx_all_df', h5_table='all', dl=300)
+
+
+    hdf5_wri = cct.cct_raw_input("write all Tdx data to Multi hdf_900[rw|y|n]:")
     if hdf5_wri == 'rw':
         Write_tdx_all_to_hdf('all', h5_fname='tdx_all_df', h5_table='all', dl=900, rewrite=True)
     elif hdf5_wri == 'y':

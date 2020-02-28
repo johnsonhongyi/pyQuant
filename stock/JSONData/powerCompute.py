@@ -55,8 +55,7 @@ if cct.isMac():
 else:
     mpl.rcParams['font.sans-serif'] = ['SimHei']
     mpl.rcParams['axes.unicode_minus'] = False
-
-# print mpl.rcParams
+    mpl.rcParams['backend'] = 'Qt4Agg'
 
 # import signal
 # def signal_handler(sig, frame):
@@ -701,7 +700,6 @@ def get_linear_model_candles(code, ptype='low', dtype='d', start=None, end=None,
     # log.info("df:%s" % asset[:1])
     asset = asset.dropna()
     dates = asset.index
-
     fig = plt.figure(figsize=(10, 6))
     # plt.subplots_adjust(left=0.05, bottom=0.08, right=0.95,
     #                     top=0.95, wspace=0.15, hspace=0.25)
@@ -957,7 +955,16 @@ def get_linear_model_candles(code, ptype='low', dtype='d', start=None, end=None,
     if cct.get_os_system() == 'mac':
         plt.show(block=False)
     else:
-        plt.show(block=True)
+        # plt.show(block=False)
+        plt.show()
+        # def plt_show():
+        #     '''Text-blocking version of plt.show()
+        #     Use this instead of plt.show()'''
+        #     plt.draw()
+        #     plt.pause(0.001)
+        #     # input("Press enter to continue...")
+        #     # plt.close()
+        # plt_show()
     return df
 
 global Power_CXG_Error, drop_cxg, wencai_drop
@@ -1544,7 +1551,7 @@ def parseArgmain():
                         help='price type')
     parser.add_argument('-f', action="store", dest="filter", type=str, choices=['y', 'n'], default='n',
                         help='find duration low')
-    parser.add_argument('-l', action="store", dest="dl", type=int, default=None,
+    parser.add_argument('-l', action="store", dest="dl", type=int, default=60,
                         help='dl')
     parser.add_argument('-dl', action="store", dest="days", type=int, default=1,
                         help='days')
@@ -1641,7 +1648,7 @@ if __name__ == "__main__":
                 # ts=time.time()
                 # time.sleep(5)
                 # print "%0.5f"%(time.time()-ts)
-            elif code == 'q':
+            elif code == 'q' or code == 'e':
                 sys.exit(0)
             elif code == 'h' or code == 'help':
                 parser.print_help()

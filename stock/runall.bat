@@ -1,7 +1,9 @@
-rem set var="E:\Johnson\Quant"
-REM cd "E:\Johnson\Quant"
+rem set var="D:\MacTools\WorkFile\WorkSpace\pyQuant\stock"
+REM cd "D:\MacTools\WorkFile\WorkSpace\pyQuant\stock"
 REM E:
-cd stock
+D:
+cd "D:\MacTools\WorkFile\WorkSpace\pyQuant\stock"
+rem cd stock
 start cmd /k python singleAnalyseUtil.py
 ping -n 20 localhost > nul
 REM start python sina_Monitor.py 

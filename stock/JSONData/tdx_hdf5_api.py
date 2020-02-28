@@ -33,14 +33,16 @@ class SafeHDFStore(HDFStore):
         lock = cct.get_ramdisk_path(args[0], lock=True)
         baseDir = BaseDir
         self.fname_o = args[0]
+        self.basedir = baseDir
         self.config_ini = baseDir + os.path.sep+ 'h5config.txt'
-
         if args[0] == cct.tdx_hd5_name or args[0].find('tdx_all_df') >=0:
             
             self.fname = cct.get_run_path_tdx(args[0])
+            self.basedir = self.fname.split(self.fname_o)[0]
             log.info("tdx_hd5:%s"%(self.fname))
         else:
             self.fname = cct.get_ramdisk_path(args[0])
+            self.basedir = self.fname.split(self.fname_o)[0]
             log.info("ramdisk_hd5:%s"%(self.fname))
 
         self._lock = lock
@@ -49,7 +51,7 @@ class SafeHDFStore(HDFStore):
         self.complevel = 9
         self.complib = 'zlib'
         # self.ptrepack_cmds = "ptrepack --chunkshape=auto --propindexes --complevel=9 --complib=%s %s %s"
-        self.ptrepack_cmds = "ptrepack --chunkshape=auto --complevel=9 --complib=%s %s %s"
+        self.ptrepack_cmds = "ptrepack --overwrite-nodes --chunkshape=auto --complevel=9 --complib=%s %s %s"
         self.big_H5_Size_limit = ct.big_H5_Size_limit
         self.h5_size_org = 0
         # self.pt_lock_file = self.fname + '.txt'
@@ -151,12 +153,25 @@ class SafeHDFStore(HDFStore):
             # if  h5_size >= self.big_H5_Size_limit:
             if cct.get_config_value(self.config_ini,self.fname_o,h5_size,new_limit):
                 time_pt=time.time()
+                if os.path.exists(self.fname) and os.path.exists(self.temp_file):
+                    log.error("remove tmpfile is exists:%s"%(self.temp_file))
+                    os.remove(self.temp_file)
                 os.rename(self.fname, self.temp_file)
-                p=subprocess.Popen(self.ptrepack_cmds % (
-                    self.complib, self.temp_file, self.fname), shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+                if cct.get_os_system() == 'mac':
+                    p=subprocess.Popen(self.ptrepack_cmds % (
+                        self.complib, self.temp_file, self.fname), shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+                else:
+                    back_path = os.getcwd()
+                    os.chdir(self.basedir)
+                    log.info('current path is: %s after change dir' %os.getcwd())
+                    pt_cmd = self.ptrepack_cmds % (self.complib, self.temp_file.split(self.basedir)[1], self.fname.split(self.basedir)[1])
+                    p=subprocess.Popen(pt_cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+                    os.chdir(back_path)
                 p.wait()
+                # ptrepack --chunkshape=auto --complevel=9 --complib=zlib tdx_all_df_300.h5_tmp tdx_all_df_300.h5
                 if p.returncode != 0:
-                    log.error("ptrepack hdf Error:%s Er:%s" % (self.fname,p.stderr))
+                    # log.error("ptrepack hdf Error:%s for tmp_file:%s Er:%s" % (self.fname,self.temp_file,p.stderr))
+                    log.error("ptrepack hdf Error:%s  tofile:%s Er:%s" % (self.temp_file,self.fname,p.stdout.read().decode("gbk")))
                     # return -1
                 else:
                     if os.path.exists(self.temp_file):
@@ -873,6 +888,29 @@ if __name__ == "__main__":
 
     #    import tushare as ts
     #    df = ts.get_k_data('300334', start='2017-04-01')
+    # p=subprocess.Popen('dir', shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    # p=subprocess.Popen('ptrepack --chunkshape=auto --complevel=9 --complib=zlib "D:\MacTools\WorkFile\WorkSpace\pyQuant\tdx_all_df_300.h5_tmp" "D:\MacTools\WorkFile\WorkSpace\pyQuant\tdx_all_df_300.h5"', shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    # import commands
+    # ret,output = commands.getstatusoutput('C:\Users\Johnson\Anaconda2\Scripts\ptrepack --chunkshape=auto --complevel=9 --complib=zlib "D:\MacTools\WorkFile\WorkSpace\pyQuant\tdx_all_df_300.h5_tmp" "D:\MacTools\WorkFile\WorkSpace\pyQuant\tdx_all_df_300.h5"')
+    # print output.decode('gbk'),ret
+    # ret,output = commands.getstatusoutput('C:\Users\Johnson\Anaconda2\Scripts\ptrepack.exe')
+    # ret,output = commands.getstatusoutput('dir')
+    # print output.decode('gbk')
+
+
+    # import os
+    # fp=os.popen('ptrepack --chunkshape=auto --complevel=9 --complib=zlib   ../../tdx_all_df_300.h5_tmp  ../../tdx_all_df_300.h5')
+    # print fp.read().decode('gbk')
+    
+
+
+    # p=subprocess.Popen('ptrepack --chunkshape=auto --complevel=9 --complib=zlib ../../tdx_all_df_300.h5_tmp ../../tdx_all_df_300.h5"', shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    # p.wait()
+    # print p.stdout.read().decode("gbk")
+    # print p.stderr
+    # import ipdb;ipdb.set_trace()
+
+
     fname=['sina_data.h5', 'tdx_last_df', 'powerCompute.h5', 'get_sina_all_ratio']
     # fname = 'powerCompute.h5'
     for na in fname:
