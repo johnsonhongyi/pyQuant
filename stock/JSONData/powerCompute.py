@@ -516,18 +516,18 @@ def get_linear_model_status(code, df=None, dtype='d', type='m', start=None, end=
         operation = 0
         # log.debug("line_now:%s src:%s" % (Y_hat[-1], Y_hat[0]))
         Y_FutureM = X * b + a
-        log.debug("mid:%.2f" % (Y_FutureM[-1]))
+        # log.debug("mid:%.2f" % (Y_FutureM[-1]))
 
         i = (asset.values.T - Y_hat).argmin()
         c_low = X[i] * b + a - asset.values[i]
         Y_FutureL = X * b + a - c_low
-        log.debug("Bottom:%.2f" % (Y_FutureL[-1]))
+        # log.debug("Bottom:%.2f" % (Y_FutureL[-1]))
 
         i = (asset.values.T - Y_hat).argmax()
         c_high = X[i] * b + a - asset.values[i]
         Y_FutureH = X * b + a - c_high
 
-        log.debug("Top:%.2f" % (Y_FutureH[-1]))
+        # log.debug("Top:%.2f" % (Y_FutureH[-1]))
 
         if nowP is not None:
             diff = nowP - Y_FutureM[-1]

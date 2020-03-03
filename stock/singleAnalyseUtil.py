@@ -354,7 +354,7 @@ def get_hot_countNew(changepercent, rzrq, fibl=None, fibc=10):
         #        df = rd.get_sina_Market_json(market, False)
         df = sina_data.Sina().market(market)
         # count=len(df.index)
-        log.info("market:%s" % df[:1])
+        # log.info("market:%s" % df[:1])
         df = df.dropna()
         df = df[df.close > 0]
         if 'percent' not in df.columns:
@@ -461,8 +461,7 @@ def get_hot_countNew(changepercent, rzrq, fibl=None, fibc=10):
     ff = ffu.get_dfcfw_fund_SHSZ()
     hgt = ffu.get_dfcfw_fund_HGT()
     szt = ffu.get_dfcfw_fund_HGT(url=ct.DFCFW_FUND_FLOW_SZT)
-    log.debug("shzs:%s" % ff)
-    log.debug("hgt:%s" % hgt)
+    log.debug("shzs:%s hgt:%s" % (ff,hgt))
     # if len(ff) > 0:
     #     print ("\tSH: %s u:%s vo: %s sz: %s u:%s vo: %s" % (
     #         f_print(4, ff['scent']), f_print(4, ff['sup']), f_print(5, ff['svol']), f_print(4, ff['zcent']),
@@ -659,7 +658,7 @@ if __name__ == '__main__':
                         break
 
             else:
-                if (cct.get_now_time_int() > 1500 and cct.get_now_time_int() < 1800):
+                if (cct.get_now_time_int() > 1502 and cct.get_now_time_int() < 1800):
                     while 1:
                         if cct.get_now_time_int() > 1502 and cct.get_now_time_int() < 1510:
                             print ".",
@@ -669,7 +668,6 @@ if __name__ == '__main__':
                             print "write dm to file"
                             if cct.get_work_day_status():
                                 tdd.Write_market_all_day_mp('all')
-
                                 top_temp = cct.GlobalValues().getkey('top_max')
                                 codew = stf.WriteCountFilter(top_temp, writecount='all')
                                 cct.write_to_blocknew(block_path,codew,append=False,doubleFile=False)

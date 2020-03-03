@@ -280,7 +280,7 @@ def get_tdx_Exp_day_to_df(code, start=None, end=None, dl=None, newdays=None, typ
         newstockdayl = newdaysinit
     # day_path = day_dir % 'sh' if code[:1] in ['5', '6', '9'] else day_dir % 'sz'
     code_u = cct.code_to_symbol(code)
-    log.debug("code:%s code_u:%s" % (code, code_u))
+    # log.debug("code:%s code_u:%s" % (code, code_u))
     if type == 'f':
         file_path = exp_path + 'forwardp' + path_sep + code_u.upper() + ".txt"
     elif type == 'b':
@@ -288,7 +288,7 @@ def get_tdx_Exp_day_to_df(code, start=None, end=None, dl=None, newdays=None, typ
     else:
         return None
     # print file_path
-    log.debug("daypath:%s" % file_path)
+    # log.debug("daypath:%s" % file_path)
     # p_day_dir = day_path.replace('/', path_sep).replace('\\', path_sep)
     # p_exp_dir = exp_dir.replace('/', path_sep).replace('\\', path_sep)
     # print p_day_dir,p_exp_dir
@@ -1586,6 +1586,7 @@ def Write_tdx_all_to_hdf(market, h5_fname='tdx_all_df', h5_table='all', dl=300, 
                 # if 'code' in df.columns:
                 # df.drop(['code'],axis=1,inplace=True)
                 df = df.sort_index(ascending=True)
+                df = df.loc[:, ['code','open', 'high', 'low', 'close', 'vol', 'amount']]
                 df = df.reset_index()
                 df = df.set_index(['code', 'date'])
                 # df = df.astype(float)
@@ -1615,6 +1616,7 @@ def Write_tdx_all_to_hdf(market, h5_fname='tdx_all_df', h5_table='all', dl=300, 
                 Closing remaining open files:/Volumes/RamDisk/tdx_all_df_30.h5...done
                 '''
         concat_t = time.time() - time_s
+
         # dd = dd.loc[:,[u'open', u'high', u'low', u'close', u'vol', u'amount']]
         print("rewrite:%s dd.concat all :%s  time:%0.2f" % (rewrite, len(dfcode), concat_t))
         status = h5a.write_hdf_db(h5_fname, dd, table=h5_table, index=False, baseCount=500, append=False, MultiIndex=True,rewrite=rewrite)
@@ -1691,6 +1693,7 @@ def Write_sina_to_tdx(market='all', h5_fname='tdx_all_df', h5_table='all', dl=30
             df = df.set_index(['code', 'date'])
             df = df.astype(float)
             status = h5a.write_hdf_db(h5_fname, df, table=h5_table, index=False, baseCount=500, append=False, MultiIndex=True)
+            # search_Tdx_multi_data_duration(h5_fname, h5_table, df=None,code_l=code_list, start=None, end=None, freq=None, col=None, index='date',tail=1)
             if status is not None and status:
                 print "Tdx writime:%0.2f" % (time.time() - time_t)
             else:
@@ -1702,7 +1705,7 @@ def Write_sina_to_tdx(market='all', h5_fname='tdx_all_df', h5_table='all', dl=30
     return status
 
 
-def search_Tdx_multi_data_duration(fname='tdx_all_df_300', table='all_300', df=None,  code_l=None, start=None, end=None, freq=None, col=None, index='date'):
+def search_Tdx_multi_data_duration(fname='tdx_all_df_300', table='all_300', df=None,  code_l=None, start=None, end=None, freq=None, col=None, index='date',tail=0):
     """[summary]
 
     [description]
@@ -1754,7 +1757,10 @@ def search_Tdx_multi_data_duration(fname='tdx_all_df_300', table='all_300', df=N
             log.info("cct.GlobalValues().setkey(%s) is ok" % (tdx_hd5_name))
 
     log.info("search_Multi_tdx time:%0.2f" % (time.time() - time_s))
-    return h51
+    if tail == 0:
+        return h51
+    else:
+        return h51.groupby(level=[0]).tail(tail)
 # code_list = ['000001','399006','999999']
 # code_list = sina_data.Sina().all.index.tolist()
 # df = search_Tdx_multi_data_duration('tdx_all_df_300', 'all_300', df=None,code_l=code_list, start=20170101, end=None, freq=None, col=None, index='date')
@@ -1773,7 +1779,7 @@ def Write_market_all_day_mp(market='all', rewrite=False):
         duration = cct.get_today_duration(dd.date)
         if duration == 0:
             print "Duration:%s is OK" % (duration)
-            return False
+            # return False
 
         # fpath =  get_code_file_path(sh_index)
         # mtime = os.path.getmtime(fpath)
@@ -1784,6 +1790,22 @@ def Write_market_all_day_mp(market='all', rewrite=False):
         #     if hs > 1500:
         #         print "Data is out:%s"%(dd.close)
         #         return False
+
+
+    # duration = 300
+    # if duration <= 300 :
+    #     h5_fname = 'tdx_all_df' + '_' + str(300)
+    #     h5_table = 'all' + '_' + str(300)
+    # else:
+    #     h5_fname = 'tdx_all_df' + '_' + str(900)
+    #     h5_table = 'all' + '_' + str(900)
+    # df = tdd.search_Tdx_multi_data_duration('tdx_all_df_300', 'all_300', df=None,code_l=code_list, start='20150501', end=None, freq=None, col=None, index='date')
+    # df = tdd.search_Tdx_multi_data_duration(h5_fname, h5_table, df=None,code_l=code_list, start=None, end=None, freq=None, col=None, index='date',tail=1)
+    dfs = search_Tdx_multi_data_duration(code_l=[sh_index],tail=1)
+    mdate = dfs.reset_index().date.values
+    if mdate == dd.date:
+        print "Multi_data:%s %s is write" % (sh_index,mdate)
+        return True
 
     # import sys;sys.exit(0)
     # start=dd.date
@@ -2866,15 +2888,15 @@ def get_tdx_exp_low_or_high_power(code, dt=None, ptype='close', dl=None, end=Non
                 if ptype == 'high':
                     lowp = dz.close.max()
                     lowdate = dz[dz.close == lowp].index.values[-1]
-                    log.debug("high:%s" % lowdate)
+                    # log.debug("high:%s" % lowdate)
                 elif ptype == 'close':
                     lowp = dz.close.min()
                     lowdate = dz[dz.close == lowp].index.values[-1]
-                    log.debug("close:%s" % lowdate)
+                    # log.debug("close:%s" % lowdate)
                 else:
                     lowp = dz.close.min()
                     lowdate = dz[dz.close == lowp].index.values[-1]
-                    log.debug("low:%s" % lowdate)
+                    # log.debug("low:%s" % lowdate)
 
                 lastvol = dz.vol[:lvoldays].min()
 
@@ -3832,6 +3854,10 @@ if __name__ == '__main__':
     # code = '603486'
     # code = '999999'
     # df2 = get_tdx_Exp_day_to_df(code,dl=160, end=None, newdays=0, resample='w')
+
+
+    Write_market_all_day_mp('all')
+
 
     # print df2.shape,df2.cumin
     # print get_kdate_data('000859', start='2019-01-01', end='', ktype='D')

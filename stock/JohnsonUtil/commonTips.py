@@ -523,6 +523,8 @@ def isMac():
     if get_sys_system().find('Darwin') == 0:
         return True
     else:
+        import codecs
+        sys.stdout = codecs.getwriter('utf-8')(sys.stdout)
         return False
 
 
@@ -756,6 +758,7 @@ def cct_eval(cmd):
         print e
     return st
 
+GlobalValues().setkey('Except_count', 0)
 
 def sleep(timet, catch=True):
     times = time.time()
@@ -2690,6 +2693,10 @@ if __name__ == '__main__':
     print (get_index_fibl())
     GlobalValues()
     GlobalValues().setkey('key', 'GlobalValuesvalue')
+    print get_work_time()
+    print get_now_time_int()
+    print get_work_duration()
+    print (random.randint(0, 30))
     print GlobalValues().getkey('key', defValue=None)
     print get_run_path_tdx('aa')
     print get_ramdisk_path(tdx_hd5_name)

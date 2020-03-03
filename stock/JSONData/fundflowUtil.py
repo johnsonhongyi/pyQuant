@@ -290,7 +290,7 @@ def get_dfcfw_rzrq_SHSZ(url=ct.DFCFW_RZYE):
                     yestoday = cct.last_tddate(x)
                     if yestoday in df.index:
                         data2 = df.loc[yestoday]
-                        log.info("yestoday:%s data:%s" % (yestoday, data2))
+                        # log.info("yestoday:%s data:%s" % (yestoday, data2))
                         break
                         # print da
                     else:
@@ -303,7 +303,7 @@ def get_dfcfw_rzrq_SHSZ(url=ct.DFCFW_RZYE):
     
     # data = df.loc[yestoday]
     # data2 = df.loc[beforeyesterday]
-    log.info("data1:%s,data2:%s", data1, data2)
+    # log.info("data1:%s,data2:%s", data1, data2)
     if len(data2) > 0:
         # print data2
         data['all'] = round(data1.loc['all'], 2)
@@ -315,7 +315,7 @@ def get_dfcfw_rzrq_SHSZ(url=ct.DFCFW_RZYE):
     else:
         data['dff'] = 'error'
     if len(data) == 0:
-        log.info("Fund_f NO Url:%s" % url)
+        log.error("Fund_f NO Url:%s" % url)
     return data
 
 

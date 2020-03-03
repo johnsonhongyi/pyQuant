@@ -42,8 +42,10 @@ def get_roll_mean_all(single=True,tdx=False,app=True,duration=100):
         h5_table = 'all' + '_' + str(900)
     # df = tdd.search_Tdx_multi_data_duration('tdx_all_df_300', 'all_300', df=None,code_l=code_list, start='20150501', end=None, freq=None, col=None, index='date')
     df = tdd.search_Tdx_multi_data_duration(h5_fname, h5_table, df=None,code_l=code_list, start=None, end=None, freq=None, col=None, index='date')
-    
+    # df = tdd.search_Tdx_multi_data_duration(h5_fname, h5_table, df=None,code_l=code_list, start=None, end=None, freq=None, col=None, index='date',tail=1)
+
     code_uniquelist=df.index.get_level_values('code').unique()
+
     code_select = code_uniquelist[random.randint(0,len(code_uniquelist)-1)]
     print round(time.time()-time_s,2),df.index.get_level_values('code').unique().shape,code_select,df.loc[code_select].shape
     # df.groupby(level=[0]),df.index.get_level_values(0)
@@ -54,7 +56,7 @@ def get_roll_mean_all(single=True,tdx=False,app=True,duration=100):
     
     # rollma = ['5','10','60','100','200']
     # rollma = ['5','10','250']
-    if duration == 250:
+    if duration < 300:
         rollma = ['10']
     else:
         rollma = ['10','250']
@@ -99,7 +101,8 @@ def get_roll_mean_all(single=True,tdx=False,app=True,duration=100):
     # mask = (dfs[('ma%s')%(rollma[0])] > dfs[('ma%s')%(rollma[1])]) & (dfs[('ma%s')%(rollma[-1])] > 0) & (dfs[('close')] > dfs[('ma%s')%(rollma[0])])  & (dfs[('close')] > dfs[('ma%s')%(rollma[-1])]) 
     # mask = (dfs[('ma%s')%(rollma[0])] > dfs[('ma%s')%(rollma[1])]) & (dfs[('ma%s')%(rollma[-1])] > 0) & (dfs[('close')] > dfs[('ma%s')%(rollma[1])])  & (dfs[('close')] > dfs[('ma%s')%(rollma[-1])]) 
     # mask = (dfs[('ma%s')%(rollma[0])] > dfs[('ma%s')%(rollma[1])]) & (dfs[('ma%s')%(rollma[-1])] > 0) &  (dfs[('close')] > dfs[('ma%s')%(rollma[-1])]) 
-   
+    import ipdb;ipdb.set_trace()
+
 
     # mask = ( (dfs[('ma%s')%(rollma[0])] > 0) & (dfs[('ma%s')%(rollma[-1])] > 0) & (dfs[('close')] > dfs[('ma%s')%(rollma[-1])]) & (dfs[('close')] > dfs[('ma%s')%(rollma[0])]))
     mask = ( (dfs[('ma%s')%(rollma[0])] > 0) & (dfs[('ma%s')%(rollma[-1])] > 0) & (dfs[('close')] > dfs[('ma%s')%(rollma[-1])]) & (dfs[('close')] > dfs[('ma%s')%(rollma[0])]))
@@ -180,7 +183,8 @@ def get_roll_mean_all(single=True,tdx=False,app=True,duration=100):
     return df
 
 if __name__ == '__main__':
-    # get_roll_mean_all(single=False,tdx=True,app=True,duration=250)
+    # get_roll_mean_all(single=False,tdx=True,app=True,duration=250) ???
+    # get_roll_mean_all(single=False,tdx=True,app=True,duration=120) ???
     get_roll_mean_all(single=False,tdx=True,app=True,duration=600)
     # get_roll_mean_all(single=True,tdx=True,app=True)
     # get_roll_mean_all(single=True,tdx=True,app=False)
