@@ -142,6 +142,11 @@ if __name__ == "__main__":
                 #         print "code:%s op:%s ra:%s  start:%s" % (code, op, ra, st)
 
                 if args.mpl == 'y':
+                    # from multiprocessing import Process
+                    # p = Process(target=pct.get_linear_model_candles, args=(args.code,args.ptype,args.dtype, start, end,args.filter,df,args.dl,args.days,))
+                    #   # (args.code,args.ptype,args.dtype, start, end,args.filter,df,args.dl,args.days)
+                    # p.start()
+                    # p.join()
                     pct.get_linear_model_candles(args.code, dtype=args.dtype, start=start, end=end, ptype=args.ptype,
                                              filter=args.filter,df=df,dl=args.dl,days=args.days)
                 else:

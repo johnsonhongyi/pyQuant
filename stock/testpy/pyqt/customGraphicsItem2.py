@@ -1,10 +1,29 @@
-"""
-Demonstrate creation of a custom graphic (a candlestick plot)
-
-"""
 import pyqtgraph as pg
 from pyqtgraph import QtCore, QtGui
 import random
+import numpy as np 
+# from apscheduler.schedulers.background import BackgroundScheduler
+# https://stackoverflow.com/questions/47256835/how-can-i-automatically-update-data-in-pyqtgraph?r=SearchResults
+class PlotRunnable(QtCore.QRunnable):
+    def __init__(self, it):
+        QtCore.QRunnable.__init__(self)
+        self.it = it
+
+    def run(self):
+        while True:
+            data = self.it.data
+            data_len = len(data)
+            rand = random.randint(0, len(data)-1)
+            new_bar = data[rand][:]
+            new_bar[0] = data_len
+            data.append(new_bar)
+
+            QtCore.QMetaObject.invokeMethod(self.it, "set_data",
+                                     QtCore.Qt.QueuedConnection,
+                                     QtCore.Q_ARG(list, data))
+            QtCore.QThread.msleep(1000)
+
+
 
 ## Create a subclass of GraphicsObject.
 ## The only required methods are paint() and boundingRect() 
@@ -48,7 +67,7 @@ class CandlestickItem(pg.GraphicsObject):
 
 app = QtGui.QApplication([])
 
-data = [  ## fields are (time, open, close, min, max).
+data = [  
     [1., 10, 13, 5, 15],
     [2., 13, 17, 9, 20],
     [3., 17, 14, 11, 23],
@@ -64,6 +83,10 @@ plt.addItem(item)
 plt.setWindowTitle('pyqtgraph example: customGraphicsItem')
 
 
+#diff 2
+# runnable = PlotRunnable(item)
+# QtCore.QThreadPool.globalInstance().start(runnable)
+
 def update():
     global item, data
     data_len = len(data)
@@ -72,13 +95,20 @@ def update():
     new_bar[0] = data_len
     data.append(new_bar)
     item.set_data(data)
-    app.processEvents()  ## force complete redraw for every plot
+    app.processEvents() 
 
+
+## DOESN'T SHOW NEW CANDLESTICKS UNLESS YOU SELECT THE PLOT WINDOW
+#sched = BackgroundScheduler()
+#sched.start()
+#sched.add_job(update, trigger='cron', second='*/1')
+
+## WORKS FINE WITH THIS PARAGRAPH.
 timer = QtCore.QTimer()
 timer.timeout.connect(update)
 timer.start(1000)
 
-## Start Qt event loop unless running in interactive mode or using pyside.
+
 if __name__ == '__main__':
     import sys
     if (sys.flags.interactive != 1) or not hasattr(QtCore, 'PYQT_VERSION'):

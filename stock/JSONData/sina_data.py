@@ -27,6 +27,7 @@ class StockCode:
     def __init__(self):
         self.start_t = time.time()
         self.STOCK_CODE_PATH = 'stock_codes.conf'
+        self.encoding = 'gbk'
         self.stock_code_path = self.stock_code_path()
         # print os.path.getsize(self.stock_code_path)
         if not os.path.exists(self.stock_code_path) or os.path.getsize(self.stock_code_path) < 500:

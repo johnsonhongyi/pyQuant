@@ -620,7 +620,7 @@ if __name__ == '__main__':
                         ave = get_code_search_loop(
                             num_input, code, dayl=days, ave=ave)
                     code = num_input
-
+                    
             int_time = cct.get_now_time_int()
             if cct.get_work_time():
                 if 930 < int_time < 1000:

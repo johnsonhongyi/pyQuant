@@ -55,7 +55,8 @@ if cct.isMac():
 else:
     mpl.rcParams['font.sans-serif'] = ['SimHei']
     mpl.rcParams['axes.unicode_minus'] = False
-    mpl.rcParams['backend'] = 'Qt4Agg'
+    # mpl.rcParams['backend'] = 'Qt4Agg'
+    # plt.ion()
 
 # import signal
 # def signal_handler(sig, frame):
@@ -956,13 +957,28 @@ def get_linear_model_candles(code, ptype='low', dtype='d', start=None, end=None,
         plt.show(block=False)
     else:
         # plt.show(block=False)
+        # plt.ion()
+
+        # plt.draw()
+        # plt.pause(0.001)
+        # plt.show(block=False)
+        
+        # # set processing to continue when window closed
+        # def onclose(event):
+        #     fig.canvas.stop_event_loop()
+        # fig.canvas.mpl_connect('close_event', onclose)
+        # fig.show() # this call does not block on my system
+        # fig.canvas.start_event_loop_default() # block here until window closed
+        # # continue with further processing, perhaps using result from callbacks
+
         plt.show()
+        # plt.close()
         # def plt_show():
         #     '''Text-blocking version of plt.show()
         #     Use this instead of plt.show()'''
         #     plt.draw()
         #     plt.pause(0.001)
-        #     # input("Press enter to continue...")
+        #     raw_input("Press enter to continue...")
         #     # plt.close()
         # plt_show()
     return df
