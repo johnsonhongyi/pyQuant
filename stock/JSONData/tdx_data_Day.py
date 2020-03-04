@@ -1780,6 +1780,8 @@ def Write_market_all_day_mp(market='all', rewrite=False):
         if duration == 0:
             print "Duration:%s is OK" % (duration)
             # return False
+        else:
+            log.info("duration to write :%s"%(duration))
 
         # fpath =  get_code_file_path(sh_index)
         # mtime = os.path.getmtime(fpath)
@@ -1801,11 +1803,13 @@ def Write_market_all_day_mp(market='all', rewrite=False):
     #     h5_table = 'all' + '_' + str(900)
     # df = tdd.search_Tdx_multi_data_duration('tdx_all_df_300', 'all_300', df=None,code_l=code_list, start='20150501', end=None, freq=None, col=None, index='date')
     # df = tdd.search_Tdx_multi_data_duration(h5_fname, h5_table, df=None,code_l=code_list, start=None, end=None, freq=None, col=None, index='date',tail=1)
-    dfs = search_Tdx_multi_data_duration(code_l=[sh_index],tail=1)
-    mdate = dfs.reset_index().date.values
-    if mdate == dd.date:
-        print "Multi_data:%s %s is write" % (sh_index,mdate)
-        return True
+    
+    if duration == 0:
+        dfs = search_Tdx_multi_data_duration(code_l=[sh_index],tail=1)
+        mdate = dfs.reset_index().date.values
+        if mdate == dd.date:
+            print "Multi_data:%s %s all writed" % (sh_index,mdate)
+            return True
 
     # import sys;sys.exit(0)
     # start=dd.date

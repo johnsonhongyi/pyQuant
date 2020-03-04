@@ -502,6 +502,8 @@ def get_hot_countNew(changepercent, rzrq, fibl=None, fibc=10):
                            'To:%s' % len(topTen), 'D:%s' % len(
                         crash), 'Sh: %s ' % ff['scent'] if len(ff) > 0 else '?', 'Vr:%s%% ' % ff['svol'] if len(ff) > 0 else '?',
                         'MR: %s' % zzb, 'ZL: %s' % (zlr if len(ff) > 0 else '?')],closeTerminal=False)
+    log.debug("set_console:bigcount[0]%s  bigcount[2]:%s" % (bigcount[0], bigcount[2]))
+
 
     return allTop
 
@@ -599,6 +601,7 @@ if __name__ == '__main__':
                     # if rzrq['shrz'] == 0 or rzrq['szrz'] == 0 or rzrq['dff'] == 0 or rzrq['all'] == 0:
                     #     log.warn("rzrq 0")
                     rzrq = ffu.get_dfcfw_rzrq_SHSZ()
+                log.info('start get_hot_count')
                 get_hot_countNew(percentDuration, rzrq, fibl, fibc)
                 fibcount += 1
             if status:
@@ -620,14 +623,16 @@ if __name__ == '__main__':
                             num_input, code, dayl=days, ave=ave)
                     code = num_input
                     
+            # int_time = cct.get_now_time_int()
+            # if cct.get_work_time():
+            #     if 930 < int_time < 1000:
+            #         cct.sleep(45)
+            #     else:
+            #         cct.sleep(ct.duration_sleep_time)
+                    
             int_time = cct.get_now_time_int()
             if cct.get_work_time():
-                if 930 < int_time < 1000:
-                    cct.sleep(45)
-                else:
-                    cct.sleep(ct.duration_sleep_time)
-            int_time = cct.get_now_time_int()
-            if cct.get_work_time():
+                log.debug('into get_work_time:%s'%(int_time))
                 if 915 < int_time < 926:
                     while 1:
                         cct.sleeprandom(15)
@@ -646,6 +651,7 @@ if __name__ == '__main__':
                 else:
                     cct.sleep(60)
             elif cct.get_work_duration():
+                log.debug('into work_duration:%s'%(int_time))
                 while 1:
                     if cct.get_work_duration():
                         print ".",
@@ -658,6 +664,7 @@ if __name__ == '__main__':
                         break
 
             else:
+                log.debug('into clean_duration:%s'%(int_time))
                 if (cct.get_now_time_int() > 1502 and cct.get_now_time_int() < 1800):
                     while 1:
                         if cct.get_now_time_int() > 1502 and cct.get_now_time_int() < 1510:
@@ -672,7 +679,8 @@ if __name__ == '__main__':
                                 codew = stf.WriteCountFilter(top_temp, writecount='all')
                                 cct.write_to_blocknew(block_path,codew,append=False,doubleFile=False)
                             break
-
+                        else:
+                            print "."
 
 
 	                

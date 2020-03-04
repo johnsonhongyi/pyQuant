@@ -762,11 +762,20 @@ GlobalValues().setkey('Except_count', 0)
 
 def sleep(timet, catch=True):
     times = time.time()
+    log.info('sleep:%s'%(timet))
+    loop_status = 1
     try:
-        for _ in range(int(timet) * 2):
+        # log.info("range(int(timet) * 2):%s"%(range(int(timet) * 2)))
+        # for _ in range(int(timet) * 2):
+        while loop_status:
+            loop_status = 0
+            time.sleep(0.5)
             if int(time.time() - times) >= int(timet):
                 break
-            time.sleep(0.5)
+            else:
+                loop_status = 1
+            # log.info('sleeptime:%s'%(int(time.time() - times)))
+        log.info('break sleeptime:%s'%(int(time.time() - times)))
     except (KeyboardInterrupt) as e:
         # raise KeyboardInterrupt("CTRL-C!")
         # print "Catch KeyboardInterrupt"
@@ -777,12 +786,15 @@ def sleep(timet, catch=True):
 
     except (IOError, EOFError, Exception) as e:
         count_Except = GlobalValues().getkey('Except_count')
-        if count_Except is not None and count_Except < 4:
+        if count_Except is not None and count_Except < 3:
             GlobalValues().setkey('Except_count', count_Except + 1)
             print "cct_raw_input:ExceptionError:%s count:%s" % (e, count_Except)
         else:
             print "cct_ExceptionError:%s count:%s" % (e, count_Except)
             sys.exit(0)
+
+    finally:
+        log.info('cct_Exception finally loop_status:%s'%(loop_status))
         # raise Exception("code is None")
     # print time.time()-times
 

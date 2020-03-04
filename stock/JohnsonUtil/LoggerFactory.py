@@ -5,7 +5,8 @@ Created on 2015-3-11
 '''
 import logging
 import sys,os
-from logging.handlers import RotatingFileHandler
+# from logging.handlers import RotatingFileHandler
+from LoggerFactoryMultiprocess import MultiprocessHandler
 # sys.path.append("..")
 import ipykernel.iostream 
 # from logbook import StderrHandler
@@ -148,8 +149,18 @@ def getLogger(name=None,logpath=None,writemode='a',show_detail=True):
     # print "handeer",len(logger.handlers)
     # formatter = logging.Formatter(name + ': LINE %(lineno)-4d : %(levelname)-8s %(message)s');
     # formatter = logging.Formatter( '%(levelname)-5s %(message)s');
-    handler = RotatingFileHandler(log_f, maxBytes=2*1000*1000, 
-                                 backupCount=1, encoding=None, delay=0)
+
+
+
+    # handler = RotatingFileHandler(log_f, maxBytes=2*1000*1000, 
+    #                              backupCount=1, encoding=None, delay=0)
+    
+     # handler = RotatingFileHandler(log_f, maxBytes=2*1000*1000, 
+     #                             backupCount=1, encoding=None, delay=0)
+
+    handler = MultiprocessHandler(log_f, when='D')
+
+
     # fh_formatter = logging.Formatter( '%(filename)s(%(funcName)s:%(lineno)s):%(levelname)-5s %(message)s');
     if show_detail:
         handler_logformat = logging.Formatter("[%(asctime)s] %(levelname)s:%(filename)s(%(funcName)s:%(lineno)s): %(message)s")

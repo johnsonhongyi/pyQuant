@@ -261,7 +261,7 @@ def get_dfcfw_fund_SHSZ(url=ct.DFCFW_ZS_SHSZ):
 
 def get_dfcfw_rzrq_SHSZ(url=ct.DFCFW_RZYE):
     data = {}
-    log.info("%s"%(ct.DFCFW_RZYE))
+    log.info("rzrq:%s"%(ct.DFCFW_RZYE))
     rzdata = cct.get_url_data(url)
     # import pdb;pdb.set_trace()
     rzdata = rzdata.replace(':"-"',':0.1')
