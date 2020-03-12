@@ -481,8 +481,8 @@ def get_tushare_market(market='zxb', renew=False, days=5):
 sina_doc = """sina_Johnson.
 
 Usage:
-  sina_cxdn.py
-  sina_cxdn.py [-d <debug>]
+  sina_xxx.py
+  sina_xxx.py [-d <debug>]
 
 Options:
   -h --help     Show this screen.
@@ -760,6 +760,27 @@ def cct_eval(cmd):
 
 GlobalValues().setkey('Except_count', 0)
 
+def custom_sleep(sleep=5):
+
+    time_set = sleep  # 计时设定时间
+    SYSJ = None  # 剩余时间
+    start_time = time.time()
+    while True:
+        t1 = time.time() - start_time  # 计时时间间隔
+        SYSJ = time_set - t1  # 剩余时间
+        # print("t1:%s du:%s"%(t1,SYSJ))
+        # m, s = divmod(SYSJ, 60)  # 获取分， 秒
+        # h, m = divmod(m, 60)  # 获取小时，分
+        if SYSJ > 0:
+            pass
+            # print("%02d:%02d:%02d" % (h, m, s))  #正常打印
+            # print("\r%02d:%02d:%02d" % (h, m, s),end="")  # 每次把光标定位到行首，打印
+        else:
+            # print(u"\n计时结束")
+            break
+    # print "start:%s"%(time.time()-start_time)
+# custom_sleep(0.5)
+
 def sleep(timet, catch=True):
     times = time.time()
     log.info('sleep:%s'%(timet))
@@ -767,13 +788,20 @@ def sleep(timet, catch=True):
     try:
         # log.info("range(int(timet) * 2):%s"%(range(int(timet) * 2)))
         # for _ in range(int(timet) * 2):
+        count_s = 0
         while loop_status:
             loop_status = 0
             time.sleep(0.5)
-            if int(time.time() - times) >= int(timet):
+            # custom_sleep(0.5)
+            t1 = time.time() - times
+            duration = t1 - timet
+            if duration >= 0 :
                 break
             else:
+                count_s +=1
                 loop_status = 1
+                if count_s%10 == 0:
+                    log.info("sleep10:%s"%(int(time.time() - times) - int(timet))) 
             # log.info('sleeptime:%s'%(int(time.time() - times)))
         log.info('break sleeptime:%s'%(int(time.time() - times)))
     except (KeyboardInterrupt) as e:

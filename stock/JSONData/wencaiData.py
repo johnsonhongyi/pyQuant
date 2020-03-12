@@ -249,7 +249,8 @@ def get_wencai_Market_url(filter='国企改革', perpage=1, url=None, pct=False,
             sleep_t = ct.wencai_delay_time - duratime
             log.error('timelimit:%s' % (sleep_t))
             time.sleep(sleep_t)
-        log.info("duratime:%s", duratime)
+        else:
+            log.info("duratime:%s", duratime)
         duratime = cct.get_config_value_wencai(
             config_ini, fname, currvalue=time.time(), xtype='time', update=True)
         # wencairoot = 'http://www.iwencai.com/stockpick/search?typed=0&preParams=&ts=1&f=1&qs=result_original&selfsectsn=&querytype=&searchfilter=&tid=stockpick&w=%s'
@@ -297,7 +298,7 @@ def get_wencai_Market_url(filter='国企改革', perpage=1, url=None, pct=False,
 
             if perpage > 1000:
                 html = cct.get_url_data(
-                    cacheurl, retry_count=1, headers=headers, timeout=30)
+                    cacheurl, retry_count=1, headers=headers, timeout=20)
             else:
                 html = cct.get_url_data(
                     cacheurl, retry_count=1, headers=headers, timeout=10)

@@ -60,16 +60,17 @@ if __name__ == "__main__":
     from docopt import docopt
     log = LoggerFactory.log
     args = docopt(cct.sina_doc, version='sina_cxdn')
-    # print args,args['-d']
+
     if args['-d'] == 'debug':
         log_level = LoggerFactory.DEBUG
     elif args['-d'] == 'info':
         log_level = LoggerFactory.INFO
     else:
         log_level = LoggerFactory.ERROR
+    log.setLevel(log_level)
+    
     # log_level = LoggerFactory.DEBUG if args['-d']  else LoggerFactory.ERROR
     # log_level = LoggerFactory.DEBUG
-    log.setLevel(log_level)
     # log.setLevel(LoggerFactory.DEBUG)
     # handler=StderrHandler(format_string='{record.channel}: {record.message) [{record.extra[cwd]}]')
     # log.level = log.debug
