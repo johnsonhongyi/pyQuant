@@ -23,7 +23,7 @@ import socket
 from configobj import ConfigObj
 log = LoggerFactory.log
 from tqdm import tqdm
-
+# import win32MoveCom
 # log.setLevel(Log.DEBUG)
 # import numba as nb
 
@@ -257,7 +257,7 @@ end tell
 terminal_positionKey = {'sina_Market-DurationDn.py': '8, 801',
                         'sina_Market-DurationCXDN.py': '79, 734',
                         'sina_Market-DurationSH.py': '-29, 623',
-                        'sina_Market-DurationUp.py': '451, 703',
+                        'sina_Market-DurationUP.py': '451, 703',
                         'sina_Monitor-Market-LH.py': '666, 338',
                         'sina_Monitor-Market.py': '19, 179',
                         'sina_Monitor.py': '205, 659',
@@ -267,7 +267,7 @@ terminal_positionKey = {'sina_Market-DurationDn.py': '8, 801',
 terminal_positionKey_all = {'sina_Market-DurationDn.py': '654, 680',
                         'sina_Market-DurationCXDN.py': '-16, 54',
                         'sina_Market-DurationSH.py': '-29, 623',
-                        'sina_Market-DurationUp.py': '-22, 89',
+                        'sina_Market-DurationUP.py': '-22, 89',
                         'sina_Monitor-Market-LH.py': '666, 338',
                         'sina_Monitor-Market.py': '19, 179',
                         'sina_Monitor.py': '28, 23',
@@ -279,7 +279,7 @@ terminal_positionKey_all = {'sina_Market-DurationDn.py': '654, 680',
 terminal_positionKeyMac = {'sina_Market-DurationDn.py': '216, 490',
                         'sina_Market-DurationCXDN.py': '-16, 54',
                         'sina_Market-DurationSH.py': '-29, 623',
-                        'sina_Market-DurationUp.py': '-22, 89',
+                        'sina_Market-DurationUP.py': '-22, 89',
                         'sina_Monitor-Market-LH.py': '184, 239',
                         'sina_Monitor-Market.py': '19, 179',
                         'sina_Monitor.py': '28, 23',
@@ -289,12 +289,22 @@ terminal_positionKeyMac = {'sina_Market-DurationDn.py': '216, 490',
 terminal_positionKey_VM = {'sina_Market-DurationDn.py': '342, 397',
                         'sina_Market-DurationCXDN.py': '84, 222',
                         'sina_Market-DurationSH.py': '-29, 623',
-                        'sina_Market-DurationUp.py': '-12, 383',
+                        'sina_Market-DurationUP.py': '-12, 383',
                         'sina_Monitor-Market-LH.py': '666, 338',
                         'sina_Monitor-Market.py': '19, 179',
                         'sina_Monitor.py': '8, 30',
                         'singleAnalyseUtil.py': '615, 23',
                         'LinePower.py': '6, 216', }
+
+terminal_positionKey_triton = {'sina_Market-DurationDn.py': '-4, 718,1320,460',
+                        'sina_Market-DurationCXDN.py': '23, 634,1320,460',
+                        'sina_Market-DurationSH.py': '-29, 623,1320,460',
+                        'sina_Market-DurationUP.py': '54, 574,1320,460',
+                        'sina_Monitor-Market-LH.py': '666, 338,1320,460',
+                        'sina_Monitor-Market.py': '19, 179,1320,460',
+                        'sina_Monitor.py': '87, 489,1320,460',
+                        'singleAnalyseUtil.py': '1134, 690,880,360',
+                        'LinePower.py': '1031, 682,800,420', }
 
 terminal_positionKey = terminal_positionKey_VM
 
@@ -619,11 +629,43 @@ def creation_date_duration(path_to_file):
     today = datetime.date.today()
     return (today - dtm).days
 
+import win32api,win32gui
+import thread
+
+def get_window_pos(targetTitle):  
+    hWndList = []  
+    win32gui.EnumWindows(lambda hWnd, param: param.append(hWnd), hWndList)  
+    for hwnd in hWndList:
+        clsname = win32gui.GetClassName(hwnd)
+        title = win32gui.GetWindowText(hwnd)
+        if (title.find(targetTitle) >= 0):    #调整目标窗口到坐标(600,300),大小设置为(600,600)
+            rect1 = win32gui.GetWindowRect(hwnd)
+            # rect2 = get_window_rect(hwnd)
+            # rect2 = rect1
+            # print("targetTitle:%s rect1:%s rect2:%s"%(title,rect1,rect1))
+            print("target rect1:%s rect2:%s"%(rect1,rect1))
+            # win32gui.SetWindowPos(hwnd, win32con.HWND_TOPMOST, 330,678,600,600, win32con.SWP_SHOWWINDOW)
+            # win32gui.SetWindowPos(hwnd, win32con.HWND_TOPMOST, 330,678,600,600, win32con.SWP_SHOWWINDOW)
+            # win32gui.MoveWindow(hwnd,1026, 699, 900, 360,True)  #108,19
+
+def reset_window_pos(targetTitle,posx=1026,posy=699,width=900,height=360):
+
+    hWndList = []  
+    win32gui.EnumWindows(lambda hWnd, param: param.append(hWnd), hWndList)  
+    for hwnd in hWndList:
+        clsname = win32gui.GetClassName(hwnd)
+        title = win32gui.GetWindowText(hwnd)
+        if (title.find(targetTitle) >= 0):    #调整目标窗口到坐标(600,300),大小设置为(600,600)
+            rect1 = win32gui.GetWindowRect(hwnd)
+            # rect2 = get_window_rect(hwnd)
+            log.debug("targetTitle:%s rect1:%s rect2:%s"%(title,rect1,rect1))
+            # win32gui.SetWindowPos(hwnd, win32con.HWND_TOPMOST, 330,678,600,600, win32con.SWP_SHOWWINDOW)
+            # win32gui.SetWindowPos(hwnd, win32con.HWND_TOPMOST, 330,678,600,600, win32con.SWP_SHOWWINDOW)
+            win32gui.MoveWindow(hwnd,int(posx), int(posy), int(width), int(height),True)  #108,19
+
 
 def set_ctrl_handler():
     # os.environ['FOR_DISABLE_CONSOLE_CTRL_HANDLER'] = '1'
-    import win32api
-    import thread
     # def doSaneThing(sig, func=None):
     # '''忽略所有KeyCtrl'''
     # return True
@@ -670,6 +712,10 @@ def set_console(width=80, height=15, color=3, title=None, closeTerminal=True):
     else:
         # os.system('title=%s' % sys.argv[0])
         os.system('title=%s' % filename)
+        # win32MoveCom.reset_window_pos(title,width=width,height=height)
+        # os.system("mode con cols=%s lines=25"%(width))   #windowsfg
+        # os.system("mode con cols=%s lines=%s"%(width,height))   #windowsfg
+        # os.system("mode con cols=120 lines=2000"%(width,height))   #windowsfg
         # os.system('mode %s,%s'%(width,height))
     # printf "\033]0;My Window title\007”
     # os.system('color %s'%color)
@@ -800,8 +846,8 @@ def sleep(timet, catch=True):
             else:
                 count_s +=1
                 loop_status = 1
-                if count_s%10 == 0:
-                    log.info("sleep10:%s"%(int(time.time() - times) - int(timet))) 
+                # if count_s%10 == 0:
+                #     log.info("sleep10:%s"%(int(time.time() - times) - int(timet))) 
             # log.info('sleeptime:%s'%(int(time.time() - times)))
         log.info('break sleeptime:%s'%(int(time.time() - times)))
     except (KeyboardInterrupt) as e:
@@ -829,13 +875,15 @@ def sleep(timet, catch=True):
 
 def sleeprandom(timet):
     now_t = get_now_time_int()
+    if now_t > 915 and now_t < 926:
+        sleeptime = random.randint(10 / 3, 5)
+    else:
+        sleeptime = random.randint(timet / 3, timet)
     if get_work_duration():
-        if now_t > 915 and now_t < 926:
-            sleeptime = random.randint(10 / 3, 5)
-        else:
-            sleeptime = random.randint(timet / 3, timet)
         print "Error2sleep:%s" % (sleeptime)
         sleep(sleeptime, False)
+    else:
+        sleep(sleeptime)
 
 
 def get_cpu_count():
@@ -1480,7 +1528,7 @@ def get_config_value(fname, classtype, currvalue, limitvalue=1, xtype='limit', r
                 else:
                     config[classtype][xtype] = limitvalue
                     config.write()
-                    log.info("f_size:%s < read_limit:%s ratio < 2 ratio:%0.2f" % (currvalue, config[classtype][xtype], ratio))
+                    log.error("f_size:%s < read_limit:%s ratio < 2 ratio:%0.2f" % (currvalue, config[classtype][xtype], ratio))
 
             else:
 

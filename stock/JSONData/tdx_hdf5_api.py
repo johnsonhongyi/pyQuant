@@ -456,16 +456,16 @@ def write_hdf_db(fname, df, table='all', index=False, complib='blosc', baseCount
                             now_time=df.loc[inx_key].index[-1]
                             tmp_time=tmpdf.loc[inx_key].index[-1]
                             if now_time == tmp_time:
-                                log.error("%s %s Multi out %s hdf5:%s No Wri!!!" % (fname, table,inx_key
+                                log.debug("%s %s Multi out %s hdf5:%s No Wri!!!" % (fname, table,inx_key
                                     , now_time))
                                 return False
                     elif dratio == 1:
                         print ("newData ratio:%s all:%s"%(dratio,len(df)))
                     else:
-                        log.error("dratio:%s main:%s new:%s %s %s Multi All Wri" % (dratio,len(multi_code),len(df_multi_code),fname, table))
+                        log.debug("dratio:%s main:%s new:%s %s %s Multi All Wri" % (dratio,len(multi_code),len(df_multi_code),fname, table))
                     # da.drop(('000001','2017-05-11'))
                 else:
-                    log.error("%s %s Multi rewrite:%s Wri!!!" % (fname, table, rewrite))
+                    log.debug("%s %s Multi rewrite:%s Wri!!!" % (fname, table, rewrite))
 
 
     time_t=time.time()

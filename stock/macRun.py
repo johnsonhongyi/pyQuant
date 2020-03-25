@@ -313,44 +313,65 @@ def setPosition(cmd=None, position=None):
 # os.system(cmdRun)
 # getPosition('Johnson@',close=True)
 
+if cct.isMac():
+    count = doScript(scriptcount)
+    # print count
+    # count = 2
+    if int(count) > 2:
+        # print getPosition('Johnson@bogon',close=True)
+        # print getPosition('cd \'/Users/Johnson/Documents/Quant/pyQuant/stock/\'')
+        # print getPosition('cd \'/Users/Johnson/Documents')
+        # print getPosition('cd \'/Users/Johnson/Documents',close=True)
+        for key in positionKey.keys():
+            print (getPosition(key))
 
-count = doScript(scriptcount)
-# print count
-# count = 2
-if int(count) > 2:
-    # print getPosition('Johnson@bogon',close=True)
-    # print getPosition('cd \'/Users/Johnson/Documents/Quant/pyQuant/stock/\'')
-    # print getPosition('cd \'/Users/Johnson/Documents')
-    # print getPosition('cd \'/Users/Johnson/Documents',close=True)
-    for key in positionKey.keys():
-        print (getPosition(key))
-
-    # print 'singleAnalyseUtil.py:',getPosition('singleAnalyseUtil.py')
-    # print 'sina_Market-DurationDn.py:',getPosition('sina_Market-DurationDn.py')
-    # # print 'sina_Monitor-Market-LH.py:',getPosition('sina_Monitor-Market-LH.py')
-    print "sina_Market-DurationUP.py:",getPosition('sina_Market-DurationUP.py')
-    # # print 'sina_Market-DurationSH.py:',getPosition('sina_Market-DurationSH.py')
-    # print 'sina_Market-DurationCXDN.py:',getPosition('sina_Market-DurationCXDN.py')
-    # # print 'sina_Market-DurationCXUP.py:',getPosition('sina_Market-DurationCXUP.py')
-    # # print 'sina_Market-DurationDnUP.py:',getPosition('sina_Market-DurationDnUP.py')
-    # # print 'sina_Monitor-GOLD.py:',getPosition('sina_Monitor-GOLD.py')
-    # print 'sina_Monitor.py:',getPosition('sina_Monitor.py')
+        # print 'singleAnalyseUtil.py:',getPosition('singleAnalyseUtil.py')
+        # print 'sina_Market-DurationDn.py:',getPosition('sina_Market-DurationDn.py')
+        # # print 'sina_Monitor-Market-LH.py:',getPosition('sina_Monitor-Market-LH.py')
+        print "sina_Market-DurationUP.py:",getPosition('sina_Market-DurationUP.py')
+        # # print 'sina_Market-DurationSH.py:',getPosition('sina_Market-DurationSH.py')
+        # print 'sina_Market-DurationCXDN.py:',getPosition('sina_Market-DurationCXDN.py')
+        # # print 'sina_Market-DurationCXUP.py:',getPosition('sina_Market-DurationCXUP.py')
+        # # print 'sina_Market-DurationDnUP.py:',getPosition('sina_Market-DurationDnUP.py')
+        # # print 'sina_Monitor-GOLD.py:',getPosition('sina_Monitor-GOLD.py')
+        # print 'sina_Monitor.py:',getPosition('sina_Monitor.py')
 
 
-    print getPosition('LinePower.py')
-    print getPosition('Johnson',close=True)
-    print getPosition('/Users/Johnson/Documents',close=True)
+        print getPosition('LinePower.py')
+        print getPosition('Johnson',close=True)
+        print getPosition('/Users/Johnson/Documents',close=True)
+    else:
+        setPosition(cmd=None, position=None)
+        cct.get_terminal_Position(cct.clean_terminal[2],close=True)
+    cct.get_terminal_Position(cct.clean_terminal[1],close=True)
+
+    cct.get_terminal_Position(cmd=cct.scriptquit, position=None, close=False)
+    # getPosition('Johnson —',close=True)
+    # getPosition('Johnson —',close=True)
+    # getPosition('Johnson — python',close=True)
+    # getPosition('Johnson — osasc',close=True)
+    print getPosition('Johnson — python',close=True)
+
 else:
-    setPosition(cmd=None, position=None)
-    cct.get_terminal_Position(cct.clean_terminal[2],close=True)
-cct.get_terminal_Position(cct.clean_terminal[1],close=True)
+    print("win")
+    positionKey = cct.terminal_positionKey_triton
+    for key in positionKey:
+        print("title:%s"%(key))
+        # cct.get_window_pos(key)
+        cct.get_window_pos(key)
+    for key in positionKey:
+        pos=positionKey[key].split(',')
+        # cct.get_window_pos('sina_Market-DurationUP.py')
+        cct.reset_window_pos(key,pos[0],pos[1],pos[2],pos[3])
 
-cct.get_terminal_Position(cmd=cct.scriptquit, position=None, close=False)
-# getPosition('Johnson —',close=True)
-# getPosition('Johnson —',close=True)
-# getPosition('Johnson — python',close=True)
-# getPosition('Johnson — osasc',close=True)
-print getPosition('Johnson — python',close=True)
+    # pos=cct.terminal_positionKey_triton['sina_Market-DurationDn.py'].split(',')
+    # # print pos
+    # # cct.get_window_pos('sina_Market-DurationUP.py')
+    # cct.reset_window_pos('sina_Market-DurationDn.py',pos[0],pos[1],pos[2],pos[3])
+
+
+
+
 '''
 
 https://stackoverflow.com/questions/8798641/close-terminal-window-from-within-shell-script-unix

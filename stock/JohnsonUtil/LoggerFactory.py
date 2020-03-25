@@ -159,6 +159,7 @@ def getLogger(name=None,logpath=None,writemode='a',show_detail=True):
      #                             backupCount=1, encoding=None, delay=0)
 
     handler = MultiprocessHandler(log_f, when='D')
+    # handler = MultiprocessHandler(log_f, when='S')
 
 
     # fh_formatter = logging.Formatter( '%(filename)s(%(funcName)s:%(lineno)s):%(levelname)-5s %(message)s');
