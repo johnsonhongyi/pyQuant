@@ -123,6 +123,27 @@ def reset_window_pos(targetTitle,posx=1026,posy=699,width=900,height=360):
             # win32gui.SetWindowPos(hwnd, win32con.HWND_TOPMOST, 330,678,600,600, win32con.SWP_SHOWWINDOW)
             win32gui.MoveWindow(hwnd,posx, posy, width, height,True)  #108,19
 
+def get_window_hwnd(targetTitle):
+    hWndList = []  
+    win32gui.EnumWindows(lambda hWnd, param: param.append(hWnd), hWndList)
+    hwnd = None  
+    for hwnd in hWndList:
+        clsname = win32gui.GetClassName(hwnd)
+        title = win32gui.GetWindowText(hwnd)
+        if (title.find(targetTitle) >= 0): 
+            return hwnd
+
+def set_hwnd_backgroud(targetTitle):
+    hwnd = get_window_hwnd(targetTitle)
+    if hwnd is not None:
+        win32gui.SetBkMode(hwnd, win32con.TRANSPARENT)
+        print("ok")
+import time
+while 1:
+    set_hwnd_backgroud('single')
+    time.sleep(2)
+    # reset_window_pos("single")
+    print"."
 # reset_window_pos("single",width=900,height=360)
 
 # import sys

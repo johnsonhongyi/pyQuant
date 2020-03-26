@@ -296,12 +296,12 @@ terminal_positionKey_VM = {'sina_Market-DurationDn.py': '342, 397',
                         'singleAnalyseUtil.py': '615, 23',
                         'LinePower.py': '6, 216', }
 
-terminal_positionKey_triton = {'sina_Market-DurationDn.py': '-4, 718,1320,460',
-                        'sina_Market-DurationCXDN.py': '23, 634,1320,460',
-                        'sina_Market-DurationSH.py': '-29, 623,1320,460',
-                        'sina_Market-DurationUP.py': '54, 574,1320,460',
-                        'sina_Monitor-Market-LH.py': '666, 338,1320,460',
-                        'sina_Monitor-Market.py': '19, 179,1320,460',
+terminal_positionKey_triton = {'sina_Market-DurationDn.py': '-4, 718,1360,460',
+                        'sina_Market-DurationCXDN.py': '23, 634,1360,460',
+                        'sina_Market-DurationSH.py': '-29, 623,1360,460',
+                        'sina_Market-DurationUP.py': '54, 574,1360,460',
+                        'sina_Monitor-Market-LH.py': '666, 338,1360,460',
+                        'sina_Monitor-Market.py': '19, 179,1360,460',
                         'sina_Monitor.py': '87, 489,1320,460',
                         'singleAnalyseUtil.py': '1134, 690,880,360',
                         'LinePower.py': '1031, 682,800,420', }
@@ -335,7 +335,6 @@ def get_terminal_Position(cmd=None, position=None, close=False, retry=False):
     win_count = 0
     if get_os_system() == 'mac':
         import subprocess
-
         def cct_doScript(scriptn):
             proc = subprocess.Popen(['osascript', '-'],
                                     stdin=subprocess.PIPE,
@@ -723,7 +722,15 @@ def set_console(width=80, height=15, color=3, title=None, closeTerminal=True):
 
     if closeTerminal:
         # get_terminal_Position(cmd=scriptquit, position=None, close=False)
-        get_terminal_Position(position=filename)
+        if isMac():
+            get_terminal_Position(position=filename)
+        else:
+            title= (os.path.basename(sys.argv[0]))
+            pos=terminal_positionKey_triton[title].split(',')
+            # cct.get_window_pos('sina_Market-DurationUP.py')
+            # cct.reset_window_pos(key,pos[0],pos[1],pos[2],pos[3])
+            reset_window_pos(title,pos[0],pos[1],pos[2],pos[3])
+        # (os.path.basename(sys.argv[0]))
         # get_terminal_Position(clean_terminal[1], close=True)
 
 
