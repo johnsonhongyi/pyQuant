@@ -3235,7 +3235,7 @@ def compute_top10_count(df,lastdays=ct.compute_lastdays,top_limit=ct.per_redline
 
     df['top10']=temp.T[temp.T >=9.9].count()        #涨停个数
 
-    # df['topU']=temp.T[temp.T >= top_limit].count()  #0.8 上涨个数
+    # df['topU']=temp.T[temp.T >= top_limit].count()  #0.8 上涨个数  compute_upper_cross
     # df['topR']=temp_du.T[temp_du.T >= 0].count()    #跳空缺口
     # df['top0']=temp_du.T[temp_du.T == 0].count()    #一字涨停
     # df['upper'] = map(lambda x: round((1 + 11.0 / 100) * x, 1), df.ma10d)

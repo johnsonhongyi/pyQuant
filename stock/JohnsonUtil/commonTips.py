@@ -302,7 +302,7 @@ terminal_positionKey_triton = {'sina_Market-DurationDn.py': '-4, 718,1360,460',
                         'sina_Market-DurationUP.py': '54, 574,1360,460',
                         'sina_Monitor-Market-LH.py': '666, 338,1360,460',
                         'sina_Monitor-Market.py': '19, 179,1360,460',
-                        'sina_Monitor.py': '87, 489,1320,460',
+                        'sina_Monitor.py': '87, 489,1350,460',
                         'singleAnalyseUtil.py': '1134, 690,880,360',
                         'LinePower.py': '1031, 682,800,420', }
 
@@ -686,6 +686,26 @@ def set_clear_logtime(time_t=1):
     logtime = get_config_value_ramfile(fname)
     write_t = get_config_value_ramfile(fname,currvalue=time_t,xtype='time',update=True)
 
+
+#将字典里的键全部由大写转换为小写
+def capital_to_lower(dict_info):
+    new_dict = {}
+    for i, j in dict_info.items():
+        new_dict[i.lower()] = j
+    return new_dict
+
+    # before_dict = {'ABC': 'python', 'DEF': 'java', 'GHI': 'c', 'JKL': 'go'}
+    # print capital_to_lower(before_dict)
+
+#将字典里的键全部由小写转换为大写
+
+def lower_to_capital(dict_info):
+    new_dict = {}
+    for i, j in dict_info.items():
+        new_dict[i.upper()] = j
+    return new_dict
+
+
 def set_console(width=80, height=15, color=3, title=None, closeTerminal=True):
     # mode con cp select=936
     # os.system("mode con: cols=%s lines=%s"%(width,height))
@@ -725,11 +745,16 @@ def set_console(width=80, height=15, color=3, title=None, closeTerminal=True):
         if isMac():
             get_terminal_Position(position=filename)
         else:
-            title= (os.path.basename(sys.argv[0]))
-            pos=terminal_positionKey_triton[title].split(',')
-            # cct.get_window_pos('sina_Market-DurationUP.py')
-            # cct.reset_window_pos(key,pos[0],pos[1],pos[2],pos[3])
-            reset_window_pos(title,pos[0],pos[1],pos[2],pos[3])
+            
+            title= (os.path.basename(sys.argv[0])).lower()
+            positionKey=capital_to_lower(terminal_positionKey_triton)
+            if title in positionKey.keys():
+                pos=positionKey[title].split(',')
+                # cct.get_window_pos('sina_Market-DurationUP.py')
+                # cct.reset_window_pos(key,pos[0],pos[1],pos[2],pos[3])
+                reset_window_pos(title,pos[0],pos[1],pos[2],pos[3])
+            else:
+                log.error("%s not in terminal_positionKey_triton"%(title))
         # (os.path.basename(sys.argv[0]))
         # get_terminal_Position(clean_terminal[1], close=True)
 
@@ -749,7 +774,7 @@ def cct_raw_input(sts):
     # print sts
     if GlobalValues().getkey('Except_count') is None:
         GlobalValues().setkey('Except_count', 0)
-    st = None
+    st = ''
     try:
         st = raw_input(sts)
     except (KeyboardInterrupt) as e:

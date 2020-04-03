@@ -145,6 +145,8 @@ if __name__ == "__main__":
             # top_now = tdd.getSinaAlldf(market='all', vol=ct.json_countVol, vtype=ct.json_countType)
             market_blk = '次新股'
             top_now = tdd.getSinaAlldf(market=market_blk,filename='cxg', vol=ct.json_countVol, vtype=ct.json_countType)
+            # top_now = tdd.getSinaAlldf(market='all', vol=ct.json_countVol, vtype=ct.json_countType)
+            
             now_count = len(top_now)
             radio_t = cct.get_work_time_ratio()
             # top_now = top_now[top_now.buy > 0]

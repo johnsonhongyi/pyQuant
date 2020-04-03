@@ -224,8 +224,14 @@ if __name__ == "__main__":
                     # if cct.get_now_time_int() > 1030 and cct.get_now_time_int() < 1400:
                     #     top_all = top_all[(top_all.volume > ct.VolumeMinR) & (
                     #         top_all.volume < ct.VolumeMaxR)]
+                    
+                if st_key_sort.split()[0] == '4' and 915 < cct.get_now_time_int() < 1000:
+                    top_all['dff'] = (map(lambda x, y: round((x - y) / y * 100, 1),
+                                          top_all['buy'].values, top_all['llastp'].values))
+                    top_all['dff2'] = (map(lambda x, y: round((x - y) / y * 100, 1),
+                                          top_all['buy'].values, top_all['lastp'].values))
 
-                if st_key_sort.split()[0] == '4' and 926 < cct.get_now_time_int() < 1455 and 'lastbuy' in top_all.columns:
+                elif st_key_sort.split()[0] == '4' and 926 < cct.get_now_time_int() < 1455 and 'lastbuy' in top_all.columns:
 
                         
                     top_all['dff'] = (map(lambda x, y: round((x - y) / y * 100, 1),
@@ -265,6 +271,10 @@ if __name__ == "__main__":
                 # top_temp = top_all.copy()
                 # top_temp =  top_all[(top_all.boll < 1) &(top_all.df2 >0) &(top_all.close > top_all.max5)]
 
+
+
+
+                '''
                 if cct.get_now_time_int() > 830 and cct.get_now_time_int() <= 935:
                     top_temp = top_all[ (top_all.low >= top_all.lastl1d) & (top_all.lasth1d > top_all.lasth2d) & (top_all.close > top_all.lastp1d)] 
                     # top_temp =  top_all[( ((top_all.top10 >0) | (top_all.boll >0)) & (top_all.lastp1d > top_all.ma5d) & (top_all.close > top_all.lastp1d))]
@@ -291,9 +301,27 @@ if __name__ == "__main__":
                         top_temp = top_all[ (top_all.volume >= 1.2 ) & (top_all.low >= top_all.lastl1d) & (top_all.lasth1d > top_all.lasth2d) & (top_all.low >= top_all.nlow) & ((top_all.open >= top_all.nlow *0.99) & (top_all.open <= top_all.nlow*1.01)) ]
                     else:
                         top_temp = top_all[ (top_all.volume >= 1.2 ) & (top_all.low >= top_all.lastl1d) & (top_all.lasth1d > top_all.lasth2d) & (top_all.close > top_all.lastp1d)] 
-
                 else:
                     top_temp = top_all.copy()
+                '''
+
+                if cct.get_now_time_int() > 830 and cct.get_now_time_int() <= 935:
+                    top_temp = top_all[ ((top_all.topU > 0 ) | (top_all.top10 > 0) | (top_all.topR > 0) | (top_all.top0 > 0)) & (top_all.lastl1d > top_all.ma5d)] 
+                elif cct.get_now_time_int() > 935 and cct.get_now_time_int() <= 1100:
+                    if 'nlow' in top_all.columns:  
+                        top_temp = top_all[ ((top_all.topU > 0 ) | (top_all.top10 > 0) | (top_all.topR > 0) | (top_all.top0 > 0)) & ((top_all.lastl1d > top_all.ma5d) &  (top_all.low >= top_all.ma5d) & (top_all.low >= top_all.nlow))] 
+                    else:
+                         top_temp = top_all[ ((top_all.topU > 0 ) | (top_all.top10 > 0) | (top_all.topR > 0) | (top_all.top0 > 0)) & ((top_all.lastl1d > top_all.ma5d) &  (top_all.low >= top_all.ma5d))]
+                        # top_temp = top_all[ (top_all.volume >= 1.2 ) & (top_all.low >= top_all.lastl1d) & (top_all.lasth1d > top_all.lasth2d) & ((top_all.lastl1d > top_all.ma5d) &  (top_all.low >= top_all.ma5d))] 
+                else:
+                    # top_temp = top_all[ (top_all.volume >= 1.2 ) & (top_all.low >= top_all.lastl1d) & (top_all.lasth1d > top_all.lasth2d) & ((top_all.lastl1d > top_all.ma5d) &  (top_all.low >= top_all.ma5d))] 
+                    if 'nlow' in top_all.columns:  
+                        top_temp = top_all[ ((top_all.topU > 0 ) | (top_all.top10 > 0) | (top_all.topR > 0) | (top_all.top0 > 0)) & ((top_all.lastl1d > top_all.ma5d) &  (top_all.low >= top_all.ma5d) & (top_all.low >= top_all.nlow))] 
+                    else:
+                         top_temp = top_all[ ((top_all.topU > 0 ) | (top_all.top10 > 0) | (top_all.topR > 0) | (top_all.top0 > 0)) & ((top_all.lastl1d > top_all.ma5d) &  (top_all.low >= top_all.ma5d))]
+
+
+
 
 
                 # dd =top_all[(top_all.boll >0) &(top_all.df2 >0) &(top_all.low >= top_all.ma20d) &(top_all.low <= top_all.ma20d *1.05)]
