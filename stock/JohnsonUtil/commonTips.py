@@ -772,8 +772,12 @@ def get_delay_time():
 
 def cct_raw_input(sts):
     # print sts
+    if sys.getrecursionlimit() < 2000:
+        sys.setrecursionlimit(2000)
     if GlobalValues().getkey('Except_count') is None:
         GlobalValues().setkey('Except_count', 0)
+        log.info("recursionlimit:%s"%(sys.getrecursionlimit()))
+
     st = ''
     try:
         st = raw_input(sts)
@@ -788,12 +792,12 @@ def cct_raw_input(sts):
             return ''
     except (IOError, EOFError, Exception) as e:
         count_Except = GlobalValues().getkey('Except_count')
-        if count_Except is not None and count_Except < 4:
+        if count_Except is not None and count_Except < 3:
             GlobalValues().setkey('Except_count', count_Except + 1)
             print "cct_raw_input:ExceptionError:%s count:%s" % (e, count_Except)
         else:
             print "cct_ExceptionError:%s count:%s" % (e, count_Except)
-            sys.exit(0)
+            sys.exit()
     return st
 
 # eval_rule = "[elem for elem in dir() if not elem.startswith('_') and not elem.startswith('ti')]"

@@ -455,6 +455,7 @@ if __name__ == "__main__":
                 raise KeyboardInterrupt("StopTime")
         except (KeyboardInterrupt) as e:
             # st = cct.cct_raw_input("status:[go(g),clear(c),[d 20150101 [l|h]|[y|n|pn|py],quit(q),W(a),sh]:")
+            # print sys.getrecursionlimit()
             st = cct.cct_raw_input(ct.RawMenuArgmain() % (market_sort_value))
 
             if len(st) == 0:
