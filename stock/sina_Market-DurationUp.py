@@ -100,15 +100,15 @@ if __name__ == "__main__":
     ptype = 'low'
     # op, ra, duration_date, days = pct.get_linear_model_status('999999', filter='y', dl=dl, ptype=ptype, days=1)
     # duration_date = int(ct.duration_date * 1.5)
-    duration_date = ct.duration_date_up
-    # duration_date = ct.duration_date_l
+    # duration_date = ct.duration_date_up
+    duration_date = ct.duration_date_l
     # duration_date = 10
 #    duration_date = 120
     # duration_date = 300
     du_date = duration_date
     # resample = ct.resample_dtype
-    resample = 'w'
-    # resample = 'd'
+    # resample = 'w'
+    resample = 'd'
     end_date = None
     ptype = 'low'
     filter = 'y'
@@ -145,6 +145,7 @@ if __name__ == "__main__":
             # top_now = tdd.getSinaAlldf(market='060.blk', vol=ct.json_countVol, vtype=ct.json_countType)
             # market_blk = '次新股'
             market_blk = 'all'
+            # market_blk = 'cyb'
             # market_blk = '060'
             top_now = tdd.getSinaAlldf(
                 market=market_blk, filename='cxg', vol=ct.json_countVol, vtype=ct.json_countType)

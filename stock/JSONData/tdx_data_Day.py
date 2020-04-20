@@ -1066,6 +1066,7 @@ def get_tdx_append_now_df_api(code, start=None, end=None, type='f', df=None, dm=
 
 
 def get_tdx_append_now_df_api_tofile(code, dm=None, newdays=0, start=None, end=None, type='f', df=None, dl=5, power=True):
+    #补数据power = false
     start = cct.day8_to_day10(start)
     end = cct.day8_to_day10(end)
     if df is None:
@@ -1524,7 +1525,8 @@ def Write_tdx_all_to_hdf(market, h5_fname='tdx_all_df', h5_table='all', dl=300, 
         Write_tdx_all_to_hdf(index_key, h5_fname=h5_fname, h5_table=h5_table, dl=dl, index=True,rewrite = rewrite)
         index = False
         rewrite = False
-        market = ['cyb', 'sh', 'sz']
+        market = ['all']
+        # market = ['cyb', 'sh', 'sz']
     if not isinstance(market, list):
         mlist = [market]
     else:
@@ -1815,7 +1817,9 @@ def Write_market_all_day_mp(market='all', rewrite=False):
     # start=dd.date
     # index_ts = get_kdate_data('sh',start=start)
     if market == 'all':
-        mlist = ['sh', 'sz', 'cyb']
+        mlist = ['all']
+        # mlist = ['sh', 'sz', 'cyb']
+        # sina_data.Sina().all
     else:
         mlist = [market]
     # if len(index_ts) > 1:
@@ -2551,12 +2555,11 @@ def dataframe_mode_round(df):
             break
     return df_mode
 
-def compute_perd_df(dd,lastdays=3):
+def compute_perd_df(dd,lastdays=3,resample='d'):
     df = dd[-(lastdays+1):].copy()
     df['perlastp'] = map(cct.func_compute_percd2, df['close'], df['close'].shift(1), df['open'], df['open'].shift(1), df['high'].shift(1), df['low'].shift(1), df['high'], df['low'],df['vol'],df['vol'].shift(1),df['upper'])
     df['perd'] = ((df['close'] - df['close'].shift(1)) / df['close'].shift(1) * 100).map(lambda x: round(x, 1))
     # df['perd'] = ((df['low'] - df['low'].shift(1)) / df['close'].shift(1) * 100).map(lambda x: round(x, 1))
-
     df = df.dropna()
     # df['red'] = ((df['close'] - df['open']) / df['close'] * 100).map(lambda x: round(x, 1))
     df['lastdu'] = ((df['high'] - df['low']) / df['close'] * 100).map(lambda x: round(x, 1))
@@ -2595,9 +2598,13 @@ def compute_perd_df(dd,lastdays=3):
 
     dd['topR']=temp_du.T[temp_du.T >= 0].count()    #跳空缺口
     dd['top0']=temp_du.T[temp_du.T == 0].count()    #一字涨停
+    if resample == 'd':
+        df['perd'] = df['perd'].apply(lambda x: round(x, 1) if ( x < 9.85)  else 10.0)
 
-    df['perd'] = df['perd'].apply(lambda x: round(x, 1) if ( x < 9.85)  else 10.0)
     dd['perd'] = df['perd']
+    dd.fillna(ct.FILLNA,inplace=True)
+    #fillna -101
+
     # print dataframe_mode_round(df.high)
     # print dataframe_mode_round(df.low)
 
@@ -2696,7 +2703,7 @@ def compute_lastdays_percent(df=None, lastdays=3, resample='d',vc_radio=100):
         dd = compute_ma_cross(df)
         dd = compute_upper_cross(df)
 
-        df = compute_perd_df(df,lastdays=lastdays)
+        df = compute_perd_df(df,lastdays=lastdays,resample=resample)
         df['vchange'] = ((df['vol'] - df['vol'].shift(1)) / df['vol'].shift(1) * 100).map(lambda x: round(x, 1))
         df = df.fillna(0)
         df['vcra'] = len(df[df.vchange > vc_radio])
@@ -3215,15 +3222,18 @@ def get_single_df_lastp_to_df(top_all, lastpTDX_DF=None, dl=ct.PowerCountdl, end
     return top_all
 
 def compute_jump_du_count(df,lastdays=ct.compute_lastdays):
+
     df = df[(df.op > -1) & (df.boll > -1)]
     temp=df[df.columns[(df.columns >= 'per1d') & (df.columns <= 'per%sd'%(lastdays))]]
     
     tpp =temp[temp >9.9].count()
+    # temp[temp >9.9].per1d.dropna(how='all')
     idxkey= tpp[ tpp ==tpp.min()].index.values[0]
     perlist = temp.columns[temp.columns <= idxkey][-2:].values.tolist()
     if len(perlist) >=2:
         # codelist= temp[ ((temp[perlist[0]] >9) &(temp[perlist[1]] > 9)) | (temp[perlist[1]] > 9) ].index.tolist()
         codelist= temp[ ((temp[perlist[0]] >9)) & (temp[perlist[1]] > 9) ].index.tolist()
+        # temp[ ((temp[perlist[0]] >9)) & (temp[perlist[1]] > 9) | ((temp[perlist[0]] >9)) & (temp[perlist[1]] > 0)].shape
     else:
         codelist= temp[ (temp[perlist[0]] >9.9)].index.tolist()
     return codelist
@@ -3302,6 +3312,7 @@ def get_append_lastp_to_df(top_all, lastpTDX_DF=None, dl=ct.PowerCountdl, end=No
             #             tdxdata = pd.concat([tdxdata, tdx_diff],axis=0)
 
             # tdxdata.rename(columns={'close': 'llow'}, inplace=True)
+            
             tdxdata.rename(columns={'open': 'lopen'}, inplace=True)
             tdxdata.rename(columns={'high': 'lhigh'}, inplace=True)
             tdxdata.rename(columns={'close': 'lastp'}, inplace=True)
@@ -3843,7 +3854,9 @@ if __name__ == '__main__':
     code='600604'
     code='002175'
     code='603000'
-    code='000723'
+    code='688020'
+    code='300201'
+    # code='000800'
     # code='000990'
     # code='600299'
     # code='002606'
@@ -3858,15 +3871,25 @@ if __name__ == '__main__':
     # code = '603486'
     # code = '999999'
     # df2 = get_tdx_Exp_day_to_df(code,dl=160, end=None, newdays=0, resample='w')
+    resample = 'w'
+    # df2 = get_tdx_Exp_day_to_df(code,dl=160, end=None, newdays=0, resample='d')
+    df = get_tdx_exp_low_or_high_power(code, dl=30, newdays=0, resample=resample)
+    df3 =  get_tdx_exp_all_LastDF_DL([code],  dt=60, ptype='low', filter='y', power=ct.lastPower, resample=resample)
+
+    import ipdb;ipdb.set_trace()
+
+    df3 = get_tdx_append_now_df_api_tofile(code,newdays=0, start=None, end=None, type='f', df=None, dl=10, power=False)
+
+    # type D:\MacTools\WinTools\new_tdx\T0002\export\forwardp\SH688020.txt
 
 
-    Write_market_all_day_mp('all')
+    # Write_market_all_day_mp('all')
 
 
     # print df2.shape,df2.cumin
     # print get_kdate_data('000859', start='2019-01-01', end='', ktype='D')
     # write_tdx_tushare_to_file(code)
-    # df = get_tdx_exp_low_or_high_power(code, dl=30, newdays=0, resample='d')
+   
     df = get_tdx_Exp_day_to_df(code, dl=ct.PowerCountdl,end=None, newdays=0, resample='d')
     # print df.perc1d[-1:],df.perc2d[-1:],df.perc3d[-1:],df.perc4d[-1:],df.perc5d[-1:]
     # print df[df.columns[(df.columns >= 'perc1d') & (df.columns <= 'perc%sd'%(9))]][:1]

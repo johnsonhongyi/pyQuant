@@ -29,6 +29,7 @@ DD_VOL_List = {'0': '40000', '1': '100000',
                '2': '100000', '3': '200000', '4': '1000000'}
 # LvolumeSize = 125000
 tqdm_mininterval=2
+FILLNA = -101
 ncols = 60
 per_redline = 0.5
 LvolumeSize = 12500
