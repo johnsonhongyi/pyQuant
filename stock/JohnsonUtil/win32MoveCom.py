@@ -108,7 +108,7 @@ def get_window_pos(targetTitle):
             # win32gui.SetWindowPos(hwnd, win32con.HWND_TOPMOST, 330,678,600,600, win32con.SWP_SHOWWINDOW)
             # win32gui.MoveWindow(hwnd,1026, 699, 900, 360,True)  #108,19
 
-def reset_window_pos(targetTitle,posx=1026,posy=699,width=900,height=360):
+def reset_window_pos2(targetTitle,posx=1026,posy=699,width=900,height=360):
 
     hWndList = []  
     win32gui.EnumWindows(lambda hWnd, param: param.append(hWnd), hWndList)  

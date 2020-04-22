@@ -650,18 +650,20 @@ def get_window_pos(targetTitle):
 def reset_window_pos(targetTitle,posx=1026,posy=699,width=900,height=360):
 
     hWndList = []  
-    win32gui.EnumWindows(lambda hWnd, param: param.append(hWnd), hWndList)  
+    win32gui.EnumWindows(lambda hWnd, param: param.append(hWnd), hWndList)
+    status=0  
     for hwnd in hWndList:
         clsname = win32gui.GetClassName(hwnd)
         title = win32gui.GetWindowText(hwnd)
-        if (title.find(targetTitle) >= 0):    #调整目标窗口到坐标(600,300),大小设置为(600,600)
+        if (title.find(targetTitle) == 0):    #调整目标窗口到坐标(600,300),大小设置为(600,600)
             rect1 = win32gui.GetWindowRect(hwnd)
             # rect2 = get_window_rect(hwnd)
             log.debug("targetTitle:%s rect1:%s rect2:%s"%(title,rect1,rect1))
             # win32gui.SetWindowPos(hwnd, win32con.HWND_TOPMOST, 330,678,600,600, win32con.SWP_SHOWWINDOW)
             # win32gui.SetWindowPos(hwnd, win32con.HWND_TOPMOST, 330,678,600,600, win32con.SWP_SHOWWINDOW)
             win32gui.MoveWindow(hwnd,int(posx), int(posy), int(width), int(height),True)  #108,19
-
+            status +=1
+    return status
 
 def set_ctrl_handler():
     # os.environ['FOR_DISABLE_CONSOLE_CTRL_HANDLER'] = '1'
@@ -746,13 +748,14 @@ def set_console(width=80, height=15, color=3, title=None, closeTerminal=True):
             get_terminal_Position(position=filename)
         else:
             
-            title= (os.path.basename(sys.argv[0])).lower()
+            title= (os.path.basename(sys.argv[0]))
             positionKey=capital_to_lower(terminal_positionKey_triton)
-            if title in positionKey.keys():
-                pos=positionKey[title].split(',')
+            if title.lower() in positionKey.keys():
+                pos=terminal_positionKey_triton[title].split(',')
                 # cct.get_window_pos('sina_Market-DurationUP.py')
                 # cct.reset_window_pos(key,pos[0],pos[1],pos[2],pos[3])
-                reset_window_pos(title,pos[0],pos[1],pos[2],pos[3])
+                status=reset_window_pos(title,pos[0],pos[1],pos[2],pos[3])
+                log.debug("reset_window_pos-status:%s"%(status))
             else:
                 log.error("%s not in terminal_positionKey_triton"%(title))
         # (os.path.basename(sys.argv[0]))
