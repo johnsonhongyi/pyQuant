@@ -262,14 +262,17 @@ def get_dfcfw_fund_SHSZ(url=ct.DFCFW_ZS_SHSZ):
 def get_dfcfw_rzrq_SHSZ(url=ct.DFCFW_RZYE):
     data = {}
     log.info("rzrq:%s"%(ct.DFCFW_RZYE))
-    rzdata = cct.get_url_data(url)
+
+    # rzdata = cct.get_url_data(url)
+    rzdata = cct.get_url_data_R(url)
     # import pdb;pdb.set_trace()
     rzdata = rzdata.replace(':"-"',':0.1')
     rz_dic = re.findall('{"tdate"[\D\d]+?}', rzdata.encode('utf8'))
     rzdict=[eval(x) for x in rz_dic ]
     df=pd.DataFrame(rzdict,columns=ct.dfcfw_rzye_columns)
-    df.tdate = df.tdate.apply(lambda x:x[:10])
+    df.tdate=df.tdate.apply(lambda x: x[:10])
     df = df.set_index('tdate')
+    # df.index = pd.to_datetime(df.index,format='%Y-%m-%d')
     df.rename(columns={'rzye_hs': 'all'}, inplace=True)
     df.rename(columns={'rzye_h': 'sh'}, inplace=True)
     df.rename(columns={'rzye_s': 'sz'}, inplace=True)
@@ -280,11 +283,13 @@ def get_dfcfw_rzrq_SHSZ(url=ct.DFCFW_RZYE):
     # yestoday = cct.last_tddate(1)
     # log.debug(today)
     # beforeyesterday =  cct.last_tddate(days=2)
+
     def get_days_data(days=1,df=None):
             rzrq_status = 1
             # data=''
             da = 0
             i = 0
+            data2 = ''
             while rzrq_status:
                 for x in range(days, 20):
                     yestoday = cct.last_tddate(x)
@@ -313,7 +318,13 @@ def get_dfcfw_rzrq_SHSZ(url=ct.DFCFW_RZYE):
         data['shrz'] = round(data1.loc['sh'] - data2.loc['sh'], 2)
         data['szrz'] = round(data1.loc['sz'] - data2.loc['sz'], 2)
     else:
+        log.error("df.index:%s"%(df.index.values[0]))
         data['dff'] = 'error'
+        data['all'] = 0
+        data['sh'] = 0
+        data['sz'] = 0
+        data['shrz'] = 0
+        data['szrz'] = 0
     if len(data) == 0:
         log.error("Fund_f NO Url:%s" % url)
     return data
