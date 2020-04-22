@@ -1235,12 +1235,12 @@ def get_url_data_R(url, timeout=30):
         data = ''
 
         log.error('socket timed out error:%s - URL %s ' % (e, url))
-        sleeprandom(60)
+        sleeprandom(120)
     except Exception as e:
         data = ''
         log.error('url Exception Error:%s - URL %s ' % (e, url))
-
-        sleeprandom(60)
+        # sleeprandom(60)
+        sleep(300)
     else:
         log.info('Access successful.')
     return data

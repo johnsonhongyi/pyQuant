@@ -168,7 +168,7 @@ if __name__ == "__main__":
                     top_all, lastpTDX_DF = tdd.get_append_lastp_to_df(
                         top_now, lastpTDX_DF=None, dl=duration_date, end=end_date, ptype=ptype, filter=filter, power=ct.lastPower, lastp=False, resample=resample)
                     log.debug("len:%s" % (len(top_all)))
-                    top_list = tdd.compute_jump_du_count(top_all)
+                    top_list = tdd.compute_jump_du_count(top_all,resample=resample)
 
                 elif len(top_all) == 0 and len(lastpTDX_DF) > 0:
                     top_all = top_now

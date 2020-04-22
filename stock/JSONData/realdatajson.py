@@ -76,8 +76,27 @@ def _parsing_Market_price_json(url):
     # url='http://vip.stock.finance.sina.com.cn/quotes_service/api/json_v2.php/Market_Center.getHQNodeData?page=1&num=20&sort=changepercent&asc=0&node=cyb&symbol='
     text = cct.get_url_data_R(url)
     # text = cct.get_url_data(url)
+
     if text == 'null':
         return None
+
+    # text = text.replace('"{symbol', '{"symbol')
+    # text = text.replace('{symbol', '{"symbol"')
+    text = text.replace('changepercent', 'percent')
+    text = text.replace('turnoverratio', 'ratio')
+    # text.decode('unicode-escape')
+    js=json.loads(text,encoding='GBK')
+    # df = pd.DataFrame(pd.read_json(js, dtype={'code':object}),columns=ct.MARKET_COLUMNS)
+    log.debug("Market json:%s"%js[0])
+    df = pd.DataFrame(js,columns=ct.SINA_Market_COLUMNS)
+
+
+
+
+
+
+    ### 20200422 problem : pd
+    '''
     reg = re.compile(r'\,(.*?)\:')
     text = reg.sub(r',"\1":', text.decode('gbk') if ct.PY3 else text)
     text = text.replace('"{symbol', '{"symbol')
@@ -95,7 +114,13 @@ def _parsing_Market_price_json(url):
     # log.debug("Market json:%s"%js[:1])
     df = pd.DataFrame(pd.read_json(js, dtype={'code': object}),
                       columns=ct.SINA_Market_COLUMNS)
-    # print df[:1]
+
+    '''
+
+
+
+
+
     # df = df.drop('symbol', axis=1)
     df = df.ix[df.volume >= 0]
     # print type(df)
@@ -209,7 +234,10 @@ def get_sina_Market_json(market='all', showtime=True, num='100', retry_count=3, 
     # df = df.append(data, ignore_index=True)
 
     # results = cct.to_mp_run(_parsing_Market_price_json, url_list)
+    # urltest ='http://vip.stock.finance.sina.com.cn/quotes_service/api/json_v2.php/Market_Center.getHQNodeData?page=1&num=100&sort=changepercent&asc=0&node=sh_a&symbol='
+
     if len(url_list) > 0:
+        log.debug("cct.to_asyncio_run:_parsing_Market_price_json:%s"%(url_list[0]))
         results = cct.to_asyncio_run(url_list, _parsing_Market_price_json)
     else:
         results = []
@@ -218,8 +246,9 @@ def get_sina_Market_json(market='all', showtime=True, num='100', retry_count=3, 
         # df['volume']= df['volume'].apply(lambda x:x/100)
         # print df.columns
         if 'ratio' in df.columns:
-            df['ratio']=df['ratio'].apply(lambda x:round(x,1))
-        df['percent']=df['percent'].apply(lambda x:round(x,2))
+            df['ratio']=df['ratio'].apply(lambda x:round(float(x),1))
+
+        df['percent']=df['percent'].apply(lambda x:round(float(x),2))
 #        if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 926:
 #            df = df[(df.buy > 0)]
 #        else:
@@ -425,6 +454,23 @@ def _parsing_sina_dd_price_json(url):
     # return text
     if len(text) < 10:
         return ''
+
+
+    #2020 new json
+    text = text.replace('symbol', 'code')
+    # text = text.replace('turnoverratio', 'ratio')
+    # text.decode('unicode-escape')
+    js=json.loads(text,encoding='GBK')
+    # df = pd.DataFrame(pd.read_json(js, dtype={'code':object}),columns=ct.MARKET_COLUMNS)
+    log.debug("parsing_sina_dd:%s"%js[0])
+    df = pd.DataFrame(js,columns=ct.DAY_REAL_DD_COLUMNS)
+
+
+
+
+
+    #20200422 problem json
+    '''
     reg = re.compile(r'\,(.*?)\:')
     text = reg.sub(r',"\1":', text.decode('gbk') if ct.PY3 else text)
     text = text.replace('"{symbol', '{"code')
@@ -438,6 +484,9 @@ def _parsing_sina_dd_price_json(url):
     js = json.loads(jstr)
     df = pd.DataFrame(pd.read_json(js, dtype={'code': object}),
                       columns=ct.DAY_REAL_DD_COLUMNS)
+    '''
+
+
     df = df.drop('symbol', axis=1)
     df = df.ix[df.volume > 0]
     # print ""
@@ -755,7 +804,7 @@ def get_market_price_sina_dd_realTime(dp='',vol='0',type='0'):
         dp=dp.dropna('index')
         # if dp[:1].volume.values >0:
         # log.debug("dp.volume>0:%s"%dp[:1].volume.values)
-        # dp['volume']=dp['volume'].apply(lambda x:round(x/100,1))
+        # dp['volume']=dp['volume'].apply(lambda x:round(float(x)/100,1))
         # dp=dp.loc[:,'trade':].astype(float)
         log.info("DP:%s" % dp[:1].open)
 
@@ -768,6 +817,7 @@ def get_market_price_sina_dd_realTime(dp='',vol='0',type='0'):
         # dp.loc[dp.percent>9.9,'percent']=10
 
         dp['dff']=0
+        
         df=get_sina_all_json_dd(vol,type)
 
         if len(df)>5:
@@ -807,6 +857,7 @@ def get_market_price_sina_dd_realTime(dp='',vol='0',type='0'):
     else:
         dm=''
     # print type(dm)
+
     return dm
 
 
@@ -822,6 +873,11 @@ if __name__ == '__main__':
     # print df.couts.sum()
     # df = get_market_price_sina_dd_realTime(dp='', vol='1', type='0')
     # print df
+    urltemp ='http://vip.stock.finance.sina.com.cn/quotes_service/api/json_v2.php/Market_Center.getHQNodeData?page=1&num=100&sort=changepercent&asc=0&node=sh_a&symbol='
+
+    _parsing_Market_price_json(urltemp)
+    # import ipdb;ipdb.set_trace()
+
     df = get_sina_all_json_dd(1,0,num=10000)
     print len(df)
     print "getconfigBigCount:",getconfigBigCount(count=None, write=False)
@@ -848,7 +904,6 @@ if __name__ == '__main__':
     # sys.exit()
     top_now = get_market_price_sina_dd_realTime(df, '2', type)
     print top_now[:1]
-    # _parsing_Market_price_json('cyb')
     # sys.exit(0)
     # dd = get_sina_all_json_dd('0', '4')
     dd = get_sina_all_json_dd('2')

@@ -2148,6 +2148,7 @@ def getSinaAlldf(market='cyb', vol=ct.json_countVol, vtype=ct.json_countType, fi
     # print 'ratio' in dm.columns
     # print time.time()-time_s
     dm['nvol'] = dm['volume']
+
     if cct.get_now_time_int() > 932 and market not in ['sh', 'sz', 'cyb']:
         dd = rl.get_sina_Market_json('all')
         if isinstance(dd, pd.DataFrame):
@@ -2166,7 +2167,7 @@ def getSinaAlldf(market='cyb', vol=ct.json_countVol, vtype=ct.json_countType, fi
         dm = cct.combine_dataFrame(dm, df.loc[:, ['name', 'ratio']])
         log.info("dm combine_df ratio:%s %s" % (len(dm), len(df))),
         dm = dm.fillna(0)
-
+        
     if market <> 'index' and (cct.get_now_time_int() > 935 or not cct.get_work_time()):
         top_now = rl.get_market_price_sina_dd_realTime(dm, vol, vtype)
     else:
@@ -3221,21 +3222,36 @@ def get_single_df_lastp_to_df(top_all, lastpTDX_DF=None, dl=ct.PowerCountdl, end
     log.debug('T:%0.2f'%(time.time()-time_s))
     return top_all
 
-def compute_jump_du_count(df,lastdays=ct.compute_lastdays):
+def compute_jump_du_count(df,lastdays=ct.compute_lastdays,resample='d'):
 
     df = df[(df.op > -1) & (df.boll > -1)]
     temp=df[df.columns[(df.columns >= 'per1d') & (df.columns <= 'per%sd'%(lastdays))]]
     
-    tpp =temp[temp >9.9].count()
-    # temp[temp >9.9].per1d.dropna(how='all')
-    idxkey= tpp[ tpp ==tpp.min()].index.values[0]
-    perlist = temp.columns[temp.columns <= idxkey][-2:].values.tolist()
-    if len(perlist) >=2:
-        # codelist= temp[ ((temp[perlist[0]] >9) &(temp[perlist[1]] > 9)) | (temp[perlist[1]] > 9) ].index.tolist()
-        codelist= temp[ ((temp[perlist[0]] >9)) & (temp[perlist[1]] > 9) ].index.tolist()
-        # temp[ ((temp[perlist[0]] >9)) & (temp[perlist[1]] > 9) | ((temp[perlist[0]] >9)) & (temp[perlist[1]] > 0)].shape
+    if resample == 'd':
+        tpp =temp[temp >9.9].count()
+        # temp[temp >9.9].per1d.dropna(how='all')
+        idxkey= tpp[ tpp ==tpp.min()].index.values[0]
+        perlist = temp.columns[temp.columns <= idxkey][-2:].values.tolist()
+        if len(perlist) >=2:
+            # codelist= temp[ ((temp[perlist[0]] >9) &(temp[perlist[1]] > 9)) | (temp[perlist[1]] > 9) ].index.tolist()
+            codelist= temp[ ((temp[perlist[0]] >9)) & (temp[perlist[1]] > 9) ].index.tolist()
+            # temp[ ((temp[perlist[0]] >9)) & (temp[perlist[1]] > 9) | ((temp[perlist[0]] >9)) & (temp[perlist[1]] > 0)].shape
+        else:
+            codelist= temp[ (temp[perlist[0]] >9.9)].index.tolist()
     else:
-        codelist= temp[ (temp[perlist[0]] >9.9)].index.tolist()
+        
+        tpp =temp[temp >9.9].count()
+        # temp[temp >9.9].per1d.dropna(how='all')
+        idxkey= tpp[ tpp ==tpp.min()].index.values[0]
+        perlist = temp.columns[temp.columns <= idxkey][-2:].values.tolist()
+        if len(perlist) >=2:
+            # codelist= temp[ ((temp[perlist[0]] >9) &(temp[perlist[1]] > 9)) | (temp[perlist[1]] > 9) ].index.tolist()
+            codelist= temp[ ((temp[perlist[0]] >9)) & (temp[perlist[1]] > 9) ].index.tolist()
+            # temp[ ((temp[perlist[0]] >9)) & (temp[perlist[1]] > 9) | ((temp[perlist[0]] >9)) & (temp[perlist[1]] > 0)].shape
+        else:
+            codelist= temp[ (temp[perlist[0]] >9.9)].index.tolist()
+
+
     return codelist
 
 def compute_top10_count(df,lastdays=ct.compute_lastdays,top_limit=ct.per_redline):
