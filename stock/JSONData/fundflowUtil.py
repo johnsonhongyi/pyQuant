@@ -259,15 +259,219 @@ def get_dfcfw_fund_SHSZ(url=ct.DFCFW_ZS_SHSZ):
 # global rzrqCount
 # rzrqCount = 1
 
+def get_dfcfw_rzrq_SHSZ2(url=ct.DFCFW_RZYE2sh):
+    data = {}
+    log.info("rzrq:%s"%(url))
+    dd = pd.DataFrame()
+    # rzdata = cct.get_url_data(url)
+    #shrzrq2
+    rzdata = cct.get_url_data_R(ct.DFCFW_RZYE2sh)
+    # rzdata = rzdata.replace('var HIoUWbQY=','')
+    # rz_dic = re.findall('{"result"[\D\d]+?}', rzdata.encode('utf8'))
+    rz_dic = re.findall('{"result":[\D\d]+.', rzdata.encode('utf8'))[0]
+    rz_dic = rz_dic.replace(';', '')
+    # ct.DFCFW_RZYE2sh
+    rzdata_dic=json.loads(rz_dic)
+    rzdata_list=(rzdata_dic['result']['data'])
+    df=pd.DataFrame(rzdata_list,columns=ct.dfcfw_rzye_columns2sh)
+    # ['DIM_DATE','RZYEZB', 'RQCHL10D', 'RQCHL3D', 'RQYE', 'RQMCL', 'RQYL', 'R]
+    # df.index = pd.to_datetime(df.index,format='%Y-%m-%d')
+    # rz_dic = re.findall('{"tdate"[\D\d]+?}', rzdata.encode('utf8'))
+    df.rename(columns={'DIM_DATE': 'tdate'}, inplace=True)
+    # RZYE->rzye_hs rzye_h none rzye_h none
+    df.rename(columns={'RZYE': 'sh'}, inplace=True)
+    # df.rename(columns={'rzye_h': 'sh'}, inplace=True)
+    # df.rename(columns={'rzye_h': 'sz'}, inplace=True)
+    df.tdate=df.tdate.apply(lambda x: x[:10])
+    df = df.set_index('tdate')
+    dd = df.loc[:,['sh']]
+
+
+
+
+    #szrzrq
+    rzdata = cct.get_url_data_R(ct.DFCFW_RZYE2sz)
+    # rzdata = rzdata.replace('var HIoUWbQY=','')
+    # rz_dic = re.findall('{"result"[\D\d]+?}', rzdata.encode('utf8'))
+    rz_dic = re.findall('{"result":[\D\d]+.', rzdata.encode('utf8'))[0]
+    rz_dic = rz_dic.replace(';', '')
+
+    # ct.DFCFW_RZYE2sh
+    rzdata_dic=json.loads(rz_dic)
+    rzdata_list=(rzdata_dic['result']['data'])
+    df=pd.DataFrame(rzdata_list,columns=ct.dfcfw_rzye_columns2sh)
+    # ['DIM_DATE','RZYEZB', 'RQCHL10D', 'RQCHL3D', 'RQYE', 'RQMCL', 'RQYL', 'R]
+    # df.index = pd.to_datetime(df.index,format='%Y-%m-%d')
+
+    # rz_dic = re.findall('{"tdate"[\D\d]+?}', rzdata.encode('utf8'))
+    df.rename(columns={'DIM_DATE': 'tdate'}, inplace=True)
+    # RZYE->rzye_hs rzye_h none rzye_h none
+    df.rename(columns={'RZYE': 'sz'}, inplace=True)
+    # df.rename(columns={'rzye_h': 'sh'}, inplace=True)
+    # df.rename(columns={'rzye_h': 'sz'}, inplace=True)
+    df.tdate=df.tdate.apply(lambda x: x[:10])
+    df = df.set_index('tdate')
+    dd = cct.combine_dataFrame(dd,df.loc[:,['sz']])
+    df = dd
+
+    df['sh'] = df['sh'].apply(lambda x:round((float(x)/1000/1000/100),2))
+    df['sz'] = df['sz'].apply(lambda x:round((float(x)/1000/1000/100),2))
+    df['all'] = map(lambda x, y: round(
+                x+y, 1), df.sh.values, df.sz.values)
+    # data=get_tzrq(url,today)
+    # yestoday = cct.last_tddate(1)
+    # log.debug(today)
+    # beforeyesterday =  cct.last_tddate(days=2)
+
+    def get_days_data(days=1,df=None):
+            rzrq_status = 1
+            # data=''
+            da = 0
+            i = 0
+            data2 = ''
+            while rzrq_status:
+                for x in range(days, 10):
+                    yestoday = cct.last_tddate(x)
+                    if yestoday in df.index:
+                        data2 = df.loc[yestoday]
+                        # log.info("yestoday:%s data:%s" % (yestoday, data2))
+                        break
+                        # print da
+                    else:
+                        log.error("%s:None" % (yestoday))
+                rzrq_status = 0
+            return data2
+            
+    data1 = get_days_data(1,df)
+    data2 = get_days_data(2,df)
+    
+    # data = df.loc[yestoday]
+    # data2 = df.loc[beforeyesterday]
+    # log.info("data1:%s,data2:%s", data1, data2)
+    if len(data2) > 0:
+        # print data1
+        data['all'] = round(data1.loc['all'], 2)
+        data['sh'] = round(data1.loc['sh'], 2)
+        data['sz'] = round(data1.loc['sz'], 2)
+        data['dff'] = round(data1.loc['all'] - data2.loc['all'], 2)
+        data['shrz'] = round(data1.loc['sh'] - data2.loc['sh'], 2)
+        data['szrz'] = round(data1.loc['sz'] - data2.loc['sz'], 2)
+    else:
+        log.error("df.index:%s"%(df.index.values[0]))
+        data['dff'] = 'error'
+        data['all'] = 0
+        data['sh'] = 0
+        data['sz'] = 0
+        data['shrz'] = 0
+        data['szrz'] = 0
+    if len(data) == 0:
+        log.error("Fund_f NO Url:%s" % url)
+
+    return data
+
+
+def get_dfcfw_rzrq_SHSZ2_(url=ct.DFCFW_RZYE2):
+    data = {}
+    log.info("rzrq:%s"%(ct.DFCFW_RZYE))
+
+    # rzdata = cct.get_url_data(url)
+    rzdata = cct.get_url_data_R(url)
+
+    # ct.DFCFW_RZYE2
+    rzdata_dic=json.loads(rzdata)
+    rzdata_list=(rzdata_dic['result']['data'])
+    df=pd.DataFrame(rzdata_list,columns=ct.dfcfw_rzye_columns2)
+    # ['DIM_DATE','RZYEZB', 'RQCHL10D', 'RQCHL3D', 'RQYE', 'RQMCL', 'RQYL', 'R]
+    # df.index = pd.to_datetime(df.index,format='%Y-%m-%d')
+    df.rename(columns={'DIM_DATE': 'tdate'}, inplace=True)
+    # RZYE->rzye_hs rzye_h none rzye_h none
+    df.rename(columns={'RZYE': 'all'}, inplace=True)
+    # df.rename(columns={'rzye_h': 'sh'}, inplace=True)
+    # df.rename(columns={'rzye_h': 'sz'}, inplace=True)
+    df.tdate=df.tdate.apply(lambda x: x[:10])
+    df = df.set_index('tdate')
+
+    import ipdb;ipdb.set_trace()
+
+    # ct.DFCFW_RZYE
+    # rzdata = rzdata.replace(':"-"',':0.1')
+    # rz_dic = re.findall('{"tdate"[\D\d]+?}', rzdata.encode('utf8'))
+    # rzdict=[eval(x) for x in rz_dic ]
+    # df=pd.DataFrame(rzdict,columns=ct.dfcfw_rzye_columns)
+    # df.tdate=df.tdate.apply(lambda x: x[:10])
+    # df = df.set_index('tdate')
+    # # df.index = pd.to_datetime(df.index,format='%Y-%m-%d')
+    # df.rename(columns={'rzye_hs': 'all'}, inplace=True)
+    # df.rename(columns={'rzye_h': 'sh'}, inplace=True)
+    # df.rename(columns={'rzye_s': 'sz'}, inplace=True)
+
+
+
+    df['all'] = df['all'].apply(lambda x:round((x/1000/1000/100),2))
+    df['sh'] = df['sh'].apply(lambda x:round((x/1000/1000/100),2))
+    df['sz'] = df['sz'].apply(lambda x:round((x/1000/1000/100),2))
+    # data=get_tzrq(url,today)
+    # yestoday = cct.last_tddate(1)
+    # log.debug(today)
+    # beforeyesterday =  cct.last_tddate(days=2)
+
+    def get_days_data(days=1,df=None):
+            rzrq_status = 1
+            # data=''
+            da = 0
+            i = 0
+            data2 = ''
+            while rzrq_status:
+                for x in range(days, 20):
+                    yestoday = cct.last_tddate(x)
+                    if yestoday in df.index:
+                        data2 = df.loc[yestoday]
+                        # log.info("yestoday:%s data:%s" % (yestoday, data2))
+                        break
+                        # print da
+                    else:
+                        log.error("%s:None" % (yestoday))
+                rzrq_status = 0
+            return data2
+            
+    data1 = get_days_data(1,df)
+    data2 = get_days_data(2,df)
+    
+    # data = df.loc[yestoday]
+    # data2 = df.loc[beforeyesterday]
+    # log.info("data1:%s,data2:%s", data1, data2)
+    if len(data2) > 0:
+        # print data2
+        print data1
+        data['all'] = round(data1.loc['all'], 2)
+        data['sh'] = round(data1.loc['sh'], 2)
+        data['sz'] = round(data1.loc['sz'], 2)
+        data['dff'] = round(data1.loc['all'] - data2.loc['all'], 2)
+        data['shrz'] = round(data1.loc['sh'] - data2.loc['sh'], 2)
+        data['szrz'] = round(data1.loc['sz'] - data2.loc['sz'], 2)
+    else:
+        log.error("df.index:%s"%(df.index.values[0]))
+        data['dff'] = 'error'
+        data['all'] = 0
+        data['sh'] = 0
+        data['sz'] = 0
+        data['shrz'] = 0
+        data['szrz'] = 0
+    if len(data) == 0:
+        log.error("Fund_f NO Url:%s" % url)
+    return data
+
 def get_dfcfw_rzrq_SHSZ(url=ct.DFCFW_RZYE):
     data = {}
     log.info("rzrq:%s"%(ct.DFCFW_RZYE))
 
     # rzdata = cct.get_url_data(url)
     rzdata = cct.get_url_data_R(url)
+
     # import pdb;pdb.set_trace()
     rzdata = rzdata.replace(':"-"',':0.1')
     rz_dic = re.findall('{"tdate"[\D\d]+?}', rzdata.encode('utf8'))
+    
     rzdict=[eval(x) for x in rz_dic ]
     df=pd.DataFrame(rzdict,columns=ct.dfcfw_rzye_columns)
     df.tdate=df.tdate.apply(lambda x: x[:10])
@@ -310,7 +514,7 @@ def get_dfcfw_rzrq_SHSZ(url=ct.DFCFW_RZYE):
     # data2 = df.loc[beforeyesterday]
     # log.info("data1:%s,data2:%s", data1, data2)
     if len(data2) > 0:
-        # print data2
+        # print data1
         data['all'] = round(data1.loc['all'], 2)
         data['sh'] = round(data1.loc['sh'], 2)
         data['sz'] = round(data1.loc['sz'], 2)
@@ -532,7 +736,8 @@ if __name__ == "__main__":
 #    pp=get_dfcfw_fund_HGT(ct.DFCFW_FUND_FLOW_HGT)
     log.setLevel(LoggerFactory.DEBUG)
     # print get_dfcfw_rzrq_SHSZ(url=ct.DFCFW_RZRQ_SHSZ)
-    rzrq = get_dfcfw_rzrq_SHSZ()
+    # rzrq = get_dfcfw_rzrq_SHSZ()
+    rzrq = get_dfcfw_rzrq_SHSZ2()
     print rzrq
     import ipdb;ipdb.set_trace()
 

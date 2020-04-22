@@ -436,7 +436,23 @@ http://dcfm.eastmoney.com/em_mutisvcexpandinterface/api/js/get?type=RZRQ_SUMMARY
 
 
 DFCFW_RZYE = "http://dcfm.eastmoney.com/em_mutisvcexpandinterface/api/js/get?type=RZRQ_SUMMARY_NJ&token=70f12f2f4f091e459a279469fe49eca5&st="
+DFCFW_RZYE2 = "http://datacenter.eastmoney.com/api/data/get?type=RPTA_RZRQ_LSHJ&sty=ALL&source=WEB&st=DIM_DATE&sr=-1&p=1&ps=240"
+# http://data.eastmoney.com/rzrq/total/SZ.html
+DFCFW_RZYE2sh = "http://datacenter.eastmoney.com/api/data/get?type=RPTA_WEB_RZRQ_LSSH&sty=ALL&source=WEB&st=dim_date&sr=-1\
+&p=1&ps=50&var=HIoUWbQY&filter=(scdm=%22007%22)&rt=52918142"
+# http://datacenter.eastmoney.com/api/data/get?type=RPTA_WEB_RZRQ_LSSH&sty=ALL&source=WEB&st=dim_date&sr=-1&p=1&ps=50&var=HIoUWbQY&filter=(scdm=%22007%22)&rt=52918142
+DFCFW_RZYE2sz ="http://datacenter.eastmoney.com/api/data/get?type=RPTA_WEB_RZRQ_LSSH&sty=ALL&source=WEB&st=dim_date&sr=-1\
+&p=1&ps=50&var=tYQNgZbk&filter=(scdm=%22001%22)&rt=52918151"
+# http://datacenter.eastmoney.com/api/data/get?type=RPTA_WEB_RZRQ_LSSH&sty=ALL&source=WEB&st=dim_date&sr=-1&p=1&ps=50&var=tYQNgZbk&filter=(scdm=%22001%22)&rt=52918151
 dfcfw_rzye_columns = ['tdate','rzye_h','rzye_s','rzye_hs','ltsz_h','ltsz_s','ltsz_hs','rzyezb_h','rzyezb_s','rzyezb_hs','rzmre_h','rzmre_s','rzmre_hs','rqye_h','rqye_s','rqye_hs','rzrqye_h','rzrqye_s','rzrqye_hs','rzrqyecz_h','rzrqyecz_s','rzrqyecz_hs']
+
+
+# find columns
+# rzdata_list[0]
+# ipdb> aa={"DIM_DATE":"2020-04-21 00:00:00","NEW":3808.0474,"ZDF":-1.178363,"LTSZ":47669746124309.92952905,"ZDF3D":0.149033,"ZDF5D":-0.461398,"ZDF10D":0.26398,"RZYE":1042487466934,"RZYEZB":2.186895,"RZMRE":57826192806,"RZMRE3D":180360988260,"RZMRE5D":288077109078,"RZMRE10D":560353200118,"RZCHE":56802085916,"RZCHE3D":177858633663,"RZCHE5D":283368875084,"RZCHE10D":560836868560,"RZJME":1024106890,"RZJME3D":2502354597,"RZJME5D":4708233994,"RZJME10D":-483668442,"RQYE":21081561892,"RQYL":2778976415,"RQCHL":190543301,"RQCHL3D":603227604,"RQCHL5D":1102605960,"RQCHL10D":2177398481,"RQMCL":253801570,"RQMCL3D":767634990,"RQMCL5D":1240930423,"RQMCL10D":2585587625,"RQJMG":63258269,"RQJMG3D":164407386,"RQJMG5D":138324463,"RQJMG10D":408189144,"RZRQYE":1063569028826,"RZRQYECZ":1021405905042}
+# ipdb> aa.keys()
+dfcfw_rzye_columns2sh = [u'DIM_DATE',u'RZYEZB', u'RQCHL10D', u'RQYE', u'RQMCL', u'RZCHE5D', u'RZCHE3D', u'RZMRE5D', u'XOB_MARKET_0001', u'RQJMG', u'RZYE', u'RZCHE', u'NEW', u'ZDF', u'RZCHE10D', u'RZJME3D', u'RZJME5D', u'RQMCL5D', u'SCDM',  u'RZJME10D', u'RQJMG10D', u'RQYL', u'RQCHL', u'RQJMG5D', u'RZRQYECZ', u'LTSZ', u'RQMCL10D', u'RZMRE', u'RZMRE10D', u'RQJMG3D', u'RZRQYE', u'RQCHL5D', u'RQCHL3D', u'ZDF3D', u'ZDF10D', u'RZJME', u'ZDF5D', u'RZMRE3D', u'RQMCL3D']
+dfcfw_rzye_columns2 = ['DIM_DATE','RZYEZB', 'RQCHL10D', 'RQCHL3D', 'RQYE', 'RQMCL', 'RQYL', 'RZCHE5D', 'RZCHE', 'RZCHE3D', 'RZMRE5D', 'RQJMG', 'ZDF10D', 'RZYE', 'LTSZ', 'RQJMG10D', 'NEW', 'RQMCL10D', 'ZDF', 'RQMCL5D', 'RZMRE10D', 'RZRQYECZ', 'RQJMG3D', 'RZMRE', 'RQCHL5D', 'RZJME3D', 'RZJME5D', 'ZDF3D', 'RZCHE10D', 'RQJMG5D', 'RZJME', 'ZDF5D', 'RQCHL', 'RZMRE3D', 'RQMCL3D', 'RZRQYE', 'RZJME10D']
 # TDX_Day_columns=['code','date','open','high','low','close','vol','amount']
 TDX_Day_columns_all = ['code', 'date', 'open', 'high', 'low', 'close', 'vol','amount', 'ra', 'op', 'fib', 'ma5d', 'ma10d', 'ldate', 'hmax', 'lmin', 'cmean']
 TDX_Day_columns = ['code', 'date', 'open', 'high', 'low', 'close', 'vol','amount']
