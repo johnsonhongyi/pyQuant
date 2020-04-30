@@ -274,7 +274,7 @@ if __name__ == "__main__":
 
 
 
-                '''
+                # '''
                 if cct.get_now_time_int() > 830 and cct.get_now_time_int() <= 935:
                     top_temp = top_all[ (top_all.low >= top_all.lastl1d) & (top_all.lasth1d > top_all.lasth2d) & (top_all.close > top_all.lastp1d)] 
                     # top_temp =  top_all[( ((top_all.top10 >0) | (top_all.boll >0)) & (top_all.lastp1d > top_all.ma5d) & (top_all.close > top_all.lastp1d))]
@@ -303,22 +303,22 @@ if __name__ == "__main__":
                         top_temp = top_all[ (top_all.volume >= 1.2 ) & (top_all.low >= top_all.lastl1d) & (top_all.lasth1d > top_all.lasth2d) & (top_all.close > top_all.lastp1d)] 
                 else:
                     top_temp = top_all.copy()
-                '''
+                # '''
 
-                if cct.get_now_time_int() > 830 and cct.get_now_time_int() <= 935:
-                    top_temp = top_all[ ((top_all.topU > 0 ) | (top_all.top10 > 0) | (top_all.topR > 0) | (top_all.top0 > 0)) & (top_all.lastl1d > top_all.ma5d)] 
-                elif cct.get_now_time_int() > 935 and cct.get_now_time_int() <= 1100:
-                    if 'nlow' in top_all.columns:  
-                        top_temp = top_all[ ((top_all.topU > 0 ) | (top_all.top10 > 0) | (top_all.topR > 0) | (top_all.top0 > 0)) & ((top_all.lastl1d > top_all.ma5d) &  (top_all.low >= top_all.ma5d) & (top_all.low >= top_all.nlow))] 
-                    else:
-                         top_temp = top_all[ ((top_all.topU > 0 ) | (top_all.top10 > 0) | (top_all.topR > 0) | (top_all.top0 > 0)) & ((top_all.lastl1d > top_all.ma5d) &  (top_all.low >= top_all.ma5d))]
-                        # top_temp = top_all[ (top_all.volume >= 1.2 ) & (top_all.low >= top_all.lastl1d) & (top_all.lasth1d > top_all.lasth2d) & ((top_all.lastl1d > top_all.ma5d) &  (top_all.low >= top_all.ma5d))] 
-                else:
-                    # top_temp = top_all[ (top_all.volume >= 1.2 ) & (top_all.low >= top_all.lastl1d) & (top_all.lasth1d > top_all.lasth2d) & ((top_all.lastl1d > top_all.ma5d) &  (top_all.low >= top_all.ma5d))] 
-                    if 'nlow' in top_all.columns:  
-                        top_temp = top_all[ ((top_all.topU > 0 ) | (top_all.top10 > 0) | (top_all.topR > 0) | (top_all.top0 > 0)) & ((top_all.lastl1d > top_all.ma5d) &  (top_all.low >= top_all.ma5d) & (top_all.low >= top_all.nlow))] 
-                    else:
-                         top_temp = top_all[ ((top_all.topU > 0 ) | (top_all.top10 > 0) | (top_all.topR > 0) | (top_all.top0 > 0)) & ((top_all.lastl1d > top_all.ma5d) &  (top_all.low >= top_all.ma5d))]
+                # if cct.get_now_time_int() > 830 and cct.get_now_time_int() <= 935:
+                #     top_temp = top_all[ ((top_all.topU > 0 ) | (top_all.top10 > 0) | (top_all.topR > 0) | (top_all.top0 > 0)) & (top_all.lastl1d > top_all.ma5d)] 
+                # elif cct.get_now_time_int() > 935 and cct.get_now_time_int() <= 1100:
+                #     if 'nlow' in top_all.columns:  
+                #         top_temp = top_all[ ((top_all.topU > 0 ) | (top_all.top10 > 0) | (top_all.topR > 0) | (top_all.top0 > 0)) & ((top_all.lastl1d > top_all.ma5d) &  (top_all.low >= top_all.ma5d) & (top_all.low >= top_all.nlow))] 
+                #     else:
+                #          top_temp = top_all[ ((top_all.topU > 0 ) | (top_all.top10 > 0) | (top_all.topR > 0) | (top_all.top0 > 0)) & ((top_all.lastl1d > top_all.ma5d) &  (top_all.low >= top_all.ma5d))]
+                #         # top_temp = top_all[ (top_all.volume >= 1.2 ) & (top_all.low >= top_all.lastl1d) & (top_all.lasth1d > top_all.lasth2d) & ((top_all.lastl1d > top_all.ma5d) &  (top_all.low >= top_all.ma5d))] 
+                # else:
+                #     # top_temp = top_all[ (top_all.volume >= 1.2 ) & (top_all.low >= top_all.lastl1d) & (top_all.lasth1d > top_all.lasth2d) & ((top_all.lastl1d > top_all.ma5d) &  (top_all.low >= top_all.ma5d))] 
+                #     if 'nlow' in top_all.columns:  
+                #         top_temp = top_all[ ((top_all.topU > 0 ) | (top_all.top10 > 0) | (top_all.topR > 0) | (top_all.top0 > 0)) & ((top_all.lastl1d > top_all.ma5d) &  (top_all.low >= top_all.ma5d) & (top_all.low >= top_all.nlow))] 
+                #     else:
+                #          top_temp = top_all[ ((top_all.topU > 0 ) | (top_all.top10 > 0) | (top_all.topR > 0) | (top_all.top0 > 0)) & ((top_all.lastl1d > top_all.ma5d) &  (top_all.low >= top_all.ma5d))]
 
 
 

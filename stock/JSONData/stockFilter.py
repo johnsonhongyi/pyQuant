@@ -185,17 +185,18 @@ def getBollFilter(df=None, boll=ct.bollFilter, duration=ct.PowerCountdl, filter=
     else:
         # top10 = df[ (df.percent >= 9.99) & (df.b1_v > df.a1_v)]
 
-        # df.loc[(df.percent >= 9.99) & (df.b1_v > df.a1_v), 'percent'] = -10
-        if not top10 or (cct.get_now_time_int() < 950 or cct.get_now_time_int() > 1502):
-            df.loc[((df.b1_v > df.a1_v) & (df.percent > 9)), 'percent'] = 10.1
-            df.loc[((df.percent >= 9.97) & (df.percent < 10.1)), 'percent'] = 10
-
-        else:
-            df.loc[((df.b1_v > df.a1_v) & (df.percent > 9)), 'percent'] = 10.1
-            df.loc[((df.percent >= 9.97) & (df.percent < 10.1)), 'percent'] = 10
-            # df.loc[(df.b1_v > df.a1_v), 'percent'] = -11
-        # if resample in ['d', 'w']:
         if resample in ['d']:
+            # df.loc[(df.percent >= 9.99) & (df.b1_v > df.a1_v), 'percent'] = -10
+            if not top10 or (cct.get_now_time_int() < 950 or cct.get_now_time_int() > 1502):
+                df.loc[((df.b1_v > df.a1_v) & (df.percent > 9)), 'percent'] = 10.1
+                df.loc[((df.percent >= 9.97) & (df.percent < 10.1)), 'percent'] = 10
+
+            else:
+                df.loc[((df.b1_v > df.a1_v) & (df.percent > 9)), 'percent'] = 10.1
+                df.loc[((df.percent >= 9.97) & (df.percent < 10.1)), 'percent'] = 10
+                # df.loc[(df.b1_v > df.a1_v), 'percent'] = -11
+            # if resample in ['d', 'w']:
+
             df.loc[df.per1d >= 9.99, 'per1d'] = 10
             df['percent'] = df['percent'].apply(lambda x: round(x, 2))
             # time_ss = time.time()
@@ -212,7 +213,7 @@ def getBollFilter(df=None, boll=ct.bollFilter, duration=ct.PowerCountdl, filter=
             # df['perc_n'] = map((lambda c, lc: (1 if (c - lc) > 0 else down_zero) + (1 if (c - lc) / lc * 100 > 3 else down_zero) +
             # (down_dn if (c - lc) / lc * 100 < -3 else down_zero)), df['close'], df['lastp%sd' % da])
 
-            idx_rnd = random.randint(0, len(df) - 10) if len(df) > 10 else 0
+            # idx_rnd = random.randint(0, len(df) - 10) if len(df) > 10 else 0
 
             # print "idx_rnd",idx_rnd,df.ix[idx_rnd].lastp0d ,df.ix[idx_rnd].close,df.ix[idx_rnd].lastp0d != df.ix[idx_rnd].close
 
@@ -238,7 +239,14 @@ def getBollFilter(df=None, boll=ct.bollFilter, duration=ct.PowerCountdl, filter=
             # df[co] = (df[co] + df['percent']).map(lambda x: int(x))
 
             # print "percT:%.2f"%(time.time()-time_ss)
-
+        else:
+            df['percent'] = (map(lambda x, y: round((x-y)/y*100,1) if int(y) > 0 else 0, df.buy, df.lastp1d))
+            # df.loc['002204'].percent
+            # -15.4
+            # ipdb> df.loc['002204'].ma10d
+            # 3.2000000000000002
+            # ipdb> df.loc['002204'].ma5d
+            # 3.2999999999999998
     if 'fib' not in df.columns:
         df['fib'] = 0
     # else:

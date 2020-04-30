@@ -2795,7 +2795,7 @@ def combine_dataFrame(maindf, subdf, col=None, compare=None, append=False, clean
                 if append:
                     subdf[co_t] = 0
                     subdf[co_t] = subdf[co_t].astype(maindf.dtypes[co_t])
-
+                    
         maindf = pd.concat([maindf, subdf], axis=0)
         maindf = maindf.fillna(-2)
         if not 'code' in maindf.columns:

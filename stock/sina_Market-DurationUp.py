@@ -101,14 +101,14 @@ if __name__ == "__main__":
     # op, ra, duration_date, days = pct.get_linear_model_status('999999', filter='y', dl=dl, ptype=ptype, days=1)
     # duration_date = int(ct.duration_date * 1.5)
     # duration_date = ct.duration_date_up
-    duration_date = ct.duration_date_l
+    # duration_date = ct.duration_date_l
     # duration_date = 10
-#    duration_date = 120
+    duration_date = 120
     # duration_date = 300
     du_date = duration_date
     # resample = ct.resample_dtype
-    # resample = 'w'
-    resample = 'd'
+    resample = 'w'
+    # resample = 'd'
     end_date = None
     ptype = 'low'
     filter = 'y'
@@ -287,30 +287,32 @@ if __name__ == "__main__":
                     goldstock = len(top_dif[(top_dif.buy >= top_dif.lhigh * 0.99)
                                             & (top_dif.buy >= top_dif.llastp * 0.99)])
                     ## goldstock=len(top_dif[top_dif.buy >(top_dif.high-top_dif.low)/2])
-                    if ptype == 'low':
-                        top_dif = top_dif[top_dif.lvol > ct.LvolumeSize]
-                        if cct.get_now_time_int() > 1100 and cct.get_now_time_int() < 1330:
-                            # if cct.get_now_time_int() > 931 and cct.get_work_time():
-                            top_dif = top_dif[(top_dif.volume > ct.VolumeMinR) & (
-                                top_dif.volume < ct.VolumeMaxR)]
-                        # top_dif = top_dif[top_dif.lvol > 12000]
-                        if 'couts' in top_dif.columns.values:
-                            top_dif = top_dif.sort_values(by=['dff', 'percent', 'volume', 'couts', 'ratio'],
-                                                          ascending=[0, 0, 0, 1, 1])
+                    if resample == 'd':
+                        
+                        if ptype == 'low':
+                            top_dif = top_dif[top_dif.lvol > ct.LvolumeSize]
+                            if cct.get_now_time_int() > 1100 and cct.get_now_time_int() < 1330:
+                                # if cct.get_now_time_int() > 931 and cct.get_work_time():
+                                top_dif = top_dif[(top_dif.volume > ct.VolumeMinR) & (
+                                    top_dif.volume < ct.VolumeMaxR)]
+                            # top_dif = top_dif[top_dif.lvol > 12000]
+                            if 'couts' in top_dif.columns.values:
+                                top_dif = top_dif.sort_values(by=['dff', 'percent', 'volume', 'couts', 'ratio'],
+                                                              ascending=[0, 0, 0, 1, 1])
+                            else:
+                                top_dif = top_dif.sort_values(
+                                    by=['dff', 'percent', 'ratio'], ascending=[0, 0, 1])
                         else:
-                            top_dif = top_dif.sort_values(
-                                by=['dff', 'percent', 'ratio'], ascending=[0, 0, 1])
-                    else:
-                        # top_dif['dff'] = top_dif['dff'].apply(lambda x: x * 2 if x > 0 else x)
-                        top_dif = top_dif[top_dif.lvol > ct.LvolumeSize]
-                        top_dif['dff'] = top_dif['dff'].apply(
-                            lambda x: x * 2 if x < 0 else x)
-                        if 'couts' in top_dif.columns.values:
-                            top_dif = top_dif.sort_values(by=['dff', 'percent', 'volume', 'couts', 'ratio'],
-                                                          ascending=[1, 0, 0, 1, 1])
-                        else:
-                            top_dif = top_dif.sort_values(
-                                by=['dff', 'percent', 'ratio'], ascending=[1, 0, 1])
+                            # top_dif['dff'] = top_dif['dff'].apply(lambda x: x * 2 if x > 0 else x)
+                            top_dif = top_dif[top_dif.lvol > ct.LvolumeSize]
+                            top_dif['dff'] = top_dif['dff'].apply(
+                                lambda x: x * 2 if x < 0 else x)
+                            if 'couts' in top_dif.columns.values:
+                                top_dif = top_dif.sort_values(by=['dff', 'percent', 'volume', 'couts', 'ratio'],
+                                                              ascending=[1, 0, 0, 1, 1])
+                            else:
+                                top_dif = top_dif.sort_values(
+                                    by=['dff', 'percent', 'ratio'], ascending=[1, 0, 1])
 
                     # top_all=top_all.sort_values(by=['percent','dff','couts','ratio'],ascending=[0,0,1,1])
                     # print cct.format_for_print(top_dif[:10])
@@ -328,7 +330,8 @@ if __name__ == "__main__":
                     # elif percent_status == 'y' and cct.get_now_time_int() > 935 and ptype == 'high' :
                     elif ptype == 'low':
 
-                        top_temp = top_dif[top_dif.topR >= 1]
+                        # top_temp = top_dif[top_dif.topR >= 1]
+                        top_temp = top_dif.copy()
                         # top_dif = top_dif[top_dif.percent >= 0]
                         # top_temp = stf.filterPowerCount(top_dif,ct.PowerCount)
                         # top_temp = top_dif[ ((top_dif.lastp0d >=9.8)  & (top_dif.lastp1d < 9) & (top_dif.lastp2d < 9) & (top_dif.lastp3d < 9) )  | ((top_dif.lastp0d <9)  & (top_dif.lastp1d < 9) & (top_dif.lastp2d < 9) & (top_dif.lastp3d < 9)) ][:100]
@@ -374,6 +377,7 @@ if __name__ == "__main__":
 
                     top_all = tdd.get_powerdf_to_all(top_all, top_temp)
                     top_all = tdd.get_powerdf_to_all(top_all, top_end)
+                    
                     # top_temp = stf.getBollFilter(df=top_temp, boll=ct.bollFilter, duration=ct.PowerCountdl,resample=resample)
                     top_temp = stf.getBollFilter(df=top_temp, boll=ct.bollFilter, duration=ct.PowerCountdl,
                                                  filter=False, ma5d=False, dl=14, percent=False, resample=resample, ene=False, top10=False)

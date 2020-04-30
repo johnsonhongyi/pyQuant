@@ -2682,8 +2682,11 @@ def compute_lastdays_percent(df=None, lastdays=3, resample='d',vc_radio=100):
             df = df[:-1]
             # print "df:",df[-1:]
         if len(df) > lastdays + 1:
+            # 判断lastdays > 9 
             lastdays = len(df) - 1
             lastdays = lastdays if lastdays < ct.compute_lastdays else ct.compute_lastdays
+        else:
+            lastdays = len(df) - 1
         if 'date' in df.columns:
             df = df.set_index('date')
         df = df.sort_index(ascending=True)
@@ -3224,8 +3227,29 @@ def get_single_df_lastp_to_df(top_all, lastpTDX_DF=None, dl=ct.PowerCountdl, end
 
 def compute_jump_du_count(df,lastdays=ct.compute_lastdays,resample='d'):
 
-    df = df[(df.op > -1) & (df.boll > -1)]
-    temp=df[df.columns[(df.columns >= 'per1d') & (df.columns <= 'per%sd'%(lastdays))]]
+    # if 'op' in df.columns and 'boll' in df.columns:
+    #     df = df[(df.op > -1) & (df.boll > -1)]
+    _Integer = int(lastdays/10) 
+    _remainder = lastdays%10
+
+
+    #没有用处理顺序截取非个股处理
+    if _Integer > 0:
+        temp=df[df.columns[((df.columns >= 'per1d') & (df.columns <= 'per%sd'%(9)))]]
+        #lastday > 20 error !!!!
+        # if _Integer > 1:
+        #     for i in range(1,_Integer, 1):
+        #         # temp=df[df.columns[((df.columns >= 'per1d') & (df.columns <= 'per%sd'%(9))) | ((df.columns >= 'per%s0d'%(_Integer)) & (df.columns <= 'per%s%sd'%(_Integer,_remainder))) ]]
+        #         # d_col=df[ ((df.columns >= 'per%s0d'%(_Integer)) & (df.columns <= 'per%s%sd'%(_Integer,_remainder))) ]
+        #         d_col=df[df.columns[((df.columns >= 'per%s0d'%(i)) & (df.columns <= 'per%s%sd'%(i,9)))]]
+        #         temp = cct.combine_dataFrame(temp, d_col, col=None, compare=None, append=False, clean=True)
+        d_col=df[df.columns[((df.columns >= 'per%s0d'%(_Integer)) & (df.columns <= 'per%s%sd'%(_Integer,_remainder)))]]
+        temp = cct.combine_dataFrame(temp, d_col, col=None, compare=None, append=False, clean=True)
+
+
+    else:
+
+        temp=df[df.columns[(df.columns >= 'per1d') & (df.columns <= 'per%sd'%(lastdays))]]
     
     if resample == 'd':
         tpp =temp[temp >9.9].count()
@@ -3239,17 +3263,17 @@ def compute_jump_du_count(df,lastdays=ct.compute_lastdays,resample='d'):
         else:
             codelist= temp[ (temp[perlist[0]] >9.9)].index.tolist()
     else:
-        
-        tpp =temp[temp >9.9].count()
-        # temp[temp >9.9].per1d.dropna(how='all')
-        idxkey= tpp[ tpp ==tpp.min()].index.values[0]
-        perlist = temp.columns[temp.columns <= idxkey][-2:].values.tolist()
-        if len(perlist) >=2:
-            # codelist= temp[ ((temp[perlist[0]] >9) &(temp[perlist[1]] > 9)) | (temp[perlist[1]] > 9) ].index.tolist()
-            codelist= temp[ ((temp[perlist[0]] >9)) & (temp[perlist[1]] > 9) ].index.tolist()
-            # temp[ ((temp[perlist[0]] >9)) & (temp[perlist[1]] > 9) | ((temp[perlist[0]] >9)) & (temp[perlist[1]] > 0)].shape
-        else:
-            codelist= temp[ (temp[perlist[0]] >9.9)].index.tolist()
+        codelist = temp.index.tolist()
+        # tpp =temp[temp >9.9].count()
+        # # temp[temp >9.9].per1d.dropna(how='all')
+        # idxkey= tpp[ tpp ==tpp.min()].index.values[0]
+        # perlist = temp.columns[temp.columns <= idxkey][-2:].values.tolist()
+        # if len(perlist) >=2:
+        #     # codelist= temp[ ((temp[perlist[0]] >9) &(temp[perlist[1]] > 9)) | (temp[perlist[1]] > 9) ].index.tolist()
+        #     codelist= temp[ ((temp[perlist[0]] >9)) & (temp[perlist[1]] > 9) ].index.tolist()
+        #     # temp[ ((temp[perlist[0]] >9)) & (temp[perlist[1]] > 9) | ((temp[perlist[0]] >9)) & (temp[perlist[1]] > 0)].shape
+        # else:
+        #     codelist= temp[ (temp[perlist[0]] >9.9)].index.tolist()
 
 
     return codelist
@@ -3887,8 +3911,12 @@ if __name__ == '__main__':
     # code = '603486'
     # code = '999999'
     # df2 = get_tdx_Exp_day_to_df(code,dl=160, end=None, newdays=0, resample='w')
-    resample = 'w'
-    # df2 = get_tdx_Exp_day_to_df(code,dl=160, end=None, newdays=0, resample='d')
+    resample = 'd'
+    df2 = get_tdx_Exp_day_to_df(code,dl=160, end=None, newdays=0, resample='d',lastdays=12)
+    # get_tdx_Exp_day_to_df(code, start=None, end=None, dl=None, newdays=None, type='f', wds=True, lastdays=3, resample='d', MultiIndex=False)
+    df3 = compute_jump_du_count(df2, lastdays=9, resample='d')
+    import ipdb;ipdb.set_trace()
+
     df = get_tdx_exp_low_or_high_power(code, dl=30, newdays=0, resample=resample)
     df3 =  get_tdx_exp_all_LastDF_DL([code],  dt=60, ptype='low', filter='y', power=ct.lastPower, resample=resample)
 
