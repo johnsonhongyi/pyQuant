@@ -34,7 +34,7 @@ import ipykernel.iostream
 # constants = load_module("commonTips")    
 # print constants    
 
-win10_ramdisk_triton = r'E:'
+win10_ramdisk_triton = r'G:'
 win10_ramdisk_root = r'R:'
 mac_ramdisk_root = r'/Volumes/RamDisk' 
 path_sep = os.path.sep

@@ -478,10 +478,10 @@ def get_hot_countNew(changepercent, rzrq, fibl=None, fibc=10):
         print(u'B:%s-%s V:%s' % (bigcount[0], bigcount[2], f_print(4,bigcount[1])))
 
     if len(hgt) > 0:
-        print("\tHgt: %s Ggt: %s Sgt: %s Gst: %s SSVol:%s" %
-              (hgt['hgt'], hgt['ggt'], szt['hgt'], szt['ggt'],f_print(5, ff['allvol'],31)))
+        print("\tSgt: %s Gst: %s Hgt: %s Ggt: %s SSVol:%s" %
+              (szt['hgt'], szt['ggt'],hgt['hgt'], hgt['ggt'],f_print(5, ff['allvol'],31)))
     else:
-        print("\tHgt: \t%s Ggt: \t%s Sgt: %s Gst: %s" % (0, 0, 0, 0))
+        print("\t%s Sgt: %s Gst: %s \tHgt: \t%s Ggt: " % (0, 0, 0, 0))
         
     if len(rzrq) > 0:
         if 'shrz' not in rzrq.keys() and 'szrz' not in rzrq.keys():
