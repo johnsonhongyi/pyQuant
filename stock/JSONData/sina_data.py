@@ -663,7 +663,6 @@ class Sina:
             df.ticktime = map(lambda x, y: str(x) + ' ' + str(y), df.dt, df.ticktime)
             df.ticktime = pd.to_datetime(df.ticktime, format='%Y-%m-%d %H:%M:%S')
 
-
             # df = df.loc[:, ['open', 'high', 'low', 'close', 'llastp', 'volume', 'ticktime']]
             # config_ini = cct.get_ramdisk_dir() + os.path.sep+ 'h5config.txt'
 
@@ -673,9 +672,12 @@ class Sina:
                                           df['close'].values, df['llastp'].values))
 
             else:
-                if time.time() - float(logtime) > float(ct.logtime):
-                # if cct.get_now_time_int() - cct.GlobalValues().getkey('logtime') > ct.logtime:
+
+                if (cct.GlobalValues().getkey('lastbuylogtime') is not None ) or (time.time() - float(cct.get_config_value_ramfile(fname)) > float(ct.sina_lastbuy_logtime)):
+                # if cct.get_now_time_int() - cct.GlobalValues().getkey('logtime') > ct.sina_lastbuy_logtime:
+                    cct.GlobalValues().setkey('lastbuylogtime', None) 
                     duratime = cct.get_config_value_ramfile(fname,currvalue=time.time(),xtype='time',update=True)
+                    # df[['llastp','close','lastbuy']][:10]
                     df['lastbuy'] = (map(lambda x, y: y if int(x) == 0 else x,
                                               df['close'].values, df['llastp'].values))
 

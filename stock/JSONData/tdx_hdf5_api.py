@@ -24,6 +24,20 @@ INIT_LOG_Error = 0
 # Compress_Count = 1
 BaseDir = cct.get_ramdisk_dir()
 
+#import fcntl linux
+#lock：
+# fcntl.flock(f,fcntl.LOCK_EX)
+# unlock
+# fcntl.flock(f,fcntl.LOCK_UN)
+
+# for win
+# with portalocker.Lock('some_file', 'rb+', timeout=60) as fh:
+#     # do what you need to do
+#     ...
+ 
+#     # flush and sync to filesystem
+#     fh.flush()
+#     os.fsync(fh.fileno())
 
 class SafeHDFStore(HDFStore):
     # def __init__(self, *args, **kwargs):
@@ -102,7 +116,8 @@ class SafeHDFStore(HDFStore):
         while True:
             try:
                 self._flock = os.open(
-                    self._lock, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
+                    self._lock, os.O_CREAT | os.O_EXCL)
+                    # self._lock, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
                 log.info("SafeHDF:%s lock:%s" % (self._lock, self._flock))
                 break
             # except FileExistsError:
@@ -110,16 +125,27 @@ class SafeHDFStore(HDFStore):
             except (IOError, EOFError, Exception) as e:
                 # except (IOError, OSError) as e:
                 # time.sleep(probe_interval)
+                # import ipdb;ipdb.set_trace()
+                # os.unlink(self._lock)
+                # os.remove(self._lock)
                 if self.countlock > 1:
                     log.error("IOError Error:%s" % (e))
+
                 if self.countlock <= 8:
                     time.sleep(round(random.randint(3, 10) / 1.2, 2))
                     # time.sleep(random.randint(0,5))
                     self.countlock += 1
                 else:
+                    # os.close(self._flock)
+                    # os.unlink(self._lock)
                     os.remove(self._lock)
                     # time.sleep(random.randint(15, 30))
                     log.error("count10 remove lock")
+            except WindowsError:
+                log.error('WindowsError')
+            finally:
+                pass
+
 #            except (Exception) as e:
 #                print ("Exception Error:%s"%(e))
 #                log.info("safeHDF Except:%s"%(e))
@@ -179,7 +205,7 @@ class SafeHDFStore(HDFStore):
                     # log.error("fname:%s h5_size:%sM Limit:%s t:%.1f" % (self.fname, h5_size, new_limit , time_pt - time.time()))
             if os.path.exists(self._lock):
                 os.remove(self._lock)
-            gc.collect()
+            # gc.collect()
 '''
 https://stackoverflow.com/questions/21126295/how-do-you-create-a-compressed-dataset-in-pytables-that-can-store-a-unicode-stri/21128497#21128497
 >>> h5file = pt.openFile("test1.h5",'w')

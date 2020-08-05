@@ -22,7 +22,7 @@ def parseArgmain():
         parser.add_argument('-v', action="store", dest="vtype", type=str, choices=['f', 'b'], default='f',help='Price Forward or back')
         parser.add_argument('-p', action="store", dest="ptype", type=str, choices=['high', 'low', 'close'], default='low',help='price type')
         parser.add_argument('-f', action="store", dest="filter", type=str, choices=['y', 'n'], default='y',help='find duration low')
-        parser.add_argument('-l', action="store", dest="dl", type=int, default=ct.PowerCountdl,help='dl default=%s'%(ct.PowerCountdl))
+        parser.add_argument('-l', action="store", dest="dl", type=int, default=ct.linePowerCountdl,help='dl default=%s'%(ct.linePowerCountdl))
         parser.add_argument('-da', action="store", dest="days", type=int, default=ct.Power_last_da,help='days')
         parser.add_argument('-m', action="store", dest="mpl", type=str, default='y',help='mpl show')
         parser.add_argument('-i', action="store", dest="line", type=str, choices=['y', 'n'], default='y', help='LineHis show')
@@ -180,7 +180,7 @@ if __name__ == "__main__":
                 # print args.dl,ra,fibl,rah,op
                 # print ra * fibl + rah*(abs(int(args.dl)-fibl))/fib +ma +kdj+rsi
 
-                diff=eval(ct.powerdiff%(ct.PowerCountdl))
+                diff=eval(ct.powerdiff%(ct.linePowerCountdl))
                 print "Diff:%.1f"%(diff)
                 cct.sleep(0.1)
                 # ts=time.time()

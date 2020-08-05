@@ -19,6 +19,8 @@ from JohnsonUtil import commonTips as cct
 # from logbook import Logger,StreamHandler,SyslogHandler
 # from logbook import StderrHandler
 
+# import logging
+# logging.basicConfig(level=logging.INFO, stream=sys.stdout)
 
 # def parseArgmain():
 # import argparse
@@ -68,7 +70,7 @@ if __name__ == "__main__":
     from docopt import docopt
     log = LoggerFactory.log
     args = docopt(cct.sina_doc, version='sina_cxdn')
-    # print args,args['-d']
+    # print args,args['-d']0
     if args['-d'] == 'debug':
         log_level = LoggerFactory.DEBUG
     elif args['-d'] == 'info':
@@ -171,7 +173,7 @@ if __name__ == "__main__":
 
             now_count = len(top_now)
             radio_t = cct.get_work_time_ratio()
-            # top_now = top_now[top_now.buy > 0]
+            # top_now = top_now[top_now.buy > 0]`
             time_d = time.time()
             if time_d - time_s > delay_time:
                 status_change = True

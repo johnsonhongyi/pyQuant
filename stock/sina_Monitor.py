@@ -284,7 +284,7 @@ if __name__ == "__main__":
                     # top_temp =  top_all[((top_all.boll >0) & (top_all.close > top_all.lastp1d))]
 
                     # top_all[(top_all.low >= top_all.nlow)& (top_all.high > top_all.nhigh)]
-                elif cct.get_now_time_int() > 935 and cct.get_now_time_int() <= 1100:
+                elif cct.get_now_time_int() > 935 and cct.get_now_time_int() <= 1430:
 
                     # top_temp =  top_all[ ( (top_all.lastp1d > top_all.lastp2d) &(top_all.close >top_all.lastp1d )) | ((top_all.low >= top_all.nlow)) & ((top_all.lastp1d > top_all.ma5d)  & (top_all.close > top_all.ma5d) &(top_all.close > top_all.lastp1d))]
 
@@ -297,10 +297,13 @@ if __name__ == "__main__":
                     # top_temp =  top_all[(top_all.topR < 2) & (top_all.close >= top_all.nhigh) & ((top_all.low > top_all.lastp1d) | (top_all.low == top_all.open))]
 
                     if 'nlow' in top_all.columns:  
+                        top_temp = top_all[ ((top_all.open > top_all.lastp1d)) & (top_all.low >= top_all.lastl1d) & (top_all.lasth1d > top_all.lasth2d) & (top_all.open >= top_all.nlow) ]
                         # top_temp = top_all[  (top_all.low >= top_all.lastl1d) & (top_all.lasth1d > top_all.lasth2d) & (top_all.low >= top_all.nlow) & ((top_all.open >= top_all.nlow *0.998) & (top_all.open <= top_all.nlow*1.002)) ]
-                        top_temp = top_all[ (top_all.volume >= 1.2 ) & (top_all.low >= top_all.lastl1d) & (top_all.lasth1d > top_all.lasth2d) & (top_all.low >= top_all.nlow) & ((top_all.open >= top_all.nlow *0.99) & (top_all.open <= top_all.nlow*1.01)) ]
+                        # top_temp = top_all[ (top_all.volume >= 1.2 ) & (top_all.low >= top_all.lastl1d) & (top_all.lasth1d > top_all.lasth2d) & (top_all.low >= top_all.nlow) & ((top_all.open >= top_all.nlow *0.99) & (top_all.open <= top_all.nlow*1.01)) ]
                     else:
-                        top_temp = top_all[ (top_all.volume >= 1.2 ) & (top_all.low >= top_all.lastl1d) & (top_all.lasth1d > top_all.lasth2d) & (top_all.close > top_all.lastp1d)] 
+                        top_temp = top_all[ ((top_all.open > top_all.lastp1d)) & (top_all.low >= top_all.lastl1d) & (top_all.lasth1d > top_all.lasth2d) ]
+                        # top_temp = top_all[  (top_all.low >= top_all.lastl1d) & (top_all.lasth1d > top_all.lasth2d) & (top_all.low >= top_all.nlow) & ((top_all.open >= top_all.nlow *0.998) & (top_all.open <= top_all.nlow*1.002)) ]
+                        # top_temp = top_all[ (top_all.volume >= 1.2 ) & (top_all.low >= top_all.lastl1d) & (top_all.lasth1d > top_all.lasth2d) & (top_all.close > top_all.lastp1d)] 
                 else:
                     top_temp = top_all.copy()
                 # '''
@@ -491,6 +494,7 @@ if __name__ == "__main__":
                 status = True
             elif st.lower() == 'clear' or st.lower() == 'c':
                 top_all = pd.DataFrame()
+                cct.GlobalValues().setkey('lastbuylogtime', 1)
                 cct.set_clear_logtime()
                 status = False
             elif st.startswith('w') or st.startswith('a'):
