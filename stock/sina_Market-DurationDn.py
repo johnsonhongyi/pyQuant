@@ -82,7 +82,8 @@ if __name__ == "__main__":
         if cct.isMac():
             cct.set_console(width, height)
         else:
-            cct.set_console(width, height, title=str(duration_date))
+            cct.set_console(width, height)
+            # cct.set_console(width, height, title=str(duration_date))
 
     status = False
     vol = ct.json_countVol

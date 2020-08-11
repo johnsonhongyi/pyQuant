@@ -672,14 +672,14 @@ class Sina:
                                           df['close'].values, df['llastp'].values))
 
             else:
-
+                
                 if (cct.GlobalValues().getkey('lastbuylogtime') is not None ) or (time.time() - float(cct.get_config_value_ramfile(fname)) > float(ct.sina_lastbuy_logtime)):
                 # if cct.get_now_time_int() - cct.GlobalValues().getkey('logtime') > ct.sina_lastbuy_logtime:
-                    cct.GlobalValues().setkey('lastbuylogtime', None) 
                     duratime = cct.get_config_value_ramfile(fname,currvalue=time.time(),xtype='time',update=True)
                     # df[['llastp','close','lastbuy']][:10]
                     df['lastbuy'] = (map(lambda x, y: y if int(x) == 0 else x,
                                               df['close'].values, df['llastp'].values))
+                    cct.GlobalValues().setkey('lastbuylogtime', None) 
 
                 else:
                     df = self.combine_lastbuy(df)

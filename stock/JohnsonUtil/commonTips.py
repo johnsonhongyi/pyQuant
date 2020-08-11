@@ -332,6 +332,14 @@ def get_terminal_Position(cmd=None, position=None, close=False, retry=False):
     Returns:
         [type] -- [description]
     """
+
+    if (GlobalValues().getkey('Position') is not None ):
+        log.info("Position:%s"%(GlobalValues().getkey('Position')))
+        # log.info("Position is locate")
+        return 0
+    # else:
+    #     GlobalValues().setkey('Position',1)
+
     win_count = 0
     if get_os_system() == 'mac':
         import subprocess
@@ -742,7 +750,15 @@ def set_console(width=80, height=15, color=3, title=None, closeTerminal=True):
     # os.system('color %s'%color)
     # set_ctrl_handler()
 
-    if closeTerminal:
+    # if (GlobalValues().getkey('Position') is not None ):
+    #     print("Position:%s"%(cct.GlobalValues().getkey('Position')))
+    #     log.info("Position is locate")
+    #     return 0
+    # else:
+    #     GlobalValues().setkey('Position',1)
+
+    if closeTerminal and title is not None and (GlobalValues().getkey('Position') is None):
+        GlobalValues().setkey('Position',1)
         # get_terminal_Position(cmd=scriptquit, position=None, close=False)
         if isMac():
             get_terminal_Position(position=filename)

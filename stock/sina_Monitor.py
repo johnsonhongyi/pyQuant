@@ -225,7 +225,7 @@ if __name__ == "__main__":
                     #     top_all = top_all[(top_all.volume > ct.VolumeMinR) & (
                     #         top_all.volume < ct.VolumeMaxR)]
                     
-                if st_key_sort.split()[0] == '4' and 915 < cct.get_now_time_int() < 1000:
+                if st_key_sort.split()[0] == '4' and 915 < cct.get_now_time_int() < 930:
                     top_all['dff'] = (map(lambda x, y: round((x - y) / y * 100, 1),
                                           top_all['buy'].values, top_all['llastp'].values))
                     top_all['dff2'] = (map(lambda x, y: round((x - y) / y * 100, 1),
@@ -495,7 +495,7 @@ if __name__ == "__main__":
             elif st.lower() == 'clear' or st.lower() == 'c':
                 top_all = pd.DataFrame()
                 cct.GlobalValues().setkey('lastbuylogtime', 1)
-                cct.set_clear_logtime()
+                # cct.set_clear_logtime()
                 status = False
             elif st.startswith('w') or st.startswith('a'):
                 args = cct.writeArgmain().parse_args(st.split())
