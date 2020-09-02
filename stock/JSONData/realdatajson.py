@@ -545,7 +545,7 @@ def get_sina_all_json_dd(vol='0', type='0', num='10000', retry_count=3, pause=0.
     # else:
     #     data=cct.to_asyncio_run(url_list,_parsing_sina_dd_price_json)
 
-        if len(data)>0:
+        if len(data)>1:
             df = df.append(data, ignore_index=True)
 #            log.debug("dd.columns:%s" % df.columns.values)
             #['code' 'name' 'ticktime' 'price' 'volume' 'prev_price' 'kind']
@@ -576,7 +576,7 @@ def get_sina_all_json_dd(vol='0', type='0', num='10000', retry_count=3, pause=0.
             return df
         else:
             print
-            print ("no data  json-df:%0.2f"%((time.time() - start_t))),
+            print ("url:%s no data  json-df:%0.2f"%(url_list[0],(time.time() - start_t))),
             return ''
     else:
         print ("Url None json-df:%0.2f "%((time.time() - start_t))),

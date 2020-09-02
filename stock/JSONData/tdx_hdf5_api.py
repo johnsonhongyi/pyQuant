@@ -694,7 +694,7 @@ def load_hdf_db(fname, table='all', code_l=None, timelimit=True, index=False, li
                     if dratio > dratio_limit:
                        if len(code_l) > ct.h5_time_l_count * 10 and INIT_LOG_Error < 5:
                            # INIT_LOG_Error += 1
-                           log.error("fn:%s cl:%s h5:%s don't find:%s dra:%0.2f log_err:%s" % (
+                           log.info("fn:%s cl:%s h5:%s don't find:%s dra:%0.2f log_err:%s" % (
                                fname, len(code_l), len(dd), len(code_l) - len(dif_co), dratio, INIT_LOG_Error))
                            return None
 
