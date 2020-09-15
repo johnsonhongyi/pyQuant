@@ -186,16 +186,13 @@ def getBollFilter(df=None, boll=ct.bollFilter, duration=ct.PowerCountdl, filter=
         # top10 = df[ (df.percent >= 9.99) & (df.b1_v > df.a1_v)]
 
         if resample in ['d']:
-            # df.loc[(df.percent >= 9.99) & (df.b1_v > df.a1_v), 'percent'] = -10
-            if not top10 or (cct.get_now_time_int() < 950 or cct.get_now_time_int() > 1502):
-                df.loc[((df.b1_v > df.a1_v) & (df.percent > 9)), 'percent'] = 10.1
-                df.loc[((df.percent >= 9.97) & (df.percent < 10.1)), 'percent'] = 10
+            # if not top10 or (cct.get_now_time_int() < 950 or cct.get_now_time_int() > 1502):
+            #     df.loc[((df.b1_v > df.a1_v) & (df.percent > 9)), 'percent'] = 10.1
+            #     df.loc[((df.percent >= 9.97) & (df.percent < 10.1)), 'percent'] = 10
 
-            else:
-                df.loc[((df.b1_v > df.a1_v) & (df.percent > 9)), 'percent'] = 10.1
-                df.loc[((df.percent >= 9.97) & (df.percent < 10.1)), 'percent'] = 10
-                # df.loc[(df.b1_v > df.a1_v), 'percent'] = -11
-            # if resample in ['d', 'w']:
+            # else:
+            #     df.loc[((df.b1_v > df.a1_v) & (df.percent > 9)), 'percent'] = 10.1
+            #     df.loc[((df.percent >= 9.97) & (df.percent < 10.1)), 'percent'] = 10
 
             df.loc[df.per1d >= 9.99, 'per1d'] = 10
             df['percent'] = df['percent'].apply(lambda x: round(x, 2))

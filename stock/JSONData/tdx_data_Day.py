@@ -268,8 +268,12 @@ def get_tdx_Exp_day_to_df(code, start=None, end=None, dl=None, newdays=None, typ
 
     start = cct.day8_to_day10(start)
     end = cct.day8_to_day10(end)
-    if dl is not None and dl < 70:
-        tdx_max_int = dl
+
+    if dl is not None:
+        if dl < 70:
+            tdx_max_int = dl
+        else:
+            tdx_max_int = ct.tdx_max_int_start
     else:
         tdx_max_int = ct.tdx_max_int
     # max_int_end = -1 if int(tdx_max_int) > 10 else None
@@ -563,7 +567,9 @@ def get_tdx_Exp_day_to_df(code, start=None, end=None, dl=None, newdays=None, typ
     # df['ma10d'] = pd.rolling_mean(df.close, 10)
     # df['ma20d'] = pd.rolling_mean(df.close, 26)
     # df['ma60d'] = pd.rolling_mean(df.close, 60)
-    df['hmax'] = df.high[-tdx_max_int:max_int_end].max()
+
+    #hmax -5前max
+    df['hmax'] = df.high[-tdx_max_int:-ct.tdx_max_int_end].max()
     df['max5'] = df.close[-5:max_int_end].max()
     df['lmin'] = df.low[-tdx_max_int:max_int_end].min()
     df['min5'] = df.low[-5:max_int_end].min()
@@ -2727,15 +2733,18 @@ def compute_lastdays_percent(df=None, lastdays=3, resample='d',vc_radio=100):
             # df['lastl%sd' % da] = df['low'].shift(da-1)
             # df['lastv%sd' % da] = df['vol'].shift(da-1)
             if da <=2:
-                df['lastp%sd' % da] = df['close'][-da]
+                # df['lastp%sd' % da] = df['close'][-da]
                 df['lasto%sd' % da] = df['open'][-da]
                 df['lasth%sd' % da] = df['high'][-da]
                 df['lastl%sd' % da] = df['low'][-da]
                 df['lastv%sd' % da] = df['vol'][-da]
 
+            df['lastp%sd' % da] = df['close'][-da]
             # df['per%sd' % da] = df['close'].pct_change(da).apply(lambda x:round(x*100,1))
             # df['per%sd' % da] = df['perd'][-da:].sum()
             df['per%sd' % da] = df['perd'][-da]
+            df['ma5%sd' % da] = df['ma5d'][-da]
+            df['ma20%sd' % da] = df['ma20d'][-da]
             # df['du%sd' % da] = df['perd'][-da] - df['lastdu'][-da]
             # df['per%sd' % da] = df['perd'].shift(da-1)
             df['perc%sd' % da] = df['perlastp'][-da]
@@ -3912,7 +3921,8 @@ if __name__ == '__main__':
     # code = '999999'
     # df2 = get_tdx_Exp_day_to_df(code,dl=160, end=None, newdays=0, resample='w')
     resample = 'd'
-    df2 = get_tdx_Exp_day_to_df(code,dl=160, end=None, newdays=0, resample='d',lastdays=12)
+    # df2 = get_tdx_Exp_day_to_df(code,dl=160, end=None, newdays=0, resample='d',lastdays=12)
+    df2 = get_tdx_Exp_day_to_df(code,dl=160, end=None, newdays=0, resample='d',lastdays=1)
     # get_tdx_Exp_day_to_df(code, start=None, end=None, dl=None, newdays=None, type='f', wds=True, lastdays=3, resample='d', MultiIndex=False)
     df3 = compute_jump_du_count(df2, lastdays=9, resample='d')
     import ipdb;ipdb.set_trace()
