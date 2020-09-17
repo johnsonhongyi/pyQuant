@@ -82,11 +82,14 @@ def filterPowerCount(df, count=200, down=False, duration=2):
     return top_temp
 
 
-def compute_perd_value(df, market_value=2, col='per'):
+def compute_perd_value(df, market_value=3, col='per'):
 
+    if market_value==None:
+        market_value = 3
     temp = df[df.columns[(df.columns >= '%s1d' % (col)) & (
         df.columns <= '%s%sd' % (col, market_value))]]
     df['%s%sd' % (col, market_value)] = temp.T.sum()
+
     return df
 
 
@@ -299,8 +302,8 @@ def getBollFilter(df=None, boll=ct.bollFilter, duration=ct.PowerCountdl, filter=
     # else:
 
     co2int= ['boll', 'op', 'ratio', 'fib', 'fibl', 'df2']
-    co2int.extend([co for co in df.columns.tolist()
-                   if co.startswith('perc') and co.endswith('d')])
+    # co2int.extend([co for co in df.columns.tolist()
+    #                if co.startswith('perc') and co.endswith('d')])
     co2int.extend(['top10', 'topR'])
     co2int= [inx for inx in co2int if inx in df.columns]
 
