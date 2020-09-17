@@ -2562,9 +2562,10 @@ def dataframe_mode_round(df):
             break
     return df_mode
 
-def compute_perd_df(dd,lastdays=3,resample='d'):
+def compute_perd_df(dd,lastdays=3,resample ='d'):
     df = dd[-(lastdays+1):].copy()
-    df['perlastp'] = map(cct.func_compute_percd2, df['close'], df['close'].shift(1), df['open'], df['open'].shift(1), df['high'].shift(1), df['low'].shift(1), df['high'], df['low'],df['vol'],df['vol'].shift(1),df['upper'])
+    df['perlastp'] = map(cct.func_compute_percd2020, df['open'], df['close'], df['high'], df['low'],df['open'].shift(1), 
+                            df['close'].shift(1), df['high'].shift(1), df['low'].shift(1),df['ma5d'],df['ma10d'],df['vol'],df['vol'].shift(1),df['upper'])
     df['perd'] = ((df['close'] - df['close'].shift(1)) / df['close'].shift(1) * 100).map(lambda x: round(x, 1))
     # df['perd'] = ((df['low'] - df['low'].shift(1)) / df['close'].shift(1) * 100).map(lambda x: round(x, 1))
     df = df.dropna()
@@ -3905,6 +3906,7 @@ if __name__ == '__main__':
     code='603000'
     code='688020'
     code='300201'
+    code='300405'
     # code='000800'
     # code='000990'
     # code='600299'

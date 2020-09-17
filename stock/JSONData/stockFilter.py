@@ -140,6 +140,35 @@ def getBollFilter(df=None, boll=ct.bollFilter, duration=ct.PowerCountdl, filter=
     market_key = cct.GlobalValues().getkey('market_key')
     market_value = cct.GlobalValues().getkey('market_value')
 
+    # if int(market_value) > 1 and 930 < cct.get_now_time_int():
+    df= compute_perd_value(df, market_value, 'perc')
+    df= compute_perd_value(df, market_value, 'per')
+
+    if sort_value <> 'percent' and (market_key in ['2', '3'] and market_value not in ['1']):
+        # print("sort_value:%s,market_key:%s ,market_value:%s" %
+        #       (sort_value, market_key, market_value))
+        if market_key is not None and market_value is not None:
+            # if market_key == '3':
+
+            if market_key == '3':
+                market_value= int(market_value)
+                log.info("stf market_key:%s" % (market_key))
+                idx_k= cct.get_col_in_columns(df, 'perc%sd', market_value)
+
+                # if int(market_value) > 1 and 930 < cct.get_now_time_int():
+                #     df= compute_perd_value(df, market_value, 'perc')
+                #     df= compute_perd_value(df, market_value, 'per')
+
+                df= df[df["perc%sd" % (idx_k)] >= idx_k]
+                
+            # elif market_key == '2':
+            #     if int(market_value) > 1 and 915 < cct.get_now_time_int():
+            #         # df['per%d'%(market_value)] = compute_perd_value(df,market_value)
+            #         df= compute_perd_value(df, market_value,'per')
+            #         df= compute_perd_value(df, market_value, 'perc')
+
+
+
     # if sort_value <> 'percent' and (market_key in ['2','3'] and market_value not in ['1'] ):
     #     if indexfibl is not None:
     #         df = df[df.fibl >= (indexfibl - 1)]
@@ -185,7 +214,7 @@ def getBollFilter(df=None, boll=ct.bollFilter, duration=ct.PowerCountdl, filter=
     else:
         # top10 = df[ (df.percent >= 9.99) & (df.b1_v > df.a1_v)]
 
-        if resample in ['d']:
+        if resample in ['d','w']:
             # if not top10 or (cct.get_now_time_int() < 950 or cct.get_now_time_int() > 1502):
             #     df.loc[((df.b1_v > df.a1_v) & (df.percent > 9)), 'percent'] = 10.1
             #     df.loc[((df.percent >= 9.97) & (df.percent < 10.1)), 'percent'] = 10
@@ -194,7 +223,7 @@ def getBollFilter(df=None, boll=ct.bollFilter, duration=ct.PowerCountdl, filter=
             #     df.loc[((df.b1_v > df.a1_v) & (df.percent > 9)), 'percent'] = 10.1
             #     df.loc[((df.percent >= 9.97) & (df.percent < 10.1)), 'percent'] = 10
 
-            df.loc[df.per1d >= 9.99, 'per1d'] = 10
+            # df.loc[df.per1d >= 9.99, 'per1d'] = 10
             df['percent'] = df['percent'].apply(lambda x: round(x, 2))
             # time_ss = time.time()
             perc_col = [co for co in df.columns if co.find('perc') == 0]
@@ -229,15 +258,36 @@ def getBollFilter(df=None, boll=ct.bollFilter, duration=ct.PowerCountdl, filter=
             #         df['perc_n'] = map(cct.func_compute_percd2, df['close'], df['llastp'], df['open'],df['lasto%sd' % nowd], df['lasth%sd' %
             #                                                                                               (nowd)], df['lastl%sd' % (nowd)], df['high'], df['low'], df['hmax'])
 
-            # for co in perc_col:
-            # df[co] = (df[co] + df['perc_n']).map(lambda x: int(x))
+
+            '''
+            idx_rnd = random.randint(0, len(df) - 10) if len(df) > 10 else 0
+            if not upper:
+               # if cct.get_work_time() or df.ix[idx_rnd].lastp1d <> df.ix[idx_rnd].close:
+               if cct.get_work_time() :
+                   nowd, per1d=1, 1
+                   if 'nlow' in df.columns:
+                       df['perc_n']=map(cct.func_compute_percd2020, df['open'], df['close'], df['nhigh'], df['nlow'], df['lasto%sd' % nowd], df['llastp'],
+                                         df['lasth%sd' % (nowd)], df['lastl%sd' % (nowd)], df['ma5d'], df['ma10d'], df['nvol'] / radio_t, df['lastv%sd' % (nowd)])
+                   else:
+                       df['perc_n']=map(cct.func_compute_percd2020, df['open'], df['close'], df['high'], df['low'], df['lasto%sd' % nowd], df['llastp'],
+                                         df['lasth%sd' % (nowd)], df['lastl%sd' % (nowd)], df['ma5d'], df['ma10d'], df['nvol'] / radio_t, df['lastv%sd' % (nowd)])
+               else:
+                   nowd, per1d=1, 1
+                   # print  df['per%sd' % da+1], df['lastp%sd' % (da)], df['lasth%sd' % (da)], df['lastl%sd' % (da)], df['high'], df['low']
+                   df['perc_n']=map(cct.func_compute_percd2020, df['open'], df['close'], df['high'], df['low'], df['lasto%sd' % nowd], df['llastp'],
+                                         df['lasth%sd' % (nowd)], df['lastl%sd' % (nowd)], df['ma5d'], df['ma10d'], df['nvol'] / radio_t, df['lastv%sd' % (nowd)])
+
+            for co in perc_col:
+                df[co] = (df[co] + df['perc_n']).map(lambda x: int(x))
+            '''
 
             # for co in per_col:
             # df[co] = (df[co] + df['percent']).map(lambda x: int(x))
 
             # print "percT:%.2f"%(time.time()-time_ss)
         else:
-            df['percent'] = (map(lambda x, y: round((x-y)/y*100,1) if int(y) > 0 else 0, df.buy, df.lastp1d))
+            df['percent']=(map(lambda x, y: round(
+                (x - y) / y * 100, 1) if int(y) > 0 else 0, df.buy, df.lastp1d))
             # df.loc['002204'].percent
             # -15.4
             # ipdb> df.loc['002204'].ma10d
@@ -245,60 +295,44 @@ def getBollFilter(df=None, boll=ct.bollFilter, duration=ct.PowerCountdl, filter=
             # ipdb> df.loc['002204'].ma5d
             # 3.2999999999999998
     if 'fib' not in df.columns:
-        df['fib'] = 0
+        df['fib']= 0
     # else:
 
-    co2int = ['boll', 'op', 'ratio', 'fib', 'fibl', 'df2']
+    co2int= ['boll', 'op', 'ratio', 'fib', 'fibl', 'df2']
     co2int.extend([co for co in df.columns.tolist()
                    if co.startswith('perc') and co.endswith('d')])
     co2int.extend(['top10', 'topR'])
-    co2int = [inx for inx in co2int if inx in df.columns]
+    co2int= [inx for inx in co2int if inx in df.columns]
 
     for co in co2int:
-        df[co] = df[co].astype(int)
+        df[co]= df[co].astype(int)
 
-    if down:
-        # if 'nlow' in df.columns:
-        #     if 'max5' in df.columns:
-        #         # df = df[(df.hmax >= df.ene) & (df.nlow >= df.low) & (df.low <> df.high) & (((df.low < df.hmax) & (df.high > df.cmean)) | (df.high > df.max5))]
-        #         df = df[ (((df.buy > df.ene) & (df.volume / radio_t > 1.5)) ) |  (((df.lastv1d > df.lvol * 1.5) & (df.lastv1d > df.lvol * 1.5)) & (df.lastp1d > df.ene) )]
-        #     else:
-        #         df = df[ (((df.buy > df.ene) & (df.volume / radio_t > 1.5)) ) |  (((df.lastv1d > df.lvol * 1.5) )  )]
-        # else:
-        #     # df = df[ (df.max5 >= df.ene) & (df.low <> df.high) & (((df.low < df.hmax) & (df.close > df.cmean)) | (df.high > df.cmean))]
-        #     df = df[ (((df.buy > df.ene) & (df.volume / radio_t > 1.5)) )  | (((df.lastp1d > df.ene) ) | ((df.buy > df.max5)|(df.buy > df.ene)) | (df.max5 >= df.ene)  | (df.high > df.cmean) )]
-        return df
+    # if down:
+    #     # if 'nlow' in df.columns:
+    #     #     if 'max5' in df.columns:
+    #     #         # df = df[(df.hmax >= df.ene) & (df.nlow >= df.low) & (df.low <> df.high) & (((df.low < df.hmax) & (df.high > df.cmean)) | (df.high > df.max5))]
+    #     #         df = df[ (((df.buy > df.ene) & (df.volume / radio_t > 1.5)) ) |  (((df.lastv1d > df.lvol * 1.5) & (df.lastv1d > df.lvol * 1.5)) & (df.lastp1d > df.ene) )]
+    #     #     else:
+    #     #         df = df[ (((df.buy > df.ene) & (df.volume / radio_t > 1.5)) ) |  (((df.lastv1d > df.lvol * 1.5) )  )]
+    #     # else:
+    #     #     # df = df[ (df.max5 >= df.ene) & (df.low <> df.high) & (((df.low < df.hmax) & (df.close > df.cmean)) | (df.high > df.cmean))]
+    #     #     df = df[ (((df.buy > df.ene) & (df.volume / radio_t > 1.5)) )  | (((df.lastp1d > df.ene) ) | ((df.buy > df.max5)|(df.buy > df.ene)) | (df.max5 >= df.ene)  | (df.high > df.cmean) )]
+    #     return df
 
     if cct.get_work_time() and 'b1_v' in df.columns and 'nvol' in df.columns:
-        df = df[(df.b1_v > 0) | (df.nvol > 0)]
+        df= df[(df.b1_v > 0) | (df.nvol > 0)]
 
     if (cct.get_now_time_int() > 915 and cct.get_now_time_int() < 926):
-        df['b1_v'] = df['volume']
+        df['b1_v']= df['volume']
     else:
-        dd = df[df.percent < 10]
-        dd['b1_v'] = dd['volume']
-        df = cct.combine_dataFrame(df, dd.loc[:, ['b1_v']])
+        dd= df[df.percent < 10]
+        dd['b1_v']= dd['volume']
+        df= cct.combine_dataFrame(df, dd.loc[:, ['b1_v']])
         # print "t:%0.2f"%(time.time()-time_ss)
 
-    # print market_key, market_value
 
-    if market_key is not None and market_value is not None:
-        # if market_key == '3':
 
-        if market_key == '3':
-            market_value = int(market_value)
-            log.info("stf market_key:%s" % (market_key))
-            idx_k = cct.get_col_in_columns(df, 'perc%sd', market_value)
-            df = df[df["perc%sd" % (idx_k)] >= idx_k]
-            if int(market_value) > 1 and 930 < cct.get_now_time_int():
-                df = compute_perd_value(df, market_value, 'perc')
-                df = compute_perd_value(df, market_value, 'per')
 
-        elif market_key == '2':
-            if int(market_value) > 1 and 915 < cct.get_now_time_int():
-                # df['per%d'%(market_value)] = compute_perd_value(df,market_value)
-                df = compute_perd_value(df, market_value)
-                df = compute_perd_value(df, market_value, 'perc')
 
         # if int(market_value) < 3 and 930 < cct.get_now_time_int():
         #     if 'nlow' in df.columns:
@@ -321,18 +355,22 @@ def getBollFilter(df=None, boll=ct.bollFilter, duration=ct.PowerCountdl, filter=
     # df['df2'] = (map(func_compute_df2, df.close.values, df.llastp.values,df.high.values, df.low.values,df.ratio.values))
     # df['df2'] = (map(func_compute_df2, df.close.values, df.llastp.values,df.high.values, df.low.values))
 
-    filter_up = 'ma5d'
-    filter_dn = 'ma10d'
 
+    '''
+    filter_up= 'ma5d'
+    filter_dn= 'ma10d'
     if ma5d and filter_up in df.columns:
         if filter_dn in df.columns:
             if market_key is not None and market_key == '3':
-                df = df[(df.buy >= df[filter_up]) & (
+                df= df[(df.buy >= df[filter_up]) & (
                     df.buy * 1.02 >= df[filter_dn] * ct.changeRatio)]
             else:
-                df = df[(df.buy >= df[filter_up])]
+                df= df[(df.buy >= df[filter_up])]
         else:
-            df = df[df.buy >= df[filter_up] * ct.changeRatio]
+            df= df[df.buy >= df[filter_up] * ct.changeRatio]
+    '''
+
+
 
         # df = df[(df.lvolume > df.lvol * 0.9) & (df.lvolume > df.lowvol * 1.1)]
 
@@ -343,7 +381,7 @@ def getBollFilter(df=None, boll=ct.bollFilter, duration=ct.PowerCountdl, filter=
 
         if 'nclose' in df.columns:
             # df = df[ ((df.buy > df.ene) ) | ((df.buy > df.upper) & ( df.nclose > df.cmean))]
-            df = df[((df.buy > df.llastp)) | ((df['nclose'] > df['ene'] * ct.changeRatio) & (df['percent'] > -3) & (df.volume > 1.5)) |
+            df= df[((df.buy > df.llastp)) | ((df['nclose'] > df['ene'] * ct.changeRatio) & (df['percent'] > -3) & (df.volume > 1.5)) |
                     ((df['nclose'] > df['upper'] * ct.changeRatio) & (df['buy'] > df['upper'] * ct.changeRatioUp)) | ((df['llastp'] > df['upper']) & (df['nclose'] > df['upper']))]
         else:
             df = df[((df.buy > df.llastp)) | ((df.buy > df.ene)) |
@@ -516,18 +554,19 @@ def getBollFilter(df=None, boll=ct.bollFilter, duration=ct.PowerCountdl, filter=
         # if 945 < cct.get_now_time_int() and market_key is None:
         #     df.loc[df.percent >= 9.94, 'percent'] = -10
 
-    else:
-        # df['upper'] = map(lambda x: round((1 + 11.0 / 100) * x, 1), df.ma10d)
-        # df['lower'] = map(lambda x: round((1 - 9.0 / 100) * x, 1), df.ma10d)
-        # df['ene'] = map(lambda x, y: round((x + y) / 2, 1), df.upper, df.lower)
-        # df = df[((df['buy'] >= df['ene'])) | ((df['buy'] < df['ene']) & (df['low'] > df['lower'])) | ((df['buy'] > df['upper']) & (df['low'] > df['upper']))]
-        # df = df[(( df['ene'] * ct.changeRatio < df['open']) & (df['buy'] > df['ene'] * ct.changeRatioUp)) | ((df['low'] > df['upper']) & (df['close'] > df['ene']))]
-        if 'nclose' in df.columns:
-            # df = df[((df['nclose'] > df['ene'] * ct.changeRatio) & (df['percent'] > -3) & (df.volume > 1.5)) |
-            #         ((df['nclose'] > df['upper'] * ct.changeRatio) & (df['buy'] > df['upper'] * ct.changeRatioUp)) | ((df['llastp'] > df['upper']) & (df['nclose'] > df['upper']))]
-            df = df[(df.nclose > df.cmean)]
-        else:
-            df = df[(df.buy > df.cmean)]
+    # else:
+    #     # df['upper'] = map(lambda x: round((1 + 11.0 / 100) * x, 1), df.ma10d)
+    #     # df['lower'] = map(lambda x: round((1 - 9.0 / 100) * x, 1), df.ma10d)
+    #     # df['ene'] = map(lambda x, y: round((x + y) / 2, 1), df.upper, df.lower)
+    #     # df = df[((df['buy'] >= df['ene'])) | ((df['buy'] < df['ene']) & (df['low'] > df['lower'])) | ((df['buy'] > df['upper']) & (df['low'] > df['upper']))]
+    #     # df = df[(( df['ene'] * ct.changeRatio < df['open']) & (df['buy'] > df['ene'] * ct.changeRatioUp)) | ((df['low'] > df['upper']) & (df['close'] > df['ene']))]
+    #     if 'nclose' in df.columns:
+    #         # df = df[((df['nclose'] > df['ene'] * ct.changeRatio) & (df['percent'] > -3) & (df.volume > 1.5)) |
+    #         #         ((df['nclose'] > df['upper'] * ct.changeRatio) & (df['buy'] > df['upper'] * ct.changeRatioUp)) | ((df['llastp'] > df['upper']) & (df['nclose'] > df['upper']))]
+    #         df = df[(df.nclose > df.cmean)]
+    #     else:
+    #         df = df[(df.buy > df.cmean)]
+
     print("bo:%0.1f" % (time.time() - time_s)),
 
     return df

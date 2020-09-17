@@ -1,15 +1,18 @@
 # -*- coding:utf-8 -*-
 # !/usr/bin/env python
 
-
 # import sys
+# reload(sys)
+# sys.setdefaultencoding('gbk')
+
 #
 # reload(sys)
 #
 # sys.setdefaultencoding('utf-8')
 url_s = "http://vip.stock.finance.sina.com.cn/quotes_service/view/cn_bill_all.php?num=100&page=1&sort=ticktime&asc=0&volume=0&type=1"
 url_b = "http://vip.stock.finance.sina.com.cn/quotes_service/view/cn_bill_all.php?num=100&page=1&sort=ticktime&asc=0&volume=100000&type=0"
-status_dict = {u"中性盘": "normal", u"买盘": "up", u"卖盘": "down"}
+# status_dict = {u"???": "normal", u"??": "up", u"??": "down"}
+status_dict = {u"mid": "normal", u"buy": "up", u"sell": "down"}
 url_real_sina = "http://finance.sina.com.cn/realstock/"
 url_real_sina_top = "http://vip.stock.finance.sina.com.cn/mkt/#stock_sh_up"
 url_real_east = "http://quote.eastmoney.com/sz000004.html"
@@ -125,13 +128,13 @@ if __name__ == "__main__":
                 st_key_sort = '%s %s' % (
                     st_key_sort.split()[0], cct.get_index_fibl())
             time_Rt = time.time()
-            # top_now = tdd.getSinaAlldf(market='央企,rzrq',filename='yqbk', vol=ct.json_countVol, vtype=ct.json_countType)
+            # top_now = tdd.getSinaAlldf(market='??,rzrq',filename='yqbk', vol=ct.json_countVol, vtype=ct.json_countType)
             top_now = tdd.getSinaAlldf(
                 market='all', vol=ct.json_countVol, vtype=ct.json_countType)
-            # top_now = tdd.getSinaAlldf(market='央企',filename='yqbk', vol=ct.json_countVol, vtype=ct.json_countType,trend=False)
+            # top_now = tdd.getSinaAlldf(market='??',filename='yqbk', vol=ct.json_countVol, vtype=ct.json_countType,trend=False)
 
             # top_now = tdd.getSinaAlldf(market='rzrq', vol=ct.json_countVol, vtype=ct.json_countType)
-            # top_now = tdd.getSinaAlldf(market='次新股,060',filename='cxg', vol=ct.json_countVol, vtype=ct.json_countType)
+            # top_now = tdd.getSinaAlldf(market='??¹?060',filename='cxg', vol=ct.json_countVol, vtype=ct.json_countType)
 
             time_d = time.time()
             if time_d - time_s > delay_time:
@@ -273,6 +276,7 @@ if __name__ == "__main__":
                 # top_temp =  top_all[(top_all.boll < 1) &(top_all.df2 >0) &(top_all.close > top_all.max5)]
 
                 # '''
+
                 if cct.get_now_time_int() > 830 and cct.get_now_time_int() <= 935:
                     top_temp = top_all[(top_all.low >= top_all.lastl1d) & (
                         top_all.lasth1d > top_all.lasth2d) & (top_all.close > top_all.lastp1d)]
@@ -298,12 +302,12 @@ if __name__ == "__main__":
                     if 'nlow' in top_all.columns:
 
                         if st_key_sort == '4':
-                            # 跳空
+                            # ???
                             # top_temp = top_all[ (top_all.topR > 0) & ((top_all.close >= top_all.nclose)) & ((top_all.open > top_all.lastp1d)) & (top_all.low >= top_all.lastl1d) & (top_all.lasth1d > top_all.lasth2d) & (top_all.open >= top_all.nlow) ]
 
                             # top_temp = top_all[ ((top_all.lastp1d > top_all.ma5d) & (top_all.lastp2d > top_all.ma5d) & (top_all.close > top_all.ma5d) & (top_all.ma5d > top_all.ma10d)) & ((top_all.close >= top_all.nclose)) & ((top_all.open > top_all.lastp1d)) & (top_all.low >= top_all.lastl1d) & (top_all.lasth1d > top_all.lasth2d) & (top_all.open >= top_all.nlow) ]
 
-                            # 3日ma5的，ma5d>ma10d,open最低
+                            # 3?ma5?ģ?ma5d>ma10d,open???
                             # top_temp = top_all[ ((top_all.lastp1d > top_all.ma5d) & (top_all.lastp2d > top_all.ma5d) & (top_all.close > top_all.ma5d) \
                                 # & (top_all.ma5d > top_all.ma10d)) & (top_all.open >= top_all.nlow) & ((top_all.lastp1d > top_all.ene) & (top_all.close >= top_all.ene)) ]
 
@@ -314,7 +318,7 @@ if __name__ == "__main__":
                             #                     & ((top_all.per2d > 0) | (top_all.lastp2d > top_all.ma52d)) \
                             #                     & ((top_all.per3d > 0) | (top_all.lastp3d > top_all.ma53d)) )]
 
-                            # max5 < top_all.hmax ,反转新高
+                            # max5 < top_all.hmax ,??ת???
                             # top_temp = top_all[((top_all.max5 < top_all.hmax) & ((top_all.close > top_all.hmax) | (top_all.close > top_all.max5)) )]
                             top_temp = top_all[ (top_all.max5 < top_all.hmax) & ((top_all.close > top_all.hmax) | (top_all.close > top_all.max5))
                                         & (top_all.low > top_all.lastl1d) & (top_all.low > top_all.lastl1d) 
@@ -329,12 +333,12 @@ if __name__ == "__main__":
                             #
                             # top_temp = top_all[ ((top_all.close >= top_all.ene)) & (top_all.close >= top_all.upper) & (top_all.topR > 0) & (top_all.top10 >= 0) ]
 
-                            # 3日ma5的，ma5d>ma10d,close > ene,lastp1d>ene
+                            # 3?ma5?ģ?ma5d>ma10d,close > ene,lastp1d>ene
                             # top_temp = top_all[ ((top_all.lastp1d > top_all.ma5d) & (top_all.lastp2d > top_all.ma5d) & (top_all.close > top_all.ma5d) & (top_all.ma5d > top_all.ma10d)) & ((top_all.close >= top_all.ene)) & (top_all.close >= top_all.upper) & (top_all.topR > 0) & (top_all.top10 >= 0) ]
                             # top_temp = top_all[ ((top_all.lastp1d > top_all.ma5d) & (top_all.lastp2d > top_all.ma5d) & (top_all.close > top_all.ma5d) \
                                 # & (top_all.ma5d > top_all.ma10d)) & ((top_all.lastp1d > top_all.ene) & (top_all.close >= top_all.ene))  & (top_all.topR > 0) & (top_all.top10 > 0) ]
 
-                            # max5 > hmax(30)新高
+                            # max5 > hmax(30)???
                             # top_temp = top_all[((top_all.max5 > top_all.hmax) & ( top_all.open >= top_all.nlow) &( top_all.close > top_all.lastp1d)) ]
                             # top_temp = top_all[((top_all.max5 > top_all.hmax))]
 
@@ -344,7 +348,7 @@ if __name__ == "__main__":
                                                 & ((top_all.per2d > 0) | (top_all.lastp2d > top_all.ma52d))
                                                 & ((top_all.per3d > 0) | (top_all.lastp3d > top_all.ma53d)))]
 
-                            # 大于ene中轨，大于上轨，一个跳空，一个涨停
+                            # ???ne??죬???Ϲ죬һ????գ?һ???ͣ
                         # top_temp = top_all[  (top_all.low >= top_all.lastl1d) & (top_all.lasth1d > top_all.lasth2d) & (top_all.low >= top_all.nlow) & ((top_all.open >= top_all.nlow *0.998) & (top_all.open <= top_all.nlow*1.002)) ]
                         # top_temp = top_all[ (top_all.volume >= 1.2 ) & (top_all.low >= top_all.lastl1d) & (top_all.lasth1d > top_all.lasth2d) & (top_all.low >= top_all.nlow) & ((top_all.open >= top_all.nlow *0.99) & (top_all.open <= top_all.nlow*1.01)) ]
                     else:
@@ -354,6 +358,9 @@ if __name__ == "__main__":
                         # top_temp = top_all[ (top_all.volume >= 1.2 ) & (top_all.low >= top_all.lastl1d) & (top_all.lasth1d > top_all.lasth2d) & (top_all.close > top_all.lastp1d)]
                 else:
                     top_temp=top_all.copy()
+
+
+
                 # '''
 
                 # if cct.get_now_time_int() > 830 and cct.get_now_time_int() <= 935:

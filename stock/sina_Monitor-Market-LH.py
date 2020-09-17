@@ -260,6 +260,100 @@ if __name__ == "__main__":
                             by=['dff', 'percent', 'ratio'], ascending=[0, 0, 1])
 
                     # top_all=top_all.sort_values(by=['percent','dff','couts','ratio'],ascending=[0,0,1,1])
+                    
+                    top_all = top_dif.copy()
+                    if cct.get_now_time_int() > 830 and cct.get_now_time_int() <= 935:
+                        top_temp = top_all[(top_all.low >= top_all.lastl1d) & (
+                            top_all.lasth1d > top_all.lasth2d) & (top_all.close > top_all.lastp1d)]
+                        # top_temp =  top_all[( ((top_all.top10 >0) | (top_all.boll >0)) & (top_all.lastp1d > top_all.ma5d) & (top_all.close > top_all.lastp1d))]
+                        # top_temp =  top_all[((top_all.lastp1d < top_all.ma5d) & (top_all.close > top_all.lastp1d))]
+                        # top_temp =  top_all[((top_all.topR < 2) & (top_all.close > top_all.upper) & (top_all.close > top_all.lastp1d))]
+                        # top_temp =  top_all[((top_all.topR >0) & (top_all.top10 >1) &   (top_all.close > top_all.upper) & (top_all.close > top_all.ma5d))]
+                        # top_temp =  top_all[((top_all.boll >0) & (top_all.close > top_all.lastp1d))]
+
+                        # top_all[(top_all.low >= top_all.nlow)& (top_all.high > top_all.nhigh)]
+                    elif cct.get_now_time_int() > 935 and cct.get_now_time_int() <= 1450:
+
+                        # top_temp =  top_all[ ( (top_all.lastp1d > top_all.lastp2d) &(top_all.close >top_all.lastp1d )) | ((top_all.low >= top_all.nlow)) & ((top_all.lastp1d > top_all.ma5d)  & (top_all.close > top_all.ma5d) &(top_all.close > top_all.lastp1d))]
+
+                        # top_temp =  top_all[ ((top_all.top10 >0) | (top_all.boll >0))  & (top_all.lastp1d > top_all.ma5d)  & ((top_all.low > top_all.lastl1d) | (top_all.low == top_all.open))]
+                        # top_temp =  top_all[ ( (top_all.lastp1d > top_all.ma5d) ) ]
+                        # top_temp =  top_all[(top_all.topR < 2)  & (top_all.close > top_all.upper) & ((top_all.low > top_all.lastp1d) | (top_all.low == top_all.open))]
+                        # top_temp =  top_all[((top_all.topR >0) & (top_all.top10 >1) &   (top_all.close > top_all.upper) & (top_all.low > top_all.lastl1d) & (top_all.close > top_all.ma5d) )]
+                        # top_temp =  top_all[(top_all.boll >0)  & ((top_all.low > top_all.upper) | (top_all.low == top_all.open))]
+                        # top_temp =  top_all[(top_all.boll >0)  & ((top_all.low > top_all.lastp1d) | (top_all.low == top_all.open))]
+                        # top_temp =  top_all[(top_all.topR < 2) & (top_all.close >= top_all.nhigh) & ((top_all.low > top_all.lastp1d) | (top_all.low == top_all.open))]
+
+                        if 'nlow' in top_all.columns:
+
+                            if st_key_sort == '4':
+                                # 跳空
+                                # top_temp = top_all[ (top_all.topR > 0) & ((top_all.close >= top_all.nclose)) & ((top_all.open > top_all.lastp1d)) & (top_all.low >= top_all.lastl1d) & (top_all.lasth1d > top_all.lasth2d) & (top_all.open >= top_all.nlow) ]
+
+                                # top_temp = top_all[ ((top_all.lastp1d > top_all.ma5d) & (top_all.lastp2d > top_all.ma5d) & (top_all.close > top_all.ma5d) & (top_all.ma5d > top_all.ma10d)) & ((top_all.close >= top_all.nclose)) & ((top_all.open > top_all.lastp1d)) & (top_all.low >= top_all.lastl1d) & (top_all.lasth1d > top_all.lasth2d) & (top_all.open >= top_all.nlow) ]
+
+                                # 3日ma5的，ma5d>ma10d,open最低
+                                # top_temp = top_all[ ((top_all.lastp1d > top_all.ma5d) & (top_all.lastp2d > top_all.ma5d) & (top_all.close > top_all.ma5d) \
+                                    # & (top_all.ma5d > top_all.ma10d)) & (top_all.open >= top_all.nlow) & ((top_all.lastp1d > top_all.ene) & (top_all.close >= top_all.ene)) ]
+
+                                # max5>hmax,low>last1d,per1d,2d,3d>-1,per1d >ma51d...
+
+                                # top_temp = top_all[((top_all.max5 > top_all.hmax) & (top_all.ma5d > top_all.ma10d)) & (top_all.low > top_all.lastl1d)
+                                #                    & (top_all.low > top_all.lastl1d) & ( ((top_all.per1d > 0) | (top_all.lastp1d > top_all.ma51d)) \
+                                #                     & ((top_all.per2d > 0) | (top_all.lastp2d > top_all.ma52d)) \
+                                #                     & ((top_all.per3d > 0) | (top_all.lastp3d > top_all.ma53d)) )]
+
+                                # max5 < top_all.hmax ,反转新高
+                                # top_temp = top_all[((top_all.max5 < top_all.hmax) & ((top_all.close > top_all.hmax) | (top_all.close > top_all.max5)) )]
+                                top_temp = top_all[ (top_all.max5 < top_all.hmax) & ((top_all.close > top_all.hmax) | (top_all.close > top_all.max5))
+                                            & (top_all.low > top_all.lastl1d) & (top_all.low > top_all.lastl1d) 
+                                            & (((top_all.per1d > 0) | (top_all.lastp1d > top_all.ma51d))
+                                            & ((top_all.per2d > 0) | (top_all.lastp2d > top_all.ma52d))
+                                            & ((top_all.per3d > 0) | (top_all.lastp3d > top_all.ma53d)))]
+
+                                # top_temp = top_all[ ((top_all.lastp1d > top_all.ma5d) & (top_all.lastp2d > top_all.ma5d) & (top_all.close > top_all.ma5d) \
+                                # & (top_all.ma5d > top_all.ma10d)) & (top_all.open >= top_all.nlow) & ((top_all.lastp1d > top_all.ene) & (top_all.close >= top_all.ene)) ]
+
+                            else:
+                                #
+                                # top_temp = top_all[ ((top_all.close >= top_all.ene)) & (top_all.close >= top_all.upper) & (top_all.topR > 0) & (top_all.top10 >= 0) ]
+
+                                # 3日ma5的，ma5d>ma10d,close > ene,lastp1d>ene
+                                # top_temp = top_all[ ((top_all.lastp1d > top_all.ma5d) & (top_all.lastp2d > top_all.ma5d) & (top_all.close > top_all.ma5d) & (top_all.ma5d > top_all.ma10d)) & ((top_all.close >= top_all.ene)) & (top_all.close >= top_all.upper) & (top_all.topR > 0) & (top_all.top10 >= 0) ]
+                                # top_temp = top_all[ ((top_all.lastp1d > top_all.ma5d) & (top_all.lastp2d > top_all.ma5d) & (top_all.close > top_all.ma5d) \
+                                    # & (top_all.ma5d > top_all.ma10d)) & ((top_all.lastp1d > top_all.ene) & (top_all.close >= top_all.ene))  & (top_all.topR > 0) & (top_all.top10 > 0) ]
+
+                                # max5 > hmax(30)新高
+                                # top_temp = top_all[((top_all.max5 > top_all.hmax) & ( top_all.open >= top_all.nlow) &( top_all.close > top_all.lastp1d)) ]
+                                # top_temp = top_all[((top_all.max5 > top_all.hmax))]
+
+                                # max5>hmax,low>last1d,per1d,2d,3d>-1,per1d >ma51d...
+                                top_temp=top_all[((top_all.max5 > top_all.hmax) & (top_all.ma5d > top_all.ma10d)) & (top_all.low > top_all.lastl1d)
+                                                   & (top_all.low > top_all.lastl1d) & (((top_all.per1d > 0) | (top_all.lastp1d > top_all.ma51d))
+                                                    & ((top_all.per2d > 0) | (top_all.lastp2d > top_all.ma52d))
+                                                    & ((top_all.per3d > 0) | (top_all.lastp3d > top_all.ma53d)))]
+
+                                # 大于ene中轨，大于上轨，一个跳空，一个涨停
+                            # top_temp = top_all[  (top_all.low >= top_all.lastl1d) & (top_all.lasth1d > top_all.lasth2d) & (top_all.low >= top_all.nlow) & ((top_all.open >= top_all.nlow *0.998) & (top_all.open <= top_all.nlow*1.002)) ]
+                            # top_temp = top_all[ (top_all.volume >= 1.2 ) & (top_all.low >= top_all.lastl1d) & (top_all.lasth1d > top_all.lasth2d) & (top_all.low >= top_all.nlow) & ((top_all.open >= top_all.nlow *0.99) & (top_all.open <= top_all.nlow*1.01)) ]
+                        else:
+                            top_temp=top_all[((top_all.open > top_all.lastp1d)) & (
+                                top_all.low >= top_all.lastl1d) & (top_all.lasth1d > top_all.lasth2d)]
+                            # top_temp = top_all[  (top_all.low >= top_all.lastl1d) & (top_all.lasth1d > top_all.lasth2d) & (top_all.low >= top_all.nlow) & ((top_all.open >= top_all.nlow *0.998) & (top_all.open <= top_all.nlow*1.002)) ]
+                            # top_temp = top_all[ (top_all.volume >= 1.2 ) & (top_all.low >= top_all.lastl1d) & (top_all.lasth1d > top_all.lasth2d) & (top_all.close > top_all.lastp1d)]
+                    else:
+                        top_temp=top_all.copy()
+
+
+
+
+
+
+
+
+
+
+
 
                     top_temp = stf.filterPowerCount(top_dif,ct.PowerCount)
                     

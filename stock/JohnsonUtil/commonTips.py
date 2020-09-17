@@ -2438,6 +2438,42 @@ def func_compute_percd(close, lastp, op, lasth, lastl, nowh, nowl):
     #         initc -= 1
     return initc
 
+
+
+# import numba as nb
+# @numba.jit(nopython=True)
+# @nb.autojit
+def func_compute_percd2020( open, close,high, low,lastopen, lastclose,lasthigh, lastlow, ma5,ma10,nowvol=None,lastvol=None,upper=None,hmax=None):
+    # down_zero, down_dn, percent_l = 0, 0, 2
+     # (1 if ( ((c >= op) and ((c - lc)/lc*100 >= 0)) or (c >= op and c >=m5a) ) else down_dn)
+    # df['vol'],df['vol'].shift(1),df['upper']
+    initc = 0
+    if 0 < lastclose < 1000 and lasthigh <> 1.0 and lastlow <> 1.0 and lasthigh <> 0 and lastlow <> 0:
+#        close = round(close, 1)
+#        lastp = round(lastp, 1)
+#        op = round(op, 1)
+#        lastopen = round(lastopen, 1)
+#        lasth = round(lasth, 1)
+#        lastl = round(lastl, 1)
+        percent = round((close - lastclose)/lastclose*100,1)
+        # now_du = round((high - low)/low*100,1)
+        close_du = round((high - low)/low*100,1)
+        # last_du = round((lasthigh - lastlow)/lastlow*100,1)
+        # volratio = round((nowvol / lastvol),1)
+
+        if percent > 1 and low > lastlow and high > lasthigh:
+            initc +=2
+        elif percent > 2:
+            initc +=1
+        elif close > ma5 and close > ma10:
+            initc +=0.5
+        # else:
+            # initc -=1
+
+    return initc
+
+
+
 # import numba as nb
 # @numba.jit(nopython=True)
 # @nb.autojit
