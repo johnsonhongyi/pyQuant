@@ -406,6 +406,12 @@ if __name__ == "__main__":
                     ct_Duration_format_Values = ct.get_Duration_format_Values(ct_Duration_format_Values,replace='b1_v',dest='perc3d')
                     ct_Duration_format_Values = ct.get_Duration_format_Values(ct_Duration_format_Values,replace='couts',dest='b1_v')
                     ct_Duration_format_Values = ct.get_Duration_format_Values(ct_Duration_format_Values,replace='fibl',dest='top10')
+                    ct_Duration_format_Values = ct.get_Duration_format_Values(
+                        ct_Duration_format_Values, replace='perc1d', dest='percxd')
+                    ct_Duration_format_Values = ct.get_Duration_format_Values(
+                        ct_Duration_format_Values, replace='percxd', dest='perc3d')
+                    ct_Duration_format_Values = ct.get_Duration_format_Values(
+                        ct_Duration_format_Values, replace='perc3d', dest='perc1d')
                     top_dd = top_dd.loc[:, ct_Duration_format_Values]
                     # ct_Duration_format_Values = ct.get_Duration_format_Values(ct_Duration_format_Values,replace='op',dest='upper')
                     # top_dd[col for col in top_dd.index if col in top_temp[:10].index]

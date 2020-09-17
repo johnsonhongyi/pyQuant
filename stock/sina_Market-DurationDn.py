@@ -425,7 +425,8 @@ if __name__ == "__main__":
                         ct_Duration_format_Values, replace='b1_v', dest='upper')
                     ct_Duration_format_Values = ct.get_Duration_format_Values(
                         ct_Duration_format_Values, replace='fibl', dest='top10')
-
+                    ct_Duration_format_Values = ct.get_Duration_format_Values(
+                        ct_Duration_format_Values, replace='perc1d', dest='perc3d')
                     top_dd = top_dd.loc[:, ct_Duration_format_Values]
 
                     # df[df.columns[(df.columns >= 'per1d') & (df.columns <= 'per9d')]][:100]

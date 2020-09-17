@@ -419,6 +419,8 @@ if __name__ == "__main__":
                         ct_Duration_format_Values, replace='b1_v', dest='volume')
                     ct_Duration_format_Values = ct.get_Duration_format_Values(
                         ct_Duration_format_Values, replace='fibl', dest='top10')
+                    ct_Duration_format_Values = ct.get_Duration_format_Values(
+                        ct_Duration_format_Values, replace='perc1d', dest='perc3d')
                     top_dd = top_dd.loc[:, ct_Duration_format_Values]
                     # print cct.format_for_print(top_dd)
                     # table,widths = cct.format_for_print(top_dd[:9],widths=True)

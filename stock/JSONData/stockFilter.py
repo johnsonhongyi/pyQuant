@@ -84,7 +84,7 @@ def filterPowerCount(df, count=200, down=False, duration=2):
 
 def compute_perd_value(df, market_value=3, col='per'):
 
-    if market_value==None:
+    if market_value==None or market_value < '3':
         market_value = 3
     temp = df[df.columns[(df.columns >= '%s1d' % (col)) & (
         df.columns <= '%s%sd' % (col, market_value))]]
@@ -144,6 +144,7 @@ def getBollFilter(df=None, boll=ct.bollFilter, duration=ct.PowerCountdl, filter=
     market_value = cct.GlobalValues().getkey('market_value')
 
     # if int(market_value) > 1 and 930 < cct.get_now_time_int():
+
     df= compute_perd_value(df, market_value, 'perc')
     df= compute_perd_value(df, market_value, 'per')
 
