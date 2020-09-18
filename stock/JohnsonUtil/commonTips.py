@@ -2466,7 +2466,7 @@ def func_compute_percd2020( open, close,high, low,lastopen, lastclose,lasthigh, 
         elif percent > 2:
             initc +=1
         elif close > ma5 and close > ma10:
-            initc +=0.5
+            initc +=0.1
         # else:
             # initc -=1
 

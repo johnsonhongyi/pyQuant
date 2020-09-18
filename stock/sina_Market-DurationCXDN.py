@@ -136,6 +136,7 @@ if __name__ == "__main__":
     # market_sort_value, market_sort_value_key = ct.get_market_sort_value_key('1')
     # st_key_sort = '7'
     # st_key_sort = ct.sort_value_key_perd23
+    # st_key_sort = '3 5'
     st_key_sort = '2'
     market_sort_value, market_sort_value_key = ct.get_market_sort_value_key(st_key_sort)
     st = None
@@ -403,15 +404,17 @@ if __name__ == "__main__":
 
                     # ct_Duration_format_Values = ct.get_Duration_format_Values(ct_Duration_format_Values,replace='couts',dest='stdv')
                     # ct_Duration_format_Values = ct.get_Duration_format_Values(ct_Duration_format_Values,replace='boll',dest='upper')
-                    ct_Duration_format_Values = ct.get_Duration_format_Values(ct_Duration_format_Values,replace='b1_v',dest='perc3d')
-                    ct_Duration_format_Values = ct.get_Duration_format_Values(ct_Duration_format_Values,replace='couts',dest='b1_v')
-                    ct_Duration_format_Values = ct.get_Duration_format_Values(ct_Duration_format_Values,replace='fibl',dest='top10')
-                    ct_Duration_format_Values = ct.get_Duration_format_Values(
-                        ct_Duration_format_Values, replace='perc1d', dest='percxd')
-                    ct_Duration_format_Values = ct.get_Duration_format_Values(
-                        ct_Duration_format_Values, replace='percxd', dest='perc3d')
-                    ct_Duration_format_Values = ct.get_Duration_format_Values(
-                        ct_Duration_format_Values, replace='perc3d', dest='perc1d')
+
+                    if 'perc3d' in top_dd.columns and 'b1_v' in top_dd.columns:
+                        ct_Duration_format_Values = ct.get_Duration_format_Values(ct_Duration_format_Values,replace='b1_v',dest='perc3d')
+                        ct_Duration_format_Values = ct.get_Duration_format_Values(ct_Duration_format_Values,replace='couts',dest='b1_v')
+                        ct_Duration_format_Values = ct.get_Duration_format_Values(ct_Duration_format_Values,replace='fibl',dest='top10')
+                        ct_Duration_format_Values = ct.get_Duration_format_Values(
+                            ct_Duration_format_Values, replace='perc3d', dest='percxd')
+                        ct_Duration_format_Values = ct.get_Duration_format_Values(
+                            ct_Duration_format_Values, replace='perc1d', dest='perc3d')
+                        ct_Duration_format_Values = ct.get_Duration_format_Values(
+                            ct_Duration_format_Values, replace='percxd', dest='perc1d')
                     top_dd = top_dd.loc[:, ct_Duration_format_Values]
                     # ct_Duration_format_Values = ct.get_Duration_format_Values(ct_Duration_format_Values,replace='op',dest='upper')
                     # top_dd[col for col in top_dd.index if col in top_temp[:10].index]

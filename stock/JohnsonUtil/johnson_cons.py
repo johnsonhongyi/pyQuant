@@ -53,7 +53,7 @@ changeRatioUp = 1.025
 # duration_date = 10
 wencai_delay_time = 45
 resample_dtype = 'd'
-sina_lastbuy_logtime = 600
+sina_lastbuy_logtime = 1500
 cumdays = 14
 bollFilter = -5
 keep_lastnum = 15
@@ -655,6 +655,9 @@ def negate_boolean_list(negate_list, idx=1, position=False):
 
 
 def get_Duration_format_Values(duration_format, column=None, replace='perc3d',dest='b1_v'):
+    if column is not None and not isinstance(column, list) and column not in duration_format:
+        # print('column:%s not in Values:%s'%(column,duration_format))
+        return duration_format
     if column is not None or dest <>'b1_v':
         t_list = []
 #        perd_l = ['per%sd','perc%sd']
