@@ -421,6 +421,23 @@ if __name__ == "__main__":
                         ct_Duration_format_Values, replace='fibl', dest='top10')
                     ct_Duration_format_Values = ct.get_Duration_format_Values(
                         ct_Duration_format_Values, replace='perc1d', dest='perc3d')
+
+
+                    if 'nhigh' in top_all.columns:
+                        ct_Duration_format_Values = ct.get_Duration_format_Values(
+                            ct_Duration_format_Values, replace='df2', dest='nhigh')
+                        # ct_MonitorMarket_Values2 = ct.get_Duration_format_Values(
+                        #             ct_MonitorMarket_Values2, replace='df2', dest='nhigh')
+                    else:
+                        ct_Duration_format_Values = ct.get_Duration_format_Values(
+                            ct_Duration_format_Values, replace='df2', dest='high')
+
+                        # ct_MonitorMarket_Values2 = ct.get_Duration_format_Values(
+                        #             ct_MonitorMarket_Values2, replace='df2', dest='high')
+
+
+
+                    
                     top_dd = top_dd.loc[:, ct_Duration_format_Values]
                     # print cct.format_for_print(top_dd)
                     # table,widths = cct.format_for_print(top_dd[:9],widths=True)

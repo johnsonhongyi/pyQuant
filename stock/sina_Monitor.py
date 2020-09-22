@@ -321,10 +321,10 @@ if __name__ == "__main__":
                             # max5 < top_all.hmax ,??ת???
                             # top_temp = top_all[((top_all.max5 < top_all.hmax) & ((top_all.close > top_all.hmax) | (top_all.close > top_all.max5)) )]
                             top_temp = top_all[ (top_all.max5 < top_all.hmax) & ((top_all.close > top_all.hmax) | (top_all.close > top_all.max5))
-                                        & (top_all.low > top_all.lastl1d) & (top_all.low > top_all.lastl1d) 
-                                        & (((top_all.per1d > 0) | (top_all.lastp1d > top_all.ma51d))
-                                        & ((top_all.per2d > 0) | (top_all.lastp2d > top_all.ma52d))
-                                        & ((top_all.per3d > 0) | (top_all.lastp3d > top_all.ma53d)))]
+                                        & (top_all.low > top_all.ma51d) 
+                                        & (((top_all.per1d > 0) | (top_all.lastp1d > top_all.ma10d))
+                                        & ((top_all.per2d > 0) | (top_all.lastp2d > top_all.ma10d))
+                                        & ((top_all.per3d > 0) | (top_all.lastp3d > top_all.ma10d)))]
 
                             # top_temp = top_all[ ((top_all.lastp1d > top_all.ma5d) & (top_all.lastp2d > top_all.ma5d) & (top_all.close > top_all.ma5d) \
                             # & (top_all.ma5d > top_all.ma10d)) & (top_all.open >= top_all.nlow) & ((top_all.lastp1d > top_all.ene) & (top_all.close >= top_all.ene)) ]
@@ -343,16 +343,16 @@ if __name__ == "__main__":
                             # top_temp = top_all[((top_all.max5 > top_all.hmax))]
 
                             # max5>hmax,low>last1d,per1d,2d,3d>-1,per1d >ma51d...
-                            top_temp=top_all[((top_all.max5 > top_all.hmax) & (top_all.ma5d > top_all.ma10d)) & (top_all.low > top_all.lastl1d)
-                                               & (top_all.low > top_all.lastl1d) & (((top_all.per1d > 0) | (top_all.lastp1d > top_all.ma51d))
-                                                & ((top_all.per2d > 0) | (top_all.lastp2d > top_all.ma52d))
-                                                & ((top_all.per3d > 0) | (top_all.lastp3d > top_all.ma53d)))]
+                            top_temp=top_all[((top_all.max5 > top_all.hmax) & (top_all.ma5d > top_all.ma10d)) & (top_all.low > top_all.ma51d)
+                                                & (((top_all.per1d > 0) | (top_all.lastp1d > top_all.ma10d))
+                                                & ((top_all.per2d > 0) | (top_all.lastp2d > top_all.ma10d))
+                                                & ((top_all.per3d > 0) | (top_all.lastp3d > top_all.ma10d)))]
 
                             # ???ne??죬???Ϲ죬һ????գ?һ???ͣ
                         # top_temp = top_all[  (top_all.low >= top_all.lastl1d) & (top_all.lasth1d > top_all.lasth2d) & (top_all.low >= top_all.nlow) & ((top_all.open >= top_all.nlow *0.998) & (top_all.open <= top_all.nlow*1.002)) ]
                         # top_temp = top_all[ (top_all.volume >= 1.2 ) & (top_all.low >= top_all.lastl1d) & (top_all.lasth1d > top_all.lasth2d) & (top_all.low >= top_all.nlow) & ((top_all.open >= top_all.nlow *0.99) & (top_all.open <= top_all.nlow*1.01)) ]
                     else:
-                        top_temp=top_all[((top_all.open > top_all.lastp1d)) & (
+                        top_temp=top_all[((top_all.close > top_all.ma51d)) & (
                             top_all.low >= top_all.lastl1d) & (top_all.lasth1d > top_all.lasth2d)]
                         # top_temp = top_all[  (top_all.low >= top_all.lastl1d) & (top_all.lasth1d > top_all.lasth2d) & (top_all.low >= top_all.nlow) & ((top_all.open >= top_all.nlow *0.998) & (top_all.open <= top_all.nlow*1.002)) ]
                         # top_temp = top_all[ (top_all.volume >= 1.2 ) & (top_all.low >= top_all.lastl1d) & (top_all.lasth1d > top_all.lasth2d) & (top_all.close > top_all.lastp1d)]
@@ -407,6 +407,7 @@ if __name__ == "__main__":
                 # top_temp = stf.getBollFilter(df=top_temp, boll=ct.bollFilter, duration=ct.PowerCountdl, filter=False)
                 # top_temp = stf.getBollFilter(df=top_temp, boll=ct.bollFilter, duration=ct.PowerCountdl, filter=False, ma5d=False, dl=14, percent=False, resample='d')
                 # top_temp = stf.getBollFilter(df=top_temp, boll=ct.bollFilter, duration=ct.PowerCountdl, filter=True, ma5d=True, dl=14, percent=False, resample=resample)
+                
                 top_temp=stf.getBollFilter(
                     df=top_temp, resample=resample, down=True)
                 top_end=stf.getBollFilter(
@@ -430,8 +431,9 @@ if __name__ == "__main__":
 
                 market_sort_value2, market_sort_value_key2=ct.get_market_sort_value_key(
                     f_sort, top_all=top_all)
-                ct_MonitorMarket_Values2=ct.get_Duration_format_Values(
-                    ct.Monitor_format_trade, market_sort_value2[:2])
+                
+                # ct_MonitorMarket_Values2=ct.get_Duration_format_Values(
+                #     ct.Monitor_format_trade, market_sort_value2[:2])
 
                 top_temp2=top_end.sort_values(
                     by=(market_sort_value2), ascending=market_sort_value_key2)
@@ -440,17 +442,35 @@ if __name__ == "__main__":
                     ct_MonitorMarket_Values, replace='b1_v', dest='volume')
                 ct_MonitorMarket_Values=ct.get_Duration_format_Values(
                     ct_MonitorMarket_Values, replace='fibl', dest='top10')
-                ct_MonitorMarket_Values2=ct.get_Duration_format_Values(
-                    ct_MonitorMarket_Values2, replace='b1_v', dest='volume')
-                ct_MonitorMarket_Values2=ct.get_Duration_format_Values(
-                    ct_MonitorMarket_Values2, replace='fibl', dest='top10')
+
+                # ct_MonitorMarket_Values2=ct.get_Duration_format_Values(
+                #     ct_MonitorMarket_Values2, replace='b1_v', dest='volume')
+                # ct_MonitorMarket_Values2=ct.get_Duration_format_Values(
+                #     ct_MonitorMarket_Values2, replace='fibl', dest='top10')
+
+
+
+                if 'nhigh' in top_all.columns:
+                    ct_MonitorMarket_Values = ct.get_Duration_format_Values(
+                        ct_MonitorMarket_Values, replace='df2', dest='nhigh')
+                    # ct_MonitorMarket_Values2 = ct.get_Duration_format_Values(
+                    #             ct_MonitorMarket_Values2, replace='df2', dest='nhigh')
+                else:
+                    ct_MonitorMarket_Values = ct.get_Duration_format_Values(
+                        ct_MonitorMarket_Values, replace='df2', dest='high')
+
+                    # ct_MonitorMarket_Values2 = ct.get_Duration_format_Values(
+                    #             ct_MonitorMarket_Values2, replace='df2', dest='high')
+
+
+
 
                 # if st_key_sort == '1' or st_key_sort == '7':
                 if st_key_sort == '1':
                     top_temp=top_temp[top_temp.per1d < 8]
 
                 top_dd=cct.combine_dataFrame(
-                    top_temp.loc[:, ct_MonitorMarket_Values][:10], top_temp2.loc[:, ct_MonitorMarket_Values2][:5], append=True, clean=True)
+                    top_temp.loc[:, ct_MonitorMarket_Values][:10], top_temp2.loc[:, ct_MonitorMarket_Values][:5], append=True, clean=True)
                 # print cct.format_for_print(top_dd)
 
                 # table,widths = cct.format_for_print(top_dd[:10],widths=True)

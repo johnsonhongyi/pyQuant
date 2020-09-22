@@ -405,16 +405,29 @@ if __name__ == "__main__":
                     # ct_Duration_format_Values = ct.get_Duration_format_Values(ct_Duration_format_Values,replace='couts',dest='stdv')
                     # ct_Duration_format_Values = ct.get_Duration_format_Values(ct_Duration_format_Values,replace='boll',dest='upper')
 
-                    if 'perc3d' in top_dd.columns and 'b1_v' in top_dd.columns:
+                    if 'b1_v' in ct_Duration_format_Values:
                         ct_Duration_format_Values = ct.get_Duration_format_Values(ct_Duration_format_Values,replace='b1_v',dest='perc3d')
                         ct_Duration_format_Values = ct.get_Duration_format_Values(ct_Duration_format_Values,replace='couts',dest='b1_v')
                         ct_Duration_format_Values = ct.get_Duration_format_Values(ct_Duration_format_Values,replace='fibl',dest='top10')
+                    if 'perc1d' in ct_Duration_format_Values:
                         ct_Duration_format_Values = ct.get_Duration_format_Values(
                             ct_Duration_format_Values, replace='perc3d', dest='percxd')
                         ct_Duration_format_Values = ct.get_Duration_format_Values(
                             ct_Duration_format_Values, replace='perc1d', dest='perc3d')
                         ct_Duration_format_Values = ct.get_Duration_format_Values(
                             ct_Duration_format_Values, replace='percxd', dest='perc1d')
+
+
+                    if 'nhigh' in top_all.columns:
+                        ct_Duration_format_Values = ct.get_Duration_format_Values(
+                            ct_Duration_format_Values, replace='df2', dest='nhigh')
+                        # ct_MonitorMarket_Values2 = ct.get_Duration_format_Values(
+                        #             ct_MonitorMarket_Values2, replace='df2', dest='nhigh')
+                    else:
+                        ct_Duration_format_Values = ct.get_Duration_format_Values(
+                            ct_Duration_format_Values, replace='df2', dest='high')
+
+
                     top_dd = top_dd.loc[:, ct_Duration_format_Values]
                     # ct_Duration_format_Values = ct.get_Duration_format_Values(ct_Duration_format_Values,replace='op',dest='upper')
                     # top_dd[col for col in top_dd.index if col in top_temp[:10].index]

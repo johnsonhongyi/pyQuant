@@ -371,11 +371,11 @@ def get_hot_countNew(changepercent, rzrq, fibl=None, fibc=10):
             # else:
             top = df[df['percent'] > changepercent]
             topTen = df[df['percent'] > 9.9]
-            dropcode = [ x for x in topTen.index.tolist() if x not in top_Ten_Dropcxg]
-            if len(dropcode) >0:
-                topT_l = tdd.get_tdx_exp_all_LastDF_DL(dropcode, dt=ct.duration_date_l,newdays=10,showRunTime=False)
-                if isinstance(topT_l, pd.DataFrame):
-                    top_Ten_Dropcxg.extend(topT_l.index.tolist())  
+            # dropcode = [ x for x in topTen.index.tolist() if x not in top_Ten_Dropcxg]
+            # if len(dropcode) >0:
+            #     topT_l = tdd.get_tdx_exp_all_LastDF_DL(dropcode, dt=ct.duration_date_l,newdays=10,showRunTime=False)
+            #     if isinstance(topT_l, pd.DataFrame):
+            #         top_Ten_Dropcxg.extend(topT_l.index.tolist())  
             crashTen = df[df['percent'] < -9.8]
             crash = df[df['percent'] < -changepercent]
         else:
@@ -406,10 +406,13 @@ def get_hot_countNew(changepercent, rzrq, fibl=None, fibc=10):
             # print modfprint(zlr)
             # print (u"流入: %s亿 比: %s%%" % (modfprint(zlr), modfprint(zzb))),
             print(u"流入: %s亿 比: %s%% " % (f_print(6, zlr,32), f_print(4, zzb,32))),
-            if ff['close'] == 0:
-                _percent = 0
+            if 'close' in ff.keys():
+                if ff['close'] == 0:
+                    _percent = 0
+                else:
+                    _percent = round((ff['close']-ff['lastp'])*100/ff['close'],2)
             else:
-                _percent = round((ff['close']-ff['lastp'])*100/ff['close'],2)
+                _percent = 0
             # print (u" %s"%(f_print(2,cumin_index[market],31))),
             print(u"%s %s%% %s%s" % (f_print(7, ff['close']),f_print(4,_percent,31), f_print(1, '!' if ff['open'] > ff[
                 'lastp'] else '?'), f_print(2, '!!' if ff['close'] > ff['lastp'] else '??',32)))

@@ -111,10 +111,13 @@ def getBollFilter(df=None, boll=ct.bollFilter, duration=ct.PowerCountdl, filter=
     # df['lower'] = map(lambda x: round((1 - 9.0 / 100) * x, 1), df.ma10d)
     # df['ene'] = map(lambda x, y: round((x + y) / 2, 1), df.upper, df.lower)
 
+    '''
     df = df[(df.close > df.ma20d) | (df.close > df.ene)]
     if filter:
         if 'boll' in df.columns:
             df = df[(df.boll >= boll) | (df.buy > df.upper)]
+    '''
+
     # if 'nlow' in df.columns:
         # df = df[ ((df.nlow >= df.llastp) & (df.nlow >= df.low)) | ((df.nlow <= df.low) & (df.open == df.nlow))]
     # if cct.get_work_time() and 'df2' in df.columns:
@@ -163,7 +166,7 @@ def getBollFilter(df=None, boll=ct.bollFilter, duration=ct.PowerCountdl, filter=
                 #     df= compute_perd_value(df, market_value, 'perc')
                 #     df= compute_perd_value(df, market_value, 'per')
 
-                df= df[df["perc%sd" % (idx_k)] >= idx_k]
+                df= df[(df[("perc%sd" % (idx_k))] >= idx_k) | (df[("perc%sd" % (idx_k))]< -idx_k)]
                 
             # elif market_key == '2':
             #     if int(market_value) > 1 and 915 < cct.get_now_time_int():
@@ -381,8 +384,7 @@ def getBollFilter(df=None, boll=ct.bollFilter, duration=ct.PowerCountdl, filter=
     # if 'nlow' in df.columns and 932 < cct.get_now_time_int() < 1030:
 
     if ene:
-        #        df = df[ ((df.buy > df.ene) & (df['lvolr%s' % (resample)] > 1.2)) | ((df.buy > df.upper) & (df.nclose > df.cmean))]
-
+        pass
         if 'nclose' in df.columns:
             # df = df[ ((df.buy > df.ene) ) | ((df.buy > df.upper) & ( df.nclose > df.cmean))]
             df= df[((df.buy > df.llastp)) | ((df['nclose'] > df['ene'] * ct.changeRatio) & (df['percent'] > -3) & (df.volume > 1.5)) |

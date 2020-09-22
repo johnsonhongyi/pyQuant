@@ -467,7 +467,7 @@ def get_dfcfw_rzrq_SHSZ(url=ct.DFCFW_RZYE):
     log.info("rzrq:%s"%(ct.DFCFW_RZYE))
 
     # rzdata = cct.get_url_data(url)
-    rzdata = cct.get_url_data_R(url)
+    rzdata = cct.get_url_data_R(url,timeout=10)
 
     # import pdb;pdb.set_trace()
     rzdata = rzdata.replace(':"-"',':0.1')
@@ -523,7 +523,7 @@ def get_dfcfw_rzrq_SHSZ(url=ct.DFCFW_RZYE):
         data['shrz'] = round(data1.loc['sh'] - data2.loc['sh'], 2)
         data['szrz'] = round(data1.loc['sz'] - data2.loc['sz'], 2)
     else:
-        log.error("df.index:%s"%(df.index.values[0]))
+        log.error("data2:%s"%(data2))
         data['dff'] = 'error'
         data['all'] = 0
         data['sh'] = 0
