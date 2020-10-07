@@ -467,7 +467,8 @@ def get_dfcfw_rzrq_SHSZ(url=ct.DFCFW_RZYE):
     log.info("rzrq:%s"%(ct.DFCFW_RZYE))
 
     # rzdata = cct.get_url_data(url)
-    rzdata = cct.get_url_data_R(url,timeout=10)
+    # rzdata = cct.get_url_data_R(url,timeout=10)
+    rzdata = cct.get_url_data(url,timeout=10)
 
     # import pdb;pdb.set_trace()
     rzdata = rzdata.replace(':"-"',':0.1')
@@ -737,8 +738,8 @@ if __name__ == "__main__":
 #    pp=get_dfcfw_fund_HGT(ct.DFCFW_FUND_FLOW_HGT)
     log.setLevel(LoggerFactory.DEBUG)
     # print get_dfcfw_rzrq_SHSZ(url=ct.DFCFW_RZRQ_SHSZ)
-    # rzrq = get_dfcfw_rzrq_SHSZ()
-    rzrq = get_dfcfw_rzrq_SHSZ2()
+    rzrq = get_dfcfw_rzrq_SHSZ()
+    # rzrq = get_dfcfw_rzrq_SHSZ2()
     print rzrq
     import ipdb;ipdb.set_trace()
 

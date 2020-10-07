@@ -1256,7 +1256,7 @@ def get_url_data_R(url, timeout=30):
         data = ''
         log.error('url Exception Error:%s - URL %s ' % (e, url))
         # sleeprandom(60)
-        sleep(300)
+        sleep(120)
     else:
         log.info('Access successful.')
     return data

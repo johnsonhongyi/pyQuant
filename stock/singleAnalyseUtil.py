@@ -252,12 +252,12 @@ def get_today_tick_ave(code, ave=None):
         # print "IOError"
 
 
-def f_print(lens, datastr,color=None):
+def f_print(lens, datastr, color=None):
     # if lens < len(str(datastr)):
         # log.warn("str:%s f_print:%s %s"%(datastr,lens,len(str(datastr))))
     lenf = '{0:>%s}' % (lens)
     data = lenf.format(datastr)
-    # print("\033[1;31;40m您输入的帐号或密码错误！\033[0m")  
+    # print("\033[1;31;40m您输入的帐号或密码错误！\033[0m")
     # \033[5;31;42m
     # https://www.cnblogs.com/hellojesson/p/5961570.html
     """数值表示的参数含义：
@@ -273,7 +273,7 @@ def f_print(lens, datastr,color=None):
     """
     # data = "\033[1;31;40m%s\033[0m"%(data)
     # color_dic = {31:'47',32:'40'}
-    color_dic = {31:'47',32:'47',35:'47'}
+    color_dic = {31: '47', 32: '47', 35: '47'}
     if color is not None:
         if color <> 31:
             # if color == 32:
@@ -281,7 +281,8 @@ def f_print(lens, datastr,color=None):
             flash = 5
         else:
             flash = 1
-        data = "\033[%s;%s;%sm%s\033[0m"%(flash,color,color_dic[color],data)
+        data = "\033[%s;%s;%sm%s\033[0m" % (
+            flash, color, color_dic[color], data)
     return data
 
 
@@ -310,15 +311,18 @@ def fibonacciCount(code, dl=60, start=None, days=0):
             if not daysData[1].ma5d[0]:
                 daysData[1].ma5d[0] = 0
             fibl.append(
-                [code, op, ra, [daysData[0], int(daysData[1].ma5d[0])], fib, st ])
+                [code, op, ra, [daysData[0], int(daysData[1].ma5d[0])], fib, st])
     return fibl
 
-# global cumin_index 
+
+# global cumin_index
 # cumin_index = {}
-top_Ten_Dropcxg=[]
+top_Ten_Dropcxg = []
+
+
 def get_hot_countNew(changepercent, rzrq, fibl=None, fibc=10):
     global fibcount
-    INDEX_LIST_TDX = {'999999':'sh', '399001':'sz', '399006':'cyb'}
+    INDEX_LIST_TDX = {'999999': 'sh', '399001': 'sz', '399006': 'cyb'}
     # {v: k for k, v in m.items()}
     # >>> zip(m.values(), m.keys())
     # mi = dict(zip(m.values(), m.keys()))
@@ -331,7 +335,7 @@ def get_hot_countNew(changepercent, rzrq, fibl=None, fibc=10):
             int = 0
             for f in fibl:
                 code, op, ra, daysData, fib, st = f[
-                    0], f[1], f[2], f[3], f[4], f[5] 
+                    0], f[1], f[2], f[3], f[4], f[5]
                 # cumin_index[INDEX_LIST_TDX[code]]=cumin
                 int += 1
                 if int % 2 != 0:
@@ -346,6 +350,8 @@ def get_hot_countNew(changepercent, rzrq, fibl=None, fibc=10):
     ffindex = ffu.get_dfcfw_fund_flow('all')
 
     ffall = {}
+    topTen_all = 0
+    crashTen_all = 0
     ffall['zlr'] = 0
     ffall['zzb'] = 0
 
@@ -360,7 +366,7 @@ def get_hot_countNew(changepercent, rzrq, fibl=None, fibc=10):
         if 'percent' not in df.columns:
             df['percent'] = map(lambda x, y: round(
                 (x - y) / y * 100, 1), df.close.values, df.llastp.values)
-        
+
         if 'percent' in df.columns.values:
             # and len(df[:20][df[:20]['percent']>0])>3:
             # if 'code' in df.columns:
@@ -375,7 +381,7 @@ def get_hot_countNew(changepercent, rzrq, fibl=None, fibc=10):
             # if len(dropcode) >0:
             #     topT_l = tdd.get_tdx_exp_all_LastDF_DL(dropcode, dt=ct.duration_date_l,newdays=10,showRunTime=False)
             #     if isinstance(topT_l, pd.DataFrame):
-            #         top_Ten_Dropcxg.extend(topT_l.index.tolist())  
+            #         top_Ten_Dropcxg.extend(topT_l.index.tolist())
             crashTen = df[df['percent'] < -9.8]
             crash = df[df['percent'] < -changepercent]
         else:
@@ -384,8 +390,10 @@ def get_hot_countNew(changepercent, rzrq, fibl=None, fibc=10):
             topTen = '0'
             crashTen = '0'
             crash = '0'
+        topTen_all += len(topTen)
+        crashTen_all += len(crashTen)
         # top=df[ df['changepercent'] <6]
-        # print("\033[1;31;40m您输入的帐号或密码错误！\033[0m")  
+        # print("\033[1;31;40m您输入的帐号或密码错误！\033[0m")
         print(
             "%s topT: %s top>%s: %s" % (
                 f_print(4, market), f_print(3, len(topTen)), changepercent, f_print(4, len(top)))),
@@ -405,51 +413,57 @@ def get_hot_countNew(changepercent, rzrq, fibl=None, fibc=10):
             # modfprint=lambda x:f_print(4,x) if x>0 else "-%s"%(f_print(4,str(x).replace('-','')))
             # print modfprint(zlr)
             # print (u"流入: %s亿 比: %s%%" % (modfprint(zlr), modfprint(zzb))),
-            print(u"流入: %s亿 比: %s%% " % (f_print(6, zlr,32), f_print(4, zzb,32))),
+            print(u"流入: %s亿 比: %s%% " %
+                  (f_print(6, zlr, 32), f_print(4, zzb, 32))),
             if 'close' in ff.keys():
                 if ff['close'] == 0:
                     _percent = 0
                 else:
-                    _percent = round((ff['close']-ff['lastp'])*100/ff['close'],2)
+                    _percent = round(
+                        (ff['close'] - ff['lastp']) * 100 / ff['close'], 2)
             else:
                 _percent = 0
             # print (u" %s"%(f_print(2,cumin_index[market],31))),
-            print(u"%s %s%% %s%s" % (f_print(7, ff['close']),f_print(4,_percent,31), f_print(1, '!' if ff['open'] > ff[
-                'lastp'] else '?'), f_print(2, '!!' if ff['close'] > ff['lastp'] else '??',32)))
+            print(u"%s %s%% %s%s" % (f_print(7, ff['close']), f_print(4, _percent, 31), f_print(1, '!' if ff['open'] > ff[
+                'lastp'] else '?'), f_print(2, '!!' if ff['close'] > ff['lastp'] else '??', 32)))
         allTop = allTop.append(df.reset_index(), ignore_index=True)
         allTop = allTop.drop_duplicates()
     df = allTop
-    df  = tdd.get_single_df_lastp_to_df(
-                        df.set_index('code'),resample='d')    
+    df = tdd.get_single_df_lastp_to_df(
+        df.set_index('code'), resample='d')
     count = len(df.index)
     top = df[df['percent'] > changepercent]
+
     topTen = df[df['percent'] >= 9.9]
-    if 'max5' in df.columns: 
+    if 'max5' in df.columns:
         top_Max = (df[(df.close >= df.hmax) & (df.close >= df.max5)])
 
         # top_low = len(df[df.low < df.min5])
         top_min = (df[(df.close <= df.lmin) & (df.close <= df.min5)])
-        cct.GlobalValues().setkey('top_max',top_Max)
-        cct.GlobalValues().setkey('top_min',top_min)
+        cct.GlobalValues().setkey('top_max', top_Max)
+        cct.GlobalValues().setkey('top_min', top_min)
 
     else:
         top_Max = []
         top_low = 0
         top_min = []
 
-    topTen = str(len(topTen)) +'('+str(len(top_Ten_Dropcxg))+')' +'(H:'+str(len(top_Max))+')'
+    # topTen = str(len(topTen)) +'('+str(len(top_Ten_Dropcxg))+')' +'(H:'+str(len(top_Max))+')'
+    topTen = str(topTen_all) + '(' + str(len(topTen)) + ')' + \
+        '(H:' + str(len(top_Max)) + ')'
     # print "top_Ten_Dropcxg:%s",top_Ten_Dropcxg
-    crashTen = df[df['percent'] < -9.8]
-    crashTen = str(len(crashTen)) +'(L:'+str(len(top_min))+')'
+    # crashTen = df[df['percent'] < -9.8]
+    crashTen = str(crashTen_all) + '(L:' + str(len(top_min)) + ')'
 
     crash = df[df['percent'] < -changepercent]
+
     print(
-        u"A:%s topT:%s top>%s:%s" % (
-            f_print(4, count), f_print(3, (topTen),31), changepercent, f_print(4, len(top),31))),
+        u"AL:%s topT:%s top>%s:%s" % (
+            f_print(4, count), f_print(3, (topTen), 31), changepercent, f_print(4, len(top), 31))),
     print(u"crashT:%s crash<-%s:%s" %
-          (f_print(3, (crashTen),32), changepercent, f_print(4, len(crash),31))),
+          (f_print(3, (crashTen), 32), changepercent, f_print(4, len(crash), 31))),
     print(u"-5:%s" %
-          (f_print(4, len(crash[crash.percent < -5]),32))),
+          (f_print(4, len(crash[crash.percent < -5]), 32))),
     # ff = ffu.get_dfcfw_fund_flow(ct.DFCFW_FUND_FLOW_ALL)
     ffall['time'] = ff['time']
     ff = ffall
@@ -459,12 +473,12 @@ def get_hot_countNew(changepercent, rzrq, fibl=None, fibc=10):
         zzb = round(float(ff['zzb']) / 3, 1)
         zt = str(ff['time'])
         print(u"流入: %s亿 占比: %s%% %s" %
-              (f_print(4, zlr,31), f_print(4, zzb,31), f_print(4, zt)))
+              (f_print(4, zlr, 31), f_print(4, zzb, 31), f_print(4, zt)))
 
     ff = ffu.get_dfcfw_fund_SHSZ()
     hgt = ffu.get_dfcfw_fund_HGT()
     szt = ffu.get_dfcfw_fund_HGT(url=ct.DFCFW_FUND_FLOW_SZT)
-    log.debug("shzs:%s hgt:%s" % (ff,hgt))
+    log.debug("shzs:%s hgt:%s" % (ff, hgt))
     # if len(ff) > 0:
     #     print ("\tSH: %s u:%s vo: %s sz: %s u:%s vo: %s" % (
     #         f_print(4, ff['scent']), f_print(4, ff['sup']), f_print(5, ff['svol']), f_print(4, ff['zcent']),
@@ -474,18 +488,20 @@ def get_hot_countNew(changepercent, rzrq, fibl=None, fibc=10):
 
     if len(ff) > 0:
         print(u"\tSh: %s Vr:%s Sz: %s Vr:%s " % (
-            f_print(4, ff['scent']), f_print(5, ff['svol'],31), f_print(4, ff['zcent']), f_print(5, ff['zvol'],31))),
-        print(u'B:%s-%s V:%s' % (bigcount[0], bigcount[2], f_print(4,bigcount[1])))
+            f_print(4, ff['scent']), f_print(5, ff['svol'], 31), f_print(4, ff['zcent']), f_print(5, ff['zvol'], 31))),
+        print(u'B:%s-%s V:%s' %
+              (bigcount[0], bigcount[2], f_print(4, bigcount[1])))
     else:
         print(u"\tSh: \t%s Vr:  \t%s Sz: \t%s Vr: \t%s ") % (0, 0, 0, 0),
-        print(u'B:%s-%s V:%s' % (bigcount[0], bigcount[2], f_print(4,bigcount[1])))
+        print(u'B:%s-%s V:%s' %
+              (bigcount[0], bigcount[2], f_print(4, bigcount[1])))
 
     if len(hgt) > 0:
         print("\tSgt: %s Gst: %s Hgt: %s Ggt: %s SSVol:%s" %
-              (szt['hgt'], szt['ggt'],hgt['hgt'], hgt['ggt'],f_print(10, ff['allvol'],31)))
+              (szt['hgt'], szt['ggt'], hgt['hgt'], hgt['ggt'], f_print(10, ff['allvol'], 31)))
     else:
         print("\t%s Sgt: %s Gst: %s \tHgt: \t%s Ggt: " % (0, 0, 0, 0))
-        
+
     if len(rzrq) > 0:
         if 'shrz' not in rzrq.keys() and 'szrz' not in rzrq.keys():
             rzrq['shrz'] = 0
@@ -497,16 +513,16 @@ def get_hot_countNew(changepercent, rzrq, fibl=None, fibc=10):
         print(u"\tSh: %s rz:%s :%s%% sz: %s rz:%s :%s%% All: %s diff: %s亿" % (
             f_print(5, rzrq['sh']), f_print(4, rzrq['shrz']), shpcent, f_print(
                 5, rzrq['sz']), f_print(4, rzrq['szrz']),
-            szpcent, f_print(4, rzrq['all'],31), f_print(5, rzrq['dff'],31)))
+            szpcent, f_print(4, rzrq['all'], 31), f_print(5, rzrq['dff'], 31)))
     # print "bigcount:",bigcount
 
     cct.set_console(width, height,
                     title=['B:%s-%s V:%s' % (bigcount[0], bigcount[2], bigcount[1]), 'ZL: %s' % (zlr if len(ff) > 0 else 0),
                            'To:%s' % len(topTen), 'D:%s' % len(
                         crash), 'Sh: %s ' % ff['scent'] if len(ff) > 0 else '?', 'Vr:%s%% ' % ff['svol'] if len(ff) > 0 else '?',
-                        'MR: %s' % zzb, 'ZL: %s' % (zlr if len(ff) > 0 else '?')],closeTerminal=False)
-    log.debug("set_console:bigcount[0]%s  bigcount[2]:%s" % (bigcount[0], bigcount[2]))
-
+                        'MR: %s' % zzb, 'ZL: %s' % (zlr if len(ff) > 0 else '?')], closeTerminal=False)
+    log.debug("set_console:bigcount[0]%s  bigcount[2]:%s" % (
+        bigcount[0], bigcount[2]))
 
     return allTop
 
@@ -626,17 +642,17 @@ if __name__ == '__main__':
                         ave = get_code_search_loop(
                             num_input, code, dayl=days, ave=ave)
                     code = num_input
-                    
+
             # int_time = cct.get_now_time_int()
             # if cct.get_work_time():
             #     if 930 < int_time < 1000:
             #         cct.sleep(45)
             #     else:
             #         cct.sleep(ct.duration_sleep_time)
-                    
+
             int_time = cct.get_now_time_int()
             if cct.get_work_time():
-                log.debug('into get_work_time:%s'%(int_time))
+                log.debug('into get_work_time:%s' % (int_time))
                 if 915 < int_time < 926:
                     while 1:
                         cct.sleeprandom(15)
@@ -655,7 +671,7 @@ if __name__ == '__main__':
                 else:
                     cct.sleep(60)
             elif cct.get_work_duration():
-                log.debug('into work_duration:%s'%(int_time))
+                log.debug('into work_duration:%s' % (int_time))
                 while 1:
                     if cct.get_work_duration():
                         print ".",
@@ -668,7 +684,7 @@ if __name__ == '__main__':
                         break
 
             else:
-                log.debug('into clean_duration:%s'%(int_time))
+                log.debug('into clean_duration:%s' % (int_time))
                 if (cct.get_now_time_int() > 1502 and cct.get_now_time_int() < 1800):
                     while 1:
                         if cct.get_now_time_int() > 1502 and cct.get_now_time_int() < 1510:
@@ -680,14 +696,14 @@ if __name__ == '__main__':
                             if cct.get_work_day_status():
                                 tdd.Write_market_all_day_mp('all')
                                 top_temp = cct.GlobalValues().getkey('top_max')
-                                codew = stf.WriteCountFilter(top_temp, writecount='all')
-                                cct.write_to_blocknew(block_path,codew,append=False,doubleFile=False)
+                                codew = stf.WriteCountFilter(
+                                    top_temp, writecount='all')
+                                cct.write_to_blocknew(
+                                    block_path, codew, append=False, doubleFile=False)
                             break
                         else:
                             print "."
 
-
-	                
                 raise KeyboardInterrupt("Stop Time")
                 # st = cct.cct_raw_input("status:[go(g),clear(c),quit(q,e)]:")
                 # if len(st) == 0:
@@ -724,13 +740,13 @@ if __name__ == '__main__':
                 codew = stf.WriteCountFilter(
                     top_temp, writecount=args.dl)
                 if args.code == 'a':
-                    cct.write_to_blocknew(block_path,codew,doubleFile=False)
+                    cct.write_to_blocknew(block_path, codew, doubleFile=False)
                     # sl.write_to_blocknew(all_diffpath, codew)
                 else:
-                    cct.write_to_blocknew(block_path,codew, False,doubleFile=False)
+                    cct.write_to_blocknew(
+                        block_path, codew, False, doubleFile=False)
                     # sl.write_to_blocknew(all_diffpath, codew, False)
                 print ("wri ok:%s" % block_path)
-
 
             elif len(st) == 6:
                 status = True
@@ -757,7 +773,7 @@ if __name__ == '__main__':
             cct.sleeprandom(30)
 #            print "Error2sleep:%s"%(sleeptime)
         except Exception as e:
-            log.error("Error Exception:%s"%(e))
+            log.error("Error Exception:%s" % (e))
             import traceback
             traceback.print_exc()
             # global except_count
