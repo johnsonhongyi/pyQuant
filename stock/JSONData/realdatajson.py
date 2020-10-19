@@ -545,13 +545,13 @@ def get_sina_all_json_dd(vol='0', type='0', num='10000', retry_count=3, pause=0.
     # else:
     #     data=cct.to_asyncio_run(url_list,_parsing_sina_dd_price_json)
 
-        if len(data)>1:
+        if len(data)>50:
             df = df.append(data, ignore_index=True)
 #            log.debug("dd.columns:%s" % df.columns.values)
             #['code' 'name' 'ticktime' 'price' 'volume' 'prev_price' 'kind']
             log.debug("get_sina_all_json_dd:%s" % df[:1])
 
-        if df is not None and not df.empty:
+        if df is not None and not df.empty and len(df) > 50:
             # for i in range(2, ct.PAGE_NUM[0]):
             #     newdf = _parsing_dayprice_json(i)
             #     df = df.append(newdf, ignore_index=True)
