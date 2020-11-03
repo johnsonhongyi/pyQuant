@@ -367,6 +367,7 @@ def sina_json_Big_Count(vol='1', type='0', num='10000'):
     """
     url = ct.JSON_DD_CountURL % (ct.DD_VOL_List[vol], type)
     log.info("Big_Count_url:%s"%url)
+
     data = cct.get_url_data(url)
     
     count = re.findall('(\d+)', data, re.S)
@@ -449,9 +450,12 @@ def _parsing_sina_dd_price_json(url):
     #                              ct.PAGES['jv'], pageNum))
     # request = Request(url)
     # text = urlopen(request, timeout=10).read()
-    text = cct.get_url_data(url)
+    sinaheader = {'Referer':'http://vip.stock.finance.sina.com.cn'}
+
+    text = cct.get_url_data(url,headers=sinaheader)
     # print(len(text))
     # return text
+    
     if len(text) < 10:
         return ''
 
@@ -498,6 +502,9 @@ def get_sina_all_json_dd(vol='0', type='0', num='10000', retry_count=3, pause=0.
     start_t = time.time()
     # url="http://vip.stock.finance.sina.com.cn/quotes_service/api/json_v2.php/Market_Center.getHQNodeData?page=1&num=50&sort=changepercent&asc=0&node=sh_a&symbol="
     # SINA_REAL_PRICE_DD = '%s%s/quotes_service/api/json_v2.php/Market_Center.getHQNodeData?page=1&num=%s&sort=changepercent&asc=0&node=%s&symbol=%s'
+    #http://vip.stock.finance.sina.com.cn/quotes_service/view/cn_bill_sum.php
+    #http://vip.stock.finance.sina.com.cn/quotes_service/api/json_v2.php/CN_Bill.GetBillList?num=10000&page=1&sort=ticktime&asc=0&volume=100000&type=0
+    #http://vip.stock.finance.sina.com.cn/quotes_service/view/cn_bill_all.php?num=100&page=1&sort=ticktime&asc=0&volume=100000&type=0
     """
         一次性获取最近一个日交易日所有股票的交易数据
     return
@@ -505,7 +512,7 @@ def get_sina_all_json_dd(vol='0', type='0', num='10000', retry_count=3, pause=0.
       DataFrame
            属性：代码，名称，涨跌幅，现价，开盘价，最高价，最低价，最日收盘价，成交量，换手率
     """
-
+    # return ''
     h5_fname = 'get_sina_all_dd'
     h5_table = 'all'+'_'+ct.DD_VOL_List[str(vol)]+'_'+str(num)
     limit_time = ct.sina_dd_limit_time
@@ -525,11 +532,19 @@ def get_sina_all_json_dd(vol='0', type='0', num='10000', retry_count=3, pause=0.
     url_list = _get_sina_json_dd_url(vol, type, num)
     # print url_list
     df = pd.DataFrame()
+    # import ipdb;ipdb.set_trace()
+
     # data['code'] = symbol
     # df = df.append(data, ignore_index=True)
     if len(url_list)>0:
         log.info("json_dd_url:%s"%url_list[0])
-        data = cct.to_asyncio_run(url_list, _parsing_sina_dd_price_json)
+        for url in url_list:
+            df = df.append(_parsing_sina_dd_price_json(url))
+
+
+
+
+        
     # data = cct.to_mp_run(_parsing_sina_dd_price_json, url_list)
     # data = cct.to_mp_run_async(_parsing_sina_dd_price_json, url_list)
 
@@ -545,11 +560,15 @@ def get_sina_all_json_dd(vol='0', type='0', num='10000', retry_count=3, pause=0.
     # else:
     #     data=cct.to_asyncio_run(url_list,_parsing_sina_dd_price_json)
 
-        if len(data)>50:
-            df = df.append(data, ignore_index=True)
-#            log.debug("dd.columns:%s" % df.columns.values)
-            #['code' 'name' 'ticktime' 'price' 'volume' 'prev_price' 'kind']
-            log.debug("get_sina_all_json_dd:%s" % df[:1])
+
+
+        # data = cct.to_asyncio_run(url_list, _parsing_sina_dd_price_json)  //return df list 
+        # if len(data)>50:
+        #     df = df.append(data, ignore_index=True)
+        #     # log.debug("dd.columns:%s" % df.columns.values)
+        #     #['code' 'name' 'ticktime' 'price' 'volume' 'prev_price' 'kind']
+        #     log.debug("get_sina_all_json_dd:%s" % df[:1])
+
 
         if df is not None and not df.empty and len(df) > 50:
             # for i in range(2, ct.PAGE_NUM[0]):
@@ -873,13 +892,14 @@ if __name__ == '__main__':
     # print df.couts.sum()
     # df = get_market_price_sina_dd_realTime(dp='', vol='1', type='0')
     # print df
-    urltemp ='http://vip.stock.finance.sina.com.cn/quotes_service/api/json_v2.php/Market_Center.getHQNodeData?page=1&num=100&sort=changepercent&asc=0&node=sh_a&symbol='
+    # urltemp ='http://vip.stock.finance.sina.com.cn/quotes_service/api/json_v2.php/Market_Center.getHQNodeData?page=1&num=100&sort=changepercent&asc=0&node=sh_a&symbol='
 
-    _parsing_Market_price_json(urltemp)
+    # _parsing_Market_price_json(urltemp)
     # import ipdb;ipdb.set_trace()
 
     df = get_sina_all_json_dd(1,0,num=10000)
     print len(df)
+
     print "getconfigBigCount:",getconfigBigCount(count=None, write=False)
     df = get_sina_Market_json(market='all', showtime=True, num='100', retry_count=3, pause=0.001)
     print df[:1]

@@ -423,6 +423,9 @@ def get_hot_countNew(changepercent, rzrq, fibl=None, fibc=10):
                         (ff['close'] - ff['lastp']) * 100 / ff['close'], 2)
             else:
                 _percent = 0
+                ff['close'] = 0.0
+                ff['open'] = 0.0
+                ff['lastp'] = 0.0
             # print (u" %s"%(f_print(2,cumin_index[market],31))),
             print(u"%s %s%% %s%s" % (f_print(7, ff['close']), f_print(4, _percent, 31), f_print(1, '!' if ff['open'] > ff[
                 'lastp'] else '?'), f_print(2, '!!' if ff['close'] > ff['lastp'] else '??', 32)))

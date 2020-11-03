@@ -76,7 +76,7 @@ newdays_limit_days = 30
 big_H5_Size_limit = 30
 sina_limit_time = 10
 h5_time_l_count = 6
-sina_dd_limit_time = 900
+sina_dd_limit_time = 1200
 diffcode = 0.2
 dratio_limit = 0.05
 duration_sleep_time = 60
@@ -350,6 +350,8 @@ SINA_DD_VRatio_All = '%s%s/quotes_service/view/%s?num=%s&page=1&sort=ticktime&as
 
 json_countVol = '1'
 json_countType = '0'
+# index
+# http://vip.stock.finance.sina.com.cn/quotes_service/view/cn_bill_all.php
 JSON_DD_CountURL = "http://vip.stock.finance.sina.com.cn/quotes_service/api/json_v2.php/CN_Bill.GetBillListCount?num=100&page=1&sort=ticktime&asc=0&volume=%s&type=%s"
 JSON_DD_Data_URL = "http://vip.stock.finance.sina.com.cn/quotes_service/api/json_v2.php/CN_Bill.GetBillList?num=%s&page=1&sort=ticktime&asc=0&volume=%s&type=%s"
 JSON_DD_Data_URL_Page = "http://vip.stock.finance.sina.com.cn/quotes_service/api/json_v2.php/CN_Bill.GetBillList?num=%s&page=%s&sort=ticktime&asc=0&volume=%s&type=%s"
