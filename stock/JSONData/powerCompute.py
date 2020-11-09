@@ -972,6 +972,7 @@ def get_linear_model_candles(code, ptype='low', dtype='d', start=None, end=None,
         # # continue with further processing, perhaps using result from callbacks
 
         plt.show()
+        # plt.show(block=False)
         # plt.close()
         # def plt_show():
         #     '''Text-blocking version of plt.show()

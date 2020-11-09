@@ -341,10 +341,15 @@ def get_linear_model_histogramDouble(code, ptype='low', dtype='d', start=None, e
         figZoom = zp3.zoom_factory(ax3, base_scale=scale)
         figPan = zp3.pan_factory(ax3)
     # plt.title(code, fontsize=14)
+
     if 'name' in df.columns:
         plt.legend([df.name.values[-1:][0], df1.name.values[-1:][0]], loc=0)
     else:
-        dm = tdd.get_sina_data_df(code)
+        if code not in ['999999', '399006', '399001']:
+            indexIdx = False
+        else:
+            indexIdx = True 
+        dm = tdd.get_sina_data_df(code,index=indexIdx)
         if 'name' in dm.columns:
             cname = dm.name[0]
         else:

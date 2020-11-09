@@ -803,6 +803,11 @@ if __name__ == "__main__":
     # code='300107'
     df =sina.all
     # print df.lastbuy[-5:].to_frame().T
+    print sina.get_stock_list_data(['999999','399001','399006'],index=True).name
+    df = sina.get_stock_code_data('999999',index=True)
+    print df.name
+    import ipdb;ipdb.set_trace()
+
     df = Sina().market('cyb')
     print df.shape
 
@@ -811,9 +816,7 @@ if __name__ == "__main__":
     print df.columns
     # print df[-5:][['lastbuy','close']].T
 
-    # print sina.get_stock_list_data(['999999','399001','399006'],index=True)
-    df = sina.get_stock_code_data('999999,399001,399006',index=True)
-    print df.volume
+
     # df = sina.get_stock_code_data('000001',index=True).set_index('code')
     # df= sina.get_stock_code_data('999999,399001',index=True)
     sys.exit(0)

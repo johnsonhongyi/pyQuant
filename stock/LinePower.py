@@ -73,7 +73,10 @@ if __name__ == "__main__":
             # log.setLevel(LoggerFactory.DEBUG)
             code = raw_input("code:")
             args = parser.parse_args(code.split())
-            if not code == 'q' and not code == 'e' and not str(args.code) == 'None' and (args.wencai == 'y' or re.match('[a-zA-Z]+',code) is not None  or re.match('[ \u4e00 -\u9fa5]+',code) == None ):
+            # if not code.lower() == 'q' and not code.lower() == 'quit' and not code.lower() == 'exit' and not code == 'q' and not code == 'e' and not str(args.code) == 'None' and (args.wencai == 'y' or re.match('[a-zA-Z]+',code) is not None  or re.match('[ \u4e00 -\u9fa5]+',code) == None ):
+
+            if not code.lower() == 'q' and not code.lower() == 'quit' and not code.lower() == 'exit' and not code == 'q' and not code == 'e' \
+                and not str(args.code) == 'None' and (args.wencai == 'y' and (re.match('[a-zA-Z]+',code) is  None  and re.match(ur"[\u4e00-\u9fa5]+",code) is not None ) ):
                 df  = wcd.get_wencai_Market_url(code,200,pct=False)
                 print df.shape,df[:8]
                 if len(df) == 1:
@@ -186,7 +189,7 @@ if __name__ == "__main__":
                 # ts=time.time()
                 # time.sleep(5)
                 # print "%0.5f"%(time.time()-ts)
-            elif code == 'q':
+            elif code.lower() == 'q' or code.lower() == 'quit' or code.lower() =='exit':
                 sys.exit(0)
 
             elif code == 'h' or code == 'help':
