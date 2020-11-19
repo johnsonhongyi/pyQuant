@@ -9,7 +9,8 @@ import JohnsonUtil.johnson_cons as ct
 from JohnsonUtil import commonTips as cct
 from JohnsonUtil import LoggerFactory as LoggerFactory
 log = LoggerFactory.log
-
+import warnings
+warnings.filterwarnings("ignore",".*GUI is implemented.*")
 
 import argparse
 def parseArgmain():
@@ -48,6 +49,44 @@ def maintest(code, start=None, type='m', filter='y'):
     print("ex Read:", strip_tx)
 
 
+from threading import Thread
+class MyThread(Thread):
+    def __init__(self, func, args):
+        super(MyThread, self).__init__()
+        self.func = func
+        self.args = args
+
+    def run(self):
+        self.result = self.func(*self.args)
+
+    def get_result(self):
+        try:
+            return self.result
+        except Exception:
+            return None
+
+
+# _sum = 0
+# def cal_sum(begin, end):
+#     # global _sum
+#     _sum = 0
+#     for i in range(begin, end + 1):
+#         _sum += i
+#     return  _sum
+
+# """重新定义带返回值的线程类"""
+
+# if __name__ == '__main__':
+#     t1 = MyThread(cal_sum, args=(1, 5))
+#     t2 = MyThread(cal_sum, args=(6, 10))
+#     t1.start()
+#     t2.start()
+#     t1.join()
+#     t2.join()
+#     res1 = t1.get_result()
+#     res2 = t2.get_result()
+#     print(res1 + res2)
+
 if __name__ == "__main__":
     # print get_linear_model_status('600671', filter='y', dl=10, ptype='low')
     # print get_linear_model_status('600671', filter='y', dl=10, ptype='high')
@@ -74,6 +113,8 @@ if __name__ == "__main__":
             code = raw_input("code:")
             args = parser.parse_args(code.split())
             # if not code.lower() == 'q' and not code.lower() == 'quit' and not code.lower() == 'exit' and not code == 'q' and not code == 'e' and not str(args.code) == 'None' and (args.wencai == 'y' or re.match('[a-zA-Z]+',code) is not None  or re.match('[ \u4e00 -\u9fa5]+',code) == None ):
+            # if not cct.get_os_system() == 'mac':
+            #     import ipdb;ipdb.set_trace()
 
             if not code.lower() == 'q' and not code.lower() == 'quit' and not code.lower() == 'exit' and not code == 'q' and not code == 'e' \
                 and not str(args.code) == 'None' and (args.wencai == 'y' and (re.match('[a-zA-Z]+',code) is  None  and re.match(ur"[\u4e00-\u9fa5]+",code) is not None ) ):
@@ -104,11 +145,20 @@ if __name__ == "__main__":
                     code = args.code
                     args.filter = 'n'
                     df=lht.get_linear_model_histogramDouble(code, dtype=args.dtype, start=start, end=end,filter=args.filter, dl=args.dl)
+                    # args: code, ptype='low', dtype='d', start=None, end=None, vtype='f', filter='n', df=None,dl=None
+                    
+
+                    # t1 = MyThread(lht.get_linear_model_histogramDouble, args=(code,'low', args.dtype, start, end,'f',args.filter,None, args.dl))
+                    # t1.start()
+                    # t1.join()
+                    # df = t1.get_result()
                     # candlestick_powercompute(code,start, end)
 
                     # op, ra, st, days = pct.get_linear_model_status(code,df=df, start=start, end=end, filter=args.filter)
                     # print "%s op:%s ra:%s  start:%s" % (code, op, ra, st)
                     # print "op:%s ra:%s  start:%s" % (op, ra, st)
+
+
                     args.filter = 'y'
                     for ptype in ['low', 'high']:
                         op, ra, st, days = pct.get_linear_model_status(args.code,df=df, dtype=args.dtype, start=start, end=end,
@@ -126,6 +176,7 @@ if __name__ == "__main__":
                             rah = ra
                             fib = int(days[0])
                             ra = ral
+
 
                     # p=multiprocessing.Process(target=get_linear_model_histogramDouble,args=(code, args.ptype, args.dtype, start, end,args.vtype,args.filter,))
                     # p.daemon = True
@@ -196,6 +247,7 @@ if __name__ == "__main__":
                 parser.print_help()
             else:
                 pass
+
         except (KeyboardInterrupt) as e:
             # print "key"
             print "KeyboardInterrupt:", e

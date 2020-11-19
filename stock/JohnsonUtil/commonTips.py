@@ -48,6 +48,8 @@ perdallc = "df[df.columns[(df.columns >= 'perc1d') & (df.columns <= 'perc%sd'%(c
 perdalla = "df[df.columns[ ((df.columns >= 'per1d') & (df.columns <= 'per%sd'%(ct.compute_lastdays))) | ((df.columns >= 'du1d') & (df.columns <= 'du%sd'%(ct.compute_lastdays)))]][:1]"
 perdallu = "df[df.columns[ ((df.columns >= 'du1d') & (df.columns <= 'du%sd'%(ct.compute_lastdays)))]][:1]"
 
+
+
 class GlobalValues:
     # -*- coding: utf-8 -*-
 
@@ -190,6 +192,25 @@ def get_os_system():
         return 'other'
 
 
+
+def set_default_encode(code='utf-8'):
+        import sys
+        reload(sys)
+        sys.setdefaultencoding(code)
+        print (sys.getdefaultencoding())
+        print (sys.stdin.encoding,sys.stdout.encoding)
+        
+# if get_os_system().find('win') >= 0:
+#     import win_unicode_console
+#     win_unicode_console.enable()
+
+# reload(sys)
+# sys.setdefaultencoding('utf8')
+# reload(sys)
+# sys.setdefaultencoding('cp936')
+
+
+          
 
 
 def get_ramdisk_dir():

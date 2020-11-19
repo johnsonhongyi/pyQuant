@@ -702,6 +702,7 @@ def get_linear_model_candles(code, ptype='low', dtype='d', start=None, end=None,
     asset = asset.dropna()
     dates = asset.index
     fig = plt.figure(figsize=(10, 6))
+    # plt.ion()
     # plt.subplots_adjust(left=0.05, bottom=0.08, right=0.95,
     #                     top=0.95, wspace=0.15, hspace=0.25)
     # ax = fig.add_subplot(111)
@@ -971,8 +972,16 @@ def get_linear_model_candles(code, ptype='low', dtype='d', start=None, end=None,
         # fig.canvas.start_event_loop_default() # block here until window closed
         # # continue with further processing, perhaps using result from callbacks
 
-        plt.show()
+        # plt.ioff()
+        plt.show(block=True)
+        
+        # plt.draw()
+        # plt.pause(0.001)
+
         # plt.show(block=False)
+
+        # _ = raw_input("Press [enter] to continue.")
+
         # plt.close()
         # def plt_show():
         #     '''Text-blocking version of plt.show()

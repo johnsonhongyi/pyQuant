@@ -29,10 +29,32 @@ from JohnsonUtil import johnson_cons as ct
 # log=LoggerFactory.getLogger('wencaiData')
 log = LoggerFactory.log
 # curl 'http://www.iwencai.com/stockpick/search?typed=1&preParams=&ts=1&f=1&qs=index_rewrite&selfsectsn=&querytype=&searchfilter=&tid=stockpick&w=%E9%9B%84%E5%AE%89' -H 'Cookie: v=AZaxA_wZ09rYlOd-tO91dApK4U2ZN9pxLHsO1QD_gnkUwzj_aMcqgfwLXuTQ'
+
+# class UnicodeStreamFilter:  
+#     def __init__(self, target):  
+#         self.target = target  
+#         self.encoding = 'utf-8'  
+#         self.errors = 'replace'  
+#         self.encode_to = self.target.encoding  
+#     def write(self, s):  
+#         if type(s) == str:  
+#             s = s.decode("utf-8")  
+#         s = s.encode(self.encode_to, self.errors).decode(self.encode_to)  
+#         self.target.write(s)  
+
+# if sys.stdout.encoding == 'cp936':  
+#     print (sys.getdefaultencoding())
+#     print (sys.stdin.encoding,sys.stdout.encoding)
+#     sys.stdout = UnicodeStreamFilter(sys.stdout)
+
 if cct.get_os_system().find('win') >= 0:
     import win_unicode_console
     win_unicode_console.enable()
+    # os.system("chcp 65001")
     # os.write(sys.stdout.fileno(), table)
+
+
+
 
 import requests
 from lxml import etree

@@ -36,12 +36,12 @@ log = LoggerFactory.log
 # log=LoggerFactory.JohnsonLoger('Realdata')
 
 
-def set_default_encode(code='utf-8'):
-        import sys
-        reload(sys)
-        sys.setdefaultencoding(code)
-        print (sys.getdefaultencoding())
-        print (sys.stdout.encoding)
+# def set_default_encode(code='utf-8'):
+#         import sys
+#         reload(sys)
+#         sys.setdefaultencoding(code)
+#         print (sys.getdefaultencoding())
+#         print (sys.stdin.encoding,sys.stdout.encoding)
 
 
 # print pt.PrettyTable([''] + list(df.columns))

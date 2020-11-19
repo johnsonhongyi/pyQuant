@@ -12,6 +12,10 @@ from matplotlib.lines import Line2D
 from matplotlib.patches import Rectangle
 from matplotlib import transforms
 from pylab import plt, mpl
+# plt.isinteractive()
+# plt.interactive(False)
+# from pylab import mpl
+# import matplotlib.pyplot as plt
 from sklearn.linear_model import LinearRegression
 from statsmodels import regression
 
@@ -228,7 +232,9 @@ def get_linear_model_histogramDouble(code, ptype='low', dtype='d', start=None, e
     # 画出价格随时间变化的图像
     # _, ax = plt.subplots()
     # fig = plt.figure()
+    # plt.ion()
     fig = plt.figure(figsize=(16, 10))
+
     # fig = plt.figure(figsize=(16, 10), dpi=72)
     # fig.autofmt_xdate() #(no fact)
 
@@ -478,9 +484,16 @@ def get_linear_model_histogramDouble(code, ptype='low', dtype='d', start=None, e
     plt.grid(True)
 
     # plt.ion()
-    plt.show(block=False)
+    plt.draw()
+    plt.pause(0.001)
+    
+    # plt.show(block=False)
+    
+    # plt.draw()
+    # plt.pause(0.001)
+    # plt.close()
     # print plt.get_backend()
-    # plt.show()
+    # plt.show(block=True)
     return df
 
 
@@ -873,9 +886,12 @@ def parseArgmain():
 
 
 if __name__ == "__main__":
-    # matplotlib.use('WXAgg')
-    #     plt.interactive(True)
-    # status=get_linear_model_histogramDouble('601198')
+    # import matplotlib
+    # # matplotlib.use('WXAgg')
+    # #     plt.interactive(True)
+    # matplotlib.use('QT5Agg') 
+    status=get_linear_model_histogramDouble('601198')
+    # plt.show()
     # print status
     # get_tdx_and_now_data('002399')
     # sys.exit(0)
