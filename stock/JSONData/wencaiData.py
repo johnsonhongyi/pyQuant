@@ -50,6 +50,8 @@ log = LoggerFactory.log
 if cct.get_os_system().find('win') >= 0:
     import win_unicode_console
     win_unicode_console.enable()
+
+    
     # os.system("chcp 65001")
     # os.write(sys.stdout.fileno(), table)
 

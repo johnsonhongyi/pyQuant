@@ -201,7 +201,9 @@ def get_os_system():
     else:
         return 'other'
 
-
+import win_unicode_console
+# if get_os_system().find('win') >= 0:
+#     win_unicode_console.enable()
 
 def set_default_encode(code='utf-8'):
         import sys
@@ -210,9 +212,7 @@ def set_default_encode(code='utf-8'):
         print (sys.getdefaultencoding())
         print (sys.stdin.encoding,sys.stdout.encoding)
         
-# if get_os_system().find('win') >= 0:
-#     import win_unicode_console
-#     win_unicode_console.enable()
+
 
 # reload(sys)
 # sys.setdefaultencoding('utf8')
@@ -841,6 +841,8 @@ def cct_raw_input(sts):
 
     st = ''
     try:
+        if get_os_system().find('win') >= 0:
+            win_unicode_console.disable()
         st = raw_input(sts)
     except (KeyboardInterrupt) as e:
         inputerr = cct_raw_input(" Break: ")
@@ -859,6 +861,8 @@ def cct_raw_input(sts):
         else:
             print "cct_ExceptionError:%s count:%s" % (e, count_Except)
             sys.exit()
+    if get_os_system().find('win') >= 0:
+        win_unicode_console.enable()
     return st
 
 # eval_rule = "[elem for elem in dir() if not elem.startswith('_') and not elem.startswith('ti')]"
