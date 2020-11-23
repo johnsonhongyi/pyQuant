@@ -141,12 +141,22 @@ ramdisk_rootList = LoggerFactory.ramdisk_rootList
 path_sep = os.path.sep
 
 
+def get_now_basedir(root_list):
+    basedir=''
+    for mpath in root_list:
+        if os.path.exists(mpath):
+            basedir = mpath
+            break
+    return basedir
+
+
 def get_tdx_dir():
     os_sys = get_sys_system()
     os_platform = get_sys_platform()
     if os_sys.find('Darwin') == 0:
         log.info("DarwinFind:%s" % os_sys)
-        basedir = macroot_vm.replace('/', path_sep).replace('\\', path_sep)
+        macbase=get_now_basedir([macroot,macroot_vm])
+        basedir = macbase.replace('/', path_sep).replace('\\', path_sep)
         log.info("Mac:%s" % os_platform)
 
     elif os_sys.find('Win') == 0:
