@@ -657,7 +657,8 @@ def creation_date_duration(path_to_file):
     today = datetime.date.today()
     return (today - dtm).days
 
-import win32api,win32gui
+if not isMac():
+    import win32api,win32gui
 import thread
 
 def get_window_pos(targetTitle):  
