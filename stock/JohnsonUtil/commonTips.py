@@ -141,7 +141,7 @@ ramdisk_rootList = LoggerFactory.ramdisk_rootList
 path_sep = os.path.sep
 
 
-def get_now_basedir(root_list):
+def get_now_basedir(root_list=[macroot,macroot_vm]):
     basedir=''
     for mpath in root_list:
         if os.path.exists(mpath):
@@ -155,7 +155,7 @@ def get_tdx_dir():
     os_platform = get_sys_platform()
     if os_sys.find('Darwin') == 0:
         log.info("DarwinFind:%s" % os_sys)
-        macbase=get_now_basedir([macroot,macroot_vm])
+        macbase=get_now_basedir()
         basedir = macbase.replace('/', path_sep).replace('\\', path_sep)
         log.info("Mac:%s" % os_platform)
 
@@ -283,6 +283,16 @@ scriptname = '''tell application "Terminal"
 end tell
 '''
 
+
+terminal_positionKey4K = {'sina_Market-DurationDn.py': '6, 633',
+                        'sina_Market-DurationCXDN.py': '118, 504',
+                        'sina_Market-DurationSH.py': '-29, 623',
+                        'sina_Market-DurationUP.py': '54, 560',
+                        'sina_Monitor-Market-LH.py': '666, 338',
+                        'sina_Monitor-Market.py': '19, 179',
+                        'sina_Monitor.py': '168, 421',
+                        'singleAnalyseUtil.py': '1084, 765',
+                        'LinePower.py': '6, 216', }
 
 
 terminal_positionKey = {'sina_Market-DurationDn.py': '8, 801',

@@ -267,7 +267,12 @@ def getPosition(cmd=None, position=None,close=False):
                 return cmd,position
 
 # positionKey = cct.terminal_positionKey
-positionKey = cct.terminal_positionKey_VM
+basedir = cct.get_now_basedir()
+
+if basedir.find('vm') >= 0:
+    positionKey = cct.terminal_positionKey_VM
+else:
+    positionKey = cct.terminal_positionKey4K
 
 
 def setPosition(cmd=None, position=None):
