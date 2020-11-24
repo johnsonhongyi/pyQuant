@@ -202,9 +202,9 @@ def get_os_system():
         return 'other'
 
 import win_unicode_console
-if get_os_system().find('win') >= 0:
-    # https://github.com/Drekin/win-unicode-console
-    win_unicode_console.enable(use_readline_hook=False)
+# if get_os_system().find('win') >= 0:
+#     # https://github.com/Drekin/win-unicode-console
+#     win_unicode_console.enable(use_readline_hook=False)
 
 def set_default_encode(code='utf-8'):
         import sys
