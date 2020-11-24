@@ -201,8 +201,8 @@ def get_os_system():
     else:
         return 'other'
 
-import win_unicode_console
-# if get_os_system().find('win') >= 0:
+if get_os_system().find('win') >= 0:
+    import win_unicode_console
 #     # https://github.com/Drekin/win-unicode-console
 #     win_unicode_console.enable(use_readline_hook=False)
 
