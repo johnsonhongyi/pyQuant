@@ -347,7 +347,8 @@ def get_hot_countNew(changepercent, rzrq, fibl=None, fibc=10):
         fibcount += 1
     allTop = pd.DataFrame()
     indexKeys = ['sh', 'sz', 'cyb']
-    ffindex = ffu.get_dfcfw_fund_flow('all')
+    # ffindex = ffu.get_dfcfw_fund_flow('all')
+    ffindex = ffu.get_dfcfw_fund_flow2020('all')
 
     ffall = {}
     topTen_all = 0

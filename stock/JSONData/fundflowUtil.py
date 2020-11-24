@@ -68,6 +68,7 @@ def get_dfcfw_fund_flow_old(market):
 
 
 def get_dfcfw_fund_flow(market):
+    #outdata 
     indexall = ['sh','sz','cyb']
     if market.startswith('http'):
         single = True
@@ -137,6 +138,86 @@ def get_dfcfw_fund_flow(market):
                 # 1592652100,32691894461
                 # 215722046, 207426675004
     return dk
+
+
+def get_dfcfw_fund_flow2020(market):
+    indexall = ['sh','sz','cyb']
+    url = ''
+    if market == "all":
+        single = False
+        url = ct.DFCFW_FUND_FLOW_URL_2020All
+    else:
+        log.error("market is not all")
+    log.info("url:%s"%(url))
+    data = cct.get_url_data_R(url,timeout=20).split('=')
+    # vollist=re.findall('{data:(\d+)',code)
+    # vol_l = []
+
+    if len(data) > 0:
+        # vol_l = re.findall('\"([\d\D]+?)\"', data[1])
+        # ['jQuery18308448273886036106_1606189025852({"rc":0,"rt":11,"svr":182994506,"lt":1,"full":1,\
+        # "data":{"total":3,"diff":[{"f62":-9060049408.0,"f184":-4.05},{"f62":-9359993344.0,"f184":-3.16},{"f62":-3487613184.0,"f184":-3.08}]}});']
+        data_s = eval(re.findall('{[\d\D]*}', data[0])[0])
+        data_s = data_s['data']['diff']
+    else:
+        data_s = ''
+        # data_s = data[1]
+    dk = {}
+    start_inx = 0
+    for i in range(len(indexall)):
+        dd = {}
+        # start_inx = start_inx + i * 24
+        # end_inx = start_inx + (i+1)*24
+
+        if len(data_s) > 0:
+            data = (data_s[i])
+            # [{'f184': -4.05, 'f62': -9060049408.0}, \
+            # {'f184': -3.16, 'f62': -9359993344.0}, {'f184': -3.08, 'f62': -3487613184.0}]
+            dd['zlr'] = round(float(data['f62'])/1000/1000/100, 1)
+            dd['zzb'] = round(float(data['f184']), 1)
+            dd['sjlr'] = 0
+            dd['sjzb'] = 0
+            dd['time'] = cct.get_now_time_int()
+
+            # dd['zlr'] = round(float(data[5+i*25] if data[5+i*25] != '-' else 0)/10000, 1)
+            # dd['zzb'] = round(float(data[23+i*25].replace("%","")), 1)
+            # dd['sjlr'] = round(float(data[9+i*25])/10000, 1)
+            # dd['sjzb'] = round(float(data[10+i*25].replace("%","")), 1)
+            # dd['time'] = data[24+i*25].split(" ")[1][:5]
+            # print dd['time']
+        else:
+            dd['zlr'] = 0.0
+            dd['zzb'] = 0.0
+            dd['sjlr'] = 0.0
+            dd['sjzb'] = 0.0
+            dd['time'] = 0.0
+            log.error("Fund_f NO Url:%s" % url)
+        if not single:
+            url = ct.SINA_JSON_API_URL % ct.INDEX_LIST[indexall[i]]
+            data = cct.get_url_data_R(url,timeout=20)
+            vol_l = re.findall('\"([\d\D]+?)\"', data)
+            if len(vol_l) == 1:
+                data = vol_l[0].split(',')
+                try:
+                    dd['open'] = round(float(data[1]), 2)
+                    dd['lastp'] = round(float(data[2]), 2)
+                    dd['close'] = round(float(data[3]), 2)
+                    dd['high'] = round(float(data[4]), 2)
+                    dd['low'] = round(float(data[5]), 2)
+                    dd['vol'] = round(float(data[8]) / 100000, 1)
+                    dd['amount'] = round(float(data[9]) / 100000000, 1)
+                except Exception, e:
+                    print e
+                    return dd
+                else:
+                    pass
+                finally:
+                    pass
+        dk[indexall[i]] = dd
+                # 1592652100,32691894461
+                # 215722046, 207426675004
+    return dk
+
 def get_dfcfw_fund_HGT(url=ct.DFCFW_FUND_FLOW_HGT):
     data = cct.get_url_data_R(url,timeout=15)
     "http://nufm.dfcfw.com/EM_Finance2014NumericApplication/JS.aspx?type=CT&cmd=P.%28x%29,%28x%29,%28x%29|0000011|3990012|3990012,0000011,HSI5,BK07071,MK01461,MK01441,BK08041&sty=SHSTD|SZSTD|FCSHSTR&st=z&sr=&p=&ps=&cb=&js=var%20muXWEC=%28{data:[%28x%29]}%29&token=1942f5da9b46b069953c873404aad4b5"
@@ -744,7 +825,8 @@ if __name__ == "__main__":
     import ipdb;ipdb.set_trace()
 
     indexKeys = [ 'sh','sz', 'cyb']
-    ffindex = get_dfcfw_fund_flow('all')
+    ffindex = get_dfcfw_fund_flow2020('all')
+    # ffindex = get_dfcfw_fund_flow('all')
     print ffindex
     print get_dfcfw_fund_SHSZ()
     print "hgt:",get_dfcfw_fund_HGT()

@@ -409,6 +409,9 @@ DFCFW_FUND_FLOW_URL = "http://s1.dfcfw.com/js/%s.js?rt=0.3585179701661414"
 DFCFW_FUND_FLOW_ALL = "http://s1.dfcfw.com/js/index.js?rt=0.3585179701661414"
 # DFCFW_FUND_FLOW_URL_New="http://nufm.dfcfw.com/EM_Finance2014NumericApplication/JS.aspx?type=CT&cmd=%s&sty=CTBF&st=z&sr=&p=&ps=&cb=var%%20pie_data=&js=(x)&token=28758b27a75f62dc3065b81f7facb365"
 DFCFW_FUND_FLOW_URL_New = "http://nufm.dfcfw.com/EM_Finance2014NumericApplication/JS.aspx?type=CT&cmd=%s&sty=CTBFTA&st=z&sr=&p=&ps=&cb=&js=var%%20tab_data=({data:[(x)]})&token=70f12f2f4f091e459a279469fe49eca5"
+DFCFW_FUND_FLOW_URL_2020 = "http://push2.eastmoney.com/api/qt/ulist.np/get?fltt=2&secids=%s&fields=f62,f184&ut=b2884a393a59ad64002292a3e90d46a5&cb=jQuery18304554261368383843_1606188476429&_=1606188486614"
+DFCF_index={'sh':'1.000001','sz':'0.399001','cyb':'0.399006'}
+DFCFW_FUND_FLOW_URL_2020All ="http://push2.eastmoney.com/api/qt/ulist.np/get?fltt=2&secids=1.000001,0.399001,0.399006&fields=f62,f184&ut=b2884a393a59ad64002292a3e90d46a5&cb=jQuery18308448273886036106_1606189025852&_=1606189035954"
 # DFCFW_FUND_FLOW_URL_New="http://nufm.dfcfw.com/EM_Finance2014NumericApplication/JS.aspx?type=CT&cmd=%s"
 
 # http://data.eastmoney.com/rzrq/
