@@ -47,9 +47,13 @@ log = LoggerFactory.log
 #     print (sys.stdin.encoding,sys.stdout.encoding)
 #     sys.stdout = UnicodeStreamFilter(sys.stdout)
 
-if cct.get_os_system().find('win') >= 0:
-    import win_unicode_console
-    win_unicode_console.enable()
+# if cct.get_os_system().find('win') >= 0:
+#     import win_unicode_console
+    # https://github.com/Drekin/win-unicode-console
+    # win_unicode_console.enable(use_readline_hook=False)
+    # win_unicode_console.enable(raw_input__return_unicode=False)
+    # win_unicode_console.enable(use_unicode_argv=False)
+    # win_unicode_console.enable(raw_input__return_unicode=False)
 
     
     # os.system("chcp 65001")

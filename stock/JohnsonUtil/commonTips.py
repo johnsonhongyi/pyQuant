@@ -202,8 +202,9 @@ def get_os_system():
         return 'other'
 
 import win_unicode_console
-# if get_os_system().find('win') >= 0:
-#     win_unicode_console.enable()
+if get_os_system().find('win') >= 0:
+    # https://github.com/Drekin/win-unicode-console
+    win_unicode_console.enable(use_readline_hook=False)
 
 def set_default_encode(code='utf-8'):
         import sys
@@ -843,6 +844,7 @@ def cct_raw_input(sts):
     try:
         if get_os_system().find('win') >= 0:
             win_unicode_console.disable()
+        # st = win_unicode_console.raw_input.raw_input(sts)
         st = raw_input(sts)
     except (KeyboardInterrupt) as e:
         inputerr = cct_raw_input(" Break: ")
@@ -862,7 +864,7 @@ def cct_raw_input(sts):
             print "cct_ExceptionError:%s count:%s" % (e, count_Except)
             sys.exit()
     if get_os_system().find('win') >= 0:
-        win_unicode_console.enable()
+        win_unicode_console.enable(use_readline_hook=False)
     return st
 
 # eval_rule = "[elem for elem in dir() if not elem.startswith('_') and not elem.startswith('ti')]"
