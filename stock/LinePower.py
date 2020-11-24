@@ -106,6 +106,9 @@ if __name__ == "__main__":
         cct.set_console(80, 19)
     parser = parseArgmain()
     parser.print_help()
+    if cct.get_os_system().find('win') >= 0:
+        import win_unicode_console
+        win_unicode_console.disable()
     while 1:
         try:
             # log.setLevel(LoggerFactory.INFO)
