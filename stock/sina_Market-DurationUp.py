@@ -76,7 +76,7 @@ if __name__ == "__main__":
     # handler=StderrHandler(format_string='{record.channel}: {record.message) [{record.extra[cwd]}]')
     # log.level = log.debug
     # error_handler = SyslogHandler('Sina-M-Log', level='ERROR')
-    width, height = 178, 22
+    width, height = 180,22
 
     def set_duration_console(du_date):
         if cct.isMac():

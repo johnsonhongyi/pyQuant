@@ -689,12 +689,12 @@ if __name__ == '__main__':
 
             else:
                 log.debug('into clean_duration:%s' % (int_time))
-                if (cct.get_now_time_int() > 1502 and cct.get_now_time_int() < 1800):
+                if (cct.get_now_time_int() > 1502 and cct.get_now_time_int() < 2400):
                     while 1:
                         if cct.get_now_time_int() > 1502 and cct.get_now_time_int() < 1510:
                             print ".",
                             cct.sleep(60)
-                        elif cct.get_now_time_int() < 1800:
+                        elif cct.get_now_time_int() < 2400:
                             print ".",
                             print "write dm to file"
                             if cct.get_work_day_status():

@@ -844,6 +844,7 @@ def cct_raw_input(sts):
     try:
         if get_os_system().find('win') >= 0:
             win_unicode_console.disable()
+        # https://stackoverflow.com/questions/11068581/python-raw-input-odd-behavior-with-accents-containing-strings
         # st = win_unicode_console.raw_input.raw_input(sts)
         st = raw_input(sts)
     except (KeyboardInterrupt) as e:

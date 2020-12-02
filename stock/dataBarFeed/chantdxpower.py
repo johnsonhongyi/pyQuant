@@ -1190,8 +1190,8 @@ def show_chan_mpl_power(code, start_date=None, end_date=None, stock_days=60, res
         pos = quotes['open'] - quotes['close'] < 0
         neg = quotes['open'] - quotes['close'] >= 0
         idx = quotes.reset_index().index
-        ax2.bar(idx[pos], volume[pos], color='red', width=1, align='center')
-        ax2.bar(idx[neg], volume[neg], color='green', width=1, align='center')
+        ax2.bar(idx[pos.values], volume[pos.values], color='red', width=1, align='center')
+        ax2.bar(idx[neg.values], volume[neg.values], color='green', width=1, align='center')
         yticks = ax2.get_yticks()
         ax2.set_yticks(yticks[::3])
         # plt.tight_layout()
@@ -1212,8 +1212,8 @@ def show_chan_mpl_power(code, start_date=None, end_date=None, stock_days=60, res
         # plt.legend()
         # plt.tight_layout()
         # plt.draw()
-        # plt.show()
-        plt.show(block=False)
+        plt.show()
+        # plt.show(block=False)
     #
 
 
@@ -2383,7 +2383,7 @@ def show_chan_mpl_fb(code, start_date, end_date, stock_days, resample, show_mpl=
             plt.axhline(y=np.median(kdl_mode.values), linewidth=2, color='red', linestyle="--")
         if len(kdh_mode) > 0:
             plt.axhline(y=np.median(kdh_mode.values), linewidth=2, color='green', linestyle="--")
-        plt.title(stock_code + " | " + cname + " | " + str(quotes.index[-1])[:10], fontsize=14)
+        plt.title(stock_code + " | " + str(cname) + " | " + str(quotes.index[-1])[:10], fontsize=14)
         plt.plot(x_xd_seq, y_xd_seq)
         if len(quotes) > windows:
             roll_mean=pd.rolling_mean(quotes.close, window=windows)
@@ -2432,8 +2432,9 @@ def show_chan_mpl_fb(code, start_date, end_date, stock_days, resample, show_mpl=
         pos=quotes['open'] - quotes['close'] < 0
         neg=quotes['open'] - quotes['close'] >= 0
         idx=quotes.reset_index().index
-        ax2.bar(idx[pos], volume[pos], color='red', width=1, align='center')
-        ax2.bar(idx[neg], volume[neg], color='green', width=1, align='center')
+
+        ax2.bar(idx[pos.values], volume[pos.values], color='red', width=1, align='center')
+        ax2.bar(idx[neg.values], volume[neg.values], color='green', width=1, align='center')
         yticks=ax2.get_yticks()
         ax2.set_yticks(yticks[::3])
         # plt.tight_layout()
@@ -2455,8 +2456,8 @@ def show_chan_mpl_fb(code, start_date, end_date, stock_days, resample, show_mpl=
         # plt.legend()
         # plt.tight_layout()
         # plt.draw()
-        # plt.show()
-        plt.show(block=False)
+        plt.show()
+        # plt.show(block=False)
 
 import argparse
 def parseArgmain():
@@ -2529,7 +2530,13 @@ if __name__ == "__main__":
             # log.setLevel(LoggerFactory.INFO)
             # log.setLevel(LoggerFactory.ERROR)
             # log.setLevel(LoggerFactory.DEBUG)
+            if cct.get_os_system().find('win') >= 0:
+                import win_unicode_console
+                win_unicode_console.disable()
             code=raw_input("code:")
+            if cct.get_os_system().find('win') >= 0:
+                # import win_unicode_console
+                win_unicode_console.enable()
             # code == '000830'
             args=parser.parse_args(code.split())
             # print args
