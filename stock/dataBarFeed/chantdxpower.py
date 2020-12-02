@@ -266,7 +266,7 @@ def show_chan_mpl_tdx(code, start_date=None, end_date=None, stock_days=60, resam
             # print "次级:",len(biIdx),biIdx,[str(k_data_c.index[x])[:10] for x in biIdx]
         return biIdx
 
-    def get_quotes_tdx(code, start=None, end=None, dl=120, resample='d', show_name=True,df=None):
+    def get_quotes_tdx2(code, start=None, end=None, dl=120, resample='d', show_name=True,df=None):
 
         if df is None:
 
@@ -315,7 +315,7 @@ def show_chan_mpl_tdx(code, start_date=None, end_date=None, stock_days=60, resam
         return quotes, cname
 
     time_s = time.time()
-    quotes, cname = get_quotes_tdx(stock_code, start_date, end_date, dl=stock_days, resample=resample, show_name=show_mpl,df=df)
+    quotes, cname = get_quotes_tdx2(stock_code, start_date, end_date, dl=stock_days, resample=resample, show_name=show_mpl,df=df)
     # 缠论k线
     #         open  close   high    low    volume      money
     # 2017-05-03  15.69  15.66  15.73  15.53  10557743  165075887
@@ -1810,6 +1810,7 @@ def show_chan_mpl_power(code, start_date=None, end_date=None, stock_days=60, res
 def show_chan_mpl_fb(code, start_date, end_date, stock_days, resample, show_mpl=True, least_init=3, chanK_flag=False, windows=20, fb_show=0):
    
     stock_code = code  # 股票代码
+
     stock_frequency = '%sm'%resample if resample.isdigit() else resample
     resample = '%sT'%resample if resample.isdigit() else resample
     log.info('resample:%s'%(resample))
@@ -2466,7 +2467,7 @@ def parseArgmain():
         parser.add_argument('code', type=str, nargs='?', help='999999')
         parser.add_argument('start', nargs='?', type=str, help='20150612')
         parser.add_argument('end', nargs='?', type=str, help='20160101')
-        parser.add_argument('-d', action="store", dest="dtype", type=str, nargs='?', choices=['1','3','5','10', '15', '30','60', 'd', 'w', 'm'], default='w', help='DateType')
+        parser.add_argument('-d', action="store", dest="dtype", type=str, nargs='?', choices=['1','3','5','10', '15', '30','60', 'd', 'w', 'm'], default='d', help='DateType')
         parser.add_argument('-v', action="store", dest="vtype", type=str, choices=['f', 'b'], default='f', help='Price Forward or back')
         parser.add_argument('-p', action="store", dest="ptype", type=str, choices=['high', 'low', 'close'], default='low', help='price type')
         parser.add_argument('-f', action="store", dest="filter", type=str, choices=['y', 'n'], default='y', help='find duration low')
