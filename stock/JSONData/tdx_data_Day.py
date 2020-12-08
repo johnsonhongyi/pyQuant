@@ -2515,7 +2515,8 @@ def compute_power_tdx_df(tdx_df,dd):
         #         idx = tdx_df.red[tdx_df.red >0].index[0]
         # trend = tdx_df[tdx_df.index >= idx]
         # fibl = len(trend)
-        idxh = tdx_df.high.argmax()
+        # idxh = tdx_df.high.argmax()
+        idxh = tdx_df.low.argmin()
         fibh = len(tdx_df[tdx_df.index >= idxh])
         # vratio = -1
         # if fibl > 1:
@@ -2635,7 +2636,57 @@ def compute_upper_cross(dd,ma1='upper',ma2='ma5d',ratio=0.02):
         dd['topU'] = 0
     return dd
 
+
 def compute_ma_cross(dd,ma1='ma5d',ma2='ma10d',ratio=0.02):
+    #low
+    temp = dd
+    # temp = df[ (df[ma1] > df[ma2] * (1-ratio))  & (df[ma1] < df[ma2] * (1+ratio)) ]
+    # temp = df[ ((df.close > df.ene) & (df.close < df.upper)) & (df[ma1] > df[ma2] * (1-ratio))  & (df[ma1] < df[ma2] * (1+ratio))]
+
+    if len(temp) > 0:
+        temp_close = temp.low
+        if len(temp_close[temp_close >0]) >0:
+            idx_max = temp.close[:-1].argmax()
+            idx_min = temp_close[:-1].argmin()
+        else:
+            idx_min = -1
+            idx_max = -1
+
+        if idx_min <> -1:
+            fibl = len(dd[dd.index >= idx_min])
+            idx = round((dd.close[-1]/temp.close[temp.index == idx_max])*100-100,1)
+        else:
+            fibl = -1
+            idx = round((dd.close[-1]/temp.close[-1])*100-100,1)
+        # if len(temp) == len(df):
+        #     fibl = len(dd[dd.index >= temp.index[0]])
+        #     idx = round((dd.close[-1]/temp.close[0])*100-100,1)
+        # else:
+        #     fibl = len(dd[dd.index >= temp.index[-1]])
+        #     idx = round((dd.close[-1]/temp.close[-1])*100-100,1)
+        dd['op'] = idx
+        dd['fib'] = fibl
+        dd['ra'] = round(idx/fibl,1)
+        dd['ldate'] = temp.index[0]
+    else:
+
+        temp = df[ df[ma1] > df[ma2]]
+        if len(temp) == len(df) and len(df) > 0:
+            fibl = len(dd[dd.index >= temp.index[0]])
+            idx = round((dd.close[-1]/temp.close[0])*100-100,1)
+            dd['op'] = idx
+            dd['fib'] = fibl
+            dd['ra'] = round(idx/fibl,1)
+            dd['ldate'] = temp.index[0]
+        else:
+            idx = 0
+            dd['op'] = idx
+            dd['fib'] = -1
+            dd['ra'] = -1
+            dd['ldate'] = -1
+    return dd
+
+def compute_ma_cross_old(dd,ma1='ma5d',ma2='ma10d',ratio=0.02):
 
     df = dd[(dd[ma2] <> 0)]
     # temp = df[ (df[ma1] > df[ma2] * (1-ratio))  & (df[ma1] < df[ma2] * (1+ratio)) ]
@@ -3908,6 +3959,7 @@ if __name__ == '__main__':
     code='300201'
     code='300405'
     code='300274'
+    code='600257'
     # code='000800'
     # code='000990'
     # code='600299'
@@ -3925,7 +3977,9 @@ if __name__ == '__main__':
     # df2 = get_tdx_Exp_day_to_df(code,dl=160, end=None, newdays=0, resample='w')
     resample = 'd'
     # df2 = get_tdx_Exp_day_to_df(code,dl=160, end=None, newdays=0, resample='d',lastdays=12)
-    df2 = get_tdx_Exp_day_to_df(code,dl=160, end=None, newdays=0, resample='d',lastdays=1)
+    df2 = get_tdx_Exp_day_to_df(code,dl=60, end=None, newdays=0, resample='d',lastdays=1)
+    import ipdb;ipdb.set_trace()
+
     # get_tdx_Exp_day_to_df(code, start=None, end=None, dl=None, newdays=None, type='f', wds=True, lastdays=3, resample='d', MultiIndex=False)
     df3 = compute_jump_du_count(df2, lastdays=9, resample='d')
     import ipdb;ipdb.set_trace()
