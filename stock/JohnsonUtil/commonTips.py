@@ -338,12 +338,12 @@ terminal_positionKey_VM = {'sina_Market-DurationDn.py': '342, 397',
                         'singleAnalyseUtil.py': '615, 23',
                         'LinePower.py': '6, 216', }
 
-terminal_positionKey_triton = {'sina_Market-DurationDn.py': '-4, 718,1380,460',
-                        'sina_Market-DurationCXDN.py': '23, 634,1380,460',
-                        'sina_Market-DurationSH.py': '-29, 623,1380,460',
+terminal_positionKey_triton = {'sina_Market-DurationDn.py': '-4, 718,1400,460',
+                        'sina_Market-DurationCXDN.py': '23, 634,1400,460',
+                        'sina_Market-DurationSH.py': '-29, 623,1400,460',
                         'sina_Market-DurationUP.py': '54, 574,1400,460',
-                        'sina_Monitor-Market-LH.py': '603, 501, 1380, 420',
-                        'sina_Monitor-Market.py': '19, 179,1380,460',
+                        'sina_Monitor-Market-LH.py': '603, 501, 1400, 420',
+                        'sina_Monitor-Market.py': '19, 179,1400,460',
                         'sina_Monitor.py': '87, 489,1400,460',
                         'singleAnalyseUtil.py': '1074, 694,880,360',
                         'LinePower.py': '1031, 682,800,420', }
@@ -703,9 +703,11 @@ def reset_window_pos(targetTitle,posx=1026,posy=699,width=900,height=360):
     hWndList = []  
     win32gui.EnumWindows(lambda hWnd, param: param.append(hWnd), hWndList)
     status=0  
+    time.sleep(0.1)
     for hwnd in hWndList:
         clsname = win32gui.GetClassName(hwnd)
         title = win32gui.GetWindowText(hwnd)
+        # log.error("title:%s"%(title))
         if (title.find(targetTitle) == 0):    #调整目标窗口到坐标(600,300),大小设置为(600,600)
             rect1 = win32gui.GetWindowRect(hwnd)
             # rect2 = get_window_rect(hwnd)
@@ -714,6 +716,7 @@ def reset_window_pos(targetTitle,posx=1026,posy=699,width=900,height=360):
             # win32gui.SetWindowPos(hwnd, win32con.HWND_TOPMOST, 330,678,600,600, win32con.SWP_SHOWWINDOW)
             win32gui.MoveWindow(hwnd,int(posx), int(posy), int(width), int(height),True)  #108,19
             status +=1
+
     return status
 
 def set_ctrl_handler():
@@ -802,6 +805,7 @@ def set_console(width=80, height=15, color=3, title=None, closeTerminal=True):
 
     if closeTerminal and title is not None and (GlobalValues().getkey('Position') is None):
         GlobalValues().setkey('Position',1)
+
         # get_terminal_Position(cmd=scriptquit, position=None, close=False)
         if isMac():
             get_terminal_Position(position=filename)
@@ -810,7 +814,9 @@ def set_console(width=80, height=15, color=3, title=None, closeTerminal=True):
             title= (os.path.basename(sys.argv[0]))
             positionKey=capital_to_lower(terminal_positionKey_triton)
             if title.lower() in positionKey.keys():
+                # log.error("title.lower() in positionKey.keys()")
                 pos=terminal_positionKey_triton[title].split(',')
+                log.info("pos:%s title:%s Position:%s"%(pos,title,GlobalValues().getkey('Position')))
                 # cct.get_window_pos('sina_Market-DurationUP.py')
                 # cct.reset_window_pos(key,pos[0],pos[1],pos[2],pos[3])
                 status=reset_window_pos(title,pos[0],pos[1],pos[2],pos[3])
@@ -819,7 +825,8 @@ def set_console(width=80, height=15, color=3, title=None, closeTerminal=True):
                 log.error("%s not in terminal_positionKey_triton"%(title))
         # (os.path.basename(sys.argv[0]))
         # get_terminal_Position(clean_terminal[1], close=True)
-
+    # else:
+        # log.error("closeTerminal:%s title:%s Position:%s"%(closeTerminal,title,GlobalValues().getkey('Position')))
 
 def timeit_time(cmd, num=5):
     import timeit
