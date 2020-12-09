@@ -85,7 +85,7 @@ if __name__ == "__main__":
     # log.level = log.debug
     # error_handler = SyslogHandler('Sina-M-Log', level='ERROR')
 
-    width, height = 168, 22
+    width, height = 172, 22
 
     def set_duration_console(duration_date):
         if cct.isMac():

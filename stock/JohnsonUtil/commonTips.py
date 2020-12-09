@@ -339,11 +339,11 @@ terminal_positionKey_VM = {'sina_Market-DurationDn.py': '342, 397',
                         'LinePower.py': '6, 216', }
 
 terminal_positionKey_triton = {'sina_Market-DurationDn.py': '-4, 718,1380,460',
-                        'sina_Market-DurationCXDN.py': '23, 634,1360,460',
-                        'sina_Market-DurationSH.py': '-29, 623,1360,460',
+                        'sina_Market-DurationCXDN.py': '23, 634,1380,460',
+                        'sina_Market-DurationSH.py': '-29, 623,1380,460',
                         'sina_Market-DurationUP.py': '54, 574,1400,460',
-                        'sina_Monitor-Market-LH.py': '603, 501, 1360, 420',
-                        'sina_Monitor-Market.py': '19, 179,1360,460',
+                        'sina_Monitor-Market-LH.py': '603, 501, 1380, 420',
+                        'sina_Monitor-Market.py': '19, 179,1380,460',
                         'sina_Monitor.py': '87, 489,1400,460',
                         'singleAnalyseUtil.py': '1074, 694,880,360',
                         'LinePower.py': '1031, 682,800,420', }
