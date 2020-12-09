@@ -415,7 +415,9 @@ if __name__ == "__main__":
                 top_end=stf.getBollFilter(
                     df=top_end, resample=resample, down=True)
 
-                print "G:%s Rt:%0.1f dT:%s N:%s T:%s" % (goldstock, float(time.time() - time_Rt), cct.get_time_to_date(time_s), cct.get_now_time(), len(top_temp))
+                nhigh = top_temp[top_temp.close > top_temp.nhigh]
+                nlow = top_temp[top_temp.close > top_temp.nlow]
+                print "G:%s Rt:%0.1f dT:%s N:%s T:%s nh:%s nlow:%s" % (goldstock, float(time.time() - time_Rt), cct.get_time_to_date(time_s), cct.get_now_time(), len(top_temp),len(nhigh),len(nlow))
 
                 top_temp=top_temp.sort_values(by=(market_sort_value),
                                                 ascending=market_sort_value_key)

@@ -54,6 +54,7 @@ changeRatioUp = 1.025
 wencai_delay_time = 45
 resample_dtype = 'd'
 sina_lastbuy_logtime = 3600
+bigcount_logtime = 360
 cumdays = 14
 bollFilter = -5
 keep_lastnum = 15

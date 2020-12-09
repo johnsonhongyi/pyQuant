@@ -303,7 +303,11 @@ from configobj import ConfigObj
 import os
 # http://www.cnblogs.com/qq78292959/archive/2013/07/25/3213939.html
 def getconfigBigCount(count=None,write=False):
+
     conf_ini = cct.get_work_path('stock','JSONData','count.ini')
+    fname = 'bigcount_logtime'
+    logtime = cct.get_config_value_ramfile(fname)
+
     # print os.chdir(os.path.dirname(sys.argv[0]))
     # print (os.path.dirname(sys.argv[0]))
     # log.setLevel(LoggerFactory.INFO)
@@ -312,10 +316,21 @@ def getconfigBigCount(count=None,write=False):
         config = ConfigObj(conf_ini,encoding='UTF8')
         if config['BigCount']['type2'] > 0:
             big_last= int(config['BigCount']['type2'])
-            if count is None:
-                big_now = int(sina_json_Big_Count())
+            if logtime <> 0:
+                if (time.time() - float(cct.get_config_value_ramfile(fname)) > float(ct.bigcount_logtime)):
+                    duratime = cct.get_config_value_ramfile(fname,currvalue=time.time(),xtype='time',update=True)
+                    if count is None:
+                        big_now = int(sina_json_Big_Count())
+                    else:
+                        big_now = int(count)
+                else:
+                    write = False
+                    big_now = big_last
             else:
-                big_now = int(count)
+                duratime = cct.get_config_value_ramfile(fname,currvalue=time.time(),xtype='time',update=True)
+                write = False
+                big_now = big_last
+
             ratio_t=cct.get_work_time_ratio()
             bigRt=round( big_now / big_last / ratio_t, 1)
             big_v=int(bigRt*int(config['BigCount']['type2']))
@@ -900,7 +915,9 @@ if __name__ == '__main__':
     df = get_sina_all_json_dd(1,0,num=10000)
     print len(df)
 
+
     print "getconfigBigCount:",getconfigBigCount(count=None, write=False)
+
     df = get_sina_Market_json(market='all', showtime=True, num='100', retry_count=3, pause=0.001)
     print df[:1]
     for mk in ['sh','sz','cyb']:
@@ -914,6 +931,8 @@ if __name__ == '__main__':
     # print df[:1]
     # _get_sina_json_dd_url()
     print "Big_Count:",sina_json_Big_Count()
+    import ipdb;ipdb.set_trace()
+
     # print getconfigBigCount(write=True)
     # sys.exit(0)
     # post_login()
