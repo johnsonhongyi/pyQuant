@@ -235,7 +235,8 @@ if __name__ == "__main__":
 
                 # top_dif['dff'] = map(lambda x, y: round((x - y) / y * 100, 1),
                 #                      top_dif['buy'].values, top_dif['lastp'].values)
-                if st_key_sort.split()[0] == '4' and 926 < cct.get_now_time_int() < 1455 and 'lastbuy' in top_dif.columns:
+                # if st_key_sort.split()[0] == '4' and 926 < cct.get_now_time_int() < 1455 and 'lastbuy' in top_dif.columns:
+                if  926 < cct.get_now_time_int() < 1455 and 'lastbuy' in top_dif.columns:
                     top_dif['dff'] = (map(lambda x, y: round((x - y) / y * 100, 1),
                                           top_dif['buy'].values, top_dif['lastbuy'].values))
                     top_dif['dff2'] = (map(lambda x, y: round((x - y) / y * 100, 1),
@@ -270,7 +271,13 @@ if __name__ == "__main__":
                     # top_all=top_all.sort_values(by=['percent','dff','couts','ratio'],ascending=[0,0,1,1])
 
                     top_all = top_dif.copy()
-                    if cct.get_now_time_int() > 830 and cct.get_now_time_int() <= 935:
+
+
+                    if st_key_sort != '4':
+                        
+                        top_temp=top_all.copy()
+
+                    elif cct.get_now_time_int() > 830 and cct.get_now_time_int() <= 935:
                         top_temp = top_all[(top_all.low >= top_all.lastl1d) & (
                             top_all.lasth1d > top_all.lasth2d) & (top_all.close > top_all.lastp1d)]
                         # top_temp =  top_all[( ((top_all.top10 >0) | (top_all.boll >0)) & (top_all.lastp1d > top_all.ma5d) & (top_all.close > top_all.lastp1d))]
