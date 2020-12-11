@@ -279,7 +279,11 @@ if __name__ == "__main__":
 
                 # '''
 
-                if cct.get_now_time_int() > 830 and cct.get_now_time_int() <= 935:
+                # if st_key_sort == '8':
+                if st_key_sort != '4':
+                    top_temp=top_all.copy()
+
+                elif cct.get_now_time_int() > 830 and cct.get_now_time_int() <= 935:
                     top_temp = top_all[(top_all.low >= top_all.lastl1d) & (
                         top_all.lasth1d > top_all.lasth2d) & (top_all.close > top_all.lastp1d)]
                     # top_temp =  top_all[( ((top_all.top10 >0) | (top_all.boll >0)) & (top_all.lastp1d > top_all.ma5d) & (top_all.close > top_all.lastp1d))]
