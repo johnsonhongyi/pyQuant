@@ -143,7 +143,7 @@ if __name__ == "__main__":
         try:
             # top_now = tdd.getSinaAlldf(market='sh', vol=ct.json_countVol, vtype=ct.json_countType)
             time_Rt = time.time()
-            if st is None:
+            if st is None and st_key_sort in ['2', '3']:
                 st_key_sort = '%s %s' % (
                     st_key_sort.split()[0], cct.get_index_fibl())
 
@@ -274,7 +274,7 @@ if __name__ == "__main__":
 
 
                     if st_key_sort != '4':
-                        
+
                         top_temp=top_all.copy()
 
                     elif cct.get_now_time_int() > 830 and cct.get_now_time_int() <= 935:
@@ -360,7 +360,8 @@ if __name__ == "__main__":
                     else:
                         top_temp = top_all.copy()
 
-                    top_temp = stf.filterPowerCount(top_dif, ct.PowerCount)
+                    # if st_key_sort != '4':
+                    #     top_temp = stf.filterPowerCount(top_temp, ct.PowerCount)
 
                     top_end = top_all[-int((ct.PowerCount) / 10):].copy()
 
@@ -377,9 +378,18 @@ if __name__ == "__main__":
                     top_all = tdd.get_powerdf_to_all(top_all, top_temp)
                     # top_temp = stf.getBollFilter(df=top_temp, boll=ct.bollFilter,duration=ct.PowerCountdl)
                     # top_temp = stf.getBollFilter(df=top_temp, boll=-10, duration=ct.PowerCountdl,resample=resample)
-                    top_temp = stf.getBollFilter(df=top_temp, boll=ct.bollFilter, duration=ct.PowerCountdl,
-                                                 filter=False, ma5d=False, dl=14, percent=False, resample='d', ene=True)
-                    top_end = stf.getBollFilter(df=top_end, down=True)
+                    
+                    # top_temp = stf.getBollFilter(df=top_temp, boll=ct.bollFilter, duration=ct.PowerCountdl,
+                    #                              filter=False, ma5d=False, dl=14, percent=False, resample='d', ene=True)
+                    # top_end = stf.getBollFilter(df=top_end, down=True)
+
+
+                    top_temp=stf.getBollFilter(
+                        df=top_temp, resample=resample, down=True)
+                    top_end=stf.getBollFilter(
+                        df=top_end, resample=resample, down=True)
+
+
                     print("A:%s N:%s K:%s %s G:%s" % (
                         df_count, now_count, len(top_all[top_all['buy'] > 0]),
                         len(top_now[top_now['volume'] <= 0]), goldstock)),
