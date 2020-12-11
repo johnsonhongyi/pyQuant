@@ -235,8 +235,9 @@ if __name__ == "__main__":
 
                 # top_dif['dff'] = map(lambda x, y: round((x - y) / y * 100, 1),
                 #                      top_dif['buy'].values, top_dif['lastp'].values)
-                # if st_key_sort.split()[0] == '4' and 926 < cct.get_now_time_int() < 1455 and 'lastbuy' in top_dif.columns:
-                if  926 < cct.get_now_time_int() < 1455 and 'lastbuy' in top_dif.columns:
+               
+                if st_key_sort.split()[0] in ['4','9'] and 926 < cct.get_now_time_int() < 1455 and 'lastbuy' in top_dif.columns:
+                # if  926 < cct.get_now_time_int() < 1455 and 'lastbuy' in top_dif.columns:
                     top_dif['dff'] = (map(lambda x, y: round((x - y) / y * 100, 1),
                                           top_dif['buy'].values, top_dif['lastbuy'].values))
                     top_dif['dff2'] = (map(lambda x, y: round((x - y) / y * 100, 1),

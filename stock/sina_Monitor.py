@@ -234,15 +234,15 @@ if __name__ == "__main__":
                     #     top_all = top_all[(top_all.volume > ct.VolumeMinR) & (
                     #         top_all.volume < ct.VolumeMaxR)]
 
-                # if st_key_sort.split()[0] == '4' and 915 < cct.get_now_time_int() < 930:
-                if  915 < cct.get_now_time_int() < 930:
+                if st_key_sort.split()[0] in ['4','9'] and 915 < cct.get_now_time_int() < 930:
+                # if  915 < cct.get_now_time_int() < 930:
                     top_all['dff'] = (map(lambda x, y: round((x - y) / y * 100, 1),
                                           top_all['buy'].values, top_all['llastp'].values))
                     top_all['dff2'] = (map(lambda x, y: round((x - y) / y * 100, 1),
                                            top_all['buy'].values, top_all['lastp'].values))
-
-                # elif st_key_sort.split()[0] == '4' and 926 < cct.get_now_time_int() < 1455 and 'lastbuy' in top_all.columns:
-                elif 926 < cct.get_now_time_int() < 1455 and 'lastbuy' in top_all.columns:
+               
+                elif st_key_sort.split()[0] in ['4','9'] and 926 < cct.get_now_time_int() < 1455 and 'lastbuy' in top_all.columns:
+                # elif 926 < cct.get_now_time_int() < 1455 and 'lastbuy' in top_all.columns:
 
                     top_all['dff'] = (map(lambda x, y: round((x - y) / y * 100, 1),
                                           top_all['buy'].values, top_all['lastbuy'].values))
