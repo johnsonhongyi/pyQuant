@@ -152,9 +152,9 @@ Duration_percent_dff = ['percent','per1d','df2','b1_v', 'dff',  'op',
                         'fib', 'fibl', 'ra', 'ratio', 'volume', 'couts']
 Duration_percent_dff_key = [0, 0,0, 0, 0, 0, 1, 1, 0, 1, 1, 1]
 
-Duration_percent_vol = ['df2','fib','percent', 'dff',
+Duration_percent_vol = ['fib','dff','percent',
                         'df2', 'op', 'fib', 'volume', 'ra', 'ratio', 'couts']
-Duration_percent_vol_key = [0,0, 0, 0, 0, 0, 1, 1, 0, 1, 1]
+Duration_percent_vol_key = [0,0, 0 , 0, 0, 1, 1, 0, 1, 1]
 
 # Duration_percent_per_ra=['percent','ra','dff','op','fib','fibl','ratio','volume','couts']
 # Duration_percent_per_ra_key=[0,0,0,0,1,1,1,1,1]
@@ -619,7 +619,7 @@ def RawMenuArgmain():
     raw = 'status:[go(g),clear(c),[d 20150101 [l|h]|[y|n|pn|py],quit(q),W(a),sh]:'
     raw_input_menu = raw + "\n\tNow : %s" + \
         "\n\t1:Sort By Percent\t2:Sort by per1d\t3:Sort By percd\t\t4:Sort By DFF\n\t5:Sort By Ra_dff\t6:Sort By top10\t7:Sort Per b1V\t\t8:Sort by Count" + \
-        "\n\t9:By df2\t\tx: by_topR\tx1:by boll_perc\nplease input:"
+        "\n\t9:By fib\t\tx: by_topR\tx1:by boll_perc\nplease input:"
     return raw_input_menu
 
 # "Sort By Percent\t3:Sort By DFF\n\t2:Sort By OP\t\t4:Sort By Ra\nplease input:"
