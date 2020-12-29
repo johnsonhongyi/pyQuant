@@ -257,6 +257,11 @@ if __name__ == "__main__":
                         top_temp = top_temp.sort_values(by=(market_sort_value),
                                                         ascending=market_sort_value_key)
                     #     top_temp = top_temp.loc[:,ct.MonitorMarket_format_buy]
+                    
+                    if st_key_sort.split()[0] == 'x':
+                        top_temp = top_temp[top_temp.topR > 0]
+
+                        
                     ct_MonitorMarket_Values = ct.get_Duration_format_Values(ct.MonitorMarket_format_buy, market_sort_value[:2])
                     print cct.format_for_print(top_temp.loc[:, ct_MonitorMarket_Values][:10])
                     # print cct.format_for_print(top_dif[:10])

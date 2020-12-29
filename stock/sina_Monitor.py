@@ -281,6 +281,9 @@ if __name__ == "__main__":
 
                 # '''
 
+
+
+
                 # if st_key_sort == '8':
                 if st_key_sort != '4':
                     top_temp=top_all.copy()
@@ -367,6 +370,11 @@ if __name__ == "__main__":
                 else:
                     top_temp=top_all.copy()
 
+
+
+
+                if st_key_sort.split()[0] == 'x':
+                    top_temp = top_temp[top_temp.topR > 0]
 
 
                 # '''

@@ -216,7 +216,6 @@ if __name__ == "__main__":
                     top_dif['buy'] = (
                         map(lambda x, y: y if int(x) == 0 else x, top_dif['buy'].values, top_dif['trade'].values))
 
-                # �ж�����
                 # log.debug('top_dif:%s'%(len(top_dif)))
                 if ct.checkfilter and cct.get_now_time_int() > 915 and cct.get_now_time_int() < ct.checkfilter_end_timeDu:
                     top_dif = top_dif[top_dif.low > top_dif.llow * ct.changeRatio]
