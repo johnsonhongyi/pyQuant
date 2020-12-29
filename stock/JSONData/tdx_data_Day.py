@@ -2598,10 +2598,12 @@ def compute_perd_df(dd,lastdays=3,resample ='d'):
         dd['upperL'] = top_ten
     # dd['upperL'] = df.close[df.low > df.upper].count()
     # dd['red'] = df.red[df.red > 0].count()
-    ra = round((df.close[-1]-dd.close.max())/df.close[-1]*100,1)
-    if ra == 0.0:
-        ra = round((df.close[-1]-df.close.min())/df.close[-1]*100,1)
-    dd['ra'] = ra
+
+    #old ra max
+    # ra = round((df.close[-1]-dd.close.max())/df.close[-1]*100,1)
+    # if ra == 0.0:
+    #     ra = round((df.close[-1]-df.close.min())/df.close[-1]*100,1)
+    # dd['ra'] = ra
 
     # temp_du = df['perd'] - df['lastdu']
     # print df[df.close > df.ma5d]
@@ -2619,11 +2621,26 @@ def compute_perd_df(dd,lastdays=3,resample ='d'):
     # print(len(dd),dd.code[0])  #fix np.seterr(divide='ignore',invalid='ignore') 
     condition_up = dd[dd['low'] > dd['high'].shift()]        #向上跳空缺口
     condition_down = dd[dd['high'] < dd['low'].shift()]      #向下跳空缺口
+
     top0 = dd[(dd['low'] == dd['high']) & (dd['low'] <> 0)]  #一字涨停
+    if len(condition_up) > 0 and len(condition_down):
+        if condition_up.index[-1] > condition_down.index[-1]:
+            close_idx_up = condition_up.low[0]
+        else:
+            close_idx_up = condition_down.high[0]
+    else:
+        close_idx_up = condition_up.low[0] if len(condition_up) > 0 else dd.close.max()
 
     dd['topR'] = len(condition_up)
     dd['topD'] = len(condition_down)
     dd['top0'] = len(top0)
+
+    # ra = round((df.close[-1]-dd.close.max())/df.close[-1]*100,1)
+    ra = round((df.close[-1]-close_idx_up)/df.close[-1]*100,1)
+    if ra == 0.0:
+        ra = round((df.close[-1]-df.close.min())/df.close[-1]*100,1)
+    dd['ra'] = ra
+
 
     if resample == 'd':
         df['perd'] = df['perd'].apply(lambda x: round(x, 1) if ( x < 9.85)  else 10.0)
@@ -3978,7 +3995,8 @@ if __name__ == '__main__':
     code='300274'
     code='600257'
     code='001896'
-    code='999999'
+    code='300730'
+    # code='999999'
     # code='000800'
     # code='000990'
     # code='600299'
