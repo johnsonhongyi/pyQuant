@@ -374,7 +374,7 @@ if __name__ == "__main__":
 
 
                 if st_key_sort.split()[0] == 'x':
-                    top_temp = top_temp[top_temp.topR > 0]
+                    top_temp = top_temp[top_temp.topR != 0]
 
 
                 # '''

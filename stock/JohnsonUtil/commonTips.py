@@ -1568,7 +1568,10 @@ def read_last_lines(filename, lines=1):
             fsock.seek(curpos)
             # read to end
             block = fsock.read()
-            nl_count = block.count('\n')
+            nl_count = block.count('\n') - block.count('\n\n')
+            # nl_count_err = block.count('\n\n')
+            # nl_count = nl_count - nl_count_err
+
             # if read enough(more)
             if nl_count >= lines:
                 break

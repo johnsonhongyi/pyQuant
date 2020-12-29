@@ -268,7 +268,7 @@ def get_tdx_Exp_day_to_df(code, start=None, end=None, dl=None, newdays=None, typ
 
     start = cct.day8_to_day10(start)
     end = cct.day8_to_day10(end)
-
+    
     if dl is not None:
         if dl < 70:
             tdx_max_int = dl
@@ -2622,18 +2622,23 @@ def compute_perd_df(dd,lastdays=3,resample ='d'):
     condition_up = dd[dd['low'] > dd['high'].shift()]        #向上跳空缺口
     condition_down = dd[dd['high'] < dd['low'].shift()]      #向下跳空缺口
 
-    top0 = dd[(dd['low'] == dd['high']) & (dd['low'] <> 0)]  #一字涨停
-    if len(condition_up) > 0 and len(condition_down):
-        if condition_up.index[-1] > condition_down.index[-1]:
-            close_idx_up = condition_up.low[0]
-        else:
-            close_idx_up = condition_down.high[0]
-    else:
-        close_idx_up = condition_up.low[0] if len(condition_up) > 0 else dd.close.max()
+    top0 = dd[(dd['low'] == dd['high']) & (dd['low'] != 0)]  #一字涨停
+
 
     dd['topR'] = len(condition_up)
     dd['topD'] = len(condition_down)
     dd['top0'] = len(top0)
+    
+    if len(condition_up) > 0 and len(condition_down) > 0:
+        if condition_up.index[-1] > condition_down.index[-1]:
+            close_idx_up = condition_up.low[0]
+        else:
+            close_idx_up = condition_down.high[0]
+            dd['topR'] = -len(condition_down)
+    else:
+        close_idx_up = condition_up.low[0] if len(condition_up) > 0 else dd.close.max()
+
+
 
     # ra = round((df.close[-1]-dd.close.max())/df.close[-1]*100,1)
     ra = round((df.close[-1]-close_idx_up)/df.close[-1]*100,1)
@@ -3996,6 +4001,7 @@ if __name__ == '__main__':
     code='600257'
     code='001896'
     code='300730'
+    code='300750'
     # code='999999'
     # code='000800'
     # code='000990'

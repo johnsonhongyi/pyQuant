@@ -398,7 +398,7 @@ if __name__ == "__main__":
                             # ascending=ct.Duration_percentdn_ra_key)
 
                     if st_key_sort.split()[0] == 'x':
-                        top_temp = top_temp[top_temp.topR > 0]
+                        top_temp = top_temp[top_temp.topR != 0]
 
                     if cct.get_now_time_int() > 915 and cct.get_now_time_int() < 935:
                         # top_temp = top_temp[ (top_temp['ma5d'] > top_temp['ma10d']) & (top_temp['buy'] > top_temp['ma10d']) ][:10]

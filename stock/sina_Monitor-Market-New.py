@@ -259,7 +259,7 @@ if __name__ == "__main__":
                     #     top_temp = top_temp.loc[:,ct.MonitorMarket_format_buy]
                     
                     if st_key_sort.split()[0] == 'x':
-                        top_temp = top_temp[top_temp.topR > 0]
+                        top_temp = top_temp[top_temp.topR != 0]
 
                         
                     ct_MonitorMarket_Values = ct.get_Duration_format_Values(ct.MonitorMarket_format_buy, market_sort_value[:2])
