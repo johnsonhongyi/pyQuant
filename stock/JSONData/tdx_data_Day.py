@@ -2564,6 +2564,7 @@ def dataframe_mode_round(df):
     return df_mode
 
 def compute_perd_df(dd,lastdays=3,resample ='d'):
+    np.seterr(divide='ignore',invalid='ignore')  #RuntimeWarning: invalid value encountered in greater
     df = dd[-(lastdays+1):].copy()
     df['perlastp'] = map(cct.func_compute_percd2020, df['open'], df['close'], df['high'], df['low'],df['open'].shift(1), 
                             df['close'].shift(1), df['high'].shift(1), df['low'].shift(1),df['ma5d'],df['ma10d'],df['vol'],df['vol'].shift(1),df['upper'])
@@ -2602,17 +2603,33 @@ def compute_perd_df(dd,lastdays=3,resample ='d'):
         ra = round((df.close[-1]-df.close.min())/df.close[-1]*100,1)
     dd['ra'] = ra
 
-    temp_du = df['perd'] - df['lastdu']
+    # temp_du = df['perd'] - df['lastdu']
     # print df[df.close > df.ma5d]
 
-    dd['topR']=temp_du.T[temp_du.T >= 0].count()    #跳空缺口
-    dd['top0']=temp_du.T[temp_du.T == 0].count()    #一字涨停
+
+    # condition_up = df[df['low'] > df['high'].shift()]
+    # top0 = df[(df['low'] == df['high']) & (df['low'] <> 0)]
+
+    # # dd['topR']=temp_du.T[temp_du.T >= 0].count()    #跳空缺口
+    # # dd['top0']=temp_du.T[temp_du.T == 0].count()    #一字涨停
+    # dd['topR'] = condition_up.count()
+    # dd['top0'] = top0.count()
+
+    # https://blog.csdn.net/xingbuxing_py/article/details/89323460
+    # print(len(dd),dd.code[0])  #fix np.seterr(divide='ignore',invalid='ignore') 
+    condition_up = dd[dd['low'] > dd['high'].shift()]        #向上跳空缺口
+    condition_down = dd[dd['high'] < dd['low'].shift()]      #向下跳空缺口
+    top0 = dd[(dd['low'] == dd['high']) & (dd['low'] <> 0)]  #一字涨停
+
+    dd['topR'] = len(condition_up)
+    dd['topD'] = len(condition_down)
+    dd['top0'] = len(top0)
+
     if resample == 'd':
         df['perd'] = df['perd'].apply(lambda x: round(x, 1) if ( x < 9.85)  else 10.0)
 
     dd['perd'] = df['perd']
-    dd.fillna(ct.FILLNA,inplace=True)
-    #fillna -101
+    dd.fillna(ct.FILLNA,inplace=True)    #ct.FILLNA -101
 
     # print dataframe_mode_round(df.high)
     # print dataframe_mode_round(df.low)
@@ -3960,6 +3977,8 @@ if __name__ == '__main__':
     code='300405'
     code='300274'
     code='600257'
+    code='001896'
+    code='999999'
     # code='000800'
     # code='000990'
     # code='600299'
