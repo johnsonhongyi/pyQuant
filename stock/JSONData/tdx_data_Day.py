@@ -2793,7 +2793,7 @@ def compute_perd_df(dd,lastdays=3,resample ='d'):
     else:
         dd['topR'] = -len(condition_down)
         dd['topD'] = len(condition_down)
-
+    
     if len(condition_up) > 0 and len(condition_down) > 0:
         if condition_up.jop_date.values[-1] > condition_down.jop_date.values[-1]:
             close_idx_up = dd[dd.index == condition_up.jop_date.values[0]].low[0]
@@ -2801,9 +2801,13 @@ def compute_perd_df(dd,lastdays=3,resample ='d'):
             close_idx_up = dd[dd.index == condition_down.jop_date.values[0]].high[0]
             dd['topR'] = -len(condition_down)
     else:
-        
-        close_idx_up = dd[dd.index == condition_up.jop_date.values[0]].low[0] if len(condition_up) > 0 else dd.close.max()
-
+        if len(condition_up) > 0:
+            close_idx_up = dd[dd.index == condition_up.jop_date.values[0]].low[0] 
+            # close_idx_up = dd[dd.index == condition_up.jop_date.values[0]].low[0] if len(condition_up) > 0 else dd.close.max()
+        elif len(condition_down) > 0:
+            close_idx_up = dd[dd.index == condition_down.jop_date.values[0]].high[0] 
+        else:
+            close_idx_up = dd.close.min()
 
 
     # ra = round((df.close[-1]-dd.close.max())/df.close[-1]*100,1)
