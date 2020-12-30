@@ -2568,7 +2568,7 @@ def compute_condition_up_sample(df):
     condition_up = df['low'] > df['high'].shift()        #向上跳空缺口
     condition_down = df['high'] < df['low'].shift()      #向下跳空缺口
 
-    df['hop'] = np.nan
+    # df['hop'] = np.nan
     # df['hop_up'] = 101
     # df['hop_down'] = 101
 
@@ -2620,11 +2620,18 @@ def compute_condition_up(df):
     condition_up = df[df['low'] > df['high'].shift()]        #向上跳空缺口
     condition_down = df[df['high'] < df['low'].shift()]      #向下跳空缺口
 
-    # df['htop'] = np.nan
+    df['hop'] = np.nan
     # df.loc[condition_up,'hop_up'] = -1
     # df.loc[condition_down,'hop_down'] =1
 
-    hop_record=[]
+    hop_record= []
+
+    # hop_record=[{'hop':np.nan,
+    #             'jop_date':np.nan,
+    #             'ex_hop_price':np.nan,
+    #             'post_hop_price':np.nan,
+    #             'fill_data':np.nan,
+    #             'fill_day':np.nan }]
     # hop_record_up=[]
     # hop_record_down=[]
     #向上跳空,看是否有回落(之后的最低价有没有低于缺口前价格)
@@ -2640,7 +2647,7 @@ def compute_condition_up(df):
         post_hop_price = df['low'].at[i]  #跳空后的价格
 
         fill_data = ''          #回补时间
-        fill_day = ''           #回补天数
+        fill_day = np.nan           #回补天数
         #看滞后有没有回补向上的跳空
         duration = df.index[df.index > i] #跳空后的数据日
 
@@ -2668,7 +2675,7 @@ def compute_condition_up(df):
         post_hop_price = df['high'].at[i]  #跳空后的价格
 
         fill_data = ''          #回补时间
-        fill_day = ''           #回补天数
+        fill_day = np.nan           #回补天数
         #看滞后有没有回补向上的跳空
         duration = df.index[df.index > i] #跳空后的数据日
         for j in duration:
@@ -2771,11 +2778,11 @@ def compute_perd_df(dd,lastdays=3,resample ='d'):
     #计算回补
     hop_df = compute_condition_up(dd)
     # condition_up = hop_df[hop_df.hop == 'up']
-    condition_up = hop_df[(hop_df.hop == 'up') & (hop_df.fill_day == '')]
+    condition_up = hop_df[(hop_df.fill_day.isnull() ) & (hop_df.hop == 'up')]   if len(hop_df) > 0  else pd.DataFrame()
     # condition_down = hop_df[hop_df.hop == 'down']
-    condition_down = hop_df[(hop_df.hop == 'down') & (hop_df.fill_day == '')]
-    fill_day_up = hop_df[(hop_df.hop == 'up') & (hop_df.fill_day <> '')]
-    fill_day_down = hop_df[(hop_df.hop == 'down') & (hop_df.fill_day <> '')]
+    condition_down = hop_df[ (hop_df.fill_day.isnull() ) & (hop_df.hop == 'down')] if len(hop_df) > 0  else pd.DataFrame()
+    fill_day_up = hop_df[( hop_df.fill_day.notnull() ) & (hop_df.hop == 'up')] if len(hop_df) > 0  else pd.DataFrame()
+    fill_day_down = hop_df[ (hop_df.fill_day.notnull() ) & (hop_df.hop == 'down') ] if len(hop_df) > 0  else pd.DataFrame()
 
     dd['top0'] = len(top0)
 

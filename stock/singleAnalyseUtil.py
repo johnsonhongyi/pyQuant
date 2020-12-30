@@ -606,7 +606,7 @@ if __name__ == '__main__':
     success = 0
     # rzrq = ffu.get_dfcfw_rzrq_SHSZ2()
     rzrq = ffu.get_dfcfw_rzrq_SHSZ()
-    dl = 34
+    dl = 60
     fibc = 3
     fibl = fibonacciCount(['999999', '399001', '399006'], dl=dl)
     percentDuration = 2
