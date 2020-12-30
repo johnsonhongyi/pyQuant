@@ -1102,6 +1102,9 @@ def last_tddate(days=1):
 #         return True
 
 
+def day_last_days(daynow,last=-1):
+    return str(datetime.datetime.strptime(daynow, '%Y-%m-%d').date() + datetime.timedelta(last))
+
 def day_last_week(days=-7):
     lasty = datetime.datetime.today().date() + datetime.timedelta(days)
     return str(lasty)

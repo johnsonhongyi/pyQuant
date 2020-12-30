@@ -19,7 +19,7 @@ from JohnsonUtil import johnson_cons as ct
 import tushare as ts
 import sina_data
 # import numba as nb
-# import datetime
+import datetime
 # import logbook
 
 # log=logbook.Logger('TDX_day')
@@ -2563,6 +2563,131 @@ def dataframe_mode_round(df):
             break
     return df_mode
 
+
+def compute_condition_up_sample(df):
+    condition_up = df['low'] > df['high'].shift()        #向上跳空缺口
+    condition_down = df['high'] < df['low'].shift()      #向下跳空缺口
+
+    df['hop'] = np.nan
+    # df['hop_up'] = 101
+    # df['hop_down'] = 101
+
+    df.loc[condition_up,'hop_up'] = -1
+    df.loc[condition_down,'hop_down'] =1
+
+    hop_record=[]
+    #向上跳空,看是否有回落(之后的最低价有没有低于缺口前价格)
+    #向下跳空,看是否有回升(之后的最高价有没有高于缺口前价格)
+    for i in range(len(df)):
+        #如果向上跳空
+        if df['hop_up'].at[i].values() == -1:     #at loc index 
+            hop_date = df['date'].at[i] #跳空时间 
+            ex_hop_price = df['high'].at[i -1]  #前一根K线最高价   
+            post_hop_price = df['low'].at[i]  #跳空后的价格
+            fill_data = ''
+            #看滞后有没有回补向上的跳空
+            for j in range(i,len(df)):
+                if df['low'].at[j] <= ex_hop_price:
+                    fill_data = df['date'].at[i]
+                    break
+            hop_record.append({'hop':'up',
+                                'jop_date':hop_date,
+                                'ex_hop_price':ex_hop_price,
+                                'post_hop_price':post_hop_price,
+                                'fill_data':fill_data })
+        #如果有向下跳空
+        elif df['hop_down'].at[i] == 1:
+            hop_date = df['date'].at[i] #跳空时间
+            ex_hop_price = df['low'].at[i -1] #前一根K线最低价   
+            post_hop_price = df['high'].at[i]  #跳空后的价格
+            fill_data = ''
+            #看之后有没有回补向下的跳空
+            for j in rang(i,len(df)):
+                if df['high'].at[j] >= ex_hop_price:
+                    fill_data = df['date'].at[j]
+                    break
+
+            hop_record.append({'hop':'down',
+                                'jop_date':hop_date,
+                                'ex_hop_price':ex_hop_price,
+                                'post_hop_price':post_hop_price,
+                                'fill_data':fill_data })
+
+    hop_df = pd.DataFrame(hop_record)
+    return hop_df
+
+def compute_condition_up(df):
+    condition_up = df[df['low'] > df['high'].shift()]        #向上跳空缺口
+    condition_down = df[df['high'] < df['low'].shift()]      #向下跳空缺口
+
+    # df['htop'] = np.nan
+    # df.loc[condition_up,'hop_up'] = -1
+    # df.loc[condition_down,'hop_down'] =1
+
+    hop_record=[]
+    # hop_record_up=[]
+    # hop_record_down=[]
+    #向上跳空,看是否有回落(之后的最低价有没有低于缺口前价格)
+    #向下跳空,看是否有回升(之后的最高价有没有高于缺口前价格)
+    for i in condition_up.index:
+        #如果向上跳空
+
+        hop_date = i #跳空时间 
+        # lastday = cct.day_last_days(i,-1)
+        lastday = df.index[df.index < i][-1]
+
+        ex_hop_price = df['high'].at[lastday]  #前一根K线最高价   
+        post_hop_price = df['low'].at[i]  #跳空后的价格
+
+        fill_data = ''          #回补时间
+        fill_day = ''           #回补天数
+        #看滞后有没有回补向上的跳空
+        duration = df.index[df.index > i] #跳空后的数据日
+
+        for j in duration:
+
+            if df['low'].at[j] <= ex_hop_price:
+                fill_data = j
+                fill_day = len(df.index[(df.index > i) & (df.index <= j)])
+                break
+        hop_record.append({'hop':'up',
+                            'jop_date':hop_date,
+                            'ex_hop_price':ex_hop_price,
+                            'post_hop_price':post_hop_price,
+                            'fill_data':fill_data,
+                            'fill_day':fill_day })
+
+        #如果有向下跳空
+    for i in condition_down.index:
+        #如果向下跳空
+
+        hop_date = i #跳空时间 
+        # lastday = cct.day_last_days(i,-1)
+        lastday = df.index[df.index < i][-1]
+        ex_hop_price = df['low'].at[lastday]  #前一根K线最低价   
+        post_hop_price = df['high'].at[i]  #跳空后的价格
+
+        fill_data = ''          #回补时间
+        fill_day = ''           #回补天数
+        #看滞后有没有回补向上的跳空
+        duration = df.index[df.index > i] #跳空后的数据日
+        for j in duration:
+            if df['low'].at[j] >= ex_hop_price:
+                fill_data = j
+                fill_day = len(df.index[(df.index > i) & (df.index <= j)])
+                break
+        hop_record.append({'hop':'down',
+                            'jop_date':hop_date,
+                            'ex_hop_price':ex_hop_price,
+                            'post_hop_price':post_hop_price,
+                            'fill_data':fill_data,
+                            'fill_day':fill_day })
+    hop_df = pd.DataFrame(hop_record)
+    # hop_df[hop_df.fill_day <> '']         #已经回补
+    # hop_df.fill_day.isnull()  #没有回补
+
+    return hop_df
+
 def compute_perd_df(dd,lastdays=3,resample ='d'):
     np.seterr(divide='ignore',invalid='ignore')  #RuntimeWarning: invalid value encountered in greater
     df = dd[-(lastdays+1):].copy()
@@ -2619,16 +2744,19 @@ def compute_perd_df(dd,lastdays=3,resample ='d'):
 
     # https://blog.csdn.net/xingbuxing_py/article/details/89323460
     # print(len(dd),dd.code[0])  #fix np.seterr(divide='ignore',invalid='ignore') 
+    top0 = dd[(dd['low'] == dd['high']) & (dd['low'] != 0)]  #一字涨停
+
+
+    ''' 旧的跳空未计算回补
     condition_up = dd[dd['low'] > dd['high'].shift()]        #向上跳空缺口
     condition_down = dd[dd['high'] < dd['low'].shift()]      #向下跳空缺口
 
-    top0 = dd[(dd['low'] == dd['high']) & (dd['low'] != 0)]  #一字涨停
-
+    # hop_df = compute_condition_up(dd)
 
     dd['topR'] = len(condition_up)
     dd['topD'] = len(condition_down)
     dd['top0'] = len(top0)
-    
+
     if len(condition_up) > 0 and len(condition_down) > 0:
         if condition_up.index[-1] > condition_down.index[-1]:
             close_idx_up = condition_up.low[0]
@@ -2638,12 +2766,44 @@ def compute_perd_df(dd,lastdays=3,resample ='d'):
     else:
         close_idx_up = condition_up.low[0] if len(condition_up) > 0 else dd.close.max()
 
+    '''
+
+    #计算回补
+    hop_df = compute_condition_up(dd)
+    # condition_up = hop_df[hop_df.hop == 'up']
+    condition_up = hop_df[(hop_df.hop == 'up') & (hop_df.fill_day == '')]
+    # condition_down = hop_df[hop_df.hop == 'down']
+    condition_down = hop_df[(hop_df.hop == 'down') & (hop_df.fill_day == '')]
+    fill_day_up = hop_df[(hop_df.hop == 'up') & (hop_df.fill_day <> '')]
+    fill_day_down = hop_df[(hop_df.hop == 'down') & (hop_df.fill_day <> '')]
+
+    dd['top0'] = len(top0)
+
+    if len(fill_day_down) > 0 and len(fill_day_up) > 0:
+        dd['topR'] = len(condition_up)
+        dd['topD'] = len(condition_down)
+    else:
+        dd['topR'] = len(condition_up)
+        dd['topD'] = len(condition_down)
+
+    if len(condition_up) > 0 and len(condition_down) > 0:
+        if condition_up.jop_date.values[-1] > condition_down.jop_date.values[-1]:
+            close_idx_up = dd[dd.index == condition_up.jop_date.values[0]].low[0]
+        else:
+            close_idx_up = dd[dd.index == condition_down.jop_date.values[0]].high[0]
+            dd['topR'] = -len(condition_down)
+    else:
+        
+        close_idx_up = dd[dd.index == condition_up.jop_date.values[0]].low[0] if len(condition_up) > 0 else dd.close.max()
+
 
 
     # ra = round((df.close[-1]-dd.close.max())/df.close[-1]*100,1)
-    ra = round((df.close[-1]-close_idx_up)/df.close[-1]*100,1)
+    # ra = round((df.close[-1]-close_idx_up)/df.close[-1]*100,1)
+
+    ra = round((df.close[-1]-close_idx_up)/close_idx_up*100,1)
     if ra == 0.0:
-        ra = round((df.close[-1]-df.close.min())/df.close[-1]*100,1)
+        ra = round((df.close[-1]-df.close.min())/dd.close.min()*100,1)
     dd['ra'] = ra
 
 
@@ -4002,6 +4162,10 @@ if __name__ == '__main__':
     code='001896'
     code='300730'
     code='300750'
+    code='002340'
+    code='300549'
+    code='002049' 
+    code='001896' #豫能控股
     # code='999999'
     # code='000800'
     # code='000990'
