@@ -2781,16 +2781,17 @@ def compute_perd_df(dd,lastdays=3,resample ='d'):
     condition_up = hop_df[(hop_df.fill_day.isnull() ) & (hop_df.hop == 'up')]   if len(hop_df) > 0  else pd.DataFrame()
     # condition_down = hop_df[hop_df.hop == 'down']
     condition_down = hop_df[ (hop_df.fill_day.isnull() ) & (hop_df.hop == 'down')] if len(hop_df) > 0  else pd.DataFrame()
-    fill_day_up = hop_df[( hop_df.fill_day.notnull() ) & (hop_df.hop == 'up')] if len(hop_df) > 0  else pd.DataFrame()
-    fill_day_down = hop_df[ (hop_df.fill_day.notnull() ) & (hop_df.hop == 'down') ] if len(hop_df) > 0  else pd.DataFrame()
+    # fill_day_up = hop_df[( hop_df.fill_day.notnull() ) & (hop_df.hop == 'up')] if len(hop_df) > 0  else pd.DataFrame()
+    # fill_day_down = hop_df[ (hop_df.fill_day.notnull() ) & (hop_df.hop == 'down') ] if len(hop_df) > 0  else pd.DataFrame()
 
     dd['top0'] = len(top0)
 
-    if len(fill_day_down) > 0 and len(fill_day_up) > 0:
+    # if len(fill_day_down) > 0 and len(fill_day_up) > 0:
+    if len(condition_up) > len(condition_down) > 0:
         dd['topR'] = len(condition_up)
         dd['topD'] = len(condition_down)
     else:
-        dd['topR'] = len(condition_up)
+        dd['topR'] = -len(condition_down)
         dd['topD'] = len(condition_down)
 
     if len(condition_up) > 0 and len(condition_down) > 0:
@@ -4173,6 +4174,7 @@ if __name__ == '__main__':
     code='300549'
     code='002049' 
     code='001896' #豫能控股
+    code='300730' #科创信息
     # code='999999'
     # code='000800'
     # code='000990'
