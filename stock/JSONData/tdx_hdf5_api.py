@@ -532,7 +532,8 @@ def write_hdf_db(fname, df, table='all', index=False, complib='blosc', baseCount
                         #     df = df.index.drop_duplicates()
                                 # df[df.index.get_level_values('code') not in diff_code ]
                         h5.remove(table)
-                        h5[table]=df
+                        # h5[table]=df
+                        h5.put(table, df, format='table', append=False)
                         # h5.put(table, df, format='table',index=False, data_columns=True, append=False)
                     else:
                         if rewrite:
@@ -541,7 +542,8 @@ def write_hdf_db(fname, df, table='all', index=False, complib='blosc', baseCount
                         # h5.append(table, df, format='table', append=True,data_columns=True, dropna=None)
                 else:
                     if not MultiIndex:
-                        h5[table]=df
+                        # h5[table]=df
+                        h5.put(table, df, format='table', append=False)
                         # h5.put(table, df, format='table',index=False, data_columns=True, append=False)
                     else:
                         h5.put(table, df, format='table', index=False, complib=complib, data_columns=True, append=True)
@@ -937,13 +939,23 @@ if __name__ == "__main__":
     # import ipdb;ipdb.set_trace()
 
 
+    a = np.random.standard_normal((9000,4))
+    df = pd.DataFrame(a)
+    h5_fname = 'test_s.h5'
+    h5_table = 'all'
+    h5 = write_hdf_db(h5_fname, df, table=h5_table, index=False, baseCount=500, append=False, MultiIndex=False)
+    import ipdb;ipdb.set_trace()
+
     fname=['sina_data.h5', 'tdx_last_df', 'powerCompute.h5', 'get_sina_all_ratio']
+    # fname=['test_s.h5','sina_data.h5', 'tdx_last_df', 'powerCompute.h5', 'get_sina_all_ratio']
+    fname=['test_s.h5']
     # fname = 'powerCompute.h5'
     for na in fname:
         with SafeHDFStore(na) as h5:
-            print h5
-            if '/' + 'all' in h5.keys():
-                print h5['all'].loc['600007']
+            import ipdb;ipdb.set_trace()
+            print(h5)
+            if '/' + 'all' in list(h5.keys()):
+                print(h5['all'].loc['600007'])
         # h5.remove('high_10_y_20170620_all_15')
         # print h5
         # dd = h5['d_21_y_all']

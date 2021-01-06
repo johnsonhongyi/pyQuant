@@ -1678,12 +1678,13 @@ def code_to_tdx_blk(code):
 
 def get_config_value(fname, classtype, currvalue, limitvalue=1, xtype='limit', read=False):
     conf_ini = fname
+    currvalue = int(float(currvalue))
     # conf_ini = cct.get_work_path('stock','JSONData','count.ini')
     if os.path.exists(conf_ini):
         # log.info("file ok:%s"%conf_ini)
         config = ConfigObj(conf_ini, encoding='UTF8')
         if classtype in config.keys():
-            if int(config[classtype][xtype]) > currvalue:
+            if int(float(config[classtype][xtype])) > currvalue:
                 ratio = float(config[classtype][xtype]) / limitvalue
                 if ratio < 1.2:
                     log.info("f_size:%s < read_limit:%s ratio:%0.2f" % (currvalue, config[classtype][xtype], ratio))

@@ -137,7 +137,7 @@ if __name__ == "__main__":
     # st_key_sort = '7'
     # st_key_sort = ct.sort_value_key_perd23
     # st_key_sort = '3 5'
-    st_key_sort = '2'
+    st_key_sort = '2 2'
     market_sort_value, market_sort_value_key = ct.get_market_sort_value_key(st_key_sort)
     st = None
     while 1:
