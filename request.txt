@@ -12,6 +12,7 @@ win_unicode_console
 pywin32  # python pywin32_postinstall.py  --install
 matplotlib
 sklearn
+pyreadline
 #TA-Lib
 #pytables:  https://www.lfd.uci.edu/~gohlke/pythonlibs/#ta-lib
 #conda install -n py39 -c conda-forge pytables   #pip install --upgrade tables

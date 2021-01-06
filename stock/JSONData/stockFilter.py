@@ -88,8 +88,7 @@ def compute_perd_value(df, market_value=3, col='per'):
         market_value = 3
     temp = df[df.columns[(df.columns >= '%s1d' % (col)) & (
         df.columns <= '%s%sd' % (col, market_value))]]
-    df['%s%sd' % (col, market_value)] = temp.T.sum()
-
+    df['%s%sd' % (col, market_value)] = round(temp.T.sum(),1)
     return df
 
 
