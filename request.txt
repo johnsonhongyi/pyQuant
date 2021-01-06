@@ -1,3 +1,19 @@
 tushare
 trollius
-TA-Lib
+numpy
+pandas
+tushare
+configobj
+tqdm
+statsmodels
+docopt
+#tables
+win_unicode_console
+pywin32  # python pywin32_postinstall.py  --install
+matplotlib
+sklearn
+#TA-Lib
+#pytables:  https://www.lfd.uci.edu/~gohlke/pythonlibs/#ta-lib
+#conda install -n py39 -c conda-forge pytables   #pip install --upgrade tables
+#trollius
+#prettytable
