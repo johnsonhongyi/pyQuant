@@ -356,6 +356,7 @@ def get_tdx_Exp_day_to_df(code, start=None, end=None, dl=None, newdays=None, typ
             # if dt is not None and tdate < dt:
             #     break
         df = pd.DataFrame(dt_list, columns=ct.TDX_Day_columns)
+        df = df[~df.date.duplicated()]
         # df.sort_index(ascending=False, inplace=True)
         if start is not None and end is not None:
             df = df[(df.date >= start) & (df.date <= end)]
@@ -494,6 +495,8 @@ def get_tdx_Exp_day_to_df(code, start=None, end=None, dl=None, newdays=None, typ
                     #     break
 
             df = pd.DataFrame(dt_list, columns=ct.TDX_Day_columns)
+            df = df[~df.date.duplicated()]
+
         else:
             # log.error("df in Multidata:%s"%(len(df)))
             df.sort_index(ascending=False, inplace=True)
@@ -920,7 +923,10 @@ def get_tdx_append_now_df_api(code, start=None, end=None, type='f', df=None, dm=
 #            ds['volume']=ds.volume.apply(lambda x: x * 100)
             if not 'amount' in ds.columns:
                 ds['amount'] = map(lambda x, y, z: round(
-                    (y + z) / 2 * x, 2), ds.volume, ds.high, ds.low)
+                    (y + z) / 2 * x, 1), ds.volume, ds.high, ds.low)
+            else:
+                ds['amount'] = ds['amount'].apply(lambda x: round(x , 1))
+
             ds = ds.loc[:, ['code', 'open', 'high',
                             'low', 'close', 'volume', 'amount']]
             # ds.rename(columns={'volume': 'amount'}, inplace=True)
@@ -1155,7 +1161,10 @@ def get_tdx_append_now_df_api_tofile(code, dm=None, newdays=0, start=None, end=N
 #            ds['volume']=ds.volume.apply(lambda x: x * 100)
             if not 'amount' in ds.columns:
                 ds['amount'] = map(lambda x, y, z: round(
-                    (y + z) / 2 * x, 2), ds.volume, ds.high, ds.low)
+                    (y + z) / 2 * x, 1), ds.volume, ds.high, ds.low)
+            else:
+                ds['amount'] = ds['amount'].apply(lambda x: round(x , 1))
+
             ds = ds.loc[:, ['code', 'open', 'high',
                             'low', 'close', 'volume', 'amount']]
             # ds.rename(columns={'volume': 'amount'}, inplace=True)
@@ -1163,6 +1172,8 @@ def get_tdx_append_now_df_api_tofile(code, dm=None, newdays=0, start=None, end=N
             ds.sort_index(ascending=True, inplace=True)
             ds = ds.fillna(0)
             df = df.append(ds)
+            import ipdb;ipdb.set_trace()
+
             if (len(ds) == 1 and ds.index.values[0] != cct.get_today()) or len(ds) > 1:
                 sta = write_tdx_tushare_to_file(code, df=df)
                 if sta:
@@ -1275,6 +1286,7 @@ def get_tdx_append_now_df_api_tofile(code, dm=None, newdays=0, start=None, end=N
 
     if writedm and len(df) > 0:
         if cct.get_now_time_int() < 900 or cct.get_now_time_int() > 1505:
+            df['amount'] = df['amount'].apply(lambda x: round(x , 1))
             sta = write_tdx_sina_data_to_file(code, df=df)
     return df
 
@@ -1375,7 +1387,10 @@ def write_tdx_tushare_to_file(code, df=None, start=None, type='f'):
             df.rename(columns={'volume': 'vol'}, inplace=True)
         if not 'amount' in df.columns:
             df['amount'] = map(lambda x, y, z: round(
-                (y + z) / 2 * x, 2), df.vol, df.high, df.low)
+                (y + z) / 2 * x, 1), df.vol, df.high, df.low)
+        else:
+            df['amount'] = df['amount'].apply(lambda x: round(x , 1))
+
         w_t = time.time()
         wdata_list = []
         for date in df.index:
@@ -1391,7 +1406,8 @@ def write_tdx_tushare_to_file(code, df=None, start=None, type='f'):
                 tvol = str(td.vol)
                 amount = str(td.amount)
                 tdata = tdate + ',' + topen + ',' + thigh + ',' + tlow + \
-                    ',' + tclose + ',' + tvol + ',' + amount + '\r\n'
+                    ',' + tclose + ',' + tvol + ',' + amount + '\n'
+                    # ',' + tclose + ',' + tvol + ',' + amount + '\r\n'
                 wdata_list.append(tdata)
 #        import cStringIO
 #        b = cStringIO.StringIO()
@@ -1451,6 +1467,7 @@ def write_tdx_sina_data_to_file(code, dm=None, df=None, dl=2, type='f'):
                 tdate = alist[0]
                 tvol = round(float(alist[5]), 0)
                 tamount = round(float(alist[6].split('\r')[0].replace('\r\n', '')), 0)
+                # tamount = round(float(alist[6].split('\r')[0].replace('\n', '')), 0)
     #            print int(tamount)
                 if fsize > 600 and (int(tvol) == 0 or int(tamount) == 0):
                     continue
@@ -1491,7 +1508,8 @@ def write_tdx_sina_data_to_file(code, dm=None, df=None, dl=2, type='f'):
             tvol = str(round(td.vol, 2))
             amount = str(round(td.amount, 2))
             tdata = tdate + ',' + topen + ',' + thigh + ',' + tlow + \
-                ',' + tclose + ',' + tvol + ',' + amount + '\r\n'
+                ',' + tclose + ',' + tvol + ',' + amount + '\n'
+                # ',' + tclose + ',' + tvol + ',' + amount + '\r\n'
             w_data.append(tdata)
         fo.writelines(w_data)
         fo.close()
@@ -2267,6 +2285,8 @@ def get_tdx_day_to_df(code):
         b = b + 32
         e = e + 32
     df = pd.DataFrame(dt_list, columns=ct.TDX_Day_columns)
+    df = df[~df.date.duplicated()]
+
     df = df.set_index('date')
     # print "time:",(time.time()-time_s)*1000
     return df
@@ -2678,6 +2698,7 @@ def compute_condition_up(df):
         fill_day = np.nan           #回补天数
         #看滞后有没有回补向上的跳空
         duration = df.index[df.index > i] #跳空后的数据日
+        
         for j in duration:
             if df['low'].at[j] >= ex_hop_price:
                 fill_data = j
@@ -2707,6 +2728,7 @@ def compute_perd_df(dd,lastdays=3,resample ='d'):
     df['lastdu'] = ((df['high'] - df['low']) / df['close'] * 100).map(lambda x: round(x, 1))
     # df['perddu'] = ((df['high'] - df['low']) / df['low'] * 100).map(lambda x: round(x, 1))
     dd['upperT'] = dd.close[ (dd.upper > 0) & (dd.high > dd.upper)].count()
+    df = df[~df.index.duplicated()]
     upperL = dd.close[ (dd.upper > 0) & (dd.close >= dd.upper)]
     top_10 = df[df.perd >9.9]
     if len(top_10) >0:
@@ -2822,7 +2844,7 @@ def compute_perd_df(dd,lastdays=3,resample ='d'):
     if resample == 'd':
         df['perd'] = df['perd'].apply(lambda x: round(x, 1) if ( x < 9.85)  else 10.0)
 
-    dd['perd'] = df['perd']
+    dd['perd'] = df['perd'][~df.index.duplicated()]
     dd.fillna(ct.FILLNA,inplace=True)    #ct.FILLNA -101
 
     # print dataframe_mode_round(df.high)
@@ -3837,14 +3859,16 @@ def get_tdx_exp_all_LastDF_DL(codeList, dt=None, end=None, ptype='low', filter='
                 dl = 30
                 dt = None
             log.info("LastDF:%s,%s" % (dt, dl))
-        results = cct.to_mp_run_async(
-            get_tdx_exp_low_or_high_power, codeList, dt=dt, ptype=ptype, dl=dl, end=end, power=power, lastp=lastp, newdays=newdays, resample=resample)
+        # results = cct.to_mp_run_async(
+            # get_tdx_exp_low_or_high_power, codeList, dt=dt, ptype=ptype, dl=dl, end=end, power=power, lastp=lastp, newdays=newdays, resample=resample)
 
         # results = get_tdx_exp_low_or_high_price(codeList[0], dt,ptype,dl)
-#        results=[]
-#        for code in codeList:
-#            print code
-#            results.append(get_tdx_exp_low_or_high_price(code, dt, ptype, dl,end,power,lastp,newdays))
+
+        results=[]
+        for code in codeList:
+           print code
+           results.append(get_tdx_exp_low_or_high_power(code, dt=dt, ptype=ptype, dl=dl, end=end, power=power, lastp=lastp, newdays=newdays, resample=resample))
+           # results.append(get_tdx_exp_low_or_high_price(code, dt, ptype, dl,end,power,lastp,newdays))
         # results = get_tdx_exp_low_or_high_price(codeList[0], dt,ptype,dl)))
 
 #    elif dt is not None and filter == 'y':
@@ -3881,15 +3905,20 @@ def get_tdx_exp_all_LastDF_DL(codeList, dt=None, end=None, ptype='low', filter='
 
         if len(codeList) > 150:
             results = cct.to_mp_run_async(
-                # get_tdx_exp_low_or_high_power, codeList, dt, ptype, dl, end, power, lastp, newdays, resample)
                 get_tdx_exp_low_or_high_power, codeList, dt=dt, ptype=ptype, dl=dl, end=end, power=power, lastp=lastp, newdays=newdays, resample=resample)
+                # get_tdx_exp_low_or_high_power, codeList, dt, ptype, dl, end, power, lastp, newdays, resample)
+            # results=[]
+            # codeList = ['300055','002443']
+            # for code in codeList:
+            #    print code
+            #    results.append(get_tdx_exp_low_or_high_power(code, dt=dt, ptype=ptype, dl=dl, end=end, power=power, lastp=lastp, newdays=newdays, resample=resample))
+
         else:
             results = []
             ts = time.time()
             for code in codeList:
                 ts_1 = time.time()
-                results.append(get_tdx_exp_low_or_high_power(
-                    code, dt, ptype, dl, end, power, lastp, newdays, resample))
+                results.append(get_tdx_exp_low_or_high_power(code, dt, ptype, dl, end, power, lastp, newdays, resample))
 #            print round(time.time()-ts_1,2),
 #        print round(time.time()-ts,2),
         # print dt,ptype,dl,end
@@ -3899,9 +3928,12 @@ def get_tdx_exp_all_LastDF_DL(codeList, dt=None, end=None, ptype='low', filter='
 
     else:
         dl = None
-        results = cct.to_mp_run_async(
-            get_tdx_Exp_day_to_df, codeList, type='f', start=None, end=None, dl=None, newdays=1)
-
+        # results = cct.to_mp_run_async(
+        #     get_tdx_Exp_day_to_df, codeList, type='f', start=None, end=None, dl=None, newdays=1)
+        results=[]
+        for code in codeList:
+           print code
+           results.append(get_tdx_Exp_day_to_df, codeList, type='f', start=None, end=None, dl=None, newdays=1)
     # print results
 #    df = pd.DataFrame(results, columns=ct.TDX_Day_columns)
     df = pd.DataFrame(results)
@@ -4161,6 +4193,9 @@ if __name__ == '__main__':
     # code='000837'
     # code='000750'
     # code='000752'
+    # print write_tdx_tushare_to_file('300055')
+    # print write_tdx_sina_data_to_file('300055')
+    print get_tdx_append_now_df_api_tofile('300055')
     code='000043'
     code='601699'
     code='600604'

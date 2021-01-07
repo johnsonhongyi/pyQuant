@@ -250,7 +250,6 @@ if __name__ == "__main__":
                                            top_all['buy'].values, top_all['lastp'].values))
                     # if len(top_all[top_all.lastbuy < 0]) > 0 or len(top_all[top_all.dff < -10]) >0 :
                     #     print top_all.loc['600313'].lastbuy,top_all.loc['600313'].buy,top_all.loc['600313'].lastp
-                    #     import ipdb;ipdb.set_trace()
                 else:
                     top_all['dff'] = (map(lambda x, y: round((x - y) / y * 100, 1),
                                           top_all['buy'].values, top_all['lastp'].values))
