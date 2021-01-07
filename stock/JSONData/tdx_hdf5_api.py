@@ -533,7 +533,7 @@ def write_hdf_db(fname, df, table='all', index=False, complib='blosc', baseCount
                                 # df[df.index.get_level_values('code') not in diff_code ]
                         h5.remove(table)
                         # h5[table]=df
-                        h5.put(table, df, format='table', append=False)
+                        h5.put(table, df, format='table', append=False, complib=complib, data_columns=True)
                         # h5.put(table, df, format='table',index=False, data_columns=True, append=False)
                     else:
                         if rewrite:
@@ -543,7 +543,7 @@ def write_hdf_db(fname, df, table='all', index=False, complib='blosc', baseCount
                 else:
                     if not MultiIndex:
                         # h5[table]=df
-                        h5.put(table, df, format='table', append=False)
+                        h5.put(table, df, format='table', append=False, complib=complib, data_columns=True)
                         # h5.put(table, df, format='table',index=False, data_columns=True, append=False)
                     else:
                         h5.put(table, df, format='table', index=False, complib=complib, data_columns=True, append=True)
