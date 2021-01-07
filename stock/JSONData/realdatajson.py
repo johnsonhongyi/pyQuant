@@ -1,4 +1,3 @@
-# -*- coding:utf8 -*-
 """
 交易数据接口
 Created on 2014/07/31
@@ -58,6 +57,13 @@ log = LoggerFactory.log
 #         table.add_row(row[1:])
 #     return str(table)
 
+sinaheader = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:84.0) Gecko/20100101 Firefox/84.0',
+    'Host': 'vip.stock.finance.sina.com.cn',
+    'Referer':'http://vip.stock.finance.sina.com.cn',
+    'Connection': 'keep-alive',
+}
+
 
 def _parsing_Market_price_json(url):
     """
@@ -74,7 +80,7 @@ def _parsing_Market_price_json(url):
     # request = Request(ct.SINA_DAY_PRICE_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'],
     #                              ct.PAGES['jv'], pageNum))
     # url='http://vip.stock.finance.sina.com.cn/quotes_service/api/json_v2.php/Market_Center.getHQNodeData?page=1&num=20&sort=changepercent&asc=0&node=cyb&symbol='
-    text = cct.get_url_data_R(url)
+    text = cct.get_url_data_R(url,headers=sinaheader)
     # text = cct.get_url_data(url)
 
     if text == 'null':
@@ -465,7 +471,7 @@ def _parsing_sina_dd_price_json(url):
     #                              ct.PAGES['jv'], pageNum))
     # request = Request(url)
     # text = urlopen(request, timeout=10).read()
-    sinaheader = {'Referer':'http://vip.stock.finance.sina.com.cn'}
+    # sinaheader = {'Referer':'http://vip.stock.finance.sina.com.cn'}
 
     text = cct.get_url_data(url,headers=sinaheader)
     # print(len(text))
