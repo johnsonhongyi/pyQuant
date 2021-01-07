@@ -495,7 +495,7 @@ def get_wencai_Market_url(filter='国企改革', perpage=1, url=None, pct=False,
             # print count[0].decode('unicode-escape')
 
             if len(df) == 0:
-                log.error('df 0 filter:%s df is None:%s' % (filter,url))
+                log.error('df 0 filter:%s df is None:%s' % (filter.decode('utf8'),url.decode('utf8')))
         else:
             log.error('count is 0')
 

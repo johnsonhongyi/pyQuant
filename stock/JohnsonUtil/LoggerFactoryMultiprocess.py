@@ -52,7 +52,7 @@ class MultiprocessHandler(logging.FileHandler):
             print u"创建文件夹失败"
             print u"文件夹路径：" + self.filePath
             pass
-
+        
         if codecs is None:
             encoding = None
 
