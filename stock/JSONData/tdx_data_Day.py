@@ -1,4 +1,4 @@
-# -*- encoding: utf-8 -*-
+# encoding: utf-8
 # !/usr/bin/python
 from __future__ import division
 
@@ -3859,15 +3859,15 @@ def get_tdx_exp_all_LastDF_DL(codeList, dt=None, end=None, ptype='low', filter='
                 dl = 30
                 dt = None
             log.info("LastDF:%s,%s" % (dt, dl))
-        # results = cct.to_mp_run_async(
-            # get_tdx_exp_low_or_high_power, codeList, dt=dt, ptype=ptype, dl=dl, end=end, power=power, lastp=lastp, newdays=newdays, resample=resample)
+        results = cct.to_mp_run_async(
+            get_tdx_exp_low_or_high_power, codeList, dt=dt, ptype=ptype, dl=dl, end=end, power=power, lastp=lastp, newdays=newdays, resample=resample)
 
         # results = get_tdx_exp_low_or_high_price(codeList[0], dt,ptype,dl)
 
-        results=[]
-        for code in codeList:
-           print code
-           results.append(get_tdx_exp_low_or_high_power(code, dt=dt, ptype=ptype, dl=dl, end=end, power=power, lastp=lastp, newdays=newdays, resample=resample))
+        # results=[]
+        # for code in codeList:
+        #    print code,
+        #    results.append(get_tdx_exp_low_or_high_power(code, dt=dt, ptype=ptype, dl=dl, end=end, power=power, lastp=lastp, newdays=newdays, resample=resample))
            # results.append(get_tdx_exp_low_or_high_price(code, dt, ptype, dl,end,power,lastp,newdays))
         # results = get_tdx_exp_low_or_high_price(codeList[0], dt,ptype,dl)))
 
@@ -3908,9 +3908,9 @@ def get_tdx_exp_all_LastDF_DL(codeList, dt=None, end=None, ptype='low', filter='
                 get_tdx_exp_low_or_high_power, codeList, dt=dt, ptype=ptype, dl=dl, end=end, power=power, lastp=lastp, newdays=newdays, resample=resample)
                 # get_tdx_exp_low_or_high_power, codeList, dt, ptype, dl, end, power, lastp, newdays, resample)
             # results=[]
-            # codeList = ['300055','002443']
+            # # codeList = ['300055','002443']
             # for code in codeList:
-            #    print code
+            #    print code,
             #    results.append(get_tdx_exp_low_or_high_power(code, dt=dt, ptype=ptype, dl=dl, end=end, power=power, lastp=lastp, newdays=newdays, resample=resample))
 
         else:
@@ -3923,7 +3923,7 @@ def get_tdx_exp_all_LastDF_DL(codeList, dt=None, end=None, ptype='low', filter='
 #        print round(time.time()-ts,2),
         # print dt,ptype,dl,end
         # for code in codelist:
-        #     print code
+        #     print code,
         #     print get_tdx_exp_low_or_high_price('600654', dt, ptype, dl,end)
 
     else:

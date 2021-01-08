@@ -1,4 +1,4 @@
-# -*- encoding: utf-8 -*-
+#encoding: utf-8
 
 import argparse
 import datetime
@@ -1493,13 +1493,14 @@ def to_mp_run_async(cmd, urllist, *args,**kwargs):
             pool = ThreadPool(1)
             # pool = ThreadPool(2)
             func = partial(cmd, **kwargs)
+            # TDXE:44.26  cpu 1   
             # for y in tqdm(pool.imap_unordered(func, urllist),unit='%',mininterval=ct.tqdm_mininterval,unit_scale=True,total=len(urllist),ncols=5):
             # results = pool.map(func, urllist)
             try:
                 for y in tqdm(pool.imap(func, urllist),unit='%',mininterval=ct.tqdm_mininterval,unit_scale=True,total=len(urllist),ncols=ct.ncols):
                     results.append(y)
             except Exception as e:
-                print e
+                log.error("except:%s"%(e))
         else:
             pool = ThreadPool(cpu_count())
             # log.error("to_mp_run args is not None")
@@ -1510,17 +1511,18 @@ def to_mp_run_async(cmd, urllist, *args,**kwargs):
                     # result = pool.apply_async(cmd, (code,) + args).get()
                     results.append(pool.apply_async(cmd, (code,) + args).get())
                 except Exception as e:
-                    print e, code
+                    log.error("except:%s code:%s"%(e,code))
     else:
         if len(kwargs) > 0 :
             pool = ThreadPool(1)
             func = partial(cmd, **kwargs)
+            # TDXE:40.63  cpu 1    cpu_count() 107.14
             # for y in tqdm(pool.imap_unordered(func, urllist),unit='%',mininterval=ct.tqdm_mininterval,unit_scale=True,total=len(urllist),ncols=5):
             # results = pool.map(func, urllist)
             try:
                 results = pool.map(func, urllist)
             except Exception as e:
-                print e
+                log.error("except:%s"%(e))
         else:
             pool = ThreadPool(cpu_count())
             for code in urllist:
@@ -1528,7 +1530,7 @@ def to_mp_run_async(cmd, urllist, *args,**kwargs):
                     # result = pool.apply_async(cmd, (code,) + args).get()
                     results.append(pool.apply_async(cmd, (code,) + args).get())
                 except Exception as e:
-                    print e, code
+                    log.error("except:%s code:%s"%(e,code))
 
 
 

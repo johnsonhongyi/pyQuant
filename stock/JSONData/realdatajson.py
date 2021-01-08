@@ -1,3 +1,4 @@
+#encoding: utf-8
 """
 交易数据接口
 Created on 2014/07/31
