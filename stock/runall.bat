@@ -28,7 +28,10 @@ start cmd /k python sina_Market-DurationDn.py
 ping -n 20 localhost > nul 
 start cmd /k python sina_Monitor-Market-LH.py
 rem ping -n 20 localhost > nul 
-start cmd /k python LinePower.py
+rem start cmd /k python LinePower.py
+cd dataBarFeed\
+start cmd /k python chantdxpower.py
+cd ..
 python macRun.py
 rem pause
 rem start python LineHistogram.py

@@ -1172,8 +1172,6 @@ def get_tdx_append_now_df_api_tofile(code, dm=None, newdays=0, start=None, end=N
             ds.sort_index(ascending=True, inplace=True)
             ds = ds.fillna(0)
             df = df.append(ds)
-            import ipdb;ipdb.set_trace()
-
             if (len(ds) == 1 and ds.index.values[0] != cct.get_today()) or len(ds) > 1:
                 sta = write_tdx_tushare_to_file(code, df=df)
                 if sta:
