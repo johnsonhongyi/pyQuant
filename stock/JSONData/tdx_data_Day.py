@@ -2860,11 +2860,15 @@ def compute_upper_cross(dd,ma1='upper',ma2='ma5d',ratio=0.02):
     
     df = dd[(dd[ma1] <> 0)]
     # temp = df[ (df[ma1] > df[ma2] * (1-ratio))  & (df[ma1] < df[ma2] * (1+ratio)) ]
-    temp = df[(df.low > df.upper)]
-    if len(temp) >0 and  temp.index[-1] == df.index[-1]:
-        dd['topU'] = len(temp)
-    else:
-        dd['topU'] = 0
+    # temp = df[(df.low > df.upper)]
+    temp = df[(df.high >= df.upper)]
+    # if len(temp) >0 and  temp.index[-1] == df.index[-1]:
+    #     dd['topU'] = len(temp)
+    # else:
+    #     dd['topU'] = 0
+    dd['topU'] = len(temp)
+    dd['eneU'] = len(df[(df.close >= df.ene)])
+
     return dd
 
 
@@ -4193,7 +4197,8 @@ if __name__ == '__main__':
     # code='000752'
     # print write_tdx_tushare_to_file('300055')
     # print write_tdx_sina_data_to_file('300055')
-    print get_tdx_append_now_df_api_tofile('300055')
+
+    # print get_tdx_append_now_df_api_tofile('300055')
     code='000043'
     code='601699'
     code='600604'
@@ -4211,7 +4216,9 @@ if __name__ == '__main__':
     code='300549'
     code='002049' 
     code='001896' #豫能控股
-    code='688106' #科创信息
+    code='002594' #byd
+    code='601628' #中国人寿
+    # code='688106' #科创信息
     # code='999999'
     # code='000800'
     # code='000990'

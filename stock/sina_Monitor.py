@@ -346,9 +346,13 @@ if __name__ == "__main__":
                             #topR and nlow > lastp1d
                             # top_temp = top_all[(top_all.low >= top_all.lasth1d) & (top_all.nlow > top_all.lastp1d) & (top_all.close > top_all.nclose) ]
                             
-                            top_temp = top_all[(top_all.close / top_all.hmax > 1.1) & (top_all.close / top_all.hmax < 1.5)] 
-                            top_temp = top_temp[~top_temp.name.str.contains('ST')]
+                           
+                            # top_temp = top_all[(top_all.close / top_all.hmax > 1.1) & (top_all.close / top_all.hmax < 1.5)] 
+                            # top_temp = top_all[(top_all.topU > 0) & (top_all.close > top_all.ene) & (top_all.low > top_all.lastl1d)] 
+                            top_temp = top_all[(top_all.topU > 0) & (top_all.close > top_all.ene)] 
+                            top_temp = top_temp[ (~top_temp.index.str.contains('688')) & (~top_temp.name.str.contains('ST'))]
 
+                            # top_all[ (~top_all.index.str.contains('688'))  &(top_all.topU > 0)]  
 
                             # top_temp = top_all[ ((top_all.lastp1d > top_all.ma5d) & (top_all.lastp2d > top_all.ma5d) & (top_all.close > top_all.ma5d) \
                             # & (top_all.ma5d > top_all.ma10d)) & (top_all.open >= top_all.nlow) & ((top_all.lastp1d > top_all.ene) & (top_all.close >= top_all.ene)) ]
@@ -373,9 +377,10 @@ if __name__ == "__main__":
                             #                     & ((top_all.per3d > 0) | (top_all.lastp3d > top_all.ma10d)))]
 
                             #topR and 
-                            top_temp = top_all[(top_all.low > top_all.lasth1d) & (top_all.close > top_all.lastp1d) & (top_all.close > top_all.ma10d)]
-                            top_temp = top_temp[~top_temp.name.str.contains('ST')]
-
+                            # top_temp = top_all[(top_all.low > top_all.lasth1d) & (top_all.close > top_all.lastp1d) & (top_all.close > top_all.ma10d)]
+                            # top_temp = top_temp[~top_temp.name.str.contains('ST')]
+                            top_temp = top_all[(top_all.topU > 0) & (top_all.close > top_all.ene)] 
+                            top_temp = top_temp[ (~top_temp.index.str.contains('688')) & (~top_temp.name.str.contains('ST'))]
 
                             # ???ne??죬???Ϲ죬һ????գ?һ???ͣ
                         # top_temp = top_all[  (top_all.low >= top_all.lastl1d) & (top_all.lasth1d > top_all.lasth2d) & (top_all.low >= top_all.nlow) & ((top_all.open >= top_all.nlow *0.998) & (top_all.open <= top_all.nlow*1.002)) ]
@@ -383,10 +388,13 @@ if __name__ == "__main__":
                     else:
                         top_temp=top_all[((top_all.close > top_all.ma51d)) & (
                             top_all.low >= top_all.lastl1d) & (top_all.lasth1d > top_all.lasth2d)]
+
+                        top_temp = top_temp[ (~top_temp.index.str.contains('688')) & (~top_temp.name.str.contains('ST'))]
                         # top_temp = top_all[  (top_all.low >= top_all.lastl1d) & (top_all.lasth1d > top_all.lasth2d) & (top_all.low >= top_all.nlow) & ((top_all.open >= top_all.nlow *0.998) & (top_all.open <= top_all.nlow*1.002)) ]
                         # top_temp = top_all[ (top_all.volume >= 1.2 ) & (top_all.low >= top_all.lastl1d) & (top_all.lasth1d > top_all.lasth2d) & (top_all.close > top_all.lastp1d)]
                 else:
                     top_temp=top_all.copy()
+                    # top_temp = top_temp[ (~top_temp.index.str.contains('688')) & (~top_temp.name.str.contains('ST'))]
 
 
 
