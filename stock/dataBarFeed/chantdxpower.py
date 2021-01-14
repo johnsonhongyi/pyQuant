@@ -444,7 +444,8 @@ def show_chan_mpl_tdx(code, start_date=None, end_date=None, stock_days=60, resam
     #          ResizeTool(), ResetTool(),\
     #          PanTool(dimensions=['width']), PreviewSaveTool()]
     if show_mpl:
-        fig = plt.figure(figsize=(10, 6))
+        # fig = plt.figure(figsize=(10, 6))
+        fig = plt.figure(figsize=(16, 10))
         ax1 = plt.subplot2grid((10, 1), (0, 0), rowspan=8, colspan=1)
         # ax1 = fig.add_subplot(2,1,1)
         # fig = plt.figure()
@@ -932,7 +933,8 @@ def show_chan_mpl_power(code, start_date=None, end_date=None, stock_days=60, res
     #          ResizeTool(), ResetTool(),\
     #          PanTool(dimensions=['width']), PreviewSaveTool()]
     if show_mpl:
-        fig = plt.figure(figsize=(10, 6))
+        # fig = plt.figure(figsize=(10, 6))
+        fig = plt.figure(figsize=(16, 10))
         ax1 = plt.subplot2grid((10, 1), (0, 0), rowspan=8, colspan=1)
         # ax1 = fig.add_subplot(2,1,1)
         # fig = plt.figure()
@@ -1162,7 +1164,7 @@ def show_chan_mpl_power(code, start_date=None, end_date=None, stock_days=60, res
     
     if show_mpl:
         plt.plot(x_fenbi_seq, y_fenbi_seq)
-        quotes = quotes.round(2)
+        # quotes = quotes.round(2)
         # plt.legend([stock_code,cname], loc=0)
         plt.legend([stock_code, cname, "Now:%s" % (quotes.close[-1]), 'kdl:%s' % (kdl_mode.values), 'kdh:%s' % (kdh_mode.values)], fontsize=12, loc=0)
         if len(kdl_mode) > 0:
@@ -1967,6 +1969,7 @@ def show_chan_mpl_fb(code, start_date, end_date, stock_days, resample, show_mpl=
     # 2017-05-04  15.66  15.63  15.70  15.52   8343270  130330396
     # 2017-05-05  15.56  15.65  15.68  15.41  18384031  285966842
     # 2017-05-08  15.62  15.75  15.76  15.54  12598891  197310688
+    quotes=quotes.round(2)
 
     quotes= chan.parse2ChanK(quotes, quotes.values) if chanK_flag else quotes
     # print quotes[:1].index
@@ -2126,7 +2129,8 @@ def show_chan_mpl_fb(code, start_date, end_date, stock_days, resample, show_mpl=
     #          ResizeTool(), ResetTool(),\
     #          PanTool(dimensions=['width']), PreviewSaveTool()]
     if show_mpl:
-        fig=plt.figure(figsize = (10, 6))
+        # fig=plt.figure(figsize = (10, 6))
+        fig=plt.figure(figsize = (16, 10))
         ax1=plt.subplot2grid((10, 1), (0, 0), rowspan = 8, colspan = 1)
         # ax1 = fig.add_subplot(2,1,1)
         # fig = plt.figure()
@@ -2376,7 +2380,7 @@ def show_chan_mpl_fb(code, start_date, end_date, stock_days, resample, show_mpl=
         plt.plot(x_fenbi_seq, y_fenbi_seq)
         # import ipdb;ipdb.set_trace()
         # quotes = quotes.apply(pd.Series.round)
-        quotes = quotes.round(2)
+        # quotes = quotes.round(2)
 
         # plt.legend([stock_code,cname], loc=0)
         plt.legend([stock_code, cname, "Now:%s" % quotes.close[-1], 'kdl:%s' % (kdl_mode.values), 'kdh:%s' % (kdh_mode.values)], fontsize=12, loc=0)
@@ -2476,9 +2480,9 @@ def parseArgmain():
         parser.add_argument('-m', action="store", dest="mpl", type=str, default='y', help='mpl show')
         parser.add_argument('-i', action="store", dest="line", type=str, choices=['y', 'n'], default='y', help='LineHis show')
         parser.add_argument('-w', action="store", dest="wencai", type=str, choices=['y', 'n'], default='n', help='WenCai Search')
-        parser.add_argument('-k', action="store", dest="chanK_flag", type=int, choices=[1, 0], default=0, help='WenCai Search')
+        parser.add_argument('-c', action="store", dest="chanK_flag", type=int, choices=[1, 0], default=0, help='chanK_flag')
         parser.add_argument('-le', action="store", dest="least", type=int, default=1, help='least_init 2')
-        parser.add_argument('-fb', action="store", dest="fb", type=int, choices=[1, 0], default=0, help='fb show')
+        parser.add_argument('-fb', action="store", dest="fb", type=int, choices=[1, 0], default=1, help='fb show')
         return parser
     except Exception, e:
         # print 'Eerror:',e

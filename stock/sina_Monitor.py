@@ -315,7 +315,7 @@ if __name__ == "__main__":
                     # top_temp =  top_all[(top_all.boll >0)  & ((top_all.low > top_all.upper) | (top_all.low == top_all.open))]
                     # top_temp =  top_all[(top_all.boll >0)  & ((top_all.low > top_all.lastp1d) | (top_all.low == top_all.open))]
                     # top_temp =  top_all[(top_all.topR < 2) & (top_all.close >= top_all.nhigh) & ((top_all.low > top_all.lastp1d) | (top_all.low == top_all.open))]
-
+                    
                     if 'nlow' in top_all.columns:
 
                         if st_key_sort == '4':
@@ -381,8 +381,8 @@ if __name__ == "__main__":
                             #topR and 
                             # top_temp = top_all[(top_all.low > top_all.lasth1d) & (top_all.close > top_all.lastp1d) & (top_all.close > top_all.ma10d)]
                             # top_temp = top_temp[~top_temp.name.str.contains('ST')]
-                            top_temp = top_all[(top_all.topU > 0) & (top_all.close > top_all.ene)] 
                             # top_temp = top_all[(top_all.topU > 0) & (top_all.close > top_all.ene) & (top_all.lastp1d > top_all.ene) & (top_all.topR > 0)] 
+                            top_temp = top_all[(top_all.topU > 0) & (top_all.close > top_all.ene)] 
                             top_temp = top_temp[ (~top_temp.index.str.contains('688')) & (~top_temp.name.str.contains('ST'))]
 
                             # ???ne??죬???Ϲ죬һ????գ?һ???ͣ
@@ -459,8 +459,8 @@ if __name__ == "__main__":
                 top_end=stf.getBollFilter(
                     df=top_end, resample=resample, down=True)
 
-                nhigh = top_temp[top_temp.close > top_temp.nhigh]
-                nlow = top_temp[top_temp.close > top_temp.nlow]
+                nhigh = top_temp[top_temp.close > top_temp.nhigh] if 'nhigh'  in top_temp.columns else []
+                nlow = top_temp[top_temp.close > top_temp.nlow] if 'nhigh'  in top_temp.columns else []
                 print "G:%s Rt:%0.1f dT:%s N:%s T:%s nh:%s nlow:%s" % (goldstock, float(time.time() - time_Rt), cct.get_time_to_date(time_s), cct.get_now_time(), len(top_temp),len(nhigh),len(nlow))
 
                 top_temp=top_temp.sort_values(by=(market_sort_value),
