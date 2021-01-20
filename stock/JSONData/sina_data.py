@@ -257,6 +257,7 @@ class Sina:
         else:
             code = 0
         return code
+
     def get_code_cname(self,code):
         self.cname  = True
         dm = self.all
@@ -801,6 +802,9 @@ if __name__ == "__main__":
     sina = Sina()
     # print len(df)
     # code='300107'
+    # print sina.get_cname_code('陕西黑猫')
+    # print sina.get_code_cname(['300107')
+
     df =sina.all
     # print df.lastbuy[-5:].to_frame().T
     print sina.get_stock_list_data(['999999','399001','399006'],index=True).name

@@ -1983,8 +1983,15 @@ def get_sina_data_cname(cname,index=False):
 
 def get_sina_data_code(code,index=False):
     # index_status=False
-    code = sina_data.Sina().get_code_cname(code)
-    return code
+    cname = sina_data.Sina().get_code_cname(code)
+    return cname
+
+def get_sina_datadf_cnamedf(code,df,index=False):
+    # index_status=False
+    dm = get_sina_data_df(code)
+    dd = cct.combine_dataFrame(df,dm['name'])
+    # cname = sina_data.Sina().get_code_cname(code)
+    return dd
 
 # print get_sina_data_cname('通合科技')
 def getSinaJsondf(market='cyb', vol=ct.json_countVol, vtype=ct.json_countType):

@@ -25,7 +25,7 @@ def get_multi_code_count(df,col='code'):
     dd = dd.set_index(['code', 'date'])
     return dd
 
-def get_roll_mean_all(single=True,tdx=False,app=True,duration=100):
+def get_roll_mean_all(single=True,tdx=False,app=True,duration=100,ma_250_l=1.02,ma_250_h=1.11):
     # df = tdd.search_Tdx_multi_data_duration('tdx_all_df_300', 'all_300', df=None,code_l=code_list, start=start, end=None, freq=None, col=None, index='date')
     block_path = tdd.get_tdx_dir_blocknew() + '060.blk'
 
@@ -101,11 +101,14 @@ def get_roll_mean_all(single=True,tdx=False,app=True,duration=100):
     # mask = (dfs[('ma%s')%(rollma[0])] > dfs[('ma%s')%(rollma[1])]) & (dfs[('ma%s')%(rollma[-1])] > 0) & (dfs[('close')] > dfs[('ma%s')%(rollma[0])])  & (dfs[('close')] > dfs[('ma%s')%(rollma[-1])]) 
     # mask = (dfs[('ma%s')%(rollma[0])] > dfs[('ma%s')%(rollma[1])]) & (dfs[('ma%s')%(rollma[-1])] > 0) & (dfs[('close')] > dfs[('ma%s')%(rollma[1])])  & (dfs[('close')] > dfs[('ma%s')%(rollma[-1])]) 
     # mask = (dfs[('ma%s')%(rollma[0])] > dfs[('ma%s')%(rollma[1])]) & (dfs[('ma%s')%(rollma[-1])] > 0) &  (dfs[('close')] > dfs[('ma%s')%(rollma[-1])]) 
-    import ipdb;ipdb.set_trace()
 
 
     # mask = ( (dfs[('ma%s')%(rollma[0])] > 0) & (dfs[('ma%s')%(rollma[-1])] > 0) & (dfs[('close')] > dfs[('ma%s')%(rollma[-1])]) & (dfs[('close')] > dfs[('ma%s')%(rollma[0])]))
-    mask = ( (dfs[('ma%s')%(rollma[0])] > 0) & (dfs[('ma%s')%(rollma[-1])] > 0) & (dfs[('close')] > dfs[('ma%s')%(rollma[-1])]) & (dfs[('close')] > dfs[('ma%s')%(rollma[0])]))
+
+    mask = ( (dfs[('ma%s')%(rollma[0])] > 0) & (dfs[('ma%s')%(rollma[-1])] > 0) 
+            & (dfs[('close')] > dfs[('ma%s')%(rollma[-1])]*ma_250_l) 
+            & (dfs[('close')] < dfs[('ma%s')%(rollma[-1])]*ma_250_h) 
+            & (dfs[('close')] > dfs[('ma%s')%(rollma[0])]))
     # mask = ((dfs[('close')] > dfs[('ma%s')%(rollma[-1])])) 
     df=dfs.loc[idx[mask, :]]
     df = get_multi_code_count(df)
@@ -127,6 +130,7 @@ def get_roll_mean_all(single=True,tdx=False,app=True,duration=100):
 
     code_uniquelist=df.index.get_level_values('code').unique()
     code_select = code_uniquelist[random.randint(0,len(code_uniquelist)-1)]
+
     if app:
         print round(time.time()-time_s,2),'s',df.index.get_level_values('code').unique().shape,code_select,df.loc[code_select][-1:]
 
@@ -159,6 +163,12 @@ def get_roll_mean_all(single=True,tdx=False,app=True,duration=100):
                 df = df[(df.date >= cct.last_tddate(days=10)) & (df.date <= cct.get_today())]
                 codew = df.index.tolist()
 
+            top_temp = tdd.get_sina_datadf_cnamedf(codew,df) 
+            top_temp = top_temp[ (~top_temp.index.str.contains('688')) & (~top_temp.name.str.contains('ST'))]  
+            codew = top_temp.index.tolist()
+
+            #clean st and 688
+
             if app:
                 hdf5_wri = cct.cct_raw_input("rewrite code [Y] or append [N]:")
                 if hdf5_wri == 'y' or hdf5_wri == 'Y':
@@ -167,11 +177,12 @@ def get_roll_mean_all(single=True,tdx=False,app=True,duration=100):
                     append_status=True
             else:
                 append_status=False
+
             if len(codew) > 10: 
                 cct.write_to_blocknew(block_path, codew, append_status,doubleFile=False,keep_last=0)
-                print "write:%s"%(len(codew))
+                print "write:%s block_path:%s"%(len(codew),block_path)
             else:
-                print "write error:%s"%(len(codew))
+                print "write error:%s block_path:%s"%(len(codew),block_path)
 
         # df['date'] = df['date'].apply(lambda x:(x.replace('-','')))
         # df['date'] = df['date'].astype(int)
@@ -185,6 +196,6 @@ def get_roll_mean_all(single=True,tdx=False,app=True,duration=100):
 if __name__ == '__main__':
     # get_roll_mean_all(single=False,tdx=True,app=True,duration=250) ???
     # get_roll_mean_all(single=False,tdx=True,app=True,duration=120) ???
-    get_roll_mean_all(single=False,tdx=True,app=True,duration=600)
+    get_roll_mean_all(single=False,tdx=True,app=True,duration=250,ma_250_l=1.02,ma_250_h=1.11)
     # get_roll_mean_all(single=True,tdx=True,app=True)
     # get_roll_mean_all(single=True,tdx=True,app=False)
