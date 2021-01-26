@@ -2725,7 +2725,7 @@ def compute_perd_df(dd,lastdays=3,resample ='d'):
     np.seterr(divide='ignore',invalid='ignore')  #RuntimeWarning: invalid value encountered in greater
     df = dd[-(lastdays+1):].copy()
     df['perlastp'] = map(cct.func_compute_percd2020, df['open'], df['close'], df['high'], df['low'],df['open'].shift(1), 
-                            df['close'].shift(1), df['high'].shift(1), df['low'].shift(1),df['ma5d'],df['ma10d'],df['vol'],df['vol'].shift(1),df['upper'])
+                            df['close'].shift(1), df['high'].shift(1), df['low'].shift(1),df['ma5d'],df['ma10d'],df['vol'],df['vol'].shift(1),df['upper'],df.index)
     df['perd'] = ((df['close'] - df['close'].shift(1)) / df['close'].shift(1) * 100).map(lambda x: round(x, 1))
     # df['perd'] = ((df['low'] - df['low'].shift(1)) / df['close'].shift(1) * 100).map(lambda x: round(x, 1))
     df = df.dropna()
@@ -4225,6 +4225,7 @@ if __name__ == '__main__':
     code='001896' #豫能控股
     code='002594' #byd
     code='601628' #中国人寿
+    code='601015' #陕西黑猫
     # code='688106' #科创信息
     # code='999999'
     # code='000800'
@@ -4244,7 +4245,7 @@ if __name__ == '__main__':
     # df2 = get_tdx_Exp_day_to_df(code,dl=160, end=None, newdays=0, resample='w')
     resample = 'd'
     # df2 = get_tdx_Exp_day_to_df(code,dl=160, end=None, newdays=0, resample='d',lastdays=12)
-    df2 = get_tdx_Exp_day_to_df(code,dl=60, end=None, newdays=0, resample='d',lastdays=1)
+    df2 = get_tdx_Exp_day_to_df(code,dl=14, end=None, newdays=0, resample='d',lastdays=1)
     import ipdb;ipdb.set_trace()
 
     # get_tdx_Exp_day_to_df(code, start=None, end=None, dl=None, newdays=None, type='f', wds=True, lastdays=3, resample='d', MultiIndex=False)

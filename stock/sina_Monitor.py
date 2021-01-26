@@ -109,7 +109,8 @@ if __name__ == "__main__":
     blkname = '064.blk'
     block_path = tdd.get_tdx_dir_blocknew() + blkname
     lastpTDX_DF = pd.DataFrame()
-    st_key_sort = '4'
+    # st_key_sort = '4'
+    st_key_sort = '3 1'
     # st_key_sort = '8'
     resample = 'd'
     market_sort_value, market_sort_value_key = ct.get_market_sort_value_key(
@@ -282,7 +283,7 @@ if __name__ == "__main__":
 
 
 
-
+                
                 # if st_key_sort == '8':
                 if st_key_sort != '4':
                     top_temp=top_all.copy()
@@ -402,7 +403,7 @@ if __name__ == "__main__":
 
 
 
-
+                    
                 if st_key_sort.split()[0] == 'x':
                     top_temp = top_temp[top_temp.topR != 0]
 

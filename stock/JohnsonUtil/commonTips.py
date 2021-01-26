@@ -26,7 +26,7 @@ from tqdm import tqdm
 # import win32MoveCom
 # log.setLevel(Log.DEBUG)
 # import numba as nb
-
+import numpy as np
 
 try:
     from urllib.request import urlopen, Request
@@ -2533,12 +2533,13 @@ def func_compute_percd(close, lastp, op, lasth, lastl, nowh, nowl):
 # import numba as nb
 # @numba.jit(nopython=True)
 # @nb.autojit
-def func_compute_percd2020( open, close,high, low,lastopen, lastclose,lasthigh, lastlow, ma5,ma10,nowvol=None,lastvol=None,upper=None,hmax=None):
+def func_compute_percd2020( open, close,high, low,lastopen, lastclose,lasthigh, lastlow, ma5,ma10,nowvol=None,lastvol=None,upper=None,idate=None):
     # down_zero, down_dn, percent_l = 0, 0, 2
      # (1 if ( ((c >= op) and ((c - lc)/lc*100 >= 0)) or (c >= op and c >=m5a) ) else down_dn)
     # df['vol'],df['vol'].shift(1),df['upper']
+
     initc = 0
-    if 0 < lastclose < 1000 and lasthigh <> 1.0 and lastlow <> 1.0 and lasthigh <> 0 and lastlow <> 0:
+    if  0 < lastclose < 1000 and lasthigh <> 1.0 and lastlow <> 1.0 and lasthigh <> 0 and lastlow <> 0:
 #        close = round(close, 1)
 #        lastp = round(lastp, 1)
 #        op = round(op, 1)
@@ -2550,13 +2551,29 @@ def func_compute_percd2020( open, close,high, low,lastopen, lastclose,lasthigh, 
         close_du = round((high - low)/low*100,1)
         # last_du = round((lasthigh - lastlow)/lastlow*100,1)
         # volratio = round((nowvol / lastvol),1)
+        vol_du = round((nowvol)/lastvol,1)
 
-        if percent > 1 and low > lastlow and high > lasthigh:
+        if open >= lastclose and close == high and close > ma5:
+            initc +=3
+            if close > ma5:
+                if close < ma5*1.1:
+                    initc +=3*vol_du
+                elif close < ma5*1.2:
+                    initc +=2*vol_du
+                else:
+                    initc+=2
+
+        elif percent > 2 and low > lastlow and high > lasthigh:
             initc +=2
-        elif percent > 2:
+
+        elif percent > 2 and close_du > 9 and vol_du > 2:
+            initc += 1*vol_du
+        elif percent > 2 :
             initc +=1
-        elif close > ma5 and close > ma10:
+        elif open > ma5 and open > ma10 :
             initc +=0.1
+            if  vol_du < 0.6:
+                initc +=0.1
         elif percent < -2 and low < lastlow and high < lasthigh:
             initc -=1
         elif percent < -5:
@@ -2565,6 +2582,10 @@ def func_compute_percd2020( open, close,high, low,lastopen, lastclose,lasthigh, 
             initc -=0.51
         # else:
             # initc -=1
+    elif  np.isnan(lastclose) :
+        if close > open:
+            initc +=1
+
 
     return initc
 
