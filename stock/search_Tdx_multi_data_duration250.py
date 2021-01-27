@@ -22,6 +22,8 @@ def get_multi_date_duration(df,dt):
 def get_multi_code_count(df,col='code'):
     dd = df.reset_index()
     dd['couts'] = dd.groupby([col])[col].transform('count')
+    # dd = dd.sort_values(by='couts',ascending=0)
+    print('count dd.couts')
     dd = dd.set_index(['code', 'date'])
     return dd
 
@@ -65,9 +67,17 @@ def get_roll_mean_all(single=True,tdx=False,app=True,duration=100,ma_250_l=1.02,
 
     # import ipdb;ipdb.set_trace()
     # df.loc['300130'][:2]
+
     for da in rollma:
         cumdays=int(da)
         dfs['ma%d'%cumdays] = groupd['close'].apply(pd.rolling_mean, cumdays)
+        if cumdays == 10:
+            dfs['upper'] = dfs['ma%d'%cumdays].apply(lambda x: round((1 + 11.0 / 100) * x, 1))
+            dfs['lower'] = dfs['ma%d'%cumdays].apply(lambda x: round((1 - 9.0 / 100) * x, 1))
+            dfs['ene'] = map(lambda x, y: round((x + y) / 2, 1), dfs['upper'], dfs['lower'])
+        # df['upper'] = map(lambda x: round((1 + 11.0 / 100) * x, 1), df.ma10d)
+        # df['lower'] = map(lambda x: round((1 - 9.0 / 100) * x, 1), df.ma10d)
+        # df['ene'] = map(lambda x, y: round((x + y) / 2, 1), df.upper, df.lower)
         # dfs['amount%d'%cumdays] = groupd['amount'].apply(pd.rolling_mean, cumdays)
     # df.ix[df.index.levels[0]]
     #df.ix[df.index[len(df.index)-1][0]] #last row
@@ -81,7 +91,7 @@ def get_roll_mean_all(single=True,tdx=False,app=True,duration=100,ma_250_l=1.02,
     dt_low = None
     if single:
         dfs = groupd.tail(1)
-
+        print("dfs tail1")
     else:
         dl = 30
         dindex = tdd.get_tdx_Exp_day_to_df(
@@ -91,6 +101,7 @@ def get_roll_mean_all(single=True,tdx=False,app=True,duration=100,ma_250_l=1.02,
         dt_low = dt[-1]
         dtlen = len(dt) if len(dt) >0 else 1
         dfs = groupd.tail(dtlen)
+        print("dfs tail:%s dt:%s"%(dtlen,dt))
         dfs = get_multi_date_duration(dfs,dt[-1])
 
         # dfs.reset_index().groupby(['code'])['date'].transform('count')
@@ -105,14 +116,22 @@ def get_roll_mean_all(single=True,tdx=False,app=True,duration=100,ma_250_l=1.02,
 
     # mask = ( (dfs[('ma%s')%(rollma[0])] > 0) & (dfs[('ma%s')%(rollma[-1])] > 0) & (dfs[('close')] > dfs[('ma%s')%(rollma[-1])]) & (dfs[('close')] > dfs[('ma%s')%(rollma[0])]))
 
+    # mask = ( (dfs[('ma%s')%(rollma[0])] > 0) & (dfs[('ma%s')%(rollma[-1])] > 0) 
+    #         & (dfs[('close')] > dfs[('ma%s')%(rollma[-1])]*ma_250_l) 
+    #         & (dfs[('close')] < dfs[('ma%s')%(rollma[-1])]*ma_250_h) 
+    #         & (dfs[('close')] > dfs[('ma%s')%(rollma[0])]))
+
+
     mask = ( (dfs[('ma%s')%(rollma[0])] > 0) & (dfs[('ma%s')%(rollma[-1])] > 0) 
-            & (dfs[('close')] > dfs[('ma%s')%(rollma[-1])]*ma_250_l) 
-            & (dfs[('close')] < dfs[('ma%s')%(rollma[-1])]*ma_250_h) 
+            & (dfs[('close')] > dfs[('ma%s')%(rollma[-1])]*ma_250_h) 
+            & ((dfs[('close')] > dfs['ene']) | (dfs[('close')] > dfs['upper']) ) 
             & (dfs[('close')] > dfs[('ma%s')%(rollma[0])]))
+
+
     # mask = ((dfs[('close')] > dfs[('ma%s')%(rollma[-1])])) 
     df=dfs.loc[idx[mask, :]]
     df = get_multi_code_count(df)
-
+    print(df.couts[:5])
     # import ipdb;ipdb.set_trace()
     # df.sort_values(by='couts',ascending=0)
     # groupd.first()[:2],groupd.last()[:2]
@@ -140,6 +159,7 @@ def get_roll_mean_all(single=True,tdx=False,app=True,duration=100,ma_250_l=1.02,
             # block_path = tdd.get_tdx_dir_blocknew() + '060.blk'
             # if cct.get_work_time():
             #     codew = df[df.date == cct.get_today()].index.tolist()
+
             if dt_low is not None:
                 groupd2 = df.groupby(level=[0])
                 df = groupd2.tail(1)
@@ -147,8 +167,11 @@ def get_roll_mean_all(single=True,tdx=False,app=True,duration=100,ma_250_l=1.02,
                 # import ipdb;ipdb.set_trace()
 
                 # df = df[(df.date >= dt_low) & (df.date <= cct.get_today())]
-
+                dd = df[(df.date == dt_low)]
                 df = df[(df.date >= cct.last_tddate(1))]
+                # import ipdb;ipdb.set_trace()
+
+                print("Main Down dd :%s MainUP df:%s couts std:%0.1f "%(len(dd),len(df),df.couts.std()))
                 # print df.date.mode()[0]
                 df = df.sort_values(by='couts',ascending=1)
                 df = df[df.couts > df.couts.std()]
