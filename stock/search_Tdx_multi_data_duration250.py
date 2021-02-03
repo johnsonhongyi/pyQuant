@@ -54,6 +54,41 @@ def get_roll_mean_all(single=True,tdx=False,app=True,duration=100,ma_250_l=1.02,
     # len(df.index.get_level_values('code').unique())
     # df = df[~df.index.duplicated(keep='first')]
     dfs = df
+
+    def get_groupby_mean_median_close(dfs):
+
+        groupd = dfs.groupby(level=[0])
+        df = groupd['close'].agg({'median':'median','mean':'mean'})
+        df['close'] = groupd.tail(1).reset_index().set_index(['code'])['close']
+        # dfs['mean'] = groupd['close'].agg('mean')
+        # dfs['median'] = groupd['close'].agg('median')
+        
+        # dfs = dfs.fillna(0)
+        # idx = pd.IndexSlice
+        # mask = ( (dfs['mean'] > dfs['median'])
+        #         & (dfs['close'] > dfs['mean'])
+        #         )
+        # df=dfs.loc[idx[mask, :]]
+        
+        df = df[(df['mean']>df['median'])  & (df['close'] > df['mean'])]
+
+        # dt_low = None
+        # if dl == 1:
+        #     dfs = groupd.tail(1)
+        #     print("dfs tail1")
+        # else:
+        #     dl = 30
+        #     dindex = tdd.get_tdx_Exp_day_to_df(
+        #         '999999', dl=dl).sort_index(ascending=False)
+        #     dt = tdd.get_duration_price_date('999999', df=dindex)
+        #     dt = dindex[dindex.index >= dt].index.values
+        #     dt_low = dt[-1]
+        #     dtlen = len(dt) if len(dt) >0 else 1
+        #     dfs = groupd.tail(dtlen)
+        #     print("dfs tail:%s dt:%s"%(dtlen,dt))
+        #     dfs = get_multi_date_duration(dfs,dt[-1])
+        return df
+
     groupd = dfs.groupby(level=[0])
     
     # rollma = ['5','10','60','100','200']
@@ -67,6 +102,9 @@ def get_roll_mean_all(single=True,tdx=False,app=True,duration=100,ma_250_l=1.02,
 
     # import ipdb;ipdb.set_trace()
     # df.loc['300130'][:2]
+
+    # dfs['mean'] = groupd['close'].agg('mean')
+    # dfs['median'] = groupd['close'].agg('median')
 
     for da in rollma:
         cumdays=int(da)
@@ -89,6 +127,7 @@ def get_roll_mean_all(single=True,tdx=False,app=True,duration=100,ma_250_l=1.02,
     # '''idx mask filter'''
     # '''
     dt_low = None
+    df_idx = None
     if single:
         dfs = groupd.tail(1)
         print("dfs tail1")
@@ -101,8 +140,15 @@ def get_roll_mean_all(single=True,tdx=False,app=True,duration=100,ma_250_l=1.02,
         dt_low = dt[-1]
         dtlen = len(dt) if len(dt) >0 else 1
         dfs = groupd.tail(dtlen)
+        # import ipdb;ipdb.set_trace()
+        df_idx = get_groupby_mean_median_close(dfs)
+
         print("dfs tail:%s dt:%s"%(dtlen,dt))
         dfs = get_multi_date_duration(dfs,dt[-1])
+
+        # groupd2 = dfs.groupby(level=[0])
+        # dfs['ma%d'%cumdays] = groupd['close'].apply(pd.rolling_mean, cumdays)
+
 
         # dfs.reset_index().groupby(['code'])['date'].transform('count')
         single = True
@@ -122,16 +168,30 @@ def get_roll_mean_all(single=True,tdx=False,app=True,duration=100,ma_250_l=1.02,
     #         & (dfs[('close')] > dfs[('ma%s')%(rollma[0])]))
 
 
-    mask = ( (dfs[('ma%s')%(rollma[0])] > 0) & (dfs[('ma%s')%(rollma[-1])] > 0) 
-            & (dfs[('close')] > dfs[('ma%s')%(rollma[-1])]*ma_250_h) 
-            & ((dfs[('close')] > dfs['ene']) | (dfs[('close')] > dfs['upper']) ) 
-            & (dfs[('close')] > dfs[('ma%s')%(rollma[0])]))
+                # & (dfs['mean'] > dfs['median'])
+                # & (dfs['close'] > dfs['mean'])
+
+
+    if len(rollma) > 1:
+
+        mask = ( (dfs[('ma%s')%(rollma[0])] > 0) & (dfs[('ma%s')%(rollma[-1])] > 0)
+                & (dfs[('ma%s')%(rollma[0])] > dfs[('ma%s')%(rollma[-1])])
+                & (dfs[('close')] > dfs[('ma%s')%(rollma[0])])
+                & (dfs[('close')] > dfs[('ma%s')%(rollma[-1])]*ma_250_h) 
+                & ((dfs[('close')] > dfs['ene']) | (dfs[('close')] > dfs['upper']) ) 
+                )
+    else:
+                mask = ( (dfs[('ma%s')%(rollma[0])] > 0) 
+                & (dfs[('close')] > dfs[('ma%s')%(rollma[0])])
+                & ((dfs[('close')] > dfs['ene']) | (dfs[('close')] > dfs['upper']) ) 
+                )
 
 
     # mask = ((dfs[('close')] > dfs[('ma%s')%(rollma[-1])])) 
     df=dfs.loc[idx[mask, :]]
     df = get_multi_code_count(df)
     print(df.couts[:5])
+
     # import ipdb;ipdb.set_trace()
     # df.sort_values(by='couts',ascending=0)
     # groupd.first()[:2],groupd.last()[:2]
@@ -170,7 +230,9 @@ def get_roll_mean_all(single=True,tdx=False,app=True,duration=100,ma_250_l=1.02,
                 dd = df[(df.date == dt_low)]
                 df = df[(df.date >= cct.last_tddate(1))]
                 # import ipdb;ipdb.set_trace()
-
+                print("df:%s df_idx:%s"%(len(df),len(df_idx)))
+                if df_idx is not None:
+                    df = df.loc[df_idx.index,:].dropna()
                 print("Main Down dd :%s MainUP df:%s couts std:%0.1f "%(len(dd),len(df),df.couts.std()))
                 # print df.date.mode()[0]
                 df = df.sort_values(by='couts',ascending=1)
