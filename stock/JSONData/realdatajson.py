@@ -558,7 +558,7 @@ def get_sina_all_json_dd(vol='0', type='0', num='10000', retry_count=3, pause=0.
 
     # data['code'] = symbol
     # df = df.append(data, ignore_index=True)
-    if len(url_list)>
+    if len(url_list)>0:
         log.info("json_dd_url:%s"%url_list[0])
         for url in url_list:
             dd_l = _parsing_sina_dd_price_json(url)
