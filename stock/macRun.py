@@ -190,6 +190,23 @@ sleep 0.2;osascript -e 'tell application "Python Launcher" to quit';sleep 5;
 '''
 
 
+''' Triton samsung
+title:sina_Market-DurationDn.py
+target rect1:(-12, 661, 1401, 1116) rect2:(-12, 661, 1401, 1116)
+title:sina_Monitor-Market-LH.py
+target rect1:(577, 453, 1989, 873) rect2:(577, 453, 1989, 873)
+title:sina_Monitor-Market.py
+title:LinePower.py
+title:sina_Monitor.py
+target rect1:(69, 368, 1450, 828) rect2:(69, 368, 1450, 828)
+title:singleAnalyseUtil.py
+target rect1:(1056, 681, 2045, 1093) rect2:(1056, 681, 2045, 1093)
+title:sina_Market-DurationCXDN.py
+target rect1:(41, 453, 1490, 908) rect2:(41, 453, 1490, 908)
+title:sina_Market-DurationUP.py
+target rect1:(5, 529, 1360, 984) rect2:(5, 529, 1360, 984)
+'''
+
 
 cmdRun200_all_old = '''cd /Users/Johnson/Documents/Quant/pyQuant/stock;
 open sina_Market-DurationDn.py;
