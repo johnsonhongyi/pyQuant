@@ -478,7 +478,7 @@ def _parsing_sina_dd_price_json(url):
     # print(len(text))
     # return text
     
-    if len(text) < 10:
+    if len(text) < 10 or text.find('finproduct@staff.sina.com.cn') > 0:
         return ''
 
 
