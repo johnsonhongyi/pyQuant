@@ -231,7 +231,8 @@ def get_roll_mean_all(single=True,tdx=False,app=True,duration=100,ma_250_l=1.02,
                 df = df[(df.date >= cct.last_tddate(1))]
                 # import ipdb;ipdb.set_trace()
                 print("df:%s df_idx:%s"%(len(df),len(df_idx)))
-                if df_idx is not None:
+
+                if df_idx is not None and len(df_idx) > 0:
                     df = df.loc[df_idx.index,:].dropna()
                 print("Main Down dd :%s MainUP df:%s couts std:%0.1f "%(len(dd),len(df),df.couts.std()))
                 # print df.date.mode()[0]

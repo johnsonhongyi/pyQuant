@@ -290,7 +290,9 @@ if basedir.find('vm') >= 0:
     positionKey = cct.terminal_positionKey_VM
 else:
     positionKey = cct.terminal_positionKey4K
+    # positionKey = cct.terminal_positionKey1K_triton
 
+# print("position:%s"%(positionKey))
 
 def setPosition(cmd=None, position=None):
     count = doScript(scriptcount)

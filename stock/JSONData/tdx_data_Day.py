@@ -1969,9 +1969,14 @@ def get_tdx_power_now_df(code, start=None, end=None, type='f', df=None, dm=None,
 
 
 def get_sina_data_df(code,index=False):
+
     # index_status=False
     if isinstance(code, list):
-        dm = sina_data.Sina().get_stock_list_data(code,index=index)
+        if len(code) > 1:
+            dm = sina_data.Sina().get_stock_list_data(code,index=index)
+        else:
+            dm=[]
+            log.error("code is None:%s"%(code))
     else:
         dm = sina_data.Sina().get_stock_code_data(code,index=index)
     return dm

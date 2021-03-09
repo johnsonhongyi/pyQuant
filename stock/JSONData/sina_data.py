@@ -358,6 +358,8 @@ class Sina:
         # response = yield (requests.get(self.sina_stock_api + self.stock_list[index]))
         # log.debug("url:%s"%(self.sina_stock_api + self.stock_list[index]))
         # log.debug("res_encoding:%s" % response.encoding[:10])
+        if len(response.text) < 10:
+            log.error("response.text is None:%s"%(response.text))
         self.stock_data.append(response.text)
         # Return(self.stock_data.append(response.text))
 
@@ -516,6 +518,8 @@ class Sina:
                 self.stock_codes = map(lambda stock_code: ('sh%s' if stock_code.startswith(
                     ('5', '6', '9')) else 'sz%s') % stock_code, ulist)
 
+            if len(self.stock_codes) == 0:
+                log.error("self.stock_codes is None:%s"%(self.stock_codes))
             self.url = self.sina_stock_api + ','.join(self.stock_codes)
             log.info("stock_list:%s" % self.url[:30])
             response = requests.get(self.url)
