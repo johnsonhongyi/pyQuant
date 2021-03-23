@@ -285,7 +285,7 @@ if __name__ == "__main__":
 
                 
                 # if st_key_sort == '8':
-                if st_key_sort != '4':
+                if st_key_sort.split()[0] != '4':
                     top_temp=top_all.copy()
 
                 elif cct.get_now_time_int() > 830 and cct.get_now_time_int() <= 935:
@@ -404,7 +404,7 @@ if __name__ == "__main__":
                         # top_temp = top_all[ (top_all.volume >= 1.2 ) & (top_all.low >= top_all.lastl1d) & (top_all.lasth1d > top_all.lasth2d) & (top_all.close > top_all.lastp1d)]
                 else:
 
-                    if st_key_sort == '4':  #20210323   跳空缺口,max5 大于 hmax 或者 max5上轨
+                    if st_key_sort.split()[0] == '4':  #20210323   跳空缺口,max5 大于 hmax 或者 max5上轨
                         top_temp = top_all[(top_all.topR > 0) & ( (top_all.max5 > top_all.hmax) | (top_all.max5 > top_all.upper) )] 
 
                     else:
