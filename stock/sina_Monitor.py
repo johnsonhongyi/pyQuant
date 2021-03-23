@@ -352,7 +352,8 @@ if __name__ == "__main__":
                             # top_temp = top_all[(top_all.topU > 0) & (top_all.close > top_all.ene) & (top_all.low > top_all.lastl1d)] 
                             # top_temp = top_all[(top_all.topU > 0) & (top_all.close > top_all.ene)] 
                             
-                            top_temp = top_all[(top_all.topU > 0) & (top_all.close > top_all.ene)  & (top_all.topR > 0)] 
+                            # top_temp = top_all[(top_all.topU > 0) & (top_all.close > top_all.ene)  & (top_all.topR > 0)]   #20210323
+                            top_temp = top_all[(top_all.topU > 0) & ( (top_all.close > top_all.max5) | (top_all.close > top_all.hmax) ) & (top_all.topR > 0)] 
                             top_temp = top_temp[ (~top_temp.index.str.contains('688')) & (~top_temp.name.str.contains('ST'))]
 
                             # top_all[ (~top_all.index.str.contains('688'))  &(top_all.topU > 0)]  
@@ -383,7 +384,11 @@ if __name__ == "__main__":
                             # top_temp = top_all[(top_all.low > top_all.lasth1d) & (top_all.close > top_all.lastp1d) & (top_all.close > top_all.ma10d)]
                             # top_temp = top_temp[~top_temp.name.str.contains('ST')]
                             # top_temp = top_all[(top_all.topU > 0) & (top_all.close > top_all.ene) & (top_all.lastp1d > top_all.ene) & (top_all.topR > 0)] 
-                            top_temp = top_all[(top_all.topU > 0) & (top_all.close > top_all.ene)] 
+                           
+
+                            # top_temp = top_all[(top_all.topU > 0) & (top_all.close > top_all.ene)]   #20210323
+                            top_temp = top_all[(top_all.topU > 0) & ( (top_all.close > top_all.max5) | (top_all.close > top_all.hmax) )] 
+
                             top_temp = top_temp[ (~top_temp.index.str.contains('688')) & (~top_temp.name.str.contains('ST'))]
 
                             # ???ne??죬???Ϲ죬һ????գ?һ???ͣ
