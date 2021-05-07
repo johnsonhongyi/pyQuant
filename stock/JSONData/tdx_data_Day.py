@@ -2731,6 +2731,8 @@ def compute_perd_df(dd,lastdays=3,resample ='d'):
     df = dd[-(lastdays+1):].copy()
     df['perlastp'] = map(cct.func_compute_percd2020, df['open'], df['close'], df['high'], df['low'],df['open'].shift(1), 
                             df['close'].shift(1), df['high'].shift(1), df['low'].shift(1),df['ma5d'],df['ma10d'],df['vol'],df['vol'].shift(1),df['upper'],df.index)
+   
+    df['perlastp'] = df['perlastp'].apply(lambda x: round(x, 2))
     df['perd'] = ((df['close'] - df['close'].shift(1)) / df['close'].shift(1) * 100).map(lambda x: round(x, 1))
     # df['perd'] = ((df['low'] - df['low'].shift(1)) / df['close'].shift(1) * 100).map(lambda x: round(x, 1))
     df = df.dropna()
