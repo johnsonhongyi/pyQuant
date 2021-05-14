@@ -390,10 +390,13 @@ if __name__ == "__main__":
                             # top_temp = top_temp[~top_temp.name.str.contains('ST')]
                             # top_temp = top_all[(top_all.topU > 0) & (top_all.close > top_all.ene) & (top_all.lastp1d > top_all.ene) & (top_all.topR > 0)] 
                            
-                            #TopU ?
+                            #TopU > upper
                             # top_temp = top_all[(top_all.topU > 0) & (top_all.close > top_all.ene)]   #20210323
-                            top_temp = top_all[ (top_all.topR > 0)] 
+                            # top_temp = top_all[ (top_all.topR > 0)] 
                             
+                            # MA5 > ene and topU > upper
+                            top_temp = top_all[(top_all.topU > 0) & (top_all.close > top_all.ene) & (top_all.ma5d > top_all.ene)  ] 
+
                             #主升浪
                             # top_temp = top_all[(top_all.topU > 0) & ( (top_all.close > top_all.max5) | (top_all.close > top_all.hmax) )] 
 
@@ -408,7 +411,10 @@ if __name__ == "__main__":
                     
                         #TopR跳空
                         # top_temp = top_all[(top_all.topU > 0) & (top_all.close > top_all.ene)  & (top_all.topR > 0)] 
-                        top_temp = top_all[ (top_all.topR > 0)] 
+                        # top_temp = top_all[ (top_all.topR > 0)] 
+
+                        # MA5 > ene and topU > upper
+                        top_temp = top_all[(top_all.topU > 0) & (top_all.close > top_all.ene) & (top_all.ma5d > top_all.ene)  ] # & (top_all.topR > 0)] 
 
                         top_temp = top_temp[ (~top_temp.index.str.contains('688')) & (~top_temp.name.str.contains('ST'))]
                         # top_temp = top_all[  (top_all.low >= top_all.lastl1d) & (top_all.lasth1d > top_all.lasth2d) & (top_all.low >= top_all.nlow) & ((top_all.open >= top_all.nlow *0.998) & (top_all.open <= top_all.nlow*1.002)) ]
