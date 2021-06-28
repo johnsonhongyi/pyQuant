@@ -1,4 +1,4 @@
 {
     "python.linting.pylintEnabled": true,
-    "python.pythonPath": "/Users/Johnson/.pyenv/shims/python"
+    "python.pythonPath": "/Users/Johnson/anaconda/bin/python"
 }

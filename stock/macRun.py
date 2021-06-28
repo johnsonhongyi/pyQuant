@@ -288,6 +288,9 @@ basedir = cct.get_now_basedir()
 
 if basedir.find('vm') >= 0:
     positionKey = cct.terminal_positionKey_VM
+elif cct.get_os_system() == 'mac':
+    positionKey = cct.terminal_positionKeyMac2021
+    # positionKey = cct.terminal_positionKeyMac
 else:
     positionKey = cct.terminal_positionKey4K
     # positionKey = cct.terminal_positionKey1K_triton
