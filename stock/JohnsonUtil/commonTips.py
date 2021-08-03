@@ -913,10 +913,14 @@ def cct_raw_input(sts):
 # eval_rule = "[elem for elem in dir() if not elem.startswith('_')]"
 eval_rule = "[elem for elem in dir() if elem.startswith('top') or elem.startswith('block') or elem.startswith('du') ]"
 
-# import readline
-# import rlcompleter, readline
-# readline.set_completer(completer.complete)
-# readline.parse_and_bind('tab:complete')
+
+
+#MacOS arrow keys history auto complete
+if isMac():
+    import readline
+    import rlcompleter, readline
+    # readline.set_completer(completer.complete)
+    readline.parse_and_bind('tab:complete')
 
 
 class MyCompleter(object):  # Custom completer
