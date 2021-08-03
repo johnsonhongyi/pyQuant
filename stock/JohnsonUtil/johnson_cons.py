@@ -201,6 +201,12 @@ Duration_ra_dff = ['ra', 'dff', 'couts', 'percent',
 
 Duration_ra_dff_key = [0, 0, 0, 0, 0, 1, 1, 1, 1]
 
+Duration_ral_dff = ['ral', 'dff', 'couts', 'percent',
+                   'topR', 'fib', 'fibl', 'ratio', 'volume']
+                   # 'op', 'fib', 'fibl', 'ratio', 'volume']
+
+Duration_ral_dff_key = [0, 0, 0, 0, 0, 1, 1, 1, 1]
+
 Duration_sort_per_df2 = ['percent', 'b1_v','df2','ma', 'dff', 'ratio', 'volume']
 Duration_sort_per_df2_key = [0, 0, 0, 0, 0, 0 , 0]
 
@@ -243,15 +249,18 @@ Duration_format_buy = ['name', 'buy', 'boll', 'dff', 'df2', 'percent', 'per1d', 
                        'ra', 'topR', 'ratio', 'couts',  'volume', 'fib','fibl', 'category']
                        # 'ra', 'op', 'ratio', 'couts',  'volume', 'fib','fibl', 'category']
 Duration_format_trade = ['name', 'trade', 'boll', 'dff', 'df2',
-                         'percent', 'per1d',  'perc3d',  'ra', 'topR', 'ratio', 'couts', 'volume', 'fib','fibl', 'category']
+                         'percent', 'per1d',  'perc3d',  'ra', 'ral', 'topR', 'couts', 'volume', 'fib','fibl', 'category']
+                         # 'percent', 'per1d',  'perc3d',  'ra', 'topR', 'ratio', 'couts', 'volume', 'fib','fibl', 'category']
                          # 'percent', 'per1d',  'perc3d',  'ra', 'op', 'ratio', 'couts', 'volume', 'fib','fibl', 'category']
 
 
 Monitor_format_trade = ['name', 'trade', 'boll', 'dff', 'df2', 'couts',
-                        'percent', 'per1d', 'perc3d', 'ra', 'topR', 'ratio',  'volume', 'fib','fibl', 'category']
-                        # 'percent', 'per1d', 'perc3d', 'ra', 'op', 'ratio',  'volume', 'fib','fibl', 'category']
+                        'percent', 'per1d', 'perc3d', 'ra', 'ral', 'topR',  'volume', 'fib','fibl', 'category']
+                        # 'percent', 'per1d', 'perc3d', 'ra', 'topR', 'ratio',  'volume', 'fib','fibl', 'category']
+                        # mod ratio ->ral
 MonitorMarket_format_buy = ['name', 'buy', 'boll', 'dff', 'df2',
-                            'couts', 'percent', 'per1d', 'perc3d', 'ra', 'topR', 'ratio',  'volume', 'fib','fibl', 'category']
+                            'couts', 'percent', 'per1d', 'perc3d', 'ra', 'ral', 'topR',  'volume', 'fib','fibl', 'category']
+                            # 'couts', 'percent', 'per1d', 'perc3d', 'ra', 'topR', 'ratio',  'volume', 'fib','fibl', 'category']
                             # 'couts', 'percent', 'per1d', 'perc3d', 'ra', 'op', 'ratio',  'volume', 'fib','fibl', 'category']
 
 # Sina_Monitor_format =['name', 'trade', 'ma5d','boll','dff','df2','couts','percent', 'ra','op', 'fib','ratio','ma','volume','category']
@@ -635,18 +644,18 @@ def RawMenuArgmain():
     raw = 'status:[go(g),clear(c),[d 20150101 [l|h]|[y|n|pn|py],quit(q),W(a),sh]:'
     raw_input_menu = raw + "\n\tNow : %s" + \
         "\n\t1:Sort By Percent\t2:Sort by per1d\t3:Sort By percd\t\t4:Sort By DFF\n\t5:Sort By Ra_dff\t6:Sort By top10\t7:Sort Per b1V\t\t8:Sort by Count" + \
-        "\n\t9:By fib\t\tx: by_topR\tx1:by boll_perc\nplease input:"
+        "\n\t9:By fib\t\tx: by_topR\tx1:by boll_perc\t\tx2:by ral\nplease input:"
     return raw_input_menu
 
 # "Sort By Percent\t3:Sort By DFF\n\t2:Sort By OP\t\t4:Sort By Ra\nplease input:"
 
 Market_sort_idx = {'1': 'ct.Duration_percent_dff', '2': 'ct.Duration_sort_per1d', '3': 'ct.Duration_sort_per3d', '4': 'ct.Duration_dff_percent', '5': 'ct.Duration_ra_dff', '6': 'ct.Duration_percent_df2dff',
                    '7': 'ct.Duration_sort_per_df2', '8': 'ct.Monitor_sort_count', '9':'ct.Duration_percent_vol',
-                  'x': 'ct.Duration_percent_opboll', 'x1':'ct.Duration_percent_boll'}
+                  'x': 'ct.Duration_percent_opboll', 'x1':'ct.Duration_percent_boll','x2':'ct.Duration_ral_dff'}
 
 Market_sort_idx_perd = {'1': 'ct.Duration_percent_dff', '2': 'ct.Duration_sort_perd', '3': 'ct.Duration_sort_percd', '4': 'ct.Duration_dff_percent', '5': 'ct.Duration_ra_dff', '6': 'ct.Duration_percent_df2dff',
                         '7': 'ct.Duration_sort_per_df2', '8': 'ct.Monitor_sort_count','9':'ct.Duration_percent_vol',
-                  'x': 'ct.Duration_percent_opboll', 'x1':'ct.Duration_percent_boll'}
+                  'x': 'ct.Duration_percent_opboll', 'x1':'ct.Duration_percent_boll','x2':'ct.Duration_ral_dff'}
 
 # Market_sort_idx = {'1': 'ct.Duration_percent_dff', '2': 'ct.Duration_dff_percent', '3': 'ct.Duration_ra_dff', '4': 'ct.Duration_percent_df2dff',
 #                    '5': 'ct.Duration_sort_ma', '6': 'ct.Monitor_sort_count', '7': 'ct.Duration_sort_per_ratio', '8': 'ct.Duration_percent_vol'}

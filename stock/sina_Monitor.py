@@ -132,11 +132,11 @@ if __name__ == "__main__":
                     st_key_sort.split()[0], cct.get_index_fibl())
             time_Rt = time.time()
             # top_now = tdd.getSinaAlldf(market='??,rzrq',filename='yqbk', vol=ct.json_countVol, vtype=ct.json_countType)
-            top_now = tdd.getSinaAlldf(
-                market='all', vol=ct.json_countVol, vtype=ct.json_countType)
+            # top_now = tdd.getSinaAlldf(
+                # market='all', vol=ct.json_countVol, vtype=ct.json_countType)
             # top_now = tdd.getSinaAlldf(market='??',filename='yqbk', vol=ct.json_countVol, vtype=ct.json_countType,trend=False)
 
-            # top_now = tdd.getSinaAlldf(market='rzrq', vol=ct.json_countVol, vtype=ct.json_countType)
+            top_now = tdd.getSinaAlldf(market='rzrq', vol=ct.json_countVol, vtype=ct.json_countType)
             # top_now = tdd.getSinaAlldf(market='??¹?060',filename='cxg', vol=ct.json_countVol, vtype=ct.json_countType)
 
             time_d = time.time()
@@ -297,7 +297,7 @@ if __name__ == "__main__":
                     # 
                     # top_temp = top_all[(top_all.close / top_all.hmax > 1.1) & (top_all.close / top_all.hmax < 1.5)] 
                     top_temp = top_all[(top_all.low > top_all.lasth1d) & (top_all.close > top_all.lastp1d)]
-
+                    # top_now.loc['000988'].    
                     # top_temp =  top_all[( ((top_all.top10 >0) | (top_all.boll >0)) & (top_all.lastp1d > top_all.ma5d) & (top_all.close > top_all.lastp1d))]
                     # top_temp =  top_all[((top_all.lastp1d < top_all.ma5d) & (top_all.close > top_all.lastp1d))]
                     # top_temp =  top_all[((top_all.topR < 2) & (top_all.close > top_all.upper) & (top_all.close > top_all.lastp1d))]
@@ -355,8 +355,11 @@ if __name__ == "__main__":
 
                             #TopR跳空
                             # top_temp = top_all[(top_all.topU > 0) & (top_all.close > top_all.ene)  & (top_all.topR > 0)]   #20210323
-                            top_temp = top_all[ (top_all.topR > 0)] 
                             
+                            # top_temp = top_all[ (top_all.topR > 0)] 
+                            # 20210803 mod ral
+                            top_temp = top_all[top_all.close > top_all.ma20d]
+
                             #主升浪
                             # top_temp = top_all[(top_all.topU > 0) & ( (top_all.close > top_all.max5) | (top_all.close > top_all.hmax) ) & (top_all.topR > 0)] 
                             top_temp = top_temp[ (~top_temp.index.str.contains('688')) & (~top_temp.name.str.contains('ST'))]

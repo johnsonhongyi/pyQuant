@@ -2623,7 +2623,70 @@ def func_compute_percd2020( open, close,high, low,lastopen, lastclose,lasthigh, 
 
     return initc
 
+def func_compute_percd2021( open, close,high, low,lastopen, lastclose,lasthigh, lastlow, ma5,ma10,nowvol=None,lastvol=None,upper=None,idate=None):
+    # down_zero, down_dn, percent_l = 0, 0, 2
+     # (1 if ( ((c >= op) and ((c - lc)/lc*100 >= 0)) or (c >= op and c >=m5a) ) else down_dn)
+    # df['vol'],df['vol'].shift(1),df['upper']
 
+    initc = 0
+    if  0 < lastclose < 1000 and lasthigh <> 1.0 and lastlow <> 1.0 and lasthigh <> 0 and lastlow <> 0:
+#        close = round(close, 1)
+#        lastp = round(lastp, 1)
+#        op = round(op, 1)
+#        lastopen = round(lastopen, 1)
+#        lasth = round(lasth, 1)
+#        lastl = round(lastl, 1)
+        percent = round((close - lastclose)/lastclose*100,1)
+        # now_du = round((high - low)/low*100,1)
+        close_du = round((high - low)/low*100,1)
+        # last_du = round((lasthigh - lastlow)/lastlow*100,1)
+        # volratio = round((nowvol / lastvol),1)
+        vol_du = round((nowvol)/lastvol,1)
+
+        if percent > 1:
+            initc +=1
+            if  close_du > 5:
+                initc +=0.1
+        elif percent < -1:
+            initc -=1
+            if  close_du > 5:
+                initc -=0.1
+
+        # if percent >0 and open >= lastclose and close == high and close > ma5:
+        #     initc +=1
+        #     if close > ma5:
+        #         if close < ma5*1.1:
+        #             initc +=3*vol_du
+        #         elif close < ma5*1.2:
+        #             initc +=2*vol_du
+        #         else:
+        #             initc+=2
+
+        # elif percent > 3 and low >= lastlow and high > lasthigh:
+        #     initc +=2
+
+        # elif percent > 3 and close_du > 9 and vol_du > 2:
+        #     initc += 1*vol_du
+        # elif percent > 2 :
+        #     initc +=1
+        # elif percent > 0  and open > ma5 and open > ma10 :
+        #     initc +=1
+        #     if  vol_du < 0.6:
+        #         initc +=0.1
+        # elif low < lastlow and high < lasthigh:
+        #     initc -=1
+        # elif percent < -5 and low < lastlow:
+        #     initc -=2
+        # elif percent < 0 and close < ma5 and close < ma10:
+        #     initc -=0.51
+        # else:
+            # initc -=1
+    elif  np.isnan(lastclose) :
+        if close > open:
+            initc +=1
+
+
+    return initc
 
 # import numba as nb
 # @numba.jit(nopython=True)

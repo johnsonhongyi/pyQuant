@@ -2729,7 +2729,7 @@ def compute_condition_up(df):
 def compute_perd_df(dd,lastdays=3,resample ='d'):
     np.seterr(divide='ignore',invalid='ignore')  #RuntimeWarning: invalid value encountered in greater
     df = dd[-(lastdays+1):].copy()
-    df['perlastp'] = map(cct.func_compute_percd2020, df['open'], df['close'], df['high'], df['low'],df['open'].shift(1), 
+    df['perlastp'] = map(cct.func_compute_percd2021, df['open'], df['close'], df['high'], df['low'],df['open'].shift(1), 
                             df['close'].shift(1), df['high'].shift(1), df['low'].shift(1),df['ma5d'],df['ma10d'],df['vol'],df['vol'].shift(1),df['upper'],df.index)
    
     df['perlastp'] = df['perlastp'].apply(lambda x: round(x, 2))
@@ -2741,6 +2741,7 @@ def compute_perd_df(dd,lastdays=3,resample ='d'):
     # df['perddu'] = ((df['high'] - df['low']) / df['low'] * 100).map(lambda x: round(x, 1))
     dd['upperT'] = dd.close[ (dd.upper > 0) & (dd.high > dd.upper)].count()
     df = df[~df.index.duplicated()]
+
     upperL = dd.close[ (dd.upper > 0) & (dd.close >= dd.upper)]
     top_10 = df[df.perd >9.9]
     if len(top_10) >0:
@@ -2750,6 +2751,7 @@ def compute_perd_df(dd,lastdays=3,resample ='d'):
             top_ten = 0
     else:
         top_ten = 0
+
     if len(upperL) > 0:
         cum_maxf, posf = LIS_TDX(upperL)
         if len(upperL) == len(df[df.index >= upperL.index[0]]):
@@ -2827,7 +2829,7 @@ def compute_perd_df(dd,lastdays=3,resample ='d'):
     else:
         dd['topR'] = -len(condition_down)
         dd['topD'] = len(condition_down)
-    
+
     if len(condition_up) > 0 and len(condition_down) > 0:
         if condition_up.jop_date.values[-1] > condition_down.jop_date.values[-1]:
             close_idx_up = dd[dd.index == condition_up.jop_date.values[0]].low[0]
@@ -2847,11 +2849,19 @@ def compute_perd_df(dd,lastdays=3,resample ='d'):
     # ra = round((df.close[-1]-dd.close.max())/df.close[-1]*100,1)
     # ra = round((df.close[-1]-close_idx_up)/df.close[-1]*100,1)
 
-    ra = round((df.close[-1]-close_idx_up)/close_idx_up*100,1)
-    if ra == 0.0:
-        ra = round((df.close[-1]-df.close.min())/dd.close.min()*100,1)
-    dd['ra'] = ra
+    # ra = round((df.close[-1]-close_idx_up)/close_idx_up*100,1)
+    #跳空缺口的价差diff
 
+    # ra = round((df.close[-1]-df.close.min())/df.close.min()*100,1)
+    
+    ra = round((dd.close[-1]-dd.close.min())/dd.close.min()*100,1)
+    ral = round((dd.close[-1]-dd.high[:-1].max())/dd.high[:-1].max()*100,1)
+
+    # if ra == 0.0:
+    #     ra = round((df.close[-1]-df.close.min())/dd.close.min()*100,1)
+
+    dd['ra'] = ra
+    dd['ral'] = ral
 
     if resample == 'd':
         df['perd'] = df['perd'].apply(lambda x: round(x, 1) if ( x < 9.85)  else 10.0)
@@ -2866,7 +2876,7 @@ def compute_perd_df(dd,lastdays=3,resample ='d'):
 
     dd['perlastp'] = df['perlastp']
     dd = compute_power_tdx_df(df, dd)
-
+    
     return dd
 
 
@@ -2903,7 +2913,7 @@ def compute_ma_cross(dd,ma1='ma5d',ma2='ma10d',ratio=0.02):
 
         if idx_min <> -1:
             fibl = len(dd[dd.index >= idx_min])
-            idx = round((dd.close[-1]/temp.close[temp.index == idx_max])*100-100,1)
+            idx = round((dd.close[-1]/temp.close[temp.index == idx_min])*100-100,1)
         else:
             fibl = -1
             idx = round((dd.close[-1]/temp.close[-1])*100-100,1)
@@ -3004,11 +3014,16 @@ def compute_lastdays_percent(df=None, lastdays=3, resample='d',vc_radio=100):
 #        df['perd'] = ((df['close'] - df['close'].shift(1)) / df['close'].shift(1) * 100).map(lambda x: round(x, 1) if ( x < 9.85)  else 10.0)
         df['ma5d'] = pd.rolling_mean(df.close, 5).apply(lambda x: round(x,1))
         df['ma10d'] = pd.rolling_mean(df.close, 10).apply(lambda x: round(x,1))
-        df['ma20d'] = pd.rolling_mean(df.close, 26).apply(lambda x: round(x,1))
+        df['ma20d'] = pd.rolling_mean(df.close, 20).apply(lambda x: round(x,1))
 
-        df['upper'] = map(lambda x: round((1 + 11.0 / 100) * x, 1), df.ma10d)
-        df['lower'] = map(lambda x: round((1 - 9.0 / 100) * x, 1), df.ma10d)
-        df['ene'] = map(lambda x, y: round((x + y) / 2, 1), df.upper, df.lower)
+        if len(df) > 33:
+            df['upper'] = map(lambda x: round((1 + 11.0 / 100) * x, 1), df.ma20d)
+            df['lower'] = map(lambda x: round((1 - 9.0 / 100) * x, 1), df.ma20d)
+            df['ene'] = map(lambda x, y: round((x + y) / 2, 1), df.upper, df.lower)
+        else:
+            df['upper'] = map(lambda x: round((1 + 11.0 / 100) * x, 1), df.ma10d)
+            df['lower'] = map(lambda x: round((1 - 9.0 / 100) * x, 1), df.ma10d)
+            df['ene'] = map(lambda x, y: round((x + y) / 2, 1), df.upper, df.lower)
         df = df.fillna(0)
 
         dd = compute_ma_cross(df)
@@ -4233,6 +4248,8 @@ if __name__ == '__main__':
     code='002594' #byd
     code='601628' #中国人寿
     code='601015' #陕西黑猫
+    code='000988' #华工科技
+    code='600499' #科达制造
     # code='688106' #科创信息
     # code='999999'
     # code='000800'
@@ -4252,7 +4269,7 @@ if __name__ == '__main__':
     # df2 = get_tdx_Exp_day_to_df(code,dl=160, end=None, newdays=0, resample='w')
     resample = 'd'
     # df2 = get_tdx_Exp_day_to_df(code,dl=160, end=None, newdays=0, resample='d',lastdays=12)
-    df2 = get_tdx_Exp_day_to_df(code,dl=14, end=None, newdays=0, resample='d',lastdays=1)
+    df2 = get_tdx_Exp_day_to_df(code,dl=34, end=None, newdays=0, resample='d',lastdays=1)
     import ipdb;ipdb.set_trace()
 
     # get_tdx_Exp_day_to_df(code, start=None, end=None, dl=None, newdays=None, type='f', wds=True, lastdays=3, resample='d', MultiIndex=False)
@@ -4261,8 +4278,6 @@ if __name__ == '__main__':
 
     df = get_tdx_exp_low_or_high_power(code, dl=30, newdays=0, resample=resample)
     df3 =  get_tdx_exp_all_LastDF_DL([code],  dt=60, ptype='low', filter='y', power=ct.lastPower, resample=resample)
-
-    import ipdb;ipdb.set_trace()
 
     df3 = get_tdx_append_now_df_api_tofile(code,newdays=0, start=None, end=None, type='f', df=None, dl=10, power=False)
 

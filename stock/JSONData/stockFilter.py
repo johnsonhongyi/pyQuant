@@ -161,13 +161,16 @@ def getBollFilter(df=None, boll=ct.bollFilter, duration=ct.PowerCountdl, filter=
                 market_value= int(market_value)
                 log.info("stf market_key:%s" % (market_key))
                 idx_k= cct.get_col_in_columns(df, 'perc%sd', market_value)
+                # filter percd > idx
+                # df= df[(df[("perc%sd" % (idx_k))] >= idx_k) | (df[("perc%sd" % (idx_k))]< -idx_k)]
+
+
 
                 # if int(market_value) > 1 and 930 < cct.get_now_time_int():
                 #     df= compute_perd_value(df, market_value, 'perc')
                 #     df= compute_perd_value(df, market_value, 'per')
 
-                df= df[(df[("perc%sd" % (idx_k))] >= idx_k) | (df[("perc%sd" % (idx_k))]< -idx_k)]
-                
+
             # elif market_key == '2':
             #     if int(market_value) > 1 and 915 < cct.get_now_time_int():
             #         # df['per%d'%(market_value)] = compute_perd_value(df,market_value)
@@ -579,6 +582,10 @@ def getBollFilter(df=None, boll=ct.bollFilter, duration=ct.PowerCountdl, filter=
 
     print("bo:%0.1f" % (time.time() - time_s)),
 
+    df['ral']=(map(lambda x, y: round(
+        (x + y) , 1) , df.percent, df.ral))
+    df['ra']=(map(lambda x, y: round(
+        (x + y) , 1) , df.percent, df.ra))
     return df
 
     # df = df[df.buy > df.cmean * ct.changeRatio]
