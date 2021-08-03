@@ -2855,7 +2855,11 @@ def compute_perd_df(dd,lastdays=3,resample ='d'):
     # ra = round((df.close[-1]-df.close.min())/df.close.min()*100,1)
     
     ra = round((dd.close[-1]-dd.close.min())/dd.close.min()*100,1)
-    ral = round((dd.close[-1]-dd.high[:-1].max())/dd.high[:-1].max()*100,1)
+
+    if resample == 'd' :
+        ral = round((dd.close[-1]-dd.high[:-1].max())/dd.high[:-1].max()*100,1)
+    else:
+        ral = round((dd.close[-1]-dd.high.max())/dd.high.max()*100,1)
 
     # if ra == 0.0:
     #     ra = round((df.close[-1]-df.close.min())/dd.close.min()*100,1)
@@ -4249,7 +4253,7 @@ if __name__ == '__main__':
     code='601628' #中国人寿
     code='601015' #陕西黑猫
     code='000988' #华工科技
-    code='600499' #科达制造
+    code='300346' #科达制造
     # code='688106' #科创信息
     # code='999999'
     # code='000800'
@@ -4267,9 +4271,9 @@ if __name__ == '__main__':
     # code = '603486'
     # code = '999999'
     # df2 = get_tdx_Exp_day_to_df(code,dl=160, end=None, newdays=0, resample='w')
-    resample = 'd'
+    resample = 'w'
     # df2 = get_tdx_Exp_day_to_df(code,dl=160, end=None, newdays=0, resample='d',lastdays=12)
-    df2 = get_tdx_Exp_day_to_df(code,dl=34, end=None, newdays=0, resample='d',lastdays=1)
+    df2 = get_tdx_Exp_day_to_df(code,dl=134, end=None, newdays=0, resample=resample,lastdays=1)
     import ipdb;ipdb.set_trace()
 
     # get_tdx_Exp_day_to_df(code, start=None, end=None, dl=None, newdays=None, type='f', wds=True, lastdays=3, resample='d', MultiIndex=False)
