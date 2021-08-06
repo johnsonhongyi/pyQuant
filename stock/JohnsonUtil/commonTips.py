@@ -2695,7 +2695,7 @@ def func_compute_percd2021( open, close,high, low,lastopen, lastclose,lasthigh, 
         initc +=0.1
         if  ma5 > ma10:
             initc +=0.1
-        elif:
+        else:
             initc -=0.11
     else:
         initc -=0.1
