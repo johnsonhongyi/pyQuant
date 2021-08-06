@@ -2689,6 +2689,16 @@ def func_compute_percd2021( open, close,high, low,lastopen, lastclose,lasthigh, 
         if close > open:
             initc +=1
 
+    # open, close,high, low,lastopen, lastclose,lasthigh, lastlow, 
+    # ma5,ma10,nowvol=None,lastvol=None,upper=None,idate=None
+    if close > ma5:
+        initc +=0.1
+        if  ma5 > ma10:
+            initc +=0.1
+        elif:
+            initc -=0.11
+    else:
+        initc -=0.1
 
     return initc
 

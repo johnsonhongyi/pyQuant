@@ -84,7 +84,7 @@ def filterPowerCount(df, count=200, down=False, duration=2):
 
 def compute_perd_value(df, market_value=3, col='per'):
 
-    if market_value==None or market_value < '3':
+    if market_value==None or market_value < '2':
         market_value = 3
     temp = df[df.columns[(df.columns >= '%s1d' % (col)) & (
         df.columns <= '%s%sd' % (col, market_value))]]
