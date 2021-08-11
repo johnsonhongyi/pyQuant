@@ -282,10 +282,11 @@ if __name__ == "__main__":
                 # '''
 
 
-
+                st_key_sort_status=['4','x2','3'] 
                 
                 # if st_key_sort == '8':
-                if st_key_sort.split()[0] != '4':
+                # if st_key_sort.split()[0] != '4':
+                if st_key_sort.split()[0] not in st_key_sort_status:
                     top_temp=top_all.copy()
 
                 elif cct.get_now_time_int() > 830 and cct.get_now_time_int() <= 935:
@@ -319,7 +320,8 @@ if __name__ == "__main__":
                     
                     if 'nlow' in top_all.columns:
 
-                        if st_key_sort == '4':
+                        # if st_key_sort == '4':
+                        if st_key_sort.split()[0]  in st_key_sort_status :
                             # ???
                             # top_temp = top_all[ (top_all.topR > 0) & ((top_all.close >= top_all.nclose)) & ((top_all.open > top_all.lastp1d)) & (top_all.low >= top_all.lastl1d) & (top_all.lasth1d > top_all.lasth2d) & (top_all.open >= top_all.nlow) ]
 
@@ -358,7 +360,8 @@ if __name__ == "__main__":
                             
                             # top_temp = top_all[ (top_all.topR > 0)] 
                             # 20210803 mod ral
-                            top_temp = top_all[top_all.close > top_all.ma20d]
+                            # top_temp = top_all[top_all.close > top_all.ma20d]
+                            top_temp = top_all[(top_all.close > top_all.ma20d) & (top_all.close > top_all.max5)]
 
                             #主升浪
                             # top_temp = top_all[(top_all.topU > 0) & ( (top_all.close > top_all.max5) | (top_all.close > top_all.hmax) ) & (top_all.topR > 0)] 
