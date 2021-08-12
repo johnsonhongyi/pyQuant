@@ -68,7 +68,7 @@ open_time = 926
 sleep_time = 6
 tdx_max_int = 10
 tdx_max_int_start = 30
-tdx_max_int_end = 7
+tdx_max_int_end = 10
 wcd_limit_day = 30
 h5_limit_time = 180
 h5_power_limit_time = 36000
@@ -491,8 +491,14 @@ dfcfw_rzye_columns2 = ['DIM_DATE','RZYEZB', 'RQCHL10D', 'RQCHL3D', 'RQYE', 'RQMC
 TDX_Day_columns_all = ['code', 'date', 'open', 'high', 'low', 'close', 'vol','amount', 'ra', 'op', 'fib', 'ma5d', 'ma10d', 'ldate', 'hmax', 'lmin', 'cmean']
 TDX_Day_columns = ['code', 'date', 'open', 'high', 'low', 'close', 'vol','amount']
 
+
+
+
+# http://data.eastmoney.com/hsgtcg/gzcglist.html
+# http://push2.eastmoney.com/api/qt/kamt/get?fltt=2&fields1=f1,f3&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59&ut=b2884a393a59ad64002292a3e90d46a5&cb=jQuery112308976712127389186_1628752728202&_=1628752728203
 DFCFW_FUND_FLOW_HGT = "http://nufm.dfcfw.com/EM_Finance2014NumericApplication/JS.aspx?type=CT&cmd=0000011&sty=SHSTD&st=z&sr=&p=&ps=&cb=&js=var%20quote_zjl%3d{rank:[%28x%29],pages:%28pc%29}&token=beb0a0047196124721f56b0f0ff5a27c&jsName=quote_zjl&dt=1452070103085"
 DFCFW_FUND_FLOW_SZT = "http://nufm.dfcfw.com/EM_Finance2014NumericApplication/JS.aspx?type=CT&cmd=0000011&sty=SZSTD&st=z&sr=&p=&ps=&cb=&js=var%20quote_zjl%3d{rank:[%28x%29],pages:%28pc%29}&token=beb0a0047196124721f56b0f0ff5a27c&jsName=quote_zjl&dt=1452070103085"
+DFCFW_FUND_FLOW_HGSZT2021 = "http://push2.eastmoney.com/api/qt/kamt/get?fltt=2&fields1=f1,f3&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59&ut=b2884a393a59ad64002292a3e90d46a5&cb=jQuery112308976712127389186_1628752728202&_=1628752728203"
 DFCFW_ZS_SHSZ = "http://nufm2.dfcfw.com/EM_Finance2014NumericApplication/JS.aspx?type=CT&cmd=0000011,3990012&sty=DFPIU&st=z&sr=&p=&ps=&cb=&js=var%20C1Cache={quotation:[(x)]}&token=44c9d251add88e27b65ed86506f6e5da&0.6733153457793924"
 DFCFW_RZRQ_SHSZ = "http://datainterface.eastmoney.com/EM_DataCenter/js.aspx?type=FD&sty=SHSZSUM&fd=%s"
 # DFCFW_RZRQ_SHSZ="http://datainterface.eastmoney.com/EM_DataCenter/js.aspx?type=FD&sty=SHSZSUM&fd=%s&js=var%20rzrqhuizong=[%28x%29]"DFCFW_RZRQ_SHSZ="http://datainterface.eastmoney.com/EM_DataCenter/js.aspx?type=FD&sty=SHSZSUM&fd=%s&js=var%20rzrqhuizong=[%28x%29]"

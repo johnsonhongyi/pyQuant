@@ -218,11 +218,15 @@ def get_dfcfw_fund_flow2020(market):
                 # 215722046, 207426675004
     return dk
 
-def get_dfcfw_fund_HGT(url=ct.DFCFW_FUND_FLOW_HGT):
+def get_dfcfw_fund_HGT(url=ct.DFCFW_FUND_FLOW_HGSZT2021):
     data = cct.get_url_data_R(url,timeout=15)
-    "http://nufm.dfcfw.com/EM_Finance2014NumericApplication/JS.aspx?type=CT&cmd=P.%28x%29,%28x%29,%28x%29|0000011|3990012|3990012,0000011,HSI5,BK07071,MK01461,MK01441,BK08041&sty=SHSTD|SZSTD|FCSHSTR&st=z&sr=&p=&ps=&cb=&js=var%20muXWEC=%28{data:[%28x%29]}%29&token=1942f5da9b46b069953c873404aad4b5"
+    # "http://nufm.dfcfw.com/EM_Finance2014NumericApplication/JS.aspx?type=CT&cmd=P.%28x%29,%28x%29,%28x%29|0000011|3990012|3990012,0000011,HSI5,BK07071,MK01461,MK01441,BK08041&sty=SHSTD|SZSTD|FCSHSTR&st=z&sr=&p=&ps=&cb=&js=var%20muXWEC=%28{data:[%28x%29]}%29&token=1942f5da9b46b069953c873404aad4b5"
+    "http://push2.eastmoney.com/api/qt/kamt/get?fltt=2&fields1=f1,f3&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59&ut=b2884a393a59ad64002292a3e90d46a5&cb=jQuery112308976712127389186_1628752728202&_=1628752728203"
     log.info("url:%s" % url)
+
     # vollist=re.findall('{data:(\d+)',code)
+    # re.findall('"data":{[\D\d]+.', data)[0]
+    # re.findall('"data":{[\D\d]+.', data)[0].replace("});",'')
     vol_l = re.findall('\"([\d\D]+?)\"', data)
     dd = {}
     # print vol_l
@@ -241,6 +245,45 @@ def get_dfcfw_fund_HGT(url=ct.DFCFW_FUND_FLOW_HGT):
         log.info("Fund_f NO Url:%s" % url)
     return dd
 
+HGZS_LIST = {'bei': ['hk2sh','hk2sz'],'nan': ['sh2hk','sz2hk']}
+
+# url=ct.DFCFW_FUND_FLOW_HGSZT2021   http://data.eastmoney.com/hsgtcg/ http://data.eastmoney.com/hsgtcg/lz.html
+HGZS_URL_LIST = {'bei':"http://push2.eastmoney.com/api/qt/kamt/get?fltt=2&fields1=f1,f3&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59&ut=b2884a393a59ad64002292a3e90d46a5&cb=jQuery112308976712127389186_1628752728202&_=1628752728203",
+        'nan':"http://push2.eastmoney.com/api/qt/kamt/get?fltt=2&fields1=f2,f4&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59&ut=b2884a393a59ad64002292a3e90d46a5&cb=jQuery1123011359186010295064_1628755572432&_=1628755572433"}
+
+def get_dfcfw_fund_HGSZ2021(market='bei'):
+    data = cct.get_url_data_R(HGZS_URL_LIST[market],timeout=15)
+    # "http://nufm.dfcfw.com/EM_Finance2014NumericApplication/JS.aspx?type=CT&cmd=P.%28x%29,%28x%29,%28x%29|0000011|3990012|3990012,0000011,HSI5,BK07071,MK01461,MK01441,BK08041&sty=SHSTD|SZSTD|FCSHSTR&st=z&sr=&p=&ps=&cb=&js=var%20muXWEC=%28{data:[%28x%29]}%29&token=1942f5da9b46b069953c873404aad4b5"
+    #beixiang
+    "http://push2.eastmoney.com/api/qt/kamt/get?fltt=2&fields1=f1,f3&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59&ut=b2884a393a59ad64002292a3e90d46a5&cb=jQuery112308976712127389186_1628752728202&_=1628752728203"
+    #nanxiang
+    # "http://push2.eastmoney.com/api/qt/kamt/get?fltt=2&fields1=f2,f4&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59&ut=b2884a393a59ad64002292a3e90d46a5&cb=jQuery1123011359186010295064_1628755572432&_=1628755572433"
+    log.info("url:%s" % HGZS_URL_LIST[market])
+
+    # vollist=re.findall('{data:(\d+)',code)
+    # re.findall('"data":{[\D\d]+.', data)[0]
+    # re.findall('"data":{[\D\d]+.', data)[0].replace("});",'')
+
+    data_ = re.findall('"data":{[\D\d]+.', data)[0].replace("});",'').replace('"data":','')
+
+    js_data = json.loads(data_)
+    dd = {}
+
+    # [u'hk2sz', u'hk2sh']
+    if len(js_data) == 2:
+        # hg2sh = js_data['hk2sh']
+
+        dd['hgt'] = round(js_data[HGZS_LIST[market][0]]['dayNetAmtIn']/10000,2)
+        dd['ggt'] = round(js_data[HGZS_LIST[market][1]]['dayNetAmtIn']/10000,2)
+
+        # dd['zzb']=data[1]
+        # dd['sjlr']=data[2]
+        # dd['sjzb']=data[3]
+        # dd['time']=vol_l[1]
+    else:
+        # print "Fund:Null%s %s"%(data,url)
+        log.info("Fund_f NO Url:%s" % url)
+    return dd
 
 def get_dfcfw_fund_SHSZ(url=ct.DFCFW_ZS_SHSZ):
 #    sina = Sina()
@@ -819,16 +862,17 @@ if __name__ == "__main__":
 #    pp=get_dfcfw_fund_HGT(ct.DFCFW_FUND_FLOW_HGT)
     log.setLevel(LoggerFactory.DEBUG)
     # print get_dfcfw_rzrq_SHSZ(url=ct.DFCFW_RZRQ_SHSZ)
-    rzrq = get_dfcfw_rzrq_SHSZ()
+    # rzrq = get_dfcfw_rzrq_SHSZ()
     # rzrq = get_dfcfw_rzrq_SHSZ2()
-    print rzrq
+    # print rzrq
     import ipdb;ipdb.set_trace()
-
+    print get_dfcfw_fund_HGSZ2021()
+    print get_dfcfw_fund_HGSZ2021('nan')
     indexKeys = [ 'sh','sz', 'cyb']
     ffindex = get_dfcfw_fund_flow2020('all')
     # ffindex = get_dfcfw_fund_flow('all')
     print ffindex
-    print get_dfcfw_fund_SHSZ()
+    # print get_dfcfw_fund_SHSZ()
     print "hgt:",get_dfcfw_fund_HGT()
     print "szt:",get_dfcfw_fund_HGT(url=ct.DFCFW_FUND_FLOW_SZT)
     sys.exit(0)

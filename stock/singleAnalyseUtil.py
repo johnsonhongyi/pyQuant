@@ -480,8 +480,10 @@ def get_hot_countNew(changepercent, rzrq, fibl=None, fibc=10):
               (f_print(4, zlr, 31), f_print(4, zzb, 31), f_print(4, zt)))
 
     ff = ffu.get_dfcfw_fund_SHSZ()
-    hgt = ffu.get_dfcfw_fund_HGT()
-    szt = ffu.get_dfcfw_fund_HGT(url=ct.DFCFW_FUND_FLOW_SZT)
+    # hgt = ffu.get_dfcfw_fund_HGT()
+    # szt = ffu.get_dfcfw_fund_HGT(url=ct.DFCFW_FUND_FLOW_SZT)
+    hgt = ffu.get_dfcfw_fund_HGSZ2021('bei')
+    szt = ffu.get_dfcfw_fund_HGSZ2021('nan')
     log.debug("shzs:%s hgt:%s" % (ff, hgt))
     # if len(ff) > 0:
     #     print ("\tSH: %s u:%s vo: %s sz: %s u:%s vo: %s" % (
@@ -502,7 +504,7 @@ def get_hot_countNew(changepercent, rzrq, fibl=None, fibc=10):
 
     if len(hgt) > 0:
         print("\tSgt: %s Gst: %s Hgt: %s Ggt: %s SSVol:%s" %
-              (szt['hgt'], szt['ggt'], hgt['hgt'], hgt['ggt'], f_print(10, ff['allvol'], 31)))
+              (hgt['ggt'], szt['ggt'], hgt['hgt'], szt['hgt'], f_print(10, ff['allvol'], 31)))
     else:
         print("\t%s Sgt: %s Gst: %s \tHgt: \t%s Ggt: " % (0, 0, 0, 0))
 

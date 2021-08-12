@@ -277,7 +277,8 @@ def get_tdx_Exp_day_to_df(code, start=None, end=None, dl=None, newdays=None, typ
     else:
         tdx_max_int = ct.tdx_max_int
     # max_int_end = -1 if int(tdx_max_int) > 10 else None
-    max_int_end = None if int(tdx_max_int) > 10 else None
+    # max_int_end = -1 if int(tdx_max_int) > 10 else None
+    max_int_end = -1 
     if newdays is not None:
         newstockdayl = newdays
     else:
@@ -572,7 +573,8 @@ def get_tdx_Exp_day_to_df(code, start=None, end=None, dl=None, newdays=None, typ
     # df['ma60d'] = pd.rolling_mean(df.close, 60)
 
     #hmax -5前max
-    df['hmax'] = df.high[-tdx_max_int:-ct.tdx_max_int_end].max()
+    # df['hmax'] = df.high[-tdx_max_int:-ct.tdx_max_int_end].max()
+    df['hmax'] = df.close[:-ct.tdx_max_int_end].max()
     df['max5'] = df.close[-5:max_int_end].max()
     df['lmin'] = df.low[-tdx_max_int:max_int_end].min()
     df['min5'] = df.low[-5:max_int_end].min()
@@ -2866,6 +2868,9 @@ def compute_perd_df(dd,lastdays=3,resample ='d'):
 
     dd['ra'] = ra
     dd['ral'] = ral
+
+    cum_maxf, posf = LIS_TDX(dd.high[-5:])
+    dd['up5'] = len(posf)
 
     if resample == 'd':
         df['perd'] = df['perd'].apply(lambda x: round(x, 1) if ( x < 9.85)  else 10.0)

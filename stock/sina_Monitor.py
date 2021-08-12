@@ -361,8 +361,11 @@ if __name__ == "__main__":
                             # top_temp = top_all[ (top_all.topR > 0)] 
                             # 20210803 mod ral
                             # top_temp = top_all[top_all.close > top_all.ma20d]
-                            top_temp = top_all[(top_all.close > top_all.ma20d) & (top_all.close > top_all.max5)]
+                            # top_temp = top_all[(top_all.close > top_all.ma20d) & (top_all.close > top_all.max5)]
+                            # top_temp = top_all[(top_all.close > top_all.ma20d) & (top_all.close >= top_all.ene)]
+                            top_temp = top_all[(top_all.close > top_all.ma20d) & ((top_all.close >= top_all.hmax) | (top_all.up5 > 2) | (top_all.perc3d > 3)) ]
 
+                            # & (top_all.close >= top_all.hmax) & (top_all.hmax >= top_all.max5) 
                             #主升浪
                             # top_temp = top_all[(top_all.topU > 0) & ( (top_all.close > top_all.max5) | (top_all.close > top_all.hmax) ) & (top_all.topR > 0)] 
                             top_temp = top_temp[ (~top_temp.index.str.contains('688')) & (~top_temp.name.str.contains('ST'))]
@@ -428,7 +431,8 @@ if __name__ == "__main__":
                 else:
 
                     if st_key_sort.split()[0] == '4':  #20210323   跳空缺口,max5 大于 hmax 或者 max5上轨
-                        top_temp = top_all[(top_all.topR > 0) & ( (top_all.max5 > top_all.hmax) | (top_all.max5 > top_all.upper) )] 
+                        # top_temp = top_all[(top_all.topR > 0) & ( (top_all.max5 > top_all.hmax) | (top_all.max5 > top_all.upper) )] 
+                        top_temp = top_all[(top_all.close > top_all.ma20d) & (top_all.close >= top_all.ene)]
 
                     else:
 
@@ -545,7 +549,8 @@ if __name__ == "__main__":
                     # ct_MonitorMarket_Values2 = ct.get_Duration_format_Values(
                     #             ct_MonitorMarket_Values2, replace='df2', dest='high')
 
-
+                # loc ral
+                # top_temp[:5].loc[:,['name','ral']
 
 
                 # if st_key_sort == '1' or st_key_sort == '7':
