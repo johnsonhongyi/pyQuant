@@ -363,7 +363,7 @@ if __name__ == "__main__":
                             # top_temp = top_all[top_all.close > top_all.ma20d]
                             # top_temp = top_all[(top_all.close > top_all.ma20d) & (top_all.close > top_all.max5)]
                             # top_temp = top_all[(top_all.close > top_all.ma20d) & (top_all.close >= top_all.ene)]
-                            top_temp = top_all[(top_all.close > top_all.ma20d) & ((top_all.close >= top_all.hmax) | (top_all.up5 > 2) | (top_all.perc3d > 3)) ]
+                            top_temp = top_all[(top_all.close > top_all.ma10d) & ((top_all.close >= top_all.hmax) | (top_all.up5 > 2) | (top_all.perc3d > 3)) ]
 
                             # & (top_all.close >= top_all.hmax) & (top_all.hmax >= top_all.max5) 
                             #主升浪

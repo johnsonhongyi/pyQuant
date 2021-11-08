@@ -396,11 +396,20 @@ if __name__ == "__main__":
                     top_temp = stf.getBollFilter(df=top_temp, boll=ct.bollFilter, duration=ct.PowerCountdl,
                                                  filter=False, ma5d=False, dl=14, percent=False, resample=resample, ene=False, top10=False)
 
+                    
+                    #20210816 filter ma5d ma10d
+                    # top_temp = top_temp[ (top_temp.close > top_temp.ma5d) & ((top_temp.close > top_temp.hmax))]
+                    top_temp = top_temp[ (top_temp.close > top_temp.ma5d) ]
+
+
                     print("N:%s K:%s %s G:%s" % (
                         now_count, len(top_all[top_all['buy'] > 0]),
                         len(top_now[top_now['volume'] <= 0]), goldstock)),
                     print "Rt:%0.1f dT:%s N:%s T:%s %s%%" % (float(time.time() - time_Rt), cct.get_time_to_date(time_s), cct.get_now_time(), len(top_temp), round(len(top_temp) / float(ct.PowerCount) * 100, 1))
                     # top_end = stf.getBollFilter(df=top_end, boll=ct.bollFilter,duration=ct.PowerCountdl)
+                    
+
+
                     if 'op' in top_temp.columns:
                         if cct.get_now_time_int() > ct.checkfilter_end_timeDu and (int(duration_date) > int(ct.duration_date_sort) or int(duration_date) < 6):
                             top_temp = top_temp.sort_values(by=(market_sort_value),

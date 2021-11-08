@@ -292,6 +292,10 @@ if __name__ == "__main__":
                         else:
                             top_dif = top_dif.sort_values(by=['dff', 'percent', 'ratio'], ascending=[1, 0, 1])
 
+
+                    #20210816 filter ma5d ma10d
+                    top_dif = top_dif[top_dif.close > top_dif.ma10d ]
+                    
                     # top_all=top_all.sort_values(by=['percent','dff','couts','ratio'],ascending=[0,0,1,1])
                     # print cct.format_for_print(top_dif[:10])
                     # top_dd = pd.concat([top_dif[:5],top_temp[:3],top_dif[-3:],top_temp[-3:]], axis=0)

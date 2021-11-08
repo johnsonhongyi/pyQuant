@@ -1795,8 +1795,16 @@ def search_Tdx_multi_data_duration(fname='tdx_all_df_300', table='all_300', df=N
 
 
 def Write_market_all_day_mp(market='all', rewrite=False):
-    sh_index = '601998'
+    """
+    rewrite True: history date ?
+    rewrite False: Now Sina date
+
+    """
+    sh_index = '000002'
     dd = get_tdx_Exp_day_to_df(sh_index, dl=1)
+    log.error("Write_market_all_day_mp:%s"%(dd))
+    # import ipdb;ipdb.set_trace()
+
     # print dt,dd.date
     if market == 'alla':
         rewrite = True
@@ -1857,7 +1865,7 @@ def Write_market_all_day_mp(market='all', rewrite=False):
         # print df.loc['600581']
 
         if df is None or len(df) < 10:
-            print "df is none"
+            print "dsina_data f is none"
             break
         else:
             # dt = df.dt.value_counts().index[0]
@@ -4279,17 +4287,17 @@ if __name__ == '__main__':
     # df2 = get_tdx_Exp_day_to_df(code,dl=160, end=None, newdays=0, resample='w')
     resample = 'w'
     # df2 = get_tdx_Exp_day_to_df(code,dl=160, end=None, newdays=0, resample='d',lastdays=12)
-    df2 = get_tdx_Exp_day_to_df(code,dl=134, end=None, newdays=0, resample=resample,lastdays=1)
-    import ipdb;ipdb.set_trace()
+    # df2 = get_tdx_Exp_day_to_df(code,dl=134, end=None, newdays=0, resample=resample,lastdays=1)
+    # import ipdb;ipdb.set_trace()
 
     # get_tdx_Exp_day_to_df(code, start=None, end=None, dl=None, newdays=None, type='f', wds=True, lastdays=3, resample='d', MultiIndex=False)
-    df3 = compute_jump_du_count(df2, lastdays=9, resample='d')
-    import ipdb;ipdb.set_trace()
+    # df3 = compute_jump_du_count(df2, lastdays=9, resample='d')
+    # import ipdb;ipdb.set_trace()
 
-    df = get_tdx_exp_low_or_high_power(code, dl=30, newdays=0, resample=resample)
-    df3 =  get_tdx_exp_all_LastDF_DL([code],  dt=60, ptype='low', filter='y', power=ct.lastPower, resample=resample)
+    # df = get_tdx_exp_low_or_high_power(code, dl=30, newdays=0, resample=resample)
+    # df3 =  get_tdx_exp_all_LastDF_DL([code],  dt=60, ptype='low', filter='y', power=ct.lastPower, resample=resample)
 
-    df3 = get_tdx_append_now_df_api_tofile(code,newdays=0, start=None, end=None, type='f', df=None, dl=10, power=False)
+    # df3 = get_tdx_append_now_df_api_tofile(code,newdays=0, start=None, end=None, type='f', df=None, dl=10, power=False)
 
     # type D:\MacTools\WinTools\new_tdx\T0002\export\forwardp\SH688020.txt
 
@@ -4301,7 +4309,7 @@ if __name__ == '__main__':
     # print get_kdate_data('000859', start='2019-01-01', end='', ktype='D')
     # write_tdx_tushare_to_file(code)
    
-    df = get_tdx_Exp_day_to_df(code, dl=ct.PowerCountdl,end=None, newdays=0, resample='d')
+    # df = get_tdx_Exp_day_to_df(code, dl=ct.PowerCountdl,end=None, newdays=0, resample='d')
     # print df.perc1d[-1:],df.perc2d[-1:],df.perc3d[-1:],df.perc4d[-1:],df.perc5d[-1:]
     # print df[df.columns[(df.columns >= 'perc1d') & (df.columns <= 'perc%sd'%(9))]][:1]
 
@@ -4359,9 +4367,9 @@ if __name__ == '__main__':
     # print python_resample(qs, xs, rands)
 
 #    code='300174'
-    dm = get_sina_data_df(sina_data.Sina().market('all').index.tolist())
+    # dm = get_sina_data_df(sina_data.Sina().market('all').index.tolist())
     # dm = None
-    get_tdx_append_now_df_api_tofile('000838', dm=dm,newdays=0, start=None, end=None, type='f', df=None, dl=10, power=True)
+    # get_tdx_append_now_df_api_tofile('000838', dm=dm,newdays=0, start=None, end=None, type='f', df=None, dl=10, power=True)
     # get_tdx_append_now_df_api_tofile('002196', dm=dm,newdays=1,dl=5)
 #
     # code = '300661'
@@ -4377,9 +4385,9 @@ if __name__ == '__main__':
     # code = '000916'
     # code = '600619'
 
-    # print get_tdx_exp_all_LastDF_DL([code],  dt=60, ptype='low', filter='y', power=ct.lastPower, resample=resample)
+    df = get_tdx_exp_all_LastDF_DL([code],  dt=60, ptype='low', filter='y', power=ct.lastPower, resample=resample)
 
-    df = get_tdx_exp_low_or_high_power(code, dl=30, newdays=0, resample='d')
+    # df = get_tdx_exp_low_or_high_power(code, dl=30, newdays=0, resample='d')
     # df = get_tdx_Exp_day_to_df(code, dl=60, newdays=0, resample='d')
 
     print "day_to_df:", df[:1][['per1d','per2d','per3d']]
@@ -4429,8 +4437,10 @@ if __name__ == '__main__':
             if market in ['all', 'sh', 'sz', 'cyb', 'alla']:
                 if market != 'all':
                     Write_market_all_day_mp(market, rewrite=True)
+                    break
                 else:
                     Write_market_all_day_mp(market)
+                    break
             else:
                 print "market is None "
         else:
