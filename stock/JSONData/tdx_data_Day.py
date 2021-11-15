@@ -1261,7 +1261,7 @@ def get_tdx_append_now_df_api_tofile(code, dm=None, newdays=0, start=None, end=N
         # log.debug("df.open:%s dm.open%s" % (df.open[-1], round(dm.open[-1], 2)))
         # print df.close[-1],round(dm.close[-1],2)
 
-        if end is None and ((df is not None and not dm.empty) and (round(df.open[-1], 2) != round(dm.open[-1], 2)) or (round(df.close[-1], 2) != round(dm.close[-1], 2))):
+        if end is None and ((df is not None and not dm.empty) and ((len(df) > 0 and round(df.open[-1], 2) != round(dm.open[-1], 2) )) or ((len(df) > 0 and round(df.close[-1], 2) != round(dm.close[-1], 2)))):
             if dm.open[0] > 0 and len(df) > 0:
                 if dm_code.index[-1] == df.index[-1]:
                     log.debug("app_api_dm.Index:%s df:%s" %
@@ -1270,6 +1270,8 @@ def get_tdx_append_now_df_api_tofile(code, dm=None, newdays=0, start=None, end=N
                 df = df.append(dm_code)
             elif len(dm) != 0 and len(df) == 0:
                 df = dm_code
+        else:
+            df = dm_code
                 # df = df.astype(float)
             # df=pd.concat([df,dm],axis=0, ignore_index=True).set
         df['name'] = c_name
@@ -1805,6 +1807,7 @@ def Write_market_all_day_mp(market='all', rewrite=False):
     log.error("Write_market_all_day_mp:%s"%(dd))
     # import ipdb;ipdb.set_trace()
 
+
     # print dt,dd.date
     if market == 'alla':
         rewrite = True
@@ -1860,6 +1863,10 @@ def Write_market_all_day_mp(market='all', rewrite=False):
     for mk in mlist:
         time_t = time.time()
         df = sina_data.Sina().market(mk)
+        log.error("Write_market_all_day_mp:%s"%(df.loc['000002',['open','close','dt','ticktime']] if '000002' in df.index.values else 'No 0002'))
+        if dd.date == df.loc['000002','dt']:
+            log.error("Pls check sina_data.Sina().market data")
+
         # df = getSinaAlldf(market=mk,trend=False)
         # df = rl.get_sina_Market_json(mk)
         # print df.loc['600581']
@@ -4268,6 +4275,7 @@ if __name__ == '__main__':
     code='000988' #华工科技
     code='300346' #科达制造
     code='002176' #江特电机
+    code='301098'
     # code='688106' #科创信息
     # code='999999'
     # code='000800'
@@ -4284,7 +4292,11 @@ if __name__ == '__main__':
     # code = '002906'
     # code = '603486'
     # code = '999999'
-    # df2 = get_tdx_Exp_day_to_df(code,dl=160, end=None, newdays=0, resample='w')
+    df2 = get_tdx_Exp_day_to_df(code,dl=160, end=None, newdays=0, resample='d')
+    # print get_tdx_append_now_df_api_tofile(code)
+
+    import ipdb;ipdb.set_trace()
+
     resample = 'w'
     # df2 = get_tdx_Exp_day_to_df(code,dl=160, end=None, newdays=0, resample='d',lastdays=12)
     # df2 = get_tdx_Exp_day_to_df(code,dl=134, end=None, newdays=0, resample=resample,lastdays=1)
