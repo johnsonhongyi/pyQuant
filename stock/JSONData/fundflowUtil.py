@@ -14,6 +14,14 @@ log = LoggerFactory.log
 # log.setLevel(LoggerFactory.INFO)
 # log.setLevel(LoggerFactory.DEBUG)
 # from bs4 import BeautifulSoup
+
+
+sinaheader = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:84.0) Gecko/20100101 Firefox/84.0',
+            'Host': 'vip.stock.finance.sina.com.cn',
+            'Referer':'http://vip.stock.finance.sina.com.cn',
+            'Connection': 'keep-alive',
+            }
 def get_dfcfw_fund_flow_old(market):
     if market.startswith('http'):
         single = True
@@ -42,7 +50,7 @@ def get_dfcfw_fund_flow_old(market):
         log.error("Fund_f NO Url:%s" % url)
     if not single:
         url = ct.SINA_JSON_API_URL % ct.INDEX_LIST[market]
-        data = cct.get_url_data_R(url)
+        data = cct.get_url_data_R(url,headers=sinaheader)
         vol_l = re.findall('\"([\d\D]+?)\"', data)
         if len(vol_l) == 1:
             data = vol_l[0].split(',')
@@ -115,7 +123,7 @@ def get_dfcfw_fund_flow(market):
             log.error("Fund_f NO Url:%s" % url)
         if not single:
             url = ct.SINA_JSON_API_URL % ct.INDEX_LIST[indexall[i]]
-            data = cct.get_url_data_R(url,timeout=20)
+            data = cct.get_url_data_R(url,timeout=20,headers=sinaheader)
             vol_l = re.findall('\"([\d\D]+?)\"', data)
             if len(vol_l) == 1:
                 data = vol_l[0].split(',')
@@ -194,7 +202,7 @@ def get_dfcfw_fund_flow2020(market):
             log.error("Fund_f NO Url:%s" % url)
         if not single:
             url = ct.SINA_JSON_API_URL % ct.INDEX_LIST[indexall[i]]
-            data = cct.get_url_data_R(url,timeout=20)
+            data = cct.get_url_data_R(url,timeout=20,headers=sinaheader)
             vol_l = re.findall('\"([\d\D]+?)\"', data)
             if len(vol_l) == 1:
                 data = vol_l[0].split(',')
