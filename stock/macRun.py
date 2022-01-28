@@ -381,7 +381,8 @@ if cct.isMac():
 
 else:
     print("win")
-    positionKey = cct.terminal_positionKey_triton
+    #positionKey = cct.terminal_positionKey_triton
+    positionKey = cct.terminal_positionKey1K_triton
     for key in positionKey:
         print("title:%s"%(key))
         # cct.get_window_pos(key)
@@ -389,7 +390,10 @@ else:
     for key in positionKey:
         pos=positionKey[key].split(',')
         # cct.get_window_pos('sina_Market-DurationUP.py')
-        print "status:%s"%(cct.reset_window_pos(key,pos[0],pos[1],pos[2],pos[3]))
+        if len(pos) == 2:
+            print "status:%s"%(cct.reset_window_pos(key,pos[0],pos[1]))
+        else:
+            print "status:%s"%(cct.reset_window_pos(key,pos[0],pos[1],pos[2],pos[3]))
 
     # pos=cct.terminal_positionKey_triton['sina_Market-DurationDn.py'].split(',')
     # # print pos
