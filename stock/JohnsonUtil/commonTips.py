@@ -307,6 +307,38 @@ terminal_positionKey1K_triton = {'sina_Market-DurationDn.py': '6, 434,1400,440',
                         'LinePower.py': '6, 216,800,420', }
 
 
+
+terminal_positionKey2K_R9000P = {'sina_Market-DurationDn.py': '-13, 601,1400,440',
+                        'sina_Market-DurationCXDN.py': '31, 301,1400,440',
+                        'sina_Market-DurationSH.py': '-29, 623,1400,440',
+                        'sina_Market-DurationUP.py': '92, 142,1400,440',
+                        'sina_Monitor-Market-LH.py': '666, 338,1400,420',
+                        'sina_Monitor-Market.py': '271, 39,1400,440',
+                        'sina_Monitor.py': '170, 7,1400,440',
+                        'singleAnalyseUtil.py': '833, 666,880,360',
+                        'LinePower.py': '6, 216,800,420', }
+
+
+''' R9000P 2.5K
+title:sina_Market-DurationDn.py
+target rect1:(6, 434, 1406, 874) rect2:(6, 434, 1406, 874)
+target rect1:(-13, 601, 1387, 1041) rect2:(-13, 601, 1387, 1041)
+title:sina_Monitor-Market-LH.py
+target rect1:(666, 338, 2067, 758) rect2:(666, 338, 2067, 758)
+title:sina_Monitor-Market.py
+title:LinePower.py
+title:sina_Monitor.py
+target rect1:(271, 39, 1671, 479) rect2:(271, 39, 1671, 479)
+title:singleAnalyseUtil.py
+target rect1:(833, 666, 1713, 1026) rect2:(833, 666, 1713, 1026)
+title:sina_Market-DurationCXDN.py
+target rect1:(31, 301 1445, 688) rect2:(45, 248, 1445, 688)
+title:sina_Market-DurationUP.py
+target rect1:(92, 142, 1492, 582) rect2:(92, 142, 1492, 582)
+'''
+
+
+
 # title:sina_Market-DurationDn.py
 # target rect1:(-4, 718, 1396, 1178) rect2:(-4, 718, 1396, 1178)
 # title:sina_Monitor-Market-LH.py

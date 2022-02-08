@@ -285,6 +285,8 @@ def getPosition(cmd=None, position=None,close=False):
 
 # positionKey = cct.terminal_positionKey
 basedir = cct.get_now_basedir()
+import socket
+hostname = socket.gethostname() 
 
 if basedir.find('vm') >= 0:
     positionKey = cct.terminal_positionKey_VM
@@ -294,6 +296,9 @@ elif cct.get_os_system() == 'mac':
 else:
     positionKey = cct.terminal_positionKey4K
     # positionKey = cct.terminal_positionKey1K_triton
+
+if hostname.find('R900') >=0:
+    positionKey = cct.terminal_positionKey2K_R9000P
 
 # print("position:%s"%(positionKey))
 
@@ -382,7 +387,12 @@ if cct.isMac():
 else:
     print("win")
     #positionKey = cct.terminal_positionKey_triton
-    positionKey = cct.terminal_positionKey1K_triton
+    if hostname.find('R900') >=0:
+
+        positionKey = cct.terminal_positionKey2K_R9000P
+    else:
+        positionKey = cct.terminal_positionKey1K_triton
+
     for key in positionKey:
         print("title:%s"%(key))
         # cct.get_window_pos(key)
