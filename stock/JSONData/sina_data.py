@@ -48,7 +48,7 @@ class StockCode:
         """获取所有股票 ID 到 all_stock_code 目录下"""
         all_stock_codes_url = 'http://www.shdjt.com/js/lib/astock.js'
         grep_stock_codes = re.compile('~(\d+)`')
-        response = requests.get(all_stock_codes_url,headers=self.sinaheader)
+        response = requests.get(all_stock_codes_url)
         response.encoding = self.encoding
         stock_codes = grep_stock_codes.findall(response.text)
         stock_codes = list(set([elem for elem in stock_codes if elem.startswith(('6', '30', '00'))]))
