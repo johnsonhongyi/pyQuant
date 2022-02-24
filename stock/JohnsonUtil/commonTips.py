@@ -375,7 +375,7 @@ terminal_positionKey_all = {'sina_Market-DurationDn.py': '654, 680',
                         'LinePower.py': '6, 216', }
 
 
-terminal_positionKeyMac2021 = {'sina_Market-DurationDn.py': '186, 506',
+terminal_positionKeyMac2021_OLD = {'sina_Market-DurationDn.py': '186, 506',
                         'sina_Market-DurationCXDN.py': '39, 126',
                         'sina_Market-DurationSH.py': '-29, 623',
                         'sina_Market-DurationUP.py': '0, 394',
@@ -384,6 +384,26 @@ terminal_positionKeyMac2021 = {'sina_Market-DurationDn.py': '186, 506',
                         'sina_Monitor.py': '116, 58',
                         'singleAnalyseUtil.py': '594, 23',
                         'LinePower.py': '6, 216', }
+
+terminal_positionKeyMac2021 = {'sina_Market-DurationDn.py': '541, 530',
+                        'sina_Market-DurationCXDN.py': '-30, 85',
+                        'sina_Market-DurationSH.py': '-29, 623',
+                        'sina_Market-DurationUP.py': '-21, 418',
+                        'sina_Monitor-Market-LH.py': '184, 239',
+                        'sina_Monitor-Market.py': '19, 179',
+                        'sina_Monitor.py': '213, 46',
+                        'singleAnalyseUtil.py': '630, 23',
+                        'LinePower.py': '6, 216', }
+
+"""
+('sina_Market-DurationDn.py', '541, 530\n')
+('sina_Monitor.py', '213, 46\n')
+('singleAnalyseUtil.py', '630, 23\n')
+('sina_Market-DurationCXDN.py', '-30, 85\n')
+('sina_Market-DurationUP.py', '-21, 418\n')
+('sina_Market-DurationUP.py', '-21, 418\n')
+
+"""
 
 terminal_positionKeyMac = {'sina_Market-DurationDn.py': '216, 490',
                         'sina_Market-DurationCXDN.py': '-16, 54',
