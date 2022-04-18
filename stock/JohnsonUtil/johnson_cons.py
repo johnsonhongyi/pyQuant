@@ -469,7 +469,13 @@ http://dcfm.eastmoney.com/em_mutisvcexpandinterface/api/js/get?type=RZRQ_SUMMARY
 '''
 
 
-DFCFW_RZYE = "http://dcfm.eastmoney.com/em_mutisvcexpandinterface/api/js/get?type=RZRQ_SUMMARY_NJ&token=70f12f2f4f091e459a279469fe49eca5&st="
+DFCFW_RZYE_2022 = "http://dcfm.eastmoney.com/em_mutisvcexpandinterface/api/js/get?type=RZRQ_SUMMARY_NJ&token=70f12f2f4f091e459a279469fe49eca5&st="
+
+#mod 2022 firfox-调试器-来源data-center reg->"data":([\D\d]+.}])
+DFCFW_RZYE = 'https://datacenter-web.eastmoney.com/api/data/v1/get?callback=datatable9293024&reportName=RPTA_RZRQ_LSDB&columns=ALL&source=WEB&sortColumns=DIM_DATE&sortTypes=-1&pageNumber=1&pageSize=10&_=1650247619410'
+
+dfcfw_rzye_col2022 = [u'DIM_DATE',u'H_RZYE', u'H_RQYL', u'RZYE']
+
 DFCFW_RZYE2 = "http://datacenter.eastmoney.com/api/data/get?type=RPTA_RZRQ_LSHJ&sty=ALL&source=WEB&st=DIM_DATE&sr=-1&p=1&ps=240"
 # http://data.eastmoney.com/rzrq/total/SZ.html
 DFCFW_RZYE2sh = "http://datacenter.eastmoney.com/api/data/get?type=RPTA_WEB_RZRQ_LSSH&sty=ALL&source=WEB&st=dim_date&sr=-1\
