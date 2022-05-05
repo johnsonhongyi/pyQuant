@@ -649,12 +649,16 @@ def get_dfcfw_rzrq_SHSZ(url=ct.DFCFW_RZYE):
             i = 0
             data2 = ''
             while rzrq_status:
-                for x in range(days, 20):
+                for x in range(1, 20):
                     yestoday = cct.last_tddate(x)
+                    # print("yestoday:%s"%(yestoday))
                     if yestoday in df.index:
                         data2 = df.loc[yestoday]
                         # log.info("yestoday:%s data:%s" % (yestoday, data2))
-                        break
+
+                        days -=1
+                        if days == 0:
+                            break
                         # print da
                     else:
                         log.error("%s:None" % (yestoday))
@@ -895,6 +899,8 @@ if __name__ == "__main__":
     # print get_dfcfw_rzrq_SHSZ2_()
     rzrq = get_dfcfw_rzrq_SHSZ()
     print rzrq
+    import ipdb;ipdb.set_trace()
+    
     # rzrq2 = get_dfcfw_rzrq_SHSZ2()
     # print rzrq2
     # import ipdb;ipdb.set_trace()
