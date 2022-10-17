@@ -1144,6 +1144,8 @@ def get_tdx_append_now_df_api_tofile(code, dm=None, newdays=0, start=None, end=N
                                 end=today, index=index_status)
             if ds is None:
                 return df
+            if index_status:
+                ds['volume'] = map(lambda x: round(x / 100,1),ds['volume'])
             # ds['volume'] = ds.volume.apply(lambda x: x * 100)
             # ds = ts.get_h_data('000001', start=tdx_last_day, end=today,index=index_status)
             # df.index = pd.to_datetime(df.index)
@@ -1163,7 +1165,7 @@ def get_tdx_append_now_df_api_tofile(code, dm=None, newdays=0, start=None, end=N
 #            ds['volume']=ds.volume.apply(lambda x: x * 100)
             if not 'amount' in ds.columns:
                 ds['amount'] = map(lambda x, y, z: round(
-                    (y + z) / 2 * x, 1), ds.volume, ds.high, ds.low)
+                    (y + z) / 2 /100 * x, 1), ds.volume, ds.high, ds.low)
             else:
                 ds['amount'] = ds['amount'].apply(lambda x: round(x , 1))
 
@@ -4276,6 +4278,11 @@ if __name__ == '__main__':
     code='300346' #科达制造
     code='002176' #江特电机
     code='301098'
+
+    wri_index = cct.cct_raw_input("If append  Index 399001... data to tdx[y|n]:")
+    if wri_index == 'y':
+        for inx in tdx_index_code_list:
+            get_tdx_append_now_df_api_tofile(inx)
     # code='688106' #科创信息
     # code='999999'
     # code='000800'

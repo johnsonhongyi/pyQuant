@@ -926,7 +926,7 @@ def get_linear_model_candles(code, ptype='low', dtype='d', start=None, end=None,
     yl = ax.get_ylim()
     ax2 = plt.subplot2grid((10, 1), (8, 0), rowspan=2, colspan=1,sharex=ax)
     # ax2.set_position(mat.transforms.Bbox([[0.125,0.1],[0.9,0.32]]))
-    volume = np.asarray(df.amount)
+    volume = np.asarray(df.vol)
     pos = df['open']-df['close']<0
     neg = df['open']-df['close']>=0
     if 'date' in df.columns:
