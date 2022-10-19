@@ -662,9 +662,9 @@ if __name__ == '__main__':
                 log.debug('into get_work_time:%s' % (int_time))
                 if 915 < int_time < 926:
                     while 1:
-                        cct.sleeprandom(15)
+                        cct.sleeprandom(20)
                         break
-                elif int_time < 930:
+                elif 926 < int_time < 930:
                     while 1:
                         cct.sleep(60)
                         if cct.get_now_time_int() < 931:

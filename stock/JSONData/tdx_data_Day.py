@@ -2898,7 +2898,7 @@ def compute_perd_df(dd,lastdays=3,resample ='d'):
     # print dataframe_mode_round(df.high)
     # print dataframe_mode_round(df.low)
 
-    dd['lastdu'] = df['lastdu'].max()
+    dd['lastdu'] = df[-5:]['lastdu'].max()
 
     dd['perlastp'] = df['perlastp']
     dd = compute_power_tdx_df(df, dd)
@@ -2906,9 +2906,9 @@ def compute_perd_df(dd,lastdays=3,resample ='d'):
     return dd
 
 
-def compute_upper_cross(dd,ma1='upper',ma2='ma5d',ratio=0.02):
-    
+def compute_upper_cross(dd,ma1='upper',ma2='ma5d',ratio=0.02):    
     df = dd[(dd[ma1] <> 0)]
+    df = df[-ct.upper_cross_days:]
     # temp = df[ (df[ma1] > df[ma2] * (1-ratio))  & (df[ma1] < df[ma2] * (1+ratio)) ]
     # temp = df[(df.low > df.upper)]
     temp = df[(df.high >= df.upper)]

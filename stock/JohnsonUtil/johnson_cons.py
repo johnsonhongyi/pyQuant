@@ -35,6 +35,7 @@ per_redline = 0.5
 LvolumeSize = 12500
 VolumeMaxR = 5000
 VolumeMinR = 0.1
+upper_cross_days = 14
 PowerCount = 1000
 duration_diff = 6
 duration_date_l = 60

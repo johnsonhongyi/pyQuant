@@ -298,7 +298,7 @@ if __name__ == "__main__":
                     
                     # 
                     # top_temp = top_all[(top_all.close / top_all.hmax > 1.1) & (top_all.close / top_all.hmax < 1.5)] 
-                    top_temp = top_all[(top_all.low > top_all.lasth1d) & (top_all.close > top_all.lastp1d)]
+                    top_temp = top_all[ (top_all.lastdu > 6 ) & (top_all.low > top_all.lasth1d) & (top_all.close > top_all.lastp1d)]
                     # top_now.loc['002761'].    
                     # top_temp =  top_all[( ((top_all.top10 >0) | (top_all.boll >0)) & (top_all.lastp1d > top_all.ma5d) & (top_all.close > top_all.lastp1d))]
                     # top_temp =  top_all[((top_all.lastp1d < top_all.ma5d) & (top_all.close > top_all.lastp1d))]
@@ -364,8 +364,12 @@ if __name__ == "__main__":
                             # top_temp = top_all[top_all.close > top_all.ma20d]
                             # top_temp = top_all[(top_all.close > top_all.ma20d) & (top_all.close > top_all.max5)]
                             # top_temp = top_all[(top_all.close > top_all.ma20d) & (top_all.close >= top_all.ene)]
-                            top_temp = top_all[(top_all.close > top_all.ma10d) & ((top_all.close >= top_all.hmax) | (top_all.up5 > 2) | (top_all.perc3d > 3)) ]
-
+                            
+                            #221018change
+                            # top_temp = top_all[(top_all.close > top_all.ma10d) & ((top_all.close >= top_all.hmax) | (top_all.up5 > 2) | (top_all.perc3d > 3)) ]
+                            #221018 振幅大于6 or 跳空 or 连涨 or upper or 大于hmax or 大于max5
+                            top_temp = top_all[ ((top_all.lastdu > 6 ) & (top_all.perc3d > 2)) | (top_all.topU > 0) | (top_all.topR > 0) | (top_all.close > top_all.hmax) | (top_all.close > top_all.max5)]
+                            
                             # & (top_all.close >= top_all.hmax) & (top_all.hmax >= top_all.max5) 
                             #主升浪
                             # top_temp = top_all[(top_all.topU > 0) & ( (top_all.close > top_all.max5) | (top_all.close > top_all.hmax) ) & (top_all.topR > 0)] 
@@ -404,8 +408,12 @@ if __name__ == "__main__":
                             # top_temp = top_all[(top_all.topU > 0) & (top_all.close > top_all.ene)]   #20210323
                             # top_temp = top_all[ (top_all.topR > 0)] 
                             
+                            #221018
                             # MA5 > ene and topU > upper
                             top_temp = top_all[(top_all.topU > 0) & (top_all.close > top_all.ene) & (top_all.ma5d > top_all.ene)  ] 
+                            
+                            #221018 振幅大于6 or 跳空 or 连涨 or upper or 大于hmax or 大于max5
+                            # top_temp = top_all[ ((top_all.lastdu > 6 ) & (top_all.perc3d > 2)) | (top_all.topU > 0) | (top_all.topR > 0) | (top_all.close > top_all.hmax) | (top_all.close > top_all.max5)]
 
                             #主升浪
                             # top_temp = top_all[(top_all.topU > 0) & ( (top_all.close > top_all.max5) | (top_all.close > top_all.hmax) )] 
