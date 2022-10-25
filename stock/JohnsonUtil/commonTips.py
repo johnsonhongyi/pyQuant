@@ -386,12 +386,12 @@ terminal_positionKeyMac2021_OLD = {'sina_Market-DurationDn.py': '186, 506',
                         'LinePower.py': '6, 216', }
 
 terminal_positionKeyMac2021 = {'sina_Market-DurationDn.py': '541, 530',
-                        'sina_Market-DurationCXDN.py': '-30, 85',
+                        'sina_Market-DurationCXDN.py': '0, 194',
                         'sina_Market-DurationSH.py': '-29, 623',
-                        'sina_Market-DurationUP.py': '-21, 418',
+                        'sina_Market-DurationUP.py': '-13, 406',
                         'sina_Monitor-Market-LH.py': '184, 239',
                         'sina_Monitor-Market.py': '19, 179',
-                        'sina_Monitor.py': '213, 46',
+                        'sina_Monitor.py': '27, 78',
                         'singleAnalyseUtil.py': '630, 23',
                         'LinePower.py': '6, 216', }
 
