@@ -902,7 +902,10 @@ def set_console(width=80, height=15, color=3, title=None, closeTerminal=True):
             positionKey=capital_to_lower(terminal_positionKey_triton)
             if title.lower() in positionKey.keys():
                 # log.error("title.lower() in positionKey.keys()")
-                pos=terminal_positionKey_triton[title].split(',')
+                if title in terminal_positionKey_triton.keys():
+                    pos=terminal_positionKey_triton[title].split(',')
+                else:
+                    pos= '254, 674,1400,420'.split(',')
                 log.info("pos:%s title:%s Position:%s"%(pos,title,GlobalValues().getkey('Position')))
                 # cct.get_window_pos('sina_Market-DurationUP.py')
                 # cct.reset_window_pos(key,pos[0],pos[1],pos[2],pos[3])
