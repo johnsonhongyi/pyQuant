@@ -288,35 +288,38 @@ end tell
 terminal_positionKey4K = {'sina_Market-DurationDn.py': '6, 633',
                         'sina_Market-DurationCXDN.py': '118, 504',
                         'sina_Market-DurationSH.py': '-29, 623',
-                        'sina_Market-DurationUP.py': '54, 560',
+                        'sina_Market-DurationUp.py': '54, 560',
                         'sina_Monitor-Market-LH.py': '666, 338',
                         'sina_Monitor-Market.py': '19, 179',
                         'sina_Monitor.py': '168, 421',
                         'singleAnalyseUtil.py': '1084, 765',
-                        'LinePower.py': '6, 216', }
+                        'LinePower.py': '6, 216', 
+                        'sina_Market-DurationDnUP.py': '6, 434,1400,440',}
 
 
 terminal_positionKey1K_triton = {'sina_Market-DurationDn.py': '6, 434,1400,440',
                         'sina_Market-DurationCXDN.py': '45, 248,1400,440',
                         'sina_Market-DurationSH.py': '-29, 623,1400,440',
-                        'sina_Market-DurationUP.py': '92, 142,1400,440',
+                        'sina_Market-DurationUp.py': '92, 142,1400,440',
                         'sina_Monitor-Market-LH.py': '666, 338,1400,420',
                         'sina_Monitor-Market.py': '140, 63,1400,440',
                         'sina_Monitor.py': '170, 7,1400,440',
                         'singleAnalyseUtil.py': '689, 509,880,360',
-                        'LinePower.py': '6, 216,800,420', }
+                        'LinePower.py': '6, 216,800,420',
+                        'sina_Market-DurationDnUP.py': '6, 434,1400,440' ,}
 
 
 
 terminal_positionKey2K_R9000P = {'sina_Market-DurationDn.py': '-13, 601,1400,440',
                         'sina_Market-DurationCXDN.py': '31, 301,1400,440',
                         'sina_Market-DurationSH.py': '-29, 623,1400,440',
-                        'sina_Market-DurationUP.py': '92, 142,1400,440',
+                        'sina_Market-DurationUp.py': '92, 142,1400,440',
                         'sina_Monitor-Market-LH.py': '666, 338,1400,420',
                         'sina_Monitor-Market.py': '271, 39,1400,440',
                         'sina_Monitor.py': '170, 7,1400,440',
                         'singleAnalyseUtil.py': '833, 666,880,360',
-                        'LinePower.py': '6, 216,800,420', }
+                        'LinePower.py': '6, 216,800,420', 
+                        'sina_Market-DurationDnUP.py': '6, 434,1400,440' ,}
 
 
 ''' R9000P 2.5K
@@ -333,7 +336,7 @@ title:singleAnalyseUtil.py
 target rect1:(833, 666, 1713, 1026) rect2:(833, 666, 1713, 1026)
 title:sina_Market-DurationCXDN.py
 target rect1:(31, 301 1445, 688) rect2:(45, 248, 1445, 688)
-title:sina_Market-DurationUP.py
+title:sina_Market-DurationUp.py
 target rect1:(92, 142, 1492, 582) rect2:(92, 142, 1492, 582)
 '''
 
@@ -351,34 +354,36 @@ target rect1:(92, 142, 1492, 582) rect2:(92, 142, 1492, 582)
 # target rect1:(554, 406, 1563, 799) rect2:(554, 406, 1563, 799)
 # title:sina_Market-DurationCXDN.py
 # target rect1:(40, 253, 1440, 713) rect2:(40, 253, 1440, 713)
-# title:sina_Market-DurationUP.py
+# title:sina_Market-DurationUp.py
 # target rect1:(91, 149, 1491, 609) rect2:(91, 149, 1491, 609)
 
 terminal_positionKey = {'sina_Market-DurationDn.py': '8, 801',
                         'sina_Market-DurationCXDN.py': '79, 734',
                         'sina_Market-DurationSH.py': '-29, 623',
-                        'sina_Market-DurationUP.py': '451, 703',
+                        'sina_Market-DurationUp.py': '451, 703',
                         'sina_Monitor-Market-LH.py': '666, 338',
                         'sina_Monitor-Market.py': '19, 179',
                         'sina_Monitor.py': '205, 659',
                         'singleAnalyseUtil.py': '328, 594',
-                        'LinePower.py': '6, 216', }
+                        'LinePower.py': '6, 216', 
+                        'sina_Market-DurationDnUP.py': '6, 434,1400,440' ,}
 
 terminal_positionKey_all = {'sina_Market-DurationDn.py': '654, 680',
                         'sina_Market-DurationCXDN.py': '-16, 54',
                         'sina_Market-DurationSH.py': '-29, 623',
-                        'sina_Market-DurationUP.py': '-22, 89',
+                        'sina_Market-DurationUp.py': '-22, 89',
                         'sina_Monitor-Market-LH.py': '666, 338',
                         'sina_Monitor-Market.py': '19, 179',
                         'sina_Monitor.py': '28, 23',
                         'singleAnalyseUtil.py': '1095, 23',
-                        'LinePower.py': '6, 216', }
+                        'LinePower.py': '6, 216',
+                        'sina_Market-DurationDnUP.py': '6, 434,1400,440' ,}
 
 
 terminal_positionKeyMac2021_OLD = {'sina_Market-DurationDn.py': '186, 506',
                         'sina_Market-DurationCXDN.py': '39, 126',
                         'sina_Market-DurationSH.py': '-29, 623',
-                        'sina_Market-DurationUP.py': '0, 394',
+                        'sina_Market-DurationUp.py': '0, 394',
                         'sina_Monitor-Market-LH.py': '184, 239',
                         'sina_Monitor-Market.py': '19, 179',
                         'sina_Monitor.py': '116, 58',
@@ -388,7 +393,7 @@ terminal_positionKeyMac2021_OLD = {'sina_Market-DurationDn.py': '186, 506',
 terminal_positionKeyMac2021 = {'sina_Market-DurationDn.py': '541, 530',
                         'sina_Market-DurationCXDN.py': '0, 194',
                         'sina_Market-DurationSH.py': '-29, 623',
-                        'sina_Market-DurationUP.py': '-13, 406',
+                        'sina_Market-DurationUp.py': '-13, 406',
                         'sina_Monitor-Market-LH.py': '184, 239',
                         'sina_Monitor-Market.py': '19, 179',
                         'sina_Monitor.py': '27, 78',
@@ -400,15 +405,15 @@ terminal_positionKeyMac2021 = {'sina_Market-DurationDn.py': '541, 530',
 ('sina_Monitor.py', '213, 46\n')
 ('singleAnalyseUtil.py', '630, 23\n')
 ('sina_Market-DurationCXDN.py', '-30, 85\n')
-('sina_Market-DurationUP.py', '-21, 418\n')
-('sina_Market-DurationUP.py', '-21, 418\n')
+('sina_Market-DurationUp.py', '-21, 418\n')
+('sina_Market-DurationUp.py', '-21, 418\n')
 
 """
 
 terminal_positionKeyMac = {'sina_Market-DurationDn.py': '216, 490',
                         'sina_Market-DurationCXDN.py': '-16, 54',
                         'sina_Market-DurationSH.py': '-29, 623',
-                        'sina_Market-DurationUP.py': '-22, 89',
+                        'sina_Market-DurationUp.py': '-22, 89',
                         'sina_Monitor-Market-LH.py': '184, 239',
                         'sina_Monitor-Market.py': '19, 179',
                         'sina_Monitor.py': '28, 23',
@@ -418,7 +423,7 @@ terminal_positionKeyMac = {'sina_Market-DurationDn.py': '216, 490',
 terminal_positionKey_VM = {'sina_Market-DurationDn.py': '342, 397',
                         'sina_Market-DurationCXDN.py': '84, 222',
                         'sina_Market-DurationSH.py': '-29, 623',
-                        'sina_Market-DurationUP.py': '-12, 383',
+                        'sina_Market-DurationUp.py': '-12, 383',
                         'sina_Monitor-Market-LH.py': '666, 338',
                         'sina_Monitor-Market.py': '19, 179',
                         'sina_Monitor.py': '8, 30',
@@ -428,7 +433,7 @@ terminal_positionKey_VM = {'sina_Market-DurationDn.py': '342, 397',
 terminal_positionKey_triton = {'sina_Market-DurationDn.py': '-4, 718,1400,460',
                         'sina_Market-DurationCXDN.py': '23, 634,1400,460',
                         'sina_Market-DurationSH.py': '-29, 623,1400,460',
-                        'sina_Market-DurationUP.py': '54, 574,1400,460',
+                        'sina_Market-DurationUp.py': '54, 574,1400,460',
                         'sina_Monitor-Market-LH.py': '603, 501, 1400, 420',
                         'sina_Monitor-Market.py': '19, 179,1400,460',
                         'sina_Monitor.py': '87, 489,1400,460',
@@ -907,7 +912,7 @@ def set_console(width=80, height=15, color=3, title=None, closeTerminal=True):
                 else:
                     pos= '254, 674,1400,420'.split(',')
                 log.info("pos:%s title:%s Position:%s"%(pos,title,GlobalValues().getkey('Position')))
-                # cct.get_window_pos('sina_Market-DurationUP.py')
+                # cct.get_window_pos('sina_Market-DurationUp.py')
                 # cct.reset_window_pos(key,pos[0],pos[1],pos[2],pos[3])
                 status=reset_window_pos(title,pos[0],pos[1],pos[2],pos[3])
                 log.debug("reset_window_pos-status:%s"%(status))
@@ -2044,7 +2049,7 @@ def write_to_blocknew(p_name, data, append=True, doubleFile=True, keep_last=None
             print "all write to %s:%s" % (p_name, counts)
 
     blockNew = get_tdx_dir_blocknew() + 'zxg.blk'
-    blockNewStart = get_tdx_dir_blocknew() + '066.blk'
+    blockNewStart = get_tdx_dir_blocknew() + '077.blk'
     # writeBlocknew(blockNew, data)
     p_data = ['zxg', '069', '068', '067', '061']
     if len(p_name) < 5:
