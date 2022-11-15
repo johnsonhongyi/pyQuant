@@ -1797,6 +1797,22 @@ def search_Tdx_multi_data_duration(fname='tdx_all_df_300', table='all_300', df=N
 # print df.index.get_level_values('code').unique().shape
 # print df.loc['600310']
 
+duration_zero=[]
+duration_other=[]
+
+def check_tdx_Exp_day_duration(market='all'):
+    # duration_zero=[]
+    # duration_other=[]
+    df = sina_data.Sina().market(market)
+    for code in df.index:
+        dd = get_tdx_Exp_day_to_df(code, dl=1) 
+        duration = cct.get_today_duration(dd.date) if dd is not None  else -1
+        if duration == 0:
+            duration_zero.append(code)
+        elif duration > 0 and duration < 60:
+            duration_other.append(code)
+    print("duration_zero:%s duration_other:%s"%(len(duration_zero),len(duration_other)))
+    return duration_other
 
 def Write_market_all_day_mp(market='all', rewrite=False):
     """
@@ -1805,8 +1821,10 @@ def Write_market_all_day_mp(market='all', rewrite=False):
 
     """
     sh_index = '000002'
-    dd = get_tdx_Exp_day_to_df(sh_index, dl=1)
-    log.error("Write_market_all_day_mp:%s"%(dd))
+    # dd = get_tdx_Exp_day_to_df(sh_index, dl=1)
+    # log.error("Write_market_all_day_mp:%s"%(dd))
+
+    duration_code=check_tdx_Exp_day_duration(market)
     # import ipdb;ipdb.set_trace()
 
 
@@ -1814,13 +1832,14 @@ def Write_market_all_day_mp(market='all', rewrite=False):
     if market == 'alla':
         rewrite = True
         market = 'all'
-    if not rewrite and len(dd) > 0:
-        duration = cct.get_today_duration(dd.date)
-        if duration == 0:
+    # if not rewrite and len(dd) > 0:
+    if not rewrite:
+        if len(duration_code) == 0:
             print "Duration:%s is OK" % (duration)
             # return False
         else:
-            log.info("duration to write :%s"%(duration))
+            print "Write duration_code:%s " %(len(duration_code))
+            log.info("duration to write :%s"%(len(duration_code)))
 
         # fpath =  get_code_file_path(sh_index)
         # mtime = os.path.getmtime(fpath)
@@ -1843,7 +1862,8 @@ def Write_market_all_day_mp(market='all', rewrite=False):
     # df = tdd.search_Tdx_multi_data_duration('tdx_all_df_300', 'all_300', df=None,code_l=code_list, start='20150501', end=None, freq=None, col=None, index='date')
     # df = tdd.search_Tdx_multi_data_duration(h5_fname, h5_table, df=None,code_l=code_list, start=None, end=None, freq=None, col=None, index='date',tail=1)
     
-    if duration == 0:
+    # if duration == 0:
+    if len(duration_code) == 0:
         dfs = search_Tdx_multi_data_duration(code_l=[sh_index],tail=1)
         mdate = dfs.reset_index().date.values
         if mdate == dd.date:
@@ -1865,39 +1885,45 @@ def Write_market_all_day_mp(market='all', rewrite=False):
     for mk in mlist:
         time_t = time.time()
         df = sina_data.Sina().market(mk)
-        log.error("Write_market_all_day_mp:%s"%(df.loc['000002',['open','close','dt','ticktime']] if '000002' in df.index.values else 'No 0002'))
-        if dd.date == df.loc['000002','dt']:
-            log.error("Pls check sina_data.Sina().market data")
+        # log.error("Write_market_all_day_mp:%s"%(df.loc['000002',['open','close','dt','ticktime']] if '000002' in df.index.values else 'No 0002'))
+        # if dd.date == df.loc['000002','dt']:
+        #     log.error("Pls check sina_data.Sina().market data")
 
         # df = getSinaAlldf(market=mk,trend=False)
         # df = rl.get_sina_Market_json(mk)
         # print df.loc['600581']
 
         if df is None or len(df) < 10:
-            print "dsina_data f is none"
+            print "dsina_data f is None"
             break
         else:
             # dt = df.dt.value_counts().index[0]
             # df = df[((df.b1 > 0) | (df.a1 > 0)) & ( df.dt >= dt)]
             df = df[((df.b1 > 0) | (df.a1 > 0))]
 
-        print("market:%s A:%s" % (mk, len(df))),
-        code_list = df.index.tolist()
+        # code_list = df.index.tolist()
+        code_list = duration_code
         dm = get_sina_data_df(code_list)
+        dm = dm[((dm.open > 0) | (dm.a1 > 0))]
+        print("market:%s A:%s open_dm:%s" % (mk, len(df),len(dm))),
+
         log.info('code_list:%s df:%s' % (len(code_list), len(df)))
     #        write_tdx_tushare_to_file(sh_index,index_ts)
 #        get_tdx_append_now_df_api2(code,dl=dl,dm=dz,newdays=5)
         # get_tdx_append_now_df_api_tofile('603113', dm=None, newdays=1,
         # start=None, end=None, type='f', df=None, dl=2, power=True)
-        results = cct.to_mp_run_async(
-            # get_tdx_append_now_df_api_tofile, code_list, dm=dm, newdays=0)
-            get_tdx_append_now_df_api_tofile, code_list, dm, 0)
+        if len(dm) > 0:
+            results = cct.to_mp_run_async(
+                # get_tdx_append_now_df_api_tofile, code_list, dm=dm, newdays=0)
+                get_tdx_append_now_df_api_tofile, code_list, dm, 0)
+        else:
+            print("dm is not open sell:%s"%(code_list if len(code_list) <10 else len(code_list)))
         # for code in code_list:
         # print "code:%s "%(code),
         # res=get_tdx_append_now_df_api_tofile(code,dm,5)
         # print "status:%s\t"%(len(res)),
         # results.append(res)
-        print "t:", round(time.time() - time_t, 2)
+        print "AllWrite:%s t:%s"%(len(duration_code),round(time.time() - time_t, 2))
 
 
 #    print "market:%s is succ result:%s"%(market,results),
@@ -4238,6 +4264,12 @@ if __name__ == '__main__':
     # log_level = LoggerFactory.DEBUG if args['-d']  else LoggerFactory.ERROR
     # log_level = LoggerFactory.DEBUG
     log.setLevel(log_level)
+    # time_s=time.time()
+    # check_tdx_Exp_day_duration('all')
+    # print("use time:%s"%(time.time()-time_s))
+    import ipdb;ipdb.set_trace()
+
+    write_to_all()
     # code='399001'
     # code='000862'
     # code='000859'

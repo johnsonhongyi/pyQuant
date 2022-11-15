@@ -236,6 +236,7 @@ if __name__ == "__main__":
                     #     top_all = top_all[(top_all.volume > ct.VolumeMinR) & (
                     #         top_all.volume < ct.VolumeMaxR)]
 
+                    
                 if st_key_sort.split()[0] in ['4','9'] and 915 < cct.get_now_time_int() < 930:
                 # if  915 < cct.get_now_time_int() < 930:
                     top_all['dff'] = (map(lambda x, y: round((x - y) / y * 100, 1),
