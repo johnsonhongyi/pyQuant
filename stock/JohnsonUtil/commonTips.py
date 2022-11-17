@@ -1939,7 +1939,8 @@ def write_to_blocknew(p_name, data, append=True, doubleFile=True, keep_last=None
     if keep_last is None:
         keep_last = ct.keep_lastnum
     # index_list = ['1999999','47#IFL0',  '0159915', '27#HSI']
-    index_list = ['1999999','47#IFL0', '0399001', '0159915']
+    index_list = ['1999999', '0399001', '0159915']
+    # index_list = ['1999999','47#IFL0', '0399001', '0159915']
     # index_list = ['1999999','47#IFL0', '27#HSI',  '0399006']
     # index_list = ['1999999','0399001','47#IFL0', '27#HSI',  '0159915']
     # index_list = ['0399001', '1999999', '0159915']
