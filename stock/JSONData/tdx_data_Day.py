@@ -143,6 +143,17 @@ def get_kdate_data(code, start='', end='', ktype='D', index=False):
     return df
 
 def LIS_TDX(X):
+
+
+    # ipdb> LIS_TDX([ 20.57,  21.35,  22.04,  22.68,  22.92,  22.98,  22.58,  22.23,21.81,  21.57])
+    # ([20.57, 21.35, 22.04, 22.68, 22.92, 22.98], [0, 1, 2, 3, 4, 5])
+    # ipdb> LIS_TDX([ 20.57,  21.35,  22.04,  22.68,  22.98,  22.98,  22.58,  22.23,21.81,  21.57])
+    # ([20.57, 21.35, 22.04, 22.68, 22.98], [0, 1, 2, 3, 5])
+    # ipdb> LIS_TDX([ 20.57,  21.35,  22.04,  22.68,  22.98,  22.96,  22.58,  22.23,21.81,  21.57])
+    # ([20.57, 21.35, 22.04, 22.68, 22.96], [0, 1, 2, 3, 5])
+    # ipdb> LIS_TDX([ 20.57,  21.35,  22.04,  22.68,  22.98,  22.06,  22.58,  22.23,21.81,  21.57])
+    # ([20.57, 21.35, 22.04, 22.06, 22.23], [0, 1, 2, 5, 7])
+
     N = len(X)
     P = [0] * N
     M = [0] * (N + 1)
@@ -167,6 +178,7 @@ def LIS_TDX(X):
     S = []
     pos = []
     k = M[L]
+
     for i in range(L - 1, -1, -1):
         S.append(round(X[k],2))
         pos.append(k)
@@ -180,6 +192,7 @@ def LIS_TDX_Cum(X):
     P = [0] * N
     M = [0] * (N + 1)
     L = 0
+    init_break=False
     for i in range(N):
         lo = 1
         hi = L
@@ -188,8 +201,12 @@ def LIS_TDX_Cum(X):
             if (X[M[mid]] < X[i]):
                 lo = mid + 1
             else:
+                #出现新低 newLow LIS ma5d               
                 hi = mid - 1
-
+                init_break = True
+        if init_break:
+            #出现新低 newLow LIS ma5d 
+            break        
         newL = lo
         P[i] = M[newL - 1]
         M[newL] = i
@@ -213,6 +230,7 @@ def LIS_TDX_Cum(X):
         S.append(round(X[k], 2))
         pos.append(k)
         k = P[k]
+
     return S[::-1], pos[::-1]
 
 
@@ -2613,7 +2631,7 @@ def compute_power_tdx_df(tdx_df,dd):
         dd['rah'] = 1
     else:
         dd['op'] = -1
-        dd['ra'] = -1
+        # dd['ra'] = -1
         dd['fib'] = -1
         dd['fibl'] = -1
         dd['ldate'] = -1
@@ -2899,7 +2917,8 @@ def compute_perd_df(dd,lastdays=3,resample ='d'):
 
     # ra = round((df.close[-1]-df.close.min())/df.close.min()*100,1)
     
-    ra = round((dd.close[-1]-dd.close.min())/dd.close.min()*100,1)
+    # ra = round((dd.close[-1]-dd.close.min())/dd.close.min()*100,1)
+    # LIS_TDX_Cum(df2.ma5d[:10])
 
     if resample == 'd' :
         ral = round((dd.close[-1]-dd.high[:-1].max())/dd.high[:-1].max()*100,1)
@@ -2909,7 +2928,7 @@ def compute_perd_df(dd,lastdays=3,resample ='d'):
     # if ra == 0.0:
     #     ra = round((df.close[-1]-df.close.min())/dd.close.min()*100,1)
 
-    dd['ra'] = ra
+    # dd['ra'] = ra
     dd['ral'] = ral
 
     cum_maxf, posf = LIS_TDX(dd.high[-5:])
@@ -2977,7 +2996,7 @@ def compute_ma_cross(dd,ma1='ma5d',ma2='ma10d',ratio=0.02):
         #     idx = round((dd.close[-1]/temp.close[-1])*100-100,1)
         dd['op'] = idx
         dd['fib'] = fibl
-        dd['ra'] = round(idx/fibl,1)
+        # dd['ra'] = round(idx/fibl,1)
         dd['ldate'] = temp.index[0]
     else:
 
@@ -2987,13 +3006,13 @@ def compute_ma_cross(dd,ma1='ma5d',ma2='ma10d',ratio=0.02):
             idx = round((dd.close[-1]/temp.close[0])*100-100,1)
             dd['op'] = idx
             dd['fib'] = fibl
-            dd['ra'] = round(idx/fibl,1)
+            # dd['ra'] = round(idx/fibl,1)
             dd['ldate'] = temp.index[0]
         else:
             idx = 0
             dd['op'] = idx
             dd['fib'] = -1
-            dd['ra'] = -1
+            # dd['ra'] = -1
             dd['ldate'] = -1
     return dd
 
@@ -3024,7 +3043,7 @@ def compute_ma_cross_old(dd,ma1='ma5d',ma2='ma10d',ratio=0.02):
         #     idx = round((dd.close[-1]/temp.close[-1])*100-100,1)
         dd['op'] = idx
         dd['fib'] = fibl
-        dd['ra'] = round(idx/fibl,1)
+        # dd['ra'] = round(idx/fibl,1)
         dd['ldate'] = temp.index[0]
     else:
 
@@ -3034,13 +3053,13 @@ def compute_ma_cross_old(dd,ma1='ma5d',ma2='ma10d',ratio=0.02):
             idx = round((dd.close[-1]/temp.close[0])*100-100,1)
             dd['op'] = idx
             dd['fib'] = fibl
-            dd['ra'] = round(idx/fibl,1)
+            # dd['ra'] = round(idx/fibl,1)
             dd['ldate'] = temp.index[0]
         else:
             idx = 0
             dd['op'] = idx
             dd['fib'] = -1
-            dd['ra'] = -1
+            # dd['ra'] = -1
             dd['ldate'] = -1
     return dd
 
@@ -3064,9 +3083,9 @@ def compute_lastdays_percent(df=None, lastdays=3, resample='d',vc_radio=100):
         # df['ma5d'] = pd.rolling_mean(df.close, 5)
 
 #        df['perd'] = ((df['close'] - df['close'].shift(1)) / df['close'].shift(1) * 100).map(lambda x: round(x, 1) if ( x < 9.85)  else 10.0)
-        df['ma5d'] = pd.rolling_mean(df.close, 5).apply(lambda x: round(x,1))
-        df['ma10d'] = pd.rolling_mean(df.close, 10).apply(lambda x: round(x,1))
-        df['ma20d'] = pd.rolling_mean(df.close, 20).apply(lambda x: round(x,1))
+        df['ma5d'] = pd.rolling_mean(df.close, 5).apply(lambda x: round(x,2))
+        df['ma10d'] = pd.rolling_mean(df.close, 10).apply(lambda x: round(x,2))
+        df['ma20d'] = pd.rolling_mean(df.close, 20).apply(lambda x: round(x,2))
 
         if len(df) > 33:
             df['upper'] = map(lambda x: round((1 + 11.0 / 100) * x, 1), df.ma20d)
@@ -3120,6 +3139,9 @@ def compute_lastdays_percent(df=None, lastdays=3, resample='d',vc_radio=100):
         # df['lastv9m'] = df['vol'][-lastdays:].mean()
             # df['mean%sd' % da] = df['meann'][-da]
         df = compute_top10_count(df)
+        df = compute_ma5d_count(df,madays='5')     #ma5dcum
+        # df = compute_ma5d_count(df,madays='20')   #ma20dcum
+        df = compute_ma5d_ra(df,madays='5')   #ma5d ra
 
         df = df.reset_index()
     else:
@@ -3654,6 +3676,32 @@ def compute_jump_du_count(df,lastdays=ct.compute_lastdays,resample='d'):
 
 
     return codelist
+
+def compute_ma5d_ra(df,lastdays=ct.compute_lastdays,madays='5'):
+    # temp=df[df.columns[(df.columns >= 'ma%s1d'%(madays)) & (df.columns <= 'ma%s%sd'%(madays,lastdays))]][-1:]
+    temp=df.ma5d[-10:]
+    cum_min,ops=LIS_TDX_Cum(temp.sort_index(ascending=False).values)
+    #倒叙新低了几天
+    # sorted([20.57, 21.35, 22.04, 22.68, 22.92,23.1,23.2,23.4,23.5],reverse=True)
+    df['ra']=ops[-1]+1 if ops[-1] > 0 else 0
+    return df
+
+def compute_ma5d_count(df,lastdays=ct.compute_lastdays,madays='5'):
+    # temp=df[df.columns[(df.columns >= 'ma%s1d'%(madays)) & (df.columns <= 'ma%s%sd'%(madays,lastdays))]][-1:]
+    temp=df[df.columns[(df.columns >= 'ma%s1d'%(madays)) & (df.columns <= 'ma%s%sd'%(madays,lastdays))]]
+    # temp_du=df[df.columns[(df.columns >= 'du1d') & (df.columns <= 'du%sd'%(lastdays))]]
+    # temp.T[temp.T >=10].count()
+
+    df['ma%sdcum'%(madays)]=temp.T.sum()/lastdays
+
+    # df['topU']=temp.T[temp.T >= top_limit].count()  #0.8 上涨个数  compute_upper_cross
+    # df['topR']=temp_du.T[temp_du.T >= 0].count()    #跳空缺口
+    # df['top0']=temp_du.T[temp_du.T == 0].count()    #一字涨停
+    # df['upper'] = map(lambda x: round((1 + 11.0 / 100) * x, 1), df.ma10d)
+    # df['lower'] = map(lambda x: round((1 - 9.0 / 100) * x, 1), df.ma10d)
+    # df['ene'] = map(lambda x, y: round((x + y) / 2, 1), df.upper, df.lower)
+    df = df.fillna(0)
+    return df
 
 def compute_top10_count(df,lastdays=ct.compute_lastdays,top_limit=ct.per_redline):
     temp=df[df.columns[(df.columns >= 'per1d') & (df.columns <= 'per%sd'%(lastdays))]]
@@ -4267,9 +4315,8 @@ if __name__ == '__main__':
     # time_s=time.time()
     # check_tdx_Exp_day_duration('all')
     # print("use time:%s"%(time.time()-time_s))
-    import ipdb;ipdb.set_trace()
-
-    write_to_all()
+    # import ipdb;ipdb.set_trace()
+    # write_to_all()
     # code='399001'
     # code='000862'
     # code='000859'
@@ -4307,14 +4354,16 @@ if __name__ == '__main__':
     code='601628' #中国人寿
     code='601015' #陕西黑猫
     code='000988' #华工科技
-    code='300346' #科达制造
-    code='002176' #江特电机
-    code='301098'
+    code='300346' #南大光电
+    code='600499' #科达制造
+    # code='002176' #江特电机
+    # code='300436'
 
-    wri_index = cct.cct_raw_input("If append  Index 399001... data to tdx[y|n]:")
-    if wri_index == 'y':
-        for inx in tdx_index_code_list:
-            get_tdx_append_now_df_api_tofile(inx)
+    # wri_index = cct.cct_raw_input("If append  Index 399001... data to tdx[y|n]:")
+    # if wri_index == 'y':
+    #     for inx in tdx_index_code_list:
+    #         get_tdx_append_now_df_api_tofile(inx)
+
     # code='688106' #科创信息
     # code='999999'
     # code='000800'
