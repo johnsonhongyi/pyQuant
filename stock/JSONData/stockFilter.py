@@ -584,8 +584,9 @@ def getBollFilter(df=None, boll=ct.bollFilter, duration=ct.PowerCountdl, filter=
 
     df['ral']=(map(lambda x, y: round(
         (x + y) , 1) , df.percent, df.ral))
-    df['ra']=(map(lambda x, y: round(
-        (x + y) , 1) , df.percent, df.ra))
+    # df['ra']=(map(lambda x, y: round(
+    #     (x + y) , 1) , df.percent, df.ra))
+    df['ra'] = df['ra'].apply(lambda x: int(x))
     return df
 
     # df = df[df.buy > df.cmean * ct.changeRatio]

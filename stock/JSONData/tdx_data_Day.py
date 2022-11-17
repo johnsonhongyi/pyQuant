@@ -4356,6 +4356,8 @@ if __name__ == '__main__':
     code='000988' #华工科技
     code='300346' #南大光电
     code='600499' #科达制造
+    code='600438' #隆基绿能
+    code='002020'  
     # code='002176' #江特电机
     # code='300436'
 
@@ -4380,7 +4382,7 @@ if __name__ == '__main__':
     # code = '002906'
     # code = '603486'
     # code = '999999'
-    df2 = get_tdx_Exp_day_to_df(code,dl=160, end=None, newdays=0, resample='d')
+    df2 = get_tdx_Exp_day_to_df(code,dl=160, end='20221116', newdays=0, resample='d')
     # print get_tdx_append_now_df_api_tofile(code)
 
     import ipdb;ipdb.set_trace()

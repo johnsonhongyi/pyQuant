@@ -1087,7 +1087,7 @@ def powerCompute_mp2(code,df=None,dm=None,dtype='d',statuslist=True,index=False,
 
     else:
         dd['op'] = 1
-        dd['ra'] = 1
+        # dd['ra'] = 1
         dd['fib'] = 1
         dd['fibl'] = 1
         dd['ldate'] = 1
@@ -1142,7 +1142,7 @@ def powerCompute_mp2(code,df=None,dm=None,dtype='d',statuslist=True,index=False,
             df.loc[code, 'ma10d'] = round(
                 float(tdx_df[:1].ma10d[0]), 2)
     dd['op'] = opl
-    dd['ra'] = ral
+    # dd['ra'] = ral
     dd['oph'] = oph
     dd['rah'] = rah
     dd['fib'] = fib
@@ -1236,7 +1236,7 @@ def powerCompute_mp(code,df=None,dm=None,dtype='d',statuslist=True,index=False,e
         # fib = 0
 
         dd['op'] = int(len(LIS(tdx_df.close)[1])/float(len(tdx_df.close))*10)
-        dd['ra'] = (vratio)
+        # dd['ra'] = (vratio)
         dd['fib'] = fibl
         dd['fibl'] = fibh
         dd['ldate'] = idx
@@ -1293,7 +1293,7 @@ def powerCompute_mp(code,df=None,dm=None,dtype='d',statuslist=True,index=False,e
 
     else:
         dd['op'] = -1
-        dd['ra'] = -1
+        # dd['ra'] = -1
         dd['fib'] = -1
         dd['fibl'] = -1
         dd['ldate'] = -1
