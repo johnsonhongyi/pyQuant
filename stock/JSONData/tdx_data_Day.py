@@ -1824,7 +1824,7 @@ def check_tdx_Exp_day_duration(market='all'):
     df = sina_data.Sina().market(market)
     for code in df.index:
         dd = get_tdx_Exp_day_to_df(code, dl=1) 
-        duration = cct.get_today_duration(dd.date) if dd is not None  else -1
+        duration = cct.get_today_duration(dd.date) if dd is not None and len(dd) > 5 else -1
         if duration == 0:
             duration_zero.append(code)
         elif duration > 0 and duration < 60:
@@ -3064,7 +3064,7 @@ def compute_ma_cross_old(dd,ma1='ma5d',ma2='ma10d',ratio=0.02):
     return dd
 
 def compute_lastdays_percent(df=None, lastdays=3, resample='d',vc_radio=100):
-
+    # ct.compute_lastdays lastdays to 9
     if df is not None and len(df) > lastdays:
         if resample <> 'd':
             df = df[:-1]
@@ -3135,6 +3135,7 @@ def compute_lastdays_percent(df=None, lastdays=3, resample='d',vc_radio=100):
             # df['du%sd' % da] = df['perd'][-da] - df['lastdu'][-da]
             # df['per%sd' % da] = df['perd'].shift(da-1)
             df['perc%sd' % da] = df['perlastp'][-da]
+
             # df['perc%sd' % da] = (df['perlastp'][-da:].sum())
         # df['lastv9m'] = df['vol'][-lastdays:].mean()
             # df['mean%sd' % da] = df['meann'][-da]
@@ -4357,7 +4358,7 @@ if __name__ == '__main__':
     code='300346' #南大光电
     code='600499' #科达制造
     code='600438' #隆基绿能
-    code='002020'  
+    code='600355'  
     # code='002176' #江特电机
     # code='300436'
 
@@ -4381,8 +4382,12 @@ if __name__ == '__main__':
     # code='300216'
     # code = '002906'
     # code = '603486'
-    # code = '999999'
-    df2 = get_tdx_Exp_day_to_df(code,dl=160, end='20221116', newdays=0, resample='d')
+    code = '600786'
+    # df2 = get_tdx_Exp_day_to_df(code,dl=10, end='20221116', newdays=0, resample='d')
+    df = get_tdx_Exp_day_to_df(code, dl=1)
+    import ipdb;ipdb.set_trace()
+
+    df2 = get_tdx_Exp_day_to_df(code,dl=30, end=None, newdays=0, resample='d')
     # print get_tdx_append_now_df_api_tofile(code)
 
     import ipdb;ipdb.set_trace()
