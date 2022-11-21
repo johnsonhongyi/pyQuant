@@ -145,15 +145,17 @@ def getBollFilter(df=None, boll=ct.bollFilter, duration=ct.PowerCountdl, filter=
     sort_value = cct.GlobalValues().getkey('market_sort_value')
     market_key = cct.GlobalValues().getkey('market_key')
     market_value = cct.GlobalValues().getkey('market_value')
-
+    # if market_key is not None:
+    #     market_dff = eval(ct.Market_sort_idx_perd[market_key])[0]
     # if int(market_value) > 1 and 930 < cct.get_now_time_int():
 
     df= compute_perd_value(df, market_value, 'perc')
     df= compute_perd_value(df, market_value, 'per')
 
-    if sort_value <> 'percent' and (market_key in ['2', '3'] and market_value not in ['1']):
+    if sort_value <> 'percent' and (market_key in ['2', '3','5','4','6','x','x1','x2'] and market_value not in ['1']):
         # print("sort_value:%s,market_key:%s ,market_value:%s" %
         #       (sort_value, market_key, market_value))
+
         if market_key is not None and market_value is not None:
             # if market_key == '3':
 
@@ -164,8 +166,17 @@ def getBollFilter(df=None, boll=ct.bollFilter, duration=ct.PowerCountdl, filter=
                 # filter percd > idx
                 # df= df[(df[("perc%sd" % (idx_k))] >= idx_k) | (df[("perc%sd" % (idx_k))]< -idx_k)]
 
+            if market_key in ['5','4','6','x','x1']:
+                # market_value= int(market_value)
+                # filter percd > idx
+                idx_k = int(market_value)
+                df= df[ (df[("%s" % (sort_value))] <= idx_k) ]
 
-
+            if market_key in ['x2']:
+                # market_value= int(market_value)
+                # filter percd > idx
+                idx_k = int(market_value)
+                df= df[ (df[("%s" % (sort_value))] >= idx_k) ]
                 # if int(market_value) > 1 and 930 < cct.get_now_time_int():
                 #     df= compute_perd_value(df, market_value, 'perc')
                 #     df= compute_perd_value(df, market_value, 'per')

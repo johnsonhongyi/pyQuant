@@ -301,10 +301,10 @@ terminal_positionKey1K_triton = {'sina_Market-DurationDn.py': '6, 434,1400,440',
                         'sina_Market-DurationCXDN.py': '45, 248,1400,440',
                         'sina_Market-DurationSH.py': '-29, 623,1400,440',
                         'sina_Market-DurationUp.py': '92, 142,1400,440',
-                        'sina_Monitor-Market-LH.py': '666, 338,1400,420',
+                        'sina_Monitor-Market-LH.py': '567, 286,1400,420',
                         'sina_Monitor-Market.py': '140, 63,1400,440',
-                        'sina_Monitor.py': '170, 7,1400,440',
-                        'singleAnalyseUtil.py': '689, 509,880,360',
+                        'sina_Monitor.py': '89, 6,1400,440',
+                        'singleAnalyseUtil.py': '738, 31,880,360',
                         'LinePower.py': '6, 216,800,420',
                         'sina_Market-DurationDnUP.py': '6, 434,1400,440' ,}
 
@@ -2523,15 +2523,15 @@ def LineArgmain():
     return parser
 
 
-def negate_boolean_list(negate_list, idx=1):
-    cout_all = len(negate_list)
-    if idx < cout_all:
-        sort_negate_l = [key ^ 1 for key in negate_list[:idx]]
-        sort_negate_l.extend(negate_list[idx:])
-    else:
-        sort_negate_l = [key ^ 1 for key in negate_list]
+# def negate_boolean_list(negate_list, idx=1):
+#     cout_all = len(negate_list)
+#     if idx < cout_all:
+#         sort_negate_l = [key ^ 1 for key in negate_list[:idx]]
+#         sort_negate_l.extend(negate_list[idx:])
+#     else:
+#         sort_negate_l = [key ^ 1 for key in negate_list]
 
-    return sort_negate_l
+#     return sort_negate_l
 
 
 def sort_by_value(df, column='dff', file=None, count=5, num=5, asc=0):
