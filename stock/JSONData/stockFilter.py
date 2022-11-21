@@ -165,6 +165,7 @@ def getBollFilter(df=None, boll=ct.bollFilter, duration=ct.PowerCountdl, filter=
                 idx_k= cct.get_col_in_columns(df, 'perc%sd', market_value)
                 # filter percd > idx
                 # df= df[(df[("perc%sd" % (idx_k))] >= idx_k) | (df[("perc%sd" % (idx_k))]< -idx_k)]
+                df= df[(df[("perc%sd" % (idx_k))] >= idx_k) ]
 
             if market_key in ['5','4','6','x','x1']:
                 # market_value= int(market_value)

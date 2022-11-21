@@ -2099,7 +2099,7 @@ def read_to_blocknew(p_name):
             if len(code) <= 6 or len(code) > 12:
                 continue
             if code.endswith('\r\n'):
-                if len(code) <= 6:
+                if len(code) <= 6 or code in index_list:
                     # errstatus = True
                     continue
                 else:
@@ -2108,7 +2108,7 @@ def read_to_blocknew(p_name):
                         code = tdxblk_to_code(code)
             else:
                 continue
-            if len(code) == 6:
+            if len(code) == 6 and code not in index_list:
                 flist.append(code)
         fout.close()
         return flist

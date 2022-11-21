@@ -2095,7 +2095,6 @@ def getSinaAlldf(market='cyb', vol=ct.json_countVol, vtype=ct.json_countType, fi
     
     market_all = False
     m_mark = market.split(',')
-
     if len(m_mark) > 1:
         m_0 = m_mark[0]
         market = m_mark[1]
