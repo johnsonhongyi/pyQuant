@@ -153,7 +153,7 @@ def getBollFilter(df=None, boll=ct.bollFilter, duration=ct.PowerCountdl, filter=
     df= compute_perd_value(df, market_value, 'per')
 
     # if sort_value <> 'percent' and (market_key in ['2', '3','5','4','6','x','x1','x2'] and market_value not in ['1']):
-    if sort_value <> 'percent' and (market_key in ['2', '3','5','4','6','x','x1','x2']):
+    if sort_value <> 'percent' and (market_key in ['2', '3','5','4','6','x','x1','x2']) and market_value not in ['1']:
         # print("sort_value:%s,market_key:%s ,market_value:%s" %
         #       (sort_value, market_key, market_value))
 
@@ -183,7 +183,7 @@ def getBollFilter(df=None, boll=ct.bollFilter, duration=ct.PowerCountdl, filter=
                 #     df= compute_perd_value(df, market_value, 'perc')
                 #     df= compute_perd_value(df, market_value, 'per')
 
-            elif market_key in ['4'] and market_value not in ['1']:
+            elif market_key in ['4'] :
                 # market_value= int(market_value)
                 # filter percd > idx
                 idx_k = int(market_value)

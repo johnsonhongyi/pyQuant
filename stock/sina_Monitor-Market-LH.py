@@ -291,7 +291,7 @@ if __name__ == "__main__":
                         # top_temp =  top_all[((top_all.boll >0) & (top_all.close > top_all.lastp1d))]
 
                         # top_all[(top_all.low >= top_all.nlow)& (top_all.high > top_all.nhigh)]
-                    elif cct.get_now_time_int() > 935 and cct.get_now_time_int() <= 1450:
+                    elif cct.get_now_time_int() > 935 and cct.get_now_time_int() <= 1550:
 
                         # top_temp =  top_all[ ( (top_all.lastp1d > top_all.lastp2d) &(top_all.close >top_all.lastp1d )) | ((top_all.low >= top_all.nlow)) & ((top_all.lastp1d > top_all.ma5d)  & (top_all.close > top_all.ma5d) &(top_all.close > top_all.lastp1d))]
 
@@ -302,7 +302,7 @@ if __name__ == "__main__":
                         # top_temp =  top_all[(top_all.boll >0)  & ((top_all.low > top_all.upper) | (top_all.low == top_all.open))]
                         # top_temp =  top_all[(top_all.boll >0)  & ((top_all.low > top_all.lastp1d) | (top_all.low == top_all.open))]
                         # top_temp =  top_all[(top_all.topR < 2) & (top_all.close >= top_all.nhigh) & ((top_all.low > top_all.lastp1d) | (top_all.low == top_all.open))]
-
+                        
                         if 'nlow' in top_all.columns:
 
                             if st_key_sort == '4':
@@ -329,7 +329,8 @@ if __name__ == "__main__":
                                 #                                                       & ((top_all.per2d > 0) | (top_all.lastp2d > top_all.ma10d))
                                 #                                                       & ((top_all.per3d > 0) | (top_all.lastp3d > top_all.ma10d)))]
                                 #1122 mod
-                                top_temp = top_all.copy()
+                                # top_temp = top_all.copy()
+                                top_temp = top_all[ ((top_all.open >= top_all.nlow) | (top_all.open >= top_all.lastp1d)) &  ((top_all.close >= top_all.open) |  (top_all.close >= top_all.hmax)) ] 
                                 
                                 # top_temp = top_all[ ((top_all.lastp1d > top_all.ma5d) & (top_all.lastp2d > top_all.ma5d) & (top_all.close > top_all.ma5d) \
                                 # & (top_all.ma5d > top_all.ma10d)) & (top_all.open >= top_all.nlow) & ((top_all.lastp1d > top_all.ene) & (top_all.close >= top_all.ene)) ]
@@ -354,8 +355,8 @@ if __name__ == "__main__":
                                 #                       & ((top_all.per3d > 0) | (top_all.lastp3d > top_all.ma10d)))]
 
                                 #1122 mod
-                                top_temp = top_all.copy()
-
+                                # top_temp = top_all.copy()
+                                top_temp = top_all[ ( ((top_all.open >= top_all.lastp1d)) &  ((top_all.close >= top_all.open) |  (top_all.close >= top_all.hmax)) )| ((top_all.open >= top_all.lastp1d * 0.97) & (top_all.open <= top_all.close)) ] 
                                 # 大于ene中轨，大于上轨，一个跳空，一个涨停
                             # top_temp = top_all[  (top_all.low >= top_all.lastl1d) & (top_all.lasth1d > top_all.lasth2d) & (top_all.low >= top_all.nlow) & ((top_all.open >= top_all.nlow *0.998) & (top_all.open <= top_all.nlow*1.002)) ]
                             # top_temp = top_all[ (top_all.volume >= 1.2 ) & (top_all.low >= top_all.lastl1d) & (top_all.lasth1d > top_all.lasth2d) & (top_all.low >= top_all.nlow) & ((top_all.open >= top_all.nlow *0.99) & (top_all.open <= top_all.nlow*1.01)) ]
@@ -363,8 +364,11 @@ if __name__ == "__main__":
                             # top_temp = top_all[((top_all.close > top_all.ma51d)) & (
                             #     top_all.low >= top_all.ma51d) & (top_all.lasth1d > top_all.lasth2d)]
                             #1122 mod
-                            top_temp = top_all.copy()
-                                
+                            # top_temp = top_all.copy()
+                            # top_temp = top_all[(top_all.open >= top_all.lastp1d * 0.97) & (top_all.open <= top_all.close)]
+                            top_temp = top_all[ ( ((top_all.open >= top_all.lastp1d)) &  ((top_all.close >= top_all.open) |  (top_all.close >= top_all.hmax)) )| ((top_all.open >= top_all.lastp1d * 0.97) & (top_all.open <= top_all.close)) ] 
+
+
                             # top_temp = top_all[((top_all.open > top_all.lastp1d)) & (
                                 # top_all.low >= top_all.lastl1d) & (top_all.lasth1d > top_all.lasth2d)]
                             # top_temp = top_all[  (top_all.low >= top_all.lastl1d) & (top_all.lasth1d > top_all.lasth2d) & (top_all.low >= top_all.nlow) & ((top_all.open >= top_all.nlow *0.998) & (top_all.open <= top_all.nlow*1.002)) ]
