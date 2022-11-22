@@ -1947,6 +1947,163 @@ def write_to_blocknew(p_name, data, append=True, doubleFile=True, keep_last=None
     # index_list = ['1999999', '27#HSI',  '0159915']
 
     def writeBlocknew(p_name, data, append=True,keep_last=keep_last):
+        flist=[]
+        if append:
+            fout = open(p_name, 'rb+')
+            # fout = open(p_name)
+            flist_t = fout.readlines()
+            # flist_t = file(p_name, mode='rb+', buffering=None)
+            # flist = []
+            # errstatus=False
+            for code in flist_t:
+                if len(code) <= 6 or len(code) > 12:
+                    continue
+                if not code.endswith('\r\n'):
+                    if len(code) <= 6:
+                        # errstatus = True
+                        continue
+                    else:
+                        # errstatus = True
+                        code = code + '\r\n'
+                flist.append(code)
+            for co in index_list:
+                inx = (co) + '\r\n'
+                if inx not in flist:
+                    flist.insert(index_list.index(co), inx)
+            # if errstatus:
+            # fout.close()
+            # fout = open(p_name, 'wb+')
+            # for code in flist:
+            #     fout.write(code)
+
+            # if not str(flist[-1]).endswith('\r\n'):
+                # print "File:%s end not %s"%(p_name[-7:],str(flist[-1]))
+            # print "flist", flist
+        else:
+            if int(keep_last) > 0:
+                fout = open(p_name, 'rb+')
+                flist_t = fout.readlines()
+            else:
+                flist_t = []
+            # flist_t = file(p_name, mode='rb+', buffering=None)
+            if len(flist_t) > 4:
+                # errstatus=False
+                for code in flist_t:
+                    if not code.endswith('\r\n'):
+                        if len(code) <= 6:
+                            # errstatus = True
+                            continue
+                        else:
+                            # errstatus = True
+                            code = code + '\r\n'
+                    flist.append(code)
+                # if errstatus:
+                if int(keep_last) > 0:
+                    fout.close()
+                # if p_name.find('066.blk') > 0:
+                #     writecount = ct.writeblockbakNum
+                # else:
+                #     writecount = 9
+
+                writecount = keep_last
+                flist = flist[:writecount]
+
+                for co in index_list:
+                    inx = (co) + '\r\n'
+                    if inx not in flist:
+                        flist.insert(index_list.index(co), inx)
+                # print flist
+                # fout = open(p_name, 'wb+')
+                # for code in flist:
+                #     fout.write(code)
+            else:
+                # fout = open(p_name, 'wb+')
+                # index_list.reverse()
+                for i in index_list:
+                    raw = (i) + '\r\n'
+                    flist.append(raw)
+
+        counts = 0
+        for i in data:
+            # print type(i)
+            # if append and len(flist) > 0:
+            #     raw = code_to_tdxblk(i).strip() + '\r\n'
+            #     if len(raw) > 8 and not raw in flist:
+            #         fout.write(raw)
+            # else:
+            raw = code_to_tdxblk(i) + '\r\n'
+            if len(raw) > 8:
+                if not raw in flist:
+                    counts += 1
+                    flist.append(raw)
+                else:
+                    flist.remove(raw)
+                    flist.append(raw)
+
+        fout = open(p_name, 'wb+')
+        for code in flist:
+            fout.write(code)
+                # raw = pack('IfffffII', t, i[2], i[3], i[4], i[5], i[6], i[7], i[8])
+        fout.flush()
+        fout.close()
+        # if p_name.find('066.blk') >= 0:
+        if counts == 0:
+            if len(data) == 0:
+                log.error("counts and data is None:%s"%(p_name))
+            else:
+                print ("counts:0 data:%s :%s"%(len(data),p_name))
+        else:
+            print "all write to %s:%s" % (p_name, counts)
+
+    blockNew = get_tdx_dir_blocknew() + 'zxg.blk'
+    blockNewStart = get_tdx_dir_blocknew() + '077.blk'
+    # writeBlocknew(blockNew, data)
+    p_data = ['zxg', '069', '068', '067', '061']
+    if len(p_name) < 5:
+        if p_name in p_data:
+            p_name = get_tdx_dir_blocknew() + p_name + '.blk'
+            print "p_name:%s" % (p_name)
+        else:
+            print 'p_name is not ok'
+            return None
+
+    if p_name.find('061.blk') > 0 or p_name.find('062.blk') > 0 or p_name.find('063.blk') > 0:
+        writeBlocknew(p_name, data, append)
+        if doubleFile:
+            writeBlocknew(blockNew, data)
+            writeBlocknew(blockNewStart, data, append)
+        # print "write to :%s:%s"%(p_name,len(data))
+    elif p_name.find('064.blk') > 0:
+        writeBlocknew(p_name, data, append)
+        if doubleFile:
+            writeBlocknew(blockNew, data, append,keep_last=12)
+            writeBlocknew(blockNewStart, data, append)
+        # print "write to append:%s :%s :%s"%(append,p_name,len(data))
+    elif p_name.find('068.blk') > 0 or p_name.find('069.blk') > 0:
+
+        writeBlocknew(p_name, data, append)
+        # print "write to append:%s :%s :%s"%(append,p_name,len(data))
+
+    else:
+        writeBlocknew(p_name, data, append)
+        if doubleFile:
+            writeBlocknew(blockNew, data)
+            # writeBlocknew(blockNewStart, data[:ct.writeCount - 1])
+            writeBlocknew(blockNewStart, data, append)
+        # print "write to append:%s :%s :%s"%(append,p_name,len(data))
+
+def write_to_blocknewOld(p_name, data, append=True, doubleFile=True, keep_last=None):
+    if keep_last is None:
+        keep_last = ct.keep_lastnum
+    # index_list = ['1999999','47#IFL0',  '0159915', '27#HSI']
+    index_list = ['1999999', '0399001', '0159915']
+    # index_list = ['1999999','47#IFL0', '0399001', '0159915']
+    # index_list = ['1999999','47#IFL0', '27#HSI',  '0399006']
+    # index_list = ['1999999','0399001','47#IFL0', '27#HSI',  '0159915']
+    # index_list = ['0399001', '1999999', '0159915']
+    # index_list = ['1999999', '27#HSI',  '0159915']
+
+    def writeBlocknew(p_name, data, append=True,keep_last=keep_last):
         if append:
             fout = open(p_name, 'rb+')
             # fout = open(p_name)
@@ -2018,7 +2175,6 @@ def write_to_blocknew(p_name, data, append=True, doubleFile=True, keep_last=None
                 for code in flist:
                     fout.write(code)
             else:
-                # fout.close()
                 fout = open(p_name, 'wb+')
                 # index_list.reverse()
                 for i in index_list:
