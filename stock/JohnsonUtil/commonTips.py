@@ -2698,7 +2698,7 @@ def func_compute_percd2021( open, close,high, low,lastopen, lastclose,lasthigh, 
         # last_du = round((lasthigh - lastlow)/lastlow*100,1)
         # volratio = round((nowvol / lastvol),1)
         vol_du = round((nowvol)/lastvol,1)
-        if percent > 0 or ma5 > ma10:
+        if percent >= 1 or ma5 > ma10:
             initc +=1
             # if  close_du > 5:
             #     initc +=0.1
