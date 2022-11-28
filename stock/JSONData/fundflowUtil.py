@@ -161,7 +161,7 @@ def get_dfcfw_fund_flow2020(market):
     # vollist=re.findall('{data:(\d+)',code)
     # vol_l = []
 
-    if len(data) > 0:
+    if len(data) > 0 and len(data[0]) > 10:
         # vol_l = re.findall('\"([\d\D]+?)\"', data[1])
         # ['jQuery18308448273886036106_1606189025852({"rc":0,"rt":11,"svr":182994506,"lt":1,"full":1,\
         # "data":{"total":3,"diff":[{"f62":-9060049408.0,"f184":-4.05},{"f62":-9359993344.0,"f184":-3.16},{"f62":-3487613184.0,"f184":-3.08}]}});']
