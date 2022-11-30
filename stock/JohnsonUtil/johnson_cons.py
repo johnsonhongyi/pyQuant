@@ -776,8 +776,10 @@ def get_market_sort_value_key(st, top_all=None, perd_d=3):
                     cct.GlobalValues().setkey('market_key',st_l[0])
                     cct.GlobalValues().setkey('market_value', st_l[1])
             else:
+                # market_sort_value = get_Dynamic_Duration_perd(market_sort_name, '1')
                 cct.GlobalValues().setkey('market_key',st_l[0])
                 cct.GlobalValues().setkey('market_value', '1')
+                
             idx_value = eval(market_sort_name)[0]
             market_sort_value_key = eval(market_sort_name + '_key')
             if st_count > 1 and st_l[1].isdigit():
@@ -808,15 +810,18 @@ def get_market_sort_value_key(st, top_all=None, perd_d=3):
                         market_sort_value = get_Dynamic_Duration_perd(market_sort_name, idx_perd)
                     else:
                         market_sort_value = get_Dynamic_Duration_perd(market_sort_name, '1')
+            else:
+                market_sort_value = get_Dynamic_Duration_perd(market_sort_name, '1')
 
-                if f_count == 2:
-                    market_sort_value_key = negate_boolean_list(market_sort_value_key)
+            if f_count == 2:
+                market_sort_value_key = negate_boolean_list(market_sort_value_key)
+                market_sort_value_key = negate_boolean_list(market_sort_value_key, idx=1, position=True)
+            elif f_count == 1:
+                if 'd' in st_l:
                     market_sort_value_key = negate_boolean_list(market_sort_value_key, idx=1, position=True)
-                elif f_count == 1:
-                    if 'd' in st_l:
-                        market_sort_value_key = negate_boolean_list(market_sort_value_key, idx=1, position=True)
-                    else:
-                        market_sort_value_key = negate_boolean_list(market_sort_value_key)
+                else:
+                    market_sort_value_key = negate_boolean_list(market_sort_value_key)
+
 
         elif st in ['5','4','6','x','x1','x2']:
             if len(st_l) > 1:
@@ -877,7 +882,7 @@ def get_market_sort_value_key(st, top_all=None, perd_d=3):
                 else:
                     market_sort_value_key = negate_boolean_list(market_sort_value_key)
             market_sort_value = eval(market_sort_name)
-    cct.GlobalValues().setkey('market_sort_value',market_sort_value[:1][0])
+        cct.GlobalValues().setkey('market_sort_value',market_sort_value[:1][0])
     return market_sort_value, market_sort_value_key
 
 
