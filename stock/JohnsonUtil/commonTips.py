@@ -2847,6 +2847,7 @@ def func_compute_percd2020( open, close,high, low,lastopen, lastclose,lasthigh, 
 
 def func_compute_percd2021( open, close,high, low,lastopen, lastclose,lasthigh, lastlow, ma5,ma10,nowvol=None,lastvol=None,upper=None,idate=None):
     initc = 0
+    percent_idx = 2
     if  0 < lastclose < 1000 and lasthigh <> 1.0 and lastlow <> 1.0 and lasthigh <> 0 and lastlow <> 0:
         percent = round((close - lastclose)/lastclose*100,1)
         # now_du = round((high - low)/low*100,1)
@@ -2854,12 +2855,20 @@ def func_compute_percd2021( open, close,high, low,lastopen, lastclose,lasthigh, 
         # last_du = round((lasthigh - lastlow)/lastlow*100,1)
         # volratio = round((nowvol / lastvol),1)
         vol_du = round((nowvol)/lastvol,1)
-        if percent >= 1 or ma5 > ma10:
+
+        # if idate == "2022-11-28":
+        #     import ipdb;ipdb.set_trace()
+
+        if (percent > 0 and (close_du > percent_idx or vol_du > 1.1)) or percent >= percent_idx or ma5 > ma10:
             initc +=1
             # if  close_du > 5:
             #     initc +=0.1
-        elif percent < -1:
+        # elif percent < -percent_idx or (percent < 0 and close_du > 3):
+        elif percent < -percent_idx:
             initc -=1
+            # if close > open:
+            #     #下跌中继,或者止跌信号
+            #     initc +=3
             # if  close_du > 5:
             #     initc -=0.1
 
