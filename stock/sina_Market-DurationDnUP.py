@@ -143,8 +143,10 @@ if __name__ == "__main__":
 
             time_Rt = time.time()
             # top_now = tdd.getSinaAlldf(market='all', vol=ct.json_countVol, vtype=ct.json_countType)
-            market_blk = '次新股'
-            top_now = tdd.getSinaAlldf(market=market_blk,filename='cxg', vol=ct.json_countVol, vtype=ct.json_countType)
+            # market_blk = '次新股'
+            market_blk = 'all'
+            top_now = tdd.getSinaAlldf(market=market_blk, vol=ct.json_countVol, vtype=ct.json_countType)
+            # top_now = tdd.getSinaAlldf(market=market_blk,filename='cxg', vol=ct.json_countVol, vtype=ct.json_countType)
             # top_now = tdd.getSinaAlldf(market='all', vol=ct.json_countVol, vtype=ct.json_countType)
             
             now_count = len(top_now)

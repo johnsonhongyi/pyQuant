@@ -103,7 +103,7 @@ if __name__ == "__main__":
     # duration_date = ct.duration_date_up
     # duration_date = ct.duration_date_l
     # duration_date = 10
-    duration_date = 120
+    duration_date = 180
     # duration_date = 300
     du_date = duration_date
     # resample = ct.resample_dtype
@@ -147,8 +147,8 @@ if __name__ == "__main__":
             market_blk = 'all'
             # market_blk = 'cyb'
             # market_blk = '060'
-            top_now = tdd.getSinaAlldf(
-                market=market_blk, filename='cxg', vol=ct.json_countVol, vtype=ct.json_countType)
+            # top_now = tdd.getSinaAlldf(market=market_blk, filename='cxg', vol=ct.json_countVol, vtype=ct.json_countType)
+            top_now = tdd.getSinaAlldf(market=market_blk, vol=ct.json_countVol, vtype=ct.json_countType)
             now_count = len(top_now)
             radio_t = cct.get_work_time_ratio()
             # top_now = top_now[top_now.buy > 0]

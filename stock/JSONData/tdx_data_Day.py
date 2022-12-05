@@ -3719,9 +3719,19 @@ def compute_top10_count(df,lastdays=ct.compute_lastdays,top_limit=ct.per_redline
     df = df.fillna(0)
     return df
 
+def get_index_percd(codeList=tdx_index_code_list, dt=60, end=None, ptype='low', filter='n', power=False, lastp=False, newdays=None, dl=None, resample='d', showRunTime=True):
+    tdxdata = get_tdx_exp_all_LastDF_DL(codeList, dt=dt, end=end, ptype=ptype, filter=filter, power=power, lastp=lastp, newdays=newdays, resample=resample)
+    return tdxdata
+
+
 def get_append_lastp_to_df(top_all, lastpTDX_DF=None, dl=ct.PowerCountdl, end=None, ptype='low', filter='y', power=True, lastp=False, newdays=None, checknew=True, resample='d'):
 
     codelist = top_all.index.tolist()
+    # append INDEX tdxdata
+    codelist.extend(tdx_index_code_list)
+    # tdx_index_data = get_append_lastp_to_df()tdd.get_append_lastp_to_df(
+    #                         top_now, lastpTDX_DF=None, dl=duration_date, checknew=True, resample=resample)
+
 #    codelist = ['603169']
     log.info('toTDXlist:%s dl=%s end=%s ptype=%s' % (len(codelist), dl, end, ptype))
     # print codelist[5]
@@ -3756,6 +3766,9 @@ def get_append_lastp_to_df(top_all, lastpTDX_DF=None, dl=ct.PowerCountdl, end=No
             #                if time.time() - o_time > h5_limit_time:
             log.info("load hdf data:%s %s %s" % (h5_fname, h5_table, len(h5)))
             tdxdata = h5
+            if cct.GlobalValues().getkey('tdx_Index_Tdxdata') is None:
+                #append tdx_Index_Tdxdata
+                cct.GlobalValues().setkey('tdx_Index_Tdxdata', tdxdata.loc[tdx_index_code_list])
         else:
             log.info("no hdf data:%s %s" % (h5_fname, h5_table))
             # tdxdata = get_tdx_all_day_LastDF(codelist) '''only get lastp no
@@ -3795,7 +3808,8 @@ def get_append_lastp_to_df(top_all, lastpTDX_DF=None, dl=ct.PowerCountdl, end=No
             wcdf = wcd.get_wencai_data(top_all.name, 'wencai',days='N')
             tdxdata = cct.combine_dataFrame(tdxdata, wcdf.loc[:, ['category']])
             # tdxdata = cct.combine_dataFrame(tdxdata, top_all.loc[:, ['name']])
-
+            if cct.GlobalValues().getkey('tdx_Index_Tdxdata') is None:
+                cct.GlobalValues().setkey('tdx_Index_Tdxdata', tdxdata.loc[tdx_index_code_list])
             h5 = h5a.write_hdf_db(
                 h5_fname, tdxdata, table=h5_table, append=True)
 
@@ -4360,6 +4374,7 @@ if __name__ == '__main__':
     # code='600355'  
     # code='002176' #江特电机
     # code='300436'
+    get_index_percd()
 
     # wri_index = cct.cct_raw_input("If append  Index 399001... data to tdx[y|n]:")
     # if wri_index == 'y':
@@ -4367,7 +4382,7 @@ if __name__ == '__main__':
     #         get_tdx_append_now_df_api_tofile(inx)
 
     # code='688106' #科创信息
-    # code='999999'
+    # code='399001'
     # code='000800'
     # code='000990'
     # code='600299'
@@ -4384,12 +4399,12 @@ if __name__ == '__main__':
     # code = '600786'
     # df2 = get_tdx_Exp_day_to_df(code,dl=10, end='20221116', newdays=0, resample='d')
     # df = get_tdx_Exp_day_to_df(code, dl=1)
-    import ipdb;ipdb.set_trace()
+    # import ipdb;ipdb.set_trace()
 
     df2 = get_tdx_Exp_day_to_df(code,dl=30, end=None, newdays=0, resample='d')
     # print get_tdx_append_now_df_api_tofile(code)
 
-    import ipdb;ipdb.set_trace()
+    # import ipdb;ipdb.set_trace()
 
     resample = 'w'
     # df2 = get_tdx_Exp_day_to_df(code,dl=160, end=None, newdays=0, resample='d',lastdays=12)
@@ -4497,6 +4512,7 @@ if __name__ == '__main__':
     # df = get_tdx_Exp_day_to_df(code, dl=60, newdays=0, resample='d')
 
     print "day_to_df:", df[:1][['per1d','per2d','per3d']]
+
     # col_co = df.columns.tolist()
     # col_ra_op = col_co.extend([ 'ra', 'op', 'fib', 'ma5d', 'ma10d', 'ldate', 'hmax', 'lmin', 'cmean'])
     # print col_ra_op,col_co
@@ -4513,6 +4529,22 @@ if __name__ == '__main__':
     # print df
     # sys.exit(0)
 #    print write_tdx_tushare_to_file(code)
+
+    while 1:
+        market = cct.cct_raw_input("write all TDXdata append [all,sh,sz,cyb,alla,q] :")
+        if market != 'q' :
+            if market in ['all', 'sh', 'sz', 'cyb', 'alla']:
+                if market != 'all':
+                    Write_market_all_day_mp(market, rewrite=True)
+                    break
+                else:
+                    Write_market_all_day_mp(market)
+                    break
+            else:
+                print "market is None "
+        else:
+            break
+
 
     hdf5_wri = cct.cct_raw_input("write all Tdx data to Multi hdf_300[rw|y|n]:")
     if hdf5_wri == 'rw':
@@ -4537,20 +4569,7 @@ if __name__ == '__main__':
 
         # st.close()
 
-    while 1:
-        market = cct.cct_raw_input("write all data append [all,sh,sz,cyb,alla,q] :")
-        if market != 'q' :
-            if market in ['all', 'sh', 'sz', 'cyb', 'alla']:
-                if market != 'all':
-                    Write_market_all_day_mp(market, rewrite=True)
-                    break
-                else:
-                    Write_market_all_day_mp(market)
-                    break
-            else:
-                print "market is None "
-        else:
-            break
+
 
     # print get_tdx_Exp_day_to_df('300546',dl=20)
     # print get_tdx_Exp_day_to_df('999999',end=None).sort_index(ascending=False).shape

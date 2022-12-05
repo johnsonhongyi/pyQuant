@@ -2847,8 +2847,8 @@ def func_compute_percd2020( open, close,high, low,lastopen, lastclose,lasthigh, 
 
 def func_compute_percd2021( open, close,high, low,lastopen, lastclose,lasthigh, lastlow, ma5,ma10,nowvol=None,lastvol=None,upper=None,idate=None):
     initc = 0
-    percent_idx = 2
-    if  0 < lastclose < 1000 and lasthigh <> 1.0 and lastlow <> 1.0 and lasthigh <> 0 and lastlow <> 0:
+    percent_idx = 1
+    if  0 < lastclose  and lasthigh <> 1.0 and lastlow <> 1.0 and lasthigh <> 0 and lastlow <> 0:
         percent = round((close - lastclose)/lastclose*100,1)
         # now_du = round((high - low)/low*100,1)
         close_du = round((high - low)/low*100,1)
