@@ -158,15 +158,16 @@ def getBollFilter(df=None, boll=ct.bollFilter, duration=ct.PowerCountdl, filter=
         if market_key == '3':
             idx_k = tdx_Index_Tdxdata['perc%sd'%(market_value)].max()
         else:
-            idx_k = int(market_value)
+            idx_k = int(market_value) if market_value is not None else 1
     else:
         idx_k = int(market_value)
 
     # if sort_value <> 'percent' and (market_key in ['2', '3','5','4','6','x','x1','x2'] and market_value not in ['1']):
-    if sort_value <> 'percent' and (market_key in ['2', '3','5','4','6','x','x1','x2']) :
+    if (market_key in ['1','2', '3','5','4','6','8','9','x','x1','x2']) :
+    # if sort_value <> 'percent' and (market_key in ['2', '3','5','4','6','8','9','x','x1','x2']) :
+        # @['5','4','6','8','x','x1','x2'] johnson_cons
         # print("sort_value:%s,market_key:%s ,market_value:%s" %
         #       (sort_value, market_key, market_value))
-
         if market_key is not None and market_value is not None:
             # if market_key == '3':
 
@@ -196,11 +197,14 @@ def getBollFilter(df=None, boll=ct.bollFilter, duration=ct.PowerCountdl, filter=
                 #     df= compute_perd_value(df, market_value, 'perc')
                 #     df= compute_perd_value(df, market_value, 'per')
 
-            elif market_key in ['4'] and market_value not in ['1']:
+            elif market_key in ['4','8','9','1'] and market_value not in ['1']:
                 # market_value= int(market_value)
                 # filter percd > idx
                 idx_k = int(market_value)
-                df= df[ (df[("%s" % (sort_value))] <= idx_k) ]
+                if market_key not in ['1']:
+                    df= df[ (df[("%s" % (sort_value))] <= idx_k) ]
+                else:
+                    df= df[ (df[("%s" % (sort_value))] >= idx_k) ]
 
             # elif market_key == '2':
             #     if int(market_value) > 1 and 915 < cct.get_now_time_int():

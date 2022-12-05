@@ -32,6 +32,7 @@ rem start cmd /k python LinePower.py
 cd dataBarFeed\
 start cmd /k python chantdxpower.py
 cd ..
+ping -n 2 localhost > nul 
 python macRun.py
 rem pause
 rem start python LineHistogram.py
