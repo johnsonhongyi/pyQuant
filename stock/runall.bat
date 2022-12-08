@@ -31,8 +31,8 @@ rem ping -n 20 localhost > nul
 rem start cmd /k python LinePower.py
 cd dataBarFeed\
 start cmd /k python chantdxpower.py
-cd ..
-ping -n 2 localhost > nul 
+ping -n 20 localhost > nul 
+cd "D:\MacTools\WorkFile\WorkSpace\pyQuant\stock\"
 python macRun.py
 rem pause
 rem start python LineHistogram.py

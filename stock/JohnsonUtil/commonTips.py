@@ -2859,7 +2859,7 @@ def func_compute_percd2021( open, close,high, low,lastopen, lastclose,lasthigh, 
         # if idate == "2022-11-28":
         #     import ipdb;ipdb.set_trace()
 
-        if (percent > 0 and (close_du > percent_idx or vol_du > 1.1)) or percent >= percent_idx or ma5 > ma10:
+        if (percent > 0 and (close_du > percent_idx or vol_du > 1.1)) or percent >= percent_idx or ma5 > ma10 or close > ma5:
             initc +=1
             # if  close_du > 5:
             #     initc +=0.1
