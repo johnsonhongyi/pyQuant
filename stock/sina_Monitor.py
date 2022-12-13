@@ -109,6 +109,18 @@ if __name__ == "__main__":
     blkname = '064.blk'
     block_path = tdd.get_tdx_dir_blocknew() + blkname
     lastpTDX_DF = pd.DataFrame()
+    parserDuraton = cct.DurationArgmain()
+    duration_date = ct.duration_date_l
+    du_date = duration_date
+    if len(str(duration_date)) < 4:
+        # duration_date = tdd.get_duration_price_date('999999', dl=duration_date, end=end_date, ptype='dutype')
+        du_date = tdd.get_duration_Index_date('999999', dl=duration_date)
+        if cct.get_today_duration(du_date) <= 3:
+            duration_date = 5
+            print("duaration: %s duration_date:%s" %
+                  (cct.get_today_duration(du_date), duration_date))
+        log.info("duaration: %s duration_date:%s" %
+                 (cct.get_today_duration(du_date), duration_date))
     st_key_sort = '4'
     # st_key_sort = '3 1'
     # st_key_sort = '8'
@@ -157,7 +169,7 @@ if __name__ == "__main__":
                     cct.get_terminal_Position(position=sys.argv[0])
                     time_Rt = time.time()
                     top_all, lastpTDX_DF = tdd.get_append_lastp_to_df(
-                        top_now, resample=resample)
+                        top_now, dl=duration_date,resample=resample)
                 elif len(top_all) == 0 and len(lastpTDX_DF) > 0:
                     time_Rt = time.time()
                     top_all = tdd.get_append_lastp_to_df(top_now, lastpTDX_DF)
@@ -268,7 +280,7 @@ if __name__ == "__main__":
                 # if cct.get_now_time_int() > 930 and 'llastp' in top_all.columns:
                 #     top_all = top_all[top_all.trade >= top_all.llastp * ct.changeRatio]
 
-                cct.set_console(width, height, title=[
+                cct.set_console(width, height, title=[du_date,
                                 'G:%s' % len(top_all), '%s ZXG' % (blkname)])
 
                 # if len(top_all[top_all.dff > 0]) == 0:
@@ -692,6 +704,22 @@ if __name__ == "__main__":
                 cct.GlobalValues().setkey('lastbuylogtime', 1)
                 # cct.set_clear_logtime()
                 status=False
+            elif st.startswith('d') or st.startswith('dt'):
+                args = parserDuraton.parse_args(st.split()[1:])
+                if len(str(args.start)) > 0:
+                    if args.end:
+                        end_date = args.end
+                    duration_date = args.start.strip()
+                    if len(str(duration_date)) < 4:
+                        du_date = tdd.get_duration_Index_date(
+                            '999999', dl=int(duration_date))
+                        ct.PowerCountdl = int(duration_date)
+                    # set_duration_console(du_date)
+                    top_all = pd.DataFrame()
+                    time_s = time.time()
+                    status = False
+                    lastpTDX_DF = pd.DataFrame()
+
             elif st.startswith('w') or st.startswith('a'):
                 args=cct.writeArgmain().parse_args(st.split())
                 codew=stf.WriteCountFilter(top_temp, writecount=args.dl)

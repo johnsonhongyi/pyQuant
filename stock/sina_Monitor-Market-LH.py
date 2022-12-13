@@ -128,10 +128,22 @@ if __name__ == "__main__":
     blkname = '063.blk'
     block_path = tdd.get_tdx_dir_blocknew() + blkname
     lastpTDX_DF = pd.DataFrame()
+    parserDuraton = cct.DurationArgmain()
     duration_date = ct.duration_date_l
+    du_date = duration_date
     resample = ct.resample_dtype
     end_date = cct.last_tddate(days=3)
     # all_diffpath = tdd.get_tdx_dir_blocknew() + '062.blk'
+
+    if len(str(duration_date)) < 4:
+        # duration_date = tdd.get_duration_price_date('999999', dl=duration_date, end=end_date, ptype='dutype')
+        du_date = tdd.get_duration_Index_date('999999', dl=duration_date)
+        if cct.get_today_duration(du_date) <= 3:
+            duration_date = 5
+            print("duaration: %s duration_date:%s" %
+                  (cct.get_today_duration(du_date), duration_date))
+        log.info("duaration: %s duration_date:%s" %
+                 (cct.get_today_duration(du_date), duration_date))
 
     # market_sort_value, market_sort_value_key = ct.get_market_sort_value_key(ct.sort_value_key_perd)
     # st_key_sort = '2'
@@ -389,7 +401,7 @@ if __name__ == "__main__":
                                             & (top_dif.buy >= top_dif.llastp * 0.99)])
 
                     cct.set_console(width, height,
-                                    title=['dT:%s' % cct.get_time_to_date(time_s), 'G:%s' % len(top_dif), 'zxg: %s' % (blkname + '-' + market_blk)])
+                                    title=[du_date,'dT:%s' % cct.get_time_to_date(time_s), 'G:%s' % len(top_dif), 'zxg: %s' % (blkname + '-' + market_blk)])
 
                     top_all = tdd.get_powerdf_to_all(top_all, top_temp)
                     # top_temp = stf.getBollFilter(df=top_temp, boll=ct.bollFilter,duration=ct.PowerCountdl)
@@ -571,6 +583,22 @@ if __name__ == "__main__":
                 top_all = pd.DataFrame()
                 cct.set_clear_logtime()
                 status = False
+            elif st.startswith('d') or st.startswith('dt'):
+                args = parserDuraton.parse_args(st.split()[1:])
+                if len(str(args.start)) > 0:
+                    if args.end:
+                        end_date = args.end
+                    duration_date = args.start.strip()
+                    if len(str(duration_date)) < 4:
+                        du_date = tdd.get_duration_Index_date(
+                            '999999', dl=int(duration_date))
+                        ct.PowerCountdl = int(duration_date)
+                    # set_duration_console(du_date)
+                    top_all = pd.DataFrame()
+                    time_s = time.time()
+                    status = False
+                    lastpTDX_DF = pd.DataFrame()
+
             elif st.startswith('w') or st.startswith('a'):
                 args = cct.writeArgmain().parse_args(st.split())
                 # args = cct.writeArgmainParser(st.split())
