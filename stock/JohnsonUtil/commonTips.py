@@ -949,20 +949,37 @@ def cct_raw_input(sts):
         # https://stackoverflow.com/questions/11068581/python-raw-input-odd-behavior-with-accents-containing-strings
         # st = win_unicode_console.raw_input.raw_input(sts)
         st = raw_input(sts)
-    except (KeyboardInterrupt) as e:
-        inputerr = cct_raw_input(" Break: ")
-        if inputerr == 'e' or inputerr == 'q':
-            sys.exit(0)
-        # raise Exception('raw interrupt')
-        if inputerr is not None and len(inputerr) > 0:
-            return inputerr
+        # issubclass(KeyboardInterrupt, BaseException)
+    except (KeyboardInterrupt, BaseException) as e:
+        # inputerr = cct_raw_input(" Break: ")
+        # if inputerr == 'e' or inputerr == 'q':
+        #     sys.exit(0)
+        # # raise Exception('raw interrupt')
+        # if inputerr is not None and len(inputerr) > 0:
+        #     return inputerr
+        # else:
+        #     return ''
+        count_Except = GlobalValues().getkey('Except_count')
+        if count_Except is not None and count_Except < 3:
+            count_Except = count_Except + 1
+            GlobalValues().setkey('Except_count', count_Except)
+            # print "cct_raw_input:ExceptionError:%s count:%s" % (e, count_Except)
+            # st = cct_raw_input(sts)
         else:
-            return ''
+            # print "cct_ExceptionError:%s count:%s" % (e, count_Except)
+            GlobalValues().setkey('Except_count', 0)
+            # if get_os_system().find('win') >= 0:
+            #     win_unicode_console.enable(use_readline_hook=False)
+            # raise KeyboardInterrupt()
+            sys.exit()
+
     except (IOError, EOFError, Exception) as e:
         count_Except = GlobalValues().getkey('Except_count')
         if count_Except is not None and count_Except < 3:
-            GlobalValues().setkey('Except_count', count_Except + 1)
-            print "cct_raw_input:ExceptionError:%s count:%s" % (e, count_Except)
+            count_Except = count_Except + 1
+            GlobalValues().setkey('Except_count', count_Except)
+            # print "cct_raw_input:ExceptionError:%s count:%s" % (e, count_Except)
+            # st = cct_raw_input(sts)
         else:
             print "cct_ExceptionError:%s count:%s" % (e, count_Except)
             sys.exit()
