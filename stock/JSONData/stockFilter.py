@@ -185,7 +185,7 @@ def getBollFilter(df=None, boll=ct.bollFilter, duration=ct.PowerCountdl, filter=
             #     idx_k = int(market_value)
             #     df= df[ (df[("%s" % (sort_value))] <= idx_k) ]
 
-            elif market_key in ['x2','x','x1','5','6']:
+            elif market_key in ['x2','x','x1','6'] and market_value not in ['1']:
                 # market_value= int(market_value)
                 # filter percd > idx
                 # idx_k = int(market_value)
@@ -197,11 +197,11 @@ def getBollFilter(df=None, boll=ct.bollFilter, duration=ct.PowerCountdl, filter=
                 #     df= compute_perd_value(df, market_value, 'perc')
                 #     df= compute_perd_value(df, market_value, 'per')
 
-            elif market_key in ['4','8','9','1'] and market_value not in ['1']:
+            elif market_key in ['4','8','9','5','1'] and market_value not in ['1']:
                 # market_value= int(market_value)
                 # filter percd > idx
                 idx_k = int(market_value)
-                if market_key not in ['1']:
+                if market_key not in ['1','5']:
                     df= df[ (df[("%s" % (sort_value))] <= idx_k) ]
                 else:
                     df= df[ (df[("%s" % (sort_value))] >= idx_k) ]
