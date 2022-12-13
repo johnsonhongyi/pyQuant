@@ -3752,7 +3752,6 @@ def get_append_lastp_to_df(top_all, lastpTDX_DF=None, dl=ct.PowerCountdl, end=No
     # codelist.extend(tdx_index_code_list)
     # search_Tdx_multi_data_duration(cct.tdx_hd5_name, 'all_300',code_l=codelist, start=60, end=None, index='date')
 
-
     if lastpTDX_DF is None or len(lastpTDX_DF) == 0:
         # h5 = top_hdf_api(fname=h5_fname,table=market,df=None)
         h5 = h5a.load_hdf_db(h5_fname, table=h5_table,
@@ -3768,7 +3767,8 @@ def get_append_lastp_to_df(top_all, lastpTDX_DF=None, dl=ct.PowerCountdl, end=No
             tdxdata = h5
             if cct.GlobalValues().getkey('tdx_Index_Tdxdata') is None:
                 #append tdx_Index_Tdxdata
-                cct.GlobalValues().setkey('tdx_Index_Tdxdata', tdxdata.loc[tdx_index_code_list])
+                if tdx_index_code_list[0] in tdxdata.index:
+                    cct.GlobalValues().setkey('tdx_Index_Tdxdata', tdxdata.loc[tdx_index_code_list])
         else:
             log.info("no hdf data:%s %s" % (h5_fname, h5_table))
             # tdxdata = get_tdx_all_day_LastDF(codelist) '''only get lastp no
@@ -3809,7 +3809,8 @@ def get_append_lastp_to_df(top_all, lastpTDX_DF=None, dl=ct.PowerCountdl, end=No
             tdxdata = cct.combine_dataFrame(tdxdata, wcdf.loc[:, ['category']])
             # tdxdata = cct.combine_dataFrame(tdxdata, top_all.loc[:, ['name']])
             if cct.GlobalValues().getkey('tdx_Index_Tdxdata') is None:
-                cct.GlobalValues().setkey('tdx_Index_Tdxdata', tdxdata.loc[tdx_index_code_list])
+                if tdx_index_code_list[0] in tdxdata.index:
+                    cct.GlobalValues().setkey('tdx_Index_Tdxdata', tdxdata.loc[tdx_index_code_list])
             h5 = h5a.write_hdf_db(
                 h5_fname, tdxdata, table=h5_table, append=True)
 
@@ -4371,6 +4372,7 @@ if __name__ == '__main__':
     code='300346' #南大光电
     code='600499' #科达制造
     code='600438' #隆基绿能
+    code='002193' #如意集团
     # code='600355'  
     # code='002176' #江特电机
     # code='300436'
@@ -4401,10 +4403,10 @@ if __name__ == '__main__':
     # df = get_tdx_Exp_day_to_df(code, dl=1)
     # import ipdb;ipdb.set_trace()
 
-    df2 = get_tdx_Exp_day_to_df(code,dl=30, end=None, newdays=0, resample='d')
+    df2 = get_tdx_Exp_day_to_df(code,dl=60, end=None, newdays=0, resample='d')
     # print get_tdx_append_now_df_api_tofile(code)
 
-    # import ipdb;ipdb.set_trace()
+    import ipdb;ipdb.set_trace()
 
     resample = 'w'
     # df2 = get_tdx_Exp_day_to_df(code,dl=160, end=None, newdays=0, resample='d',lastdays=12)

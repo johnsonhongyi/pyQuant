@@ -292,6 +292,8 @@ if __name__ == "__main__":
                     goldstock = len(top_dif[
                                     (top_dif.buy >= top_dif.lhigh * 0.99) & (top_dif.buy >= top_dif.llastp * 0.99)])
                     ## goldstock=len(top_dif[top_dif.buy >(top_dif.high-top_dif.low)/2])
+                    top_dif = top_dif[ (top_dif.high >= top_dif.hmax ) | (top_dif.lasth1d >= top_dif.hmax) | (top_dif.lasth2d >= top_dif.hmax) ]
+                    #now close > lastTop10 (tdx_max_int_end) High
                     if ptype == 'low':
                         #                        top_dif = top_dif[top_dif.lvol > ct.LvolumeSize]
 
