@@ -823,7 +823,7 @@ def get_market_sort_value_key(st, top_all=None, perd_d=3):
                     market_sort_value_key = negate_boolean_list(market_sort_value_key)
 
 
-        elif st in ['1','5','4','6','8','9','x','x1','x2']:
+        elif st in ['1','5','4','6','7','8','9','x','x1','x2']:
             if len(st_l) > 1:
                 if st_l[1].isdigit():
                     # cct.GlobalValues()
