@@ -208,7 +208,7 @@ Duration_ral_dff = ['ral', 'dff', 'couts', 'percent',
 
 Duration_ral_dff_key = [0, 0, 0, 0, 0, 1, 1, 1, 1]
 
-Duration_sort_per_df2 = ['percent', 'b1_v','df2','ma', 'dff', 'ratio', 'volume']
+Duration_sort_per_df2 = ['volume','percent', 'b1_v','df2','ma', 'dff', 'ratio']
 Duration_sort_per_df2_key = [0, 0, 0, 0, 0, 0 , 0]
 
 # Duration_ra_goldop=['ra','percent','dff','boll','op','fib','fibl','ratio','volume','couts']
@@ -656,7 +656,7 @@ INDEX_SYMBOL = {"399990": "sz399990", "000006": "sh000006", "399998": "sz399998"
 def RawMenuArgmain():
     raw = 'status:[go(g),clear(c),[d 20150101(dt 14)[l|h]|[y|n|pn|py],quit(q),W(a),sh]:'
     raw_input_menu = raw + "\n\tNow : %s" + \
-        "\n\t1:Sort By Percent\t2:Sort by per1d\t3:Sort By percd\t\t4:Sort By DFF\n\t5:Sort By Ra_dff\t6:Sort By top10\t7:Sort Per b1V\t\t8:Sort by Count" + \
+        "\n\t1:Sort By Percent\t2:Sort by per1d\t3:Sort By percd\t\t4:Sort By DFF\n\t5:Sort By Ra_dff\t6:Sort By top10\t7:Sort Vol per\t\t8:Sort by Count" + \
         "\n\t9:By fib\t\tx: by_topR\tx1:by boll_perc\t\tx2:by ral\nplease input:"
     return raw_input_menu
 

@@ -86,8 +86,7 @@ def compute_perd_value(df, market_value=3, col='per'):
 
     if market_value==None or market_value < '2':
         market_value = 3
-    temp = df[df.columns[(df.columns >= '%s1d' % (col)) & (
-        df.columns <= '%s%sd' % (col, market_value))]]
+    temp = df[df.columns[(df.columns >= '%s1d' % (col)) & (df.columns <= '%s%sd' % (col, market_value))]]
 
     df['%s%sd' % (col, market_value)] = temp.T.sum().apply(lambda x: round(x, 1))
     return df
@@ -153,8 +152,9 @@ def getBollFilter(df=None, boll=ct.bollFilter, duration=ct.PowerCountdl, filter=
     if market_value != '1':
         df= compute_perd_value(df, market_value, 'perc')
         df= compute_perd_value(df, market_value, 'per')
-        tdx_Index_Tdxdata = compute_perd_value(tdx_Index_Tdxdata,market_value,'perc')
-        tdx_Index_Tdxdata = compute_perd_value(tdx_Index_Tdxdata,market_value,'per')
+        if tdx_Index_Tdxdata is not None:
+            tdx_Index_Tdxdata = compute_perd_value(tdx_Index_Tdxdata,market_value,'perc')
+            tdx_Index_Tdxdata = compute_perd_value(tdx_Index_Tdxdata,market_value,'per')
         if market_key == '3':
             idx_k = tdx_Index_Tdxdata['perc%sd'%(market_value)].max()
         else:

@@ -393,7 +393,7 @@ def write_hdf_db(fname, df, table='all', index=False, complib='blosc', baseCount
 
     if not MultiIndex:
         df['timel']=time.time()
-
+        
     if not rewrite:
         if df is not None and not df.empty and table is not None:
             # h5 = get_hdf5_file(fname,wr_mode='r')
@@ -655,6 +655,7 @@ def load_hdf_db(fname, table='all', code_l=None, timelimit=True, index=False, li
                         code_l=map((lambda x: str(1000000 - int(x))
                                       if x.startswith('0') else x), code_l)
                     dif_co=list(set(dd.index) & set(code_l))
+                    #len(set(dd.index) & set(code_l))
                     if len(code_l) > 0:
                         dratio=(float(len(code_l)) - float(len(dif_co))) / \
                             float(len(code_l))
