@@ -781,6 +781,14 @@ def get_Duration_format_Values(duration_format, column=None, replace='perc3d',de
 
 # print get_Duration_format_Values(Duration_format_buy,'percent')
 
+def isDigit(x):
+    #re def isdigit()
+    try:
+        float(x)
+        return True
+    except ValueError:
+        return False
+
 
 def get_market_sort_value_key(st, top_all=None, perd_d=3):
     st_l = st.split()
@@ -792,7 +800,7 @@ def get_market_sort_value_key(st, top_all=None, perd_d=3):
         market_sort_name = Market_sort_idx_perd[st].replace("ct.", '')
         if st in ['2', '3']:
             if len(st_l) > 1:
-                if st_l[1].isdigit():
+                if isDigit(st_l[1]):
                     # cct.GlobalValues()
                     cct.GlobalValues().setkey('market_key',st_l[0])
                     cct.GlobalValues().setkey('market_value', st_l[1])
@@ -803,11 +811,12 @@ def get_market_sort_value_key(st, top_all=None, perd_d=3):
                 
             idx_value = eval(market_sort_name)[0]
             market_sort_value_key = eval(market_sort_name + '_key')
-            if st_count > 1 and st_l[1].isdigit():
+
+            if st_count > 1 and isDigit(st_l[1]):
                 idx_perd = st_l[1]
                 if top_all is not None and len(top_all) > 0:
                     if idx_value % idx_perd in top_all.columns:
-                        if st_count > 2 and st_l[2].isdigit():
+                        if st_count > 2 and isDigit(st_l[2]):
                             idx_perd = st_l[1:3]
                             if st == '3':
                                 idx_perd.reverse()
@@ -824,7 +833,7 @@ def get_market_sort_value_key(st, top_all=None, perd_d=3):
                             market_sort_value = get_Dynamic_Duration_perd(market_sort_name, '1')
                 else:
                     if st_l[1] <> 'f' and int(st_l[1]) <= perd_d:
-                        if st_count > 2 and st_l[2].isdigit():
+                        if st_count > 2 and isDigit(st_l[2]):
                             idx_perd = st_l[1:3]
                             if st == '3':
                                 idx_perd.reverse()
@@ -838,6 +847,8 @@ def get_market_sort_value_key(st, top_all=None, perd_d=3):
                 market_sort_value_key = negate_boolean_list(market_sort_value_key)
                 market_sort_value_key = negate_boolean_list(market_sort_value_key, idx=1, position=True)
             elif f_count == 1:
+                import ipdb;ipdb.set_trace()
+
                 if 'd' in st_l:
                     market_sort_value_key = negate_boolean_list(market_sort_value_key, idx=1, position=True)
                 else:
@@ -845,8 +856,9 @@ def get_market_sort_value_key(st, top_all=None, perd_d=3):
 
 
         elif st in ['1','5','4','6','7','8','9','x','x1','x2']:
+
             if len(st_l) > 1:
-                if st_l[1].isdigit():
+                if isDigit(st_l[1]):
                     # cct.GlobalValues()
                     cct.GlobalValues().setkey('market_key',st_l[0])
                     cct.GlobalValues().setkey('market_value', st_l[1])
@@ -867,7 +879,7 @@ def get_market_sort_value_key(st, top_all=None, perd_d=3):
                 else:
                     market_sort_value_key = negate_boolean_list(market_sort_value_key)
             market_sort_value = eval(market_sort_name)
-            # if st_count > 1 and st_l[1].isdigit():
+            # if st_count > 1 and st_l[1].isDigit():
             #     # idx_perd = st_l[1]
             #     market_sort_value = eval(market_sort_name)
             #     if f_count == 2:
