@@ -256,6 +256,16 @@ closeterminal_window = '''osascript -e 'tell application "Terminal" to close win
 activate_terminal = '''  osascript -e 'tell application "Terminal" to activate (every window whose name contains "%s")' '''
 activate_terminal_argc = '''  osascript -e 'tell application "Terminal" to %s (every window whose name contains "%s")' '''
 
+
+# def varname(varname):
+#     return list(dict(varname=varname).keys())[0]
+
+loc = locals()
+def get_variable_name(variable):
+    for k,v in loc.items():
+        if loc[k] is variable:
+            return k
+
 def doScript(scriptn):
     proc = subprocess.Popen(['osascript', '-'],
                             stdin=subprocess.PIPE,
@@ -284,22 +294,23 @@ def getPosition(cmd=None, position=None,close=False):
                 return cmd,position
 
 # positionKey = cct.terminal_positionKey
-basedir = cct.get_now_basedir()
-import socket
-hostname = socket.gethostname() 
+# basedir = cct.get_now_basedir()
+# import socket
+# hostname = socket.gethostname() 
 
-if basedir.find('vm') >= 0:
-    positionKey = cct.terminal_positionKey_VM
-elif cct.get_os_system() == 'mac':
-    positionKey = cct.terminal_positionKeyMac2021
-    # positionKey = cct.terminal_positionKeyMac
-else:
-    positionKey = cct.terminal_positionKey4K
-    # positionKey = cct.terminal_positionKey1K_triton
+# if basedir.find('vm') >= 0:
+#     positionKey = cct.terminal_positionKey_VM
+# elif cct.get_os_system() == 'mac':
+#     positionKey = cct.terminal_positionKeyMac2021
+#     # positionKey = cct.terminal_positionKeyMac
+# else:
+#     positionKey = cct.terminal_positionKey4K
+#     # positionKey = cct.terminal_positionKey1K_triton
 
-if hostname.find('R900') >=0:
-    positionKey = cct.terminal_positionKey2K_R9000P
+# if hostname.find('R900') >=0:
+#     positionKey = cct.terminal_positionKey2K_R9000P
 
+positionKey = cct.get_system_postionKey()
 # print("position:%s"%(positionKey))
 
 def setPosition(cmd=None, position=None):
@@ -387,11 +398,12 @@ if cct.isMac():
 else:
     print("win")
     #positionKey = cct.terminal_positionKey_triton
-    if hostname.find('R900') >=0:
+    # if hostname.find('R900') >=0:
 
-        positionKey = cct.terminal_positionKey2K_R9000P
-    else:
-        positionKey = cct.terminal_positionKey1K_triton
+    #     positionKey = cct.terminal_positionKey2K_R9000P
+    # else:
+    #     positionKey = cct.terminal_positionKey1K_triton
+
 
     for key in positionKey:
         print("title:%s"%(key))
@@ -404,7 +416,7 @@ else:
             print "status:%s"%(cct.reset_window_pos(key,pos[0],pos[1]))
         else:
             print "status:%s"%(cct.reset_window_pos(key,pos[0],pos[1],pos[2],pos[3]))
-
+# print("positionKey:%s"%(get_variable_name(positionKey)))
     # pos=cct.terminal_positionKey_triton['sina_Market-DurationDn.py'].split(',')
     # # print pos
     # # cct.get_window_pos('sina_Market-DurationUP.py')

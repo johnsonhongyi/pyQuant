@@ -285,6 +285,7 @@ end tell
 '''
 
 
+
 terminal_positionKey4K = {'sina_Market-DurationDn.py': '6, 633',
                         'sina_Market-DurationCXDN.py': '118, 504',
                         'sina_Market-DurationSH.py': '-29, 623',
@@ -430,17 +431,42 @@ terminal_positionKey_VM = {'sina_Market-DurationDn.py': '342, 397',
                         'singleAnalyseUtil.py': '615, 23',
                         'LinePower.py': '6, 216', }
 
-terminal_positionKey_triton = {'sina_Market-DurationDn.py': '-4, 718,1400,460',
+terminal_positionKey_triton = {'sina_Market-DurationDn.py': '47, 410, 1400, 460',
                         'sina_Market-DurationCXDN.py': '23, 634,1400,460',
                         'sina_Market-DurationSH.py': '-29, 623,1400,460',
-                        'sina_Market-DurationUp.py': '54, 574,1400,460',
+                        'sina_Market-DurationUp.py': '330, 464,1400,460',
                         'sina_Monitor-Market-LH.py': '603, 501, 1400, 420',
                         'sina_Monitor-Market.py': '19, 179,1400,460',
                         'sina_Monitor.py': '87, 489,1400,460',
                         'singleAnalyseUtil.py': '1074, 694,880,360',
                         'LinePower.py': '1031, 682,800,420', }
 
-terminal_positionKey = terminal_positionKey_VM
+
+
+
+def get_system_postionKey():
+    basedir = get_now_basedir()
+    import socket
+    hostname = socket.gethostname() 
+
+    if basedir.find('vm') >= 0:
+        positionKey = terminal_positionKey_VM
+    elif get_os_system() == 'mac':
+        positionKey = terminal_positionKeyMac2021
+        # positionKey = cct.terminal_positionKeyMac
+    else:
+        positionKey = terminal_positionKey4K
+        # positionKey = cct.terminal_positionKey1K_triton
+    if not isMac():
+        if hostname.find('R900') >=0:
+            positionKey = terminal_positionKey2K_R9000P
+        else:
+            positionKey = terminal_positionKey1K_triton
+    return positionKey
+
+
+    
+# terminal_positionKey = terminal_positionKey_VM
 
 script_set_position = '''tell application "Terminal"
     --activate
@@ -525,14 +551,15 @@ def get_terminal_Position(cmd=None, position=None, close=False, retry=False):
             # sleep(1, catch=True)
             position = position.split(os.sep)[-1]
             log.info("position Argv:%s" % (position))
+            positionKey = get_system_postionKey()
             if int(count) > 0:
-                if position in terminal_positionKey.keys():
+                if position in positionKey.keys():
                     log.info("count:%s" % (count))
                     for n in xrange(1, int(count) + 1):
                         title = cct_doScript(scriptname % ('get', str(object=n)))
                         if title.lower().find(position.lower()) >= 0:
-                            log.info("title find:%s po:%s" % (title, terminal_positionKey[position]))
-                            position = cct_doScript(script_set_position % ('set', str(n), terminal_positionKey[position]))
+                            log.info("title find:%s po:%s" % (title, positionKey[position]))
+                            position = cct_doScript(script_set_position % ('set', str(n), positionKey[position]))
                             break
                         else:
                             log.info("title not find:%s po:%s" % (title, position))
@@ -904,16 +931,19 @@ def set_console(width=80, height=15, color=3, title=None, closeTerminal=True):
         else:
             
             title= (os.path.basename(sys.argv[0]))
-            positionKey=capital_to_lower(terminal_positionKey_triton)
+            positionKey=capital_to_lower(get_system_postionKey())
+            # positionKey=capital_to_lower(terminal_positionKey1K_triton)
             if title.lower() in positionKey.keys():
                 # log.error("title.lower() in positionKey.keys()")
-                if title in terminal_positionKey_triton.keys():
-                    pos=terminal_positionKey_triton[title].split(',')
+                if title.lower() in positionKey.keys():
+                    pos=positionKey[title.lower()].split(',')
                 else:
                     pos= '254, 674,1400,420'.split(',')
+                    log.error("pos is none")
                 log.info("pos:%s title:%s Position:%s"%(pos,title,GlobalValues().getkey('Position')))
                 # cct.get_window_pos('sina_Market-DurationUp.py')
                 # cct.reset_window_pos(key,pos[0],pos[1],pos[2],pos[3])
+
                 status=reset_window_pos(title,pos[0],pos[1],pos[2],pos[3])
                 log.debug("reset_window_pos-status:%s"%(status))
             else:
