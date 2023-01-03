@@ -325,8 +325,10 @@ if __name__ == "__main__":
                         # top_temp = top_dif
 
 
+                        #   topU: #high >= df.upper 'eneU': #close >= df.ene
+                        # 多头排列,topR 跳空,回踩在中轨上.
 
-                        top_temp = top_dif[(top_dif.topU > 0) & (top_dif.close > top_dif.ene)] 
+                        top_temp = top_dif[(top_dif.topU > 0) & (top_dif.eneU > 0)] 
                         top_temp = top_temp[ (~top_temp.index.str.contains('688')) & (~top_temp.name.str.contains('ST'))]
 
                         
@@ -340,7 +342,7 @@ if __name__ == "__main__":
 
                         # top_temp = top_dif[top_dif.topR >= 1]
                         # top_temp = top_dif.copy()
-                        top_temp = top_dif[(top_dif.topU > 0) & (top_dif.close > top_dif.ene)] 
+                        top_temp = top_dif[(top_dif.topU > 0) & (top_dif.eneU > 0)] 
                         top_temp = top_temp[ (~top_temp.index.str.contains('688')) & (~top_temp.name.str.contains('ST'))]
 
 

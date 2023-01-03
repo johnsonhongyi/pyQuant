@@ -2790,6 +2790,11 @@ def compute_condition_up(df):
     return hop_df
 
 def compute_perd_df(dd,lastdays=3,resample ='d'):
+    if resample == 'd':
+        last_TopR_days = 11
+    else:
+        last_TopR_days = 5
+
     np.seterr(divide='ignore',invalid='ignore')  #RuntimeWarning: invalid value encountered in greater
     df = dd[-(lastdays+1):].copy()
     df['perlastp'] = map(cct.func_compute_percd2021, df['open'], df['close'], df['high'], df['low'],df['open'].shift(1), 
@@ -2875,7 +2880,8 @@ def compute_perd_df(dd,lastdays=3,resample ='d'):
     '''
 
     #计算回补
-    hop_df = compute_condition_up(dd)
+
+    hop_df = compute_condition_up(dd[-last_TopR_days:].copy())
     # condition_up = hop_df[hop_df.hop == 'up']
     condition_up = hop_df[(hop_df.fill_day.isnull() ) & (hop_df.hop == 'up')]   if len(hop_df) > 0  else pd.DataFrame()
     # condition_down = hop_df[hop_df.hop == 'down']
@@ -2961,9 +2967,11 @@ def compute_upper_cross(dd,ma1='upper',ma2='ma5d',ratio=0.02):
     #     dd['topU'] = len(temp)
     # else:
     #     dd['topU'] = 0
-    dd['topU'] = len(temp)
+    dd['topU'] = len(temp) 
+    #high >= df.upper
     dd['eneU'] = len(df[(df.close >= df.ene)])
-
+    #close >= df.ene
+    
     return dd
 
 

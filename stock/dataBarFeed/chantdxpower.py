@@ -1188,7 +1188,9 @@ def show_chan_mpl_power(code, start_date=None, end_date=None, stock_days=60, res
         # ax2 = plt.subplot(212, sharex=ax1)
         ax2 = plt.subplot2grid((10, 1), (8, 0), rowspan=2, colspan=1, sharex=ax1)
         # ax2.set_position(mat.transforms.Bbox([[0.125,0.1],[0.9,0.32]]))
-        volume = np.asarray(quotes.amount)
+        # amount is not full data
+        # volume = np.asarray(quotes.amount) 
+        volume = np.asarray(quotes.vol)
         pos = quotes['open'] - quotes['close'] < 0
         neg = quotes['open'] - quotes['close'] >= 0
         idx = quotes.reset_index().index
@@ -2433,7 +2435,8 @@ def show_chan_mpl_fb(code, start_date, end_date, stock_days, resample, show_mpl=
         # ax2 = plt.subplot(212, sharex=ax1)
         ax2=plt.subplot2grid((10, 1), (8, 0), rowspan=2, colspan=1, sharex=ax1)
         # ax2.set_position(mat.transforms.Bbox([[0.125,0.1],[0.9,0.32]]))
-        volume=np.asarray(quotes.amount)
+        # volume=np.asarray(quotes.amount)
+        volume=np.asarray(quotes.vol)
         pos=quotes['open'] - quotes['close'] < 0
         neg=quotes['open'] - quotes['close'] >= 0
         idx=quotes.reset_index().index

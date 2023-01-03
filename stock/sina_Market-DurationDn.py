@@ -151,8 +151,8 @@ if __name__ == "__main__":
                     st_key_sort.split()[0], cct.get_index_fibl())
             
             time_Rt = time.time()
-            market_blk = 'all'
-            # market_blk = 'rzrq'
+            # market_blk = 'all'
+            market_blk = 'rzrq'
             top_now = tdd.getSinaAlldf(
                 market=market_blk, vol=ct.json_countVol, vtype=ct.json_countType, trend=False)
             # top_now = tdd.getSinaAlldf(market='rzrq', vol=ct.json_countVol, vtype=ct.json_countType)

@@ -4,6 +4,8 @@ REM E:
 D:
 cd "D:\MacTools\WorkFile\WorkSpace\pyQuant\stock"
 rem cd stock
+start cmd /k python sina_Market-DurationUP.py
+ping -n 20 localhost > nul
 start cmd /k python singleAnalyseUtil.py
 ping -n 20 localhost > nul
 REM start python sina_Monitor.py 
@@ -20,14 +22,12 @@ rem ping -n 20 localhost > nul
 rem start cmd /k python sina_Monitor-Market-New.py
 rem ping -n 20 localhost > nul
 rem start cmd /k python sina_Monitor-Market-LH.py
-start cmd /k python sina_Market-DurationUP.py
-ping -n 20 localhost > nul
 rem start cmd /k python sina_Market-DurationUp.py
+rem ping -n 20 localhost > nul 
+start cmd /k python sina_Monitor-Market-LH.py
 rem ping -n 20 localhost > nul 
 start cmd /k python sina_Market-DurationDn.py
 ping -n 20 localhost > nul 
-start cmd /k python sina_Monitor-Market-LH.py
-rem ping -n 20 localhost > nul 
 rem start cmd /k python LinePower.py
 cd dataBarFeed\
 start cmd /k python chantdxpower.py
