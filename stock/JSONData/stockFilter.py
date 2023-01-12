@@ -156,7 +156,7 @@ def getBollFilter(df=None, boll=ct.bollFilter, duration=ct.PowerCountdl, filter=
             tdx_Index_Tdxdata = compute_perd_value(tdx_Index_Tdxdata,market_value,'perc')
             tdx_Index_Tdxdata = compute_perd_value(tdx_Index_Tdxdata,market_value,'per')
         if market_key == '3':
-            idx_k = tdx_Index_Tdxdata['perc%sd'%(market_value)].max()
+            idx_k = tdx_Index_Tdxdata['perc%sd'%(int(float(market_value)))].max()
         else:
 
             idx_k = int(float(market_value)) if market_value is not None else 1
@@ -172,7 +172,7 @@ def getBollFilter(df=None, boll=ct.bollFilter, duration=ct.PowerCountdl, filter=
         if market_key is not None and market_value is not None:
 
             if market_key == '3' and market_value not in ['1']:
-                market_value= int(market_value)
+                market_value= int(float(market_value))
                 log.info("stf market_key:%s" % (market_key))
                 idx_k= cct.get_col_in_columns(df, 'perc%sd', market_value)
                 # filter percd > idx

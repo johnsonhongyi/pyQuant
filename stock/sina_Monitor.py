@@ -473,7 +473,8 @@ if __name__ == "__main__":
                     # top_temp = top_temp[ (~top_temp.index.str.contains('688')) & (~top_temp.name.str.contains('ST'))]
 
                 #clean 688 and st
-                top_temp = top_temp[ (~top_temp.index.str.contains('688')) ]
+                if len(top_temp) > 0:                
+                    top_temp = top_temp[ (~top_temp.index.str.contains('688')) ]
 
 
                     

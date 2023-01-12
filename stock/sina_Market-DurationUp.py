@@ -328,8 +328,11 @@ if __name__ == "__main__":
 
                         #   topU: #high >= df.upper 'eneU': #close >= df.ene
                         # 多头排列,topR 跳空,回踩在中轨上.
+                        #top_dif[(top_dif.close >top_dif.ma20d *0.98) & (top_dif.close < top_dif.ma20d *1.05) ][:10]
+                        #close 回调指20W附近
 
-                        top_temp = top_dif[(top_dif.topU > 0) & (top_dif.eneU > 0)] 
+                        # top_temp = top_dif[(top_dif.topU > 0) & (top_dif.eneU > 0)] 
+                        top_temp = top_dif.copy() 
                         top_temp = top_temp[ (~top_temp.index.str.contains('688')) & (~top_temp.name.str.contains('ST'))]
 
                         
@@ -343,7 +346,8 @@ if __name__ == "__main__":
 
                         # top_temp = top_dif[top_dif.topR >= 1]
                         # top_temp = top_dif.copy()
-                        top_temp = top_dif[(top_dif.topU > 0) & (top_dif.eneU > 0)] 
+                        # top_temp = top_dif[(top_dif.topU > 0) & (top_dif.eneU > 0)] 
+                        top_temp = top_dif.copy() 
                         top_temp = top_temp[ (~top_temp.index.str.contains('688')) & (~top_temp.name.str.contains('ST'))]
 
 
@@ -382,7 +386,8 @@ if __name__ == "__main__":
                     else:
                         # top_dif = top_dif[top_dif.percent >= 0]
                         top_end = top_dif[:5].copy()
-                        top_temp = top_dif[-ct.PowerCount:].copy()
+                        # top_temp = top_dif[-ct.PowerCount:].copy()
+                        top_temp = top_dif.copy()
                         top_temp = pct.powerCompute_df(
                             top_temp, dl=ct.PowerCountdl, talib=True)
                         top_end = pct.powerCompute_df(

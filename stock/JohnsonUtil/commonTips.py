@@ -298,14 +298,14 @@ terminal_positionKey4K = {'sina_Market-DurationDn.py': '6, 633',
                         'sina_Market-DurationDnUP.py': '6, 434,1400,440',}
 
 
-terminal_positionKey1K_triton = {'sina_Market-DurationDn.py': '6, 434,1400,440',
+terminal_positionKey1K_triton = {'sina_Market-DurationDn.py': '62, 416,1400,440',
                         'sina_Market-DurationCXDN.py': '45, 248,1400,440',
                         'sina_Market-DurationSH.py': '-29, 623,1400,440',
-                        'sina_Market-DurationUp.py': '92, 142,1400,440',
+                        'sina_Market-DurationUp.py': '340, 419,1400,440',
                         'sina_Monitor-Market-LH.py': '567, 286,1400,420',
                         'sina_Monitor-Market.py': '140, 63,1400,440',
-                        'sina_Monitor.py': '89, 6,1400,440',
-                        'singleAnalyseUtil.py': '738, 31,880,360',
+                        'sina_Monitor.py': '139, 34,1400,440',
+                        'singleAnalyseUtil.py': '759, 0,880,360',
                         'LinePower.py': '6, 216,800,420',
                         'sina_Market-DurationDnUP.py': '6, 434,1400,440' ,}
 

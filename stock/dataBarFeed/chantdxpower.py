@@ -1174,6 +1174,7 @@ def show_chan_mpl_power(code, start_date=None, end_date=None, stock_days=60, res
         plt.title(stock_code + " | " + cname + " | " + str(quotes.index[-1])[:10], fontsize=14)
 
         plt.plot(x_xd_seq, y_xd_seq)
+        #plt roll_mean windows  default 20
         if len(quotes) > windows:
             roll_mean = pd.rolling_mean(quotes.close, window=windows)
             plt.plot(roll_mean, 'r')

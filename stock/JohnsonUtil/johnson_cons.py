@@ -823,7 +823,7 @@ def get_market_sort_value_key(st, top_all=None, perd_d=3):
                         market_sort_value = get_Dynamic_Duration_perd(market_sort_name, idx_perd, top_all.columns)
                     else:
                         idx_k = None
-                        for inx in range(int(idx_perd) - 1, 1, -1):
+                        for inx in range(int(float(idx_perd)) - 1, 1, -1):
                             if idx_value % inx in top_all.columns:
                                 idx_k = inx
                                 break
@@ -832,7 +832,7 @@ def get_market_sort_value_key(st, top_all=None, perd_d=3):
                         else:
                             market_sort_value = get_Dynamic_Duration_perd(market_sort_name, '1')
                 else:
-                    if st_l[1] <> 'f' and int(st_l[1]) <= perd_d:
+                    if st_l[1] <> 'f' and int(float(st_l[1])) <= perd_d:
                         if st_count > 2 and isDigit(st_l[2]):
                             idx_perd = st_l[1:3]
                             if st == '3':
@@ -847,7 +847,6 @@ def get_market_sort_value_key(st, top_all=None, perd_d=3):
                 market_sort_value_key = negate_boolean_list(market_sort_value_key)
                 market_sort_value_key = negate_boolean_list(market_sort_value_key, idx=1, position=True)
             elif f_count == 1:
-                import ipdb;ipdb.set_trace()
 
                 if 'd' in st_l:
                     market_sort_value_key = negate_boolean_list(market_sort_value_key, idx=1, position=True)
