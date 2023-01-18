@@ -85,7 +85,7 @@ def getCandlesData(bars):
 # ]
 start = '2016-01-01'
 # start=None
-code = '999999'
+code = '000002'
 df = tdd.get_tdx_append_now_df_api(
     code, start=start).sort_index(ascending=True)
 print df[-1:]

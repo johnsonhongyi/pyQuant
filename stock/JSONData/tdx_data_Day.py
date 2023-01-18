@@ -2035,6 +2035,7 @@ def get_tdx_power_now_df(code, start=None, end=None, type='f', df=None, dm=None,
 def get_sina_data_df(code,index=False):
 
     # index_status=False
+
     if isinstance(code, list):
         if len(code) > 1:
             dm = sina_data.Sina().get_stock_list_data(code,index=index)
@@ -2058,7 +2059,10 @@ def get_sina_data_code(code,index=False):
 def get_sina_datadf_cnamedf(code,df,index=False):
     # index_status=False
     dm = get_sina_data_df(code)
-    dd = cct.combine_dataFrame(df,dm['name'])
+    if 'close' not in df.columns:
+        dd = cct.combine_dataFrame(df,dm.loc[:,['close','name']])
+    else:
+        dd = cct.combine_dataFrame(df,dm['name'])
     # cname = sina_data.Sina().get_code_cname(code)
     return dd
 
@@ -3347,7 +3351,7 @@ def get_tdx_exp_low_or_high_power(code, dt=None, ptype='close', dl=None, end=Non
                 dd['close'] = dtemp.close.values[0]
                 dd['open'] = dtemp.open.values[0]
                 # dd['vol'] = 
-                
+
                 dd['lowvol'] = dtemp.vol.values[0]
                 dd['last6vol'] = lastvol
 
@@ -3701,8 +3705,9 @@ def compute_ma5d_count(df,lastdays=ct.compute_lastdays,madays='5'):
     # temp_du=df[df.columns[(df.columns >= 'du1d') & (df.columns <= 'du%sd'%(lastdays))]]
     # temp.T[temp.T >=10].count()
 
-    df['ma%sdcum'%(madays)]=temp.T.sum()/lastdays
-
+    df['ma%sdcum'%(madays)]=(temp.T.sum()/lastdays)
+    df['ma%sdcum'%(madays)] = df['ma%sdcum'%(madays)].apply(lambda x: round(x,1))  
+      
     # df['topU']=temp.T[temp.T >= top_limit].count()  #0.8 上涨个数  compute_upper_cross
     # df['topR']=temp_du.T[temp_du.T >= 0].count()    #跳空缺口
     # df['top0']=temp_du.T[temp_du.T == 0].count()    #一字涨停
@@ -4355,6 +4360,18 @@ if __name__ == '__main__':
     # code='000752'
     # print write_tdx_tushare_to_file('300055')
     # print write_tdx_sina_data_to_file('300055')
+    '''
+    import ipdb;ipdb.set_trace()
+    # df=search_Tdx_multi_data_duration()
+    #test Jupyter bug
+    code_list = sina_data.Sina().market('all').index.tolist()
+    df=search_Tdx_multi_data_duration('tdx_all_df_300', 'all_300', df=None,code_l=code_list, start='20150501', end=None, freq=None, col=None, index='date')
+    code_uniquelist=df.index.get_level_values('code').unique()
+    code_select = code_uniquelist[random.randint(0,len(code_uniquelist)-1)]
+    round(time.time()-time_s,2),df.index.get_level_values('code').unique().shape,code_select,df.loc[code_select][:2]
+    df = df.drop_duplicates()
+    '''
+
 
     # print get_tdx_append_now_df_api_tofile('300055')
     code='000043'
@@ -4382,10 +4399,10 @@ if __name__ == '__main__':
     code='600499' #科达制造
     code='600438' #隆基绿能
     code='002193' #如意集团
-    # code='600355'  
+    code='300039'  
     # code='002176' #江特电机
     # code='300436'
-    get_index_percd()
+    # get_index_percd()
 
     # wri_index = cct.cct_raw_input("If append  Index 399001... data to tdx[y|n]:")
     # if wri_index == 'y':
@@ -4411,7 +4428,8 @@ if __name__ == '__main__':
     # df2 = get_tdx_Exp_day_to_df(code,dl=10, end='20221116', newdays=0, resample='d')
     # df = get_tdx_Exp_day_to_df(code, dl=1)
     # import ipdb;ipdb.set_trace()
-
+    # 
+    # dm = get_sina_data_df(code)
     df2 = get_tdx_Exp_day_to_df(code,dl=60, end=None, newdays=0, resample='d')
     # print get_tdx_append_now_df_api_tofile(code)
 

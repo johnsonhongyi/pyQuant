@@ -110,16 +110,21 @@ def getcwd():
 
 
 def get_run_path_tdx(fp=None):
+    # path ='c:\\users\\johnson\\anaconda2\\envs\\pytorch_gpu\\lib\\site-packages'
+    root_path='D:\\MacTools\\WorkFile\\WorkSpace\\pyQuant\\stock\\'
     path = getcwd()
     alist = path.split('stock')
-    if len(alist) > 0:
+    # if len(alist) > 0:
+    if len(alist) > 0 and path.find('stock') >=0:
         path = alist[0]
         # os_sep=get_os_path_sep()
         if fp is not None:
             path = path + fp + '.h5'
+        log.debug("info:%s getcwd:%s"%(alist[0],path))
     else:
-        print "error"
-        raise TypeError('log path error.')
+        path  = root_path.split('stock')[0] + fp + '.h5'
+        log.debug("error:%s cwd:%s"%(alist[0],path))
+    
     return path
 
 win10Lengend = r'D:\Program\gfzq'
@@ -1976,11 +1981,14 @@ def counterCategory(df):
         for i in categoryl:
             if isinstance(i, str):
                 dicSort.extend(i.split(';'))
+                # dicSort.extend([ 'u%s'%(co) for co in i.split(';')])
+                
         topSort = Counter(dicSort)
         top5 = OrderedDict(topSort.most_common(3))
         for i in top5.keys():
             print i,top5[i],
         print ''
+    return topSort
 
 def write_to_blocknew(p_name, data, append=True, doubleFile=True, keep_last=None):
     if keep_last is None:
@@ -2894,7 +2902,7 @@ def func_compute_percd2020( open, close,high, low,lastopen, lastclose,lasthigh, 
 
 def func_compute_percd2021( open, close,high, low,lastopen, lastclose,lasthigh, lastlow, ma5,ma10,nowvol=None,lastvol=None,upper=None,idate=None):
     initc = 0
-    percent_idx = 3
+    percent_idx = 2
     if  0 < lastclose  and lasthigh <> 1.0 and lastlow <> 1.0 and lasthigh <> 0 and lastlow <> 0:
         percent = round((close - lastclose)/lastclose*100,1)
         # now_du = round((high - low)/low*100,1)
@@ -2997,7 +3005,7 @@ def func_compute_percd2021_2022mod( open, close,high, low,lastopen, lastclose,la
             initc -=1
             if  close_du > 5:
                 initc -=0.1
-
+                
         # if percent >0 and open >= lastclose and close == high and close > ma5:
         #     initc +=1
         #     if close > ma5:

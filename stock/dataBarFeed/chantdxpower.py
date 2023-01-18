@@ -9,6 +9,7 @@ import JSONData.tdx_hdf5_api as h5a
 from JohnsonUtil import commonTips as cct
 import JohnsonUtil.johnson_cons as ct
 from JohnsonUtil import zoompan
+from JSONData import stockFilter as stf
 import my_chan2 as chan
 import matplotlib as mat
 import numpy as np
@@ -2574,6 +2575,19 @@ if __name__ == "__main__":
                 # ts=time.time()
                 # time.sleep(5)
                 # print "%0.5f"%(time.time()-ts)
+            elif code.startswith('w') or code.startswith('a'):
+                blkname = '077.blk'
+                block_path = tdd.get_tdx_dir_blocknew() + blkname
+                args=cct.writeArgmain().parse_args(code.split())
+                codew=stf.WriteCountFilter(pd.DataFrame(), writecount=args.dl)
+                if args.code == 'a':
+                    cct.write_to_blocknew(block_path, codew)
+                    # cct.write_to_blocknew(all_diffpath,codew)
+                # else:
+                #     cct.write_to_blocknew(block_path, codew, False)
+                    # cct.write_to_blocknew(all_diffpath,codew,False)
+                    print "wri ok:%s" % block_path
+
             elif code == 'q':
                 sys.exit(0)
 
